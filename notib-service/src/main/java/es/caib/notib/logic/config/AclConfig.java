@@ -1,8 +1,9 @@
 /**
  * 
  */
-package es.caib.notib.persist.config;
+package es.caib.notib.logic.config;
 
+import es.caib.notib.logic.base.config.CacheConfig;
 import es.caib.notib.logic.intf.acl.ExtendedPermission;
 import es.caib.notib.persist.acl.JdbcMutableAclService;
 import es.caib.notib.persist.acl.NotibMutableAclService;
@@ -18,13 +19,7 @@ import org.springframework.security.access.expression.method.DefaultMethodSecuri
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.acls.AclPermissionCacheOptimizer;
 import org.springframework.security.acls.AclPermissionEvaluator;
-import org.springframework.security.acls.domain.AclAuthorizationStrategy;
-import org.springframework.security.acls.domain.ConsoleAuditLogger;
-import org.springframework.security.acls.domain.DefaultPermissionFactory;
-import org.springframework.security.acls.domain.DefaultPermissionGrantingStrategy;
-import org.springframework.security.acls.domain.ObjectIdentityImpl;
-import org.springframework.security.acls.domain.PermissionFactory;
-import org.springframework.security.acls.domain.SpringCacheBasedAclCache;
+import org.springframework.security.acls.domain.*;
 import org.springframework.security.acls.jdbc.BasicLookupStrategy;
 import org.springframework.security.acls.jdbc.LookupStrategy;
 import org.springframework.security.acls.model.ObjectIdentity;
@@ -122,7 +117,10 @@ public class AclConfig {
 
 	@Bean
 	public SpringCacheBasedAclCache aclCache() {
-		return new SpringCacheBasedAclCache(cacheManager.getCache("aclCache"), permissionGrantingStrategy(), aclAuthorizationStrategy());
+		return new SpringCacheBasedAclCache(
+				cacheManager.getCache(CacheConfig.ACL_CACHE_NAME),
+				permissionGrantingStrategy(),
+				aclAuthorizationStrategy());
 	}
 //	public EhCacheBasedAclCache aclCache() {
 //		return new EhCacheBasedAclCache(

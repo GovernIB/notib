@@ -14,7 +14,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @SpringBootApplication
 @PropertySource(
 		ignoreResourceNotFound = true,
-		value = { "classpath:application.yaml" })
+		value = { "classpath:application.properties" })
 public class NotibBackBootApp {
 
 	public static void main(String[] args) {

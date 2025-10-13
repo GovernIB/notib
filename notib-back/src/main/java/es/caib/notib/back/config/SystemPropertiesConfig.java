@@ -3,7 +3,7 @@
  */
 package es.caib.notib.back.config;
 
-import es.caib.notib.logic.intf.service.ConfigService;
+import es.caib.notib.logic.intf.base.config.BaseConfig;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
@@ -15,8 +15,8 @@ import org.springframework.context.annotation.PropertySource;
  */
 @Configuration
 @PropertySource(ignoreResourceNotFound = true, value = {
-	"file://${" + ConfigService.APP_PROPERTIES + "}",
-	"file://${" + ConfigService.APP_SYSTEM_PROPERTIES + "}"})
+	"file://${" + BaseConfig.APP_PROPERTIES + "}",
+	"file://${" + BaseConfig.APP_SYSTEM_PROPERTIES + "}"})
 public class SystemPropertiesConfig {
 
 }

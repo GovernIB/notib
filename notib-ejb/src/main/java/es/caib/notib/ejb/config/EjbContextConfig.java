@@ -3,32 +3,16 @@
  */
 package es.caib.notib.ejb.config;
 
-import es.caib.notib.ejb.ConfigService;
+import es.caib.notib.logic.intf.base.config.BaseConfig;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.autoconfigure.metrics.jersey.JerseyServerMetricsAutoConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
-import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.jta.JtaTransactionManager;
-
-import javax.naming.NamingException;
-import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
-import java.util.Properties;
 
 /**
  * Creació del context Spring per a la capa dels EJBs.
@@ -37,16 +21,23 @@ import java.util.Properties;
  */
 @Slf4j
 @Configuration
-@EnableAutoConfiguration(exclude = { FreeMarkerAutoConfiguration.class })
-@EnableJpaRepositories({ "es.caib.notib.persist", "org.springframework.statemachine.data.jpa" })
-@ComponentScan({ "es.caib.notib.logic", "es.caib.notib.persist" })
-@EntityScan({"es.caib.notib.persist", "org.springframework.statemachine.data.jpa"})
+@EnableAutoConfiguration(exclude = {
+		FreeMarkerAutoConfiguration.class,
+		JerseyServerMetricsAutoConfiguration.class
+})
+@ComponentScan({
+		BaseConfig.BASE_PACKAGE + ".logic",
+		BaseConfig.BASE_PACKAGE + ".persist"
+})
+//@EnableJpaRepositories({ "es.caib.notib.persist", "org.springframework.statemachine.data.jpa" })
+//@EntityScan({"es.caib.notib.persist", "org.springframework.statemachine.data.jpa"})
 @PropertySource(ignoreResourceNotFound = true, value = {
 		"classpath:application.properties",
-		"file://${" + ConfigService.APP_PROPERTIES + "}",
-		"file://${" + ConfigService.APP_SYSTEM_PROPERTIES + "}"})
+		"file://${" + BaseConfig.APP_PROPERTIES + "}",
+		"file://${" + BaseConfig.APP_SYSTEM_PROPERTIES + "}"})
 public class EjbContextConfig {
 
+	/*
 	@Value("${es.caib.notib.datasource.jndi:java:jboss/datasources/notibDS}")
 	private String dataSourceJndiName;
 	@Value("${es.caib.notib.hibernate.dialect:es.caib.notib.persist.dialect.OracleCaibDialect}")
@@ -58,24 +49,22 @@ public class EjbContextConfig {
 	@Value("${es.caib.notib.hibernate.format_sql:false}")
 	private String formatSql;
 	@Value("${es.caib.notib.servidor.jboss:true}")
-	private String jboss;
+	private String jboss;*/
 
 	private static boolean initialized;
 	private static ApplicationContext applicationContext;
 
 	public static ApplicationContext getApplicationContext() {
-
-		if (initialized) {
-			return applicationContext;
+		if (!initialized) {
+			initialized = true;
+			log.info("Starting EJB spring application...");
+			applicationContext = new AnnotationConfigApplicationContext(EjbContextConfig.class);
+			log.info("...EJB spring application started.");
 		}
-		initialized = true;
-		log.info("Starting EJB spring application..");
-		applicationContext = new AnnotationConfigApplicationContext(EjbContextConfig.class);
-		log.info("...EJB spring application started.");
 		return applicationContext;
 	}
 
-	@Bean
+	/*@Bean
 	public AbstractEntityManagerFactoryBean entityManagerFactory() throws NamingException {
 
 		log.debug("Creating EntityManagerFactory " + dataSource().getClass() + "...");
@@ -131,6 +120,6 @@ public class EjbContextConfig {
 
 	private boolean isJBoss() {
 		return Boolean.parseBoolean(jboss);
-	}
+	}*/
 
 }

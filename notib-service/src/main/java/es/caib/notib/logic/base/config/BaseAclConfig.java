@@ -11,10 +11,7 @@ import org.springframework.security.acls.domain.*;
 import org.springframework.security.acls.jdbc.BasicLookupStrategy;
 import org.springframework.security.acls.jdbc.JdbcMutableAclService;
 import org.springframework.security.acls.jdbc.LookupStrategy;
-import org.springframework.security.acls.model.Acl;
-import org.springframework.security.acls.model.AclCache;
-import org.springframework.security.acls.model.ObjectIdentity;
-import org.springframework.security.acls.model.PermissionGrantingStrategy;
+import org.springframework.security.acls.model.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.sql.DataSource;
@@ -101,80 +98,60 @@ public abstract class BaseAclConfig {
 	}
 
 	@Bean
-	public JdbcMutableAclService aclService(CacheManager springCacheManager) {
-		// S'han hagut de modificar els mètodes retrieveObjectIdentityPrimaryKey i findChildren per a
-		// solucionar errors en les consultes quan el tipus de base de dades és PostgreSQL. Si forçam
-		// que l'identificador del ObjectIdentity sigui un String dona error al executar la consulta
-		// dient que no es pot convertir un bigint al tipus varchar.
-		JdbcMutableAclService jdbcMutableAclService = new JdbcMutableAclService(
-				dataSource,
-				lookupStrategy(springCacheManager),
-				aclCache(springCacheManager)) {
-			protected Long retrieveObjectIdentityPrimaryKey(ObjectIdentity oid) {
-				return super.retrieveObjectIdentityPrimaryKey(
-						new ObjectIdentityImpl(
-								oid.getType(),
-								oid.getIdentifier().toString()));
-			}
-			public List<ObjectIdentity> findChildren(ObjectIdentity parentIdentity) {
-				return super.findChildren(
-						new ObjectIdentityImpl(
-								parentIdentity.getType(),
-								parentIdentity.getIdentifier().toString()));
-			}
-		};
+	public MutableAclService aclService(CacheManager cacheManager) {
+		BaseMutableAclService mutableAclService = createMutableAclServiceInstance(dataSource, cacheManager);
 		String tableClass = getDbTablePrefix() + "acl_class";
 		String tableSid = getDbTablePrefix() + "acl_sid";
 		String tableOid = getDbTablePrefix() + "acl_object_identity";
 		String tableEntry = getDbTablePrefix() + "acl_entry";
-		jdbcMutableAclService.setAclClassIdSupported(CLASS_ID_SUPPORTED);
+		mutableAclService.setAclClassIdSupported(CLASS_ID_SUPPORTED);
 		if (hibernateDialect.toLowerCase().contains("oracle") && isOracleSequenceLegacy()) {
-			jdbcMutableAclService.setClassIdentityQuery("select " + tableClass.toUpperCase() + "_sq.currval from dual");
-			jdbcMutableAclService.setSidIdentityQuery("select " + tableSid.toUpperCase() + "_sq.currval from dual");
+			mutableAclService.setClassIdentityQuery("select " + tableClass.toUpperCase() + "_sq.currval from dual");
+			mutableAclService.setSidIdentityQuery("select " + tableSid.toUpperCase() + "_sq.currval from dual");
 		} else if (hibernateDialect.toLowerCase().contains("oracle") && !isOracleSequenceLegacy()) {
-			jdbcMutableAclService.setClassIdentityQuery("select current_value('" + tableClass.toUpperCase() + "') from dual");
-			jdbcMutableAclService.setSidIdentityQuery("select current_value('" + tableSid.toUpperCase() + "') from dual");
+			mutableAclService.setClassIdentityQuery("select current_value('" + tableClass.toUpperCase() + "') from dual");
+			mutableAclService.setSidIdentityQuery("select current_value('" + tableSid.toUpperCase() + "') from dual");
 		} else if (hibernateDialect.toLowerCase().contains("postgres")) {
-			jdbcMutableAclService.setClassIdentityQuery("select currval(pg_get_serial_sequence('" + tableClass + "', 'id'))");
-			jdbcMutableAclService.setSidIdentityQuery("select currval(pg_get_serial_sequence('" + tableSid + "', 'id'))");
+			mutableAclService.setClassIdentityQuery("select currval(pg_get_serial_sequence('" + tableClass + "', 'id'))");
+			mutableAclService.setSidIdentityQuery("select currval(pg_get_serial_sequence('" + tableSid + "', 'id'))");
 		} else if (hibernateDialect.toLowerCase().contains("hsql")) {
-			jdbcMutableAclService.setClassIdentityQuery("call identity()");
-			jdbcMutableAclService.setSidIdentityQuery("call identity()");
+			mutableAclService.setClassIdentityQuery("call identity()");
+			mutableAclService.setSidIdentityQuery("call identity()");
 		}
-		jdbcMutableAclService.setFindChildrenQuery("select obj.object_id_identity as obj_id, class.class as class" +
+		mutableAclService.setFindChildrenQuery("select obj.object_id_identity as obj_id, class.class as class" +
 				(CLASS_ID_SUPPORTED ? ", class.class_id_type as class_id_type" : "") +
 				" from " + tableOid + " obj, " + tableOid + " parent, " + tableClass + " class " +
 				"where obj.parent_object = parent.id and obj.object_id_class = class.id " +
 				"and parent.object_id_identity = ? and parent.object_id_class = (" +
 				"select id FROM " + tableClass + " where " + tableClass + ".class = ?)");
-		jdbcMutableAclService.setDeleteEntryByObjectIdentityForeignKeySql(
+		mutableAclService.setDeleteEntryByObjectIdentityForeignKeySql(
 				"delete from " + tableEntry + " where acl_object_identity=?");
-		jdbcMutableAclService.setDeleteObjectIdentityByPrimaryKeySql(
+		mutableAclService.setDeleteObjectIdentityByPrimaryKeySql(
 				"delete from " + tableOid + " where id=?");
-		jdbcMutableAclService.setInsertClassSql(
+		mutableAclService.setInsertClassSql(
 				CLASS_ID_SUPPORTED ? "insert into " + tableClass + " (class, class_id_type) values (?, ?)" : "insert into " + tableClass + " (class) values (?)");
-		jdbcMutableAclService.setInsertEntrySql(
+		mutableAclService.setInsertEntrySql(
 				"insert into " + tableEntry + " " +
 				"(acl_object_identity, ace_order, sid, mask, granting, audit_success, audit_failure)" +
 				"values (?, ?, ?, ?, ?, ?, ?)");
-		jdbcMutableAclService.setInsertObjectIdentitySql(
+		mutableAclService.setInsertObjectIdentitySql(
 				"insert into " + tableOid + " " +
 				"(object_id_class, object_id_identity, owner_sid, entries_inheriting) " +
 				"values (?, ?, ?, ?)");
-		jdbcMutableAclService.setInsertSidSql(
+		mutableAclService.setInsertSidSql(
 				"insert into " + tableSid + " (principal, sid) values (?, ?)");
-		jdbcMutableAclService.setClassPrimaryKeyQuery(
+		mutableAclService.setClassPrimaryKeyQuery(
 				"select id from " + tableClass + " where class=?");
-		jdbcMutableAclService.setObjectIdentityPrimaryKeyQuery(
+		mutableAclService.setObjectIdentityPrimaryKeyQuery(
 				"select " + tableOid + ".id from " + tableOid + ", " + tableClass + " " +
 				"where " + tableOid + ".object_id_class = " + tableClass + ".id and " + tableClass + ".class=? " +
 				"and " + tableOid + ".object_id_identity = ?");
-		jdbcMutableAclService.setSidPrimaryKeyQuery(
+		mutableAclService.setSidPrimaryKeyQuery(
 				"select id from " + tableSid + " where principal=? and sid=?");
-		jdbcMutableAclService.setUpdateObjectIdentity(
+		mutableAclService.setUpdateObjectIdentity(
 				"update " + tableOid + " set " +
 				"parent_object = ?, owner_sid = ?, entries_inheriting = ?" + " where id = ?");
-		return jdbcMutableAclService;
+		return mutableAclService;
 	}
 
 	public String getIdsWithPermissionQuery(boolean anyPermission) {
@@ -186,7 +163,7 @@ public abstract class BaseAclConfig {
 				"    distinct " + tableOid + ".object_id_identity id " +
 				"from " +
 				"    " + tableEntry + " " +
-				"	 left join " + tableOid + " on " + tableOid + ".id = " + tableEntry + ".acl_object_identity " +
+				"    left join " + tableOid + " on " + tableOid + ".id = " + tableEntry + ".acl_object_identity " +
 				"where " +
 				"    " + tableEntry + ".granting = :isTrue " +
 				(anyPermission ? "and " + tableEntry + ".mask in (:masks) " : "") +
@@ -215,8 +192,39 @@ public abstract class BaseAclConfig {
 
 	protected abstract String getDbTablePrefix();
 
+	protected BaseMutableAclService createMutableAclServiceInstance(
+			DataSource dataSource,
+			CacheManager cacheManager) {
+		// S'han hagut de modificar els mètodes retrieveObjectIdentityPrimaryKey i findChildren per a
+		// solucionar errors en les consultes quan el tipus de base de dades és PostgreSQL. Si forçam
+		// que l'identificador del ObjectIdentity sigui un String dona error al executar la consulta
+		// dient que no es pot convertir un bigint al tipus varchar.
+		return new BaseMutableAclService(
+				dataSource,
+				lookupStrategy(cacheManager),
+				aclCache(cacheManager));
+	}
+
 	protected boolean isOracleSequenceLegacy() {
 		return false;
+	}
+
+	public static class BaseMutableAclService extends JdbcMutableAclService {
+		public BaseMutableAclService(DataSource dataSource, LookupStrategy lookupStrategy, AclCache aclCache) {
+			super(dataSource, lookupStrategy, aclCache);
+		}
+		public List<ObjectIdentity> findChildren(ObjectIdentity parentIdentity) {
+			return super.findChildren(
+					new ObjectIdentityImpl(
+							parentIdentity.getType(),
+							parentIdentity.getIdentifier().toString()));
+		}
+		protected Long retrieveObjectIdentityPrimaryKey(ObjectIdentity oid) {
+			return super.retrieveObjectIdentityPrimaryKey(
+					new ObjectIdentityImpl(
+							oid.getType(),
+							oid.getIdentifier().toString()));
+		}
 	}
 
 	private static class ExtendedPermissionFactory extends DefaultPermissionFactory {

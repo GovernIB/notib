@@ -213,7 +213,7 @@
 					<generateApplicationXml>true</generateApplicationXml>
 					<defaultLibBundleDir>/lib</defaultLibBundleDir>
 					<includeLibInApplicationXml>false</includeLibInApplicationXml>
-					<packagingExcludes>lib/es.caib.notib-notib-controller-*.jar</packagingExcludes>
+					<packagingExcludes>lib/org.apache.tomcat.embed-tomcat*.jar</packagingExcludes>
 					<version>6</version>
 					<initializeInOrder>true</initializeInOrder>
 					<skinnyWars>true</skinnyWars>

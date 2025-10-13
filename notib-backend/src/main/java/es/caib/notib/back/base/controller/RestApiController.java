@@ -1,6 +1,6 @@
 package es.caib.notib.back.base.controller;
 
-import es.caib.notib.logic.intf.base.config.BaseBootConfig;
+import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.Resource;
 import es.caib.notib.logic.intf.base.service.ResourceApiService;
 import es.caib.notib.logic.intf.base.util.TypeUtil;
@@ -27,7 +27,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Hidden
 @RestController
-@RequestMapping(BaseBootConfig.API_PATH + "aaa")
+@RequestMapping(BaseConfig.API_PATH + "aaa")
 public class RestApiController {
 
 	@Autowired

@@ -1,6 +1,7 @@
 package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
+import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.dto.config.ConfigDto;
 import es.caib.notib.logic.intf.exception.NotDefinedConfigException;
 import es.caib.notib.logic.intf.service.ConfigService;
@@ -31,8 +32,8 @@ import static es.caib.notib.logic.config.ReadDbPropertiesPostProcessor.DBAPP_PRO
 @Component
 @Slf4j
 @PropertySource(ignoreResourceNotFound = true, value = {
-        "file://${" + ConfigService.APP_PROPERTIES + "}",
-        "file://${" + ConfigService.APP_SYSTEM_PROPERTIES + "}"})
+        "file://${" + BaseConfig.APP_PROPERTIES + "}",
+        "file://${" + BaseConfig.APP_SYSTEM_PROPERTIES + "}"})
 public class ConfigHelper {
 
     // TODO REPASSAR QUE NO FALTI CAP @Transactional(readOnly = true) EN ALGUN DELS MÈTODES PER OBTENIR PROPIETATS

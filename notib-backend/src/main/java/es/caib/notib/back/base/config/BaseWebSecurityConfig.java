@@ -4,7 +4,7 @@ import com.nimbusds.jose.shaded.json.JSONArray;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
-import es.caib.notib.logic.intf.base.config.BaseBootConfig;
+import es.caib.notib.logic.intf.base.config.BaseConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -106,10 +106,10 @@ public abstract class BaseWebSecurityConfig {
 
 	protected RequestMatcher[] internalPublicRequestMatchers() {
 		return new RequestMatcher[] {
-				new AntPathRequestMatcher(BaseBootConfig.API_PATH),
-				new AntPathRequestMatcher(BaseBootConfig.PING_PATH),
-				new AntPathRequestMatcher(BaseBootConfig.SYSENV_PATH),
-				new AntPathRequestMatcher(BaseBootConfig.MANIFEST_PATH)
+				new AntPathRequestMatcher(BaseConfig.API_PATH),
+				new AntPathRequestMatcher(BaseConfig.PING_PATH),
+				new AntPathRequestMatcher(BaseConfig.SYSENV_PATH),
+				new AntPathRequestMatcher(BaseConfig.MANIFEST_PATH)
 		};
 	}
 

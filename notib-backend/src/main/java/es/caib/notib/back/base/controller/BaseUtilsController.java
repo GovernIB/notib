@@ -1,6 +1,6 @@
 package es.caib.notib.back.base.controller;
 
-import es.caib.notib.logic.intf.base.config.BaseBootConfig;
+import es.caib.notib.logic.intf.base.config.BaseConfig;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -37,12 +37,12 @@ public abstract class BaseUtilsController {
 	@Autowired
 	private ServletContext servletContext;
 
-	@GetMapping(BaseBootConfig.PING_PATH)
+	@GetMapping(BaseConfig.PING_PATH)
 	public ResponseEntity<Void> ping() {
 		return ResponseEntity.ok().build();
 	}
 
-	@GetMapping(BaseBootConfig.AUTH_TOKEN_PATH)
+	@GetMapping(BaseConfig.AUTH_TOKEN_PATH)
 	public ResponseEntity<String> authToken() {
 		String authToken = getAuthToken();
 		String response = null;
@@ -52,7 +52,7 @@ public abstract class BaseUtilsController {
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping(BaseBootConfig.MANIFEST_PATH)
+	@GetMapping(BaseConfig.MANIFEST_PATH)
 	public ResponseEntity<String> manifest() throws IOException {
 		Map<String, Object> manifestProps = getManifestProperties();
 		MediaType contentType = MediaType.valueOf("text/javascript"); // MediaType.TEXT_PLAIN;
@@ -67,7 +67,7 @@ public abstract class BaseUtilsController {
 				body(response);
 	}
 
-	@GetMapping(BaseBootConfig.SYSENV_PATH)
+	@GetMapping(BaseConfig.SYSENV_PATH)
 	public ResponseEntity<String> systemEnvironment(
 			@RequestParam(required = false) String format) {
 		Map<String, Object> systemEnv = getAllProperties(env); // System.getenv();

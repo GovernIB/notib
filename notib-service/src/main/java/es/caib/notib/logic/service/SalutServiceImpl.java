@@ -1,15 +1,6 @@
 package es.caib.notib.logic.service;
 
-import es.caib.comanda.ms.salut.model.AppInfo;
-import es.caib.comanda.ms.salut.model.ContextInfo;
-import es.caib.comanda.ms.salut.model.DetallSalut;
-import es.caib.comanda.ms.salut.model.EstatSalut;
-import es.caib.comanda.ms.salut.model.EstatSalutEnum;
-import es.caib.comanda.ms.salut.model.IntegracioInfo;
-import es.caib.comanda.ms.salut.model.IntegracioSalut;
-import es.caib.comanda.ms.salut.model.Manual;
-import es.caib.comanda.ms.salut.model.MissatgeSalut;
-import es.caib.comanda.ms.salut.model.SalutInfo;
+import es.caib.comanda.ms.salut.model.*;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.helper.SubsistemesHelper;
 import es.caib.notib.logic.helper.plugin.AbstractPluginHelper;
@@ -23,8 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
 import org.hyperic.sigar.CpuPerc;
-import org.hyperic.sigar.FileSystem;
-import org.hyperic.sigar.FileSystemUsage;
 import org.hyperic.sigar.Mem;
 import org.hyperic.sigar.Sigar;
 import org.openjdk.jmh.runner.Runner;
@@ -76,9 +65,9 @@ public class SalutServiceImpl implements SalutService {
     }
 
     @Override
-    public List<AppInfo> getSubsistemes() {
+    public List<SubsistemaInfo> getSubsistemes() {
         return Arrays.stream(SubsistemesHelper.SubsistemesEnum.values())
-                .map(subsistema -> AppInfo.builder().codi(subsistema.name()).nom(subsistema.getNom()).build())
+                .map(subsistema -> SubsistemaInfo.builder().codi(subsistema.name()).nom(subsistema.getNom()).build())
                 .collect(Collectors.toList());
     }
 

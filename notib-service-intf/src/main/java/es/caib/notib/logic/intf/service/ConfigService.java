@@ -13,9 +13,6 @@ import java.util.List;
  */
 public interface ConfigService {
 
-	public static final String APP_PROPERTIES = "es.caib.notib.properties";
-	public static final String APP_SYSTEM_PROPERTIES = "es.caib.notib.system.properties";
-
 	/**
 	 * Actualitza el valor d'una propietat de configuració.
 	 *

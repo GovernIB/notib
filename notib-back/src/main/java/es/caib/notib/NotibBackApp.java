@@ -1,13 +1,16 @@
 package es.caib.notib;
 
+import es.caib.comanda.base.config.BaseConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.actuate.autoconfigure.metrics.jersey.JerseyServerMetricsAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWarDeployment;
 import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
 import org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
 import org.springframework.boot.autoconfigure.websocket.servlet.WebSocketServletAutoConfiguration;
@@ -38,20 +41,24 @@ import java.util.jar.Manifest;
 		JpaRepositoriesAutoConfiguration.class,
 		HibernateJpaAutoConfiguration.class,
 		TransactionAutoConfiguration.class,
+		LiquibaseAutoConfiguration.class,
 		FreeMarkerAutoConfiguration.class,
-		WebSocketServletAutoConfiguration.class
+		WebSocketServletAutoConfiguration.class,
+		JerseyServerMetricsAutoConfiguration.class
 })
 @ComponentScan(
-		excludeFilters = @ComponentScan.Filter(
-				type = FilterType.REGEX,
-				pattern = {
-						"es\\.caib\\.notib\\.logic\\..*",
-						"es\\.caib\\.notib\\.persist\\..*",
-						"es\\.caib\\.notib\\.ejb\\..*",
-						"es\\.caib\\.notib\\.api\\..*"}))
+		basePackages = { BaseConfig.BASE_PACKAGE },
+		excludeFilters = {
+				@ComponentScan.Filter(
+						type = FilterType.REGEX,
+						pattern = {
+								"es\\.caib\\." + BaseConfig.APP_NAME + "\\.service\\..*",
+								"es\\.caib\\." + BaseConfig.APP_NAME + "\\.persistence\\..*",
+								"es\\.caib\\." + BaseConfig.APP_NAME + "\\.ejb\\..*" })
+		})
 @PropertySource(
 		ignoreResourceNotFound = true,
-		value = { "classpath:application.yaml" })
+		value = { "classpath:application.properties" })
 public class NotibBackApp extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {

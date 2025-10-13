@@ -1,6 +1,6 @@
 package es.caib.notib.back.base.error;
 
-import es.caib.notib.logic.intf.base.config.BaseBootConfig;
+import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -101,19 +101,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 				}
 				String constraintNameUpper = constraintName.toUpperCase();
 				try {
-					String errorKey = BaseBootConfig.BASE_PACKAGE + ".error.handling.DataIntegrityViolationException." + constraintNameUpper + ".message";
+					String errorKey = BaseConfig.BASE_PACKAGE + ".error.handling.DataIntegrityViolationException." + constraintNameUpper + ".message";
 					errorMessage = messageSource.getMessage(
 							errorKey,
 							null,
 							request.getLocale());
 				} catch (NoSuchMessageException nmex) {
-					String errorKey = BaseBootConfig.BASE_PACKAGE + ".error.handling.ConstraintViolationException.message";
+					String errorKey = BaseConfig.BASE_PACKAGE + ".error.handling.ConstraintViolationException.message";
 					if (constraintNameUpper.endsWith("_FK")) {
-						errorKey = BaseBootConfig.BASE_PACKAGE + ".error.handling.ForeigKeyViolationException.message";
+						errorKey = BaseConfig.BASE_PACKAGE + ".error.handling.ForeigKeyViolationException.message";
 					} else if (constraintNameUpper.endsWith("_UK")) {
-						errorKey = BaseBootConfig.BASE_PACKAGE + ".error.handling.UniqueKeyViolationException.message";
+						errorKey = BaseConfig.BASE_PACKAGE + ".error.handling.UniqueKeyViolationException.message";
 					} else if (constraintNameUpper.endsWith("_PK")) {
-						errorKey = BaseBootConfig.BASE_PACKAGE + ".error.handling.PrimaryKeyViolationException.message";
+						errorKey = BaseConfig.BASE_PACKAGE + ".error.handling.PrimaryKeyViolationException.message";
 					}
 					errorMessage = messageSource.getMessage(
 							errorKey,
@@ -268,7 +268,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		FieldValidationErrorResponse fieldValidationErrorResponse = new FieldValidationErrorResponse(
 				responseStatus.value(),
 				messageSource.getMessage(
-						BaseBootConfig.BASE_PACKAGE + ".error.handling.MethodArgumentNotValidException.message",
+						BaseConfig.BASE_PACKAGE + ".error.handling.MethodArgumentNotValidException.message",
 						new String[] { "validationErrors" },
 						request.getLocale())); // "Validation error. Check 'validationErrors' field for details."
 		for (ObjectError objectError: ex.getBindingResult().getGlobalErrors()) {
