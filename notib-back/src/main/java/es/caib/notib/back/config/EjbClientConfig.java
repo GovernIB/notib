@@ -3,6 +3,8 @@
  */
 package es.caib.notib.back.config;
 
+import es.caib.notib.logic.intf.base.service.PermissionEvaluatorService;
+import es.caib.notib.logic.intf.base.service.ResourceApiService;
 import es.caib.notib.logic.intf.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWarDeployment;
@@ -158,16 +160,22 @@ public class EjbClientConfig {
 	public LocalStatelessSessionProxyFactoryBean usuariService() {
 		return getLocalEjbFactoyBean(UsuariService.class);
 	}
-
 	@Bean
 	public LocalStatelessSessionProxyFactoryBean accioMassivaService() {
 		return getLocalEjbFactoyBean(AccioMassivaService.class);
 	}
-
-    @Bean
-    public LocalStatelessSessionProxyFactoryBean digitalitzacioService() {
-        return getLocalEjbFactoyBean(DigitalitzacioService.class);
-    }
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean digitalitzacioService() {
+		return getLocalEjbFactoyBean(DigitalitzacioService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean permissionEvaluatorService() {
+		return getLocalEjbFactoyBean(PermissionEvaluatorService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean resourceApiService() {
+		return getLocalEjbFactoyBean(ResourceApiService.class);
+	}
 
 	private LocalStatelessSessionProxyFactoryBean getLocalEjbFactoyBean(Class<?> serviceClass) {
 		String jndiName = EJB_JNDI_PREFIX + serviceClass.getSimpleName() + EJB_JNDI_SUFFIX;

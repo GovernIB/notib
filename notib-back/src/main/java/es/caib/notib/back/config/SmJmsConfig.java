@@ -17,8 +17,8 @@ import org.springframework.jms.support.converter.MessageType;
 
 import javax.jms.ConnectionFactory;
 
-//@EnableJms
-//@Configuration
+@EnableJms
+@Configuration
 public class SmJmsConfig {
 
     @Value("${es.caib.notib.activemq.broker-url:tcp://localhost:61666}")

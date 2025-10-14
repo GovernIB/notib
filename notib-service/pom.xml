@@ -73,8 +73,6 @@
 			<groupId>org.messaginghub</groupId>
 			<artifactId>pooled-jms</artifactId>
 		</dependency>
-
-
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>notib-service-intf</artifactId>

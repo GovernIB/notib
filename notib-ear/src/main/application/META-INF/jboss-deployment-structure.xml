@@ -19,13 +19,10 @@
 			<module name="com.fasterxml.jackson.core.jackson-annotations" />
 			<module name="com.fasterxml.jackson.dataformat.jackson-dataformat-xml" />
 			<module name="com.fasterxml.jackson.dataformat.jackson-dataformat-yaml" />
-			<!-- Les següents exclusions serien per evitar l'error al trobar 2 instàncies que implementen slf4j en jboss74 -->
-			<!-- <module name="org.slf4j.impl" /> -->
-			<!-- <module name="ch.qos.logback" /> -->
 		</exclusions>
 		<exclude-subsystems>
 			<subsystem name="jaxrs"/>
 		</exclude-subsystems>
 	</deployment>
-	<ear-subdeployments-isolated>false</ear-subdeployments-isolated>
+	<ear-subdeployments-isolated>true</ear-subdeployments-isolated>
 </jboss-deployment-structure>

@@ -191,6 +191,7 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>notib-client-intf</artifactId>
 			<version>${project.version}</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 	<profiles>
@@ -236,6 +237,21 @@
 							<mainClass>es.caib.notib.NotibBackBootApp</mainClass>
 						</configuration>
 					</plugin>
+					<!--<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-war-plugin</artifactId>
+						<configuration>
+							<archive>
+								<manifestEntries>
+									<Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
+									<Implementation-Vendor>${implementation.vendor}</Implementation-Vendor>
+									<Implementation-Version>${project.version}</Implementation-Version>
+									<Implementation-SCM-Branch>${scmBranch}</Implementation-SCM-Branch>
+									<Implementation-SCM-Revision>${buildNumber}</Implementation-SCM-Revision>
+								</manifestEntries>
+							</archive>
+						</configuration>
+					</plugin>-->
 				</plugins>
 			</build>
 		</profile>
@@ -261,6 +277,27 @@
 					<scope>provided</scope>
 				</dependency>
 			</dependencies>
+			<!--<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-war-plugin</artifactId>
+						<configuration>
+							<packagingExcludes>**/NotibBackBootApp.class</packagingExcludes>
+							<attachClasses>true</attachClasses>
+							<archive>
+								<manifestEntries>
+									<Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
+									<Implementation-Vendor>${implementation.vendor}</Implementation-Vendor>
+									<Implementation-Version>${project.version}</Implementation-Version>
+									<Implementation-SCM-Branch>${scmBranch}</Implementation-SCM-Branch>
+									<Implementation-SCM-Revision>${buildNumber}</Implementation-SCM-Revision>
+								</manifestEntries>
+							</archive>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>-->
 		</profile>
 	</profiles>
 	<build>

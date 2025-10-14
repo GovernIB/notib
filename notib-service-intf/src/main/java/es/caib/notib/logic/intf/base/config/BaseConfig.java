@@ -7,12 +7,14 @@ package es.caib.notib.logic.intf.base.config;
  */
 public class BaseConfig {
 
-	public static final String BASE_PACKAGE = "es.caib.notib";
-
-	public static final String APP_PROPERTIES = "es.caib.notib.properties";
-	public static final String APP_SYSTEM_PROPERTIES = "es.caib.notib.system.properties";
-
+	public static final String APP_NAME = "notib";
 	public static final String DB_PREFIX = "not_";
+	public static final String DEFAULT_LOCALE = "ca";
+
+	public static final String BASE_PACKAGE = "es.caib." + APP_NAME;
+
+	public static final String APP_PROPERTIES = BASE_PACKAGE + ".properties";
+	public static final String APP_SYSTEM_PROPERTIES = BASE_PACKAGE + ".system.properties";
 
 	public static final String API_PATH = "/api";
 	public static final String PING_PATH = "/ping";

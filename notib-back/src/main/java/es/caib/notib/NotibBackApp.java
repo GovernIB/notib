@@ -1,9 +1,8 @@
 package es.caib.notib;
 
-import es.caib.comanda.base.config.BaseConfig;
+import es.caib.notib.logic.intf.base.config.BaseConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.actuate.autoconfigure.metrics.jersey.JerseyServerMetricsAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWarDeployment;
 import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
@@ -43,8 +42,7 @@ import java.util.jar.Manifest;
 		TransactionAutoConfiguration.class,
 		LiquibaseAutoConfiguration.class,
 		FreeMarkerAutoConfiguration.class,
-		WebSocketServletAutoConfiguration.class,
-		JerseyServerMetricsAutoConfiguration.class
+		WebSocketServletAutoConfiguration.class
 })
 @ComponentScan(
 		basePackages = { BaseConfig.BASE_PACKAGE },
@@ -52,8 +50,8 @@ import java.util.jar.Manifest;
 				@ComponentScan.Filter(
 						type = FilterType.REGEX,
 						pattern = {
-								"es\\.caib\\." + BaseConfig.APP_NAME + "\\.service\\..*",
-								"es\\.caib\\." + BaseConfig.APP_NAME + "\\.persistence\\..*",
+								"es\\.caib\\." + BaseConfig.APP_NAME + "\\.logic\\..*",
+								"es\\.caib\\." + BaseConfig.APP_NAME + "\\.persist\\..*",
 								"es\\.caib\\." + BaseConfig.APP_NAME + "\\.ejb\\..*" })
 		})
 @PropertySource(
