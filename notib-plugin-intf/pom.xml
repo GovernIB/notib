@@ -54,7 +54,6 @@
 			<version>1.0.3</version>
 			<scope>compile</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.fundaciobit.pluginsib.validatesignature</groupId>
 			<artifactId>pluginsib-validatesignature-afirmacxf</artifactId>
@@ -157,15 +156,10 @@
 			<version>2.1.1</version>
 			<scope>provided</scope>
 		</dependency>
-
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-actuator</artifactId>-->
-<!--        </dependency>-->
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-core</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-core</artifactId>
+		</dependency>
 	</dependencies>
 	<profiles>
 		<profile>
@@ -183,11 +177,11 @@
 					<exclusions>
 						<exclusion>
 							<groupId>axis</groupId>
-					       	<artifactId>axis-jaxrpc</artifactId>
+							<artifactId>axis-jaxrpc</artifactId>
 						</exclusion>
 						<exclusion>
 							<groupId>axis</groupId>
-					        <artifactId>axis-saaj</artifactId>
+							<artifactId>axis-saaj</artifactId>
 						</exclusion>
 					</exclusions>
 				</dependency>
@@ -199,27 +193,27 @@
 			<plugins>
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
-		           	<artifactId>lifecycle-mapping</artifactId>
-		           	<version>1.0.0</version>
-		           	<configuration>
-		           		<lifecycleMappingMetadata>
-		           			<pluginExecutions>
-		           				<pluginExecution>
-		           					<pluginExecutionFilter>
-		           						<groupId>org.codehaus.mojo</groupId>
-		           						<artifactId>flatten-maven-plugin</artifactId>
-		           						<versionRange>[0.0,)</versionRange>
-		           						<goals>
-		           							<goal>flatten</goal>
-		           						</goals>
-		           					</pluginExecutionFilter>
-		           					<action>
-		           						<ignore/>
-		           					</action>
-		           				</pluginExecution>
-		           			</pluginExecutions>
-		           		</lifecycleMappingMetadata>
-		           	</configuration>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.codehaus.mojo</groupId>
+										<artifactId>flatten-maven-plugin</artifactId>
+										<versionRange>[0.0,)</versionRange>
+										<goals>
+											<goal>flatten</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore/>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
