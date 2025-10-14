@@ -10,7 +10,6 @@ import es.caib.notib.client.domini.ampliarPlazo.AmpliacionesPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
-import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.intf.ws.adviser.nexea.NexeaAdviserWs;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnvio;

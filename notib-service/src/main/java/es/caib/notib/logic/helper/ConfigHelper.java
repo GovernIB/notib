@@ -4,7 +4,6 @@ import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.dto.config.ConfigDto;
 import es.caib.notib.logic.intf.exception.NotDefinedConfigException;
-import es.caib.notib.logic.intf.service.ConfigService;
 import es.caib.notib.persist.entity.config.ConfigEntity;
 import es.caib.notib.persist.entity.config.ConfigGroupEntity;
 import es.caib.notib.persist.repository.config.ConfigGroupRepository;

@@ -287,6 +287,11 @@
             <artifactId>micrometer-core</artifactId>
         </dependency>
 
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+
 		<!-- TESTING -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

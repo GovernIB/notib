@@ -258,15 +258,35 @@
 					<groupId>org.bouncycastle</groupId>
 					<artifactId>bcprov-jdk15on</artifactId>
 				</exclusion>
+				<!--
+				<exclusion>
+					<groupId>org.jboss.resteasy</groupId>
+					<artifactId>resteasy-client</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.jboss.resteasy</groupId>
+					<artifactId>resteasy-multipart-provider</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.jboss.resteasy</groupId>
+					<artifactId>resteasy-jaxrs</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.jboss.resteasy</groupId>
+					<artifactId>resteasy-jaxb-provider</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.jboss.resteasy</groupId>
+					<artifactId>resteasy-jackson2-provider</artifactId>
+				</exclusion>
+				-->
 			</exclusions>
 		</dependency>
         <dependency>
             <groupId>javax.jws</groupId>
             <artifactId>javax.jws-api</artifactId>
             <version>1.1</version>
-            <scope>compile</scope>
         </dependency>
-
 		<dependency>
 			<groupId>org.fundaciobit.pluginsib.userinformation</groupId>
 			<artifactId>pluginsib-userinformation-ldap</artifactId>
