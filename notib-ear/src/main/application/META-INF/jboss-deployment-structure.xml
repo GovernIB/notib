@@ -5,7 +5,6 @@
 			<subsystem name="jaxrs"/>
 		</exclude-subsystems>
 		<exclusions>
-			<module name="javax.ws.rs.core" />
 			<module name="com.fasterxml.jackson.core.jackson-core" />
 			<module name="com.fasterxml.jackson.core.jackson-databind" />
 			<module name="com.fasterxml.jackson.core.jackson-annotations" />

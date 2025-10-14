@@ -28,15 +28,37 @@
    		</dependency>
 
         <dependency>
+			<groupId>org.fundaciobit.apisib.apimassivescanwebsimple</groupId>
             <artifactId>apimassivescanwebsimple-api</artifactId>
-            <groupId>org.fundaciobit.apisib.apimassivescanwebsimple</groupId>
             <version>1.0</version>
         </dependency>
         <dependency>
+			<groupId>org.fundaciobit.apisib.apimassivescanwebsimple</groupId>
             <artifactId>apimassivescanwebsimple-jersey</artifactId>
-            <groupId>org.fundaciobit.apisib.apimassivescanwebsimple</groupId>
             <version>1.0.0</version>
         </dependency>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-client</artifactId>
+			<version>1.19.4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-core</artifactId>
+			<version>1.19.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.ws.rs</groupId>
+					<artifactId>jsr311-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-json</artifactId>
+			<version>1.19.4</version>
+		</dependency>
+
 <!--    		<dependency> -->
 <!-- 			<groupId>es.caib.rolsac</groupId> -->
 <!-- 			<artifactId>rolsacAPI</artifactId> -->
@@ -258,29 +280,12 @@
 					<groupId>org.bouncycastle</groupId>
 					<artifactId>bcprov-jdk15on</artifactId>
 				</exclusion>
-				<!--
-				<exclusion>
-					<groupId>org.jboss.resteasy</groupId>
-					<artifactId>resteasy-client</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.jboss.resteasy</groupId>
-					<artifactId>resteasy-multipart-provider</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.jboss.resteasy</groupId>
-					<artifactId>resteasy-jaxrs</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.jboss.resteasy</groupId>
-					<artifactId>resteasy-jaxb-provider</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.jboss.resteasy</groupId>
-					<artifactId>resteasy-jackson2-provider</artifactId>
-				</exclusion>
-				-->
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-admin-client</artifactId>
+			<version>14.0.0</version>
 		</dependency>
         <dependency>
             <groupId>javax.jws</groupId>
