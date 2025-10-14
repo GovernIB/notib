@@ -17,7 +17,6 @@ import org.keycloak.admin.client.resource.RolesResource;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 
-import javax.ws.rs.NotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -121,7 +120,7 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 				users.add(ur.getUsername());
 			}
 			return !users.isEmpty() ? users.toArray(new String[users.size()]) : null;
-		} catch (NotFoundException var13) {
+		} catch (Exception var13) {
 			return null;
 		}
 	}
@@ -198,7 +197,7 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 			}
 
 			return users;
-		} catch (NotFoundException var7) {
+		} catch (Exception var7) {
 			return null;
 		}
 	}
@@ -226,7 +225,7 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 			}
 
 			return users;
-		} catch (NotFoundException var13) {
+		} catch (Exception var13) {
 			return null;
 		}
 	}
