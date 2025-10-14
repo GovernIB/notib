@@ -80,8 +80,9 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 		http.logout(lo -> lo.addLogoutHandler(logoutHandler).
 				logoutRequestMatcher(new AntPathRequestMatcher(LOGOUT_URL)).
 				invalidateHttpSession(true).
-				logoutSuccessUrl("/").
-				permitAll(true));
+				clearAuthentication(true).
+				deleteCookies("OAuth_Token_Request_State", "JSESSIONID").
+				logoutSuccessUrl("/"));
 		http.authorizeHttpRequests().
 				requestMatchers(publicRequestMatchers()).permitAll();
 		super.customHttpSecurityConfiguration(http);
