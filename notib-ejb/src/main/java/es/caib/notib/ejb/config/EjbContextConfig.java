@@ -5,7 +5,6 @@ package es.caib.notib.ejb.config;
 
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.actuate.autoconfigure.metrics.jersey.JerseyServerMetricsAutoConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration;
 import org.springframework.context.ApplicationContext;
@@ -23,7 +22,6 @@ import org.springframework.context.annotation.PropertySource;
 @Configuration
 @EnableAutoConfiguration(exclude = {
 		FreeMarkerAutoConfiguration.class,
-		JerseyServerMetricsAutoConfiguration.class
 })
 @ComponentScan({
 		BaseConfig.BASE_PACKAGE + ".logic",
