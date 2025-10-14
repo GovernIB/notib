@@ -3,6 +3,7 @@ package es.caib.notib.back.config;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWarDeployment;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.boot.autoconfigure.jms.JmsProperties;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +20,7 @@ import javax.jms.ConnectionFactory;
 
 @EnableJms
 @Configuration
+@ConditionalOnWarDeployment
 public class SmJmsConfig {
 
     @Value("${es.caib.notib.activemq.broker-url:tcp://localhost:61666}")
