@@ -263,6 +263,11 @@ public class ConversioTipusHelper {
 						var data = entity.getCreatedDate().orElseThrow();
 						Date date = Date.from(data.atZone(ZoneId.systemDefault()).toInstant());
 						dto.setCreatedDate(date);
+                        if (entity.getNumErrors() > 0) {
+                            dto.setNumOk(0);
+                            dto.setNumPendent(0);
+                            return;
+                        }
 						var numErrors = 0;
 						var numOk = 0;
 						var numPendent = 0;

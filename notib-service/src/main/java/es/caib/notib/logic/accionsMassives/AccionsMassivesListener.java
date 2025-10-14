@@ -3,6 +3,7 @@ package es.caib.notib.logic.accionsMassives;
 
 import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.MessageHelper;
+import es.caib.notib.logic.helper.plugin.CarpetaPluginHelper;
 import es.caib.notib.logic.intf.dto.AmpliacionPlazoDto;
 import es.caib.notib.logic.intf.dto.RespostaAccio;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaDto;
@@ -45,6 +46,7 @@ public class AccionsMassivesListener {
     private final NotificacioService notificacioService;
     private final EnviamentService enviamentService;
     private final ConversioTipusHelper conversioTipusHelper;
+    private final CarpetaPluginHelper carpetaPluginHelper;
 
     @Transactional
     @JmsListener(destination = SmConstants.CUA_ACCIONS_MASSIVES, containerFactory = SmConstants.JMS_FACTORY_ACK)
@@ -159,6 +161,20 @@ public class AccionsMassivesListener {
                     }
                     break;
                 case ENVIAR_NOT_MOVIL:
+                    var enviarCarpeta = carpetaPluginHelper.enviarCarpeta();
+                    if (!enviarCarpeta) {
+                        error = true;
+                        accioEntity.setNumErrors(accioEntity.getElements().size());
+                        var errorDesc = "El plugin de CARPETA no està configurat";
+                        accioEntity.setErrorDescripcio(errorDesc);
+                        var elements = accioEntity.getElements();
+                        for (var element : elements) {
+                            element.setErrorDescripcio(errorDesc);
+                            element.setDataExecucio(new Date());
+                        }
+                        accioEntity.setDataFi(new Date());
+                        break;
+                    }
                     for (Long notificacioId : seleccio) {
                         try {
                             var respostaAccio = notificacioService.reenviarNotificaionsMovil(notificacioId);
