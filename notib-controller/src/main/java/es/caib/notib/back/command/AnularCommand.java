@@ -3,7 +3,6 @@ package es.caib.notib.back.command;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
 import java.util.List;
 
 @Getter

@@ -5,6 +5,7 @@ import es.caib.notib.back.command.*;
 import es.caib.notib.back.helper.*;
 import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
+import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaTipus;
@@ -922,6 +923,44 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         anular.setNotificacioId(notificacioId);
         model.addAttribute(anular);
         return "anularForm";
+    }
+
+    @GetMapping(value = "/{notificacioId}/enviament/{enviamentId}/anular")
+    public String anularOEGetEnviament(HttpServletResponse response, HttpServletRequest request, Model model, @PathVariable Long notificacioId, @PathVariable Long enviamentId) {
+
+        var anular = new AnularCommand();
+        anular.setEnviamentId(enviamentId);
+        model.addAttribute(anular);
+        return "anularForm";
+    }
+
+    @PostMapping(value = "/anular")
+    public String anularPost(HttpServletResponse response, HttpServletRequest request, Model model, AmpliacionPlazoCommand ampliacionPlazo) {
+
+        try {
+//            var ampliarPlazoOE = new AmpliarPlazoOE();
+//            ampliarPlazoOE.setPlazo(ampliacionPlazo.getDies());
+//            ampliarPlazoOE.setMotivo(ampliacionPlazo.getMotiu());
+//            Long accioMassivaId;
+//            if (ampliacionPlazo.isMassiu()) {
+//                var entitatActual = sessionScopedContext.getEntitatActual();
+//                var seleccio = ampliacionPlazo.getNotificacionsId() != null && !ampliacionPlazo.getNotificacionsId().isEmpty() ? ampliacionPlazo.getNotificacionsId() : ampliacionPlazo.getEnviamentsId();
+//                var seleccioTipus = requestIsRemesesEnviamentMassiu(request) ? SeleccioTipus.NOTIFICACIO : SeleccioTipus.ENVIAMENT;
+//                var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
+//                var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.AMPLIAR_TERMINI).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+//                accioMassivaId = accioMassivaService.altaAccioMassiva(accio);
+//                accio.setAccioId(accioMassivaId);
+//                accio.setAmpliacionPlazo(ConversioTipusHelper.convertir(ampliacionPlazo, AmpliacionPlazoDto.class));
+//                accioMassivaService.executarAccio(accio);
+//            }
+//            var resposta = notificacioService.ampliacionPlazoOE(ConversioTipusHelper.convertir(ampliacionPlazo, AmpliacionPlazoDto.class));
+            var resposta = RespuestaAmpliarPlazoOE.builder().codigoRespuesta("000").build();
+            return resposta != null && resposta.isOk() ? getModalControllerReturnValueSuccess(request, "redirect:/enviament", "ampliar.plazo.ok")
+                    : getModalControllerReturnValueError(request, "redirect:/enviament", "ampliar.plazo.error", new Object[]{resposta.getDescripcions() != null ? resposta.getDescripcions() : resposta.getDescripcionRespuesta()});
+        } catch (Exception ex) {
+            log.error("Error ampliant el plazo", ex);
+            return getModalControllerReturnValueError(request, "redirect:/enviament", "ampliar.plazo.error");
+        }
     }
 
 

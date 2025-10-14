@@ -496,6 +496,7 @@
                     		<ul class="dropdown-menu dropdown-menu-right">
 								<li><a href="<c:url value="/notificacio/{{:notificacioId}}/enviament/{{:id}}"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
 								<li><a href="<c:url value="/notificacio/{{:notificacioId}}/info"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detall.remesa"/></a></li>
+                                <li><a href="<c:url value="/notificacio/{{:notificacioId}}/enviament/{{:id}}/anular"/>" data-toggle="modal"><span class="fa fa-ban"></span>&nbsp; <spring:message code="comu.boto.anular"/></a></li>
 								{{if plazoAmpliable && ${!isRolActualAdministradorLectura}}}
 									<li><a href="<c:url value="/notificacio/{{:notificacioId}}/enviament/{{:id}}/ampliacion/plazo"/>" data-toggle="modal"><span class="fa fa-calendar-o"></span>&nbsp;<spring:message code="notificacio.list.accio.massiva.ampliar.plazo.oe"/></a></li>
 								{{/if}}

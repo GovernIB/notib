@@ -287,6 +287,12 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "callback_error")
 	protected boolean errorLastCallback;
 
+    @Column(name = "anulat")
+    protected boolean anulat;
+
+    @Column(name = "motiu_anulacio", length = 250)
+    protected String motiuAnulacio;
+
 	@Transient
 	private String csvUuid;
 
