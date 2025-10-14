@@ -3,7 +3,6 @@
  */
 package es.caib.notib.api.interna.ws;
 
-import es.caib.notib.api.externa.ws.AdviserConstants;
 import es.caib.notib.logic.intf.ws.adviser.common.Opciones;
 import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Acuse;
 import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Receptor;
@@ -38,7 +37,7 @@ import static es.caib.notib.api.interna.config.ServiceInstancesConfig.getAdviser
 		portName = es.caib.notib.logic.intf.ws.adviser.AdviserServiceWsV2.SERVICE_NAME + "Port",
 		targetNamespace = es.caib.notib.logic.intf.ws.adviser.AdviserServiceWsV2.NAMESPACE_URI)
 @WebContext(
-		contextRoot = "/" + AdviserConstants.NOTIB_CONTEXT + "api/interna",
+		contextRoot = "/notibapi/interna",
 		urlPattern = "/adviser")
 public class Adviser2ServiceWsV2 implements es.caib.notib.logic.intf.ws.adviser.AdviserServiceWsV2 {
 

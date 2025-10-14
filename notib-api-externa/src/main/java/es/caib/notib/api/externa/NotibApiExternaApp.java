@@ -4,6 +4,7 @@
 package es.caib.notib.api.externa;
 
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.actuate.autoconfigure.metrics.jersey.JerseyServerMetricsAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebAutoConfiguration;
@@ -35,10 +36,8 @@ import org.springframework.context.annotation.PropertySource;
 		FreeMarkerAutoConfiguration.class,
 		WebSocketServletAutoConfiguration.class,
 		SecurityAutoConfiguration.class,
-//		OrikaAutoConfiguration.class,
-//		SpringDocWebMvcConfiguration.class,
-//		MultipleOpenApiSupportConfiguration.class,
-		SpringDataWebAutoConfiguration.class
+		SpringDataWebAutoConfiguration.class,
+		JerseyServerMetricsAutoConfiguration.class
 })
 @ComponentScan(excludeFilters = @ComponentScan.Filter(
 				type = FilterType.REGEX,
