@@ -1,5 +1,6 @@
 package es.caib.notib.plugin.registre;
 
+import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,17 +13,11 @@ import lombok.Setter;
 @Setter
 public class RespostaBase {
 
-	public static final String ERROR_CODI_OK = "OK";
-	public static final String ERROR_CODI_ERROR = "ERROR";
-
 	private String errorCodi;
 	private String errorDescripcio;
 
-	public boolean isOk() {
-		return ERROR_CODI_OK.equals(errorCodi);
-	}
 	public boolean isError() {
-		return ERROR_CODI_ERROR.equals(errorCodi);
+		return !Strings.isNullOrEmpty(errorCodi);
 	}
 
 }

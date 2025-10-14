@@ -70,8 +70,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"JOIN NOT_ENTREGA_CIE nec ON nog.ENTREGA_CIE_ID = nec.ID\n" +
 			"JOIN NOT_PAGADOR_CIE npc ON npc.id = nec.CIE_ID\n" +
 			"JOIN NOT_ENTREGA_POSTAL nep ON nep.id = nne.ENTREGA_POSTAL_ID\n" +
-			"WHERE nne.ENTREGA_POSTAL IS NOT NULL \n" +
-			"AND nep.CIE_ID IS NOT NULL\n" +
+			"WHERE nep.CIE_ID IS NOT NULL\n" +
 			"AND npc.API_KEY IS NOT NULL AND npc.salt IS NOT NULL\n" +
 			"ORDER BY nne.id DESC", nativeQuery = true)
 	List<Long> getUltimEnviamentPostal();
