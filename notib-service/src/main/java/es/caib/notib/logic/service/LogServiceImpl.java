@@ -43,8 +43,11 @@ public class LogServiceImpl implements LogService {
                     var attr = Files.readAttributes(f, BasicFileAttributes.class);
                     var dataCreacio = sdf.format(new Date(attr.creationTime().toMillis()));
                     var dataModificacio = sdf.format(new Date(attr.lastModifiedTime().toMillis()));
-                    double sizeMB = file.length() / 1048576.0; //(1024.0 * 1024.0)
-                    var fitxer = FitxerInfo.builder().nom(file.getName()).mida(sizeMB + "MB").dataCreacio(dataCreacio).dataModificacio(dataModificacio).build();
+                    var mida = file.length();
+                    var fitxer = FitxerInfo.builder().nom(file.getName())
+                                                     .mida(mida)
+                                                     .dataCreacio(dataCreacio)
+                                                     .dataModificacio(dataModificacio).build();
                     fitxers.add(fitxer);
                 } catch (Exception ex) {
                     log.error("Errror obtenint la info del fitxer " + f.getFileName(), ex);
@@ -68,8 +71,17 @@ public class LogServiceImpl implements LogService {
             if (!Files.exists(filePath) || !Files.isRegularFile(filePath)) {
                 return FitxerContingut.builder().build();
             }
+            var file = filePath.toFile();
+            var attr = Files.readAttributes(filePath, BasicFileAttributes.class);
+            var sdf = new SimpleDateFormat("dd/MM/yyyy");
+            var dataCreacio = sdf.format(new Date(attr.creationTime().toMillis()));
+            var dataModificacio = sdf.format(new Date(attr.lastModifiedTime().toMillis()));
             var contingut = Files.readAllBytes(filePath);
-            return FitxerContingut.builder().continugt(contingut).mida(contingut.length + "").build();
+            return FitxerContingut.builder().contingut(contingut)
+                                            .nom(file.getName())
+                                            .dataCreacio(dataCreacio)
+                                            .dataModificacio(dataModificacio)
+                                            .mida(contingut.length).build();
         } catch (IOException ex) {
             log.error("Error reading file content for " + nom, ex);
             return FitxerContingut.builder().build();

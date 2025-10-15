@@ -14,7 +14,7 @@ import lombok.experimental.SuperBuilder;
 public class FitxerInfo {
 
     private String nom;
-    private String mida;
+    private long mida;
     private String dataCreacio;
     private String dataModificacio;
 }

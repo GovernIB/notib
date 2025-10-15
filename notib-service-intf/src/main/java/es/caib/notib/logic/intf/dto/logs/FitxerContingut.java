@@ -11,9 +11,9 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class FitxerContingut extends FitxerInfo{
+public class FitxerContingut extends FitxerInfo {
 
-    private byte[] continugt;
+    private byte[] contingut;
 
 
 }
