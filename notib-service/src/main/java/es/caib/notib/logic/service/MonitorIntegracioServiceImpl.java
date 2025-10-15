@@ -192,7 +192,9 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 					diagnostics = null;
 					break;
 				case REGISTRE:
-					diagnostic.setCorrecte(pluginHelper.diagnosticarRegistre(diagnostics));
+                    var ok = pluginHelper.diagnosticarRegistre(diagnostics);
+					diagnostic.setCorrecte(ok);
+                    diagnostic.setErrMsg(!ok ? "Error consultant a registre (veure logs)" : null);
 					break;
 				case NOTIFICA:
 					enviament = enviamentRepository.findTopByNotificaIdentificadorNotNullOrderByIdDesc().orElseThrow();
