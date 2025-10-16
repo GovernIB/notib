@@ -266,6 +266,7 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 					} catch (Exception e) {
 						diagnostic.setCorrecte(false);
 						diagnostic.setErrMsg(e.getMessage());
+                        log.error("Error en el diagnostic d'estadistiques: ", e);
 					}
 					break;
                 case COMANDA:
