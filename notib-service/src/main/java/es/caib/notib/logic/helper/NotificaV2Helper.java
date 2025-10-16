@@ -2,8 +2,10 @@ package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.CieEstat;
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
+import es.caib.notib.client.domini.RespostaAnulacio;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.comanda.ComandaListener;
@@ -368,6 +370,53 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		}
 		return resultadoInfoEnvio;
 	}
+
+    @Transactional
+    public RespostaAnulacio anular(String identificador) {
+
+
+        try {
+            var enviament = notificacioEnviamentRepository.findByNotificaReferencia(identificador);
+            var apiKey = enviament.getNotificacio().getEntitat().getApiKey();
+            var organEmisor = enviament.getNotificacio().getEmisorDir3Codi();
+            var id = enviament.getNotificaIdentificador();
+            var tipoEntrega = BigInteger.valueOf(1);
+            var modoNotificacion = BigInteger.valueOf(1);
+            var estat = new Holder<>(EnviamentEstat.ANULADA.name().toLowerCase());
+            var data = new Date();
+            var gregorianCalendar = new GregorianCalendar();
+            gregorianCalendar.setTime(data);
+            var xmlGregorianCalendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(gregorianCalendar);
+            xmlGregorianCalendar.setMillisecond(DatatypeConstants.FIELD_UNDEFINED);
+            var dataHolder = new Holder<>(xmlGregorianCalendar);
+            var receptor = getReceptor(enviament);
+//            var acusePdf = conversioTipusHelper.convertir(sincronizarEnvio.getAcusePDF(), Acuse.class);
+//            var acuseXml = conversioTipusHelper.convertir(sincronizarEnvio.getAcuseXML(), Acuse.class);
+//            var opciones = conversioTipusHelper.convertir(sincronizarEnvio.getOpcionesSincronizarEnvio(), es.caib.notib.logic.wsdl.notificaV2.common.Opciones.class);
+            Holder<String> codigoRespuesta = new Holder<>();
+            Holder<String> descripcionRespuesta = new Holder<>();
+            Holder<es.caib.notib.logic.wsdl.notificaV2.common.Opciones> opcionesRespuestaSincronizarOE = new Holder<>();
+
+            getSincronizarEnvioWs(apiKey).sincronizarEnvioOE(organEmisor, id, tipoEntrega, modoNotificacion, estat, dataHolder,
+                    null, receptor, null, null, null, codigoRespuesta, descripcionRespuesta, opcionesRespuestaSincronizarOE);
+
+            var error = !"200".equals(codigoRespuesta.value);
+            var errorDesc = error ? codigoRespuesta.value + " - " + descripcionRespuesta.value : "";
+            notificacioEventHelper.addNotificaAnular(enviament, error, errorDesc, false);
+            var resposta = new RespostaAnulacio();
+            resposta.setIdentificador(identificador);
+            resposta.setError(error);
+            resposta.setCodiResposta(codigoRespuesta.value);
+            resposta.setDescripcioResposta(descripcionRespuesta.value);
+            return resposta;
+        } catch (Exception ex) {
+            var resposta = new RespostaAnulacio();
+            resposta.setIdentificador(identificador);
+            resposta.setCodiResposta("Error");
+            resposta.setDescripcioResposta(ex.getMessage());
+            return resposta;
+        }
+    }
 
 	@Transactional
 	public RespuestaSincronizarEnvioOE enviamentEntregaPostalNotificada(SincronizarEnvio sincronizarEnvio) throws Exception {

@@ -10,6 +10,7 @@ import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaTipus;
 import es.caib.notib.logic.intf.dto.accioMassiva.SeleccioTipus;
+import es.caib.notib.logic.intf.dto.anular.AnularDto;
 import es.caib.notib.logic.intf.dto.missatges.Missatge;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
@@ -935,9 +936,17 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     }
 
     @PostMapping(value = "/anular")
-    public String anularPost(HttpServletResponse response, HttpServletRequest request, Model model, AmpliacionPlazoCommand ampliacionPlazo) {
+    public String anularPost(HttpServletResponse response, HttpServletRequest request, Model model, AnularCommand command) {
 
         try {
+
+            /*TODO
+                FALTA COMPROVAR QUE EL COMMAND S'EMPLENA BÉ JA SIGUI PER REMESES, ENVIAMENTS O ACCIONS MASSIVES D'ENVIAMENTS O REMESES
+                FALTA MODIFICAR ENVIAMENTS PER MARCARLOS COM ANULATS SI LA CRIDA A NOTIFICA HA FUNCIONAT
+                FALTA VALIDAR ELS ENVIAMENTS ABANS D'ENVIAR A NOTIFICA QUE REALMENT SIGUINT ANULABLES.
+                FALTA COMPROBAR QUE ELS MISSATGES D'ERROR ES MOSTREN BÉ
+                FALTA IMPLEMENTAR LES ACCIONS MASSIVES D'ANULAR
+            * */
 //            var ampliarPlazoOE = new AmpliarPlazoOE();
 //            ampliarPlazoOE.setPlazo(ampliacionPlazo.getDies());
 //            ampliarPlazoOE.setMotivo(ampliacionPlazo.getMotiu());
@@ -953,13 +962,12 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 //                accio.setAmpliacionPlazo(ConversioTipusHelper.convertir(ampliacionPlazo, AmpliacionPlazoDto.class));
 //                accioMassivaService.executarAccio(accio);
 //            }
-//            var resposta = notificacioService.ampliacionPlazoOE(ConversioTipusHelper.convertir(ampliacionPlazo, AmpliacionPlazoDto.class));
-            var resposta = RespuestaAmpliarPlazoOE.builder().codigoRespuesta("000").build();
-            return resposta != null && resposta.isOk() ? getModalControllerReturnValueSuccess(request, "redirect:/enviament", "ampliar.plazo.ok")
-                    : getModalControllerReturnValueError(request, "redirect:/enviament", "ampliar.plazo.error", new Object[]{resposta.getDescripcions() != null ? resposta.getDescripcions() : resposta.getDescripcionRespuesta()});
+            var resposta = notificacioService.anular(ConversioTipusHelper.convertir(command, AnularDto.class));
+            return resposta != null && resposta.isOk() ? getModalControllerReturnValueSuccess(request, "redirect:/enviament", "anular.ok")
+                    : getModalControllerReturnValueError(request, "redirect:/enviament", "anular.error", new Object[]{resposta.getErrors()});
         } catch (Exception ex) {
-            log.error("Error ampliant el plazo", ex);
-            return getModalControllerReturnValueError(request, "redirect:/enviament", "ampliar.plazo.error");
+            log.error("Error anulat enviaments ", ex);
+            return getModalControllerReturnValueError(request, "redirect:/enviament", "anular.error");
         }
     }
 

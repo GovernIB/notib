@@ -4,6 +4,7 @@
 package es.caib.notib.back.helper;
 
 import es.caib.notib.back.command.AmpliacionPlazoCommand;
+import es.caib.notib.back.command.AnularCommand;
 import es.caib.notib.back.command.IntegracioFiltreCommand;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.AmpliacionPlazoDto;
@@ -16,6 +17,7 @@ import es.caib.notib.back.command.EntregapostalCommand;
 import es.caib.notib.back.command.EnviamentCommand;
 import es.caib.notib.back.command.NotificacioCommand;
 import es.caib.notib.back.command.PersonaCommand;
+import es.caib.notib.logic.intf.dto.anular.AnularDto;
 import es.caib.notib.logic.intf.dto.notificacio.Document;
 import es.caib.notib.logic.intf.dto.notificacio.Enviament;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
@@ -230,6 +232,9 @@ public class ConversioTipusHelper {
 
 		mapperFactory.classMap(AmpliacionPlazoCommand.class, AmpliacionPlazoDto.class).byDefault().register();
 		mapperFactory.classMap(AmpliacionPlazoDto.class, AmpliacionPlazoCommand.class).byDefault().register();
+
+        mapperFactory.classMap(AnularCommand.class, AnularDto.class).byDefault().register();
+        mapperFactory.classMap(AnularDto.class, AnularCommand.class).byDefault().register();
 	}
 
 	

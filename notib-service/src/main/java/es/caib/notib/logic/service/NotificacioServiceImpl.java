@@ -7,6 +7,7 @@ import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.OrigenEnum;
+import es.caib.notib.client.domini.RespostaAnulacio;
 import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
@@ -20,6 +21,9 @@ import es.caib.notib.logic.intf.dto.ProgresActualitzacioCertificacioDto.TipusAct
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaElement;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
 import es.caib.notib.logic.intf.dto.accioMassiva.ResultatAccio;
+import es.caib.notib.logic.intf.dto.anular.Anulacio;
+import es.caib.notib.logic.intf.dto.anular.AnularDto;
+import es.caib.notib.logic.intf.dto.anular.RespostaAnular;
 import es.caib.notib.logic.intf.dto.cie.CieDataDto;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalDataDto;
 import es.caib.notib.logic.intf.dto.notificacio.Enviament;
@@ -2155,7 +2159,77 @@ public class NotificacioServiceImpl implements NotificacioService {
 		notificacioTableViewRepository.save(item);
 	}
 
-	@Override
+    @Override
+    public RespostaAnular anular(AnularDto dto) {
+
+        var timer = metricsHelper.iniciMetrica();
+        try {
+            List<String> identificadors = new ArrayList<>();
+            var isNotificacio = dto.getNotificacioId() != null;
+            var isEnviament = dto.getEnviamentId() != null;
+            var isNotificacioMassiu = dto.getNotificacionsId() != null && dto.getNotificacionsId().size() > 0;
+            var isEnviamentMassiu = dto.getEnviamentsId() != null && dto.getEnviamentsId().size() > 0;
+            List<String> noExecutats = new ArrayList<>();
+            if (isNotificacio) {
+                var notificacio = notificacioRepository.findById(dto.getNotificacioId()).orElseThrow();
+                for (var enviament : notificacio.getEnviaments()) {
+                    if (enviament.getEntregaPostal() == null && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
+                        identificadors.add(enviament.getNotificaReferencia());
+                    } else {
+                        noExecutats.add(enviament.getUuid());
+                    }
+                }
+            }
+            if (isEnviament) {
+                var enviament = enviamentRepository.findById(dto.getEnviamentId()).orElseThrow();
+                if (enviament.getEntregaPostal() == null && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
+                    identificadors.add(enviament.getNotificaReferencia());
+                }
+            }
+            if (isNotificacioMassiu) {
+                var notificacions = notificacioRepository.findByIdIn(dto.getNotificacionsId());
+                for (var not : notificacions) {
+                    for (var enviament : not.getEnviaments()) {
+                        if (enviament.getEntregaPostal() == null && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
+                            identificadors.add(enviament.getNotificaReferencia());
+                        } else {
+                            noExecutats.add(enviament.getUuid());
+                        }
+                    }
+                }
+            }
+            if (isEnviamentMassiu) {
+                var enviaments = enviamentRepository.findByIdIn(dto.getEnviamentsId());
+                for (var enviament : enviaments) {
+                    if (enviament.getEntregaPostal() == null && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
+                        identificadors.add(enviament.getNotificaReferencia());
+                    } else {
+                        noExecutats.add(enviament.getUuid());
+                    }
+                }
+            }
+            var envios = new Envios();
+            envios.setIdentificador(identificadors);
+            var anulacio = new Anulacio(identificadors, dto.getMotiu(), dto.getAccioMassiva());
+            var resposta = notificaHelper.anular(anulacio);
+            resposta.setNoExecutades(noExecutats);
+            return resposta;
+        } catch (Exception ex) {
+            var msg = "Error inesperat al ampliarPlazoOE ";
+            log.error(msg, ex);
+            var resposta = new RespostaAnulacio();
+            resposta.setError(true);
+            resposta.setCodiResposta("Error");
+            resposta.setDescripcioResposta(msg + ex.getMessage());
+            var respostaAnular = new RespostaAnular();
+            respostaAnular.addResposta(resposta);
+            return respostaAnular;
+        } finally {
+            metricsHelper.fiMetrica(timer);
+        }
+    }
+
+    @Override
 	public RespuestaAmpliarPlazoOE ampliacionPlazoOE(AmpliacionPlazoDto dto) {
 
 		var timer = metricsHelper.iniciMetrica();

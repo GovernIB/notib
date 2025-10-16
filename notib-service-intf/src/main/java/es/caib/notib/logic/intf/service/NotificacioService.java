@@ -29,6 +29,8 @@ import es.caib.notib.logic.intf.dto.SignatureInfoDto;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaElement;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
 import es.caib.notib.logic.intf.dto.accioMassiva.ResultatAccio;
+import es.caib.notib.logic.intf.dto.anular.AnularDto;
+import es.caib.notib.logic.intf.dto.anular.RespostaAnular;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
@@ -473,6 +475,9 @@ public interface NotificacioService {
 
     @PreAuthorize("isAuthenticated()")
 	void updateEstatList(Long notificacioId);
+
+    @PreAuthorize("isAuthenticated()")
+    RespostaAnular anular(AnularDto dto);
 
 	@PreAuthorize("isAuthenticated()")
 	RespuestaAmpliarPlazoOE ampliacionPlazoOE(AmpliacionPlazoDto notificacioId);

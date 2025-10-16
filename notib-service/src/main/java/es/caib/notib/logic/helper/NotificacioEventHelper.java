@@ -256,6 +256,12 @@ public class NotificacioEventHelper {
                 .error(error).errorDescripcio(errorDescripcio).build());
     }
 
+    public void addNotificaAnular(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio, boolean errorMaxReintents) {
+
+        addEvent(EventInfo.builder().enviament(enviament).tipus(NotificacioEventTipusEnumDto.NOTIFICA_ENVIO_OE).error(error)
+                .errorDescripcio(errorDescripcio).fiReintents(errorMaxReintents).build());
+    }
+
     public void addNotificaEnvioOE(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio, boolean errorMaxReintents) {
 
         addEvent(EventInfo.builder().enviament(enviament).tipus(NotificacioEventTipusEnumDto.NOTIFICA_ENVIO_OE).error(error)

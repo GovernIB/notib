@@ -3,6 +3,7 @@ package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.RespostaAnulacio;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliacionPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliacionesPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
@@ -377,7 +378,26 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		return enviament;
 	}
 
-	private String getErrorDescripcio(Exception ex) {
+    @Override
+    public RespostaAnulacio anular(String identificador) {
+
+        try {
+            var enviament = notificacioEnviamentRepository.findByNotificaReferencia(identificador);
+            var resposta =  new RespostaAnulacio();
+            resposta.setCodiResposta("000");
+            resposta.setError(false);
+            notificacioEventHelper.addNotificaAnular(enviament, false, "", false);
+            return resposta;
+        } catch (Exception ex) {
+            var resposta = new RespostaAnulacio();
+            resposta.setError(true);
+            resposta.setCodiResposta("Error");
+            resposta.setDescripcioResposta("Error al anular l'enviament " + identificador + " motiu: " + ex.getMessage());
+            return resposta;
+        }
+    }
+
+    private String getErrorDescripcio(Exception ex) {
 
 		// Generam el missatge d'error
 		return ex instanceof ValidationException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex);
