@@ -144,7 +144,7 @@ public class SubsistemesHelper {
         if (m.timerOkLocal != null) {
             m.timerOkLocal.record(duracio, TimeUnit.MILLISECONDS);
         }
-        cuaPeticions.add(false);
+        cuaPeticions.add(true);
     }
 
     public static void addErrorOperation(SubsistemesEnum subsistema) {
@@ -160,7 +160,7 @@ public class SubsistemesHelper {
         if (m.counterErrorLocal != null) {
             m.counterErrorLocal.increment();
         }
-        cuaPeticions.add(true);
+        cuaPeticions.add(false);
     }
 
     public static SubsistemesInfo getSubsistemesInfo() {
