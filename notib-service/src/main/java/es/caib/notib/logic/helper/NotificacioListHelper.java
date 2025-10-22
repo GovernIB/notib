@@ -176,6 +176,7 @@ public class NotificacioListHelper {
                 .registreNum(f.getRegistreNum())
                 .nomesAmbErrors(nomesAmbErrors)
                 .nomesAmbEntregaPostal(f.isNomesAmbEntregaPostal())
+                .nomesLesMeves(f.isNomesLesMeves())
                 .nomesFiReintents(nomesFiReintents)
                 .deleted(deleted)
                 .nomesSenseErrors(nomesSenseErrors)

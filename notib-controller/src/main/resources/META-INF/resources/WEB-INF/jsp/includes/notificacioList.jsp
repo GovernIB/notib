@@ -89,7 +89,7 @@
         vertical-align: middle;
     }
 
-    #nomesAmbErrorsBtn, #nomesAmbEntregaPostalBtn {
+    #nomesAmbErrorsBtn, #nomesAmbEntregaPostalBtn, #nomesLesMevesBtn {
         margin-right: 2%;
     }
 
@@ -532,7 +532,9 @@
             $('#nomesAmbErrorsBtn').removeClass('active');
             $('#nomesAmbErrors').val(false);
             $('#nomesAmbEntregaPostalBtn').removeClass('active');
+            $('#nomesLesMevesBtn').removeClass('active');
             $('#nomesAmbEntregaPostal').val(false);
+            $('#nomesLesMeves').val(false);
             $('#nomesFiReintentsBtn').removeClass('active');
             $('#nomesFiReintents').val(false);
             // omplirProcediments();
@@ -542,19 +544,24 @@
         });
 
         $('#nomesAmbErrorsBtn').click(function() {
-            nomesAmbErrors = !$(this).hasClass('active');
+            let nomesAmbErrors = !$(this).hasClass('active');
             $('#nomesAmbErrors').val(nomesAmbErrors);
-        })
+        });
 
         $('#nomesAmbEntregaPostalBtn').click(function() {
-            nomesAmbEntregaPostal = !$(this).hasClass('active');
+            let nomesAmbEntregaPostal = !$(this).hasClass('active');
             $('#nomesAmbEntregaPostal').val(nomesAmbEntregaPostal);
         })
 
+        $('#nomesLesMevesBtn').click(function() {
+            let nomesLesMeves = !$(this).hasClass('active');
+            $('#nomesLesMeves').val(nomesLesMeves);
+        });
+
         $('#nomesFiReintentsBtn').click(function() {
-            nomesFiReintents = !$(this).hasClass('active');
+            let nomesFiReintents = !$(this).hasClass('active');
             $('#nomesFiReintents').val(nomesFiReintents);
-        })
+        });
 
         $('#organGestor').on('change', function () {
             omplirProcediments();
@@ -822,7 +829,9 @@
         <div class="col-md-2">
             <not:inputDate name="dataCaducitatFi" placeholderKey="notificacio.list.filtre.camp.data.caducitat.fi" inline="true" required="false" />
         </div>
-        <div id="botons-filtre-avancat" class="col-md-2 pull-right form-buttons"  style="text-align: right;">
+        <div id="botons-filtre-avancat" class="col-md-3 pull-right form-buttons"  style="text-align: right;">
+            <button id="nomesLesMevesBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesLesMeves"/>" class="btn btn-default pull-left <c:if test="${nomesLesMeves}">active</c:if>" data-toggle="button"><span class="fa fa-user"></span></button>
+            <not:inputHidden name="nomesLesMeves"/>
             <button id="nomesAmbEntregaPostalBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesAmbEntregaPostal"/>" class="btn btn-default pull-left <c:if test="${nomesAmbEntregaPostal}">active</c:if>" data-toggle="button"><span class="fa fa-envelope"></span></button>
             <not:inputHidden name="nomesAmbEntregaPostal"/>
             <button id="nomesAmbErrorsBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesAmbErrors"/>" class="btn btn-default pull-left <c:if test="${nomesAmbErrors}">active</c:if>" data-toggle="button"><span class="fa fa-warning"></span></button>
