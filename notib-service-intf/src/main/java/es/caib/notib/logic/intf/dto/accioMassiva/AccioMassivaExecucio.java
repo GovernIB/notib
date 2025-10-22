@@ -2,6 +2,7 @@ package es.caib.notib.logic.intf.dto.accioMassiva;
 
 
 import es.caib.notib.logic.intf.dto.AmpliacionPlazoDto;
+import es.caib.notib.logic.intf.dto.anular.AnularDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,5 +27,6 @@ public class AccioMassivaExecucio {
     private boolean isAdminEntitat;
     private String motiu;
     private AmpliacionPlazoDto ampliacionPlazo;
+    private AnularDto anulacio;
 
 }

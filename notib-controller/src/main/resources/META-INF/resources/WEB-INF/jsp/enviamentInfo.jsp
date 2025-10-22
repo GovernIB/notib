@@ -355,6 +355,9 @@ $(document).ready(function() {
 									and enviament.notificaEstat != 'NOTIFICADA'}">
 								<span class="fa fa-warning text-danger" title="<c:out value='${enviament.notificaErrorDescripcio}' escapeXml='true'/>"></span>
 							</c:if>
+                            <c:if test="${enviament.anulat}">
+                                <span class="fa fa-ban" title="${enviament.motiuAnulacio}"></span>
+                            </c:if>
 							<c:if test="${enviament.fiReintents}">
 								<span class="fa fa-warning text-warning" title="<c:out value='${enviament.fiReintentsDesc}' escapeXml='true'/>"></span>
 							</c:if>

@@ -4,6 +4,7 @@
 package es.caib.notib.back.controller;
 
 import es.caib.notib.back.command.AmpliacionPlazoCommand;
+import es.caib.notib.back.command.AnularCommand;
 import es.caib.notib.back.command.ColumnesCommand;
 import es.caib.notib.back.command.NotificacioEnviamentCommand;
 import es.caib.notib.back.command.EnviamentFiltreCommand;
@@ -15,6 +16,7 @@ import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.back.helper.RolHelper;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
+import es.caib.notib.logic.intf.dto.accioMassiva.SeleccioTipus;
 import es.caib.notib.logic.intf.dto.notenviament.ColumnesDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
@@ -66,6 +68,8 @@ public class EnviamentController extends TableAccionsMassivesController {
     private OrganGestorService organGestorService;
 	@Autowired
     private ProcedimentService procedimentService;
+
+    private static final String SELECCIO_BUIDA = "accio.massiva.seleccio.buida";
 
 
     public EnviamentController() {
@@ -206,13 +210,32 @@ public class EnviamentController extends TableAccionsMassivesController {
 		return getModalControllerReturnValueSuccess(request, "redirect:enviament", "enviament.controller.modificat.ok");
 	}
 
+    @GetMapping(value = "/anular/massiu")
+    public String anularMassiu(HttpServletResponse response, HttpServletRequest request, Model model) {
+
+        var seleccio = getIdsSeleccionats(request);
+        var redirect = "redirect:../../..";
+        if (seleccio == null || seleccio.isEmpty()) {
+            return getModalControllerReturnValueError(request, redirect,SELECCIO_BUIDA);
+        }
+        if (seleccio.size() == 1 && seleccio.contains(-1L)) {
+            return getModalControllerReturnValueError(request, redirect,"accio.massiva.creat.ko");
+        }
+        var anulacio = new AnularCommand();
+        anulacio.setMassiu(true);
+        anulacio.setEnviamentsId(new ArrayList<>(seleccio));
+        anulacio.setSeleccioTipus(SeleccioTipus.ENVIAMENT);
+        model.addAttribute(anulacio);
+        return "anularForm";
+    }
+
 	@GetMapping(value = "/ampliacion/plazo/massiu")
 	public String ampliarPlazoOEMassiu(HttpServletResponse response, HttpServletRequest request, Model model) {
 
 		var seleccio = getIdsSeleccionats(request);
 		var redirect = "redirect:../../..";
 		if (seleccio == null || seleccio.isEmpty()) {
-			return getModalControllerReturnValueError(request,redirect, "accio. massiva. seleccio. buida");
+			return getModalControllerReturnValueError(request,redirect,SELECCIO_BUIDA);
 		}
 		if (seleccio.size() == 1 && seleccio.contains(-1L)) {
 			return getModalControllerReturnValueError(request, redirect,"accio.massiva.creat.ko");

@@ -28,8 +28,8 @@ public enum NotificacioEventTipusEnumDto implements Serializable {
 	CIE_ADVISER, //16
 	CIE_ADVISER_CERTIFICACIO, //17
 	CIE_ADVISER_DATAT, //18
-	SIR_ADVISER,
-    NOTIFICA_ANULAR;
+	SIR_ADVISER,//19
+    NOTIFICA_ANULAR;//20
 
 
 }

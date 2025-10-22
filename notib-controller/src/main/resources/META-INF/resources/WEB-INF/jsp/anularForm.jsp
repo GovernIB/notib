@@ -21,6 +21,7 @@
     <form:hidden path="notificacionsId"/>
     <form:hidden path="enviamentsId"/>
     <form:hidden path="massiu"/>
+    <form:hidden path="seleccioTipus"/>
     <div class="row">
         <div class="col-md-2">
             <not:inputTextarea name="motiu" textKey="ampliar.plazo.form.motiu" inputMaxLength="250" required="true"/>

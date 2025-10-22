@@ -79,6 +79,8 @@ public class NotificacioTableItemDto {
 
 	private boolean entregaPostal;
 
+    private boolean anulable;
+
 
 	private Map<EnviamentEstat, Integer> contadorEstat = new HashMap<>();
 	private Map<NotificacioRegistreEstatEnumDto, Integer> contadorEstatSir = new HashMap<>();

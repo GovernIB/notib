@@ -16,5 +16,6 @@ public enum AccioMassivaTipus {
     ENVIAR_CALLBACK,
     MARCAR_PROCESSADES,
     AMPLIAR_TERMINI,
-    ENVIAR_NOT_MOVIL;
+    ENVIAR_NOT_MOVIL,
+    ANULAR;
 }

@@ -21,13 +21,13 @@ databaseChangeLog:
               - column:
                   name: motiu_anulacio
                   type: varchar(250 ${varcharUnit})
-#        - addColumn:
-#            tableName: not_notificacio_table
-#            columns:
-#              - column:
-#                  name: anulada
-#                  type: boolean
-#                  defaultValue: 0
-#              - column:
-#                  name: motiu_anulacio
-#                  type: varchar(250 ${varcharUnit})
+        - addColumn:
+            tableName: not_notificacio_env_table
+            columns:
+              - column:
+                  name: anulat
+                  type: boolean
+                  defaultValue: 0
+              - column:
+                  name: motiu_anulacio
+                  type: varchar(250 ${varcharUnit})

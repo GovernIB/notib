@@ -4,6 +4,7 @@
 package es.caib.notib.logic.service;
 
 import com.google.common.base.Strings;
+import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.OrigenEnum;
@@ -656,7 +657,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 				enviament = enviamentsEntity.get(numEnviament);
 				boolean plazoAmpliado = dto.isPlazoAmpliado();
 				dto.setPlazoAmpliado(plazoAmpliado || enviament.isPlazoAmpliado());
-				eventError = enviament.getUltimEvent();
+
+                boolean anulat = dto.isAnulat();
+                dto.setAnulat(anulat || enviament.isAnulat());
+
+                eventError = enviament.getUltimEvent();
 				if (eventError != null && eventError.isError()) {
 					lastErrorEvent.add(eventError);
 				}
@@ -2159,6 +2164,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 		notificacioTableViewRepository.save(item);
 	}
 
+    private boolean isAnulable(NotificacioEnviamentEntity enviament) {
+
+        return !enviament.isAnulat() && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador()) && !enviament.isNotificaEstatFinal() && !enviament.isCieEstatFinal()
+                && (enviament.getEntregaPostal() == null || CieEstat.ENVIADO_CI.equals(enviament.getEntregaPostal().getCieEstat())
+                        && enviament.getNotificacio().getOrganGestor().getEntregaCie().getCie().isCieExtern());
+    }
+
     @Override
     public RespostaAnular anular(AnularDto dto) {
 
@@ -2173,7 +2185,7 @@ public class NotificacioServiceImpl implements NotificacioService {
             if (isNotificacio) {
                 var notificacio = notificacioRepository.findById(dto.getNotificacioId()).orElseThrow();
                 for (var enviament : notificacio.getEnviaments()) {
-                    if (enviament.getEntregaPostal() == null && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
+                    if (isAnulable(enviament)) {
                         identificadors.add(enviament.getNotificaReferencia());
                     } else {
                         noExecutats.add(enviament.getUuid());
@@ -2182,7 +2194,7 @@ public class NotificacioServiceImpl implements NotificacioService {
             }
             if (isEnviament) {
                 var enviament = enviamentRepository.findById(dto.getEnviamentId()).orElseThrow();
-                if (enviament.getEntregaPostal() == null && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
+                if (isAnulable(enviament)) {
                     identificadors.add(enviament.getNotificaReferencia());
                 }
             }
@@ -2190,7 +2202,7 @@ public class NotificacioServiceImpl implements NotificacioService {
                 var notificacions = notificacioRepository.findByIdIn(dto.getNotificacionsId());
                 for (var not : notificacions) {
                     for (var enviament : not.getEnviaments()) {
-                        if (enviament.getEntregaPostal() == null && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
+                        if (isAnulable(enviament)) {
                             identificadors.add(enviament.getNotificaReferencia());
                         } else {
                             noExecutats.add(enviament.getUuid());
@@ -2201,7 +2213,7 @@ public class NotificacioServiceImpl implements NotificacioService {
             if (isEnviamentMassiu) {
                 var enviaments = enviamentRepository.findByIdIn(dto.getEnviamentsId());
                 for (var enviament : enviaments) {
-                    if (enviament.getEntregaPostal() == null && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
+                    if (isAnulable(enviament)) {
                         identificadors.add(enviament.getNotificaReferencia());
                     } else {
                         noExecutats.add(enviament.getUuid());

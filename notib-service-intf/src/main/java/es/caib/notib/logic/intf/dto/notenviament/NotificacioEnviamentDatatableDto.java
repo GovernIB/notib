@@ -55,6 +55,8 @@ public class NotificacioEnviamentDatatableDto {
 	private boolean callbackFiReintents;
 	private String callbackFiReintentsDesc;
 	private String  notificacioMovilErrorDesc;
+    private boolean anulat;
+    private String motiuAnulacio;
 
 	public boolean isUltimEventError() {
 		return ultimEvent != null && ultimEvent.isError();

@@ -3,6 +3,7 @@ package es.caib.notib.logic.mapper;
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.logic.helper.EnviamentHelper;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.NotificacioListHelper;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
@@ -14,6 +15,7 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.utils.NotibLogger;
+import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.NotificacioEventEntity;
 import es.caib.notib.persist.entity.NotificacioTableEntity;
@@ -73,9 +75,22 @@ public abstract class NotificacioTableMapper {
     @Mapping(target = "createdByCodi", source = "not.createdBy", qualifiedByName = "optionalUserCode")
     @Mapping(target = "permisProcessar", source = "params.permisProcessar")
     @Mapping(target = "organEstat", source = "params.organEstat")
+    @Mapping(target = "anulable", expression = "java(isAnulable(not))")
     public abstract NotificacioTableItemDto toNotificacioTableItemDto(NotificacioTableEntity not, NotificacioTableItemConversioParams params);
 
     public abstract List<NotificacioTableItemDto> toNotificacionsTableItemDto(List<NotificacioTableEntity> nots, @Context List<String> codis, @Context Map<String, OrganismeDto> organs);
+
+    protected boolean isAnulable(NotificacioTableEntity notificacio) {
+
+        for (var enviament : notificacio.getEnviaments()) {
+            if (!(!enviament.isAnulat() && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador()) && !enviament.isNotificaEstatFinal() && !enviament.isCieEstatFinal()
+                    && (enviament.getEntregaPostal() == null || CieEstat.ENVIADO_CI.equals(enviament.getEntregaPostal().getCieEstat())
+                    && enviament.getNotificacio().getOrganGestor().getEntregaCie().getCie().isCieExtern()))) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public NotificacioTableItemDto mapNotificacioTableItemDtoContext(NotificacioTableEntity not, @Context List<String> codis, @Context Map<String, OrganismeDto> organs) {
 
@@ -198,6 +213,7 @@ public abstract class NotificacioTableMapper {
         // Estats enviaments
         String registreEstat = getRegistreEstat(dto, enviaments);
         String notificaEstats = dto.isComunicacioSir() ? getSirEstats(dto, enviaments) : getNotificaEstats(dto, enviaments);
+        var anulat = getAnulat(enviaments);
 
         var columnaEstat = new StringBuilder(entregaPostal + "<div class=\"flex-column\">")
                 .append("<div style=\"display:flex; justify-content:space-between\">")
@@ -205,6 +221,7 @@ public abstract class NotificacioTableMapper {
                 .append(registreEstat)
                 .append(iconaEstat)
                 .append(nomEstat)
+                .append(anulat)
                 .append(eventError)
                 .append(callbackError)
                 .append(notificaMovilError)
@@ -220,6 +237,18 @@ public abstract class NotificacioTableMapper {
         return columnaEstat.toString();
     }
 
+    private String getAnulat(Set<NotificacioEnviamentEntity> enviaments) {
+
+        var anulat = false;
+        for (var enviament : enviaments) {
+            if (enviament.isAnulat()) {
+                anulat = true;
+            }
+        }
+        var title = messageHelper.getMessage("notificacio.enviament.anulat");
+        return anulat ?  " <span class=\"fa fa-ban\" title=\"" + title + "\"></span>" : "";
+    }
+
     private String getEntregaPostal(Set<NotificacioEnviamentEntity> enviaments) {
 
         var entregaPostal = false;
@@ -232,7 +261,6 @@ public abstract class NotificacioTableMapper {
             }
 
         }
-
         if (!entregaPostal) {
             return "";
         }

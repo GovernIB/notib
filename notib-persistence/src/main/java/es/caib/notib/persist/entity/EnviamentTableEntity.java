@@ -43,6 +43,7 @@ import java.util.Date;
 @Table(name="NOT_NOTIFICACIO_ENV_TABLE")
 @EntityListeners(AuditingEntityListener.class)
 public class EnviamentTableEntity extends NotibAuditable<Long> {
+
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id")
 	@MapsId
@@ -183,4 +184,10 @@ public class EnviamentTableEntity extends NotibAuditable<Long> {
 
 	@Column(name = "entrega_postal")
 	protected boolean entregaPostal;
+
+    @Column(name = "anulat")
+    protected boolean anulat;
+
+    @Column(name = "motiu_anulacio")
+    protected String motiuAnulacio;
 }

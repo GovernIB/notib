@@ -381,18 +381,22 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
     @Override
     public RespostaAnulacio anular(String identificador) {
 
+        var enviament = notificacioEnviamentRepository.findByNotificaReferencia(identificador);
         try {
-            var enviament = notificacioEnviamentRepository.findByNotificaReferencia(identificador);
             var resposta =  new RespostaAnulacio();
             resposta.setCodiResposta("000");
+            resposta.setIdentificador(identificador);
             resposta.setError(false);
             notificacioEventHelper.addNotificaAnular(enviament, false, "", false);
             return resposta;
         } catch (Exception ex) {
             var resposta = new RespostaAnulacio();
+            resposta.setIdentificador(identificador);
             resposta.setError(true);
             resposta.setCodiResposta("Error");
-            resposta.setDescripcioResposta("Error al anular l'enviament " + identificador + " motiu: " + ex.getMessage());
+            var errorDesc = "Error al anular l'enviament " + identificador + " motiu: " + ex.getMessage();
+            resposta.setDescripcioResposta(errorDesc);
+            notificacioEventHelper.addNotificaAnular(enviament, true, errorDesc, false);
             return resposta;
         }
     }

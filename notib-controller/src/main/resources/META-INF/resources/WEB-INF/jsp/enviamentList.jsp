@@ -280,7 +280,8 @@
 						<c:if test="${!isRolActualAdministradorLectura}">
 								<li><a id="reintentarErrors" style="cursor: pointer;" title='<spring:message code="notificacio.list.accio.massiva.reintentar.errors.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reintentar.errors"/></a></li>
 								<li><a style="cursor: pointer;" id="updateEstat"><spring:message code="enviament.list.user.actualitzar.estat"/></a></li>
-								<li><a style="cursor: pointer;" id="ampliarPlazoOe"><spring:message code="notificacio.list.accio.massiva.ampliar.plazo.oe"/></a></li>
+                            <li><a id="anular" href="<c:url value="/enviament/anular/massiu"/>" data-toggle="modal" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.anular"/></a></li>
+                            <li><a id="ampliarPlazoOE" href="<c:url value="/enviament/ampliacion/plazo/massiu"/>" data-toggle="modal" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.ampliar.plazo.oe"/></a></li>
 							<c:if test="${isRolActualAdministradorEntitat}">
 								<hr/>
 								<li><a style="cursor: pointer;" id="reactivarConsulta" title='<spring:message code="notificacio.list.accio.massiva.reactivar.consultes.tooltip"/>'><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.notifica"/></a></li>
@@ -462,7 +463,11 @@
 				<th data-col-name="estatColor" data-visible="false"></th>
 				<th data-col-name="estat" data-template="#cellEstatTemplate"   data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
-						<div class="estatColor {{:estatColor}}">{{:estat}}</div>
+						<div class="estatColor {{:estatColor}}">{{:estat}}
+						{{if anulat == true}}
+						     <span class="fa fa-ban" title="{{:motiuAnulacio}}"></span>
+						{{/if}}
+						</div>
 					</script>
 				</th>
 
@@ -488,6 +493,7 @@
 
 				<th data-col-name="notificacioId" data-visible="false"></th>
 				<th data-col-name="plazoAmpliable" data-visible="false"></th>
+				<th data-col-name="anulable" data-visible="false"></th>
 				<th data-orderable="false" data-template="#cellAccionsTemplate" width="190">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 
@@ -496,7 +502,9 @@
                     		<ul class="dropdown-menu dropdown-menu-right">
 								<li><a href="<c:url value="/notificacio/{{:notificacioId}}/enviament/{{:id}}"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
 								<li><a href="<c:url value="/notificacio/{{:notificacioId}}/info"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detall.remesa"/></a></li>
-                                <li><a href="<c:url value="/notificacio/{{:notificacioId}}/enviament/{{:id}}/anular"/>" data-toggle="modal"><span class="fa fa-ban"></span>&nbsp; <spring:message code="comu.boto.anular"/></a></li>
+                                {{if anulable == true}}
+                                    <li><a href="<c:url value="/notificacio/{{:notificacioId}}/enviament/{{:id}}/anular"/>" data-toggle="modal"><span class="fa fa-ban"></span>&nbsp; <spring:message code="comu.boto.anular"/></a></li>
+								{{/if}}
 								{{if plazoAmpliable && ${!isRolActualAdministradorLectura}}}
 									<li><a href="<c:url value="/notificacio/{{:notificacioId}}/enviament/{{:id}}/ampliacion/plazo"/>" data-toggle="modal"><span class="fa fa-calendar-o"></span>&nbsp;<spring:message code="notificacio.list.accio.massiva.ampliar.plazo.oe"/></a></li>
 								{{/if}}

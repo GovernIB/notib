@@ -1,5 +1,6 @@
 package es.caib.notib.back.command;
 
+import es.caib.notib.logic.intf.dto.accioMassiva.SeleccioTipus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,4 +16,5 @@ public class AnularCommand {
     private List<Long> notificacionsId;
     private List<Long> enviamentsId;
     private boolean massiu;
+    private SeleccioTipus seleccioTipus;
 }

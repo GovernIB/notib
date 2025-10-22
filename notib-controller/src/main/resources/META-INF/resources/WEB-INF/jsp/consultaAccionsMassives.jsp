@@ -311,6 +311,8 @@
                     <spring:message code="es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaTipus.REACTIVAR_REGISTRE"/>
                 {{else tipus == 'ENVIAR_CALLBACK'}}
                     <spring:message code="es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaTipus.ENVIAR_CALLBACK"/>
+                {{else tipus == 'ANULAR'}}
+                <spring:message code="es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaTipus.ANULAR"/>
                 {{else tipus == 'ENVIAR_NOT_MOVIL'}}
                     <spring:message code="es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaTipus.ENVIAR_NOT_MOVIL"/>
                 {{/if}}

@@ -1,6 +1,7 @@
 package es.caib.notib.logic.intf.dto.notenviament;
 
 import com.google.common.base.Strings;
+import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -70,6 +71,10 @@ public class NotEnviamentTableItemDto implements Serializable {
 	private String notificaCertificacioNumSeguiment;
 
 	private boolean isEnviant;
+
+    private boolean anulable;
+    private boolean anulat;
+    private String motiuAnulacio;
 
 	public NotEnviamentTableItemDto() {
 	}

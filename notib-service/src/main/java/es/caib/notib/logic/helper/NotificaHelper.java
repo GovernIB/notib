@@ -17,6 +17,7 @@ import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.intf.ws.adviser.nexea.NexeaAdviserWs;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnvio;
+import es.caib.notib.logic.plugin.cie.CiePluginHelper;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOE.RespuestaSincronizarEnvioOE;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -62,9 +63,13 @@ public class NotificaHelper {
 	public static final String JMS_FACTORY_ACK = "jmsFactory";
     @Autowired
     private MessageHelper messageHelper;
+    @Autowired
+    private CiePluginHelper ciePluginHelper;
+    @Autowired
+    private EnviamentTableHelper enviamentTableHelper;
 
 
-	public NotificacioEntity notificacioEnviar(Long notificacioId) {
+    public NotificacioEntity notificacioEnviar(Long notificacioId) {
 		return getNotificaHelper().notificacioEnviar(notificacioId, false);
 	}
 
@@ -80,12 +85,29 @@ public class NotificaHelper {
 		return getNotificaHelper().enviamentRefrescarEstat(consulta, raiseException);
 	}
 
+    @Transactional
     public RespostaAnular anular(Anulacio anulacio) {
 
         var respostaAnular = new RespostaAnular();
         for (var identificador : anulacio.getIdentificadors()) {
+            var enviament = enviamentRepository.findByUuid(identificador).orElseThrow();
+            if (enviament.getEntregaPostal() != null && !ciePluginHelper.cancelar(identificador)) {
+                var respostaAnulacio = RespostaAnulacio.builder()
+                                        .identificador(identificador)
+                                        .error(true)
+                                        .codiResposta("Error")
+                                        .descripcioResposta("Error al cancelar l'enviament postal, no es pot anular").build();
+                respostaAnular.addResposta(respostaAnulacio);
+                continue;
+            }
             var resposta = getNotificaHelper().anular(identificador);
             respostaAnular.addResposta(resposta);
+            if (resposta.isError()) {
+                continue;
+            }
+            enviament.setAnulat(true);
+            enviament.setMotiuAnulacio(anulacio.getMotiu());
+            enviamentTableHelper.actualitzarRegistre(enviament);
         }
         return respostaAnular;
     }

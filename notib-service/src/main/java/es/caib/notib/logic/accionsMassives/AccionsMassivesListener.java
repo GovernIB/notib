@@ -60,7 +60,6 @@ public class AccionsMassivesListener {
         try {
             var error = false;
             Set<Long> seleccio = new HashSet<>(accio.getSeleccio());
-            var tipus = accio.getSeleccioTipus().name().toLowerCase();
             /* Les seguents accions no passen per la cua:
                 EXPORTAR_FULL_CALCUL, DESCARREGA_JUSTIFICANT_ENVIAMENT, DESCARREGA_CERTIFICAT_RECEPCIO, TORNA_ENVIAR_AMB_ERROR,
                 ESBORRAR,
@@ -160,6 +159,25 @@ public class AccionsMassivesListener {
                         accioEntity.getElement(id).actualitzar(errorAmpliacion, "");
                     }
                     break;
+                case ANULAR:
+                    accio.getAnulacio().setAccioMassiva(accioEntity.getId());
+                    var respostaAnulacio = notificacioService.anular(accio.getAnulacio());
+                    for (var anulacio : respostaAnulacio.getRespostes()) {
+                        enviamentEntity = enviamentRepository.findByNotificaReferencia(anulacio.getIdentificador());
+                        if (enviamentEntity == null) {
+                            throw new Exception("Enviament inexistent. Identificador de Notifica " + anulacio.getIdentificador());
+                        }
+                        id = SeleccioTipus.NOTIFICACIO.equals(accio.getSeleccioTipus()) ? enviamentEntity.getNotificacio().getId() : enviamentEntity.getId();
+                        accioEntity.getElement(id).actualitzar(anulacio.getDescripcioResposta(), "");
+                    }
+                    String errorAnulacio;
+                    for (var uuid : respostaAnulacio.getNoExecutades()) {
+                        enviamentEntity = enviamentRepository.findByUuid(uuid).orElseThrow();
+                        errorAnulacio = "L'enviament no compleix les condicions per ser anul·lat";
+                        id = SeleccioTipus.NOTIFICACIO.equals(accio.getSeleccioTipus()) ? enviamentEntity.getNotificacio().getId() : enviamentEntity.getId();
+                        accioEntity.getElement(id).actualitzar(errorAnulacio, "");
+                    }
+                    break;
                 case ENVIAR_NOT_MOVIL:
                     var enviarCarpeta = carpetaPluginHelper.enviarCarpeta();
                     if (!enviarCarpeta) {
@@ -199,7 +217,7 @@ public class AccionsMassivesListener {
 //            accioEntity.setErrorDescripcio(errorDescricpio);
 //            accioEntity.setExcepcioStacktrace(excepcioStacktrace);
         } catch (Exception ex) {
-            log.error("[AccionsMassivesListener] Error al executar no controlat l'acció massiva " + accio, ex);
+            log.error("[AccionsMassivesListener] Error no controlat al executar l'acció massiva " + accio, ex);
             accioEntity.setError(true);
             accioEntity.setErrorDescripcio(ex.getMessage());
             accioEntity.setExcepcioStacktrace(Arrays.toString(ex.getStackTrace()));

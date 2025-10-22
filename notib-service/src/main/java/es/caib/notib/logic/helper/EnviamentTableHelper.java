@@ -129,6 +129,8 @@ public class EnviamentTableHelper {
         tableViewItem.setNotificaEstat(enviament.getNotificaEstat());
         tableViewItem.setNotificaReferencia(enviament.getNotificaReferencia());
         tableViewItem.setEntitat(notificacio.getEntitat());
+        tableViewItem.setAnulat(enviament.isAnulat());
+        tableViewItem.setMotiuAnulacio(enviament.getMotiuAnulacio());
 
         tableViewItem.setErrorLastCallback(enviament.isErrorLastCallback());
 

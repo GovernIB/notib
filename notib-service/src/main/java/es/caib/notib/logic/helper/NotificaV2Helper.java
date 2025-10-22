@@ -375,8 +375,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
     public RespostaAnulacio anular(String identificador) {
 
 
+        var enviament = notificacioEnviamentRepository.findByNotificaReferencia(identificador);
         try {
-            var enviament = notificacioEnviamentRepository.findByNotificaReferencia(identificador);
             var apiKey = enviament.getNotificacio().getEntitat().getApiKey();
             var organEmisor = enviament.getNotificacio().getEmisorDir3Codi();
             var id = enviament.getNotificaIdentificador();
@@ -414,6 +414,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
             resposta.setIdentificador(identificador);
             resposta.setCodiResposta("Error");
             resposta.setDescripcioResposta(ex.getMessage());
+            notificacioEventHelper.addNotificaAnular(enviament, true, ex.getMessage(), false);
             return resposta;
         }
     }

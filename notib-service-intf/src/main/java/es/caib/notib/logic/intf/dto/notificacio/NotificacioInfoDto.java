@@ -104,6 +104,7 @@ public class NotificacioInfoDto extends AuditoriaDto {
 	private Date enviadaDate;
 	private boolean justificantCreat;
 	private boolean deleted;
+    private boolean anulat;
 
 	public boolean isNotificaError() {
 

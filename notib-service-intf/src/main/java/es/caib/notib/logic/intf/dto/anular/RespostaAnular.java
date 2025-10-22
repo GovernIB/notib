@@ -22,7 +22,7 @@ public class RespostaAnular {
     List<RespostaAnulacio> respostes = new ArrayList<>();
     private List<String> noExecutades;
 
-    public boolean isOk() {
+    public boolean  isOk() {
 
         if (respostes == null || respostes.isEmpty()) {
             return false;
@@ -46,7 +46,7 @@ public class RespostaAnular {
             if (!resposta.isError()) {
                 continue;
             }
-            errors.add(resposta.getCodiResposta() + " - " + resposta.getCodiResposta());
+            errors.add(resposta.getCodiResposta() + " - " + resposta.getDescripcioResposta());
         }
         return errors;
     }
