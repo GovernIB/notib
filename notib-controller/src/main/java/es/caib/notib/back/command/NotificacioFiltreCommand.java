@@ -49,6 +49,7 @@ public class NotificacioFiltreCommand extends FiltreCommand {
 	private String referencia;
 	private boolean nomesAmbErrors;
 	private boolean nomesAmbEntregaPostal;
+	private boolean nomesLesMeves;
 	private boolean nomesFiReintents;
 	private boolean hasErrors;
 	private boolean deleted;

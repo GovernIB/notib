@@ -119,12 +119,14 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         var organGestorActual = getOrganGestorActual(request);
         var filtre = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE);
         filtre.setDeleted(false);
+        filtre.setNomesLesMeves(true);
         model.addAttribute(filtre);
         var codiUsuari = getCodiUsuariActual();
         var columnes = columnesService.getColumnesRemeses(entitatActual.getId(), codiUsuari);
         model.addAttribute("mostrarFiltreAvancat", !filtre.isFiltreSimpleActiu());
         model.addAttribute("columnes", ColumnesRemesesCommand.asCommand(columnes));
         model.addAttribute("nomesFiReintents", filtre.isNomesFiReintents());
+        model.addAttribute("nomesLesMeves", filtre.isNomesLesMeves());
         notificacioListHelper.fillModel(entitatActual, organGestorActual, request, model);
         return "notificacioList";
     }
@@ -182,6 +184,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         model.addAttribute("notificacioFiltreCommand", command);
         model.addAttribute("nomesAmbErrors", command.isNomesAmbErrors());
         model.addAttribute("nomesAmbEntregaPostal", command.isNomesAmbEntregaPostal());
+        model.addAttribute("nomesLesMeves", command.isNomesLesMeves());
         model.addAttribute("nomesFiReintents", command.isNomesFiReintents());
         return "notificacioList";
     }

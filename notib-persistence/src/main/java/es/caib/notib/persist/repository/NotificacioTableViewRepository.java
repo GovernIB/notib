@@ -129,6 +129,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (:#{#filtre.identificadorNull} = true or ntf.notificaIds like concat('%', :#{#filtre.identificador}, '%')) " +
 			"and (:#{#filtre.registreNumNull} = true or ntf.registreNums like concat('%', :#{#filtre.registreNum}, '%')) " +
 			"and (:#{#filtre.nomesSenseErrors} = false or ntf.notificaErrorData is null) " +
+            "and (:#{#filtre.nomesLesMeves} = false or ntf.createdBy.codi = :#{#filtre.usuariCodi}) " +
 			"and (:#{#filtre.nomesAmbEntregaPostal} = false or ntf.entregaPostal = true) " +
 			"and (:#{#filtre.adminOrgan} = true or :#{#filtre.nomesAmbErrors} = false or ntf.notificaErrorData is not null or ntf.entregaPostalError = true) " +
 			"and (:#{#filtre.deleted} = ntf.deleted) " +
@@ -195,6 +196,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (:#{#filtre.registreNumNull} = true or ntf.registreNums like concat('%', :#{#filtre.registreNum}, '%')) " +
 			"and (:#{#filtre.nomesSenseErrors} = false or ntf.notificaErrorData is null) " +
 			"and (:#{#filtre.nomesAmbEntregaPostal} = false or ntf.entregaPostal = true) " +
+			"and (:#{#filtre.nomesLesMeves} = false or ntf.createdBy.codi = :#{#filtre.usuariCodi}) " +
 			"and (:#{#filtre.adminOrgan} = true or :#{#filtre.nomesAmbErrors} = false or ntf.notificaErrorData is not null or ntf.entregaPostalError = true) " +
 			"and (:#{#filtre.deleted} = ntf.deleted) " +
 			"and (:#{#filtre.referenciaNull} = true or lower(ntf.referencia) like '%' || lower(:#{#filtre.referencia}) || '%')")
