@@ -142,10 +142,10 @@ public class RegistreSmHelper {
 				seguentRemesa.setNumRegistrePrevi(arbResposta.getRegistreNumeroFormatat());
 				seguentRemesa.getEnviaments().forEach(e -> enviamentSmService.altaEnviament(e.getNotificaReferencia()));
 			}
+		    callbackHelper.crearCallback(notificacio, enviament, !success, errorDescripcio);
 		} else {
 			notificacioEventHelper.addRegistreEnviamentEvent(eventInfo);
 		}
-		callbackHelper.crearCallback(notificacio, enviament, !success, errorDescripcio);
 		enviamentTableHelper.actualitzarRegistre(enviament);
 		auditHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "RegistreSmHelper.registrarEnviament");
 		return success;

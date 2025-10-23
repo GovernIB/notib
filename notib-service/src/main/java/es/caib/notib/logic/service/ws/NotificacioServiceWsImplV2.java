@@ -246,7 +246,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		} catch (Exception ex) {
 			log.error("Error entitat no trobada a la bdd " + notificacio.getEmisorDir3Codi(), ex);
 		}
-		var info = generateInfoAlta(notificacio, entitat != null ? entitat.getId() : null);
+//		var info = generateInfoAlta(notificacio, entitat != null ? entitat.getId() : null);
 		try {
 			log.debug("[ALTA] Alta de notificació: " + notificacio.toString());
 
@@ -268,7 +268,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			var emisorDir3Codi = notificacio.getEmisorDir3Codi();
 			if (entitat != null) {
 				ConfigHelper.setEntitatCodi(entitat.getCodi());
-				info.setCodiEntitat(entitat.getCodi());
+//				info.setCodiEntitat(entitat.getCodi());
 			}
 			// Procediment
 			if (entitat != null && !Strings.isNullOrEmpty(notificacio.getProcedimentCodi())) {
@@ -345,7 +345,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
  			notificacioValidator.validate();
 			if (errors.hasErrors()) {
 				String errorDescripcio = errors.getAllErrors().stream().map(e -> e.getCode()).collect(Collectors.joining(", "));
-				integracioHelper.addAccioError(info, errorDescripcio);
+//				integracioHelper.addAccioError(info, errorDescripcio);
 				log.debug(">> [ALTA] validacio: [errors=" + errorDescripcio + "]");
 				return setRespostaError(errorDescripcio);
 			}
@@ -423,12 +423,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			}
 			log.debug(">> [ALTA] enviaments creats");
 			notificacioGuardada = notificacioRepository.saveAndFlush(notificacioGuardada);
-			var respostaAlta = generaResposta(info, notificacioGuardada, referencies, avisos);
+			var respostaAlta = generaResposta(/*info,*/ notificacioGuardada, referencies, avisos);
 			SubsistemesHelper.addSuccessOperation(ARE, System.currentTimeMillis() - start);
 			return respostaAlta;
 		} catch (Exception ex) {
 			log.error("Error creant notificació", ex);
-			integracioHelper.addAccioError(info, "Error creant la notificació", ex);
+//			integracioHelper.addAccioError(info, "Error creant la notificació", ex);
 			SubsistemesHelper.addErrorOperation(ARE);
 			throw new RuntimeException("[NOTIFICACIO/COMUNICACIO] Hi ha hagut un error creant la " + notificacio.getEnviamentTipus().name() + ": " + ex.getMessage(), ex);
 		} finally {
@@ -1230,7 +1230,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	}
 
 
-	private RespostaAltaV2 generaResposta(IntegracioInfo info, NotificacioEntity notificacioGuardada, List<EnviamentReferenciaV2> referencies, String warns) {
+	private RespostaAltaV2 generaResposta(/*IntegracioInfo info,*/ NotificacioEntity notificacioGuardada, List<EnviamentReferenciaV2> referencies, String warns) {
 
 		RespostaAltaV2 resposta = new RespostaAltaV2();
 		resposta.setErrorDescripcio(warns);
@@ -1262,7 +1262,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		}
 		var errorEvent = notificacioHelper.getNotificaErrorEvent(notificacioGuardada);
 		if (errorEvent != null) {
-			info.setCodiEntitat(errorEvent.getNotificacio().getEntitat().getCodi());
+//			info.setCodiEntitat(errorEvent.getNotificacio().getEntitat().getCodi());
 			resposta.setError(true);
 			resposta.setErrorDescripcio(errorEvent.getErrorDescripcio());
 			resposta.setErrorData(new Date());
@@ -1270,7 +1270,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		resposta.setReferencies(referencies);
 		resposta.setDataCreacio(notificacioGuardada.getCreatedDate().isPresent() ? Date.from(notificacioGuardada.getCreatedDate().orElseThrow().atZone(ZoneId.systemDefault()).toInstant()) : null);
 		log.debug(">> [ALTA] afegides referències");
-		integracioHelper.addAccioOk(info);
+//		integracioHelper.addAccioOk(info);
 		return resposta;
 	}
 

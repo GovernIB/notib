@@ -465,7 +465,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.ultimEvent = notificaErrorEvent;
 	}
 
-	public void updateNotificaDataRefrescEstat() {
+	public void  updateNotificaDataRefrescEstat() {
 		this.notificaEstatDataActualitzacio = new Date();
 	}
 	

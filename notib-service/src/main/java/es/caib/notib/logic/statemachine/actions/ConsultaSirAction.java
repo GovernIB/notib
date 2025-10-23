@@ -85,9 +85,9 @@ public class ConsultaSirAction implements Action<EnviamentSmEstat, EnviamentSmEv
 
             enviament.updateSirNovaConsulta(maxReintents);
             notificacioEventHelper.addSirConsultaEvent(enviament, true, errorDescripcio, fiReintents);
-            if (!errorUltimaConsulta) {
-                callbackHelper.updateCallback(enviament, true, errorDescripcio);
-            }
+//            if (!errorUltimaConsulta) {
+//                callbackHelper.updateCallback(enviament, true, errorDescripcio);
+//            }
             enviamentTableHelper.actualitzarRegistre(enviament);
         } catch (Exception ex) {
             log.error("[SM] Error al modificar enviament després d'una recuperació a ConsultaSirAction.", ex);

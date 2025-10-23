@@ -3,6 +3,7 @@ package es.caib.notib.logic.plugin.cie;
 import com.google.common.base.Strings;
 import es.caib.comanda.ms.salut.model.IntegracioApp;
 import es.caib.notib.client.domini.CieEstat;
+import es.caib.notib.logic.helper.CallbackHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
@@ -80,6 +81,7 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
 
     public static final String GRUP = "CIE";
     private static final String ERROR_INESPERAT = "Error inesperat";
+    private final CallbackHelper callbackHelper;
 
     public CiePluginHelper(ConfigHelper configHelper,
                            EntitatRepository entitatRepository,
@@ -96,7 +98,7 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
                            NotificacioTableViewRepository notificacioTableViewRepository,
                            MessageHelper messageHelper,
                            NotificacioTableHelper notificacioTableHelper,
-                           MeterRegistry meterRegistry) {
+                           MeterRegistry meterRegistry, CallbackHelper callbackHelper) {
 
         super(integracioHelper, configHelper, entitatRepository, meterRegistry);
 
@@ -112,6 +114,7 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
         this.notificacioTableViewRepository = notificacioTableViewRepository;
         this.messageHelper = messageHelper;
         this.notificacioTableHelper = notificacioTableHelper;
+        this.callbackHelper = callbackHelper;
     }
 
     @Transactional
@@ -225,6 +228,7 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
                 }
                 entregaPostal.setCieId(id.getIdentificador());
                 entregaPostal.setCieEstat(CieEstat.ENVIADO_CI);
+                callbackHelper.crearCallback(notificacio, env, false, "");
                 entregaPostalRepository.save(entregaPostal);
             }
             afegirEventsEnviarCie(notificacioReferencia, resposta);
@@ -249,7 +253,9 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
             if (error) {
                 var entregaPostal = env.getEntregaPostal();
                 entregaPostal.setCieEstat(CieEstat.ERROR);
-                entregaPostal.setCieErrorDesc(resposta.getDescripcioError());
+                var errorDesc = !Strings.isNullOrEmpty(resposta.getDescripcioError()) ? resposta.getDescripcioError() : null;
+                errorDesc = errorDesc.length() > 250 ? resposta.getDescripcioError().substring(0, 250) : errorDesc;
+                entregaPostal.setCieErrorDesc(errorDesc);
                 entregaPostalRepository.save(entregaPostal);
             }
         }

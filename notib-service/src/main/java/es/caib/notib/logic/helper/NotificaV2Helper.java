@@ -205,10 +205,13 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
                         comandaListener.enviarTasca(enviament);
 					}
 
-					if (pluginHelper.enviarCarpeta()) {
-						for (NotificacioEnviamentEntity e : notificacio.getEnviaments()) {
+                    for (NotificacioEnviamentEntity e : notificacio.getEnviaments()) {
+					    if (pluginHelper.enviarCarpeta()) {
 							pluginHelper.enviarNotificacioMobil(e);
 						}
+                        if (e.getEntregaPostal() == null) {
+                            callbackHelper.crearCallback(notificacio, e, error, errorDescripcio);
+                        }
 					}
 					elapsedTime = (System.nanoTime() - startTime) / 10e6;
 					log.info(" [TIMER-NOT] Notificació enviar (Preparar events)  [Id: " + notificacioId + "]: " + elapsedTime + " ms");
@@ -238,7 +241,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			}
 			var eventInfo = NotificacioEventHelper.EventInfo.builder().notificacio(notificacio).error(error).errorDescripcio(errorDescripcio).fiReintents(fiReintents).build();
 			notificacioEventHelper.addNotificaEnviamentEvent(eventInfo);
-			callbackHelper.updateCallbacks(notificacio, error, errorDescripcio);
+//			callbackHelper.updateCallbacks(notificacio, error, errorDescripcio);
 			log.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 			notificacioTableHelper.actualitzarRegistre(notificacio);
 			auditHelper.auditaNotificacio(notificacio, TipusOperacio.UPDATE, "NotificaV2Helper.notificacioEnviar");
@@ -663,7 +666,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		log.info(" [EST] Fi actualització certificació. Creant nou event per certificació...");
 		//Crea un nou event
 		notificacioEventHelper.addAdviserCertificacioEvent(enviament, false, null);
-		callbackHelper.updateCallback(enviament, false, null);
+//		callbackHelper.updateCallback(enviament, false, null);
 	}
 
 	private void actualitzaDatatEnviament(RespuestaInfoEnvioLigero resultadoInfoEnvio, NotificacioEnviamentEntity enviament, Datado darrerDatat) throws Exception {
@@ -689,7 +692,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		//Crea un nou event
 		log.info(" [EST] Creant nou event per Datat...");
 		notificacioEventHelper.addAdviserDatatEvent(enviament, false, null);
-		callbackHelper.updateCallback(enviament, false, null);
+        if (enviament.isNotificaEstatFinal()) {
+            callbackHelper.updateCallback(enviament, false, null);
+        }
 		log.info(" [EST] L'event s'ha guardat correctament...");
 		log.info(" [EST] Actualitzant Datat enviament...");
 		enviamentUpdateDatat(estat,
