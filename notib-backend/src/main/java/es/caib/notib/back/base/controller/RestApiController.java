@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,7 +28,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Hidden
 @RestController
-@RequestMapping(BaseConfig.API_PATH + "aaa")
+@RequestMapping(BaseConfig.API_PATH + "2")
 public class RestApiController {
 
 	@Autowired
@@ -40,10 +41,14 @@ public class RestApiController {
 	@Operation(summary = "Consulta l'índex de serveis de l'aplicació")
 	public ResponseEntity<CollectionModel<?>> index() {
 		List<Class<? extends Resource<?>>> allowedResourceClasses = resourceApiService.resourceFindAllowed();
-		List<Link> indexLinks = baseControllers.stream().
-				filter(bc -> bc.isVisibleInApiIndex() && isBaseControllerAllowed(bc, allowedResourceClasses)).
-				map(BaseController::getIndexLink).
-				collect(Collectors.toList());
+		List<Link> indexLinks = new ArrayList<>();
+		if (baseControllers != null) {
+			List<Link> controllerLinks = baseControllers.stream().
+					filter(bc -> bc.isVisibleInApiIndex() && isBaseControllerAllowed(bc, allowedResourceClasses)).
+					map(BaseController::getIndexLink).
+					collect(Collectors.toList());
+			indexLinks.addAll(controllerLinks);
+		}
 		indexLinks.add(0, linkTo(ClassUtils.getUserClass(methodOn(getClass()).index())).withSelfRel());
 		CollectionModel<?> resources = CollectionModel.of(
 				Collections.emptySet(),
