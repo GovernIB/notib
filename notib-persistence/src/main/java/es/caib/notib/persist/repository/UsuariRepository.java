@@ -31,8 +31,10 @@ public interface UsuariRepository extends JpaRepository<UsuariEntity, String> {
 	Optional<UsuariEntity> getByCodiReadOnlyNewTransaction(@Param("codi") String codi);
 
 
-	@Query(   "select u from UsuariEntity u "
-			+ "where lower(u.nom) like concat('%', lower(:text), '%') "
+	@Query("select u from UsuariEntity u "
+			+ "where lower(u.nomSencer) like concat('%', lower(:text), '%') "
+            + "or lower(u.nom) like concat('%', lower(:text), '%')"
+            + "or lower(u.llinatges) like concat('%', lower(:text), '%')"
 			+ "or (u.codi) like concat('%', lower(:text), '%')"
 			+ "order by u.nom desc")
 	List<UsuariEntity> findByText(@Param("text") String text);

@@ -7,6 +7,9 @@ import es.caib.notib.back.helper.EnumHelper.HtmlOption;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.UsuariAplicacioService;
+
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -61,7 +64,7 @@ public class AjaxUserController extends BaseUserController {
 		var entitatActual = getEntitatActualComprovantPermisos(request);
 		Set<UsuariDto> setUsuaris = new HashSet<>();
 		try {
-			var encoded = new String(text.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+			var encoded = isValidUtf8(text) ? text : new String(text.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
 			var usuarisWeb = aplicacioService.findUsuariAmbText(encoded);
 			setUsuaris.addAll(usuarisWeb);
 			var aplicacio = usuariAplicacioService.findByEntitatAndText(entitatActual.getId(), encoded);
@@ -82,6 +85,17 @@ public class AjaxUserController extends BaseUserController {
 			return new ArrayList<>();
 		}
 	}
+
+    private boolean isValidUtf8(String text) {
+        try {
+            byte[] bytes = text.getBytes(StandardCharsets.UTF_8);
+            Charset charset = StandardCharsets.UTF_8;
+            charset.newDecoder().decode(java.nio.ByteBuffer.wrap(bytes));
+            return true;
+        } catch (CharacterCodingException e) {
+            return false; // Not valid UTF-8
+        }
+    }
 	
 	@GetMapping(value = "/enum/{enumClass}")
 	@ResponseBody
