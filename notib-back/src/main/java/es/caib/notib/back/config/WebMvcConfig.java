@@ -8,14 +8,17 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+import org.springframework.web.servlet.resource.PathResourceResolver;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -53,12 +56,38 @@ public class WebMvcConfig extends BaseWebMvcConfig implements WebMvcConfigurer {
 		return registrationBean;
 	}
 
-	@Override
-	protected String getJsAppStaticFolder() {
-		return "/reactapp";
-	}
+    @Override
+    protected boolean isJsAppResourceHandlerEnabled() {
+        return false;
+    }
 
-	@Override
+    @Override
+    protected String getJsAppStaticFolder() {
+        return "/reactapp";
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // ResourceHandler per a que totes les peticions desconegudes passin per l'index.html
+        registry.
+                addResourceHandler(getJsAppStaticFolder() + "/**").
+                addResourceLocations(getJsAppStaticFolder() + "/").
+                resourceChain(true).
+                addResolver(new PathResourceResolver() {
+                    @Override
+                    protected Resource getResource(String resourcePath, Resource location) throws IOException {
+                        Resource requestedResource = location.createRelative(resourcePath);
+                        if (requestedResource.exists() && requestedResource.isReadable()) {
+                            return requestedResource;
+                        } else {
+                            return location.createRelative("index.html");
+                        }
+                    }
+                });
+    }
+
+
+    @Override
 	public void configureViewResolvers(ViewResolverRegistry registry) {
 		registry.jsp("/WEB-INF/jsp/", ".jsp");
 	}
@@ -106,6 +135,8 @@ public class WebMvcConfig extends BaseWebMvcConfig implements WebMvcConfigurer {
 	}
 
 	private static final String[] INTERCEPTOR_EXCLUSIONS = 	{
+			"/reactapp",
+			"/reactapp/**",
 			"/js/**",
 			"/css/**",
 			"/fonts/**",
