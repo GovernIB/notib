@@ -1,4 +1,7 @@
 const translationEs = {
+    menu: {
+        enviament: "Envíos",
+    },
     page: {
         notFound: "No encontrado",
     },

@@ -8,18 +8,18 @@ const version = '0.0.0';
 
 export const App = () => {
     const { t } = useTranslation();
-    const menuSalut = {
-        id: 'salut',
-        title: t('menu.salut'),
-        to: '/',
+    const menuEnviaments = {
+        id: 'enviamentResource',
+        title: t('menu.enviament'),
+        to: '/enviament',
         icon: 'monitor_heart',
-        resourceName: 'salut',
+        resourceName: 'enviamentResource',
     };
     const menuEntries = [
-        menuSalut,
+        menuEnviaments,
     ];
     const appMenuEntries = [
-        menuSalut,
+        menuEnviaments,
     ];
     return (
         <BaseApp
@@ -43,7 +43,7 @@ export const App = () => {
             availableLanguages={['ca', 'es']}
             menuEntries={menuEntries}
             appMenuEntries={appMenuEntries}
-            appbarBackgroundColor="#ff9523"
+            appbarBackgroundColor="#fff"
         >
             <AppRoutes />
         </BaseApp>
