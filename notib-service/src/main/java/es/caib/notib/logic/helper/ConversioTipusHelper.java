@@ -673,6 +673,7 @@ public class ConversioTipusHelper {
 			notEnviamentTableItemDto.setProcedimentNom(enviamentTableEntity.getNotificacio().getProcediment().getNom());
 			notEnviamentTableItemDto.setOrganNom(enviamentTableEntity.getNotificacio().getOrganGestor().getNom());
             var enviament = notificacioEnviamentRepository.findById(enviamentTableEntity.getId()).orElseThrow();
+            notEnviamentTableItemDto.setEntregaPostal(enviament.getEntregaPostal() != null);
 		    notEnviamentTableItemDto.setAnulable(isAnulable(enviament));
 			if (enviamentTableEntity.getDestinataris() == null || enviamentTableEntity.getDestinataris().isEmpty()) {
 				return;
