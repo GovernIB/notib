@@ -138,17 +138,17 @@ public class UsuariController extends BaseController {
 		return "usuariForm";
 	}
 
-    private List<CodiValorDto> findProcedimentsAmbPermis(List<CodiValorDto> entitats, String usuariCodi) {
+    private List<CodiValorOrganGestorComuDto> findProcedimentsAmbPermis(List<CodiValorDto> entitats, String usuariCodi) {
 
-        List<CodiValorDto> procediments = new ArrayList<>();
+        List<CodiValorOrganGestorComuDto> procediments = new ArrayList<>();
         List<CodiValorOrganGestorComuDto> procs = new ArrayList<>();
         for (var entitat : entitats) {
             procs.addAll(permisosService.getProcSersAmbPermis(Long.valueOf(entitat.getCodi()), usuariCodi, PermisEnum.CONSULTA));
         }
-        for (var proc : procs) {
-            procediments.add(CodiValorDto.builder().codi(proc.getId() + "").valor(proc.getValor()).build());
-        }
-        return procediments;
+//        for (var proc : procs) {
+//            procediments.add(CodiValorDto.builder().codi(proc.getId() + "").valor(proc.getValor()).build());
+//        }
+        return procs;
     }
 
 
