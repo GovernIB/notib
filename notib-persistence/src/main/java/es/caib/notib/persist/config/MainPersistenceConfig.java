@@ -21,6 +21,7 @@ import org.springframework.statemachine.persist.StateMachineRuntimePersister;
 @EnableJpaRepositories(
 		basePackages = {
 				BaseConfig.BASE_PACKAGE + ".persist.repository",
+				BaseConfig.BASE_PACKAGE + ".persist.resourcerepository",
 				"org.springframework.statemachine.data.jpa"
 		},
 		entityManagerFactoryRef = "mainEntityManager",

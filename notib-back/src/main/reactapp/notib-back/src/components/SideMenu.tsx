@@ -8,18 +8,18 @@ import Icon from '@mui/material/Icon';
 import IconButton from '@mui/material/IconButton';
 import Divider from '@mui/material/Divider';
 import Box from '@mui/material/Box';
-import { MenuEntry, MenuProps } from '../../lib/components/mui/Menu';
+import { MenuProps } from '../../lib/components/mui/Menu';
 import {
     styled,
     useTheme,
     Theme,
     CSSObject
 } from '@mui/material/styles';
-import { useBaseAppContext } from '../../lib/components/BaseAppContext';
 import { useSmallScreen, useSmallHeader } from '../../lib/util/useSmallScreen';
 import logo from '../assets/goib_escut_logo.png';
 import Typography from "@mui/material/Typography";
 import SideWrapper from "./SideWrapper";
+import { useBaseAppContext, MenuEntry } from 'reactlib';
 
 
 type ListMenuContentProps = MenuProps & {
