@@ -932,9 +932,10 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @GetMapping(value = "/{notificacioId}/enviament/{enviamentId}/anular")
     public String anularOEGetEnviament(HttpServletResponse response, HttpServletRequest request, Model model, @PathVariable Long notificacioId, @PathVariable Long enviamentId) {
 
-        var anular = new AnularCommand();
-        anular.setEnviamentId(enviamentId);
-        model.addAttribute(anular);
+        var command = new AnularCommand();
+        command.setEnviamentId(enviamentId);
+        model.addAttribute(command);
+        model.addAttribute("motiuSize", command.getMotiuDefaultSize());
         return "anularForm";
     }
 
@@ -949,26 +950,24 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         if (seleccio.size() == 1 && seleccio.contains(-1L)) {
             return getModalControllerReturnValueError(request, redirect,"accio.massiva.creat.ko");
         }
-        var anulacio = new AnularCommand();
-        anulacio.setMassiu(true);
-        anulacio.setNotificacionsId(new ArrayList<>(seleccio));
-        anulacio.setSeleccioTipus(SeleccioTipus.NOTIFICACIO);
-        model.addAttribute(anulacio);
+        var command = new AnularCommand();
+        command.setMassiu(true);
+        command.setNotificacionsId(new ArrayList<>(seleccio));
+        command.setSeleccioTipus(SeleccioTipus.NOTIFICACIO);
+        model.addAttribute(command);
+        model.addAttribute("motiuSize", command.getMotiuDefaultSize());
         return "anularForm";
     }
 
     @PostMapping(value = "/anular")
-    public String anularPost(HttpServletResponse response, HttpServletRequest request, Model model, AnularCommand command) {
+    public String anularPost(HttpServletResponse response, HttpServletRequest request, Model model, @Valid AnularCommand command, BindingResult bindingResult) {
 
         try {
+            if (bindingResult.hasErrors()) {
+                model.addAttribute("motiuSize", command.getMotiuDefaultSize());
+                return "anularForm";
+            }
 
-            /*TODO
-                FALTA COMPROVAR QUE EL COMMAND S'EMPLENA BÉ JA SIGUI PER REMESES, ENVIAMENTS O ACCIONS MASSIVES D'ENVIAMENTS O REMESES
-                FALTA MODIFICAR ENVIAMENTS PER MARCARLOS COM ANULATS SI LA CRIDA A NOTIFICA HA FUNCIONAT
-                FALTA VALIDAR ELS ENVIAMENTS ABANS D'ENVIAR A NOTIFICA QUE REALMENT SIGUINT ANULABLES.
-                FALTA COMPROBAR QUE ELS MISSATGES D'ERROR ES MOSTREN BÉ
-                FALTA IMPLEMENTAR LES ACCIONS MASSIVES D'ANULAR
-            * */
             Long accioMassivaId;
             if (command.isMassiu()) {
                 var entitatActual = sessionScopedContext.getEntitatActual();
@@ -1041,7 +1040,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
 
     @PostMapping(value = "/ampliacion/plazo")
-    public String ampliarPlazoOEPost(HttpServletResponse response, HttpServletRequest request, Model model, AmpliacionPlazoCommand ampliacionPlazo) {
+    public String ampliarPlazoOEPost(HttpServletResponse response, HttpServletRequest request, Model model, @Valid AmpliacionPlazoCommand ampliacionPlazo, BindingResult bindingResult) {
 
         try {
             if (bindingResult.hasErrors()) {
