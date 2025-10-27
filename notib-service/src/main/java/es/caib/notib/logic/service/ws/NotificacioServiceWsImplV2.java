@@ -85,6 +85,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
@@ -223,7 +224,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
         } catch (Exception ex) {
             log.error("Error entitat no trobada a la bdd " + notificacio.getEmisorDir3Codi(), ex);
         }
-        var msg = notificacioHelper.checkLimitEnviamentsAplicacioSuperat(notificacio.getUsuariCodi(), entitat.getId());
+        var usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
+        var msg = notificacioHelper.checkLimitEnviamentsAplicacioSuperat(usuariCodi, entitat.getId());
         if (!Strings.isNullOrEmpty(msg)) {
             return RespostaAlta.builder().error(true).errorDescripcio(msg).build();
         }
@@ -249,8 +251,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 //		var info = generateInfoAlta(notificacio, entitat != null ? entitat.getId() : null);
 		try {
 			log.debug("[ALTA] Alta de notificació: " + notificacio.toString());
-
-            var msg = notificacioHelper.checkLimitEnviamentsAplicacioSuperat(notificacio.getUsuariCodi(), entitat.getId());
+            var usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
+            var msg = notificacioHelper.checkLimitEnviamentsAplicacioSuperat(usuariCodi, entitat.getId());
             if (!Strings.isNullOrEmpty(msg)) {
 			    return RespostaAltaV2.builder().error(true).errorData(new Date()).errorDescripcio(msg).build();
             }
