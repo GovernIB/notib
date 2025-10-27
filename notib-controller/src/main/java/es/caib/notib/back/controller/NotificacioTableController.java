@@ -1005,6 +1005,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         ampliacion.setCaducitat(notificacioService.getCaducitat(notificacioId));
         ampliacion.setNotificacioId(notificacioId);
         model.addAttribute(ampliacion);
+        model.addAttribute("motiuSize", ampliacion.getMotiuDefaultSize());
         return "ampliarPlazoForm";
     }
 
@@ -1023,6 +1024,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         ampliacion.setMassiu(true);
         ampliacion.setNotificacionsId(new ArrayList<>(seleccio));
         model.addAttribute(ampliacion);
+        model.addAttribute("motiuSize", ampliacion.getMotiuDefaultSize());
         return "ampliarPlazoForm";
     }
 
@@ -1033,6 +1035,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         var ampliacion = new AmpliacionPlazoCommand();
         ampliacion.setEnviamentId(enviamentId);
         model.addAttribute(ampliacion);
+        model.addAttribute("motiuSize", ampliacion.getMotiuDefaultSize());
         return "ampliarPlazoForm";
     }
 
@@ -1041,6 +1044,10 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     public String ampliarPlazoOEPost(HttpServletResponse response, HttpServletRequest request, Model model, AmpliacionPlazoCommand ampliacionPlazo) {
 
         try {
+            if (bindingResult.hasErrors()) {
+                model.addAttribute("motiuSize", ampliacionPlazo.getMotiuDefaultSize());
+                return "ampliarPlazoForm";
+            }
             var ampliarPlazoOE = new AmpliarPlazoOE();
             ampliarPlazoOE.setPlazo(ampliacionPlazo.getDies());
             ampliarPlazoOE.setMotivo(ampliacionPlazo.getMotiu());
