@@ -307,7 +307,6 @@ public class CallbackServiceImpl implements CallbackService {
                     log.error("Error executant callback task", e.getCause());
                 }
             }
-
             return CallbackResposta.builder().ok(true).build();
         } catch (Exception e) {
             log.error("Error executant els callbacks massius " + e);

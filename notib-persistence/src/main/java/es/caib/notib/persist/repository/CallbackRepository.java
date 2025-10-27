@@ -38,7 +38,7 @@ public interface CallbackRepository extends JpaRepository<CallbackEntity, Long> 
 
     List<CallbackEntity> findByNotificacioIdAndEstatOrderByDataDesc(Long notId, CallbackEstatEnumDto estat);
 
-    @Query("select c from CallbackEntity c " +
+    @Query("select distinct c from CallbackEntity c " +
             "join NotificacioEntity n on c.notificacioId = n.id " +
             "join AplicacioEntity a on a.usuariCodi = c.usuariCodi " +
             "where n.entitat.id = :#{#filtre.entitatId} " +
@@ -54,7 +54,7 @@ public interface CallbackRepository extends JpaRepository<CallbackEntity, Long> 
             "   and (:#{#filtre.fiReintentsNull} = true or (:#{#filtre.fiReintentsInt()} = 0 and c.intents < :#{#filtre.maxReintents} or :#{#filtre.fiReintentsInt()} = 1 and c.intents >= :#{#filtre.maxReintents})) ")
     Page<CallbackEntity> findPendentsByEntitat(CallbackFiltre filtre, Pageable page);
 
-    @Query("select c.id from CallbackEntity c " +
+    @Query("select distinct c.id from CallbackEntity c " +
             "join NotificacioEntity n on c.notificacioId = n.id " +
             "join AplicacioEntity a on a.usuariCodi = c.usuariCodi " +
             "where n.entitat.id = :#{#filtre.entitatId} " +
