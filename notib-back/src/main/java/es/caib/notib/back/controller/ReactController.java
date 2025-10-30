@@ -4,6 +4,7 @@ import es.caib.notib.back.base.controller.BaseUtilsController;
 import es.caib.notib.logic.intf.base.config.PropertyConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor
+@Profile("!devProxy")
 @Controller
 public class ReactController extends BaseUtilsController {
 
