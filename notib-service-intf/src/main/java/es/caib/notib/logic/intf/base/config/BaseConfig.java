@@ -16,6 +16,7 @@ public class BaseConfig {
 	public static final String APP_PROPERTIES = BASE_PACKAGE + ".properties";
 	public static final String APP_SYSTEM_PROPERTIES = BASE_PACKAGE + ".system.properties";
 
+    public static final String REACT_APP_PATH="/reactapp";
 	public static final String API_PATH = "/api";
 	public static final String PING_PATH = "/ping";
 	public static final String AUTH_TOKEN_PATH = "/authToken";

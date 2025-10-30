@@ -155,6 +155,8 @@ public class WebMvcConfig extends BaseWebMvcConfig implements WebMvcConfigurer {
 			"/notificacio/refrescarEstatNotifica/estat",
 			"/notificacio/procedimentsOrgan",
 			"/notificacio/serveisOrgan",
+            "/sysenv",
+            "/manifest",
 			"/error",
 			"/**/monitor/tasques"};
 	private static final String[] ALL_EXCLUSIONS = {"/js/**", "/css/**", "/fonts/**", "/img/**", "/images/**", "/extensions/**", "/webjars/**", "/**/datatable/**", "/**/selection/**", "/api/rest/**", "/api/apidoc**", "/api-docs/**", "/**/api-docs/", "/api/consulta/**", "/api/services/**", "/usuari/configuracio/**"};

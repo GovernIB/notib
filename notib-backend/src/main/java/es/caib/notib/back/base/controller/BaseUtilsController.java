@@ -37,12 +37,14 @@ public abstract class BaseUtilsController {
 	@Autowired
 	private ServletContext servletContext;
 
-	@GetMapping(BaseConfig.PING_PATH)
+//	@GetMapping(BaseConfig.PING_PATH)
+	@GetMapping(value = {BaseConfig.PING_PATH, BaseConfig.REACT_APP_PATH + BaseConfig.PING_PATH})
 	public ResponseEntity<Void> ping() {
 		return ResponseEntity.ok().build();
 	}
 
-	@GetMapping(BaseConfig.AUTH_TOKEN_PATH)
+//	@GetMapping(BaseConfig.AUTH_TOKEN_PATH)
+    @GetMapping(value = {BaseConfig.AUTH_TOKEN_PATH, BaseConfig.REACT_APP_PATH + BaseConfig.AUTH_TOKEN_PATH})
 	public ResponseEntity<String> authToken() {
 		String authToken = getAuthToken();
 		String response = null;
@@ -52,7 +54,8 @@ public abstract class BaseUtilsController {
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping(BaseConfig.MANIFEST_PATH)
+//	@GetMapping(BaseConfig.MANIFEST_PATH)
+    @GetMapping(value = {BaseConfig.MANIFEST_PATH, BaseConfig.REACT_APP_PATH + BaseConfig.MANIFEST_PATH})
 	public ResponseEntity<String> manifest() throws IOException {
 		Map<String, Object> manifestProps = getManifestProperties();
 		MediaType contentType = MediaType.valueOf("text/javascript"); // MediaType.TEXT_PLAIN;
@@ -67,7 +70,8 @@ public abstract class BaseUtilsController {
 				body(response);
 	}
 
-	@GetMapping(BaseConfig.SYSENV_PATH)
+//	@GetMapping(BaseConfig.SYSENV_PATH)
+    @GetMapping(value = {BaseConfig.SYSENV_PATH, BaseConfig.REACT_APP_PATH + BaseConfig.SYSENV_PATH})
 	public ResponseEntity<String> systemEnvironment(
 			@RequestParam(required = false) String format) {
 		Map<String, Object> systemEnv = getAllProperties(env); // System.getenv();
