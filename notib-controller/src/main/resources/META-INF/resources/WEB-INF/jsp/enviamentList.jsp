@@ -467,6 +467,8 @@
 					</c:when>
 				</c:choose>
 				<th data-col-name="estatColor" data-visible="false"></th>
+                <th data-col-name="anulat" data-visible="false"></th>
+                <th data-col-name="motiuAnulacio" data-visible="false"></th>
 				<th data-col-name="estat" data-template="#cellEstatTemplate"   data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
 						<div class="estatColor {{:estatColor}}">{{:estat}}
