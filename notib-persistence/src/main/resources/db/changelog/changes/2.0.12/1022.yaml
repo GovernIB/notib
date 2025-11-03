@@ -1,0 +1,61 @@
+databaseChangeLog:
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
+  - property:
+      name: long
+      value: number(19, 0)
+      dbms: oracle
+  - property:
+      name: long
+      value: numeric
+      dbms: postgresql
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_notificacio_table
+            columns:
+              - column:
+                  name: anulable
+                  type: boolean
+                  defaultValue: 0
+              - column:
+                  name: last_event_fi_reintents
+                  type: boolean
+                  defaultValue: 0
+        - addColumn:
+            tableName: not_notificacio_env_table
+            columns:
+              - column:
+                  name: anulable
+                  type: boolean
+                  defaultValue: null
+              - column:
+                  name: organ_nom
+                  type: varchar(1000 ${varcharUnit})
+              - column:
+                  name: procediment_nom
+                  type: varchar(1000 ${varcharUnit})
+              - column:
+                  name: referencia_notificacio
+                  type: varchar(36 ${varcharUnit})
+              - column:
+                  name: not_id
+                  type: ${long}
+              - column:
+                  name: ultim_event_data
+                  type: Date
+
+        - sql: "UPDATE not_notificacio_table SET per_actualitzar = 1;
+                UPDATE not_notificacio_table t SET t.LAST_EVENT_FI_REINTENTS = 1 WHERE t.id IN (SELECT DISTINCT e.NOTIFICACIO_ID  FROM not_notificacio_event e WHERE e.FI_REINTENTS = 1
+                AND e.tipus IN (0, 3));
+                CREATE INDEX NOT_NOT_ENV_TABLE_USR_CODI_IDX ON NOTIB.NOT_NOTIFICACIO_ENV_TABLE (USUARI_CODI);
+                CREATE INDEX NOT_ENV_TABLE_CREATEDDATE_IDX ON NOTIB.NOT_NOTIFICACIO_ENV_TABLE (CREATEDDATE);
+                CREATE INDEX NOT_ENV_TABLE_ORGAN_CODI_IDX ON NOTIB.NOT_NOTIFICACIO_ENV_TABLE (NOT_ORGAN_CODI);"

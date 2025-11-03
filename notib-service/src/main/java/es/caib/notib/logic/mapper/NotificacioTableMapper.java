@@ -6,6 +6,7 @@ import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.helper.EnviamentHelper;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.NotificacioListHelper;
+import es.caib.notib.logic.helper.NotificacioTableHelper;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
@@ -67,6 +68,8 @@ public abstract class NotificacioTableMapper {
     private NotificacioEventRepository eventRepository;
     @Autowired
     private NotificacioTableViewRepository notificacioTableViewRepository;
+    @Autowired
+    private NotificacioTableHelper notificacioTableHelper;
 
 
     @Mapping(target = "registreEnviamentIntent", source = "not.registreEnviamentIntent", defaultValue = "0")
@@ -75,22 +78,9 @@ public abstract class NotificacioTableMapper {
     @Mapping(target = "createdByCodi", source = "not.createdBy", qualifiedByName = "optionalUserCode")
     @Mapping(target = "permisProcessar", source = "params.permisProcessar")
     @Mapping(target = "organEstat", source = "params.organEstat")
-    @Mapping(target = "anulable", expression = "java(isAnulable(not))")
     public abstract NotificacioTableItemDto toNotificacioTableItemDto(NotificacioTableEntity not, NotificacioTableItemConversioParams params);
 
     public abstract List<NotificacioTableItemDto> toNotificacionsTableItemDto(List<NotificacioTableEntity> nots, @Context List<String> codis, @Context Map<String, OrganismeDto> organs);
-
-    protected boolean isAnulable(NotificacioTableEntity notificacio) {
-
-        for (var enviament : notificacio.getEnviaments()) {
-            if (!(!enviament.isAnulat() && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador()) && !enviament.isNotificaEstatFinal() && !enviament.isCieEstatFinal()
-                    && (enviament.getEntregaPostal() == null || CieEstat.ENVIADO_CI.equals(enviament.getEntregaPostal().getCieEstat())
-                    && enviament.getNotificacio().getOrganGestor().getEntregaCie().getCie().isCieExtern()))) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     public NotificacioTableItemDto mapNotificacioTableItemDtoContext(NotificacioTableEntity not, @Context List<String> codis, @Context Map<String, OrganismeDto> organs) {
 
@@ -173,6 +163,7 @@ public abstract class NotificacioTableMapper {
             }
             not.setRegistreNums(rNums);
             not.setPerActualitzar(false);
+            not.setAnulable(notificacioTableHelper.isAnulable(not.getNotificacio()));
             var inici = System.currentTimeMillis();
             notificacioTableViewRepository.saveAndFlush(not);
             var fi = System.currentTimeMillis();

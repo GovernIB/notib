@@ -53,6 +53,12 @@ public class EnviamentTableEntity extends NotibAuditable<Long> {
 	@JoinColumn(name = "NOTIFICACIO_ID")
 	private NotificacioEntity notificacio;
 
+    @Column(name = "not_id")
+    private Long notificacioId;
+
+    @Column(name = "ultim_event_data")
+    private Date enviadaDate;
+
 	@Column(name = "TIPUS_ENVIAMENT", nullable = false)
 	protected EnviamentTipus tipusEnviament;
 
@@ -114,9 +120,18 @@ public class EnviamentTableEntity extends NotibAuditable<Long> {
 
 	@Column(name = "NOT_ORGAN_CODI")
 	private String organCodi;
+
+    @Column(name = "organ_nom")
+    private String organNom;
 	
 	@Column(name = "ORGAN_ESTAT")
 	private OrganGestorEstatEnum organEstat;
+
+    @Column(name = "procediment_nom")
+    private String procedimentNom;
+
+    @Column(name="referencia_notificacio")
+    private String referenciaNotificacio;
 
 	@Column(name = "NOT_ESTAT", nullable = false)
 	protected NotificacioEstatEnumDto estat;
@@ -184,6 +199,9 @@ public class EnviamentTableEntity extends NotibAuditable<Long> {
 
 	@Column(name = "entrega_postal")
 	protected boolean entregaPostal;
+
+    @Column(name = "anulable")
+    protected Boolean anulable;
 
     @Column(name = "anulat")
     protected boolean anulat;

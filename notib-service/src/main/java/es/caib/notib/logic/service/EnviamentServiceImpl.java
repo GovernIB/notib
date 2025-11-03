@@ -60,6 +60,7 @@ import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
 import es.caib.notib.logic.intf.statemachine.dto.ParametresSm;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
+import es.caib.notib.logic.mapper.EnviamentTableMapper;
 import es.caib.notib.logic.utils.DatesUtils;
 import es.caib.notib.persist.entity.CallbackEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
@@ -176,8 +177,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 	private static final String FORMAT_DATA_HORA = "dd/MM/yyyy HH:mm:ss";
     @Autowired
     private AccioMassivaRepository accioMassivaRepository;
+    @Autowired
+    private EnviamentTableMapper enviamentTableMapper;
 
-	@Override
+    @Override
 	@Transactional(readOnly = true)
 	public List<NotificacioEnviamentDatatableDto> enviamentFindAmbNotificacio(Long notificacioId) {
 
@@ -312,7 +315,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 			if(pageEnviaments == null || !pageEnviaments.hasContent()) {
 				pageEnviaments = new PageImpl<>(new ArrayList<>());
 			}
-			return paginacioHelper.toPaginaDto(pageEnviaments, NotEnviamentTableItemDto.class);
+            var dtos = enviamentTableMapper.toNotEnviamentsTableItemDto(pageEnviaments.getContent());
+			return paginacioHelper.toPaginaDto(dtos, pageEnviaments);
 		} finally {
             metricsHelper.fiMetrica(timer);
 		}

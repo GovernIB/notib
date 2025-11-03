@@ -776,33 +776,17 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var rols = aplicacioService.findRolsUsuariActual();
 			filtre.setOrganGestor(organGestorCodi);
 			var f = notificacioListHelper.getFiltre(filtre, entitatId, rol, usuariCodi, rols);
-            var startTime = System.nanoTime();
 			var notificacions = notificacioTableViewRepository.findAmbFiltre(f, pageable);
-            var endTime = System.nanoTime();
-            double time = (endTime - startTime) / 1_000_000_000.0;
-            log.info("Time taken: " + time + " seconds");
-            startTime = System.nanoTime();
 			if (notificacions.getTotalPages() < paginacioParams.getPaginaNum()) {
 				paginacioParams.setPaginaNum(0);
 				pageable = notificacioListHelper.getMappeigPropietats(paginacioParams);
 				notificacions = notificacioTableViewRepository.findAmbFiltre(f, pageable);
 			}
-            endTime = System.nanoTime();
-            time = (endTime - startTime) / 1_000_000_000.0;
-            log.info("Time taken2: " + time + " seconds");
-            startTime = System.nanoTime();
 			var dtos = notificacioTableMapper.toNotificacionsTableItemDto(
 					notificacions.getContent(),
 					notificacioListHelper.getCodisProcedimentsAndOrgansAmpPermisProcessar(entitatId, usuariCodi),
 					cacheHelper.findOrganigramaNodeByEntitat(f.getEntitat().getDir3Codi()));
-            endTime = System.nanoTime();
-            time = (endTime - startTime) / 1_000_000_000.0;
-            log.info("Time taken3: " + time + " seconds");
-            startTime = System.nanoTime();
 			var pag = paginacioHelper.toPaginaDto(dtos, notificacions);
-            endTime = System.nanoTime();
-            time = (endTime - startTime) / 1_000_000_000.0;
-            log.info("Time taken4: " + time + " seconds");
 		    return pag;
         } finally {
 			metricsHelper.fiMetrica(timer);
@@ -2167,8 +2151,9 @@ public class NotificacioServiceImpl implements NotificacioService {
     private boolean isAnulable(NotificacioEnviamentEntity enviament) {
 
         return !enviament.isAnulat() && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador()) && !enviament.isNotificaEstatFinal() && !enviament.isCieEstatFinal()
-                && (enviament.getEntregaPostal() == null || CieEstat.ENVIADO_CI.equals(enviament.getEntregaPostal().getCieEstat())
-                        && enviament.getNotificacio().getOrganGestor().getEntregaCie().getCie().isCieExtern());
+                && (enviament.getEntregaPostal() == null || enviament.getEntregaPostal().getCieEstat() == null
+                    || CieEstat.ENVIADO_CI.equals(enviament.getEntregaPostal().getCieEstat()) || CieEstat.ERROR.equals(enviament.getEntregaPostal().getCieEstat())
+                && enviament.getNotificacio().getOrganGestor().getEntregaCie().getCie().isCieExtern());
     }
 
     @Override

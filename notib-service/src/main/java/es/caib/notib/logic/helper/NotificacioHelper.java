@@ -442,10 +442,17 @@ public class NotificacioHelper {
 		// Recuperar òrgan gestor notificació
 		log.trace("Processam organ gestor");
 		if (organGestor == null && notificacio.getOrganGestor() != null ) {
-			organGestor = organGestorRepository.findByEntitatAndCodi(entitat, notificacio.getOrganGestor());
+//			organGestor = organGestorRepository.findByEntitatAndCodi(entitat, notificacio.getOrganGestor());
+            long id;
+            try {
+                id = Long.valueOf(notificacio.getOrganGestor());
+			    organGestor = organGestorRepository.findById(id).orElse(null);
+            } catch (Exception ex) {
+			    throw new NotFoundException("Organ gestor not long" + notificacio.getOrganGestor(), OrganGestorEntity.class);
+            }
 		}
 		if (organGestor == null) {
-			throw new NotFoundException(notificacio.getOrganGestor(), OrganGestorEntity.class);
+			throw new NotFoundException("Organ gestor no trobat " + notificacio.getOrganGestor(), OrganGestorEntity.class);
 		}
 
 		// Recupera grup notificació a partir del codi

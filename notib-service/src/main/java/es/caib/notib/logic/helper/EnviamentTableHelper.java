@@ -1,5 +1,6 @@
 package es.caib.notib.logic.helper;
 
+import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EnviamentTableEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -32,6 +33,7 @@ public class EnviamentTableHelper {
         EnviamentTableEntity tableViewItem = EnviamentTableEntity.builder()
                 .enviament(enviament)
                 .notificacio(notificacio)
+                .notificacioId(notificacio.getId())
                 .entitat(notificacio.getEntitat())
                 .destinataris(getEnviamentDestinataris(enviament))
                 .tipusEnviament(notificacio.getEnviamentTipus())
@@ -43,10 +45,13 @@ public class EnviamentTableHelper {
                 .titularRaoSocial(titular != null ? titular.getRaoSocial() : null)
                 .enviamentDataProgramada(notificacio.getEnviamentDataProgramada())
                 .procedimentCodiNotib(notificacio.getProcedimentCodiNotib())
+                .procedimentNom(notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : null)
+                .referenciaNotificacio(notificacio.getReferencia())
                 .grupCodi(notificacio.getGrupCodi())
                 .emisorDir3Codi(notificacio.getEmisorDir3Codi())
                 .usuariCodi(notificacio.getUsuariCodi())
                 .organCodi(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getCodi() : null)
+                .organNom(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getNom() : null)
                 .organEstat(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getEstat() : null)
                 .concepte(notificacio.getConcepte())
                 .descripcio(notificacio.getDescripcio())
@@ -67,6 +72,8 @@ public class EnviamentTableHelper {
                 .notificaEstat(enviament.getNotificaEstat())
                 .notificaReferencia(enviament.getNotificaReferencia())
                 .errorLastCallback(false)
+                .entregaPostal(enviament.getEntregaPostal() != null)
+                .anulable(isAnulable(enviament))
                 .build();
 
         enviamentTableRepository.save(tableViewItem);
@@ -87,6 +94,8 @@ public class EnviamentTableHelper {
 
         tableViewItem.setEnviament(enviament);
         tableViewItem.setNotificacio(notificacio);
+        tableViewItem.setNotificacioId(notificacio.getId());
+        tableViewItem.setEnviadaDate(enviament.getUltimEvent() != null ? enviament.getUltimEvent().getData() : null);
         tableViewItem.setEntitat(notificacio.getEntitat());
         tableViewItem.setDestinataris(getEnviamentDestinataris(enviament));
         tableViewItem.setTipusEnviament(notificacio.getEnviamentTipus());
@@ -100,10 +109,13 @@ public class EnviamentTableHelper {
 
         tableViewItem.setEnviamentDataProgramada(notificacio.getEnviamentDataProgramada());
         tableViewItem.setProcedimentCodiNotib(notificacio.getProcedimentCodiNotib());
+        tableViewItem.setProcedimentNom(notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : null);
+        tableViewItem.setReferenciaNotificacio(notificacio.getReferencia());
         tableViewItem.setGrupCodi(notificacio.getGrupCodi());
         tableViewItem.setEmisorDir3Codi(notificacio.getEmisorDir3Codi());
         tableViewItem.setUsuariCodi(notificacio.getUsuariCodi());
         tableViewItem.setOrganCodi(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getCodi() : null);
+        tableViewItem.setOrganNom(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getNom() : null);
         tableViewItem.setOrganEstat(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getEstat() : null);
         tableViewItem.setConcepte(notificacio.getConcepte());
         tableViewItem.setDescripcio(notificacio.getDescripcio());
@@ -129,13 +141,21 @@ public class EnviamentTableHelper {
         tableViewItem.setNotificaEstat(enviament.getNotificaEstat());
         tableViewItem.setNotificaReferencia(enviament.getNotificaReferencia());
         tableViewItem.setEntitat(notificacio.getEntitat());
+        tableViewItem.setAnulable(isAnulable(enviament));
         tableViewItem.setAnulat(enviament.isAnulat());
         tableViewItem.setMotiuAnulacio(enviament.getMotiuAnulacio());
-
+        tableViewItem.setEntregaPostal(enviament.getEntregaPostal() != null);
         tableViewItem.setErrorLastCallback(enviament.isErrorLastCallback());
 
         enviamentTableRepository.saveAndFlush(tableViewItem);
         notificacioTableHelper.actualitzarRegistre(notificacio);
+    }
+
+    public boolean isAnulable(NotificacioEnviamentEntity enviament) {
+        return enviament != null && !enviament.isAnulat() && !com.google.common.base.Strings.isNullOrEmpty(enviament.getNotificaIdentificador()) && !enviament.isNotificaEstatFinal() && !enviament.isCieEstatFinal()
+                && (enviament.getEntregaPostal() == null || enviament.getEntregaPostal().getCieEstat() == null
+                    || CieEstat.ENVIADO_CI.equals(enviament.getEntregaPostal().getCieEstat()) || CieEstat.ERROR.equals(enviament.getEntregaPostal().getCieEstat())
+                && enviament.getNotificacio().getOrganGestor().getEntregaCie().getCie().isCieExtern());
     }
 
     /////
