@@ -66,7 +66,14 @@ public class ConfigHelper {
         return getPropietatGlobal(propietatGlobal).orElse(defaultValue);
     }
     public String getConfigByEntitat(String entitatCodi, String propietatGlobal) {
-        return getPropietat(entitatCodi, propietatGlobal).orElseThrow(() -> new NotDefinedConfigException(propietatGlobal));
+//        return getPropietat(entitatCodi, propietatGlobal).orElseThrow(() -> new NotDefinedConfigException(propietatGlobal));
+        return getPropietat(entitatCodi, propietatGlobal).orElse(null);
+    }
+
+    public ConfigEntity getConfigEntityByEntitat(String entitatCodi, String key)  {
+
+        var keyEntitat = crearEntitatKey(entitatCodi, key);
+        return configRepository.findByKey(keyEntitat);
     }
 
     public String getConfig(String propietatGlobal)  {

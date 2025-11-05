@@ -49,10 +49,12 @@ public class EntitatCommand {
 	private String apiKey;
 	private boolean ambEntregaDeh;
 	private String descripcio;
-	private MultipartFile logoCap;
+//	private MultipartFile logoCap;
+	private String logoCap;
 	private String logoCapNom;
 	private boolean eliminarLogoCap;
-	private MultipartFile logoPeu;
+	private String logoPeu;
+//	private MultipartFile logoPeu;
 	private String logoPeuNom;
 	private boolean eliminarLogoPeu;
 	private String colorFons;
@@ -112,7 +114,8 @@ public class EntitatCommand {
                 var nom = "logo_cap";
                 var mime = MimeUtils.getMimeTypeFromBase64(base64, nom);
                 var multipartFile = new MockMultipartFile(nom, nom, mime, dto.getLogoCapBytes());
-                entitat.setLogoCap(multipartFile);
+//                entitat.setLogoCap(multipartFile);
+                entitat.setLogoCap(dto.getLogoCap());
                 entitat.setLogoCapNom(nom);
             } catch (Exception ex) {
                 log.error("Error obtenint el mime type per el logo_cap");
@@ -124,7 +127,8 @@ public class EntitatCommand {
                 var nom = "logo_peu";
                 var mime = MimeUtils.getMimeTypeFromBase64(base64, nom);
                 var multipartFile = new MockMultipartFile(nom, nom, mime, dto.getLogoPeuBytes());
-                entitat.setLogoPeu(multipartFile);
+//                entitat.setLogoPeu(multipartFile);
+                entitat.setLogoPeu(dto.getLogoPeu());
                 entitat.setLogoPeuNom(nom);
             } catch (Exception ex) {
                 log.error("Error obtenint el mime type per el logo_cap");
@@ -137,8 +141,8 @@ public class EntitatCommand {
 		var entitat = ConversioTipusHelper.convertir(this, EntitatDataDto.class);
 		List<TipusDocumentDto> tipusDocuments = new ArrayList<>();
 		var tipusDocumentDefault = new TipusDocumentDto();
-		entitat.setLogoCapBytes(this.getLogoCap().getBytes());
-		entitat.setLogoPeuBytes(this.getLogoPeu().getBytes());
+//		entitat.setLogoCapBytes(this.getLogoCap().getBytes());
+//		entitat.setLogoPeuBytes(this.getLogoPeu().getBytes());
 		if (this.getTipusDocName() != null) {
 			TipusDocumentEnumDto tipusDocumentEnum;
 			TipusDocumentDto tipusDocument;

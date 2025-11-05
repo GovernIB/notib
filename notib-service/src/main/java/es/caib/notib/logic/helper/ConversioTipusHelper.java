@@ -540,6 +540,10 @@ public class ConversioTipusHelper {
 				entitatDto.setOperadorPostalId(entitatEntity.getEntregaCie().getOperadorPostalId());
 				entitatDto.setCieId(entitatEntity.getEntregaCie().getCieId());
 			}
+            entitatDto.setLogoCap(configHelper.getConfigByEntitat(entitatEntity.getCodi(), "es.caib.notib.capsalera.logo"));
+            entitatDto.setLogoPeu(configHelper.getConfigByEntitat(entitatEntity.getCodi(), "es.caib.notib.peu.logo"));
+            entitatDto.setColorFons(configHelper.getConfigByEntitat(entitatEntity.getCodi(), "es.caib.notib.capsalera.color.fons"));
+            entitatDto.setColorLletra(configHelper.getConfigByEntitat(entitatEntity.getCodi(), "es.caib.notib.capsalera.color.lletra"));
 		}
 	}
 

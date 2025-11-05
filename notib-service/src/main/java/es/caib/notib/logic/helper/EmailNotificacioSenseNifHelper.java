@@ -28,6 +28,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -150,9 +153,26 @@ public class EmailNotificacioSenseNifHelper {
 		var htmlBody = getComunicacioMailHtmlBody(enviament);
 		var textBody = getComunicacioMailPlainTextBody(enviament);
 		var subject = "[Notib] Nova comunicació / Nueva comunicación";
-		sendEmail(email, subject, htmlBody, textBody, entitat.getNom(), attachments, entitat.getLogoCapBytes(), entitat.getLogoPeuBytes());
+        var capLogo = getLogoBytes(entitat.getCodi(), "es.caib.notib.capsalera.logo");
+        var peuLogo = getLogoBytes(entitat.getCodi(), "es.caib.notib.capsalera.logo");
+		sendEmail(email, subject, htmlBody, textBody, entitat.getNom(), attachments, capLogo, peuLogo);
 		return null;
 	}
+
+    private byte[] getLogoBytes(String entitatCodi, String key) {
+
+        try {
+            var logo = configHelper.getConfigByEntitat(entitatCodi, "es.caib.notib.capsalera.logo");
+            if (logo == null) {
+                return null;
+            }
+            var path = Paths.get(logo);
+            return Files.readAllBytes(path);
+        } catch (Exception ex) {
+            log.error("[EmailNotifiacioSenseNifHelper.getLogoBytes] Error obtinguent el fitxer per la propietat: " + key + " entitat:" + entitatCodi);
+            return new byte[0];
+        }
+    }
 
 	public String sendEmailInfoEnviamentNotificacioSenseNif(NotificacioEnviamentEntity enviament) throws Exception {
 
@@ -162,7 +182,9 @@ public class EmailNotificacioSenseNifHelper {
 		var htmlBody = getNotificacioMailHtmlBody(enviament);
 		var textBody = getNotificacioMailPlainTextBody(enviament);
 		var subject = "Avís de nova notificació / Aviso de nueva notificación";
-		sendEmail(enviament.getTitular().getEmail(), subject, htmlBody, textBody, entitat.getNom(), null, entitat.getLogoCapBytes(), entitat.getLogoPeuBytes());
+        var capLogo = getLogoBytes(entitat.getCodi(), "es.caib.notib.capsalera.logo");
+        var peuLogo = getLogoBytes(entitat.getCodi(), "es.caib.notib.capsalera.logo");
+		sendEmail(enviament.getTitular().getEmail(), subject, htmlBody, textBody, entitat.getNom(), null, capLogo, peuLogo);
 		return null;
 	}
 

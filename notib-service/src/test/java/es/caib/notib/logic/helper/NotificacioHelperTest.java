@@ -114,7 +114,7 @@ public class NotificacioHelperTest {
                 .enviamentDataProgramada(enviamentDataProgramada)
                 .concepte("Test")
                 .descripcio("Test descripció")
-				.organGestor("A00000000")
+				.organGestor("478")
                 .enviamentDataProgramada(new Date())
                 .retard(5)
                 .caducitat(caducitat)
@@ -157,7 +157,8 @@ public class NotificacioHelperTest {
 		Mockito.when(grupRepository.findByCodiAndEntitat(Mockito.anyString(), Mockito.any(EntitatEntity.class))).thenReturn(grupNotificacio);
 		Mockito.when(documentRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(documentEntity));
 		Mockito.when(documentRepository.save(Mockito.any(DocumentEntity.class))).thenReturn(documentEntity2, documentEntity3);
-		Mockito.when(organGestorRepository.findByEntitatAndCodi(Mockito.any(EntitatEntity.class), Mockito.any(String.class))).thenReturn(organGestor);
+//		Mockito.when(organGestorRepository.findByEntitatAndCodi(Mockito.any(EntitatEntity.class), Mockito.any(String.class))).thenReturn(organGestor);
+		Mockito.when(organGestorRepository.findById(Mockito.any(Long.class))).thenReturn(Optional.of(organGestor));
 
 		//base64
 		Mockito.when(pluginHelper.gestioDocumentalCreate(Mockito.anyString(), Mockito.any(byte[].class))).thenReturn(documentGesdocId);
