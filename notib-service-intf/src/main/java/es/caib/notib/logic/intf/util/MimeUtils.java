@@ -31,6 +31,10 @@ public class MimeUtils {
         return docBase64.startsWith(formatsValidsNotCom[1]);
     }
 
+    public static boolean isTextPlain(String mime) {
+        return "text/plain".equals(mime);
+    }
+
     public static String getMimeTypeFromContingut(String arxiuNom, byte[] contingut) {
         try {
             var suffix = "";

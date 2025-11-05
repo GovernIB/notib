@@ -4,11 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 @Slf4j
 public class ZipFileUtils {
@@ -72,6 +74,19 @@ public class ZipFileUtils {
             return null;
         }
         return arxiuBytes;
+    }
+
+    public static byte[] compressFile(byte[] fileData, String fileName) throws IOException {
+
+        var byteArrayOutputStream = new ByteArrayOutputStream();
+        try (ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
+            var zipEntry = new ZipEntry(fileName);
+            zipOutputStream.putNextEntry(zipEntry);
+            zipOutputStream.write(fileData);
+            zipOutputStream.closeEntry();
+        }
+        // Return the compressed byte array
+        return byteArrayOutputStream.toByteArray();
     }
 
 }

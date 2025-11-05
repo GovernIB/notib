@@ -1,4 +1,4 @@
-package es.caib.notib.api.interna.controller;
+package es.caib.notib.back.controller;
 
 import es.caib.notib.logic.intf.dto.logs.FitxerContingut;
 import es.caib.notib.logic.intf.dto.logs.FitxerInfo;
@@ -16,6 +16,9 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RequiredArgsConstructor
