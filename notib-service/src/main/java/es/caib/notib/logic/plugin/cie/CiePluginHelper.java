@@ -3,6 +3,7 @@ package es.caib.notib.logic.plugin.cie;
 import com.google.common.base.Strings;
 import es.caib.comanda.ms.salut.model.IntegracioApp;
 import es.caib.notib.client.domini.CieEstat;
+import es.caib.notib.logic.helper.CallbackHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
@@ -16,6 +17,7 @@ import es.caib.notib.logic.helper.plugin.ArxiuPluginHelper;
 import es.caib.notib.logic.helper.plugin.GestioDocumentalPluginHelper;
 import es.caib.notib.logic.helper.plugin.RegistrePluginHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
+import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
@@ -33,6 +35,8 @@ import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.entity.OrganGestorEntity;
+import es.caib.notib.persist.entity.cie.EntregaCieEntity;
 import es.caib.notib.persist.entity.cie.EntregaPostalEntity;
 import es.caib.notib.persist.entity.cie.PagadorCieEntity;
 import es.caib.notib.persist.repository.EntitatRepository;
@@ -41,6 +45,7 @@ import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioEventRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.persist.repository.NotificacioTableViewRepository;
+import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.plugin.cie.CiePlugin;
 import es.caib.notib.plugin.cie.EnviamentCie;
 import es.caib.notib.plugin.cie.InfoCie;
@@ -77,7 +82,8 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
     private final ArxiuPluginHelper arxiuPluginHelper;
     private final EntregaPostalRepository entregaPostalRepository;
     private final NotificacioEnviamentRepository enviamentRepository;
-
+    private final OrganGestorRepository organGestorRepository;
+    private final CallbackHelper callbackHelper;
     public static final String GRUP = "CIE";
     private static final String ERROR_INESPERAT = "Error inesperat";
 
@@ -96,7 +102,9 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
                            NotificacioTableViewRepository notificacioTableViewRepository,
                            MessageHelper messageHelper,
                            NotificacioTableHelper notificacioTableHelper,
-                           MeterRegistry meterRegistry) {
+                           MeterRegistry meterRegistry,
+                           CallbackHelper callbackHelper,
+                           OrganGestorRepository organGestorRepository) {
 
         super(integracioHelper, configHelper, entitatRepository, meterRegistry);
 
@@ -112,6 +120,8 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
         this.notificacioTableViewRepository = notificacioTableViewRepository;
         this.messageHelper = messageHelper;
         this.notificacioTableHelper = notificacioTableHelper;
+        this.callbackHelper = callbackHelper;
+        this.organGestorRepository = organGestorRepository;
     }
 
     @Transactional
@@ -128,6 +138,7 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
                     new AccioParam("Notificacio", notificacio.getId() + ""));
             info.setNotificacioId(notificacio.getId());
             info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getCreatedBy().get().getCodi());
+            NotibLogger.getInstance().info("Inici enviar entrega postal", log, LoggingTipus.ENTREGA_CIE);
             try {
                 EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
                 if (entitat == null) {
@@ -153,6 +164,12 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
                 enviamentCie.setCodiDir3Entitat(configHelper.getConfigAsBoolean("es.caib.notib.plugin.codi.dir3.entitat"));
                 var entregaCieEfectiva = notificacio.getProcediment().getEntregaCieEfectiva();
                 entregaCieEfectiva = entregaCieEfectiva == null ? notificacio.getOrganGestor().getEntregaCie() : entregaCieEfectiva;
+                if (entregaCieEfectiva == null) {
+                    entregaCieEfectiva = getEntregaCiePare(notificacio.getEntitat(), notificacio.getOrganGestor());
+                    if (entregaCieEfectiva == null) {
+                        throw new Exception("[CiePluginHelper.enviar] No existeix una entrega cie activa per cap dels organs ni els seus pares");
+                    }
+                }
                 var pagadorCieEntity = entregaCieEfectiva.getCie();
                 var apiKey = getApiKey(pagadorCieEntity);
                 var cie = conversioTipusHelper.convertir(pagadorCieEntity, CieDto.class);
@@ -162,6 +179,7 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
                 cie.setApiKey(apiKey);
                 enviamentCie.setEntregaCie(cie);
                 enviamentCie.setOperadorPostal(conversioTipusHelper.convertir(entregaCieEfectiva.getOperadorPostal(), OperadorPostalDto.class));
+                NotibLogger.getInstance().info("Enviant entrega postal " + enviamentCie, log, LoggingTipus.ENTREGA_CIE);
                 resposta = getPlugin().enviar(enviamentCie);
                 if ("000".equals(resposta.getCodiResposta())) {
                     integracioHelper.addAccioOk(info);
@@ -225,6 +243,7 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
                 }
                 entregaPostal.setCieId(id.getIdentificador());
                 entregaPostal.setCieEstat(CieEstat.ENVIADO_CI);
+                callbackHelper.crearCallback(notificacio, env, false, "");
                 entregaPostalRepository.save(entregaPostal);
             }
             afegirEventsEnviarCie(notificacioReferencia, resposta);
@@ -249,7 +268,9 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
             if (error) {
                 var entregaPostal = env.getEntregaPostal();
                 entregaPostal.setCieEstat(CieEstat.ERROR);
-                entregaPostal.setCieErrorDesc(resposta.getDescripcioError());
+                var errorDesc = !Strings.isNullOrEmpty(resposta.getDescripcioError()) ? resposta.getDescripcioError() : null;
+                errorDesc = errorDesc.length() > 250 ? resposta.getDescripcioError().substring(0, 250) : errorDesc;
+                entregaPostal.setCieErrorDesc(errorDesc);
                 entregaPostalRepository.save(entregaPostal);
             }
         }
@@ -305,6 +326,7 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
             log.error("[ENTREGA_POSTAL] Error al cancelar l'enviament CIE. UUID " + uuidEnviament + " no trobat");
             return false;
         }
+        NotibLogger.getInstance().info("Cancelar entrega postal " + uuidEnviament, log, LoggingTipus.ENTREGA_CIE);
         var notificacio = enviament.getNotificacio();
         var codiDir3Entitat = notificacio.getEntitat().getDir3Codi();
         var info = new IntegracioInfo(IntegracioCodi.CIE, "Cancelar entrega postal", IntegracioAccioTipusEnumDto.ENVIAMENT,
@@ -394,6 +416,12 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
 //            var cieEntity = notificacio.getProcediment().getEntregaCieEfectiva();
             var procediment = notificacio.getProcediment();
             var cieEntity = procediment.getEntregaCieEfectiva() != null ? procediment.getEntregaCieEfectiva() : notificacio.getOrganGestor().getEntregaCie();
+            if (cieEntity == null) {
+                cieEntity = getEntregaCiePare(notificacio.getEntitat(), notificacio.getOrganGestor());
+                if (cieEntity == null) {
+                    throw new Exception("[CiePluginHelper.consultarEstatEntregaPostal] No existeix una entrega cie activa per cap dels organs ni els seus pares");
+                }
+            }
             var apiKey = getApiKey(cieEntity.getCie());
             var cie = conversioTipusHelper.convertir(cieEntity, CieDto.class);
             cie.setApiKey(apiKey);
@@ -424,6 +452,18 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
             notificacioEventHelper.addCieEventConsultaEstat(enviament, true, infoCie.getDescripcioResposta(), false);
             throw new SistemaExternException(IntegracioCodi.CIE.name(), errorDescripcio, ex);
         }
+    }
+
+    private EntregaCieEntity getEntregaCiePare(EntitatEntity entitat, OrganGestorEntity organ) {
+
+        if (organ.getCodiPare() == null || "A99999999".equals(organ.getCodiPare())) {
+            return organ.getEntregaCie();
+        }
+        var o = organGestorRepository.findByEntitatAndCodi(entitat, organ.getCodiPare());
+        if (o.getEntregaCie() != null) {
+            return o.getEntregaCie();
+        }
+        return getEntregaCiePare(entitat, o);
     }
 
     private String getApiKey(PagadorCieEntity pagadorCieEntity) {
