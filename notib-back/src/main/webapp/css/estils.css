@@ -33,9 +33,12 @@
 }
 #app-logo {
 	display: flex;
-	padding: 18px 0 0 12px;
+	padding: 0px 0 0 12px;
 }
 
+#logo-notib {
+    width: 98px;
+}
 
 #text-logo-div {
 	display: flex;

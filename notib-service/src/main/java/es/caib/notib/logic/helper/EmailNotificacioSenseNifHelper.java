@@ -474,7 +474,7 @@ public class EmailNotificacioSenseNifHelper {
 	}
 
 	private InputStream getCapsaleraLogoNotib() {
-		return getClass().getResourceAsStream("/es/caib/notib/logic/justificant/logo.png");
+		return getClass().getResourceAsStream("/es/caib/notib/logic/justificant/logo_old.png");
 	}
 
 	private String getPeuLogo() {

@@ -180,8 +180,8 @@
 					</c:choose>
 				</div>
 				<div id="app-logo" class="pull-left">
-					<img src="<c:url value="/img/logo.png"/>" alt="NOTIB" />
-					<div id="text-logo-div"><span id="text-logo">NOTIB</span></div>
+					<img id="logo-notib" src="<c:url value="/img/logo.png"/>" alt="NOTIB" />
+<%--					<div id="text-logo-div"><span id="text-logo">NOTIB</span></div>--%>
 				</div>
 			</div>
 		</div>
