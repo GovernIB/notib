@@ -321,6 +321,7 @@ public class ConversioTipusHelper {
 
 		mapperFactory.classMap(ProcedimentEntity.class, ProcSerDto.class)
                 .field("organGestor.codi", "organGestor")
+                .field("organGestor.id", "organGestorId")
 				.field("organGestor.nom", "organGestorNom")
 				.customize(new CustomMapper<>() {
 					@Override

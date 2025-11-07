@@ -34,6 +34,7 @@ public class ProcSerDataDto extends AuditoriaDto implements Serializable {
 	protected String llibreNom;
 	protected String oficina;
 	protected String oficinaNom;
+	protected Long organGestorId;
 	protected String organGestor;
 	protected String organGestorNom;
 	protected String tipusAssumpte;
