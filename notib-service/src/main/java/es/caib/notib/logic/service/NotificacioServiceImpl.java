@@ -45,6 +45,7 @@ import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.NotificacioService;
+import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
@@ -228,9 +229,11 @@ public class NotificacioServiceImpl implements NotificacioService {
     private NotificacioEventHelper notificacioEventHelper;
     @Autowired
     private AccioMassivaRepository accioMassivaRepository;
+    @Autowired
+    private OrganGestorService organGestorService;
 
 
-	@Transactional(rollbackFor=Exception.class)
+    @Transactional(rollbackFor=Exception.class)
 	@Override
 	public Notificacio create(Long entitatId, Notificacio notificacio) throws RegistreNotificaException {
 
@@ -1610,6 +1613,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (notificacio.getProcediment().isComu() && cieOrgan != null && cieOrgan.getCie().isCieExtern()) {
 				return true;
 			}
+            var entitatDto = conversioTipusHelper.convertir(notificacio.getEntitat(), EntitatDto.class);
+            var cieOrganPare = organGestorService.entregaCieActiva(entitatDto, notificacio.getOrganGestor().getCodi());
+            if (cieOrganPare) {
+                return true;
+            }
 		}
 		return false;
 	}

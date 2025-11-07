@@ -3,6 +3,7 @@ package es.caib.notib.logic.service;
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.logic.comanda.ComandaListener;
 import es.caib.notib.logic.email.EmailConstants;
 import es.caib.notib.logic.helper.AuditHelper;
 import es.caib.notib.logic.helper.CallbackHelper;
@@ -16,6 +17,7 @@ import es.caib.notib.logic.helper.NotificacioTableHelper;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.helper.SubsistemesHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
+import es.caib.notib.logic.intf.dto.AvisDescripcio;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
@@ -97,6 +99,8 @@ public class CieAdviserServiceImpl implements CieAdviserService {
     private EntregaPostalRepository entregaPostalRepository;
     @Autowired
     private NotificacioTableHelper notificacioTableHelper;
+    @Autowired
+    private ComandaListener comandaListener;
 
 
     @Override
@@ -510,7 +514,7 @@ public class CieAdviserServiceImpl implements CieAdviserService {
             notificacio.updateMotiu(cieEstat.name());
             notificacio.updateEstatDate(new Date());
             auditHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "AbstractNotificaHelper.enviamentUpdateDatat");
-
+            comandaListener.enviarAvis(enviament, AvisDescripcio.ACTUALITZAR_ESTAT_ENTREGA_POSTAL);
             if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
                 try {
                     log.info("Enviar email en cas d'usuaris INTERFICIE WEB");
