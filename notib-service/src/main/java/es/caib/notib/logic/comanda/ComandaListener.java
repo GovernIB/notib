@@ -10,6 +10,7 @@ import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.ProcSerHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
+import es.caib.notib.logic.intf.dto.AvisDescripcio;
 import es.caib.notib.logic.intf.dto.AvisDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
@@ -55,9 +56,101 @@ public class ComandaListener {
     private final ProcSerHelper procSerHelper;
     private final JmsTemplate jmsTemplate;
 
-    public void enviarAvisCommanda(AvisDto avis) {
+    private static final String APP_CODI = "NOT";
 
-        jmsTemplate.convertAndSend(SmConstants.CUA_COMANDA_AVISOS, avis,
+    private boolean isComandaActiva() {
+
+        var comandaActiva = configHelper.getConfigAsBoolean("es.caib.notib.plugin.comanda.actiu", false);
+        if (!comandaActiva) {
+            NotibLogger.getInstance().info("[ComandaListener] L'enviament a Comanda no esta actiu", log, LoggingTipus.COMANDA);
+            return false;
+        }
+        return true;
+    }
+
+    private String getEntornCodi() throws Exception{
+
+        var entornCodi = configHelper.getConfig("es.caib.notib.plugin.comanda.entorn.codi");
+        if (Strings.isNullOrEmpty(entornCodi)) {
+            NotibLogger.getInstance().info("[ComandaListener] No s'ha definit un codi d'entorn", log, LoggingTipus.COMANDA);
+            throw new Exception("La propietat \"es.caib.notib.plugin.comanda.entorn.codi\" no pot ser null");
+        }
+        return entornCodi;
+    }
+
+    public void enviarAvis(AvisDto dto) {
+        try {
+            if (!isComandaActiva()) {
+                return;
+            }
+            var entornCodi = getEntornCodi();
+            var avis = Avis.builder()
+                    .appCodi(APP_CODI)
+                    .entornCodi(entornCodi)
+                    .identificador(dto.getId() + "")
+                    .tipus(AvisTipus.INFO)
+                    .nom(dto.getAssumpte())
+                    .descripcio(dto.getMissatge())
+                    .dataInici(dto.getDataInici())
+                    .dataFi(dto.getDataFinal())
+                    .build();
+            enviarAvisComanda(avis);
+        } catch (Exception ex) {
+            log.error("[ComandaListener.avisDto] Error generant l'avis", ex);
+        }
+    }
+
+    public void enviarAvis(NotificacioEnviamentEntity enviament, AvisDescripcio descripcio) {
+
+        try {
+            if (!isComandaActiva()) {
+                return;
+            }
+            var entornCodi = getEntornCodi();
+            var notificacio = enviament.getNotificacio();
+            var dataInici = enviament.getCreatedDate().isPresent() ? Date.from(enviament.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()) : null;
+            var tipusEnviament = notificacio.getEnviamentTipus();
+            Date dataFi = null;
+            var isSir = !EnviamentTipus.SIR.equals(tipusEnviament);
+            if (isSir && enviament.isNotificaEstatFinal()) {
+                dataFi = enviament.getNotificaEstatData();
+            } else if(isSir) {
+                dataFi = enviament.getSirRegDestiData();
+            }
+            var desc = descripcio.getDescripcio() + " Tipus: " + tipusEnviament+ ". Estat "
+                        + (!EnviamentTipus.SIR.equals(tipusEnviament) ? enviament.getNotificaEstat() : enviament.getRegistreEstat());
+            var permisos = procSerHelper.findUsuarisAndRolsAmbPermis(notificacio);
+            var appBaseUrl = configHelper.getConfig("es.caib.notib.app.base.url");
+            var redireccio = appBaseUrl + "/notificacio/" + notificacio.getId() + "/enviament/" + enviament.getId();
+
+            var avis = Avis.builder()
+                        .appCodi(APP_CODI)
+                        .entornCodi(entornCodi)
+                        .identificador(enviament.getNotificaReferencia())
+                        .nom(notificacio.getConcepte())
+                        .dataInici(dataInici)
+                        .dataFi(dataFi)
+                        .descripcio(desc)
+                        .tipus(AvisTipus.INFO)
+                        .responsable(notificacio.getUsuariCodi())
+                        .usuarisAmbPermis(permisos.getUsuarisAmbPermis())
+                        .grupsAmbPermis(permisos.getRolsAmbPermis())
+                        .redireccio(new URL(redireccio))
+                        .grup(notificacio.getGrupCodi())
+                        .build();
+            enviarAvisComanda(avis);
+        } catch (Exception ex) {
+            log.error("[ComandaListener.avisEnviament] Error generant l'avis", ex);
+        }
+    }
+
+    private void enviarAvisComanda(Avis avis) throws Exception {
+
+        var mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        var requestBody = mapper.writeValueAsString(avis);
+        NotibLogger.getInstance().info("[ComandaListener] Enviant avis a la cua de tasques de Comanda " + avis, log, LoggingTipus.COMANDA);
+        jmsTemplate.convertAndSend(SmConstants.CUA_COMANDA_AVISOS, requestBody,
                 m -> {
                     m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 0);
                     return m;
@@ -66,23 +159,37 @@ public class ComandaListener {
 
     @Transactional
     @JmsListener(destination = SmConstants.CUA_COMANDA_AVISOS, containerFactory = SmConstants.JMS_FACTORY_ACK)
-    public void enviarAvisComanda(@Payload AvisDto avis, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
+    public void enviarAvisComanda(@Payload String avis, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
 
         message.acknowledge();
-        var info = new IntegracioInfo(IntegracioCodi.COMANDA, "Enviament de tasca a comanda", IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Avis", avis.toString()));
+        var info = new IntegracioInfo(IntegracioCodi.COMANDA, "Enviament d'avis a comanda", IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Avis", avis.toString()));
+        String url;
         try {
-            RestTemplate restTemplate = new RestTemplate();
-            String url = configHelper.getConfig("es.caib.notib.plugin.comanda.url");
+            url = configHelper.getConfig("es.caib.notib.plugin.comanda.url");
             if (url == null) {
-                throw new Exception("La propietat \"es.caib.notib.plugin.comanda.url.base\" no pot ser null");
+                throw new Exception("La propietat es.caib.notib.plugin.comanda.url.base no pot ser null");
             }
             url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "api/jms/avisos";
+            info.addParam("url", url);
+        } catch (Exception ex) {
+            var msg = "Error al obtenir la url per enviar l'avis a Commanda";
+            integracioHelper.addAccioError(info, msg, ex);
+            log.error("[enviarAvisComanda] " + msg, ex);
+            return;
+        }
+
+        try {
             var httpHeaders = new HttpHeaders();
             httpHeaders.set("Content-Type", "application/json");
-            var mapper = new ObjectMapper();
-
-            var requestBody = mapper.writeValueAsString(getAvisComanda(avis));
-            HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
+            var username = configHelper.getConfig("es.caib.notib.plugin.comanda.usuari");
+            var password = configHelper.getConfig("es.caib.notib.plugin.comanda.password");
+            String auth = username + ":" + password;
+            byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
+            String authHeader = "Basic " + new String(encodedAuth);
+            httpHeaders.set("Authorization", authHeader);
+            HttpEntity<String> requestEntity = new HttpEntity<>(avis, httpHeaders);
+            NotibLogger.getInstance().info("[enviarAvisComanda] Enviant avis a Comanda url " + url, log, LoggingTipus.COMANDA);
+            RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<String> response = restTemplate.postForEntity(url, requestEntity, String.class);
             NotibLogger.getInstance().info("[enviarAvisCommanda] Resposta: " + response.getBody(), log, LoggingTipus.COMANDA);
             integracioHelper.addAccioOk(info);
@@ -91,19 +198,6 @@ public class ComandaListener {
             integracioHelper.addAccioError(info, msg, ex);
             log.error("[enviarAvisComanda] " + msg, ex);
         }
-    }
-
-    private Avis getAvisComanda(AvisDto avis) {
-
-        return Avis.builder()
-                .appCodi("")
-                .identificador(avis.getId() + "")
-                .tipus(AvisTipus.INFO)
-                .nom(avis.getAssumpte())
-                .descripcio(avis.getMissatge())
-                .dataInici(avis.getDataInici())
-                .dataFi(avis.getDataFinal())
-                .build();
     }
 
     private void enviarTascaComanda(Tasca tasca) throws Exception  {
@@ -135,7 +229,7 @@ public class ComandaListener {
             url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "api/jms/tasques";
             info.addParam("url", url);
         } catch (Exception ex) {
-            var msg = "Error al enviar la tasca a Commanda";
+            var msg = "Error al obtenir la url per enviar la tasca a Commanda";
             integracioHelper.addAccioError(info, msg, ex);
             log.error("[enviarTascaCommanda] " + msg, ex);
             return;
@@ -165,16 +259,10 @@ public class ComandaListener {
     public void enviarTasca(NotificacioEnviamentEntity enviament) {
 
         try {
-            var comandaActiva = configHelper.getConfigAsBoolean("es.caib.notib.plugin.comanda.actiu", false);
-            if (!comandaActiva) {
-                NotibLogger.getInstance().info("[ComandaListener] L'enviament a Comanda no esta actiu", log, LoggingTipus.COMANDA);
+            if (!isComandaActiva()) {
                 return;
             }
-            var entornCodi = configHelper.getConfig("es.caib.notib.plugin.comanda.entorn.codi");
-            if (Strings.isNullOrEmpty(entornCodi)) {
-                NotibLogger.getInstance().info("[ComandaListener] No s'ha definit un codi d'entorn", log, LoggingTipus.COMANDA);
-                throw new Exception("La propietat \"es.caib.notib.plugin.comanda.entorn.codi\" no pot ser null");
-            }
+            var entornCodi = getEntornCodi();
             var notificacio = enviament.getNotificacio();
             var permisos = procSerHelper.findUsuarisAndRolsAmbPermis(notificacio);
             var descripcio = notificacio.getDescripcio();
@@ -185,7 +273,7 @@ public class ComandaListener {
             estatDesc += enviament.getEntregaPostal() != null ? ", Estat CIE: " + (enviament.getEntregaPostal().getCieEstat() != null ? enviament.getEntregaPostal().getCieEstat() : "Pendent d'enviar al centre CIE" ) : "";
             var dataInici = notificacio.getCreatedDate().isPresent() ? Date.from(notificacio.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()) : null;
             var tasca =  Tasca.builder()
-                .appCodi("NOT")
+                .appCodi(APP_CODI)
                 .entornCodi(entornCodi)
                 .identificador(enviament.getId() + "")
                 .tipus(notificacio.getEnviamentTipus().name())
@@ -205,7 +293,7 @@ public class ComandaListener {
                 .build();
             enviarTascaComanda(tasca);
         } catch (Exception ex) {
-            log.error("[ComandaListener] Error generant la tasca " );
+            log.error("[ComandaListener] Error generant la tasca", ex );
         }
     }
 

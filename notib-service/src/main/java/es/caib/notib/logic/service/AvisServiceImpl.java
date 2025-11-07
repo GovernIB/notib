@@ -49,7 +49,7 @@ public class AvisServiceImpl implements AvisService {
 		var entity = AvisEntity.getBuilder(avis.getAssumpte(), avis.getMissatge(), avis.getDataInici(), avis.getDataFinal(), avis.getAvisNivell(),
 							avis.getAvisAdministrador(), avis.getEntitatId()).build();
 		var dto = conversioTipusHelper.convertir(avisRepository.save(entity), AvisDto.class);
-//        comandaListener.enviarAvisCommanda(dto);
+        comandaListener.enviarAvis(dto);
 	    return dto;
     }
 
@@ -61,7 +61,7 @@ public class AvisServiceImpl implements AvisService {
 		var avisEntity = avisRepository.findById(avis.getId()).orElseThrow();
 		avisEntity.update(avis.getAssumpte(), avis.getMissatge(), avis.getDataInici(), avis.getDataFinal(), avis.getAvisNivell());
 		var dto = conversioTipusHelper.convertir(avisEntity, AvisDto.class);
-//        comandaListener.enviarAvisCommanda(dto);
+        comandaListener.enviarAvis(dto);
 	    return dto;
     }
 
@@ -74,7 +74,6 @@ public class AvisServiceImpl implements AvisService {
 			var avisEntity = avisRepository.findById(id).orElseThrow();
 			avisEntity.updateActiva(activa);
 			var dto = conversioTipusHelper.convertir(avisEntity, AvisDto.class);
-//            comandaListener.enviarAvisCommanda(dto);
 		    return dto;
         } catch (Exception e) {
 			log.error("[Avis] Error arctualtizant la propietat activa per l'avis " + id, e);
@@ -90,7 +89,10 @@ public class AvisServiceImpl implements AvisService {
 			log.debug("Esborrant avis (id=" + id +  ")");
 			var avisEntity = avisRepository.findById(id).orElseThrow();
 			avisRepository.delete(avisEntity);
-			return conversioTipusHelper.convertir(avisEntity, AvisDto.class);
+			var dto = conversioTipusHelper.convertir(avisEntity, AvisDto.class);
+            dto.setDataFinal(new Date());
+            comandaListener.enviarAvis(dto);
+            return dto;
 		} catch (Exception e) {
 			log.error("[Avis] Error esborrant l'avis " + id, e);
 			return null;

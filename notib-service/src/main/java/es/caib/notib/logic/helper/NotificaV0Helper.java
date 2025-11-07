@@ -10,6 +10,7 @@ import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.comanda.ComandaListener;
 import es.caib.notib.logic.intf.dto.AccioParam;
+import es.caib.notib.logic.intf.dto.AvisDescripcio;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
@@ -133,7 +134,8 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 					}
 				}
                 for (var enviament : notificacio.getEnviaments()) {
-                    comandaListener.enviarTasca(enviament);
+//                    comandaListener.enviarTasca(enviament);
+                    comandaListener.enviarAvis(enviament, AvisDescripcio.ENVIAMENT_NOTIFICA);
                     if (enviament.getEntregaPostal() == null) {
                         callbackHelper.crearCallback(notificacio, enviament, error, errorDescripcio);
                     }
@@ -281,6 +283,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 				var datatData = toDate(datado.getFecha());
 				if (datatDarrer == null) {
 					datatDarrer = datado;
+                    dataUltimDatat = datatData;
 				} else if (datado.getFecha() != null) {
 					var datatDarrerData = toDate(datatDarrer.getFecha());
 					if (datatData.after(datatDarrerData)) {
@@ -289,7 +292,10 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 				}
                 var estat = getEstatNotifica(datatDarrer.getResultado());
                 if (!datatData.equals(dataUltimDatat) || !estat.equals(enviament.getNotificaEstat())) {
-                    comandaListener.enviarTasca(enviament);
+                    enviament.setNotificaEstat(estat);
+                    enviament.setNotificaEstatData(datatData);
+//                    comandaListener.enviarTasca(enviament);
+                    comandaListener.enviarAvis(enviament, AvisDescripcio.ACTUALTIZAR_ESTAT_NOTIFICA);
                 }
 				var event = new NotificaRespostaDatatDto.NotificaRespostaDatatEventDto();
 				event.setData(datatData);
