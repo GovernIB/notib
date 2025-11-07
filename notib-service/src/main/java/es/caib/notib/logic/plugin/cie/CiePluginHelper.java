@@ -83,10 +83,9 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
     private final EntregaPostalRepository entregaPostalRepository;
     private final NotificacioEnviamentRepository enviamentRepository;
     private final OrganGestorRepository organGestorRepository;
-
+    private final CallbackHelper callbackHelper;
     public static final String GRUP = "CIE";
     private static final String ERROR_INESPERAT = "Error inesperat";
-    private final CallbackHelper callbackHelper;
 
     public CiePluginHelper(ConfigHelper configHelper,
                            EntitatRepository entitatRepository,
@@ -103,7 +102,8 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
                            NotificacioTableViewRepository notificacioTableViewRepository,
                            MessageHelper messageHelper,
                            NotificacioTableHelper notificacioTableHelper,
-                           MeterRegistry meterRegistry, CallbackHelper callbackHelper,
+                           MeterRegistry meterRegistry,
+                           CallbackHelper callbackHelper,
                            OrganGestorRepository organGestorRepository) {
 
         super(integracioHelper, configHelper, entitatRepository, meterRegistry);
