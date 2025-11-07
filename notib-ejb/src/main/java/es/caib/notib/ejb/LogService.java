@@ -14,31 +14,31 @@ import java.util.concurrent.BlockingQueue;
 public class LogService extends AbstractService<es.caib.notib.logic.intf.service.LogService> implements es.caib.notib.logic.intf.service.LogService {
 
     @Override
-    @RolesAllowed({"NOT_SUPER"})
+    @RolesAllowed({"NOT_COM"})
     public List<FitxerInfo> llistarFitxers() {
         return getDelegateService().llistarFitxers();
     }
 
     @Override
-    @RolesAllowed({"NOT_SUPER"})
+    @RolesAllowed({"NOT_COM"})
     public FitxerContingut getFitxerByNom(String nom) {
         return getDelegateService().getFitxerByNom(nom);
     }
 
     @Override
-    @RolesAllowed({"NOT_SUPER"})
+    @RolesAllowed({"NOT_COM"})
     public void tailLogFile(String filePath) {
         getDelegateService().tailLogFile(filePath);
     }
 
     @Override
-    @RolesAllowed({"NOT_SUPER"})
+    @RolesAllowed({"NOT_COM"})
     public BlockingQueue<String> getQueue() {
         return getDelegateService().getQueue();
     }
 
     @Override
-    @RolesAllowed({"NOT_SUPER"})
+    @RolesAllowed({"NOT_COM"})
     public List<String> readLastNLines(String nomFitxer, Long nLinies) {
         return getDelegateService().readLastNLines(nomFitxer, nLinies);
     }
