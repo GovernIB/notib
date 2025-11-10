@@ -44,7 +44,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 		log.debug("Generant el justificant d'enviament de la notificacio [notificacioId=" + notificacio.getId() + "]");
 		var out = new ByteArrayOutputStream();
 		try {
-			var justificant = inicialitzaDocument(out, progres);
+			var justificant = inicialitzaDocument(out, progres, notificacio.getEntitat().getCodi());
 			progres.setProgres(30);
 			progres.addInfo(ProgresDescarregaDto.TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.generant.titol"));
 			crearTitolAndIntroduccio(justificant, notificacio, progres);

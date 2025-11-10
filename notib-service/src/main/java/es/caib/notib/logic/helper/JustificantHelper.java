@@ -7,6 +7,7 @@ import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
 import es.caib.notib.logic.intf.dto.ProgresDescarregaDto;
 import es.caib.notib.logic.intf.exception.JustificantException;
+import joptsimple.internal.Strings;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -76,11 +77,11 @@ public abstract class JustificantHelper<T> {
         return formatter.format(now);
     }
 
-    protected Document inicialitzaDocument(ByteArrayOutputStream out, ProgresDescarregaDto progres) throws DocumentException, JustificantException {
+    protected Document inicialitzaDocument(ByteArrayOutputStream out, ProgresDescarregaDto progres, String entitatCodi) throws DocumentException, JustificantException {
 
         log.debug("Inicialitzant el document per la generació del justificant d'enviament");
 //		## [Event per crear el header]
-        var headerEvent = new HeaderPageEvent(progres);
+        var headerEvent = new HeaderPageEvent(progres, entitatCodi);
 //		## [Event per crear el footer]
         var footerEvent = new FooterPageEvent(progres);
         var justificant = new Document(PageSize.A4, 36, 36, 35 + headerEvent.getTableHeight(), 36);
@@ -204,7 +205,7 @@ public abstract class JustificantHelper<T> {
             header.writeSelectedRows(0, -1, justificant.left(), yPos, writer.getDirectContent());
         }
 
-        protected HeaderPageEvent(ProgresDescarregaDto progres) throws JustificantException {
+        protected HeaderPageEvent(ProgresDescarregaDto progres, String entitatCodi) throws JustificantException {
 
             var accioDescripcio = messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant.header");
             log.debug(accioDescripcio);
@@ -217,8 +218,9 @@ public abstract class JustificantHelper<T> {
 
 //				## [LOGO ENTITAT]
                 Image logoCapsalera;
-                if (getCapsaleraLogo() != null) {
-                    logoCapsalera = Image.getInstance(getCapsaleraLogo());
+                var logo = getCapsaleraLogo(entitatCodi);
+                if (!Strings.isNullOrEmpty(logo)) {
+                    logoCapsalera = Image.getInstance(logo);
                 } else {
                     byte[] logoBytes = IOUtils.toByteArray(getCapsaleraDefaultLogo());
                     logoCapsalera = Image.getInstance(logoBytes);
@@ -232,22 +234,27 @@ public abstract class JustificantHelper<T> {
                 }
 
 //				## [LOGO ENTITAT]
-                Image logoPeu;
-                if (getPeuLogo() != null) {
-                    logoPeu = Image.getInstance(getPeuLogo());
-                } else {
-                    byte[] logoBytes = IOUtils.toByteArray(getPeuDefaultLogo());
-                    logoPeu = Image.getInstance(logoBytes);
+                Image logoNotibImage;
+//                logo = getPeuLogo(entitatCodi);
+                var logoNotib = getLogoNotib();
+                if (logoNotib != null) {
+                    byte[] logoBytes = IOUtils.toByteArray(logoNotib);
+                    logoNotibImage = Image.getInstance(logoBytes);
+                    logoNotibImage.setScaleToFitHeight(true);
+                    logoNotibImage.scaleToFit(100, 80);
+                    var cellLogo = new PdfPCell(logoNotibImage);
+                    cellLogo.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                    cellLogo.setBorder(Rectangle.NO_BORDER);
+                    header.addCell(cellLogo);
+                    tableHeight = header.getTotalHeight();
                 }
+//                else {
+//                    byte[] logoBytes = IOUtils.toByteArray(getPeuDefaultLogo());
+//                    logoPeu = Image.getInstance(logoBytes);
+//                }
 
 //				## [PEU - LOGO]
-                logoPeu.setScaleToFitHeight(true);
-                logoPeu.scaleToFit(100, 80);
-                var cellLogo = new PdfPCell(logoPeu);
-                cellLogo.setHorizontalAlignment(Element.ALIGN_RIGHT);
-                cellLogo.setBorder(Rectangle.NO_BORDER);
-                header.addCell(cellLogo);
-                tableHeight = header.getTotalHeight();
+
             } catch (Exception ex) {
                 String errorMessage = messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant.header.error");
                 progres.setProgres(100);
@@ -259,12 +266,20 @@ public abstract class JustificantHelper<T> {
             return getClass().getResourceAsStream("/es/caib/notib/logic/justificant/logo.png");
         }
 
-        private String getPeuLogo() {
-            return getNotBlankProperty(configHelper.getConfig("es.caib.notib.justificant.peu.logo"));
+        private InputStream getLogoNotib() {
+            return getClass().getResourceAsStream("/es/caib/notib/logic/justificant/logo.png");
         }
 
-        private String getCapsaleraLogo() {
-            return getNotBlankProperty(configHelper.getConfig("es.caib.notib.justificant.capsalera.logo"));
+        private String getPeuLogo(String entitatCodi) {
+
+            var logoEntitat = configHelper.getConfigByEntitat(entitatCodi, "es.caib.notib.peu.logo");
+            return getNotBlankProperty(logoEntitat);
+        }
+
+        private String getCapsaleraLogo(String entitatCodi) {
+
+            var logoEntitat = configHelper.getConfigByEntitat(entitatCodi, "es.caib.notib.capsalera.logo");
+            return getNotBlankProperty(logoEntitat);
         }
 
         private InputStream getCapsaleraDefaultLogo() {
