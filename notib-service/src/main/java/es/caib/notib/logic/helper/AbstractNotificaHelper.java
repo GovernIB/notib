@@ -91,7 +91,7 @@ public abstract class AbstractNotificaHelper {
 
 	public abstract NotificacioEnviamentEntity enviamentRefrescarEstat(ConsultaNotificaRequest consulta, boolean raiseExceptions) throws Exception;
 
-	public abstract RespostaAnulacio anular(String identificador);
+	public abstract RespostaAnulacio anular(String identificador, String motiu);
 
     public abstract RespuestaSincronizarEnvioOE enviamentEntregaPostalNotificada(SincronizarEnvio sincronizarEnvio) throws Exception;
 
