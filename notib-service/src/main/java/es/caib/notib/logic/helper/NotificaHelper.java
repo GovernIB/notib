@@ -13,13 +13,11 @@ import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.dto.anular.Anulacio;
 import es.caib.notib.logic.intf.dto.anular.RespostaAnular;
-import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.intf.ws.adviser.nexea.NexeaAdviserWs;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnvio;
 import es.caib.notib.logic.plugin.cie.CiePluginHelper;
 import es.caib.notib.logic.statemachine.SmConstants;
-import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOE.RespuestaSincronizarEnvioOE;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
@@ -100,7 +98,7 @@ public class NotificaHelper {
                 respostaAnular.addResposta(respostaAnulacio);
                 continue;
             }
-            var resposta = getNotificaHelper().anular(identificador);
+            var resposta = getNotificaHelper().anular(identificador, anulacio.getMotiu());
             respostaAnular.addResposta(resposta);
             if (resposta.isError()) {
                 continue;

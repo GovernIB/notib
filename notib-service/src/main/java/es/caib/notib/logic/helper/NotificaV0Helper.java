@@ -390,7 +390,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	}
 
     @Override
-    public RespostaAnulacio anular(String identificador) {
+    public RespostaAnulacio anular(String identificador, String motiu) {
 
         var enviament = notificacioEnviamentRepository.findByNotificaReferencia(identificador);
         try {
