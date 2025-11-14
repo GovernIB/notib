@@ -1,5 +1,6 @@
 package es.caib.notib.logic.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;

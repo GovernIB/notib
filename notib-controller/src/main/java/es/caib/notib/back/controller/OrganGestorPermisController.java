@@ -34,7 +34,7 @@ import java.util.ArrayList;
  */
 @Controller
 @RequestMapping("/organgestor")
-public class OrganGestorPermisController extends BaseUserController{
+public class OrganGestorPermisController extends BaseUserController {
 	
 	@Autowired
 	OrganGestorService organGestorService;

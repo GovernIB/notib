@@ -1,13 +1,11 @@
 package es.caib.notib.back.controller;
 
 import es.caib.notib.back.command.AccioMassivaFiltreCommand;
-import es.caib.notib.back.command.CallbackFiltreCommand;
 import es.caib.notib.back.helper.DatatablesHelper;
 import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.back.helper.EnumHelper;
 import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.back.helper.RolHelper;
-import es.caib.notib.logic.intf.dto.SiNo;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaDetall;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaElementEstat;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaTipus;

@@ -275,6 +275,28 @@ public class PermisosServiceImpl implements PermisosService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<CodiValorOrganGestorComuDto> getProcedimentsAmbPermis(Long entitatId, String usuariCodi) {
+
+        try {
+            var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+            var grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
+            var permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(PermisEnum.COMUNS),
+                    entityComprovarHelper.getPermissionFromName(PermisEnum.CONSULTA),
+                    entityComprovarHelper.getPermissionFromName(PermisEnum.COMUNICACIO),
+                    entityComprovarHelper.getPermissionFromName(PermisEnum.COMUNICACIO_SIR),
+                    entityComprovarHelper.getPermissionFromName(PermisEnum.ADMIN),
+                    entityComprovarHelper.getPermissionFromName(PermisEnum.GESTIO),
+                    entityComprovarHelper.getPermissionFromName(PermisEnum.NOTIFICACIO)};
+            return getProcSerAmPermis(entitatId, usuariCodi, permisos, ProcSerTipusEnum.PROCEDIMENT, true, false);
+        } catch (Exception ex) {
+            log.error("Error obtenint permisos de procediments per l'usuari " + usuariCodi + " a l'entitat " + entitatId, ex);
+            throw ex;
+        }
+    }
+
+
+    @Override
     @Cacheable(value = "procedimentsAmbPermis", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name())")
     @Transactional(readOnly = true)
     public List<CodiValorOrganGestorComuDto> getProcedimentsAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
@@ -490,7 +512,7 @@ public class PermisosServiceImpl implements PermisosService {
 
         var permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
         boolean tractarEntitatComOrganGestor = configHelper.getConfigAsBoolean("es.caib.notib.notifica.dir3.entitat.permes");
-        
+
         // 1. Obté òrgans amb permís comú
         List<OrganGestorEntity> organsAmbPermisComu = new ArrayList<>();
         if (Boolean.TRUE.equals(hasProcSerComunsAmbPermisPerOrgan(entitat, grups, true))) {
