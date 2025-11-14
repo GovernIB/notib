@@ -60,6 +60,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -100,7 +101,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Autowired
 	private SchedulingConfig schedulingConfig;
 	@Autowired
-	private BrokerService brokerService;
+	private Optional<BrokerService> brokerService;
 
     @Autowired
     private MeterRegistry meterRegistry;
@@ -110,8 +111,14 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	public void restartSmBroker() throws Exception {
 
-		brokerService.stop();
-		brokerService.start(true);
+        brokerService.ifPresentOrElse(broker -> {
+            try {
+		        broker.stop();
+		        broker.start(true);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }, () -> { throw new RuntimeException("S'esta usant un boker remot. Cal desactivar el profile \"remoteBroker\" per usar el boker local");});
 	}
 
 

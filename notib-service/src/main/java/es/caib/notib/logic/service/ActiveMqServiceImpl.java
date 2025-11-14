@@ -16,6 +16,7 @@ import org.apache.activemq.broker.jmx.BrokerViewMBean;
 import org.apache.activemq.broker.jmx.QueueViewMBean;
 import org.apache.activemq.store.kahadb.KahaDBPersistenceAdapter;
 import org.codehaus.jettison.json.JSONObject;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import javax.management.JMX;
@@ -32,6 +33,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Service
+@Profile("!remoteBroker")
 public class ActiveMqServiceImpl implements ActiveMqService {
 
     private final BrokerService brokerService;

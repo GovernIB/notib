@@ -30,6 +30,9 @@ public class SmJmsConfig {
     private String BROKER_PASSWORD;
     @Value("${es.caib.notib.plugin.gesdoc.filesystem.base.dir:target}")
     private String fileBaseDir;
+    @Value("${es.caib.notib.activemq.max.concurrency:50}")
+    private Integer BROKER_MAX_CONCURRENCY;
+
 
     @Bean // Serialize message content to json using TextMessage
     public MessageConverter jacksonJmsMessageConverter() {
@@ -48,7 +51,7 @@ public class SmJmsConfig {
 //        factory.setSessionTransacted(true);
         factory.setConnectionFactory(new PooledConnectionFactory(BROKER_URL));
         factory.setSessionAcknowledgeMode(JmsProperties.AcknowledgeMode.CLIENT.getMode());
-        factory.setConcurrency("5-50");
+        factory.setConcurrency("5-" + BROKER_MAX_CONCURRENCY);
         configurer.configure(factory, connectionFactory);
         // You could still override some settings if necessary.
         return factory;
