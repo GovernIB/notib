@@ -3,7 +3,12 @@
  */
 package es.caib.notib.persist.repository;
 
+import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
+import es.caib.notib.logic.intf.dto.permis.PermisosUsuarisFiltre;
+import es.caib.notib.persist.entity.AccioMassivaEntity;
 import es.caib.notib.persist.entity.UsuariEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -59,4 +64,8 @@ public interface UsuariRepository extends JpaRepository<UsuariEntity, String> {
 	@Modifying
 	@Query(value = "UPDATE NOT_ACL_SID SET SID = :codiNou WHERE SID = :codiAntic AND PRINCIPAL = 1 AND NOT EXISTS (SELECT 1 FROM NOT_ACL_SID WHERE SID = :codiNou AND PRINCIPAL = 1)", nativeQuery = true)
 	int updateUsuariPermis(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+
+    @Query(value = "from UsuariEntity u where (:#{#filtre.usuariCodiNull} = true or u.codi =  :#{#filtre.usuariCodi})")
+    Page<UsuariEntity> findAmbFiltre(PermisosUsuarisFiltre filtre, Pageable paginacioParams);
+
 }

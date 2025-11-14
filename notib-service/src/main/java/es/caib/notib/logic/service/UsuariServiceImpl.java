@@ -1,9 +1,27 @@
 package es.caib.notib.logic.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import es.caib.notib.logic.cacheable.OrganGestorCachable;
+import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
+import es.caib.notib.logic.helper.PaginacioHelper;
+import es.caib.notib.logic.intf.dto.CodiValorDto;
+import es.caib.notib.logic.intf.dto.CodiValorOrganGestorComuDto;
+import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.PaginaDto;
+import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
+import es.caib.notib.logic.intf.dto.PermisDto;
 import es.caib.notib.logic.intf.dto.UsuariDto;
+import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaDto;
+import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
+import es.caib.notib.logic.intf.dto.permis.PermisosUsuari;
+import es.caib.notib.logic.intf.dto.permis.PermisosUsuarisFiltre;
 import es.caib.notib.logic.intf.exception.NotFoundException;
+import es.caib.notib.logic.intf.service.OrganGestorService;
+import es.caib.notib.logic.intf.service.PermisosService;
+import es.caib.notib.logic.intf.service.ProcedimentService;
 import es.caib.notib.logic.intf.service.UsuariService;
+import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.UsuariEntity;
 import es.caib.notib.persist.repository.AplicacioRepository;
 import es.caib.notib.persist.repository.AvisRepository;
@@ -30,8 +48,14 @@ import es.caib.notib.persist.repository.ProcedimentRepository;
 import es.caib.notib.persist.repository.UsuariRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.acls.domain.SpringCacheBasedAclCache;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -87,6 +111,18 @@ public class UsuariServiceImpl implements UsuariService {
     private AplicacioRepository aplicacioRepository;
     @Autowired
     private SpringCacheBasedAclCache aclCache;
+    @Autowired
+    private PaginacioHelper paginacioHelper;
+    @Autowired
+    private PermisosService permisosService;
+    @Autowired
+    private OrganGestorService organGestorService;
+    @Autowired
+    private CacheHelper cacheHelper;
+    @Autowired
+    private ProcedimentService procedimentService;
+    @Autowired
+    private OrganGestorCachable organGestorCachable;
 
     @Override
     public UsuariDto findByCodi(String codi) {
@@ -129,6 +165,102 @@ public class UsuariServiceImpl implements UsuariService {
         usuariRepository.delete(usuariAntic);
         aclCache.clearCache();
         return registresModificats;
+    }
+
+    @Override
+    public PaginaDto<UsuariDto> findAmbFiltre(PermisosUsuarisFiltre filtre, PaginacioParamsDto paginacioParams) {
+
+        try {
+            var pageable = getMappeigPropietats(paginacioParams);
+            var usuaris = usuariRepository.findAmbFiltre(filtre, pageable);
+            return paginacioHelper.toPaginaDto(usuaris, UsuariDto.class);
+        } catch (Exception ex) {
+            var msg = "Error carregant les dades de la taula de permisos d'usuari";
+            log.error(msg, ex);
+            throw ex;
+        }
+    }
+
+    @Override
+    public PermisosUsuari getPermisosUsuari(EntitatDto entitat, String usuariCodi) {
+
+        try {
+            var permisosUsuari = new PermisosUsuari();
+            var organsAmbPermis = permisosService.getOrgansAmbPermis(entitat.getId(), usuariCodi);
+            Map<String, List<PermisDto>> permisosOrgans = new HashMap<>();
+            Map<String, List<String>> organsFills = new HashMap<>();
+            List<String> organsFillsNom = new ArrayList<>();
+            var rols = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
+            List<PermisDto> p;
+            OrganGestorDto organEntity;
+            for (var organ : organsAmbPermis) {
+                var permisos = organGestorService.permisFind(entitat.getId(), Long.valueOf(organ.getCodi()));
+                if (permisos.isEmpty()) {
+                    continue;
+                }
+                p = new ArrayList<>();
+                for (var permis : permisos) {
+                    if (permis.getPrincipal().equals(usuariCodi) || rols.contains(permis.getPrincipal())) {
+                        permis.setOrganNom(organ.getValor());
+                        p.add(permis);
+                    }
+                }
+                var codi = organ.getValor().split(" - ")[0];
+                List<String> codiFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), codi);
+                organsFillsNom = new ArrayList<>();
+                for (var codiFill : codiFills) {
+                    organEntity = organGestorService.findByCodi(entitat.getId(), codiFill);
+                    organsFillsNom.add(organEntity.getCodi() + " - " + organEntity.getNom());
+                }
+                organsFills.put(organ.getCodi(), organsFillsNom);
+                permisosOrgans.put(organ.getCodi(), p);
+            }
+            var objectMapper = new ObjectMapper();
+            String map = "";
+            map = objectMapper.writeValueAsString(permisosOrgans);
+            permisosUsuari.setPermisosOrgans(map);
+            map = objectMapper.writeValueAsString(organsFills);
+            permisosUsuari.setOrgansFills(map);
+            var procedimentsAmbPermis = permisosService.getProcedimentsAmbPermis(entitat.getId(), usuariCodi);
+            Map<String, List<PermisDto>> permisosProcediment = new HashMap<>();
+            Map<String, List<CodiValorOrganGestorComuDto>> procSerOrgan = new HashMap<>();
+            List<CodiValorOrganGestorComuDto> procSerOrganList = new ArrayList<>();
+            for (var procediment : procedimentsAmbPermis) {
+                var permisos = procedimentService.permisFind(entitat.getId(), false, procediment.getId(), procediment.getOrganGestor(), null, null, null);
+                if (permisos.isEmpty()) {
+                    procSerOrganList.add(procediment);
+                    continue;
+                }
+                p = new ArrayList<>();
+                for (var permis : permisos) {
+                    if (permis.getPrincipal().equals(usuariCodi) || rols.contains(permis.getPrincipal())) {
+                        permis.setOrganNom(procediment.getValor());
+                        p.add(permis);
+                    }
+                }
+                permisosProcediment.put(procediment.getCodi(), p);
+            }
+            map = objectMapper.writeValueAsString(permisosProcediment);
+            permisosUsuari.setProcSerOrgan(procSerOrganList);
+            permisosUsuari.setPermisosProcediment(map);
+            return permisosUsuari;
+        } catch (Exception ex) {
+            log.error("Error obtinguent else permisos de l'usuari " + usuariCodi + " de l'entitat " + entitat.getCodi(), ex);
+            return new PermisosUsuari();
+        }
+    }
+
+
+
+    private Pageable getMappeigPropietats(PaginacioParamsDto paginacioParams) {
+
+        Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<>();
+//        mapeigPropietatsOrdenacio.put("usuariCodi", new String[] {"usuariCodi"});
+//        mapeigPropietatsOrdenacio.put("endpoint", new String[] {"usuariCodi"});
+//        mapeigPropietatsOrdenacio.put("data", new String[] {"data"});
+
+//        return paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
+        return paginacioHelper.toSpringDataPageable(paginacioParams);
     }
 
     private UsuariEntity cloneUsuari(String codiNou, UsuariEntity usuariAntic) {

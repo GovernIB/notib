@@ -285,6 +285,12 @@ public class PermisosHelper {
 		}
 		return aclObjectIdentityRepository.findObjectsIdWithAllPermissions(clazz.getName(), sids, masks, masks.size());
 	}
+//
+//    public List<PermisDto> findPermisosByUsuari(String usuariCodi) {
+//
+//
+//        aclService.readAclById()
+//    }
 
 
 	public List<PermisDto> findPermisos(Long objectIdentifier, Class<?> objectClass) {

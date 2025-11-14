@@ -32,6 +32,7 @@ public class UsuariDto implements Serializable {
 	@Include
 	private String codi;
 	private String nom;
+	private String llinatges;
 	private String nif;
 	private String email;
 	private String emailAlt;

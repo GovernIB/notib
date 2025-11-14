@@ -88,6 +88,9 @@ public interface PermisosService {
     List<CodiValorOrganGestorComuDto> getProcSerComuns(Long entitatId, List<String> grups, boolean removeInactius, ProcSerTipusEnum tipus);
 
     @PreAuthorize("isAuthenticated()")
+    List<CodiValorOrganGestorComuDto> getProcedimentsAmbPermis(Long entitatId, String usuariCodi);
+
+    @PreAuthorize("isAuthenticated()")
     List<CodiValorOrganGestorComuDto> getProcedimentsAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis);
 
     @PreAuthorize("isAuthenticated()")
@@ -98,5 +101,6 @@ public interface PermisosService {
 
     @PreAuthorize("isAuthenticated()")
     void evictGetOrgansAmbPermis();
+
 }
 
