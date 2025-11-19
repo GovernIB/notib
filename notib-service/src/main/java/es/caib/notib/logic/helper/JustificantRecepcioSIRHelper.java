@@ -14,6 +14,7 @@ import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.ProgresDescarregaDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.logic.intf.exception.JustificantException;
+import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import joptsimple.internal.Strings;
 import lombok.SneakyThrows;
@@ -53,7 +54,9 @@ public class JustificantRecepcioSIRHelper extends JustificantHelper<NotificacioE
 	public byte[] generarJustificant(NotificacioEnviamentEntity enviament, ProgresDescarregaDto progres) throws JustificantException {
 
 		log.debug("Generant el justificant de recepció SIR de l'enviament [enviamentId=" + enviament.getId() + "]");
-		var resposta = pluginHelper.obtenerAsientoRegistral(enviament.getNotificacio().getEntitat().getDir3Codi(), enviament.getRegistreNumeroFormatat(), 2L, false);
+		EntitatEntity entitat = enviament.getNotificacio().getEntitat();
+		var codiDir3 = entitat.getDir3CodiReg() != null  && !entitat.getDir3CodiReg().isEmpty() ? entitat.getDir3CodiReg() : entitat.getDir3Codi();
+		var resposta = pluginHelper.obtenerAsientoRegistral(codiDir3, enviament.getRegistreNumeroFormatat(), 2L, false);
 		progres.setProgres(30);
 		var paragrafContingut = new Paragraph();
 		var decodificacionEntidadRegistralProcesado = !Strings.isNullOrEmpty(resposta.getDecodificacionEntidadRegistralProcesado()) ? resposta.getDecodificacionEntidadRegistralProcesado() : "";
