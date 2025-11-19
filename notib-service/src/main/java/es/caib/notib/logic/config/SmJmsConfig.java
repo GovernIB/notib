@@ -72,7 +72,7 @@ public class SmJmsConfig {
     }
 
     @Bean(initMethod = "start", destroyMethod = "stop")
-    @Profile("!remoteBoker")
+    @Profile("!remoteBroker")
     public BrokerService broker() throws Exception {
 
         final BrokerService broker = new BrokerService();

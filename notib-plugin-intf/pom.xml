@@ -169,7 +169,7 @@
 				<dependency>
 					<groupId>org.fundaciobit.plugins</groupId>
 					<artifactId>plugin-arxiu-apb</artifactId>
-					<version>1.0.0</version>
+					<version>1.0.3.1</version>
 				</dependency>
 				<dependency>
 					<groupId>axis</groupId>

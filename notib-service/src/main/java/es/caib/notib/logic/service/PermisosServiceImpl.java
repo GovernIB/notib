@@ -484,6 +484,8 @@ public class PermisosServiceImpl implements PermisosService {
     private List<CodiValorDto> getOrgansAmbPermisPerNotificar(EntitatEntity entitat, List<String> grups, PermisEnum permis,  boolean incloureNoVigents) {
 
         var permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
+        boolean tractarEntitatComOrganGestor = configHelper.getConfigAsBoolean("es.caib.notib.notifica.dir3.entitat.permes");
+        
         // 1. Obté òrgans amb permís comú
         List<OrganGestorEntity> organsAmbPermisComu = new ArrayList<>();
         if (Boolean.TRUE.equals(hasProcSerComunsAmbPermisPerOrgan(entitat, grups, true))) {
@@ -504,13 +506,13 @@ public class PermisosServiceImpl implements PermisosService {
         Set<OrganGestorEntity> organs = new HashSet<>(organsAmbPermisComu);
         organs.addAll(organsAmbPermisComunicacionsSenseProcediment);
         for (var procSerOrgan: procSerAmbPermisProcedimentOrgan) {
-            if (!entitat.getDir3Codi().equals(procSerOrgan.getOrganGestor().getCodi())) {
+            if (tractarEntitatComOrganGestor || !entitat.getDir3Codi().equals(procSerOrgan.getOrganGestor().getCodi())) {
                 organs.add(procSerOrgan.getOrganGestor());
             }
         }
         // Afegim els òrgans dels procediments al conjunt d'òrgans
         for(var procSer: procSerAmbPermisOrgan) {
-            if (!entitat.getDir3Codi().equals(procSer.getOrganGestor().getCodi())) {
+            if (tractarEntitatComOrganGestor || !entitat.getDir3Codi().equals(procSer.getOrganGestor().getCodi())) {
                 organs.add(procSer.getOrganGestor());
             }
         }
@@ -518,7 +520,7 @@ public class PermisosServiceImpl implements PermisosService {
         var o =  getOrgansAfegintFills(entitat, organs, permis, !incloureNoVigents);
         // Afegir procediments amb permis directe
         for (var e : procSerAmbPermisDirecte) {
-            if (!entitat.getDir3Codi().equals(e.getOrganGestor().getCodi()) && (incloureNoVigents || OrganGestorEstatEnum.V.equals(e.getOrganGestor().getEstat()))) {
+            if ((tractarEntitatComOrganGestor || !entitat.getDir3Codi().equals(e.getOrganGestor().getCodi())) && (incloureNoVigents || OrganGestorEstatEnum.V.equals(e.getOrganGestor().getEstat()))) {
                 o.add(CodiValorDto.builder().codi(e.getOrganGestor().getId() + "").valor(e.getOrganGestor().getCodi() + " - " + e.getOrganGestor().getNom()).build());
             }
         }

@@ -15,6 +15,7 @@ import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaSirRequest;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.utils.NotibLogger;
+import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
@@ -85,7 +86,9 @@ public class RegistreHelper {
 			}
 			logTimeHelper.debugWithoutTime("Comunicació SIR --> número registre formatat: " + enviament.getRegistreNumeroFormatat());
 			// Consulta al registre
-			var resposta = pluginHelper.obtenerAsientoRegistral(notificacio.getEntitat().getDir3Codi(), enviament.getRegistreNumeroFormatat(), 2L,  /*registre sortida*/ false);
+			EntitatEntity entitat = notificacio.getEntitat();
+			String codiDir3 = entitat.getDir3CodiReg() != null  && !entitat.getDir3CodiReg().isEmpty() ? entitat.getDir3CodiReg() : entitat.getDir3Codi();
+			var resposta = pluginHelper.obtenerAsientoRegistral(codiDir3, enviament.getRegistreNumeroFormatat(), 2L,  /*registre sortida*/ false);
 			logTimeHelper.info(" [TIMER-SIR] Obtener asiento registral  [Id: " + enviamentId + "]");
 			// Consulta retorna error
 			if (resposta.getErrorCodi() != null && !resposta.getErrorCodi().isEmpty()) {

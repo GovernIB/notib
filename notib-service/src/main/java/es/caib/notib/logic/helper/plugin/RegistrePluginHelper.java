@@ -729,7 +729,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 		var dadesOficina = new DadesOficina();
 		String dir3Codi;
 		String organisme = null;
-		if (notificacio.getNotificaEnviamentNotificaData() != null && notificacio.getEntitat().getDir3CodiReg() != null) {
+		if (notificacio.getEntitat().getDir3CodiReg() != null) {
 			dir3Codi = notificacio.getEntitat().getDir3CodiReg();
 			organisme = notificacio.getEntitat().getDir3CodiReg();
 		} else {
