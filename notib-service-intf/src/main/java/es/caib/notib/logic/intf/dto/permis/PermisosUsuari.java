@@ -17,5 +17,5 @@ public class PermisosUsuari {
     private String permisosOrgans;
     private String permisosProcediment;
     private String organsFills;
-    private List<CodiValorOrganGestorComuDto> procSerOrgan;
+    private List<PermisCodivalorOrganGestorComu> procSerOrgan;
 }

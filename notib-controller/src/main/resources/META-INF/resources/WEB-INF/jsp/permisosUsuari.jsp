@@ -63,40 +63,33 @@
                 : '<a href="' + url + referencia + '" target="_blank">' + referencia + '</a>';
         }
 
-        function crearTaula(td, jsonPermisos, organsFills, titol, codiUsuari) {
+        function crearTaula(td, jsonPermisos, titol, codiUsuari) {
 
-            let taulaId = "organs-" + codiUsuari;
-            // $(td).append(
+            let isTaulaProcediments = titol === "<spring:message code="procediment.permis.directe"/>";
+            let taulaId = isTaulaProcediments ? "procediments-" + codiUsuari : "organs-" + codiUsuari;
             let contingutTbody =
                 '<table id="'+ taulaId + '"class="table table-striped table-bordered elements">' +
                 '<caption><b>' + titol + '</b></caption>' +
                 '<thead>' +
                 '<tr>' +
                 '<th class="fit-content"><spring:message code="organgestor.list.columna.nom" /></th>' +
-                '<th class="fit-content"><spring:message code="procediment.permis.columna.tipus" /></th>' +
-                '<th class="fit-content"><spring:message code="procediment.permis.columna.principal"/></th>' +
-                '<th class="fit-content"><spring:message code="procediment.permis.form.camp.administrador"/></th>' +
-                '<th class="fit-content"><spring:message code="procediment.permis.form.camp.consulta"/></th>' +
-                '<th class="fit-content"><spring:message code="procediment.permis.form.camp.processar"/></th>' +
-                '<th class="fit-content"><spring:message code="procediment.permis.form.camp.gestio"/></th>' +
-                '<th class="fit-content"><spring:message code="organgestor.permis.form.camp.comuns"/></th>' +
-                '<th class="fit-content"><spring:message code="procediment.permis.form.camp.notificacio"/></th>' +
-                '<th class="fit-content"><spring:message code="procediment.permis.form.camp.comunicacio"/></th>' +
-                '<th class="fit-content"><spring:message code="procediment.permis.form.camp.comunicacio.sir"/></th>' +
-                '<th class="fit-content"><spring:message code="procediment.permis.form.camp.comunicacio.sense.procediment"/></th>' +
-                '<th class="fit-content"></th>' +
+                '<th><spring:message code="procediment.permis.columna.tipus" /></th>' +
+                '<th><spring:message code="procediment.permis.columna.principal"/></th>' +
+                '<th><span class="fa fa-user-plus"></th>' +
+                '<th><span class="fa fa-search"></span></th>' +
+                '<th><span class="fa fa-check-square-o"></span></th>' +
+                '<th><span class="fa fa-cog"></span></th>' +
+                '<th><span class="fa fa-globe"></span></th>' +
+                '<th><span class="fa fa-gavel"></span></th>' +
+                '<th><span class="fa fa-envelope-o"></span></th>' +
+                '<th><span class="fa fa-envelope"></span></th>' +
+                '<th><span class="fa fa-paper-plane-o"></span></th>' +
+                '</tr>' +
                 '</tr>' +
                 '</thead><tbody>';
-            // );
-            // let contingutTbody = '';
             const parsedObject = JSON.parse(jsonPermisos);
             const permisos = new Map(Object.entries(parsedObject));
-            let organsFillsJson;
-            let organsFillsMap;
-            if (organsFills) {
-                organsFillsJson = JSON.parse(organsFills);
-                organsFillsMap = new Map(Object.entries(organsFillsJson));
-            }
+            let noFiles = true;
             for (const [key, value] of permisos) {
                 if (!value) {
                     continue;
@@ -104,10 +97,14 @@
                 contingutTbody += '<tr>';
                 for (i = 0; i < value.length; i++) {
                     let permis = value[i];
+                    if (!permis) {
+                        continue;
+                    }
+                    noFiles = false;
                     contingutTbody += '<td>' + permis.organNom + '</td>';
                     contingutTbody += '<td>' + permis.tipus + '</td>';
                     contingutTbody += '<td>' + permis.nomSencerAmbCodi + '</td>';
-                    contingutTbody += '<td>' + (permis.administrador ? '<span class="fa fa-check"></span>' : "")  + '</td>';
+                    contingutTbody += '<td>' + (permis.administrador ? '<span class="fa fa-check"></span>' : "") + '</td>';
                     contingutTbody += '<td>' + (permis.read ? '<span class="fa fa-check"></span>' : "") + '</td>';
                     contingutTbody += '<td>' + (permis.processar ? '<span class="fa fa-check"></span>' : "") + '</td>';
                     contingutTbody += '<td>' + (permis.administration ? '<span class="fa fa-check"></span>' : "") + '</td>';
@@ -116,61 +113,182 @@
                     contingutTbody += '<td>' + (permis.comunicacio ? '<span class="fa fa-check"></span>' : "") + '</td>';
                     contingutTbody += '<td>' + (permis.comunicacioSir ? '<span class="fa fa-check"></span>' : "") + '</td>';
                     contingutTbody += '<td>' + (permis.comunicacioSenseProcediment ? '<span class="fa fa-check"></span>' : "") + '</td>';
-                    contingutTbody += '<td><a onclick="toggleFila(' + key + ')" href="#" class="btn btn-default btn-sm btn-rowInfo"><span class="fa fa-caret-down"></span></a></td>';
                 }
                 contingutTbody += '</tr>';
-                // let tbody = $('#permisos-usuari tbody');
-                if (organsFills) {
-                    contingutTbody += crearTaulaOrgansFills(organsFillsMap, key);
-                }
-                // contingutTbody = '';
             }
-                // let tbody = $('#'+ taulaId+' tbody', td);
-                // tbody.append(contingutTbody);
-                contingutTbody += '</tbody></table>';
-                td.append(contingutTbody);
-            // $('table tbody', td).append(contingutTbody);
-            // $('#'+ taulaId+' tbody td').webutilModalEval();
+            if (noFiles) {
+                contingutTbody += filaSensePermisos();
+            }
+            contingutTbody += '</tbody></table>';
+            td.append(contingutTbody);
         }
 
-        function toggleFila(key) {
-
-            $("#organsFills-" + key).toggle();
+        function filaSensePermisos() {
+            return '<tr><td>Sense permisos</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+            // return "";
         }
 
-        function crearTaulaOrgansFills(organsFillsMap, key) {
 
-            let  divContingut = '<tr id="organsFills-' + key + '" style="display:none"><td><table class="table table-striped table-bordered elements">' +
-                '<caption><spring:message code="es.caib.notib.organs.fills" /></caption>' +
-                '<thead>' +
+        function crearTaulaProcSerOrgan(td, procSerOrgan, titol, codiUsuari) {
+
+            let tbodyId = "tbody-procSerOrgan-" + codiUsuari;
+            let theadId = "thead-procSerOrgan-" + codiUsuari;
+            let spanId = "span-" + theadId;
+            let contingutTbody =
+                '<table class="table table-striped table-bordered elements">' +
+                '<caption><b>' + titol + '</b><a style="margin-left:10px;" onclick="toggleFila( \'' + theadId + '\', \'' + tbodyId + '\');" class="btn btn-default btn-sm btn-rowInfo"><span id="' + spanId + '" class="fa fa-caret-down"></span></a></caption>' +
+                '<thead id="' + theadId + '" style="display:none;">' +
+                '<tr>' +
+                    '<th class="fit-content"><spring:message code="organgestor.list.columna.nom" /></th>' +
+                    '<th class="fit-content"><spring:message code="procediment.list.columna.organGestor" /></th>' +
+                    '<th><spring:message code="procediment.permis.columna.tipus" /></th>' +
+                    '<th><spring:message code="procediment.permis.columna.principal"/></th>' +
+                    '<th><span class="fa fa-user-plus"></th>' +
+                    '<th><span class="fa fa-search"></span></th>' +
+                    '<th><span class="fa fa-check-square-o"></span></th>' +
+                    '<th><span class="fa fa-cog"></span></th>' +
+                    '<th><span class="fa fa-globe"></span></th>' +
+                    '<th><span class="fa fa-gavel"></span></th>' +
+                    '<th><span class="fa fa-envelope-o"></span></th>' +
+                    '<th><span class="fa fa-envelope"></span></th>' +
+                    '<th><span class="fa fa-paper-plane-o"></span></th>' +
+                '</tr>' +
+                '</thead><tbody id="' + tbodyId + '" style="display:none;">';
+            let noFiles = true;
+            for (procSer of procSerOrgan) {
+                if (!procSer) {
+                    continue;
+                }
+                contingutTbody += '<tr>';
+                contingutTbody += '<td>' + procSer.codiValor.valor + '</td>';
+                contingutTbody += '<td>' + procSer.codiValor.organGestor + ' - ' + procSer.codiValor.organNom + '</td>';
+                contingutTbody += '<td>' + procSer.permis.tipus + '</td>';
+                contingutTbody += '<td>' + procSer.permis.principal + '</td>';
+                contingutTbody += '<td>' + (procSer.permis.administrador ? '<span class="fa fa-check"></span>' : "")  + '</td>';
+                contingutTbody += '<td>' + (procSer.permis.read ? '<span class="fa fa-check"></span>' : "") + '</td>';
+                contingutTbody += '<td>' + (procSer.permis.processar ? '<span class="fa fa-check"></span>' : "") + '</td>';
+                contingutTbody += '<td>' + (procSer.permis.administration ? '<span class="fa fa-check"></span>' : "") + '</td>';
+                contingutTbody += '<td>' + (procSer.permis.comuns ? '<span class="fa fa-check"></span>' : "") + '</td>';
+                contingutTbody += '<td>' + (procSer.permis.notificacio ? '<span class="fa fa-check"></span>' : "") + '</td>';
+                contingutTbody += '<td>' + (procSer.permis.comunicacio ? '<span class="fa fa-check"></span>' : "") + '</td>';
+                contingutTbody += '<td>' + (procSer.permis.comunicacioSir ? '<span class="fa fa-check"></span>' : "") + '</td>';
+                contingutTbody += '<td>' + (procSer.permis.comunicacioSenseProcediment ? '<span class="fa fa-check"></span>' : "") + '</td>';
+                contingutTbody += '</tr>';
+                noFiles = false;
+            }
+            if (noFiles) {
+                contingutTbody += filaSensePermisos();
+            }
+            contingutTbody += '</tbody></table>';
+            td.append(contingutTbody);
+        }
+
+        function toggleFila(id1, id2) {
+
+            $("#" + id1).toggle();
+            if (id2) {
+                $("#" + id2).toggle();
+            }
+            let span = $("#span-" + id1);
+            if (!span) {
+                return;
+            }
+            if (span.hasClass("fa-caret-down")) {
+                span.removeClass("fa-caret-down");
+                span.addClass("fa-caret-up");
+            } else {
+                span.removeClass("fa-caret-up");
+                span.addClass("fa-caret-down");
+            }
+        }
+
+        function crearTaulaOrgansFills(td, organsFills, organsMap, codiUsuari) {
+
+            if (!organsFills) {
+                return;
+            }
+            let tbodyId = "tbody-organsFills-" + codiUsuari;
+            let theadId = "thead-organsFills-" + codiUsuari;
+            let spanId = "span-" + theadId;
+            let organsMapJson = JSON.parse(organsMap);
+            let organsMapMap = new Map(Object.entries(organsMapJson));
+            let organsFillsJson = JSON.parse(organsFills);
+            let organsFillsMap = new Map(Object.entries(organsFillsJson));
+            let  contingut = '<table class="table table-striped table-bordered elements">' +
+                '<caption><b><spring:message code="es.caib.notib.organs.fills"/></b><a style="margin-left:10px;" onclick="toggleFila( \'' + theadId + '\', \'' + tbodyId + '\');" class="btn btn-default btn-sm btn-rowInfo"><span id="' + spanId + '" class="fa fa-caret-down"></span></a></caption>' +
+                '<thead id="' + theadId + '" style="display:none;">' +
                 '<tr>' +
                 '<th class="fit-content"><spring:message code="organgestor.list.columna.nom" /></th>' +
+                '<th class="fit-content"><spring:message code="procediment.list.columna.organGestor" /></th>' +
+                '<th><spring:message code="procediment.permis.columna.tipus" /></th>' +
+                '<th><spring:message code="procediment.permis.columna.principal"/></th>' +
+                '<th><span class="fa fa-user-plus"></th>' +
+                '<th><span class="fa fa-search"></span></th>' +
+                '<th><span class="fa fa-check-square-o"></span></th>' +
+                '<th><span class="fa fa-cog"></span></th>' +
+                '<th><span class="fa fa-globe"></span></th>' +
+                '<th><span class="fa fa-gavel"></span></th>' +
+                '<th><span class="fa fa-envelope-o"></span></th>' +
+                '<th><span class="fa fa-envelope"></span></th>' +
+                '<th><span class="fa fa-paper-plane-o"></span></th>' +
                 '</tr>' +
-                '</thead><tbody>';
-
-            let fills = organsFillsMap.get(key);
-            for (let fill of fills) {
-                divContingut += '<tr>';
-                divContingut += '<td>' + fill + '</td>';
-                divContingut += "</tr>";
+                '</thead><tbody id="' + tbodyId + '" style="display:none;">';
+            if (organsFillsMap.size === 0) {
+                divContingut += '<tr><td>Sense permisos</td></tr>';
+                td.append(divContingut);
+                return;
             }
-            divContingut += '</tbody></table>';
-            divContingut += '</td></tr>'
-            // tbody.append(divContingut);
-            // const lastRow = tbody.find('tr').last();
-            // lastRow.after(divContingut);
-            return divContingut;
+            let noFiles = true;
+            for (key of organsFillsMap.keys()) {
+                let fills = organsFillsMap.get(key);
+                let permis = organsMapMap.get(key)[0];
+                if (!permis) {
+                    continue;
+                }
+                for (let fill of fills) {
+                    contingut += '<tr>';
+                    contingut += '<td>' + fill + '</td>';
+                    contingut += '<td>' + permis.organNom + '</td>';
+                    contingut += '<td>' + permis.tipus + '</td>';
+                    contingut += '<td>' + permis.principal + '</td>';
+                    contingut += '<td>' + (permis.administrador ? '<span class="fa fa-check"></span>' : "")  + '</td>';
+                    contingut += '<td>' + (permis.read ? '<span class="fa fa-check"></span>' : "") + '</td>';
+                    contingut += '<td>' + (permis.processar ? '<span class="fa fa-check"></span>' : "") + '</td>';
+                    contingut += '<td>' + (permis.administration ? '<span class="fa fa-check"></span>' : "") + '</td>';
+                    contingut += '<td>' + (permis.comuns ? '<span class="fa fa-check"></span>' : "") + '</td>';
+                    contingut += '<td>' + (permis.notificacio ? '<span class="fa fa-check"></span>' : "") + '</td>';
+                    contingut += '<td>' + (permis.comunicacio ? '<span class="fa fa-check"></span>' : "") + '</td>';
+                    contingut += '<td>' + (permis.comunicacioSir ? '<span class="fa fa-check"></span>' : "") + '</td>';
+                    contingut += '<td>' + (permis.comunicacioSenseProcediment ? '<span class="fa fa-check"></span>' : "") + '</td>';
+                    contingut += '</tr>'
+                    noFiles = false;
+                }
+            }
+            if (noFiles) {
+                contingut += filaSensePermisos();
+            }
+            contingut += '</tbody></table>';
+            td.append(contingut);
         }
 
         function mostraElementsAccio(td, rowData) {
-            var getUrl = "<c:url value="/permisos/usuari/"/>" + rowData.codi;
+            let spinner = '<div id="spinner-container" class="loading-screen ocult" style="display:flex;justify-content:center;">' +
+                            '<div class="spin-box"><span class="fa fa-spin fa-circle-o-notch  fa-3x"></span></div></div>';
+            td.append(spinner);
+            let getUrl = "<c:url value="/permisos/usuari/"/>" + rowData.codi;
             $.get(getUrl).done(function (data) {
                 $(td).empty();
                 if (data.permisosOrgans) {
-                    crearTaula(td, data.permisosOrgans, data.organsFills, "<spring:message code="organgestor.list.titol"/>", rowData.codi);
+                    crearTaula(td, data.permisosOrgans, "<spring:message code="organ.permis.directe"/>", rowData.codi);
+                }
+                if (data.organsFills) {
+                    crearTaulaOrgansFills(td, data.organsFills, data.permisosOrgans, rowData.codi)
                 }
                 if (data.permisosProcediment) {
-                    crearTaula(td, data.permisosProcediment, null, "<spring:message code="procediment.list.titol"/>");
+                    crearTaula(td, data.permisosProcediment, "<spring:message code="procediment.permis.directe"/>", rowData.codi);
+                }
+                if (data.procSerOrgan) {
+                    crearTaulaProcSerOrgan(td, data.procSerOrgan, "<spring:message code="procediment.organ.permis"/>", rowData.codi);
                 }
             });
         }
@@ -280,7 +398,7 @@
         data-toggle="datatable"
         data-url="<c:url value="/permisos/datatable"/>"
         class="table table-striped table-bordered"
-        data-default-order="5"
+        data-default-order="1"
         data-default-dir="desc"
         data-row-info="true"
         data-date-template="#dataTemplate"
@@ -297,6 +415,16 @@
         <th data-col-name="nif" ><spring:message code="usuari.form.camp.nif"/></th>
         <th data-col-name="email" ><spring:message code="usuari.form.camp.email"/></th>
         <th data-col-name="emailAlt" ><spring:message code="accions.massives.tipus"/></th>
+        <th data-col-name="id" data-orderable="false" data-disable-events="true" data-template="#cellAccionsTemplate" width="60px" style="z-index:99999;">
+            <script id="cellAccionsTemplate" type="text/x-jsrender">
+                <div class="dropdown">
+                    <button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li><a href="<c:url value="/permisos/usuari/{codi}/exportar"/>" target="_blank" rel=”noopener noreferrer”><span class="fa fa-download"></span>&nbsp; <spring:message code="notificacio.info.document.descarregar"/></a></li>
+                    </ul>
+            </div>
+            </script>
+        </th>
     </tr>
     </thead>
 </table>

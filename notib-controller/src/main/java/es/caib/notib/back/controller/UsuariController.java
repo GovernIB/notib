@@ -156,7 +156,7 @@ public class UsuariController extends BaseController {
 
         List<CodiValorDto> organs = new ArrayList<>();
         for (var entitat : entitats) {
-            organs.addAll(permisosService.getOrgansAmbPermis(Long.valueOf(entitat.getCodi()), usuariCodi));
+            organs.addAll(permisosService.getOrgansAmbPermis(Long.valueOf(entitat.getCodi()), usuariCodi, false));
         }
         return organs;
     }

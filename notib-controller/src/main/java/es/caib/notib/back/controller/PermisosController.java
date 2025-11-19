@@ -1,5 +1,6 @@
 package es.caib.notib.back.controller;
 
+import com.google.common.base.Strings;
 import es.caib.notib.back.command.AccioMassivaFiltreCommand;
 import es.caib.notib.back.command.PermisosUsuarisFiltreCommand;
 import es.caib.notib.back.helper.DatatablesHelper;
@@ -7,6 +8,7 @@ import es.caib.notib.back.helper.EnumHelper;
 import es.caib.notib.back.helper.MissatgesHelper;
 import es.caib.notib.back.helper.NotificacioBackHelper;
 import es.caib.notib.back.helper.RequestSessionHelper;
+import es.caib.notib.back.helper.RolHelper;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaDetall;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Slf4j
 @Controller
@@ -78,26 +81,26 @@ public class PermisosController extends BaseUserController {
     public DatatablesHelper.DatatablesResponse datatable(HttpServletRequest request) {
 
         var notificacions = new PaginaDto<UsuariDto>();
-//        var filtreCommand = getFiltreCommand(request, PERMISOS_USUARIS);
+//        var filtreCommand = getFiltreCommand(request);
 //        if (!filtreCommand.getErrors().isEmpty()) {
 //            return DatatablesHelper.getDatatableResponse(request, notificacions, "id", SESSION_ATTRIBUTE_SELECCIO);
 //        }
 //        var filtre = filtreCommand.asDto();
 //        var isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
-//        var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());
+        var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());
 
         try {
             var entitatActual = getEntitatActualComprovantPermisos(request);
 //            if (isUsuariEntitat && filtre != null) {
 //                filtre.setEntitatId(entitatActual.getId());
 //            }
-//            var organGestorCodi = filtre.getOrganGestor();
-//            if (isAdminOrgan && entitatActual != null && Strings.isNullOrEmpty(organGestorCodi)) {
-//                OrganGestorDto organGestorActual = getOrganGestorActual(request);
-//                organGestorCodi = organGestorActual.getCodi();
-//            }
-//            filtre.setDeleted(false);
             var filtre = getFiltreCommand(request).asDto();
+            var organGestorCodi = filtre.getOrganGestor();
+            if (isAdminOrgan && entitatActual != null && Strings.isNullOrEmpty(organGestorCodi)) {
+                var organGestorActual = getOrganGestorActual(request);
+                organGestorCodi = organGestorActual.getCodi();
+            }
+//            filtre.setDeleted(false);
             notificacions = usuariService.findAmbFiltre(filtre, DatatablesHelper.getPaginacioDtoFromRequest(request));
         } catch (SecurityException e) {
             MissatgesHelper.error(request, e.getMessage());
@@ -118,6 +121,22 @@ public class PermisosController extends BaseUserController {
             log.error("Error obtinguent els permisos assigants a l'usuari " + usuariCodi);
             return new PermisosUsuari();
         }
+    }
+
+    @GetMapping(value = "/usuari/{usuariCodi}/exportar")
+    @ResponseBody
+    public void getExportarPermisos(HttpServletRequest request, HttpServletResponse response, Model model, @PathVariable String usuariCodi) {
+
+//        try {
+//            var entitat = getEntitatActualComprovantPermisos(request);
+//            var arxiu = notificacioService.getDocumentArxiu(notificacioId, documentId);
+//            response.setHeader("Set-cookie", "fileDownload=true; path=/");
+//            writeFileToResponse(arxiu.getNom(), arxiu.getContingut(), response);
+////        model.addAttribute("tipusAccions", EnumHelper.getOptionsForEnum(AccioMassivaTipus.class, "es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaTipus."));
+////        model.addAttribute("elementEstats", EnumHelper.getOptionsForEnum(AccioMassivaElementEstat.class, "es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaElementEstat."));
+//        } catch (Exception ex) {
+//            log.error("Error exportant els permisos de l'usuari " + usuariCodi);
+//        }
     }
 
     private PermisosUsuarisFiltreCommand getFiltreCommand(HttpServletRequest request) {
