@@ -132,7 +132,7 @@ public class PermisosServiceImpl implements PermisosService {
             var grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
             var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
             if (permis.isPermisNotCom()) {
-                return getOrgansAmbPermisPerNotificar(entitat, grups, permis);
+                return getOrgansAmbPermisPerNotificar(entitat, grups, permis, false);
             }
             // Per ara només retorna el permís directe sobre òrgan
             return getOrgansAmbPermisDirecte(entitat, grups, permis);
@@ -145,21 +145,21 @@ public class PermisosServiceImpl implements PermisosService {
     @Override
 //    @Cacheable(value = "organsAmbPermis", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name())")
     @Transactional(readOnly = true)
-    public List<CodiValorDto> getOrgansAmbPermis(Long entitatId, String usuariCodi) {
+    public List<CodiValorDto> getOrgansAmbPermis(Long entitatId, String usuariCodi, boolean incloureNoVigents) {
 
         try {
             var grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
             var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
             Set<CodiValorDto> set = new HashSet<>();
-            var organs = getOrgansAmbPermisPerNotificar(entitat, grups, PermisEnum.NOTIFICACIO);
+            var organs = getOrgansAmbPermisPerNotificar(entitat, grups, PermisEnum.NOTIFICACIO, true);
             set.addAll(organs);
-            organs = getOrgansAmbPermisPerNotificar(entitat, grups, PermisEnum.COMUNICACIO);
+            organs = getOrgansAmbPermisPerNotificar(entitat, grups, PermisEnum.COMUNICACIO, true);
             set.addAll(organs);
-            organs = getOrgansAmbPermisPerNotificar(entitat, grups, PermisEnum.COMUNICACIO_SIR);
+            organs = getOrgansAmbPermisPerNotificar(entitat, grups, PermisEnum.COMUNICACIO_SIR, true);
             set.addAll(organs);
-            organs = getOrgansAmbPermisPerNotificar(entitat, grups, PermisEnum.CONSULTA);
+            organs = getOrgansAmbPermisPerNotificar(entitat, grups, PermisEnum.CONSULTA, true);
             set.addAll(organs);
-            organs = getOrgansAmbPermisPerNotificar(entitat, grups, PermisEnum.COMUNS);
+            organs = getOrgansAmbPermisPerNotificar(entitat, grups, PermisEnum.COMUNS, true);
             set.addAll(organs);
 
             return new ArrayList<>(set);
@@ -481,7 +481,7 @@ public class PermisosServiceImpl implements PermisosService {
         return getOrgansAfegintFills(entitat, new HashSet<>(organs), permis, false);
     }
 
-    private List<CodiValorDto> getOrgansAmbPermisPerNotificar(EntitatEntity entitat, List<String> grups, PermisEnum permis) {
+    private List<CodiValorDto> getOrgansAmbPermisPerNotificar(EntitatEntity entitat, List<String> grups, PermisEnum permis,  boolean incloureNoVigents) {
 
         var permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
         // 1. Obté òrgans amb permís comú
@@ -495,11 +495,11 @@ public class PermisosServiceImpl implements PermisosService {
             organsAmbPermisComunicacionsSenseProcediment = getOrgansAmbPermisComunicacionsSenseProcediment(entitat, grups);
         }
         // 3. Obté procediemtns d'òrgans amb permis per organ
-        var procSerAmbPermisOrgan = getProcSerAmbPermisPerOrgan(entitat, permisos, grups, true, null);
+        var procSerAmbPermisOrgan = getProcSerAmbPermisPerOrgan(entitat, permisos, grups, incloureNoVigents, null);
         // 4. Obté procedimetns d'òrgans amb permís per procediment/organ
-        var procSerAmbPermisProcedimentOrgan = getProcedimentsForProcedimentsOrganAmbPermisDirecte(entitat, permisos, grups, true, null);
+        var procSerAmbPermisProcedimentOrgan = getProcedimentsForProcedimentsOrganAmbPermisDirecte(entitat, permisos, grups, incloureNoVigents, null);
         // 5. Obté procediments d'òrgans amb permis per procediment directe
-        var procSerAmbPermisDirecte = getProcSerAmbPermisDirecte(entitat, permisos, grups, true, null);
+        var procSerAmbPermisDirecte = getProcSerAmbPermisDirecte(entitat, permisos, grups, incloureNoVigents, null);
         // Agrupam els òrgans
         Set<OrganGestorEntity> organs = new HashSet<>(organsAmbPermisComu);
         organs.addAll(organsAmbPermisComunicacionsSenseProcediment);
@@ -515,15 +515,15 @@ public class PermisosServiceImpl implements PermisosService {
             }
         }
         // Afegim els òrgans fills
-        var o =  getOrgansAfegintFills(entitat, organs, permis, true);
+        var o =  getOrgansAfegintFills(entitat, organs, permis, !incloureNoVigents);
         // Afegir procediments amb permis directe
         for (var e : procSerAmbPermisDirecte) {
-            if (!entitat.getDir3Codi().equals(e.getOrganGestor().getCodi()) && OrganGestorEstatEnum.V.equals(e.getOrganGestor().getEstat())) {
+            if (!entitat.getDir3Codi().equals(e.getOrganGestor().getCodi()) && (incloureNoVigents || OrganGestorEstatEnum.V.equals(e.getOrganGestor().getEstat()))) {
                 o.add(CodiValorDto.builder().codi(e.getOrganGestor().getId() + "").valor(e.getOrganGestor().getCodi() + " - " + e.getOrganGestor().getNom()).build());
             }
         }
         for (var organ : organs) {
-            if (OrganGestorEstatEnum.V.equals(organ.getEstat())) {
+            if (incloureNoVigents || OrganGestorEstatEnum.V.equals(organ.getEstat())) {
                 o.add(CodiValorDto.builder().codi(organ.getId() + "").valor(organ.getCodi() + " - " + organ.getNom()).build());
             }
         }

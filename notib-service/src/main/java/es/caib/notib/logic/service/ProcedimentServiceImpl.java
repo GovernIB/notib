@@ -958,17 +958,27 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 		if (procediments == null || procediments.isEmpty()) {
 			return procedimentsAmbPermis;
 		}
-		if (organFiltre == null) {
+		if (Strings.isNullOrEmpty(organFiltre)) {
 			procedimentsAmbPermis.addAll(procediments);
 			return procedimentsAmbPermis;
 		}
-		var organsFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organFiltre);
-		for (var procediment: procediments) {
-			if (organsFills.contains(procediment.getOrganGestor()) || procediment.isComu()) {
-				procedimentsAmbPermis.add(procediment);
-			}
-		}
-		return procedimentsAmbPermis;
+        try {
+            var organ = organGestorRepository.findById(Long.valueOf(organFiltre)).orElse(null);
+            if (organ == null) {
+                return procedimentsAmbPermis;
+            }
+            var organsFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organ.getCodi());
+//            var organsFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organFiltre);
+            for (var procediment: procediments) {
+                if (organsFills.contains(procediment.getOrganGestor()) || procediment.isComu()) {
+                    procedimentsAmbPermis.add(procediment);
+                }
+            }
+            return procedimentsAmbPermis;
+        } catch (Exception ex) {
+            log.error("[ProcedimentService.recuperarProcedimentAmbPermis] Error obtinguetn els fills per l'organ " + organFiltre, ex);
+            return new ArrayList<>();
+        }
 	}
 
 	@Override

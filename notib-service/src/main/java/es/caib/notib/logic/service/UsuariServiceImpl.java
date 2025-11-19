@@ -2,6 +2,11 @@ package es.caib.notib.logic.service;
 
 import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.intf.dto.UsuariDto;
+import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaDto;
+import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
+import es.caib.notib.logic.intf.dto.permis.PermisCodivalorOrganGestorComu;
+import es.caib.notib.logic.intf.dto.permis.PermisosUsuari;
+import es.caib.notib.logic.intf.dto.permis.PermisosUsuarisFiltre;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.service.UsuariService;
 import es.caib.notib.persist.entity.UsuariEntity;
@@ -129,6 +134,118 @@ public class UsuariServiceImpl implements UsuariService {
         usuariRepository.delete(usuariAntic);
         aclCache.clearCache();
         return registresModificats;
+    }
+
+    @Override
+    public PaginaDto<UsuariDto> findAmbFiltre(PermisosUsuarisFiltre filtre, PaginacioParamsDto paginacioParams) {
+
+        try {
+            var pageable = getMappeigPropietats(paginacioParams);
+            var usuaris = usuariRepository.findAmbFiltre(filtre, pageable);
+            return paginacioHelper.toPaginaDto(usuaris, UsuariDto.class);
+        } catch (Exception ex) {
+            var msg = "Error carregant les dades de la taula de permisos d'usuari";
+            log.error(msg, ex);
+            throw ex;
+        }
+    }
+
+    @Override
+    public PermisosUsuari getPermisosUsuari(EntitatDto entitat, String usuariCodi) {
+
+        try {
+            var permisosUsuari = new PermisosUsuari();
+            var organsAmbPermis = permisosService.getOrgansAmbPermis(entitat.getId(), usuariCodi, true);
+            Map<String, List<PermisDto>> permisosOrgans = new HashMap<>();
+            Map<String, List<String>> organsFills = new HashMap<>();
+            List<String> organsFillsNom = new ArrayList<>();
+            var rols = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
+            List<PermisDto> p;
+            OrganGestorDto organEntity;
+            for (var organ : organsAmbPermis) {
+                var permisos = organGestorService.permisFind(entitat.getId(), Long.valueOf(organ.getCodi()));
+                if (permisos.isEmpty()) {
+                    continue;
+                }
+                p = new ArrayList<>();
+                for (var permis : permisos) {
+                    if (permis.getPrincipal().equals(usuariCodi) || rols.contains(permis.getPrincipal())) {
+                        permis.setOrganNom(organ.getValor());
+                        p.add(permis);
+                    }
+                }
+                var codi = organ.getValor().split(" - ")[0];
+                List<String> codiFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), codi);
+                organsFillsNom = new ArrayList<>();
+                for (var codiFill : codiFills) {
+                    if (codi.equals(codiFill)) {
+                        continue;
+                    }
+                    organEntity = organGestorService.findByCodi(entitat.getId(), codiFill);
+                    organsFillsNom.add(organEntity.getCodi() + " - " + organEntity.getNom());
+                }
+                organsFills.put(organ.getCodi(), organsFillsNom);
+                permisosOrgans.put(organ.getCodi(), p);
+
+
+            }
+            var objectMapper = new ObjectMapper();
+            String map = "";
+            map = objectMapper.writeValueAsString(permisosOrgans);
+            permisosUsuari.setPermisosOrgans(map);
+            map = objectMapper.writeValueAsString(organsFills);
+            permisosUsuari.setOrgansFills(map);
+            var procedimentsAmbPermis = permisosService.getProcedimentsAmbPermis(entitat.getId(), usuariCodi);
+            Map<String, List<PermisDto>> permisosProcediment = new HashMap<>();
+            Map<String, List<CodiValorOrganGestorComuDto>> procSerOrgan = new HashMap<>();
+            List<PermisCodivalorOrganGestorComu> procSerOrganList = new ArrayList<>();
+            for (var procediment : procedimentsAmbPermis) {
+                var permisos = procedimentService.permisFind(entitat.getId(), false, procediment.getId(), procediment.getOrganGestor(), null, null, null);
+                if (permisos.isEmpty()) {
+                    var organ = organGestorService.findByCodi(entitat.getId(), procediment.getOrganGestor());
+                    var permisosOrgan = organGestorService.permisFind(entitat.getId(), organ.getId());
+                    if (permisosOrgan.isEmpty()) {
+                        continue;
+                    }
+                    for (var permisOrgan : permisosOrgan) {
+                        if (permisOrgan.getPrincipal().equals(usuariCodi) || rols.contains(permisOrgan.getPrincipal())) {
+                            procSerOrganList.add(PermisCodivalorOrganGestorComu.builder().codiValor(procediment).permis(permisOrgan).build());
+                        }
+                    }
+                    continue;
+                }
+                p = new ArrayList<>();
+                for (var permis : permisos) {
+                    if (permis.getPrincipal().equals(usuariCodi) || rols.contains(permis.getPrincipal())) {
+                        permis.setOrganNom(procediment.getValor());
+                        p.add(permis);
+                    }
+                }
+                if (!permisos.isEmpty()) {
+                    permisosProcediment.put(procediment.getCodi(), p);
+                }
+            }
+            map = objectMapper.writeValueAsString(permisosProcediment);
+            permisosUsuari.setProcSerOrgan(procSerOrganList);
+            permisosUsuari.setPermisosProcediment(map);
+            return permisosUsuari;
+        } catch (Exception ex) {
+            log.error("Error obtinguent else permisos de l'usuari " + usuariCodi + " de l'entitat " + entitat.getCodi(), ex);
+            return new PermisosUsuari();
+        }
+    }
+
+
+
+    private Pageable getMappeigPropietats(PaginacioParamsDto paginacioParams) {
+
+        Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<>();
+        mapeigPropietatsOrdenacio.put("usuariCodi", new String[] {"usuariCodi"});
+//        mapeigPropietatsOrdenacio.put("endpoint", new String[] {"usuariCodi"});
+//        mapeigPropietatsOrdenacio.put("data", new String[] {"data"});
+
+//        return paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
+        return paginacioHelper.toSpringDataPageable(paginacioParams);
     }
 
     private UsuariEntity cloneUsuari(String codiNou, UsuariEntity usuariAntic) {

@@ -1426,7 +1426,7 @@
 						$.each(procedimentsOrgan, function(index, val) {
 							if (isOnlyOneProcedimentOrgan) {
 								selProcediments.append("<option value='" + val.id + "' selected>" + val.valor + "</option>");
-								$("#organGestor").val(val.organGestor).trigger("change.select2");
+								$("#organGestor").val(val.id).trigger("change.select2");
 							} else {
 								selProcediments.append("<option value='" + val.id + "'>" + val.valor + "</option>");
 							}

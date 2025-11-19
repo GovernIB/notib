@@ -21,6 +21,8 @@ public class CodiValorOrganGestorComuDto implements Serializable {
 	@EqualsAndHashCode.Exclude
 	private String valor;
 	private String organGestor;
+	private String organNom;
+	private String organId;
 	@EqualsAndHashCode.Exclude
 	private boolean comu;
 
