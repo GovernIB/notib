@@ -902,6 +902,9 @@ public class NotificacioValidator implements Validator {
         if (!Strings.isNullOrEmpty(entregaPostal.getPuntKm()) && entregaPostal.getPuntKm().length() > 5) {
             errors.rejectValue(envName + ".puntKm", error(POSTAL_PUNT_KM_SIZE, l, prefix, 5));
         }
+        if (!Strings.isNullOrEmpty(entregaPostal.getPuntKm()) && !Strings.isNullOrEmpty(entregaPostal.getPuntKm())) {
+            errors.rejectValue(envName + ".numeroCasa", error(POSTAL_NUM_KM_NUM_CASA, l, prefix));
+        }
         if (!Strings.isNullOrEmpty(entregaPostal.getPortal()) && entregaPostal.getPortal().length() > 3) {
             errors.rejectValue(envName + ".portal", error(POSTAL_PORTAL_SIZE, l, prefix, 3));
         }
