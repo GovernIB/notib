@@ -37,20 +37,18 @@ import java.util.List;
 @RequestMapping("/permisos")
 public class PermisosController extends BaseUserController {
 
-    @Autowired
-    private NotificacioBackHelper notificacioListHelper;
-
     private static final  String PERMISOS_USUARIS_FILTRE = "permisos_usuaris_filtre";
     private static final  String PERMISOS_USUARIS = "permisos_usuaris";
     private static final String SESSION_ATTRIBUTE_SELECCIO = "PermisosController.session.seleccio";
     @Autowired
     private UsuariService usuariService;
-    @Autowired
-    private PermisosService permisosService;
+
 
     @GetMapping
     public String get(HttpServletRequest request, Model model) {
 
+        getEntitatActualComprovantPermisos(request);
+        getOrganGestorActual(request);
         Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
         model.addAttribute("mantenirPaginacio", mantenirPaginacio != null && mantenirPaginacio);
         model.addAttribute("seleccio", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO));
@@ -63,17 +61,9 @@ public class PermisosController extends BaseUserController {
     @PostMapping
     public String post(HttpServletRequest request, PermisosUsuarisFiltreCommand command, Model model) {
 
-        var entitatActual = getEntitatActualComprovantPermisos(request);
-
-//        var callbackId = (Long)RequestSessionHelper.obtenirObjecteSessio(request, ACCIO_MASSIVA_ID);
-//        if (callbackId == null || !callbackId.equals(command.getId())) {
-//            RequestSessionHelper.esborrarObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
-//            RequestSessionHelper.actualitzarObjecteSessio(request, ACCIO_MASSIVA_ID, command.getId());
-//        }
+        getEntitatActualComprovantPermisos(request);
         RequestSessionHelper.actualitzarObjecteSessio(request, PERMISOS_USUARIS_FILTRE, command);
-//        model.addAttribute("seleccio", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO));
-//        model.addAttribute("tipusAccions", EnumHelper.getOptionsForEnum(AccioMassivaTipus.class, "es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaTipus."));
-//        model.addAttribute("elementEstats", EnumHelper.getOptionsForEnum(AccioMassivaElementEstat.class, "es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaElementEstat."));
+        model.addAttribute("seleccio", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO));
         model.addAttribute("permisosUsuarisFiltreCommand", command);
         return "permisosUsuari";
     }
@@ -83,29 +73,13 @@ public class PermisosController extends BaseUserController {
     public DatatablesHelper.DatatablesResponse datatable(HttpServletRequest request) {
 
         var notificacions = new PaginaDto<UsuariDto>();
-//        var filtreCommand = getFiltreCommand(request, PERMISOS_USUARIS);
-//        if (!filtreCommand.getErrors().isEmpty()) {
-//            return DatatablesHelper.getDatatableResponse(request, notificacions, "id", SESSION_ATTRIBUTE_SELECCIO);
-//        }
-//        var filtre = filtreCommand.asDto();
-//        var isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
-//        var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());
         var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());
 
         try {
             var entitatActual = getEntitatActualComprovantPermisos(request);
-//            if (isUsuariEntitat && filtre != null) {
-//                filtre.setEntitatId(entitatActual.getId());
-//            }
-//            var organGestorCodi = filtre.getOrganGestor();
-//            if (isAdminOrgan && entitatActual != null && Strings.isNullOrEmpty(organGestorCodi)) {
-//                OrganGestorDto organGestorActual = getOrganGestorActual(request);
-//                organGestorCodi = organGestorActual.getCodi();
-//            }
-//            filtre.setDeleted(false);
             var filtre = getFiltreCommand(request).asDto();
             var organGestorCodi = filtre.getOrganGestor();
-            if (isAdminOrgan && entitatActual != null && StringUtils.isEmpty(organGestorCodi)) {
+            if (isAdminOrgan && entitatActual != null && Strings.isNullOrEmpty(organGestorCodi)) {
                 var organGestorActual = getOrganGestorActual(request);
                 organGestorCodi = organGestorActual.getCodi();
             }
@@ -130,22 +104,6 @@ public class PermisosController extends BaseUserController {
         }
     }
 
-    @GetMapping(value = "/usuari/{usuariCodi}/exportar")
-    @ResponseBody
-    public void getExportarPermisos(HttpServletRequest request, HttpServletResponse response, Model model, @PathVariable String usuariCodi) {
-
-//        try {
-//            var entitat = getEntitatActualComprovantPermisos(request);
-//            var arxiu = notificacioService.getDocumentArxiu(notificacioId, documentId);
-//            response.setHeader("Set-cookie", "fileDownload=true; path=/");
-//            writeFileToResponse(arxiu.getNom(), arxiu.getContingut(), response);
-////        model.addAttribute("tipusAccions", EnumHelper.getOptionsForEnum(AccioMassivaTipus.class, "es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaTipus."));
-////        model.addAttribute("elementEstats", EnumHelper.getOptionsForEnum(AccioMassivaElementEstat.class, "es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaElementEstat."));
-//        } catch (Exception ex) {
-//            log.error("Error exportant els permisos de l'usuari " + usuariCodi);
-//        }
-    }
-
     private PermisosUsuarisFiltreCommand getFiltreCommand(HttpServletRequest request) {
 
         var filtreCommand = (PermisosUsuarisFiltreCommand) RequestSessionHelper.obtenirObjecteSessio(request, PERMISOS_USUARIS_FILTRE);
@@ -156,5 +114,4 @@ public class PermisosController extends BaseUserController {
         RequestSessionHelper.actualitzarObjecteSessio(request, PERMISOS_USUARIS_FILTRE, filtreCommand);
         return filtreCommand;
     }
-
 }
