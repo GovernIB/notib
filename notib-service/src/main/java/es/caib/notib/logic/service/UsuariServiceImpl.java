@@ -5,14 +5,12 @@ import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.PaginacioHelper;
-import es.caib.notib.logic.intf.dto.CodiValorDto;
 import es.caib.notib.logic.intf.dto.CodiValorOrganGestorComuDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.PermisDto;
 import es.caib.notib.logic.intf.dto.UsuariDto;
-import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.permis.PermisCodivalorOrganGestorComu;
 import es.caib.notib.logic.intf.dto.permis.PermisosUsuari;
@@ -22,7 +20,6 @@ import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.logic.intf.service.ProcedimentService;
 import es.caib.notib.logic.intf.service.UsuariService;
-import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.UsuariEntity;
 import es.caib.notib.persist.repository.AplicacioRepository;
 import es.caib.notib.persist.repository.AvisRepository;
@@ -57,6 +54,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -183,7 +181,7 @@ public class UsuariServiceImpl implements UsuariService {
     }
 
     @Override
-    public PermisosUsuari getPermisosUsuari(EntitatDto entitat, String usuariCodi) {
+    public PermisosUsuari getPermisosUsuari(EntitatDto entitat, String usuariCodi, OrganGestorDto organAdmin) {
 
         try {
             var permisosUsuari = new PermisosUsuari();
@@ -193,8 +191,12 @@ public class UsuariServiceImpl implements UsuariService {
             List<String> organsFillsNom = new ArrayList<>();
             var rols = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
             List<PermisDto> p;
+            var isOrganAdmin = organAdmin != null;
             OrganGestorDto organEntity;
             for (var organ : organsAmbPermis) {
+                if (isOrganAdmin && !organAdmin.getId().equals(Long.valueOf(organ.getCodi()))) {
+                    continue;
+                }
                 var permisos = organGestorService.permisFind(entitat.getId(), Long.valueOf(organ.getCodi()));
                 if (permisos.isEmpty()) {
                     continue;
@@ -232,12 +234,22 @@ public class UsuariServiceImpl implements UsuariService {
             Map<String, List<CodiValorOrganGestorComuDto>> procSerOrgan = new HashMap<>();
             List<PermisCodivalorOrganGestorComu> procSerOrganList = new ArrayList<>();
             for (var procediment : procedimentsAmbPermis) {
-                var permisos = procedimentService.permisFind(entitat.getId(), false, procediment.getId(), procediment.getOrganGestor(), null, null, null);
+                if (isOrganAdmin && !organAdmin.getCodi().equals(procediment.getOrganGestor())) {
+                    continue;
+                }
+                var permisos = procedimentService.permisFind(entitat.getId(), false, procediment.getId(), procediment.getOrganGestor(), procediment.getOrganGestor(), null, null);
                 if (permisos.isEmpty()) {
                     var organ = organGestorService.findByCodi(entitat.getId(), procediment.getOrganGestor());
                     var permisosOrgan = organGestorService.permisFind(entitat.getId(), organ.getId());
                     if (permisosOrgan.isEmpty()) {
-                        continue;
+                        var organFill = organsAmbPermis.stream().filter(x -> x.getCodi().equals(organ.getId()+"")).collect(Collectors.toList());
+                        if (organFill.isEmpty()) {
+                            continue;
+                        }
+                        var fill = organFill.get(0);
+                        var key = organsFills.keySet().stream().filter(o -> !organsFills.get(o).stream().filter(c -> c.equals(fill.getValor())).collect(Collectors.toList()).isEmpty()).collect(Collectors.toList());
+                        if (!key.isEmpty())
+                            permisosOrgan = permisosOrgans.get(key.get(0));
                     }
                     for (var permisOrgan : permisosOrgan) {
                         if (permisOrgan.getPrincipal().equals(usuariCodi) || rols.contains(permisOrgan.getPrincipal())) {
@@ -266,8 +278,6 @@ public class UsuariServiceImpl implements UsuariService {
             return new PermisosUsuari();
         }
     }
-
-
 
     private Pageable getMappeigPropietats(PaginacioParamsDto paginacioParams) {
 

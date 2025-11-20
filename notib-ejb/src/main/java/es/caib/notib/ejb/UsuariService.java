@@ -1,9 +1,11 @@
 package es.caib.notib.ejb;
 
 import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.UsuariDto;
+import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.permis.PermisosUsuari;
 import es.caib.notib.logic.intf.dto.permis.PermisosUsuarisFiltre;
 import org.jboss.ejb3.annotation.TransactionTimeout;
@@ -37,7 +39,7 @@ public class UsuariService extends AbstractService<es.caib.notib.logic.intf.serv
 
     @Override
     @RolesAllowed({"NOT_ADMIN"})
-    public PermisosUsuari getPermisosUsuari(EntitatDto entitat, String usuariCodi) {
-        return getDelegateService().getPermisosUsuari(entitat, usuariCodi);
+    public PermisosUsuari getPermisosUsuari(EntitatDto entitat, String usuariCodi, OrganGestorDto organAdmin) {
+        return getDelegateService().getPermisosUsuari(entitat, usuariCodi, organAdmin);
     }
 }
