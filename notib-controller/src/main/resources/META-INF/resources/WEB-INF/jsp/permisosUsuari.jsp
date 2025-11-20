@@ -29,6 +29,8 @@
     <link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
     <script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/js/bootstrap-datepicker.min.js"/>"></script>
     <script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
+<%--    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>--%>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="<c:url value="/js/webutil.common.js"/>"></script>
     <script src="<c:url value="/js/webutil.datatable.js"/>"></script>
     <script src="<c:url value="/js/webutil.modal.js"/>"></script>
@@ -67,7 +69,7 @@
 
             let isTaulaProcediments = titol === "<spring:message code="procediment.permis.directe"/>";
             let taulaId = isTaulaProcediments ? "procediments-" + codiUsuari : "organs-" + codiUsuari;
-            let contingutTbody =
+            let contingutTbody = (!isTaulaProcediments ? '<button style="float:right;" class="btn btn-success" onclick="exportar( \'' + codiUsuari + '\')">Exportar</button>' : '') +
                 '<table id="'+ taulaId + '"class="table table-striped table-bordered elements">' +
                 '<caption><b>' + titol + '</b></caption>' +
                 '<thead>' +
@@ -131,11 +133,12 @@
 
         function crearTaulaProcSerOrgan(td, procSerOrgan, titol, codiUsuari) {
 
+            let tableId = "procSerOrgan-" + codiUsuari;
             let tbodyId = "tbody-procSerOrgan-" + codiUsuari;
             let theadId = "thead-procSerOrgan-" + codiUsuari;
             let spanId = "span-" + theadId;
             let contingutTbody =
-                '<table class="table table-striped table-bordered elements">' +
+                '<table id="' + tableId + '" class="table table-striped table-bordered elements">' +
                 '<caption><b>' + titol + '</b><a style="margin-left:10px;" onclick="toggleFila( \'' + theadId + '\', \'' + tbodyId + '\');" class="btn btn-default btn-sm btn-rowInfo"><span id="' + spanId + '" class="fa fa-caret-down"></span></a></caption>' +
                 '<thead id="' + theadId + '" style="display:none;">' +
                 '<tr>' +
@@ -207,6 +210,7 @@
             if (!organsFills) {
                 return;
             }
+            let tableId = "organsFills-" + codiUsuari;
             let tbodyId = "tbody-organsFills-" + codiUsuari;
             let theadId = "thead-organsFills-" + codiUsuari;
             let spanId = "span-" + theadId;
@@ -214,7 +218,7 @@
             let organsMapMap = new Map(Object.entries(organsMapJson));
             let organsFillsJson = JSON.parse(organsFills);
             let organsFillsMap = new Map(Object.entries(organsFillsJson));
-            let  contingut = '<table class="table table-striped table-bordered elements">' +
+            let  contingut = '<table id="' + tableId + '" class="table table-striped table-bordered elements">' +
                 '<caption><b><spring:message code="es.caib.notib.organs.fills"/></b><a style="margin-left:10px;" onclick="toggleFila( \'' + theadId + '\', \'' + tbodyId + '\');" class="btn btn-default btn-sm btn-rowInfo"><span id="' + spanId + '" class="fa fa-caret-down"></span></a></caption>' +
                 '<thead id="' + theadId + '" style="display:none;">' +
                 '<tr>' +
@@ -293,6 +297,52 @@
             });
         }
 
+        function exportar(codiUsuari) {
+
+            let wb = XLSX.utils.book_new();
+            let tableIDs = ['organs-' + codiUsuari, "organsFills-" + codiUsuari, "procediments-" + codiUsuari, "procSerOrgan-" + codiUsuari];
+            tableIDs.forEach(function(id, index) {
+                let table = document.getElementById(id);
+                let clonedTable = table.cloneNode(true);
+                $(clonedTable).find('span').each(function() {
+                    let iconClass = $(this).attr('class');
+                    if (iconClass.includes('fa-user-plus')) {
+                        $(this).replaceWith('<spring:message code="procediment.permis.form.camp.administrador"/>'); // Replace with a cross or text
+                    } else if (iconClass.includes('fa-search')) {
+                        $(this).replaceWith('<spring:message code="procediment.permis.form.camp.consulta"/>'); // Replace with a cross or text
+                    } else if (iconClass.includes('fa-check-square-o')) {
+                        $(this).replaceWith('<spring:message code="procediment.permis.form.camp.processar"/>'); // Replace with a cross or text
+                    } else if (iconClass.includes('fa-cog')) {
+                        $(this).replaceWith('<spring:message code="procediment.permis.form.camp.gestio"/>'); // Replace with a cross or text
+                    } else if (iconClass.includes('fa-globe')) {
+                        $(this).replaceWith('<spring:message code="organgestor.permis.form.camp.comuns"/>'); // Replace with a cross or text
+                    } else if (iconClass.includes('fa-gavel')) {
+                        $(this).replaceWith('<spring:message code="procediment.permis.form.camp.notificacio"/>'); // Replace with a cross or text
+                    } else if (iconClass.includes('fa-envelope-o')) {
+                        $(this).replaceWith('<spring:message code="procediment.permis.form.camp.comunicacio"/>'); // Replace with a cross or text
+                    } else if (iconClass.includes('fa-envelope')) {
+                        $(this).replaceWith('<spring:message code="procediment.permis.form.camp.comunicacio.sir"/>'); // Replace with a cross or text
+                    } else if (iconClass.includes('fa-paper-plane-o')) {
+                        $(this).replaceWith('<spring:message code="procediment.permis.form.camp.comunicacio.sense.procediment"/>'); // Replace with a cross or text
+                    } else if (iconClass.includes('fa-check')) {
+                        $(this).replaceWith('✔️');
+                    }
+                });
+
+                let ws = XLSX.utils.table_to_sheet(clonedTable);
+                var range = XLSX.utils.decode_range(ws['!ref']);
+                var colWidth = [];
+
+                for (var C = range.s.c; C <= range.e.c; ++C) {
+                    colWidth[C] = { w: 120 }; // Set fixed width for each column
+                }
+
+                ws['!cols'] = colWidth;
+                XLSX.utils.book_append_sheet(wb, ws, id);
+            });
+            XLSX.writeFile(wb, 'permisos_usuari_' + codiUsuari + '.xlsx');
+        };
+
         $(document).ready(function () {
 
             $('[data-toggle="tooltip"]').tooltip();
@@ -320,7 +370,7 @@
                 deselecciona();
             });
 
-            initEvents($('#permisos-usuaris'), 'permisos-usuaris', eventMessages);
+            // initEvents($('#permisos-usuaris'), 'permisos-usuaris', eventMessages);
 
         });
 
@@ -414,18 +464,19 @@
         <th data-col-name="llinatges" ><spring:message code="usuari.form.camp.llinatges"/></th>
         <th data-col-name="nif" ><spring:message code="usuari.form.camp.nif"/></th>
         <th data-col-name="email" ><spring:message code="usuari.form.camp.email"/></th>
-        <th data-col-name="emailAlt" ><spring:message code="accions.massives.tipus"/></th>
-        <th data-col-name="id" data-orderable="false" data-disable-events="true" data-template="#cellAccionsTemplate" width="60px" style="z-index:99999;">
-            <script id="cellAccionsTemplate" type="text/x-jsrender">
-                <div class="dropdown">
-                    <button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
-                    <ul class="dropdown-menu dropdown-menu-right">
-                        <li><a href="<c:url value="/permisos/usuari/{codi}/exportar"/>" target="_blank" rel=”noopener noreferrer”><span class="fa fa-download"></span>&nbsp; <spring:message code="notificacio.info.document.descarregar"/></a></li>
-                    </ul>
-            </div>
-            </script>
-        </th>
-    </tr>
+        <th data-col-name="emailAlt" ><spring:message code="usuari.form.camp.email.alternatiu"/></th>
+<%--        <th data-col-name="id" data-orderable="false" data-disable-events="true" data-template="#cellAccionsTemplate" width="60px" style="z-index:99999;">--%>
+<%--            <script id="cellAccionsTemplate" type="text/x-jsrender">--%>
+<%--                <div class="dropdown">--%>
+<%--                    <button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>--%>
+<%--                    <ul class="dropdown-menu dropdown-menu-right">--%>
+<%--&lt;%&ndash;                        <li><a id="botoExportar" href="<c:url value="/permisos/usuari/{codi}/exportar"/>" target="_blank" rel=”noopener noreferrer”><span class="fa fa-download"></span>&nbsp; <spring:message code="enviament.list.user.exportar"/></a></li>&ndash;%&gt;--%>
+<%--                        <li><a id="botoExportar" onclick="exportar()><span class="fa fa-download"></span>&nbsp; <spring:message code="enviament.list.user.exportar"/></a></li>--%>
+<%--                    </ul>--%>
+<%--            </div>--%>
+<%--            </script>--%>
+<%--        </th>--%>
+<%--    </tr>--%>
     </thead>
 </table>
 </body>

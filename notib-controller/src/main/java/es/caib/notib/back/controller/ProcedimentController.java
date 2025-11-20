@@ -76,7 +76,6 @@ public class ProcedimentController extends BaseUserController {
 	private static final String REDIRECT_PROCEDIMENT = "redirect:../../procediment";
 	private String currentFiltre = PROCEDIMENTS_FILTRE;
 
-
 	@GetMapping
 	public String get(HttpServletRequest request, Model model) {
 
