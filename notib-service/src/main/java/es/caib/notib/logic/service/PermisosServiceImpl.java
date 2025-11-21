@@ -225,7 +225,12 @@ public class PermisosServiceImpl implements PermisosService {
                     organsDisponibles.addAll(organigramaHelper.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organ.getCodi()));
                 }
             }
-            return new ArrayList<>(organsDisponibles);
+            List<String> resposta = new ArrayList<>();
+            var organs = organGestorRepository.findByEntitatCodiAndCodiIn(entitat.getCodi(), new ArrayList<>(organsDisponibles));
+            for (var organ : organs) {
+                resposta.add(organ.getId() + "");
+            }
+            return resposta;
         } catch (Exception ex) {
             log.error("Error obtenint permisos de " + permis.name() + " d'òrgan per l'usuari " + usuariCodi + " a l'entitat " + entitatId + " pel procediment comú " + procSetDto.getCodi(), ex);
             throw ex;
@@ -775,6 +780,8 @@ public class PermisosServiceImpl implements PermisosService {
             response.add(CodiValorOrganGestorComuDto.builder().id(procSer.getId()).codi(procSer.getCodi())
                     .valor(procSer.getCodi() + ((procSer.getNom() != null && !procSer.getNom().isEmpty()) ? " - " + procSer.getNom() : ""))
                     .organGestor(procSer.getOrganGestor() != null ? procSer.getOrganGestor().getCodi() : "")
+                    .organNom(procSer.getOrganGestor() != null ? procSer.getOrganGestor().getNom() : "")
+                    .organId(procSer.getOrganGestor().getId() + "")
                     .comu(procSer.isComu()).build());
         }
         if (!response.isEmpty()) {

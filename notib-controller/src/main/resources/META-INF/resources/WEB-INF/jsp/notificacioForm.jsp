@@ -1426,7 +1426,7 @@
 						$.each(procedimentsOrgan, function(index, val) {
 							if (isOnlyOneProcedimentOrgan) {
 								selProcediments.append("<option value='" + val.id + "' selected>" + val.valor + "</option>");
-								$("#organGestor").val(val.id).trigger("change.select2");
+								$("#organGestor").val(val.organId).trigger("change.select2");
 							} else {
 								selProcediments.append("<option value='" + val.id + "'>" + val.valor + "</option>");
 							}
@@ -1497,7 +1497,7 @@
 						$.each(serveisOrgan, function(index, val) {
 							if (isOnlyOneServeiOrgan && !carregaInicial) {
 								selServeis.append("<option value='" + val.id + "' selected>" + val.valor + "</option>");
-								$("#organGestor").val(val.organGestor).trigger("change.select2");
+								$("#organGestor").val(val.organGestorId).trigger("change.select2");
 							} else {
 								selServeis.append("<option value='" + val.id + "'>" + val.valor + "</option>");
 							}

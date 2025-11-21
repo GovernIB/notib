@@ -59,6 +59,7 @@ import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.ProcSerOrganRepository;
 import es.caib.notib.persist.repository.ServeiFormRepository;
 import es.caib.notib.persist.repository.ServeiRepository;
+import joptsimple.internal.Strings;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -858,6 +859,7 @@ public class ServeiServiceImpl implements ServeiService {
 					.valor(nom)
 					.organGestor(organCodi)
 					.comu(servei.isComu())
+                    .organId(servei.getOrganGestor().getId() + "")
 					.build());
 		}
 		return response;
@@ -881,18 +883,28 @@ public class ServeiServiceImpl implements ServeiService {
 		if (serveis == null || serveis.isEmpty()) {
 			return serveisAmbPermis;
 		}
-		if (organFiltre == null) {
+		if (Strings.isNullOrEmpty(organFiltre)) {
 			serveisAmbPermis.addAll(serveis);
 			return serveisAmbPermis;
 		}
-		var organsFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organFiltre);
-		for (var servei: serveis) {
-			if (organsFills.contains(servei.getOrganGestor())) {
-				serveisAmbPermis.add(servei);
-			}
-		}
-		return serveisAmbPermis;
-	}
+        try {
+            var organ = organGestorRepository.findById(Long.valueOf(organFiltre)).orElse(null);
+            if (organ == null) {
+                return serveisAmbPermis;
+            }
+            var organsFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organFiltre);
+            for (var servei : serveis) {
+                if (organsFills.contains(servei.getOrganId()) || servei.isComu()) {
+                    serveisAmbPermis.add(servei);
+                }
+            }
+            return serveisAmbPermis;
+
+        } catch (Exception ex) {
+            log.error("[ServeiService.recuperarServeiAmbPermis] Error obtinguent els serveis amb permis per l'organ " + organFiltre, ex);
+            return new ArrayList<>();
+        }
+    }
 
 
 	@Override

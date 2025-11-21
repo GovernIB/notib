@@ -936,7 +936,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 			}
 			var organCodi = procediment.getOrganGestor() != null ? procediment.getOrganGestor().getCodi() : "";
 			response.add(CodiValorOrganGestorComuDto.builder().id(procediment.getId()).codi(procediment.getCodi())
-					.valor(nom).organGestor(organCodi).comu(procediment.isComu()).build());
+					.valor(nom).organGestor(organCodi).comu(procediment.isComu()).organId(procediment.getOrganGestor().getId() + "").build());
 		}
 		return response;
 	}
@@ -976,7 +976,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
             }
             return procedimentsAmbPermis;
         } catch (Exception ex) {
-            log.error("[ProcedimentService.recuperarProcedimentAmbPermis] Error obtinguetn els fills per l'organ " + organFiltre, ex);
+            log.error("[ProcedimentService.recuperarProcedimentAmbPermis] Error obtinguent els procediments amb permis per l'organ " + organFiltre, ex);
             return new ArrayList<>();
         }
 	}
