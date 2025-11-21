@@ -198,6 +198,9 @@ $(document).ready(function() {
 
 	let carregarOperadors = organ => {
 
+        if (!organ) {
+            return;
+        }
 		$.ajax({
 			type: 'GET',
 			url: "<c:url value="/procediment/operadors/"/>" + organ,
