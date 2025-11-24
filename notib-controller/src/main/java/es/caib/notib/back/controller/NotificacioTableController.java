@@ -41,6 +41,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -307,7 +308,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             organCodi = organGestor.getCodi();
         }
         var rol = RolEnumDto.valueOf(sessionScopedContext.getRolActual());
-        return procedimentService.getProcedimentsOrgan(entitatId, organCodi, null, rol, permis);
+        var procediments = procedimentService.getProcedimentsOrgan(entitatId, organCodi, null, rol, permis);
+        return procediments.stream().filter(p -> p.isActiu()).collect(Collectors.toList());
     }
 
     @GetMapping(value = "/serveisOrgan")
@@ -346,7 +348,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         }
         var rol = RolEnumDto.valueOf(sessionScopedContext.getRolActual());
         var organ = organGestorService.findById(entitatId, organGestor);
-        return procedimentService.getProcedimentsOrgan(entitatId, organ.getCodi(), organGestor, rol, permis);
+        var procediments = procedimentService.getProcedimentsOrgan(entitatId, organ.getCodi(), organGestor, rol, permis);
+        return procediments.stream().filter(p -> p.isActiu()).collect(Collectors.toList());
     }
 
     @GetMapping(value = "/serveisOrgan/{organGestor}")

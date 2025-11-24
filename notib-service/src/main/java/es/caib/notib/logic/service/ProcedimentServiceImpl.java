@@ -885,6 +885,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 							.valor(procediment.getCodi() + ((procediment.getNom() != null && !procediment.getNom().isEmpty()) ? " - " + procediment.getNom() : ""))
 							.organGestor(procediment.getOrganGestor() != null ? procediment.getOrganGestor().getCodi() : "")
 							.comu(procediment.isComu())
+                            .actiu(procediment.isActiu())
 							.build());
 				}
 			}
@@ -963,14 +964,19 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 			return procedimentsAmbPermis;
 		}
         try {
-            var organ = organGestorRepository.findById(Long.valueOf(organFiltre)).orElse(null);
+            OrganGestorEntity organ;
+            try {
+                organ = organGestorRepository.findById(Long.valueOf(organFiltre)).orElse(null);
+            } catch (NumberFormatException e) {
+                organ = organGestorRepository.findByEntitatAndCodi(entitat, organFiltre);
+            }
             if (organ == null) {
                 return procedimentsAmbPermis;
             }
             var organsFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organ.getCodi());
 //            var organsFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organFiltre);
             for (var procediment: procediments) {
-                if (organsFills.contains(procediment.getOrganGestor()) || procediment.isComu()) {
+                if (organsFills.contains(procediment.getOrganGestor()) || organsFills.contains(procediment.getOrganId())  || procediment.isComu()) {
                     procedimentsAmbPermis.add(procediment);
                 }
             }
