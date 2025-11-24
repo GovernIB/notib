@@ -1,5 +1,7 @@
 package es.caib.notib.logic.service;
 
+import es.caib.notib.logic.cacheable.OrganGestorCachable;
+import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.logic.intf.dto.CodiValorOrganGestorComuDto;
@@ -13,6 +15,9 @@ import es.caib.notib.logic.intf.dto.permis.PermisCodivalorOrganGestorComu;
 import es.caib.notib.logic.intf.dto.permis.PermisosUsuari;
 import es.caib.notib.logic.intf.dto.permis.PermisosUsuarisFiltre;
 import es.caib.notib.logic.intf.exception.NotFoundException;
+import es.caib.notib.logic.intf.service.OrganGestorService;
+import es.caib.notib.logic.intf.service.PermisosService;
+import es.caib.notib.logic.intf.service.ProcedimentService;
 import es.caib.notib.logic.intf.service.UsuariService;
 import es.caib.notib.persist.entity.UsuariEntity;
 import es.caib.notib.persist.repository.AplicacioRepository;
