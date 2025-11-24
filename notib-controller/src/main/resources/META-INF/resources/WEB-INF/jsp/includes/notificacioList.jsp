@@ -611,6 +611,7 @@
 
             e.preventDefault();
             $(".filtreOcult").toggle();
+            $(".filtreMeves").toggle();
             $("#filtreAvancat").hide();
             $("#filtreSimple").show();
             $("#filtreSimpleActiu").val(false);
@@ -623,6 +624,7 @@
 
             e.preventDefault();
             $(".filtreOcult").toggle();
+            $(".filtreMeves").toggle();
             $("#filtreAvancat").show();
             $("#filtreSimple").hide();
             $("#filtreSimpleActiu").val(true);
@@ -767,6 +769,8 @@
             <not:inputDate name="dataFi" placeholderKey="notificacio.list.filtre.camp.datafi" inline="true" required="false" />
         </div>
         <div id="botons-filtre-simple" class="col-md-2 pull-right form-buttons"  style="text-align: right;">
+            <button id="nomesLesMevesBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesLesMeves"/>" class="btn btn-default pull-left filtreMeves <c:if test="${nomesLesMeves}">active</c:if>" data-toggle="button"><span class="fa fa-user"></span></button>
+<%--            <not:inputHidden name="nomesLesMeves"/>--%>
             <button id="btn-netejar-filtre" type="submit" name="netejar" value="netejar" class="btn btn-default" style="padding: 6px 9px; margin-right:5px;" title="<spring:message code="comu.boto.netejar"/>"><span class="fa fa-eraser icona_ocultable" style="padding: 2px 0px;"></span><span class="text_ocultable"><spring:message code="comu.boto.netejar"/></span></button>
             <button id="filtrar" type="submit" name="accio" value="filtrar" class="btn btn-primary" title="<spring:message code="comu.boto.filtrar"/>"><span class="fa fa-filter" id="botoFiltrar"></span><span class="text_ocultable"><spring:message code="comu.boto.filtrar"/></span></button>
         </div>
