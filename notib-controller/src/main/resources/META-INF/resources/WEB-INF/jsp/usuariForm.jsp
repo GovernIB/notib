@@ -95,8 +95,9 @@
 		<not:inputSelect name="entitatDefecte" optionItems="${entitats}" textKey="usuari.form.camp.entitat.defecte" optionValueAttribute="codi" optionTextAttribute="valor" emptyOption="true" optionMinimumResultsForSearch="0"/>
 		<not:inputSelect name="organDefecte" optionItems="${organs}" textKey="usuari.form.camp.organ.defecte" optionValueAttribute="codi" optionTextAttribute="valor" emptyOption="true" optionMinimumResultsForSearch="0"/>
 		<not:inputSelect name="procedimentDefecte" optionItems="${procediments}" textKey="usuari.form.camp.procediment.defecte" optionValueAttribute="id" optionTextAttribute="valor" emptyOption="true" optionMinimumResultsForSearch="0"/>
-		<not:inputSelect name="idioma" optionItems="${idiomaEnumOptions}" textKey="usuari.form.camp.idioma" optionValueAttribute="value" optionTextKeyAttribute="text" disabled="false"/>
-		<not:inputSelect name="numElementsPaginaDefecte" optionItems="${numElementsPaginaDefecte}" optionValueAttribute="value" optionTextKeyAttribute="text" textKey="usuari.form.camp.elements.pagina.defecte"/>
+<%--		<not:inputSelect name="idioma" optionItems="${idiomaEnumOptions}" textKey="usuari.form.camp.idioma" optionValueAttribute="value" optionTextKeyAttribute="text" disabled="false"/>--%>
+        <not:inputRadio name="idioma" botons="false" optionItems="${idiomaEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" textKey="usuari.form.camp.idioma" inline="false" />
+        <not:inputSelect name="numElementsPaginaDefecte" optionItems="${numElementsPaginaDefecte}" optionValueAttribute="value" optionTextKeyAttribute="text" textKey="usuari.form.camp.elements.pagina.defecte"/>
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/usuari/configuracio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
