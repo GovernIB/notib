@@ -888,13 +888,18 @@ public class ServeiServiceImpl implements ServeiService {
 			return serveisAmbPermis;
 		}
         try {
-            var organ = organGestorRepository.findById(Long.valueOf(organFiltre)).orElse(null);
+            OrganGestorEntity organ;
+            try {
+                organ = organGestorRepository.findById(Long.valueOf(organFiltre)).orElse(null);
+            } catch (NumberFormatException e) {
+                organ = organGestorRepository.findByEntitatAndCodi(entitat, organFiltre);
+            }
             if (organ == null) {
                 return serveisAmbPermis;
             }
             var organsFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organFiltre);
             for (var servei : serveis) {
-                if (organsFills.contains(servei.getOrganId()) || servei.isComu()) {
+                if (organsFills.contains(servei.getOrganId()) || organsFills.contains(servei.getOrganGestor()) || servei.isComu()) {
                     serveisAmbPermis.add(servei);
                 }
             }

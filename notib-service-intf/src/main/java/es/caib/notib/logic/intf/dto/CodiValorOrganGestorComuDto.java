@@ -25,6 +25,7 @@ public class CodiValorOrganGestorComuDto implements Serializable {
 	private String organId;
 	@EqualsAndHashCode.Exclude
 	private boolean comu;
+    private boolean actiu;
 
 	private static final long serialVersionUID = 1;
 }

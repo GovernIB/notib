@@ -31,7 +31,7 @@ public class UsuariCommand implements Serializable {
 	private String emailAlt;
 	private Long entitatDefecte;
 	private Long procedimentDefecte;
-	private String organDefecte;
+	private Long organDefecte;
 	private String idioma;
 	private String[] rols;
 	private Boolean rebreEmailsNotificacio;
