@@ -262,7 +262,7 @@ $(document).ready(function() {
 		<div class="tab-content">
 			<div role="tabpanel" class="tab-pane active" id="dadesgeneralsForm">
 				<not:inputText name="codi" textKey="procediment.form.camp.codi" required="true" labelSize="2"/>
-				<not:inputText name="nom" textKey="procediment.form.camp.nom" required="true" labelSize="2" inputMinLength="2" inputMaxLength="256"/>
+				<not:inputText name="nom" textKey="procediment.form.camp.nom" required="true" labelSize="2" inputMinLength="2" inputMaxLength="256" showsize="true"/>
 				<not:inputText name="retard" textKey="procediment.form.camp.retard" labelSize="2"/>
 				<not:inputText name="caducitat" textKey="procediment.form.camp.caducitat" labelSize="2"/>
 				<c:choose>
