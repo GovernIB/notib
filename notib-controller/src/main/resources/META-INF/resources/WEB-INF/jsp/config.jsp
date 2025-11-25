@@ -205,6 +205,16 @@
         if (pluginUsuaris) {
             mostrarInputsPluginUsuaris(pluginUsuaris);
         }
+
+        $('#btn-netejar-filtre').click(() => {
+            $(':input', $('#form-filtre')).each((x, y) => {
+                let type = y.type, tag = y.tagName.toLowerCase();
+                if (type === 'text') {
+                    y.value = '';
+                }
+            });
+            $('#form-filtre').submit();
+        });
     });
 
     function mostrarInputsPluginUsuaris(plugin) {
@@ -237,6 +247,17 @@
         }
     }
 </script>
+<form:form id="form-filtre" action="" method="post" cssClass="well" modelAttribute="propietatsConfigurablesCommand">
+    <div class="row">
+        <div class="col-md-4">
+            <not:inputText name="propietat" inline="true"  placeholderKey="aplicacio.list.filtre.camp.codi.usuari"/>
+        </div>
+        <div class="col-md-2 pull-right form-buttons"  style="text-align: right;">
+            <button id="btn-netejar-filtre" type="submit" name="netejar" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
+            <button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
+        </div>
+    </div>
+</form:form>
 <div class="text-right" data-toggle="botons-titol">
     <a id="btn-sync" class="btn btn-default" data-toggle="modal" data-target="#syncModal"><span class="fa fa-refresh"></span>&nbsp;Sincronitzar amb JBoss</a>
 </div>
@@ -261,25 +282,27 @@
         <div class="col-md-3">
             <ul id="tab-list" class="nav nav-pills nav-stacked">
                 <c:forEach items="${config_groups}" var="group" varStatus="status_group">
-                        <c:choose>
-                            <c:when test="${group.key != 'PLUGINS' and group.parentCode == null}">
-                                <li role="presentation">
-                                    <a class="a-config-group" data-toggle="tab" href="#group-${group.key}">${group.description}</a>
-                                </li>
-                            </c:when>
-                            <c:when test="${group.key == 'PLUGINS'}">
-                                <li role="presentation" class="dropdown">
-                                    <a class="dropdown-toggle" href="#plugins" data-toggle="collapse" data-target="#plugin-list" aria-expanded="false" aria-controls="plugin-list">
-                                        ${group.description} <span class="caret"></span>
-                                    </a>
-                                    <ul class="nav nav-pills nav-stacked collapse" id="plugin-list">
-                                        <c:forEach items="${group.innerConfigs}" var="innerGroup">
-                                            <li style="margin-left:30px;"><a class="a-config-group" data-toggle="tab" href="#group-${innerGroup.key}">${innerGroup.description}</a></li>
-                                        </c:forEach>
-                                    </ul>
-                                </li>
-                            </c:when>
-                        </c:choose>
+                    <c:choose>
+<%--                        <c:when test="${empty group.innerConfigs and empty group.configs}">--%>
+<%--                        </c:when>--%>
+                        <c:when test="${group.key != 'PLUGINS' and group.parentCode == null}">
+                            <li role="presentation">
+                                <a class="a-config-group" data-toggle="tab" href="#group-${group.key}">${group.description}</a>
+                            </li>
+                        </c:when>
+                        <c:when test="${group.key == 'PLUGINS'}">
+                            <li role="presentation" class="dropdown">
+                                <a class="dropdown-toggle" href="#plugins" data-toggle="collapse" data-target="#plugin-list" aria-expanded="false" aria-controls="plugin-list">
+                                    ${group.description} <span class="caret"></span>
+                                </a>
+                                <ul class="nav nav-pills nav-stacked collapse" id="plugin-list">
+                                    <c:forEach items="${group.innerConfigs}" var="innerGroup">
+                                        <li style="margin-left:30px;"><a class="a-config-group" data-toggle="tab" href="#group-${innerGroup.key}">${innerGroup.description}</a></li>
+                                    </c:forEach>
+                                </ul>
+                            </li>
+                        </c:when>
+                    </c:choose>
                 </c:forEach>
             </ul>
         </div>

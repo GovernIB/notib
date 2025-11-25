@@ -115,10 +115,44 @@ public class ConfigServiceImpl implements ConfigService {
         var groups = configGroupRepository.findByParentCodeIsNull(Sort.by(Sort.Direction.ASC, "position"));
         var configGroupDtoList =  conversioTipusHelper.convertirList(groups, ConfigGroupDto.class);
         for (var cGroup: configGroupDtoList) {
-            processPropertyValues(cGroup);
+            processPropertyValues(cGroup, null);
         }
         return configGroupDtoList;
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ConfigGroupDto> findByFiltre(String filtre) {
+
+        log.info("Consulta totes les propietats amb filtre " + filtre);
+        var groups = configGroupRepository.findByParentCodeIsNull(Sort.by(Sort.Direction.ASC, "position"));
+        var configGroupDtoList = conversioTipusHelper.convertirList(groups, ConfigGroupDto.class);
+        filtre = filtre.toLowerCase();
+        for (var cGroup : configGroupDtoList) {
+            processPropertyValues(cGroup, filtre);
+        }
+        configGroupDtoList = treureConfigsBuides(configGroupDtoList);
+        return configGroupDtoList;
+    }
+
+    private List<ConfigGroupDto> treureConfigsBuides(List<ConfigGroupDto> configs) {
+
+        List<ConfigGroupDto> configsPlenes = new ArrayList<>();
+        for (var config : configs) {
+            if (config.getConfigs().isEmpty() && config.getInnerConfigs().isEmpty()) {
+                continue;
+            } else if (!config.getConfigs().isEmpty()) {
+                configsPlenes.add(config);
+            }
+            config.setInnerConfigs(treureConfigsBuides(config.getInnerConfigs()));
+            if (!config.getInnerConfigs().isEmpty() && !configsPlenes.contains(config)) {
+                configsPlenes.add(config);
+            }
+//            configsPlenes.addAll(treureConfigsBuides(config.getInnerConfigs()));
+        }
+        return configsPlenes;
+    }
+
 
     @Override
     @Transactional
@@ -235,8 +269,9 @@ public class ConfigServiceImpl implements ConfigService {
         }
     }
 
-    private void processPropertyValues(ConfigGroupDto cGroup) {
+    private void processPropertyValues(ConfigGroupDto cGroup, String filtre) {
 
+        List<ConfigDto> configs = new ArrayList<>();
         for (var config: cGroup.getConfigs()) {
             if ("PASSWORD".equals(config.getTypeCode())){
                 config.setValue("*****");
@@ -246,12 +281,19 @@ public class ConfigServiceImpl implements ConfigService {
                 // Les propietats de Jboss es llegeixen del fitxer de properties i si no estan definides prenen el valor especificat a la base de dades.
                 config.setValue(configHelper.getConfigGlobal(config.getKey(), config.getValue()));
             }
+            if (Strings.isNullOrEmpty(filtre) ||
+                     (config.getKey().toLowerCase().contains(filtre)
+                    || (!Strings.isNullOrEmpty(config.getDescription()) && config.getDescription().toLowerCase().contains(filtre))
+                    || (!Strings.isNullOrEmpty(config.getValue()) && config.getValue().toLowerCase().contains(filtre)))){
+                configs.add(config);
+            }
         }
+        cGroup.setConfigs(configs);
         if (cGroup.getInnerConfigs() == null || cGroup.getInnerConfigs().isEmpty()) {
             return;
         }
         for (var child : cGroup.getInnerConfigs()) {
-            processPropertyValues(child);
+            processPropertyValues(child, filtre);
         }
     }
 }

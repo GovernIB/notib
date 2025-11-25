@@ -33,6 +33,12 @@ public class ConfigService extends AbstractService<es.caib.notib.logic.intf.serv
 		return getDelegateService().findAll();
 	}
 
+    @Override
+    @RolesAllowed({"NOT_SUPER"})
+    public List<ConfigGroupDto> findByFiltre(String filtre){
+        return getDelegateService().findByFiltre(filtre);
+    }
+
 	@Override
 	@RolesAllowed({"NOT_SUPER"})
 	public List<String> syncFromJBossProperties(){
