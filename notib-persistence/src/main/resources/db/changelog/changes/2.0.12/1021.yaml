@@ -11,7 +11,7 @@ databaseChangeLog:
                   type: time
                   constraints:
                     nullable: false
-                  defaultValue: "TO_DATE('08:00:00', 'HH24:MI:SS')"
+                  defaultValue: "TO_DATE('07:00:00', 'HH24:MI:SS')"
               - column:
                   name: horari_laboral_fi
                   type: time

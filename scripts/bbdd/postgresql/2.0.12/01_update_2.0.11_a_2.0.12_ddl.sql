@@ -2,7 +2,7 @@ ALTER TABLE not_usuari ADD entitat_defecte numeric;
 ALTER TABLE not_usuari ADD organ_defecte numeric;
 ALTER TABLE not_usuari ADD procediment_defecte numeric;
 ALTER TABLE not_avis ALTER COLUMN  data_final DROP NOT NULL;
-ALTER TABLE not_aplicacio ADD horari_laboral_inici DATE DEFAULT TO_DATE('08:00:00', 'HH24:MI:SS') NOT NULL;
+ALTER TABLE not_aplicacio ADD horari_laboral_inici DATE DEFAULT TO_DATE('07:00:00', 'HH24:MI:SS') NOT NULL;
 ALTER TABLE not_aplicacio ADD horari_laboral_fi DATE DEFAULT TO_DATE('16:00:00', 'HH24:MI:SS') NOT NULL;
 ALTER TABLE not_aplicacio ADD max_env_min_laboral INTEGER DEFAULT 4 NOT NULL;
 ALTER TABLE not_aplicacio ADD max_env_min_no_laboral INTEGER DEFAULT 8 NOT NULL;
