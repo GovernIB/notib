@@ -512,7 +512,7 @@ public class PermisosServiceImpl implements PermisosService {
 
         var permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
         boolean tractarEntitatComOrganGestor = configHelper.getConfigAsBoolean("es.caib.notib.notifica.dir3.entitat.permes");
-        
+
         // 1. Obté òrgans amb permís comú
         List<OrganGestorEntity> organsAmbPermisComu = new ArrayList<>();
         if (Boolean.TRUE.equals(hasProcSerComunsAmbPermisPerOrgan(entitat, grups, true))) {
@@ -803,7 +803,7 @@ public class PermisosServiceImpl implements PermisosService {
                     .valor(procSer.getCodi() + ((procSer.getNom() != null && !procSer.getNom().isEmpty()) ? " - " + procSer.getNom() : ""))
                     .organGestor(procSer.getOrganGestor() != null ? procSer.getOrganGestor().getCodi() : "")
                     .organNom(procSer.getOrganGestor() != null ? procSer.getOrganGestor().getNom() : "")
-                    .organId(procSer.getOrganGestor().getId() + "")
+                    .organId(procSer.getOrganGestor() != null ? procSer.getOrganGestor().getId() + "" : "")
                     .comu(procSer.isComu())
                     .actiu(procSer.isActiu()).build());
         }
