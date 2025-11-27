@@ -533,9 +533,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.notificaIntentData = data;
 		this.sirConsultaData = data;
 
-		this.perEmail = InteressatTipus.FISICA_SENSE_NIF.equals(titular.getInteressatTipus()) && // Interessar sense NIF
-				(this.destinataris == null || this.destinataris.isEmpty()) &&							// No té destinataris (els destinataris tenen NIF obligatòriament)
-				this.entregaPostal == null;																// No s'envia per entrega postal
+		this.perEmail = InteressatTipus.FISICA_SENSE_NIF.equals(titular.getInteressatTipus()) // Interessar sense NIF
+				&& (this.destinataris == null || this.destinataris.isEmpty());							// No té destinataris (els destinataris tenen NIF obligatòriament)
+//				&& this.entregaPostal == null;																// No s'envia per entrega postal
 	}
 
 
@@ -592,9 +592,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			built.sirConsultaData = data;
 			built.notificaReferencia = referencia;
 
-			built.perEmail = InteressatTipus.FISICA_SENSE_NIF.equals(titular.getInteressatTipus()) && 	// Interessar sense NIF
-					(built.destinataris == null || built.destinataris.isEmpty()) &&								// No té destinataris (els destinataris tenen NIF obligatòriament)
-					built.entregaPostal == null;																// No s'envia per entrega postal
+			built.perEmail = InteressatTipus.FISICA_SENSE_NIF.equals(titular.getInteressatTipus()) 	// Interessar sense NIF
+                    && (built.destinataris == null || built.destinataris.isEmpty());								// No té destinataris (els destinataris tenen NIF obligatòriament)
+//                    && built.entregaPostal == null;																// No s'envia per entrega postal
 		}
 
 		public BuilderV2 destinataris(List<PersonaEntity> destinataris) {
