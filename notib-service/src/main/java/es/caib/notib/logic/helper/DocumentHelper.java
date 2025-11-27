@@ -57,7 +57,7 @@ public class DocumentHelper {
         return null;
     }
 
-    public DocumentValidDto getDocument(Document document) {
+    public DocumentValidDto getDocument(Document document, boolean validarFirma) {
 
         DocumentValidDto documentDto = null;
         if (document == null || document.isEmpty() || !document.hasOnlyOneSource()) {
@@ -74,7 +74,7 @@ public class DocumentHelper {
             dto = getDocumentByCSV(document, utilizarMetadadesPerDefecte);
         }
         if (!Strings.isNullOrEmpty(document.getContingutBase64())) {
-            dto = getDocumentByContingut(document, utilizarMetadadesPerDefecte);
+            dto = getDocumentByContingut(document, utilizarMetadadesPerDefecte, validarFirma);
             document.setArxiuGestdocId(dto.getArxiuGestdocId());
         }
         return dto;
@@ -174,13 +174,13 @@ public class DocumentHelper {
         return dto;
     }
 
-    private DocumentValidDto getDocumentByContingut(Document document, boolean utilizarMetadadesPerDefecte) {
+    private DocumentValidDto getDocumentByContingut(Document document, boolean utilizarMetadadesPerDefecte, boolean validarFirma) {
         var dto = new DocumentValidDto();
 
         var contingut = Base64.decodeBase64(document.getContingutBase64());
         var mediaType = MimeUtils.getMimeTypeFromContingut(document.getArxiuNom(), contingut);
         var isPdf = MediaType.APPLICATION_PDF_VALUE.equals(mediaType);
-        if (isPdf && isValidaFirmaRestEnabled()) {
+        if (isPdf && isValidaFirmaRestEnabled() && validarFirma) {
             SignatureInfoDto signatureInfo = pluginHelper.detectSignedAttachedUsingValidateSignaturePlugin(contingut, document.getArxiuNom(), mediaType);
             if (signatureInfo.isError()) {
                 dto.setErrorFirma(true);

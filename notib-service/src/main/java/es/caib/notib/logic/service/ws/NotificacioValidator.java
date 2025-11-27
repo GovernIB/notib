@@ -47,9 +47,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -84,6 +86,9 @@ public class NotificacioValidator implements Validator {
     private final OrganGestorService organGestorService;
     private final ConversioTipusHelper conversioTipusHelper;
     private final CacheBridge cacheBridge;
+
+    @Setter
+    private Map<String, Long> documentsProcessatsMassiu = new HashMap<>();
 
     @Setter
     private Notificacio notificacio;
@@ -408,34 +413,36 @@ public class NotificacioValidator implements Validator {
         }
         var document = notificacio.getDocument();
         var enviamentTipus = notificacio.getEnviamentTipus();
-        validateDocument(document, documents[0], enviamentTipus, 1, errors, locale);
-        if (!EnviamentTipus.SIR.equals(enviamentTipus)) {
-            if (notificacio.getDocument2() != null || notificacio.getDocument3() != null || notificacio.getDocument4() != null || notificacio.getDocument5() != null) {
-                errors.reject(error(MULTIPLES_DOCUMENTS_EN_NOTCOM, locale));
-            }
-            // Midal màxima
-            if(documents[0] != null && documents[0].getMida() != null) {
-                Long maxFileSize = getMaxSizeFile();
-                if(documents[0].getMida() > maxFileSize) {
-                    errors.rejectValue("document", error(DOCUMENT_MASSA_GRAN, locale, maxFileSize / 1048576));
+        if (!documentsProcessatsMassiu.containsKey(document.getArxiuNom())) {
+            validateDocument(document, documents[0], enviamentTipus, 1, errors, locale);
+            if (!EnviamentTipus.SIR.equals(enviamentTipus)) {
+                if (notificacio.getDocument2() != null || notificacio.getDocument3() != null || notificacio.getDocument4() != null || notificacio.getDocument5() != null) {
+                    errors.reject(error(MULTIPLES_DOCUMENTS_EN_NOTCOM, locale));
                 }
+                // Midal màxima
+                if (documents[0] != null && documents[0].getMida() != null) {
+                    Long maxFileSize = getMaxSizeFile();
+                    if (documents[0].getMida() > maxFileSize) {
+                        errors.rejectValue("document", error(DOCUMENT_MASSA_GRAN, locale, maxFileSize / 1048576));
+                    }
+                }
+                return;
             }
-            return;
         }
         var document2 = notificacio.getDocument2();
-        if (document2 != null && !document2.isEmpty() && !Strings.isNullOrEmpty(document2.getContingutBase64())) {
+        if (document2 != null && !document2.isEmpty() && !Strings.isNullOrEmpty(document2.getContingutBase64()) && !documentsProcessatsMassiu.containsKey(document.getArxiuNom())) {
             validateDocument(document2, documents[1], enviamentTipus, 2, errors, locale);
         }
         var document3 = notificacio.getDocument3();
-        if (document3 != null && !document3.isEmpty() && !Strings.isNullOrEmpty(document3.getContingutBase64())) {
+        if (document3 != null && !document3.isEmpty() && !Strings.isNullOrEmpty(document3.getContingutBase64()) && !documentsProcessatsMassiu.containsKey(document.getArxiuNom())) {
             validateDocument(document3, documents[2], enviamentTipus, 3, errors, locale);
         }
         var document4 = notificacio.getDocument4();
-        if (document4 != null && !document4.isEmpty() && !Strings.isNullOrEmpty(document4.getContingutBase64())) {
+        if (document4 != null && !document4.isEmpty() && !Strings.isNullOrEmpty(document4.getContingutBase64()) && !documentsProcessatsMassiu.containsKey(document.getArxiuNom())) {
             validateDocument(document4, documents[3], enviamentTipus, 4, errors, locale);
         }
         var document5 = notificacio.getDocument5();
-        if (document5 != null && !document5.isEmpty() && !Strings.isNullOrEmpty(document5.getContingutBase64())) {
+        if (document5 != null && !document5.isEmpty() && !Strings.isNullOrEmpty(document5.getContingutBase64()) && !documentsProcessatsMassiu.containsKey(document.getArxiuNom())) {
             validateDocument(document5, documents[4], enviamentTipus, 5, errors, locale);
         }
         // Midal màxima

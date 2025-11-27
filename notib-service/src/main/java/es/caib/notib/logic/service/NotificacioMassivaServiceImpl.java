@@ -227,7 +227,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             var numAltes = 0;
             var fila = 0;
             Map<String, Long> documentsProcessatsMassiu = new HashMap<>();
-
+            boolean validarFirma = true;
             for (Notificacio notificacio: massivaFile.getNotificacions()) {
                 var notificacioValidator = new NotificacioValidator(
                         aplicacioRepository,
@@ -245,17 +245,24 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
                 var procediment = !Strings.isNullOrEmpty(notificacio.getProcedimentCodi()) ? procSerRepository.findByCodiAndEntitat(notificacio.getProcedimentCodi(), entitat) : null;
                 var organGestor = !Strings.isNullOrEmpty(notificacio.getOrganGestor()) ? organGestorRepository.findByEntitatAndCodi(entitat, notificacio.getOrganGestor()) : null;
-                var document = documentHelper.getDocument(notificacio.getDocument());
+
+                validarFirma = !documentsProcessatsMassiu.containsKey(notificacio.getDocument().getArxiuNom());
+                var document = documentHelper.getDocument(notificacio.getDocument(), validarFirma);
+
                 // En massives només podem tenir un document
                 DocumentValidDto document2 = null;
                 DocumentValidDto document3 = null;
                 DocumentValidDto document4 = null;
                 DocumentValidDto document5 = null;
                 if (EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus())) {
-                    document2 = documentHelper.getDocument(notificacio.getDocument2());
-                    document3 = documentHelper.getDocument(notificacio.getDocument3());
-                    document4 = documentHelper.getDocument(notificacio.getDocument4());
-                    document5 = documentHelper.getDocument(notificacio.getDocument5());
+                    validarFirma = !documentsProcessatsMassiu.containsKey(notificacio.getDocument2().getArxiuNom());
+                    document2 = documentHelper.getDocument(notificacio.getDocument2(), validarFirma);
+                    validarFirma = !documentsProcessatsMassiu.containsKey(notificacio.getDocument3().getArxiuNom());
+                    document3 = documentHelper.getDocument(notificacio.getDocument3(), validarFirma);
+                    validarFirma = !documentsProcessatsMassiu.containsKey(notificacio.getDocument4().getArxiuNom());
+                    document4 = documentHelper.getDocument(notificacio.getDocument4(), validarFirma);
+                    validarFirma = !documentsProcessatsMassiu.containsKey(notificacio.getDocument5().getArxiuNom());
+                    document5 = documentHelper.getDocument(notificacio.getDocument5(), validarFirma);
                 }
 
                 //TODO AQUEST IF S'HA DE COMPROVAR SI REALMENT ES NECESITA, EN MASIVES ES POT CREAR SENSE DOCUMENT I VALIDA
@@ -269,6 +276,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 notificacioValidator.setProcediment(procediment);
                 notificacioValidator.setOrganGestor(organGestor);
                 notificacioValidator.setDocuments(docs);
+                notificacioValidator.setDocumentsProcessatsMassiu(documentsProcessatsMassiu);
                 notificacioValidator.setErrors(errors);
                 notificacioValidator.setLocale(new Locale("rest"));
                 notificacioValidator.validate();

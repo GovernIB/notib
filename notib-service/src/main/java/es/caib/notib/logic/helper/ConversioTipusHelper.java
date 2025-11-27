@@ -209,7 +209,14 @@ public class ConversioTipusHelper {
 							}
 				}).register();
 
-		mapperFactory.classMap(NotificacioMassivaEntity.class, NotificacioMassivaTableItemDto.class).byDefault();
+		mapperFactory.classMap(NotificacioMassivaEntity.class, NotificacioMassivaTableItemDto.class)
+                    .customize(new CustomMapper<>() {
+                        @Override
+                        public void mapAtoB(NotificacioMassivaEntity a, NotificacioMassivaTableItemDto b, MappingContext context) {
+                            a.getCreatedDate().ifPresent(createdDate -> b.setCreatedDate(Date.from(createdDate.atZone(ZoneId.systemDefault()).toInstant())));
+
+                        }
+                    }).byDefault().register();
 
 
 		mapperFactory.classMap(NotificacioMassivaEntity.class, NotificacioMassivaDataDto.class).byDefault().
