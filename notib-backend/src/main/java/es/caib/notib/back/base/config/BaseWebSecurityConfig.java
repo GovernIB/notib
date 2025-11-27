@@ -90,43 +90,97 @@ public abstract class BaseWebSecurityConfig {
 		return http.build();
 	}
 
-	protected boolean isWebContainerAuthActive() {
-		return false;
-	}
-	protected boolean isOauth2ResourceServerActive() {
-		return true;
-	}
-	protected boolean isOauth2ClientActive() {
-		return false;
-	}
-
-	protected List<GrantedAuthority> getAllowedRoles() {
-		return null;
-	}
-
-	protected RequestMatcher[] internalPublicRequestMatchers() {
-		return new RequestMatcher[] {
-				new AntPathRequestMatcher(BaseConfig.API_PATH),
-				new AntPathRequestMatcher(BaseConfig.PING_PATH),
-				new AntPathRequestMatcher(BaseConfig.SYSENV_PATH),
-				new AntPathRequestMatcher(BaseConfig.MANIFEST_PATH)
-		};
-	}
-
+	/**
+	 * Configuració de seguretat personalitzada.
+	 *
+	 * @param http
+	 *            l'objecte de configuració.
+	 * @throws Exception
+	 *            si es produeix alguna excepció fent la configuració.
+	 */
 	protected void customHttpSecurityConfiguration(HttpSecurity http) throws Exception {
 		http.cors();
 		http.csrf().disable();
 		http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
+		if (isWebContainerAuthActive()) {
+			// Això és per a que funcioni correctament l'autenticació amb el provider de JBoss i les aplicacions React
+			http.sessionManagement(session ->
+					session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+		}
 	}
 
+	/**
+	 * Indica si l'autenticació de contenidor web (JBoss) està activa.
+	 *
+	 * @return true si està activa o false en cas contrari.
+	 */
+	protected boolean isWebContainerAuthActive() {
+		return false;
+	}
+	/**
+	 * Indica si l'autenticació amb servidor de recursos OAUTH (Keycloak) està activa.
+	 *
+	 * @return true si està activa o false en cas contrari.
+	 */
+	protected boolean isOauth2ResourceServerActive() {
+		return true;
+	}
+	/**
+	 * Indica si l'autenticació amb client OAUTH està activa.
+	 *
+	 * @return true si està activa o false en cas contrari.
+	 */
+	protected boolean isOauth2ClientActive() {
+		return false;
+	}
+
+	/**
+	 * Configura el comportament per defecte de les URLs que no coinicideixen amb cap Matcher: NO requerir autenticació.
+	 *
+	 * @return true si no es requereix autenticació o false en cas contrari.
+	 */
 	protected boolean isAllRequestsUnauthenticatedByDefault() {
 		return false;
 	}
+	/**
+	 * Configura el comportament per defecte de les URLs que no coinicideixen amb cap Matcher: requerir autenticació.
+	 *
+	 * @return true si es requereix autenticació o false en cas contrari.
+	 */
 	protected boolean isAllRequestsAuthenticatedByDefault() {
 		return true;
 	}
+	/**
+	 * Configura el comportament per defecte de les URLs que no coinicideixen amb cap Matcher: denegar accés.
+	 *
+	 * @return true si es denega l'accés o false en cas contrari.
+	 */
 	protected boolean isAllRequestsDeniedByDefault() {
 		return false;
+	}
+
+	/**
+	 * Retorna els rols permesos per a filtrar-los. Es crida en cada petició.
+	 *
+	 * @return la llista de rols permesos.
+	 */
+	protected Set<String> getAllowedRoles() {
+		return null;
+	}
+
+	/**
+	 * Matchers per a les peticions internes que es configuren per a no requerir autenticació.
+	 *
+	 * @return la llista matchers.
+	 */
+	protected RequestMatcher[] internalPublicRequestMatchers() {
+		return new RequestMatcher[] {
+				new AntPathRequestMatcher(BaseConfig.API_PATH),
+				new AntPathRequestMatcher(BaseConfig.PING_PATH),
+				new AntPathRequestMatcher(BaseConfig.AUTH_TOKEN_PATH),
+				new AntPathRequestMatcher(BaseConfig.SYSENV_PATH),
+				new AntPathRequestMatcher(BaseConfig.MANIFEST_PATH)
+		};
 	}
 
 	protected J2eePreAuthenticatedProcessingFilter webContainerProcessingFilter() {
@@ -151,10 +205,14 @@ public abstract class BaseWebSecurityConfig {
 
 	protected Converter<Jwt, AbstractAuthenticationToken> jwtAuthConverter() {
 		return jwt -> {
-			Collection<GrantedAuthority> authorities = Stream.concat(
+			Collection<GrantedAuthority> grantedAuthorities = Stream.concat(
 					new JwtGrantedAuthoritiesConverter().convert(jwt).stream(),
 					extractJwtGrantedAuthorities(jwt).stream()).collect(Collectors.toSet());
-			return new JwtAuthenticationToken(jwt, authorities, getPrincipalClaimName(jwt));
+			filterAllowedGrantedAuthorities(grantedAuthorities);
+			return new JwtAuthenticationToken(
+					jwt,
+					grantedAuthorities,
+					getPrincipalClaimName(jwt));
 		};
 	}
 
@@ -163,7 +221,7 @@ public abstract class BaseWebSecurityConfig {
 		return (userRequest) -> {
 			OAuth2User oauth2User = delegate.loadUser(userRequest);
 			OAuth2AccessToken accessToken = userRequest.getAccessToken();
-			Set<GrantedAuthority> mappedAuthorities = new HashSet<>();
+			Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
 			try {
 				JWT parsedJwt = JWTParser.parse(accessToken.getTokenValue());
 				JSONObject realmAccess = (JSONObject)parsedJwt.getJWTClaimsSet().getClaim("realm_access");
@@ -172,16 +230,15 @@ public abstract class BaseWebSecurityConfig {
 					if (roles != null) {
 						roles.stream().
 								map(r -> new SimpleGrantedAuthority((String)r)).
-								forEach(mappedAuthorities::add);
+								forEach(grantedAuthorities::add);
 					}
 				}
 			} catch (ParseException ex) {
 				log.warn("No s'han pogut obtenir els rols del token JWT", ex);
 			}
-			List<GrantedAuthority> allowedRoles = getAllowedRoles();
-			mappedAuthorities.removeIf(a -> allowedRoles != null && !allowedRoles.contains(a));
+			filterAllowedGrantedAuthorities(grantedAuthorities);
 			return new DefaultOAuth2User(
-					mappedAuthorities,
+					grantedAuthorities,
 					oauth2User.getAttributes(),
 					userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName());
 		};
@@ -217,15 +274,16 @@ public abstract class BaseWebSecurityConfig {
 				}
 			}
 		}
-		return mapRolesToGrantedAuthorities(roles);
+		return roles.stream().
+				map(SimpleGrantedAuthority::new).
+				collect(Collectors.toSet());
 	}
 
-	protected List<GrantedAuthority> mapRolesToGrantedAuthorities(Set<String> roles) {
-		List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-		if (!roles.isEmpty()) {
-			grantedAuthorities = roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+	protected void filterAllowedGrantedAuthorities(Collection<? extends GrantedAuthority> grantedAuthorities) {
+		Set<String> allowedRoles = getAllowedRoles();
+		if (allowedRoles != null) {
+			grantedAuthorities.removeIf(a -> !allowedRoles.contains(a.getAuthority()));
 		}
-		return grantedAuthorities;
 	}
 
 }

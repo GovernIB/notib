@@ -1,4 +1,4 @@
-import { StrictMode } from 'react';
+import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@emotion/react';
@@ -6,7 +6,11 @@ import { CssBaseline } from '@mui/material';
 import { LicenseInfo } from '@mui/x-license';
 import theme from './theme';
 import App from './App.tsx';
-import { envVar, ResourceApiProvider } from 'reactlib';
+import {
+    envVar,
+    OidcAuthProvider as AuthProvider,
+    ResourceApiProvider
+} from 'reactlib';
 
 LicenseInfo.setLicenseKey(
     'd7a3848ee04d821438959d61037634beTz0xMDY1ODQsRT0xNzY5Mjk5MTk5MDAwLFM9cHJvLExNPXN1YnNjcmlwdGlvbixQVj1pbml0aWFsLEtWPTI='
@@ -17,7 +21,17 @@ export const envVars = {
     VITE_API_PUBLIC_URL: import.meta.env.VITE_API_PUBLIC_URL,
     VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
     VITE_API_SUFFIX: import.meta.env.VITE_API_SUFFIX,
+    VITE_AUTH_URL: import.meta.env.VITE_AUTH_URL,
+    VITE_AUTH_REALM: import.meta.env.VITE_AUTH_REALM,
+    VITE_AUTH_CLIENTID: import.meta.env.VITE_AUTH_CLIENTID,
+    VITE_APP_VERSION: import.meta.env.VITE_APP_VERSION,
 };
+
+const getAuthConfig = () => ({
+    url: envVar('VITE_AUTH_URL', envVars),
+    realm: envVar('VITE_AUTH_REALM', envVars),
+    clientId: envVar('VITE_AUTH_CLIENTID', envVars),
+});
 
 export const getEnvApiUrl = () => {
     const envApiPublicUrl = envVar('VITE_API_PUBLIC_URL', envVars);
@@ -43,14 +57,16 @@ export const getEnvApiUrl = () => {
 };
 
 createRoot(document.getElementById('root')!).render(
-    <StrictMode>
-        <ResourceApiProvider apiUrl={getEnvApiUrl()} userSessionActive>
-            <ThemeProvider theme={theme}>
-                <CssBaseline />
-                <BrowserRouter basename={import.meta.env.BASE_URL}>
-                    <App />
-                </BrowserRouter>
-            </ThemeProvider>
-        </ResourceApiProvider>
-    </StrictMode>
+    <React.StrictMode>
+        <AuthProvider config={getAuthConfig()} appBaseUrl={import.meta.env.BASE_URL} mandatory>
+            <ResourceApiProvider apiUrl={getEnvApiUrl()} userSessionActive>
+                <ThemeProvider theme={theme}>
+                    <CssBaseline />
+                    <BrowserRouter basename={import.meta.env.BASE_URL}>
+                        <App />
+                    </BrowserRouter>
+                </ThemeProvider>
+            </ResourceApiProvider>
+        </AuthProvider>
+    </React.StrictMode>
 );

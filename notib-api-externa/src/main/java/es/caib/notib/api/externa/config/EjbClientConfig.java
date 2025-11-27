@@ -6,6 +6,7 @@ package es.caib.notib.api.externa.config;
 import es.caib.notib.logic.intf.service.AdviserService;
 import es.caib.notib.logic.intf.service.CieAdviserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWarDeployment;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.ejb.access.LocalStatelessSessionProxyFactoryBean;

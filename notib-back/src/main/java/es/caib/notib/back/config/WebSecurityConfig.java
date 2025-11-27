@@ -14,8 +14,8 @@ import org.springframework.security.access.expression.method.DefaultMethodSecuri
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.authority.mapping.SimpleAttributes2GrantedAuthoritiesMapper;
 import org.springframework.security.core.authority.mapping.SimpleMappableAttributesRetriever;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
@@ -85,6 +85,9 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 				logoutSuccessUrl("/"));
 		http.authorizeHttpRequests().
 				requestMatchers(publicRequestMatchers()).permitAll();
+		if (!isJboss()) {
+			http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
+		}
 		super.customHttpSecurityConfiguration(http);
 	}
 
@@ -110,7 +113,7 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 	}
 	@Override
 	protected boolean isOauth2ResourceServerActive() {
-		return false;
+		return !isJboss();
 	}
 	@Override
 	protected boolean isOauth2ClientActive() {
@@ -118,10 +121,8 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 	}
 
 	@Override
-	protected List<GrantedAuthority> getAllowedRoles() {
-		return Arrays.stream(mappableRoles.split(",")).
-				map(r -> new SimpleGrantedAuthority(r.trim())).
-				collect(Collectors.toList());
+	protected Set<String> getAllowedRoles() {
+		return Arrays.stream(mappableRoles.split(",")).collect(Collectors.toSet());
 	}
 
 	@Value("${jboss.home.dir:#{null}}")

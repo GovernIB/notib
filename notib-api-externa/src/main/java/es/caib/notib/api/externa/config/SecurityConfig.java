@@ -15,6 +15,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -48,7 +49,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Profile("!boot")
 @Slf4j
 @Configuration
 @EnableWebSecurity
@@ -62,23 +62,23 @@ public class SecurityConfig {
 	private static final String ROLE_PREFIX = "";
 
 	private static final String[] AUTH_WHITELIST = {
-			"/swagger-resources/**",
-			"/swagger-ui/**",
+			"/webjars/**",
 			"/rest",
 			"/api/rest",
+			"/api/rest/appinfo",
 			"/adviser/entrega/postal",
 			"/adviser/entrega/postal/**",
-			"/api/rest/appinfo",
+			"/swagger-resources/**",
+			"/swagger-ui/**",
 			"/api-docs",
-			"/api-docs/**",
-			"/webjars/**"
+			"/api-docs/**"
 	};
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		return http
 				.cors(withDefaults())
-				.csrf((csrf) -> csrf.disable())
+				.csrf(AbstractHttpConfigurer::disable)
 //				.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
 				.addFilterBefore(preAuthenticatedProcessingFilter(), BasicAuthenticationFilter.class)
 				.authenticationProvider(preauthAuthProvider())

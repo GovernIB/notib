@@ -94,14 +94,22 @@ public class WebMvcConfig extends BaseWebMvcConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
-		registry.
+		/*registry.
 				addMapping("/**").
-				allowedOrigins("*").
-				allowCredentials(false).
-				maxAge(3600).
+				allowedOrigins("http://localhost:5173", "http://localhost:8080").
+				allowCredentials(true).
 				allowedHeaders("Accept", "Content-Type", "Origin", "Authorization", "X-Auth-Token").
 				exposedHeaders("X-Auth-Token", "Authorization").
-				allowedMethods("POST", "GET", "DELETE", "PUT", "OPTIONS");
+				allowedMethods("POST", "GET", "DELETE", "PUT", "OPTIONS");*/
+				/*allowedMethods("*").
+				allowedHeaders("*").
+				allowedMethods("POST", "GET", "DELETE", "PUT", "OPTIONS");*/
+		registry.
+				addMapping("/**").
+				allowedOrigins("http://localhost:5173", "http://localhost:8080").
+				allowCredentials(true).
+				allowedHeaders("*").
+				allowedMethods("*");
 	}
 
 	@Bean
@@ -137,6 +145,8 @@ public class WebMvcConfig extends BaseWebMvcConfig implements WebMvcConfigurer {
 	private static final String[] INTERCEPTOR_EXCLUSIONS = 	{
 			"/reactapp",
 			"/reactapp/**",
+			"/sysenv",
+			"/manifest",
 			"/js/**",
 			"/css/**",
 			"/fonts/**",
@@ -155,8 +165,6 @@ public class WebMvcConfig extends BaseWebMvcConfig implements WebMvcConfigurer {
 			"/notificacio/refrescarEstatNotifica/estat",
 			"/notificacio/procedimentsOrgan",
 			"/notificacio/serveisOrgan",
-            "/sysenv",
-            "/manifest",
 			"/error",
 			"/**/monitor/tasques"};
 	private static final String[] ALL_EXCLUSIONS = {"/js/**", "/css/**", "/fonts/**", "/img/**", "/images/**", "/extensions/**", "/webjars/**", "/**/datatable/**", "/**/selection/**", "/api/rest/**", "/api/apidoc**", "/api-docs/**", "/**/api-docs/", "/api/consulta/**", "/api/services/**", "/usuari/configuracio/**"};

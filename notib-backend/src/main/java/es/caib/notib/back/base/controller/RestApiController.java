@@ -28,7 +28,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Hidden
 @RestController
-@RequestMapping(BaseConfig.API_PATH + "2")
+@RequestMapping(BaseConfig.API_PATH)
 public class RestApiController {
 
 	@Autowired

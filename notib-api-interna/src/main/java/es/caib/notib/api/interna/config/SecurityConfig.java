@@ -48,7 +48,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Profile("!boot")
 @Slf4j
 @Configuration
 @EnableWebSecurity
