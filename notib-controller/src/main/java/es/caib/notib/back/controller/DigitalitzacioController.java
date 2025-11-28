@@ -1,24 +1,14 @@
 package es.caib.notib.back.controller;
 
-import com.itextpdf.xmp.impl.Utils;
-import es.caib.notib.back.helper.ExceptionHelper;
 import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.logic.intf.dto.escaneig.DigitalitzacioPerfil;
 import es.caib.notib.logic.intf.dto.escaneig.DigitalitzacioResultat;
 import es.caib.notib.logic.intf.dto.escaneig.DigitalitzacioTransaccioResposta;
-import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.DigitalitzacioService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,7 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Slf4j
