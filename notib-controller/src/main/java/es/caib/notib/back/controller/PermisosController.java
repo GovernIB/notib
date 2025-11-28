@@ -28,7 +28,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.text.ParseException;
+import java.util.List;
 
 @Slf4j
 @Controller
@@ -72,7 +73,7 @@ public class PermisosController extends BaseUserController {
 //            RequestSessionHelper.actualitzarObjecteSessio(request, ACCIO_MASSIVA_ID, command.getId());
 //        }
         RequestSessionHelper.actualitzarObjecteSessio(request, PERMISOS_USUARIS_FILTRE, command);
-        model.addAttribute("seleccio", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO));
+//        model.addAttribute("seleccio", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO));
 //        model.addAttribute("tipusAccions", EnumHelper.getOptionsForEnum(AccioMassivaTipus.class, "es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaTipus."));
 //        model.addAttribute("elementEstats", EnumHelper.getOptionsForEnum(AccioMassivaElementEstat.class, "es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaElementEstat."));
         model.addAttribute("permisosUsuarisFiltreCommand", command);
@@ -140,5 +141,10 @@ public class PermisosController extends BaseUserController {
         filtreCommand = new PermisosUsuarisFiltreCommand();
         RequestSessionHelper.actualitzarObjecteSessio(request, PERMISOS_USUARIS_FILTRE, filtreCommand);
         return filtreCommand;
+    }
+
+    @Override
+    protected List<Long> getIdsElementsFiltrats(HttpServletRequest request) throws ParseException {
+        return List.of();
     }
 }
