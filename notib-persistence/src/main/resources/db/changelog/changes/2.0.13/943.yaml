@@ -1,0 +1,47 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - sql: "UPDATE NOT_CONFIG SET DESCRIPTION = 'Interval de temps entre les execucions de la tasca d''enviaments DEH (ms)' WHERE key = 'es.caib.notib.tasca.enviament.deh.actualitzacio.certificacio.periode';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Temps d''espera per executar la tasca per primera vegada un cop arrencat el servidor dels enviaments DEH (ms)' WHERE key = 'es.caib.notib.tasca.enviament.deh.actualitzacio.certificacio.retard.inicial';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Interval de temps entre les execucions de la tasca d''enviaments CIE (ms)' WHERE key = 'es.caib.notib.tasca.enviament.cie.actualitzacio.certificacio.periode';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Temps d''espera per executar la tasca per primera vegada un cop arrencat el servidor dels enviaments CIE (ms)' WHERE key = 'es.caib.notib.tasca.enviament.cie.actualitzacio.certificacio.retard.inicial';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Tipus de comunicació de la plataforma (sincron/asincron)' WHERE key = 'es.caib.notib.comunicacio.tipus.defecte';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Llenguatge predeterminat de l''aplicació (ca/es)' WHERE key = 'es.caib.notib.default.user.language';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Indica si l''enviament massiu s''ha de prioritzar perquè s''enviï el més aviat possible o si ha de tenir una prioritat inferior a la resta de notificacions' WHERE key = 'es.caib.notib.documents.metadades.from.arxiu';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Indica si s''han de fer servir valors per defecte quan el document no té metadades o quan no s''envien metadades en la crida a l''API REST d''alta notificació' WHERE key = 'es.caib.notib.document.metadades.por.defecto';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Temps d''espera per executar la tasca per primera vegada un cop arrencat el servidor (ms)' WHERE key = 'es.caib.notib.tasca.registre.enviaments.retard.inicial';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Temps d''espera per executar la tasca per primera vegada un cop arrencat el servidor (ms)' WHERE key = 'es.caib.notib.tasca.notifica.enviaments.retard.inicial';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Temps d''espera per executar la tasca per primera vegada un cop arrencat el servidor (ms)' WHERE key = 'es.caib.notib.tasca.enviament.actualitzacio.estat.retard.inicial';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Temps d''espera per executar la tasca per primera vegada un cop arrencat el servidor (ms)' WHERE key = 'es.caib.notib.tasca.enviament.actualitzacio.estat.registre.retard.inicial';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Temps d''espera per executar la tasca per primera vegada un cop arrencat el servidor (ms)' WHERE key = 'es.caib.notib.tasca.callback.pendents.retard.inicial';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Especificar l''expressió ''cron'' indicant l''interval de temps per refrescar les notificacions expirades' WHERE key = 'es.caib.notib.refrescar.notificacions.expirades.cron';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Segons que hi pot haver entre peticions per obtenir justificant al registre' WHERE key = 'es.caib.notib.plugin.registre.segons.entre.peticions';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Versió de notifica a utilitzar: 0 (Mock) 1 o 2 (Notifica)' WHERE key = 'es.caib.notib.notifica.versio';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Url de Notific@' WHERE key = 'es.caib.notib.notifica.url';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Url de SEDE de Notific@' WHERE key = 'es.caib.notib.notifica.sede.url';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Usuari de notific@' WHERE key = 'es.caib.notib.notifica.username';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Password de notific@' WHERE key = 'es.caib.notib.notifica.password';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Ruta de la imatge per a usar a la capsalera com a logo de l''aplicació per defecte' WHERE key = 'es.caib.notib.capsalera.logo';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Ruta de la imatge per a usar al peu com a logo de l''aplicació per defecte' WHERE key = 'es.caib.notib.peu.logo';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Color del fons de l''aplicació a usar per defecte' WHERE key = 'es.caib.notib.capsalera.color.fons';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Color de la lletra de l''aplicació a usar per defecte' WHERE key = 'es.caib.notib.capsalera.color.lletra';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Direcció postal a mostrar al justificant' WHERE key = 'es.caib.notib.justificant.capsalera.direccio';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'NIF a mostrar al justificant' WHERE key = 'es.caib.notib.justificant.capsalera.nif';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Codi a mostrar al justificant' WHERE key = 'es.caib.notib.justificant.capsalera.codi';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Correu electrònic a mostrar al justificant' WHERE key = 'es.caib.notib.justificant.capsalera.email';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Text a mostrar al peu del justificant' WHERE key = 'es.caib.notib.justificant.peu.titol';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Path del logo a mostrar al peu del justificant' WHERE key = 'es.caib.notib.justificant.peu.logo';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Path del logo a mostrar a la capçalera del justificant' WHERE key = 'es.caib.notib.justificant.capsalera.logo';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Classe per a accedir a les unitats organitzatives' WHERE key = 'es.caib.notib.plugin.unitats.class';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Classe per a accedir al contingut administratiu' WHERE key = 'es.caib.notib.plugin.gesconadm.class';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Classe per a gestionar la firma del servidor' WHERE key = 'es.caib.notib.plugin.firmaservidor.class';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Expressió ''cron'' indicant la freqüencia en que s''han d''actualitzar els serveis' WHERE key = 'es.caib.notib.actualitzacio.serveis.cron';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Boolea indicant si es vol mostrar només les remeses dels tres últims mesos' WHERE key = 'es.caib.notib.filtre.remeses.last.3.month';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Expressió ''cron'' indicant la freqüencia en que s''han generar les dades estadístiques' WHERE key = 'es.caib.notib.generar.dades.explotacio.cron';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Mostrar logs de la digitalitzacio de documents' WHERE key = 'es.caib.notib.log.tipus.DIGITALITZACIO';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Nombre màxim de vegades que es reintentarà un enviament de callback erroni' WHERE key = 'es.caib.notib.tasca.callback.pendents.notifica.events.intents.max';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Nombre màxim de vegades que es reintentarà un enviament SIR a registre erroni' WHERE key = 'es.caib.notib.tasca.enviament.actualitzacio.estat.registre.reintents.maxim';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Nombre màxim de vegades que es reintentarà un enviament erroni a Notific@' WHERE key = 'es.caib.notib.tasca.notifica.enviaments.reintents.maxim';
+UPDATE NOT_CONFIG SET DESCRIPTION = 'Nombre màxim de vegades que es reintentarà una consulta d''estat d''enviament errònia a Notific@' WHERE key = 'es.caib.notib.tasca.enviament.actualitzacio.estat.reintents.maxim';"
