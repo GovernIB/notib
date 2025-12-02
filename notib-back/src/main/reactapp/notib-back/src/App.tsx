@@ -1,50 +1,54 @@
 import { useTranslation } from 'react-i18next';
-import { BaseApp } from './components/BaseApp';
+import { useTheme, useColorScheme } from '@mui/material/styles';
 import logo from './assets/goib_logo.svg';
-import notibLogo from './assets/notib_logo.png'; // TODO Cambiar por SVG
+import notibLogo from './assets/notib_logo.png';
+import { BaseApp } from './components/BaseApp';
 import AppRoutes from './AppRoutes';
 
 const version = '0.0.0';
 
 export const App = () => {
+    const { mode } = useColorScheme();
+    if (!mode) {
+        return null;
+    }
     const { t } = useTranslation();
-    const menuEnviaments = {
-        id: 'enviamentResource',
+    const menuEntries = [{
+        id: 'home',
+        title: t('menu.home'),
+        to: 'home',
+        icon: 'home'
+    }, {
+        id: 'enviament',
         title: t('menu.enviament'),
         to: '/enviament',
-        icon: 'monitor_heart',
+        icon: 'mail_outline',
         resourceName: 'enviamentResource',
-    };
-    const menuEntries = [
-        menuEnviaments,
-    ];
-    const appMenuEntries = [
-        menuEnviaments,
-    ];
+    }];
+    const theme = useTheme();
+    const bgColor = theme.palette.background.paper;
+    const textColor = theme.palette.getContrastText(bgColor);
     return (
         <BaseApp
             code="not"
             logo={logo}
             logoStyle={{
-                '& img': { height: '38px' },
-                pl: 2,
+                '& img': { height: '45px' },
+                pl: '15px',
                 pr: 4,
-                mr: 4,
-                borderRight: '2px solid #000',
+                borderRight: '1px solid ' + theme.palette.divider,
             }}
             title={
                 <img
-                    style={{ height: '64px', verticalAlign: 'middle' }}
+                    style={{ marginLeft: '16px', height: '54px', verticalAlign: 'middle' }}
                     src={notibLogo}
-                    alt="Logo de l'aplicació de Notib"
-                />
+                    alt="Notib" />
             }
             version={version}
             availableLanguages={['ca', 'es']}
             menuEntries={menuEntries}
-            appMenuEntries={appMenuEntries}
-            appbarBackgroundColor="#fff"
-        >
+            appbarBackgroundColor={bgColor}
+            appbarStyle={{ color: textColor }}>
             <AppRoutes />
         </BaseApp>
     );

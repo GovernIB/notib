@@ -1,100 +1,52 @@
 import React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
 import { useBaseAppContext } from 'reactlib';
 
-type LanguageOptionProps = {
+const TYPOGRAPHY_VARIANT = 'h6';
+
+const allLanguages = [{
+    locale: 'ca',
+    name: 'Català'
+}, {
+    locale: 'es',
+    name: 'Castellà'
+}];
+
+export type LanguageItem = {
     locale: string;
-    label: string;
-    isActive: boolean;
-    onClick: () => void;
-    sx?: any;
-};
-
-const LanguageOption: React.FC<LanguageOptionProps> = ({ label, isActive, onClick, sx }) => {
-
-    return (
-        <Typography
-            sx={{
-                fontWeight: isActive ? 'bold' : 'normal',
-                fontSize: '18px',
-                '&:hover': {
-                    cursor: isActive ? 'default' : 'pointer',
-                    textDecoration: isActive ? 'none' : 'underline',
-                },
-                ...sx
-            }}
-            onClick={isActive ? undefined : onClick}
-        >
-            {label}
-        </Typography>
-    );
-};
+    name: string;
+} & any;
 
 type HeaderLanguageSelectorProps = {
-    languages?: string[];
+    languages?: LanguageItem[];
     onLanguageChange?: (language?: string) => void;
-    sx?: any;
-    optionSx?: any;
-};
+} & any;
 
 const HeaderLanguageSelector: React.FC<HeaderLanguageSelectorProps> = (props) => {
     const {
         languages,
         onLanguageChange,
-        sx,
-        optionSx,
         ...otherProps
     } = props;
-
+    const { sx: otherSx, ...otherOtherProps } = otherProps;
     const { currentLanguage, setCurrentLanguage } = useBaseAppContext();
-
     React.useEffect(() => {
         onLanguageChange?.(currentLanguage);
-    }, [currentLanguage, onLanguageChange]);
-
-    const changeLanguage = (locale: string) => {
-        setCurrentLanguage(locale);
-    };
-
-    // Get the two-character language code
-    const currentLanguageTwoChars = currentLanguage?.substring(0, 2).toLowerCase();
-
-    if (!languages || languages.length === 0) {
-        return null;
-    }
-
-    return (
-        <Box
-            sx={{
-                display: "flex",
-                gap: 1,
-                mr: 4,
-                color: "black",
-                ...sx
-            }}
-            {...otherProps}
-        >
-            {languages.map((language: string, index: number) => {
-                const languageTwoChars = language.substring(0, 2).toLowerCase();
-                const isLast = index === languages.length - 1;
-
-                return (
-                    <React.Fragment key={language}>
-                        <LanguageOption
-                            locale={language}
-                            label={languageTwoChars.toUpperCase()}
-                            isActive={currentLanguageTwoChars === languageTwoChars}
-                            onClick={() => changeLanguage(language)}
-                            sx={optionSx}
-                        />
-                        {!isLast && <Divider orientation="vertical" flexItem />}
-                    </React.Fragment>
-                );
-            })}
-        </Box>
-    );
-};
+    }, [currentLanguage]);
+    return languages ? <Box sx={{ ...otherSx, display: 'flex' }} {...otherOtherProps}>
+        {allLanguages?.map((l: LanguageItem, i: number) => <React.Fragment key={l.locale}>
+            {currentLanguage === l.locale ? <Typography
+                variant={TYPOGRAPHY_VARIANT}
+                sx={{ fontWeight: 'bold' }}>{l.locale.toUpperCase()}</Typography> : <Typography
+                    variant={TYPOGRAPHY_VARIANT}
+                    onClick={() => setCurrentLanguage(l.locale)}
+                    sx={{ cursor: 'pointer', fontWeight: '400' }}>
+                {l.locale.toUpperCase()}
+            </Typography>}
+            {i < allLanguages.length - 1 && <Typography key={'locale_sep_' + i} variant={TYPOGRAPHY_VARIANT} sx={{ mx: 1 }}>|</Typography>}
+        </React.Fragment>)}
+    </Box> : null;
+}
 
 export default HeaderLanguageSelector;

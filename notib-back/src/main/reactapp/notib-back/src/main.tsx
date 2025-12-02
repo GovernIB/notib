@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@emotion/react';
@@ -8,7 +8,8 @@ import theme from './theme';
 import App from './App.tsx';
 import {
     envVar,
-    OidcAuthProvider as AuthProvider,
+    OidcAuthProvider,
+    ContainerAuthProvider,
     ResourceApiProvider
 } from 'reactlib';
 
@@ -56,9 +57,16 @@ export const getEnvApiUrl = () => {
     }
 };
 
+const isAuthUrlPresent = envVar('VITE_AUTH_URL', envVars) != null;
+const AuthProvider = isAuthUrlPresent ? OidcAuthProvider : ContainerAuthProvider;
+
 createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
-        <AuthProvider config={getAuthConfig()} appBaseUrl={import.meta.env.BASE_URL} mandatory>
+        <AuthProvider
+            appBaseUrl={import.meta.env.BASE_URL}
+            logoutUrl={import.meta.env.BASE_URL}
+            config={getAuthConfig()}
+            mandatory>
             <ResourceApiProvider apiUrl={getEnvApiUrl()} userSessionActive>
                 <ThemeProvider theme={theme}>
                     <CssBaseline />

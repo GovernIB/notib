@@ -9,7 +9,6 @@ import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.PermisDto;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto;
 import es.caib.notib.logic.intf.dto.TipusEnumDto;
-import es.caib.notib.persist.acl.NotibMutableAclService;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.ProcSerOrganEntity;
 import es.caib.notib.persist.entity.acl.AclClassEntity;
@@ -31,14 +30,7 @@ import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
 import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.jdbc.LookupStrategy;
-import org.springframework.security.acls.model.AccessControlEntry;
-import org.springframework.security.acls.model.Acl;
-import org.springframework.security.acls.model.AclCache;
-import org.springframework.security.acls.model.MutableAcl;
-import org.springframework.security.acls.model.NotFoundException;
-import org.springframework.security.acls.model.ObjectIdentity;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.acls.model.Sid;
+import org.springframework.security.acls.model.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -74,7 +66,7 @@ public class PermisosHelper {
 	@Resource
 	private LookupStrategy lookupStrategy;
 	@Resource
-	private NotibMutableAclService aclService;
+	private MutableAclService aclService;
 	@Autowired
 	private CacheBridge cacheBridge;
 	@Autowired
@@ -91,6 +83,8 @@ public class PermisosHelper {
 	private AclCache aclCache;
 	@Resource
 	private MessageHelper messageHelper;
+	@Resource
+	private AclHelper aclHelper;
 
 
 	public void assignarPermisUsuari(String userName, Long objectIdentifier, Class<?> objectClass, Permission permission) {
@@ -371,7 +365,6 @@ public class PermisosHelper {
 		}
 	}
 	public void deletePermis(Long objectIdentifier, Class<?> objectClass, Long permisId) {
-
 		try {
 			var oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
 			var acl = (MutableAcl)aclService.readAclById(oid);
@@ -379,14 +372,23 @@ public class PermisosHelper {
 			for (var ace: acl.getEntries()) {
 				if (permisId.equals(ace.getId())) {
 					sid = ace.getSid(); 
-					assignarPermisos(ace.getSid(), objectClass, objectIdentifier, new Permission[] {}, true);
+					//assignarPermisos(ace.getSid(), objectClass, objectIdentifier, new Permission[] {}, true);
 					break;
 				}
 			}
-			// asseguram que s'eliminin de BBDD!!
+			boolean sidGrantedAuthority = sid instanceof GrantedAuthoritySid;
+			String sidName = sidGrantedAuthority ?
+					((GrantedAuthoritySid)sid).getGrantedAuthority() :
+					((PrincipalSid)sid).getPrincipal();
+			aclHelper.delete(
+					objectClass,
+					objectIdentifier,
+					sidName,
+					sidGrantedAuthority);
+			/*// asseguram que s'eliminin de BBDD!!
 			if (sid != null) {
 				aclService.deleteEntries(oid, sid);
-			}
+			}*/
 		} catch (NotFoundException nfex) {
 			log.error("Permis no trobat", nfex);
 		}

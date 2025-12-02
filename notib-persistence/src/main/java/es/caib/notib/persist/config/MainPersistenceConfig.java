@@ -39,6 +39,7 @@ public class MainPersistenceConfig extends BasePersistenceConfig {
 	protected String[] getEntityPackages() {
 		return new String[] {
 				BaseConfig.BASE_PACKAGE + ".persist.entity",
+				BaseConfig.BASE_PACKAGE + ".persist.resourceentity",
 				"org.springframework.statemachine.data.jpa"
 		};
 	}

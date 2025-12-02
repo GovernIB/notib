@@ -1,6 +1,5 @@
 package es.caib.notib.persist.entity.resourceentity;
 
-import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.model.EnviamentResource;
 import es.caib.notib.persist.base.entity.BaseAuditableEntity;
 import lombok.Getter;
@@ -9,7 +8,6 @@ import lombok.Setter;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "NOT_NOTIFICACIO_ENV_TABLE")

@@ -1,30 +1,25 @@
 import React from 'react';
 import {
-    Link as RouterLink,
-    LinkProps as RouterLinkProps,
+    useNavigate,
     useLocation,
-    useNavigate
+    Link as RouterLink,
+    type LinkProps as RouterLinkProps,
 } from 'react-router-dom';
+import i18n from '../i18n/i18n';
 import { useTranslation } from 'react-i18next';
-import Button from '@mui/material/Button';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import Box from '@mui/material/Box';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import 'dayjs/locale/ca';
+import 'dayjs/locale/es';
 import {
-    DefaultMuiComponentProps,
-    MenuEntry,
     MuiBaseApp,
+    type MenuEntry,
     useBaseAppContext,
     useResourceApiContext,
 } from 'reactlib';
-import AppMenu from './AppMenu';
-import Footer from './Footer';
+import HeaderThemeSelector from './HeaderThemeSelector';
 import HeaderLanguageSelector from './HeaderLanguageSelector';
-import theme from '../theme';
-import i18n from '../i18n/i18n';
-import drassana from '../assets/drassana.png';
-import 'dayjs/locale/ca';
-import 'dayjs/locale/es';
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
@@ -39,20 +34,39 @@ export type BaseAppProps = React.PropsWithChildren & {
     code: string;
     logo?: string;
     logoStyle?: any;
-    title: string | React.ReactElement;
+    title?: string | React.ReactElement;
+    title_logo?: string;
     version: string;
     availableLanguages?: string[];
     menuEntries?: MenuEntryWithResource[];
-    appMenuEntries?: MenuEntryWithResource[];
     appbarBackgroundColor?: string;
     appbarBackgroundImg?: string;
     appbarStyle?: any;
-    defaultMuiComponentProps?: DefaultMuiComponentProps;
 };
 
-const Link = React.forwardRef<HTMLAnchorElement, RouterLinkProps>((itemProps, ref) => {
+
+export const Link = React.forwardRef<HTMLAnchorElement, RouterLinkProps>((itemProps, ref) => {
     return <RouterLink ref={ref} {...itemProps} role={undefined} />;
 });
+
+const useBaseAppMenuEntries = (menuEntries?: MenuEntryWithResource[]) => {
+    const [processedMenuEntries, setprocessedMenuEntries] = React.useState<MenuEntry[]>();
+    const { isReady: apiIsReady, indexState: apiIndex } = useResourceApiContext();
+    React.useEffect(() => {
+        if (apiIsReady) {
+            const apiLinks = apiIndex?.links.getAll();
+            const resourceNames = apiLinks?.map((l: any) => l.rel);
+            const processedMenuEntries = menuEntries?.
+                filter(e => e?.resourceName == null || resourceNames?.includes(e.resourceName)).
+                map(e => {
+                    const { resourceName, ...otherProps } = e;
+                    return otherProps;
+                });
+            setprocessedMenuEntries(processedMenuEntries);
+        }
+    }, [apiIsReady, apiIndex]);
+    return processedMenuEntries;
+}
 
 const useLocationPath = () => {
     const location = useLocation();
@@ -78,92 +92,6 @@ const CustomLocalizationProvider = ({ children }: React.PropsWithChildren) => {
     </LocalizationProvider>;
 }
 
-// Entrades independents del menú (sempre visibles si hi ha baseAppMenuEntries)
-const generateMenuItems = (appMenuEntries: MenuEntryWithResource[] | undefined) => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const { indexState: apiIndex } = useResourceApiContext();
-    const filteredAppMenuEntries = appMenuEntries?.filter(e => e.resourceName == null || apiIndex?.links.has(e.resourceName));
-    return filteredAppMenuEntries?.length
-        ? filteredAppMenuEntries.map((entry) => (
-            <Button
-                className="appMenuItem"
-                key={entry.id}
-                component={Link}
-                to={entry.to ?? ''} // Navegació amb React Router
-                sx={{
-                    color: theme.palette.text.primary,
-                    display: { xs: 'none', md: 'inline' },
-                    mr: 1,
-                    textTransform: 'none',
-                    '&:hover': {
-                        textDecoration: 'underline',
-                        '--variant-containedBg': '#fff',
-                        '--variant-textBg': '#fff',
-                        '--variant-outlinedBg': '#fff',
-                    }
-                }}>
-                {entry.title}
-            </Button>
-        ))
-        : [];
-}
-// Selector d'idioma (només si hi ha idiomes disponibles)
-const generateLanguageItems = (availableLanguages: string[] | undefined) => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const isLgUp = useMediaQuery(theme.breakpoints.up("lg"));
-    return availableLanguages?.length && isLgUp
-        ? [
-            <HeaderLanguageSelector
-                sx={{ ml: { xs: 1, md: '42px' } }}
-                key="sel_lang"
-                languages={availableLanguages}
-            />,
-        ]
-        : [];
-}
-// Menú general
-const generateAppMenu = (menuEntries: MenuEntryWithResource[] | undefined) => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const { indexState: apiIndex } = useResourceApiContext();
-    const filteredMenuEntries = menuEntries?.filter(e => e.resourceName == null || apiIndex?.links.has(e.resourceName));
-    return filteredMenuEntries?.length
-        ? [<AppMenu key="app_menu" menuEntries={filteredMenuEntries} />]
-        : [];
-}
-
-const generateFooter = () => {
-    return (
-        <>
-            <div style={{ height: '36px', flexShrink: 0, width: '100%' }} />
-            <Footer
-                title="NOTIB"
-                backgroundColor="#5F5D5D"
-                logos={[drassana]}
-                style={{ position: 'fixed', height: '36px', bottom: 0, width: '100%' }}
-                // style={{display: 'flex', flexDirection: 'row', flexShrink: 0, position: 'sticky', height: '36px', bottom: 0, width: '100%'}}
-            />
-        </>
-    );
-};
-
-const useI18n = () => {
-    // const { user } = useUserContext();
-    // const currentUserLanguage = user?.idioma.toLowerCase();
-    const currentUserLanguage = i18n.language;
-    const i18nHandleLanguageChange = (language?: string) => {
-        i18n.changeLanguage(language);
-    }
-    const i18nAddResourceBundleCallback = (language: string, namespace: string, bundle: any) => {
-        i18n.addResourceBundle(language, namespace, bundle);
-    }
-    return {
-        i18nUseTranslation: useTranslation,
-        i18nCurrentLanguage: currentUserLanguage ?? i18n.language,
-        i18nHandleLanguageChange,
-        i18nAddResourceBundleCallback,
-    }
-}
-
 export const BaseApp: React.FC<BaseAppProps> = (props) => {
     const {
         code,
@@ -173,21 +101,20 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         version,
         availableLanguages,
         menuEntries,
-        appMenuEntries,
         appbarBackgroundColor,
         appbarBackgroundImg,
         appbarStyle,
-        defaultMuiComponentProps,
         children
     } = props;
     const navigate = useNavigate();
     const location = useLocation();
-    const {
-        i18nUseTranslation,
-        i18nCurrentLanguage,
-        i18nHandleLanguageChange,
-        i18nAddResourceBundleCallback,
-    } = useI18n();
+    const baseAppMenuEntries = useBaseAppMenuEntries(menuEntries);
+    const i18nHandleLanguageChange = (language?: string) => {
+        i18n.changeLanguage(language);
+    }
+    const i18nAddResourceBundleCallback = (language: string, namespace: string, bundle: any) => {
+        i18n.addResourceBundle(language, namespace, bundle);
+    }
     const anyHistoryEntryExist = () => location.key !== 'default';
     const goBack = (fallback?: string) => {
         if (anyHistoryEntryExist()) {
@@ -195,28 +122,30 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         } else if (fallback != null) {
             navigate(fallback);
         } else {
-            console.warn('[BACK] No s\'ha pogut tornar enrere, ni s\'ha especificat una ruta alternativa ni existeix una entrada prèvia a l\'historial de navegació');
+            console.warn('[BACK] Couldn\'t go back, neither fallback specified nor previous entry exists in navigation history');
         }
     }
     return <MuiBaseApp
         code={code}
         headerTitle={title}
-        headerVersion={version}
         headerLogo={logo}
         headerLogoStyle={logoStyle}
+        headerVersion={version}
+        headerAppbarStyle={appbarStyle}
         headerAppbarBackgroundColor={appbarBackgroundColor}
         headerAppbarBackgroundImg={appbarBackgroundImg}
-        headerAppbarStyle={appbarStyle}
-        headerAdditionalComponents={[
-            ...generateMenuItems(menuEntries), // Menú
-            ...generateLanguageItems(availableLanguages), // Idioma
-            ...generateAppMenu(appMenuEntries), // Menú lateral
-        ]}
-        footer={generateFooter()}
+        headerAdditionalAuthComponents={availableLanguages?.length ? [
+            /*<Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
+                <HeaderThemeSelector />
+            </Box>,*/
+            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
+                <HeaderLanguageSelector key="sel_lang" languages={availableLanguages} />
+            </Box>
+        ] : undefined}
         persistentSession
         persistentLanguage
-        i18nUseTranslation={i18nUseTranslation}
-        i18nCurrentLanguage={i18nCurrentLanguage}
+        i18nUseTranslation={useTranslation}
+        i18nCurrentLanguage={i18n.language}
         i18nHandleLanguageChange={i18nHandleLanguageChange}
         i18nAddResourceBundleCallback={i18nAddResourceBundleCallback}
         routerGoBack={goBack}
@@ -224,9 +153,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         routerUseLocationPath={useLocationPath}
         routerAnyHistoryEntryExist={anyHistoryEntryExist}
         linkComponent={Link}
-        defaultMuiComponentProps={defaultMuiComponentProps}
-        fixedContentExpandsToAvailableHeight
-    >
+        menuEntries={baseAppMenuEntries}>
         <CustomLocalizationProvider>
             {children}
         </CustomLocalizationProvider>

@@ -1,17 +1,15 @@
-package es.caib.notib.logic.base.config;
+package es.caib.notib.logic.config;
 
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configuració de cache.
+ * Configuració de la cache.
  * 
  * @author Límit Tecnologies
  */
 @Configuration
 @EnableCaching
 public class CacheConfig {
-
-	public static final String ACL_CACHE_NAME = "aclCache";
 
 }
