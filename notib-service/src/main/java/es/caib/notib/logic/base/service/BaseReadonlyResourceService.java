@@ -1,5 +1,6 @@
 package es.caib.notib.logic.base.service;
 
+import es.caib.notib.logic.base.helper.BasePermissionHelper;
 import es.caib.notib.logic.base.helper.JasperReportsHelper;
 import es.caib.notib.logic.base.helper.ObjectMappingHelper;
 import es.caib.notib.logic.base.helper.ResourceEntityMappingHelper;
@@ -20,12 +21,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.ResolvableType;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -52,21 +57,42 @@ import java.util.stream.IntStream;
 public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID extends Serializable, E extends ResourceEntity<R, ID>>
 		implements ReadonlyResourceService<R, ID> {
 
-	@Autowired
 	protected BaseRepository<E, ID> entityRepository;
+
+	@Autowired
+	protected ApplicationContext applicationContext;
 	@Autowired
 	protected ObjectMappingHelper objectMappingHelper;
 	@Autowired
 	protected JasperReportsHelper jasperReportsHelper;
 	@Autowired
 	protected ResourceEntityMappingHelper resourceEntityMappingHelper;
+	@Autowired
+	protected BasePermissionHelper permissionHelper;
 
 	private Class<R> resourceClass;
+	private Class<ID> pkClass;
 	private Class<E> entityClass;
+
 	private final Map<String, ReportGenerator<E, ?, ? extends Serializable>> reportGeneratorMap = new HashMap<>();
 	private final Map<String, FilterProcessor<?>> filterProcessorMap = new HashMap<>();
 	private final Map<String, PerspectiveApplicator<E, R>> perspectiveApplicatorMap = new HashMap<>();
 	private final Map<String, FieldDownloader<E>> fieldDownloaderMap = new HashMap<>();
+
+	@PostConstruct
+	public void initRepository() {
+		Class<E> entityClass = getEntityClass();
+		Class<ID> pkClass = getPkClass();
+		ResolvableType type = ResolvableType.forClassWithGenerics(BaseRepository.class, entityClass, pkClass);
+		String[] beanNames = ((DefaultListableBeanFactory)applicationContext.getAutowireCapableBeanFactory()).getBeanNamesForType(type);
+		if (beanNames.length == 0) {
+			if (!isEntityRepositoryOptional()) {
+				throw new IllegalStateException("Couldn't find BaseRepository<" + entityClass + ", " + pkClass + ">");
+			}
+		} else {
+			entityRepository = (BaseRepository<E, ID>) applicationContext.getBean(beanNames[0]);
+		}
+	}
 
 	@Override
 	@Transactional(readOnly = true)
@@ -75,7 +101,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			String[] perspectives) throws ResourceNotFoundException {
 		log.debug("Getting single resource (id={}, perspectives={})", id, perspectives);
 		beforeGetOne(perspectives);
-		E entity = getEntity(id, perspectives);
+		E entity = getEntity(id);
 		beforeConversion(entity);
 		R response = entityToResource(entity);
 		afterConversion(entity, response);
@@ -108,7 +134,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 				filter,
 				namedQueries,
 				pageable);
-		Page<E> resultat = internalFindEntities(
+		Page<E> resultat = entityRepositoryFindEntities(
 				quickFilter,
 				filter,
 				namedQueries,
@@ -162,7 +188,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 				filter,
 				namedQueries,
 				pageable);
-		Page<E> resultat = internalFindEntities(
+		Page<E> resultat = entityRepositoryFindEntities(
 				quickFilter,
 				filter,
 				namedQueries,
@@ -201,7 +227,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			FieldDownloader<E> fieldDownloader = fieldDownloaderMap.get(fieldName);
 			if (fieldDownloader != null) {
 				return fieldDownloader.download(
-						getEntity(id, null),
+						getEntity(id),
 						fieldName,
 						out);
 			} else {
@@ -220,9 +246,13 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		if (type == null || type == ResourceArtifactType.PERSPECTIVE) {
 			artifacts.addAll(
 					perspectiveApplicatorMap.keySet().stream().
-							map(pa -> new es.caib.notib.logic.intf.base.model.ResourceArtifact(
+							filter(code -> permissionHelper.checkResourceArtifactPermission(
+									getResourceClass(),
 									ResourceArtifactType.PERSPECTIVE,
-									pa,
+									code)).
+							map(code -> new es.caib.notib.logic.intf.base.model.ResourceArtifact(
+									ResourceArtifactType.PERSPECTIVE,
+									code,
 									null,
 									null)).
 							collect(Collectors.toList()));
@@ -230,6 +260,10 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		if (type == null || type == ResourceArtifactType.REPORT) {
 			artifacts.addAll(
 					reportGeneratorMap.keySet().stream().
+							filter(code -> permissionHelper.checkResourceArtifactPermission(
+									getResourceClass(),
+									ResourceArtifactType.REPORT,
+									code)).
 							map(code -> new es.caib.notib.logic.intf.base.model.ResourceArtifact(
 									ResourceArtifactType.REPORT,
 									code,
@@ -240,6 +274,10 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		if (type == null || type == ResourceArtifactType.FILTER) {
 			artifacts.addAll(
 					artifactGetFilterAll().stream().
+							filter(f -> permissionHelper.checkResourceArtifactPermission(
+									getResourceClass(),
+									ResourceArtifactType.FILTER,
+									f.code())).
 							map(f -> new es.caib.notib.logic.intf.base.model.ResourceArtifact(
 									ResourceArtifactType.FILTER,
 									f.code(),
@@ -252,33 +290,53 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 
 	@Override
 	@Transactional(readOnly = true)
-	public es.caib.notib.logic.intf.base.model.ResourceArtifact artifactGetOne(ResourceArtifactType type, String code) throws ArtifactNotFoundException {
+	public es.caib.notib.logic.intf.base.model.ResourceArtifact artifactGetOne(
+			ResourceArtifactType type,
+			String code) throws ArtifactNotFoundException {
 		log.debug("Querying artifact form class (type={}, code={})", type, code);
 		if (type == ResourceArtifactType.PERSPECTIVE) {
 			PerspectiveApplicator<?, ?> perspectiveApplicator = perspectiveApplicatorMap.get(code);
 			if (perspectiveApplicator != null) {
-				return new es.caib.notib.logic.intf.base.model.ResourceArtifact(
+				boolean allowed = permissionHelper.checkResourceArtifactPermission(
+						getResourceClass(),
 						ResourceArtifactType.PERSPECTIVE,
-						code,
-						null,
-						null);
+						code);
+				if (allowed) {
+					return new es.caib.notib.logic.intf.base.model.ResourceArtifact(
+							ResourceArtifactType.PERSPECTIVE,
+							code,
+							null,
+							null);
+				}
 			}
 		} else if (type == ResourceArtifactType.REPORT) {
 			ReportGenerator<E, ?, ?> reportGenerator = reportGeneratorMap.get(code);
 			if (reportGenerator != null) {
-				return new es.caib.notib.logic.intf.base.model.ResourceArtifact(
+				boolean allowed = permissionHelper.checkResourceArtifactPermission(
+						getResourceClass(),
 						ResourceArtifactType.REPORT,
-						code,
-						artifactRequiresId(ResourceArtifactType.REPORT, code),
-						artifactGetFormClass(ResourceArtifactType.REPORT, code));
+						code);
+				if (allowed) {
+					return new es.caib.notib.logic.intf.base.model.ResourceArtifact(
+							ResourceArtifactType.REPORT,
+							code,
+							artifactRequiresId(ResourceArtifactType.REPORT, code),
+							artifactGetFormClass(ResourceArtifactType.REPORT, code));
+				}
 			}
 		} else if (type == ResourceArtifactType.FILTER) {
 			if (artifactIsPresentInResourceConfig(type, code)) {
-				return new es.caib.notib.logic.intf.base.model.ResourceArtifact(
+				boolean allowed = permissionHelper.checkResourceArtifactPermission(
+						getResourceClass(),
 						ResourceArtifactType.FILTER,
-						code,
-						null,
-						artifactGetFormClass(ResourceArtifactType.FILTER, code));
+						code);
+				if (allowed) {
+					return new es.caib.notib.logic.intf.base.model.ResourceArtifact(
+							ResourceArtifactType.FILTER,
+							code,
+							null,
+							artifactGetFormClass(ResourceArtifactType.FILTER, code));
+				}
 			}
 		}
 		throw new ArtifactNotFoundException(getResourceClass(), type, code);
@@ -370,9 +428,22 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		if (generator != null) {
 			E entity = null;
 			if (id != null) {
-				entity = getEntity(id, null);
+				entity = getEntity(id);
 			}
-			return generator.generateData(code, entity, params);
+			try {
+				return generator.generateData(code, entity, params);
+			} catch (ActionExecutionException ex) {
+				throw ex;
+			} catch (Exception ex) {
+				ReportGenerationException rgex = new ReportGenerationException(
+						getResourceClass(),
+						id,
+						code,
+						"",
+						ex);
+				log.error(rgex.getMessage(), ex);
+				throw rgex;
+			}
 		} else {
 			throw new ArtifactNotFoundException(getResourceClass(), ResourceArtifactType.REPORT, code);
 		}
@@ -388,96 +459,65 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		log.debug("Generating report file (code={}, data={}, fileType={})", code, data, fileType);
 		ReportGenerator<E, ?, ?> generator = reportGeneratorMap.get(code);
 		if (generator != null) {
-			DownloadableFile downloadableFile = generator.generateFile(code, data, fileType, out);
-			if (downloadableFile != null) {
-				return downloadableFile;
-			} else {
-				URL reportUrl = generator.getJasperReportUrl(code, fileType);
-				if (reportUrl != null) {
-					return jasperReportsHelper.generate(
-							getResourceClass(),
-							code,
-							reportUrl,
-							data,
-							LocaleContextHolder.getLocale(),
-							null,
-							fileType,
-							out);
+			try {
+				DownloadableFile downloadableFile = generator.generateFile(code, data, fileType, out);
+				if (downloadableFile != null) {
+					return downloadableFile;
 				} else {
-					throw new ReportGenerationException(
-							getResourceClass(),
-							null,
-							code,
-							"Couldn't generate report file: both generateFile and getJasperReportUrl methods returned null (fileType=" + fileType + ")");
+					URL reportUrl = generator.getJasperReportUrl(code, fileType);
+					if (reportUrl != null) {
+						return jasperReportsHelper.generate(
+								getResourceClass(),
+								code,
+								reportUrl,
+								data,
+								LocaleContextHolder.getLocale(),
+								null,
+								fileType,
+								out);
+					} else {
+						throw new ReportGenerationException(
+								getResourceClass(),
+								null,
+								code,
+								"Couldn't generate report file: both generateFile and getJasperReportUrl methods returned null (fileType=" + fileType + ")");
+					}
 				}
+			} catch (ActionExecutionException ex) {
+				throw ex;
+			} catch (Exception ex) {
+				ReportGenerationException rgex = new ReportGenerationException(
+						getResourceClass(),
+						null,
+						code,
+						"",
+						ex);
+				log.error(rgex.getMessage(), ex);
+				throw rgex;
 			}
+
 		} else {
 			throw new ArtifactNotFoundException(getResourceClass(), ResourceArtifactType.REPORT, code);
 		}
 	}
 
-	protected E getEntity(ID id, String[] perspectives) throws ResourceNotFoundException {
-		Specification<E> processedSpecification = new PkSpec<>(id);
-		String additionalSpringFilter = additionalSpringFilter(null, null);
-		processedSpecification = appendSpecificationWithAnd(
-				processedSpecification,
-				getSpringFilterSpecification(additionalSpringFilter));
-		Specification<E> additionalSpecification = additionalSpecification(null);
-		processedSpecification = appendSpecificationWithAnd(processedSpecification, additionalSpecification);
-		Optional<E> result = entityRepository.findOne(processedSpecification);
+	protected E getEntity(ID id) throws ResourceNotFoundException {
+		Optional<E> result = entityRepositoryFindOne(id);
 		if (result.isPresent()) {
 			return result.get();
 		} else {
 			String idToString = id != null ? id.toString() : "<null>";
 			String idMessage = idToString;
+			String additionalSpringFilter = additionalSpringFilter(null, null);
+			Specification<E> additionalSpecification = additionalSpecification(null);
 			if (additionalSpringFilter != null && !additionalSpringFilter.trim().isEmpty()) {
 				idMessage = "{" +
 						"id=" + idToString + ", " +
 						"springFilter=" + additionalSpringFilter + ", " +
-						"specification=" + processedSpecification + "}";
+						"additionalSpecification=" + additionalSpecification + "}";
 			}
 			throw new ResourceNotFoundException(getResourceClass(), idMessage);
 		}
-	}
-
-	protected Page<E> internalFindEntities(
-			String quickFilter,
-			String filter,
-			String[] namedFilters,
-			Pageable pageable) {
-		Page<E> resultat;
-		Specification<E> processedSpecification = toProcessedSpecification(
-				quickFilter,
-				filter,
-				namedFilters);
-		if (processedSpecification != null) {
-			log.debug("Consulta amb specification (specification={})", processedSpecification);
-			if (pageable.isUnpaged()) {
-				Sort processedSort = toProcessedSort(
-						addDefaultSort(pageable.getSort()));
-				List<E> resultList = entityRepository.findAll(
-						processedSpecification,
-						processedSort);
-				resultat = new PageImpl<E>(resultList, pageable, resultList.size());
-			} else {
-				Pageable processedPageable = toProcessedPageableSort(pageable);
-				resultat = entityRepository.findAll(
-						processedSpecification,
-						processedPageable);
-			}
-		} else {
-			log.debug("Consulta sense specification");
-			if (pageable.isUnpaged()) {
-				Sort processedSort = toProcessedSort(
-						addDefaultSort(pageable.getSort()));
-				List<E> resultList = entityRepository.findAll(processedSort);
-				resultat = new PageImpl<>(resultList, pageable, resultList.size());
-			} else {
-				Pageable processedPageable = toProcessedPageableSort(pageable);
-				resultat = entityRepository.findAll(processedPageable);
-			}
-		}
-		return resultat;
 	}
 
 	protected R entityToResource(E entity) {
@@ -522,99 +562,6 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 				throw new ArtifactNotFoundException(getResourceClass(), ResourceArtifactType.PERSPECTIVE, p);
 			}
 		});
-	}
-
-	protected <P> Specification<P> toProcessedSpecification(
-			String quickFilter,
-			String filter,
-			String[] namedFilters) {
-		Specification<P> processedSpecification = getSpringFilterSpecification(
-				buildSpringFilterForQuickFilter(
-						getResourceClass(),
-						null,
-						quickFilter));
-		processedSpecification = appendSpecificationWithAnd(
-				processedSpecification,
-				getSpringFilterSpecification(filter));
-		processedSpecification = appendSpecificationWithAnd(
-				processedSpecification,
-				getSpringFilterSpecification(
-						additionalSpringFilter(filter, namedFilters)));
-		processedSpecification = appendSpecificationWithAnd(
-				processedSpecification,
-				(Specification<P>)additionalSpecification(namedFilters));
-		if (namedFilters != null) {
-			for (String namedFilter: namedFilters) {
-				Specification<P> namedSpecification = null;
-				String namedSpringFilter = namedFilterToSpringFilter(namedFilter);
-				if (namedSpringFilter != null) {
-					namedSpecification = getSpringFilterSpecification(namedSpringFilter);
-				} else {
-					namedSpecification = namedFilterToSpecification(namedFilter);
-				}
-				processedSpecification = appendSpecificationWithAnd(
-						processedSpecification,
-						namedSpecification);
-			}
-		}
-		Specification<P> finalSpecification = processSpecification(processedSpecification);
-		return finalSpecification != null ? finalSpecification : Specification.where(null);
-	}
-
-	protected <P> Specification<P> getSpringFilterSpecification(String springFilter) {
-		if (springFilter != null) {
-			return new FilterSpecification<P>(springFilter);
-		} else {
-			return null;
-		}
-	}
-
-	protected <P> Specification<P> appendSpecificationWithAnd(
-			Specification<P> currentSpecification,
-			Specification<P> specification) {
-		if (specification != null) {
-			if (currentSpecification != null) {
-				return currentSpecification.and(specification);
-			} else {
-				return specification;
-			}
-		} else {
-			return currentSpecification;
-		}
-	}
-
-	protected String buildSpringFilterForQuickFilter(
-			Class<? extends Resource<?>> resourceClass,
-			String prefix,
-			String quickFilter) {
-		ResourceConfig resourceConfigAnnotation = resourceClass.getAnnotation(ResourceConfig.class);
-		if (quickFilter != null) {
-			String[] quickFilterFields = quickFilterGetFieldsFromResourceClass(resourceClass);
-			if (quickFilterFields != null) {
-				log.debug(
-						"Construint filtre Spring Filter per quickFilter (resourceClass={}, quickFilter={})",
-						getResourceClass(),
-						quickFilter);
-				StringBuilder quickFilterSpringFilter = new StringBuilder();
-				for (String quickFilterField : resourceConfigAnnotation.quickFilterFields()) {
-					String springFilter = getSpringFilterFromQuickFilterPath(
-							quickFilterField.split("\\."),
-							resourceClass,
-							quickFilterField,
-							quickFilter,
-							prefix);
-					if (springFilter != null) {
-						appendSpringFilter(
-								quickFilterSpringFilter,
-								springFilter,
-								" or ");
-					}
-				}
-				log.debug("Filtre Spring Filter resultant: {}", quickFilterSpringFilter);
-				return quickFilterSpringFilter.toString();
-			}
-		}
-		return null;
 	}
 
 	protected List<SortedField> getResourceDefaultSortFields(Class<?> resourceClass) {
@@ -821,6 +768,16 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		return resourceClass;
 	}
 
+	protected Class<ID> getPkClass() {
+		if (pkClass == null) {
+			pkClass = TypeUtil.getArgumentClassFromGenericSuperclass(
+					getClass(),
+					BaseReadonlyResourceService.class,
+					1);
+		}
+		return pkClass;
+	}
+
 	protected Class<E> getEntityClass() {
 		if (entityClass == null) {
 			entityClass = TypeUtil.getArgumentClassFromGenericSuperclass(
@@ -913,6 +870,142 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		fieldDownloaderMap.put(fieldName, fieldDownloader);
 	}
 
+	protected boolean isEntityRepositoryOptional() {
+		return false;
+	}
+
+	protected Optional<E> entityRepositoryFindOne(ID id) {
+		Specification<E> specification = toGetOneProcessedSpecification(id);
+		return entityRepository.findOne(specification);
+	}
+
+	protected Page<E> entityRepositoryFindEntities(
+			String quickFilter,
+			String filter,
+			String[] namedQueries,
+			Pageable pageable) {
+		Specification<E> specification = toFindProcessedSpecification(
+				quickFilter,
+				filter,
+				namedQueries);
+		log.debug("Consulta amb specification ({})", specification);
+		Sort processedSort = toProcessedSort(pageable.getSort());
+		if (pageable.isUnpaged()) {
+			List<E> resultList = entityRepository.findAll(specification, processedSort);
+			return new PageImpl<>(resultList, pageable, resultList.size());
+		} else {
+			Pageable processedPageable = PageRequest.of(
+					pageable.getPageNumber(),
+					pageable.getPageSize(),
+					processedSort);
+			return entityRepository.findAll(specification, processedPageable);
+		}
+	}
+
+	protected Specification<E> toGetOneProcessedSpecification(ID id) {
+		Specification<E> processedSpecification = new PkSpec<>(id);
+		String additionalSpringFilter = additionalSpringFilter(null, null);
+		processedSpecification = appendSpecificationWithAnd(
+				processedSpecification,
+				getSpringFilterSpecification(additionalSpringFilter));
+		return appendSpecificationWithAnd(
+				processedSpecification,
+				additionalSpecification(null));
+	}
+
+	protected <P> Specification<P> toFindProcessedSpecification(
+			String quickFilter,
+			String filter,
+			String[] namedFilters) {
+		Specification<P> processedSpecification = getSpringFilterSpecification(
+				buildSpringFilterForQuickFilter(
+						getResourceClass(),
+						null,
+						quickFilter));
+		processedSpecification = appendSpecificationWithAnd(
+				processedSpecification,
+				getSpringFilterSpecification(filter));
+		processedSpecification = appendSpecificationWithAnd(
+				processedSpecification,
+				getSpringFilterSpecification(
+						additionalSpringFilter(filter, namedFilters)));
+		processedSpecification = appendSpecificationWithAnd(
+				processedSpecification,
+				(Specification<P>)additionalSpecification(namedFilters));
+		if (namedFilters != null) {
+			for (String namedFilter: namedFilters) {
+				Specification<P> namedSpecification;
+				String namedSpringFilter = namedFilterToSpringFilter(namedFilter);
+				if (namedSpringFilter != null) {
+					namedSpecification = getSpringFilterSpecification(namedSpringFilter);
+				} else {
+					namedSpecification = namedFilterToSpecification(namedFilter);
+				}
+				processedSpecification = appendSpecificationWithAnd(
+						processedSpecification,
+						namedSpecification);
+			}
+		}
+		Specification<P> finalSpecification = processSpecification(processedSpecification);
+		return finalSpecification != null ? finalSpecification : Specification.where(null);
+	}
+
+	protected <P> Specification<P> getSpringFilterSpecification(String springFilter) {
+		if (springFilter != null) {
+			return new FilterSpecification<>(springFilter);
+		} else {
+			return null;
+		}
+	}
+
+	protected <P> Specification<P> appendSpecificationWithAnd(
+			Specification<P> currentSpecification,
+			Specification<P> specification) {
+		if (specification != null) {
+			if (currentSpecification != null) {
+				return currentSpecification.and(specification);
+			} else {
+				return specification;
+			}
+		} else {
+			return currentSpecification;
+		}
+	}
+
+	protected String buildSpringFilterForQuickFilter(
+			Class<? extends Resource<?>> resourceClass,
+			String prefix,
+			String quickFilter) {
+		ResourceConfig resourceConfigAnnotation = resourceClass.getAnnotation(ResourceConfig.class);
+		if (quickFilter != null) {
+			String[] quickFilterFields = quickFilterGetFieldsFromResourceClass(resourceClass);
+			if (quickFilterFields != null) {
+				log.debug(
+						"Construint filtre Spring Filter per quickFilter (resourceClass={}, quickFilter={})",
+						getResourceClass(),
+						quickFilter);
+				StringBuilder quickFilterSpringFilter = new StringBuilder();
+				for (String quickFilterField : resourceConfigAnnotation.quickFilterFields()) {
+					String springFilter = getSpringFilterFromQuickFilterPath(
+							quickFilterField.split("\\."),
+							resourceClass,
+							quickFilterField,
+							quickFilter,
+							prefix);
+					if (springFilter != null) {
+						appendSpringFilter(
+								quickFilterSpringFilter,
+								springFilter,
+								" or ");
+					}
+				}
+				log.debug("Filtre Spring Filter resultant: {}", quickFilterSpringFilter);
+				return quickFilterSpringFilter.toString();
+			}
+		}
+		return null;
+	}
+
 	protected Boolean artifactRequiresId(ResourceArtifactType type, String code) {
 		ResourceConfig resourceConfig = getResourceClass().getAnnotation(ResourceConfig.class);
 		if (resourceConfig != null && (type == ResourceArtifactType.ACTION || type == ResourceArtifactType.REPORT)) {
@@ -944,10 +1037,10 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			String code) {
 		ResourceConfig resourceConfig = getResourceClass().getAnnotation(ResourceConfig.class);
 		if (resourceConfig != null) {
-			Optional<ResourceArtifact> artifacts = Arrays.stream(resourceConfig.artifacts()).
+			Optional<ResourceArtifact> artifact = Arrays.stream(resourceConfig.artifacts()).
 					filter(a -> a.type() == type && a.code().equals(code)).
 					findFirst();
-			return artifacts.isPresent();
+			return artifact.isPresent();
 		} else {
 			return false;
 		}
@@ -964,18 +1057,9 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		}
 	}
 
-	private Pageable toProcessedPageableSort(Pageable pageable) {
-		return PageRequest.of(
-				pageable.getPageNumber(),
-				pageable.getPageSize(),
-				toProcessedSort(
-						addDefaultSort(pageable.getSort())));
-	}
-
-	private Sort toProcessedSort(
-			Sort sort) {
+	protected Sort toProcessedSort(Sort sort) {
 		Sort resultSort;
-		Sort protectedProcessedSort = processSort(sort);
+		Sort protectedProcessedSort = processSort(addDefaultSort(sort));
 		if (protectedProcessedSort != null) {
 			log.debug("\tProcessant ordenació " + protectedProcessedSort);
 			if (protectedProcessedSort.isSorted()) {

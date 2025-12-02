@@ -45,19 +45,19 @@ public class ResourceApiService implements es.caib.notib.logic.intf.base.service
 		boolean isReadGranted = permissionHelper.checkResourcePermission(
 				resourceId,
 				resourceClass.getName(),
-				(BasePermission)BasePermission.READ);
+				new BasePermission[] { (BasePermission)BasePermission.READ });
 		boolean isWriteGranted = permissionHelper.checkResourcePermission(
 				resourceId,
 				resourceClass.getName(),
-				(BasePermission)BasePermission.WRITE);
+				new BasePermission[] { (BasePermission)BasePermission.WRITE });
 		boolean isCreateGranted = permissionHelper.checkResourcePermission(
 				resourceId,
 				resourceClass.getName(),
-				(BasePermission)BasePermission.CREATE);
+				new BasePermission[] { (BasePermission)BasePermission.CREATE });
 		boolean isDeleteGranted = permissionHelper.checkResourcePermission(
 				resourceId,
 				resourceClass.getName(),
-				(BasePermission)BasePermission.DELETE);
+				new BasePermission[] { (BasePermission)BasePermission.DELETE });
 		return new ResourcePermissions(
 				isReadGranted,
 				isWriteGranted,

@@ -21,5 +21,6 @@ public @interface ResourceArtifact {
 	String code();
 	boolean requiresId() default false;
 	Class<? extends Serializable> formClass() default Serializable.class;
+	ResourceAccessConstraint[] accessConstraints() default {};
 
 }
