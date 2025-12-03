@@ -434,7 +434,8 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 					+ (enviament.getTitular().getLlinatge1() != null ? " " + enviament.getTitular().getLlinatge1() : "")
 					+ (enviament.getTitular().getLlinatge2() != null ? " " + enviament.getTitular().getLlinatge2() : ""));
 			datat.setOrigen("electronico");
-			datat.setResultado("expirada");
+//			datat.setResultado("expirada");
+			datat.setResultado("pendent");
 			datats.getDatado().add(datat);
 			resultat.setDatados(datats);
 			var certificacio = new Certificacion();
