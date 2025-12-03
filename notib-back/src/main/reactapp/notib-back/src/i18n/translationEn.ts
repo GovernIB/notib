@@ -1,7 +1,8 @@
 const translationEn = {
     menu: {
         home: "Home",
-        enviament: "Deliveries",
+        entitats: "Entities",
+        enviaments: "Deliveries",
     },
     page: {
         notFound: "Not found",

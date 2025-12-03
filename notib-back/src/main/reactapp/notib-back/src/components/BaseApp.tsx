@@ -135,11 +135,11 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         headerAppbarBackgroundColor={appbarBackgroundColor}
         headerAppbarBackgroundImg={appbarBackgroundImg}
         headerAdditionalAuthComponents={[
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 2 }}>
-                <HeaderLanguageSelector key="sel_lang" languages={availableLanguages} />
+            <Box key="sel_lang" sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 2 }}>
+                <HeaderLanguageSelector languages={availableLanguages} />
             </Box>,
-            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                <HeaderThemeModeSelector key="sel_theme_mode" />
+            <Box key="sel_theme_mode" sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                <HeaderThemeModeSelector />
             </Box>
         ]}
         persistentSession

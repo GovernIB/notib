@@ -1,7 +1,8 @@
 const translationCa = {
     menu: {
         home: "Inici",
-        enviament: "Enviaments",
+        entitats: "Entitats",
+        enviaments: "Enviaments",
     },
     page: {
         notFound: "No trobat",

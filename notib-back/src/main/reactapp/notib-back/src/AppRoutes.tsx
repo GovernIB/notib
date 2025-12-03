@@ -8,7 +8,8 @@ const AppRoutes = () => {
         <Routes>
             <Route index element={<HomePage />} />
             <Route path="*" element={<NotFoundPage />} />
-            <Route path="enviament" element={<Enviaments />} />
+            <Route path="entitats" element={<Enviaments />} />
+            <Route path="enviaments" element={<Enviaments />} />
         </Routes>
     );
 };
