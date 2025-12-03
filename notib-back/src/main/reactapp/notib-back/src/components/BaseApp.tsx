@@ -18,7 +18,7 @@ import {
     useBaseAppContext,
     useResourceApiContext,
 } from 'reactlib';
-import HeaderThemeSelector from './HeaderThemeSelector';
+import HeaderThemeModeSelector from './HeaderThemeModeSelector';
 import HeaderLanguageSelector from './HeaderLanguageSelector';
 
 export type MenuEntryWithResource = MenuEntry & {
@@ -134,14 +134,14 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         headerAppbarStyle={appbarStyle}
         headerAppbarBackgroundColor={appbarBackgroundColor}
         headerAppbarBackgroundImg={appbarBackgroundImg}
-        headerAdditionalAuthComponents={availableLanguages?.length ? [
-            /*<Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
-                <HeaderThemeSelector />
-            </Box>,*/
-            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
+        headerAdditionalAuthComponents={[
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 2 }}>
                 <HeaderLanguageSelector key="sel_lang" languages={availableLanguages} />
+            </Box>,
+            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                <HeaderThemeModeSelector key="sel_theme_mode" />
             </Box>
-        ] : undefined}
+        ]}
         persistentSession
         persistentLanguage
         i18nUseTranslation={useTranslation}

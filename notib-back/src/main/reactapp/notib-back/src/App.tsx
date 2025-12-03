@@ -1,7 +1,9 @@
 import { useTranslation } from 'react-i18next';
 import { useTheme, useColorScheme } from '@mui/material/styles';
-import logo from './assets/goib_logo.svg';
-import notibLogo from './assets/notib_logo.png';
+import goibLogoLight from './assets/goib_logo_light.svg';
+import goibLogoDark from './assets/goib_logo_dark.svg';
+import notibLogoLight from './assets/notib_logo_light.png';
+import notibLogoDark from './assets/notib_logo_dark.png';
 import { BaseApp } from './components/BaseApp';
 import AppRoutes from './AppRoutes';
 
@@ -31,17 +33,17 @@ export const App = () => {
     return (
         <BaseApp
             code="not"
-            logo={logo}
+            logo={mode === 'light' ? goibLogoLight : goibLogoDark}
             logoStyle={{
-                '& img': { height: '45px' },
-                pl: '15px',
-                pr: 4,
+                '& img': { height: '49px' },
+                pl: 1,
+                pr: '29px',
                 borderRight: '1px solid ' + theme.palette.divider,
             }}
             title={
                 <img
-                    style={{ marginLeft: '16px', height: '54px', verticalAlign: 'middle' }}
-                    src={notibLogo}
+                    style={{ marginLeft: '8px', height: '49px', verticalAlign: 'middle' }}
+                    src={mode === 'light' ? notibLogoLight : notibLogoDark}
                     alt="Notib" />
             }
             version={version}

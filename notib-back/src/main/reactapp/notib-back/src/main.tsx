@@ -1,9 +1,9 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import { ThemeProvider } from '@emotion/react';
 import { CssBaseline } from '@mui/material';
 import { LicenseInfo } from '@mui/x-license';
+import { ThemeProvider } from '@mui/material/styles';
 import theme from './theme';
 import App from './App.tsx';
 import {
@@ -67,7 +67,7 @@ createRoot(document.getElementById('root')!).render(
             logoutUrl={import.meta.env.BASE_URL}
             config={getAuthConfig()}
             mandatory>
-            <ResourceApiProvider apiUrl={getEnvApiUrl()} userSessionActive>
+            <ResourceApiProvider apiUrl={getEnvApiUrl()}>
                 <ThemeProvider theme={theme}>
                     <CssBaseline />
                     <BrowserRouter basename={import.meta.env.BASE_URL}>
