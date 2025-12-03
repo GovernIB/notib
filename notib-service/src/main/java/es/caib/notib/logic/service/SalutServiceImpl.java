@@ -116,7 +116,6 @@ public class SalutServiceImpl implements SalutService {
         var estatSalut = checkEstatSalut(performanceUrl);   // Estat
         var salutDatabase = checkDatabase();                // Base de dades
         var integracions = checkIntegracions();             // Integracions
-        var altres = checkAltres();                         // Altres
         var missatges = checkMissatges();                   // Missatges
 
         SubsistemesHelper.SubsistemesInfo subsistemesInfo = SubsistemesHelper.getSubsistemesInfo();
@@ -137,7 +136,6 @@ public class SalutServiceImpl implements SalutService {
                 .bd(salutDatabase)
                 .integracions(integracions)
                 .subsistemes(subsistemes)
-                .altres(altres)
                 .missatges(missatges)
                 .build();
     }
@@ -231,27 +229,27 @@ public class SalutServiceImpl implements SalutService {
         return integracionsSalut;
     }
 
-    public List<DetallSalut> checkAltres() {
-
-        OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
-        // Nombre de cores (CPU)
-        var availableProcessors = osBean.getAvailableProcessors();
-        var os = osBean.getName() + " " + osBean.getVersion() + " (" + osBean.getArch() + ")";
-
-        try {
-
-            var systemCpuLoad = "No disponible";
-            var processCpuLoad = "No disponible";
-
-            loadSigarNativeLibs();
-            Sigar sigar = new Sigar();
-
-            // Informació sobre CPU
-            CpuPerc cpu = sigar.getCpuPerc();
-            systemCpuLoad = CpuPerc.format(cpu.getCombined());
-            processCpuLoad = CpuPerc.format(sigar.getProcCpu(sigar.getPid()).getPercent());
-            // Informació sobre Memòria
-            Mem memory = sigar.getMem();
+//    public List<DetallSalut> checkAltres() {
+//
+//        OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
+//        // Nombre de cores (CPU)
+//        var availableProcessors = osBean.getAvailableProcessors();
+//        var os = osBean.getName() + " " + osBean.getVersion() + " (" + osBean.getArch() + ")";
+//
+//        try {
+//
+//            var systemCpuLoad = "No disponible";
+//            var processCpuLoad = "No disponible";
+//
+//            loadSigarNativeLibs();
+//            Sigar sigar = new Sigar();
+//
+//            // Informació sobre CPU
+//            CpuPerc cpu = sigar.getCpuPerc();
+//            systemCpuLoad = CpuPerc.format(cpu.getCombined());
+//            processCpuLoad = CpuPerc.format(sigar.getProcCpu(sigar.getPid()).getPercent());
+//            // Informació sobre Memòria
+//            Mem memory = sigar.getMem();
             // Informació sobre Disc
 //            var totalSpace = 0L;
 //            var freeSpace = 0L;
@@ -265,17 +263,17 @@ public class SalutServiceImpl implements SalutService {
 //                }
 //            }
 
-            var totalSpace = "";
-            var freeSpace = "";
-            for (var root : File.listRoots()) {
-                totalSpace = MonitorHelper.humanReadableByteCount(root.getTotalSpace());
-                freeSpace = MonitorHelper.humanReadableByteCount(root.getFreeSpace());
-            }
-
-            System.out.println("CPU User Time: " + CpuPerc.format(cpu.getUser()));
-            System.out.println("CPU System Time: " + CpuPerc.format(cpu.getSys()));
-            System.out.println("CPU Idle Time: " + CpuPerc.format(cpu.getIdle()));
-            System.out.println("CPU Combined: " + CpuPerc.format(cpu.getCombined()));
+//            var totalSpace = "";
+//            var freeSpace = "";
+//            for (var root : File.listRoots()) {
+//                totalSpace = MonitorHelper.humanReadableByteCount(root.getTotalSpace());
+//                freeSpace = MonitorHelper.humanReadableByteCount(root.getFreeSpace());
+//            }
+//
+//            System.out.println("CPU User Time: " + CpuPerc.format(cpu.getUser()));
+//            System.out.println("CPU System Time: " + CpuPerc.format(cpu.getSys()));
+//            System.out.println("CPU Idle Time: " + CpuPerc.format(cpu.getIdle()));
+//            System.out.println("CPU Combined: " + CpuPerc.format(cpu.getCombined()));
 
 //            return List.of(
 //                    DetallSalut.builder().codi("PRC").nom("Processadors").valor(String.valueOf(Runtime.getRuntime().availableProcessors())).build(),
@@ -286,51 +284,51 @@ public class SalutServiceImpl implements SalutService {
 //                    DetallSalut.builder().codi("EDT").nom("Espai de disc total").valor(humanReadableByteCount(totalSpace)).build(),
 //                    DetallSalut.builder().codi("EDL").nom("Espai de disc lliure").valor(humanReadableByteCount(freeSpace)).build(),
 //                    DetallSalut.builder().codi("SO").nom("Sistema operatiu").valor(os).build());
-            return List.of(
-                    DetallSalut.builder().codi("PRC").nom("Processadors").valor(String.valueOf(Runtime.getRuntime().availableProcessors())).build(),
-                    DetallSalut.builder().codi("SCPU").nom("Càrrega del sistema").valor(MonitorHelper.getCPULoad()).build(), // TODO REVISAR AMB EL MONITOR DE SISTEMA
-                    DetallSalut.builder().codi("PCPU").nom("Càrrega del procés").valor(processCpuLoad).build(),
-                    DetallSalut.builder().codi("MED").nom("Memòria disponible").valor(MonitorHelper.humanReadableByteCount(Runtime.getRuntime().freeMemory())).build(),
-                    DetallSalut.builder().codi("MET").nom("Memòria total").valor(MonitorHelper.humanReadableByteCount(Runtime.getRuntime().totalMemory())).build(),
-                    DetallSalut.builder().codi("EDT").nom("Espai de disc total").valor(totalSpace).build(),
-                    DetallSalut.builder().codi("EDL").nom("Espai de disc lliure").valor(freeSpace).build(),
-                    DetallSalut.builder().codi("SO").nom("Sistema operatiu").valor(os).build());
-
-        } catch (Exception e) {
-            log.error("No s'ha pogut obtenir informació del sistema utilitzant la llibreria Sigar", e);
-            try {
-                // Càrrega de la CPU (només per la implementació de Sun)
-                if (osBean instanceof com.sun.management.OperatingSystemMXBean) {
-                    com.sun.management.OperatingSystemMXBean sunOsBean = (com.sun.management.OperatingSystemMXBean) osBean;
-                    var systemCpuLoad = sunOsBean.getSystemCpuLoad() * 100 + "%";
-                    var processCpuLoad = sunOsBean.getProcessCpuLoad() * 100 + "%";
-
-                    var totalSpace = 0L;
-                    var freeSpace = 0L;
-                    for (var root : File.listRoots()) {
-                        if (root.getTotalSpace() > totalSpace) {
-                            totalSpace = root.getTotalSpace();
-                            freeSpace = root.getFreeSpace();
-                        }
-                    }
-
-                    return List.of(
-                            DetallSalut.builder().codi("PRC").nom("Processadors").valor(String.valueOf(Runtime.getRuntime().availableProcessors())).build(),
-                            DetallSalut.builder().codi("CPU").nom("Càrrega del sistema").valor(systemCpuLoad).build(),
-                            DetallSalut.builder().codi("CPU").nom("Càrrega del procés").valor(processCpuLoad).build(),
-                            DetallSalut.builder().codi("MED").nom("Memòria disponible").valor((Runtime.getRuntime().maxMemory() == Long.MAX_VALUE ? "Ilimitada" : humanReadableByteCount(Runtime.getRuntime().maxMemory()))).build(),
-                            DetallSalut.builder().codi("MET").nom("Memòria total").valor(humanReadableByteCount(Runtime.getRuntime().totalMemory())).build(),
-                            DetallSalut.builder().codi("EDT").nom("Espai de disc total").valor(humanReadableByteCount(totalSpace)).build(),
-                            DetallSalut.builder().codi("EDL").nom("Espai de disc lliure").valor(humanReadableByteCount(freeSpace)).build(),
-                            DetallSalut.builder().codi("SO").nom("Sistema operatiu").valor(os).build()
-                    );
-                }
-            } catch (Exception e2) {
-                log.error("Salut: No s'ha pogut obtenir informació del sistema amb la implementació de Sun", e2);
-            }
-            return null;
-        }
-    }
+//            return List.of(
+//                    DetallSalut.builder().codi("PRC").nom("Processadors").valor(String.valueOf(Runtime.getRuntime().availableProcessors())).build(),
+//                    DetallSalut.builder().codi("SCPU").nom("Càrrega del sistema").valor(MonitorHelper.getCPULoad()).build(), // TODO REVISAR AMB EL MONITOR DE SISTEMA
+//                    DetallSalut.builder().codi("PCPU").nom("Càrrega del procés").valor(processCpuLoad).build(),
+//                    DetallSalut.builder().codi("MED").nom("Memòria disponible").valor(MonitorHelper.humanReadableByteCount(Runtime.getRuntime().freeMemory())).build(),
+//                    DetallSalut.builder().codi("MET").nom("Memòria total").valor(MonitorHelper.humanReadableByteCount(Runtime.getRuntime().totalMemory())).build(),
+//                    DetallSalut.builder().codi("EDT").nom("Espai de disc total").valor(totalSpace).build(),
+//                    DetallSalut.builder().codi("EDL").nom("Espai de disc lliure").valor(freeSpace).build(),
+//                    DetallSalut.builder().codi("SO").nom("Sistema operatiu").valor(os).build());
+//
+//        } catch (Exception e) {
+//            log.error("No s'ha pogut obtenir informació del sistema utilitzant la llibreria Sigar", e);
+//            try {
+//                // Càrrega de la CPU (només per la implementació de Sun)
+//                if (osBean instanceof com.sun.management.OperatingSystemMXBean) {
+//                    com.sun.management.OperatingSystemMXBean sunOsBean = (com.sun.management.OperatingSystemMXBean) osBean;
+//                    var systemCpuLoad = sunOsBean.getSystemCpuLoad() * 100 + "%";
+//                    var processCpuLoad = sunOsBean.getProcessCpuLoad() * 100 + "%";
+//
+//                    var totalSpace = 0L;
+//                    var freeSpace = 0L;
+//                    for (var root : File.listRoots()) {
+//                        if (root.getTotalSpace() > totalSpace) {
+//                            totalSpace = root.getTotalSpace();
+//                            freeSpace = root.getFreeSpace();
+//                        }
+//                    }
+//
+//                    return List.of(
+//                            DetallSalut.builder().codi("PRC").nom("Processadors").valor(String.valueOf(Runtime.getRuntime().availableProcessors())).build(),
+//                            DetallSalut.builder().codi("CPU").nom("Càrrega del sistema").valor(systemCpuLoad).build(),
+//                            DetallSalut.builder().codi("CPU").nom("Càrrega del procés").valor(processCpuLoad).build(),
+//                            DetallSalut.builder().codi("MED").nom("Memòria disponible").valor((Runtime.getRuntime().maxMemory() == Long.MAX_VALUE ? "Ilimitada" : humanReadableByteCount(Runtime.getRuntime().maxMemory()))).build(),
+//                            DetallSalut.builder().codi("MET").nom("Memòria total").valor(humanReadableByteCount(Runtime.getRuntime().totalMemory())).build(),
+//                            DetallSalut.builder().codi("EDT").nom("Espai de disc total").valor(humanReadableByteCount(totalSpace)).build(),
+//                            DetallSalut.builder().codi("EDL").nom("Espai de disc lliure").valor(humanReadableByteCount(freeSpace)).build(),
+//                            DetallSalut.builder().codi("SO").nom("Sistema operatiu").valor(os).build()
+//                    );
+//                }
+//            } catch (Exception e2) {
+//                log.error("Salut: No s'ha pogut obtenir informació del sistema amb la implementació de Sun", e2);
+//            }
+//            return null;
+//        }
+//    }
 
     public List<MissatgeSalut> checkMissatges() {
 
