@@ -100,7 +100,7 @@ public class CallbackServiceImpl implements CallbackService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 
-			if (!isTasquesActivesProperty() || !isCallbackPendentsActiu()) {
+			if (/*!isTasquesActivesProperty() ||*/ !isCallbackPendentsActiu()) {
 				log.info("[Callback] Enviament periodic de callbacks deshabilitat. ");
 				return;
 			}

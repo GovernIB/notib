@@ -1,7 +1,6 @@
 package es.caib.notib.back.controller;
 
 import com.google.common.base.Strings;
-import es.caib.notib.back.command.AccioMassivaFiltreCommand;
 import es.caib.notib.back.command.PermisosUsuarisFiltreCommand;
 import es.caib.notib.back.helper.DatatablesHelper;
 import es.caib.notib.back.helper.EnumHelper;
@@ -11,7 +10,6 @@ import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.back.helper.RolHelper;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.UsuariDto;
-import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaDetall;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaElementEstat;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaTipus;
 import es.caib.notib.logic.intf.dto.permis.PermisosUsuari;
@@ -143,8 +141,4 @@ public class PermisosController extends BaseUserController {
         return filtreCommand;
     }
 
-    @Override
-    protected List<Long> getIdsElementsFiltrats(HttpServletRequest request) throws ParseException {
-        return List.of();
-    }
 }
