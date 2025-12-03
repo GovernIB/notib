@@ -33,9 +33,9 @@ public class AplicacioCommand {
 	private Long entitatId;
 	private boolean headerCsrf;
     @NotNull
-    private LocalTime horariLaboralInici;
+    private LocalTime horariLaboralInici = LocalTime.of(7, 0);
     @NotNull
-    private LocalTime horariLaboralFi;
+    private LocalTime horariLaboralFi = LocalTime.of(16, 0);
     @NotNull
     private Integer maxEnviamentsMinutLaboral;
     @NotNull
