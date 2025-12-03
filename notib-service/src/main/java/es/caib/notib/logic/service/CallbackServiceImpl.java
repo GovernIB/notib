@@ -100,7 +100,7 @@ public class CallbackServiceImpl implements CallbackService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 
-			if (/*!isTasquesActivesProperty() ||*/ !isCallbackPendentsActiu()) {
+			if (!isCallbackPendentsActiu()) {
 				log.info("[Callback] Enviament periodic de callbacks deshabilitat. ");
 				return;
 			}
@@ -391,10 +391,6 @@ public class CallbackServiceImpl implements CallbackService {
 		mapeigPropietatsOrdenacio.put("data", new String[] {"data"});
 
 		return paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
-	}
-
-	private boolean isTasquesActivesProperty() {
-		return configHelper.getConfigAsBoolean("es.caib.notib.tasques.actives");
 	}
 
 	private boolean isCallbackPendentsActiu() {
