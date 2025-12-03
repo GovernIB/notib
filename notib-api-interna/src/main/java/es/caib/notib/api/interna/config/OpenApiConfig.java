@@ -21,7 +21,9 @@ import org.springframework.context.annotation.Configuration;
         security = @SecurityRequirement(name = "basic"),
         servers = {
                 @Server(url = "/notibapi/interna", description = "Servidor per defecte"),
-                @Server(url = "https://proves.caib.es/notibapi/interna", description = "Servidor de l'entorn de PROVES")
+                @Server(url = "https://proves.caib.es/notibapi/interna", description = "Servidor de l'entorn de PROVES"),
+                @Server(url = "https://dev.caib.es/notibapi/interna", description = "Servidor de l'entorn de DESENVOLUPAMENT"),
+                @Server(url = "https://se.caib.es/notibapi/interna", description = "Servidor de l'entorn de SERVEIS ESTABLES")
         }
 )
 @SecurityScheme(name = "basic", scheme = "basic", type = SecuritySchemeType.HTTP, in = SecuritySchemeIn.HEADER)
