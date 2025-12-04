@@ -1094,7 +1094,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 
 		var permisos = permisosHelper.findPermisos(procediment.getId(), ProcedimentEntity.class);
 		var isAdministradorOrganAndNoComuOrAdminEntitat = (adminOrgan && !procediment.isComu()) || //administrador òrgan i procediment no comú
-				(adminOrgan && procediment.isComu() && (procediment.getOrganGestor().getCodi().equals(organ))) ||  //administrador òrgan, procediment comú però del mateix òrgan
+				(adminOrgan && procediment.isComu() && procediment.getOrganGestor() != null && procediment.getOrganGestor().getCodi().equals(organ)) ||  //administrador òrgan, procediment comú però del mateix òrgan
 				!adminOrgan; //administrador entitat
 		for (var permis: permisos) {
 			permis.setPermetEdicio(isAdministradorOrganAndNoComuOrAdminEntitat);
