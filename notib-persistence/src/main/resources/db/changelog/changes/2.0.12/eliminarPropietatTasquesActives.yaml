@@ -1,0 +1,6 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - sql: "DELETE FROM not_config WHERE key = 'es.caib.notib.tasques.actives';"

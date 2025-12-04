@@ -27,7 +27,9 @@ public enum NotificacioEstatEnumDto implements Serializable {
 	FINALITZADA_AMB_ERRORS(29, 1<<10, "#d9534f"),	// 29, M=1024
 	ENVIANT(40, 1<<11, "#f0ad4e"),	// M=2048
 	OFICI_ACCEPTAT(41, 1<<12, "#f0ad4e"),	// M=4096
-	REBUTJADA_SIR(42, 1<<13, "#f0ad4e"); // M=8192
+	REBUTJADA_SIR(42, 1<<13, "#f0ad4e"), // M=8192
+	ANULADA(43, 1<<14, "#00ff00"), // M=16348
+	PARCIALMENT_ANULADA(44, 1<<15, "#00ff00"); // M=32696
 
 	private Integer numVal;
 	private Integer mask;

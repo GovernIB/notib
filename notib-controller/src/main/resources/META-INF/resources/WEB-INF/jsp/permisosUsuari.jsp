@@ -351,10 +351,6 @@
                 mostraElementsAccio(td, rowData)
             });
 
-            $("#filtrar").click(() => {
-                deselecciona()
-            });
-
             $('#btn-netejar-filtre').click(function () {
                 $(':input', $('#form-filtre')).each(function () {
                     let type = this.type, tag = this.tagName.toLowerCase();
@@ -367,7 +363,6 @@
                     }
 
                 });
-                deselecciona();
             });
 
             // initEvents($('#permisos-usuaris'), 'permisos-usuaris', eventMessages);
@@ -452,6 +447,7 @@
         data-default-dir="desc"
         data-row-info="true"
         data-date-template="#dataTemplate"
+        data-selection-enabled="false"
         data-paging-style-x="true"
         data-scroll-overflow="adaptMax"
         data-save-state="true"

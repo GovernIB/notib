@@ -141,7 +141,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 	public void enviamentRefrescarEstatDEH() {
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			if (!notificaHelper.isAdviserActiu() && isTasquesActivesProperty() && isEnviamentActualitzacioCertificacioActiva() && notificaHelper.isConnexioNotificaDisponible()) {
+			if (!notificaHelper.isAdviserActiu() && isEnviamentActualitzacioCertificacioActiva() && notificaHelper.isConnexioNotificaDisponible()) {
 				log.info("[DEH] Cercant enviaments DEH finalitzats sense certificació...");
 				List<Long> pendents = notificacioService.getNotificacionsDEHPendentsRefrescarCert();
 				if (pendents != null && !pendents.isEmpty()) {
@@ -170,7 +170,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 	public void enviamentRefrescarEstatCIE() {
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			if (!notificaHelper.isAdviserActiu() && isTasquesActivesProperty() && isEnviamentActualitzacioCertificacioActiva() && notificaHelper.isConnexioNotificaDisponible()) {
+			if (!notificaHelper.isAdviserActiu() && isEnviamentActualitzacioCertificacioActiva() && notificaHelper.isConnexioNotificaDisponible()) {
 				log.info("[CIE] Cercant enviaments CIE finalitzats sense certificació...");
 				List<Long> pendents = notificacioService.getNotificacionsCIEPendentsRefrescarCert();
 				if (pendents != null && !pendents.isEmpty()) {
@@ -375,7 +375,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 	@Transactional
 	@Override
 	public void generarEstadistiques() {
-		if (isTasquesActivesProperty() && isGenerarEstadistiquesActiuProperty()) {
+		if (isGenerarEstadistiquesActiuProperty()) {
 			estadisticaService.generarDadesExplotacio();
 		}
 	}
@@ -444,9 +444,6 @@ public class SchedulledServiceImpl implements SchedulledService {
 	}
 	private boolean isEnviamentActualitzacioEstatRegistreActiu() {
 		return configHelper.getConfigAsBoolean("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.actiu");
-	}
-	private boolean isTasquesActivesProperty() {
-		return configHelper.getConfigAsBoolean("es.caib.notib.tasques.actives");
 	}
 	private boolean isActualitzacioProcedimentsActiuProperty() {
 		return configHelper.getConfigAsBoolean("es.caib.notib.actualitzacio.procediments.actiu");

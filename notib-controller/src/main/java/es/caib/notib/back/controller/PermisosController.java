@@ -1,7 +1,6 @@
 package es.caib.notib.back.controller;
 
 import com.google.common.base.Strings;
-import es.caib.notib.back.command.AccioMassivaFiltreCommand;
 import es.caib.notib.back.command.PermisosUsuarisFiltreCommand;
 import es.caib.notib.back.helper.DatatablesHelper;
 import es.caib.notib.back.helper.EnumHelper;
@@ -11,7 +10,6 @@ import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.back.helper.RolHelper;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.UsuariDto;
-import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaDetall;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaElementEstat;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaTipus;
 import es.caib.notib.logic.intf.dto.permis.PermisosUsuari;
@@ -28,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @Slf4j
 @Controller
@@ -112,4 +109,5 @@ public class PermisosController extends BaseUserController {
         RequestSessionHelper.actualitzarObjecteSessio(request, PERMISOS_USUARIS_FILTRE, filtreCommand);
         return filtreCommand;
     }
+
 }

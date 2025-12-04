@@ -859,7 +859,7 @@ public class ServeiServiceImpl implements ServeiService {
 					.valor(nom)
 					.organGestor(organCodi)
 					.comu(servei.isComu())
-                    .organId(servei.getOrganGestor().getId() + "")
+                    .organId(servei.getOrganGestor() != null ? servei.getOrganGestor().getId() + ""  : "")
 					.build());
 		}
 		return response;

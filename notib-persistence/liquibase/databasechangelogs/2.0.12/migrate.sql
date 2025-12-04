@@ -39,3 +39,5 @@ INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PRO
 INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugin.digitalitzacio.endpointName', null,'Nom del endpoint del plugin de digitalitzacio','DIGITALITZACIO', 4, 0, 'TEXT', 0);
 INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugin.digitalitzacio.scanner.mock', 0,'Resultat de l''escanneig fictici','DIGITALITZACIO', 5, 0, 'BOOL', 0);
 INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugin.fitxer.logs.path', null,'Ruta on es guarden el fitxers de logs del servidor','LOGS', 0, 1, 'TEXT', 0);
+
+DELETE FROM not_config WHERE key = 'es.caib.notib.tasques.actives';

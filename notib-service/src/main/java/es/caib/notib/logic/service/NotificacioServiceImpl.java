@@ -649,6 +649,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var numEnviament = 0;
 			var entregaPostal = false;
 			NotificacioEnviamentEntity enviament;
+            var motiuAnulacio = "";
 			for (var env : dto.getEnviaments()) {
 
 				if (notificacio.isComunicacioSir()) {
@@ -663,6 +664,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
                 boolean anulat = dto.isAnulat();
                 dto.setAnulat(anulat || enviament.isAnulat());
+                motiuAnulacio = enviament.getMotiuAnulacio();
 
                 eventError = enviament.getUltimEvent();
 				if (eventError != null && eventError.isError()) {
@@ -687,6 +689,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				callbackFiReintents++;
 				numEnviament++;
 			}
+            dto.setMotiuAnulacio(motiuAnulacio);
 			if (dto.getNotificacionsMovilErrorDesc().size() > 1) {
 				List<String> desc = new ArrayList<>();
 				desc.add(messageHelper.getMessage("api.carpeta.send.notificacio.movil.error"));

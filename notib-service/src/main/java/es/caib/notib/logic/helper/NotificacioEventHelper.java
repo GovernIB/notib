@@ -44,7 +44,7 @@ public class NotificacioEventHelper {
         }
         try {
             return !configHelper.getConfigAsBoolean("es.caib.notib.adviser.actiu") &&
-                    configHelper.getConfigAsBoolean("es.caib.notib.tasques.actives") &&
+//                    configHelper.getConfigAsBoolean("es.caib.notib.tasques.actives") &&
                     configHelper.getConfigAsBoolean("es.caib.notib.tasca.enviament.actualitzacio.estat.actiu");
         } catch (Exception ex) {
             log.error("No s'ha pogut calcular si les consultes a notifica estan actives", ex);

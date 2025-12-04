@@ -58,7 +58,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 public class SecurityConfig {
 
-	@Value("${es.caib.notib.security.mappableRoles:NOT_SUPER,NOT_ADMIN,NOT_CARPETA,NOT_APL,tothom}")
+	@Value("${es.caib.notib.security.mappableRoles:NOT_SUPER,NOT_ADMIN,NOT_CARPETA,NOT_APL,tothom,NOT_COM,NOT_ADMIN_LECTURA}")
 	private String mappableRoles;
 	@Value("${es.caib.notib.security.useResourceRoleMappings:false}")
 	private boolean useResourceRoleMappings;

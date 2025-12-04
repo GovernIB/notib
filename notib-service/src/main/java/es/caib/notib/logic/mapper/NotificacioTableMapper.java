@@ -54,6 +54,7 @@ public abstract class NotificacioTableMapper {
     private static final String ICONA_FINALITZADA = "<span class=\"fa fa-check\"></span>";
     private static final String ICONA_REGISTRADA = "<span class=\"fa fa-file-o\"></span>";
     private static final String ICONA_PROCESSADA = "<span class=\"fa fa-check-circle\"></span>";
+    private static final String ICONA_ANULADA = "<span class=\"fa fa-ban\"></span>";
     private static final String SENSE_ICONA = "";
 
     private static final String getMessage = "<getMessage>";
@@ -205,14 +206,14 @@ public abstract class NotificacioTableMapper {
         String registreEstat = getRegistreEstat(dto, enviaments);
         String notificaEstats = dto.isComunicacioSir() ? getSirEstats(dto, enviaments) : getNotificaEstats(dto, enviaments);
         var anulat = getAnulat(enviaments);
-
+        iconaEstat = !Strings.isNullOrEmpty(anulat) ? anulat : iconaEstat;
         var columnaEstat = new StringBuilder(entregaPostal + "<div class=\"flex-column\">")
                 .append("<div style=\"display:flex; justify-content:space-between\">")
                 .append("<span>")
                 .append(registreEstat)
                 .append(iconaEstat)
                 .append(nomEstat)
-                .append(anulat)
+//                .append(anulat)
                 .append(eventError)
                 .append(callbackError)
                 .append(notificaMovilError)
@@ -230,14 +231,16 @@ public abstract class NotificacioTableMapper {
 
     private String getAnulat(Set<NotificacioEnviamentEntity> enviaments) {
 
-        var anulat = false;
+        var anulat = 0;
+        var motiu = "";
         for (var enviament : enviaments) {
             if (enviament.isAnulat()) {
-                anulat = true;
+                anulat++;
+                motiu = enviament.getMotiuAnulacio();
             }
         }
-        var title = messageHelper.getMessage("notificacio.enviament.anulat");
-        return anulat ?  " <span class=\"fa fa-ban\" title=\"" + title + "\"></span>" : "";
+        var title = anulat > 1 ? messageHelper.getMessage("notificacio.enviament.anulat") : anulat == 1 ? motiu : "";
+        return anulat > 0  ? " <span class=\"fa fa-ban\" title=\"" + title + "\"></span>" : "";
     }
 
     private String getEntregaPostal(Set<NotificacioEnviamentEntity> enviaments) {
@@ -267,6 +270,7 @@ public abstract class NotificacioTableMapper {
         if (NotificacioEstatEnumDto.FINALITZADA.equals(dto.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(dto.getEstat())) return ICONA_FINALITZADA;
         if (NotificacioEstatEnumDto.REGISTRADA.equals(dto.getEstat())) return ICONA_REGISTRADA;
         if (NotificacioEstatEnumDto.PROCESSADA.equals(dto.getEstat())) return ICONA_PROCESSADA;
+        if (NotificacioEstatEnumDto.ANULADA.equals(dto.getEstat())) return ICONA_ANULADA;
         return SENSE_ICONA;
     }
 
