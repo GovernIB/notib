@@ -21,8 +21,8 @@ export const App = () => {
         id: 'entitats',
         title: t('menu.entitats'),
         to: '/entitats',
-        icon: 'mail_outline',
-        resourceName: 'entitatsResource',
+        icon: 'layers',
+        resourceName: 'entitatResource',
     }, {
         id: 'enviaments',
         title: t('menu.enviaments'),

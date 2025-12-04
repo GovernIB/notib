@@ -3,6 +3,7 @@ package es.caib.notib.back.config;
 import com.opensymphony.sitemesh.webapp.SiteMeshFilter;
 import es.caib.notib.back.base.config.BaseWebMvcConfig;
 import es.caib.notib.back.interceptor.*;
+import es.caib.notib.logic.intf.base.config.BaseConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -143,10 +144,12 @@ public class WebMvcConfig extends BaseWebMvcConfig implements WebMvcConfigurer {
 	}
 
 	private static final String[] INTERCEPTOR_EXCLUSIONS = 	{
-			"/reactapp",
-			"/reactapp/**",
-			"/sysenv",
-			"/manifest",
+			BaseConfig.API_PATH + "/**",
+			BaseConfig.PING_PATH,
+			BaseConfig.SYSENV_PATH,
+			BaseConfig.MANIFEST_PATH,
+			BaseConfig.AUTH_TOKEN_PATH,
+			BaseConfig.REACT_APP_PATH + "/**",
 			"/js/**",
 			"/css/**",
 			"/fonts/**",
@@ -166,7 +169,8 @@ public class WebMvcConfig extends BaseWebMvcConfig implements WebMvcConfigurer {
 			"/notificacio/procedimentsOrgan",
 			"/notificacio/serveisOrgan",
 			"/error",
-			"/**/monitor/tasques"};
+			"/**/monitor/tasques"
+	};
 	private static final String[] ALL_EXCLUSIONS = {"/js/**", "/css/**", "/fonts/**", "/img/**", "/images/**", "/extensions/**", "/webjars/**", "/**/datatable/**", "/**/selection/**", "/api/rest/**", "/api/apidoc**", "/api-docs/**", "/**/api-docs/", "/api/consulta/**", "/api/services/**", "/usuari/configuracio/**"};
 	// Urls accés
 	private static final String[] PAGADORS_PATHS = { "/cie**", "/cie/**", "/operadorPostal**", "/operadorPostal/**" };

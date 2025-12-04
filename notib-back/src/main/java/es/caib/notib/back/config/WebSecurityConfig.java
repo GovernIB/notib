@@ -10,10 +10,7 @@ import org.keycloak.KeycloakPrincipal;
 import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.IDToken;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
-import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -53,13 +50,6 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 	private String selectedRoleHttpHeader;
 	@Value("${" + BaseConfig.PROP_SECURITY_NAME_ATTRIBUTE_KEY + ":preferred_username}")
 	private String nameAttributeKey;
-
-	@Bean
-	public MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
-		DefaultMethodSecurityExpressionHandler handler = new DefaultMethodSecurityExpressionHandler();
-		handler.setDefaultRolePrefix(MethodSecurityConfig.DEFAULT_ROLE_PREFIX);
-		return handler;
-	}
 
 	@Override
 	protected void customHttpSecurityConfiguration(HttpSecurity http) throws Exception {

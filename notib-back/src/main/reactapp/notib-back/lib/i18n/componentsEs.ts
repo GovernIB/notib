@@ -46,17 +46,17 @@ const componentsEs = {
         toolbar: {
             error: 'Se ha producido un error',
         },
-        findDisabled: 'Sin consultar',
-        noRows: 'Sin datos',
+        noRows: 'Sin resultados',
         error: 'Error',
     },
     grid: {
         selection: {
-            one: '1 selected row ',
-            multiple: '{{count}} selected rows',
+            one: '1 fila seleccionada',
+            multiple: '{{count}} filas seleccionadas',
         },
         pageInfo: '{{from}} a {{to}} de {{count}}',
         sizeAuto: 'Automático',
+        requestPending: 'Pendiente de consultar',
     },
     form: {
         goBack: {
@@ -121,9 +121,11 @@ const componentsEs = {
                 title: 'Confirmación',
                 message: '¿Está seguro de que desea ejecutar la acción {{action}}?',
             },
+            success: 'Acción ejecutada correctamente',
             error: 'Error ejecutando la acción',
         },
         report: {
+            success: 'Informe generado correctamente',
             error: 'Error generando el informe',
         },
     },

@@ -18,8 +18,8 @@ const Entitats = () => {
     return (
         <GridPage>
             <MuiDataGrid
-                title={t('menu.enviament')}
-                resourceName="enviamentResource"
+                title={t('menu.entitats')}
+                resourceName="entitatResource"
                 columns={columns}
                 toolbarType="upper"
                 popupEditCreateActive

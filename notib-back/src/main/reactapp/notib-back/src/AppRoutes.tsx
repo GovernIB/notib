@@ -1,15 +1,15 @@
-import { Routes, Route } from 'react-router-dom';
-import HomePage from './pages/HomePage';
-import NotFoundPage from './pages/NotFound';
+import { Routes, Route, Navigate} from 'react-router-dom';
+import Entitats from './pages/Entitats';
 import Enviaments from './pages/Enviaments';
+import NotFoundPage from './pages/NotFound';
 
 const AppRoutes = () => {
     return (
         <Routes>
-            <Route index element={<HomePage />} />
-            <Route path="*" element={<NotFoundPage />} />
-            <Route path="entitats" element={<Enviaments />} />
+            <Route index element={<Navigate to="/entitats" replace />} />
+            <Route path="entitats" element={<Entitats />} />
             <Route path="enviaments" element={<Enviaments />} />
+            <Route path="*" element={<NotFoundPage />} />
         </Routes>
     );
 };

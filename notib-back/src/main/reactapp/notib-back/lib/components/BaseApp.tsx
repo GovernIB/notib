@@ -49,7 +49,8 @@ export type BaseAppProps = React.PropsWithChildren & {
     formFieldComponents?: FormFieldComponent[];
     detailFieldComponent?: React.FC<DetailFieldCustomProps>;
     contentComponentSlots: ContentComponentSlots;
-    fixedContentExpandsToAvailableHeight?: boolean;
+    fixedContentExpandsToAvailableHeightEnabled?: boolean;
+    marginsDisabled?: boolean;
 };
 
 export type BaseAppContentComponentProps = React.PropsWithChildren & {
@@ -274,13 +275,15 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         formFieldComponents,
         detailFieldComponent,
         contentComponentSlots,
-        fixedContentExpandsToAvailableHeight,
+        fixedContentExpandsToAvailableHeightEnabled,
+        marginsDisabled: marginsDisabledProp,
         children,
     } = props;
     const { offline } = useResourceApiContext();
-    const [marginsDisabled, setMarginsDisabled] = React.useState<boolean>(false);
+    const [marginsDisabled, setMarginsDisabled] =
+        React.useState<boolean>(marginsDisabledProp ?? false);
     const [contentExpandsToAvailableHeight, setContentExpandsToAvailableHeight] =
-        React.useState<boolean>(fixedContentExpandsToAvailableHeight ?? false);
+        React.useState<boolean>(fixedContentExpandsToAvailableHeightEnabled ?? false);
     const getLinkComponent = () => linkComponent;
     const { setMessageDialogShow, messageDialogShow } = useDialog();
     const { setTemporalMessageShow, temporalMessageShow } = useTemporalMessage();
@@ -306,9 +309,9 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
     const context = {
         getFormFieldComponent,
         getDetailFieldComponent,
-        setMarginsDisabled,
+        setMarginsDisabled: marginsDisabledProp == null ? setMarginsDisabled : emptyFunction,
         contentExpandsToAvailableHeight,
-        setContentExpandsToAvailableHeight: fixedContentExpandsToAvailableHeight == null ? setContentExpandsToAvailableHeight : emptyFunction,
+        setContentExpandsToAvailableHeight: fixedContentExpandsToAvailableHeightEnabled == null ? setContentExpandsToAvailableHeight : emptyFunction,
         getLinkComponent,
         goBack: routerGoBack,
         navigate: routerNavigate,

@@ -23,12 +23,12 @@ public class BaseConfig {
 	public static final String ROLE_APL = "NOT_APL";
 	public static final String ROLE_TOTHOM = "tothom";
 
-	public static final String REACT_APP_PATH="/reactapp";
 	public static final String API_PATH = "/apinew";
 	public static final String PING_PATH = "/ping";
-	public static final String AUTH_TOKEN_PATH = "/authToken";
 	public static final String SYSENV_PATH = "/sysenv";
 	public static final String MANIFEST_PATH = "/manifest";
+	public static final String AUTH_TOKEN_PATH = "/authToken";
+	public static final String REACT_APP_PATH="/reactapp";
 
 	public static final String PROP_FILES = PROPERTY_PREFIX + "fitxers";
 	public static final String PROP_SECURITY_MAPPABLE_ROLES = PROPERTY_PREFIX + "security.mappableRoles";

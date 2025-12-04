@@ -169,7 +169,7 @@ export const useActionReportLogic = (
     onClose?: () => void,
     dialogCloseCallback?: (reason?: string) => boolean
 ): ActionReportLogicResult => {
-    const { t, messageDialogShow, saveAs } = useBaseAppContext();
+    const { t, messageDialogShow, temporalMessageShow, saveAs } = useBaseAppContext();
     const actionDialogButtons = useActionDialogButtons();
     const reportDialogButtons = useReportDialogButtons();
     const confirmDialogButtons = useConfirmDialogButtons();
@@ -185,7 +185,11 @@ export const useActionReportLogic = (
                 const requestArgs = { id, code: action, data };
                 apiArtifactAction(id, requestArgs)
                     .then((result: any) => {
-                        onSuccess?.(result);
+                        if (onSuccess) {
+                            onSuccess(result);
+                        } else {
+                            temporalMessageShow(null, t('actionreport.action.success'), 'success');
+                        }
                         resolve(formDialogResultProcessor?.(result));
                     })
                     .catch((error) => {
@@ -208,7 +212,11 @@ export const useActionReportLogic = (
                 apiArtifactReport(id, requestArgs)
                     .then((result: any) => {
                         saveAs?.(result.blob, result.fileName);
-                        onSuccess?.(result);
+                        if (onSuccess) {
+                            onSuccess(result);
+                        } else {
+                            temporalMessageShow(null, t('actionreport.report.success'), 'success');
+                        }
                         resolve(formDialogResultProcessor?.(result));
                     })
                     .catch((error) => {
@@ -227,7 +235,7 @@ export const useActionReportLogic = (
             (action ? actionDialogButtons : report ? reportDialogButtons : undefined),
         action ? execAction : generateReport,
         action ? t('actionreport.action.error') : t('actionreport.report.error'),
-        formDialogContent,
+        null,
         null,
         {
             resourceType: action ? 'action' : 'report',
@@ -249,6 +257,7 @@ export const useActionReportLogic = (
                 title: dialogTitle ?? formDialogTitle,
                 additionalData: formAdditionalData ?? formAdditionalDataArg,
                 initOnChangeRequest: formInitOnChangeRequest,
+                formContent: formDialogContent,
                 dialogComponentProps: formDialogComponentProps ??
                     formDialogComponentPropsArg ?? {
                         fullWidth: true,

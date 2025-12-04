@@ -109,6 +109,8 @@ export type MuiDataGridProps = {
     readOnly?: true;
     /** Desactiva les peticions automàtiques al backend per a obtenir la informació a mostrar a la graella */
     findDisabled?: boolean;
+    /** Text pel missatge de que no hi ha resultats */
+    noRowsText?: string;
     /** Activa la persistència de l'estat (paginació, ordenació, selecció, ...) */
     persistentState?: true;
     /** Activa la selecció de files */
@@ -117,8 +119,6 @@ export type MuiDataGridProps = {
     paginationActive?: true;
     /** Model de paginació inicial */
     paginationModel?: GridPaginationModel;
-    /** Text pel missatge de que no hi ha resultats */
-    paginationNoRowsText?: string;
     /** Model d'ordenació inicial */
     sortModel?: GridSortModel;
     /** Model d'ordenació que s'aplicarà sempre (ignorant el valor de sortModel) */
@@ -225,7 +225,7 @@ export type MuiDataGridProps = {
     /** Referència a l'api del component */
     apiRef?: MuiDataGridApiRef;
     /** Referència a l'api interna del component DataGrid de MUI */
-    datagridApiRef?: React.MutableRefObject<GridApiPro | null>;
+    datagridApiRef?: React.RefObject<GridApiPro | null>;
     /** Alçada del component en píxels */
     height?: number;
     /**
@@ -474,7 +474,7 @@ const useGridColumns = (
  *
  * @returns referència a l'API del component MuiDataGrid.
  */
-export const useMuiDataGridApiRef: () => React.MutableRefObject<MuiDataGridApi> = () => {
+export const useMuiDataGridApiRef: () => React.RefObject<MuiDataGridApi> = () => {
     const gridApiRef = React.useRef<MuiDataGridApi | any>({});
     return gridApiRef;
 };
@@ -508,11 +508,11 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         columns,
         readOnly,
         findDisabled,
+        noRowsText,
         persistentState,
         selectionActive,
         paginationActive,
         paginationModel: paginationModelProp,
-        paginationNoRowsText,
         sortModel,
         staticSortModel,
         quickFilterInitialValue,
@@ -801,7 +801,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     };
     const sortingProps: any = {
         sortingMode: 'server',
-        sortModel: internalSortModel,
+        sortModel: staticSortModel ?? internalSortModel,
         onSortModelChange: setInternalSortModel,
     };
     const paginationProps: any = paginationActive
@@ -838,7 +838,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                   params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd',
           }
         : null;
-    const processedRows = [...additionalRows, ...rows];
+    const processedRows = React.useMemo(() => [...additionalRows, ...rows], [additionalRows, rows]);
     const content = (
         <>
             {!toolbarHide && toolbar}
@@ -848,8 +848,8 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
             {formDialogComponent}
             <DataGridCustomStyle
                 {...otherProps}
-                loading={loading}
-                rows={processedRows}
+                loading={otherProps?.loading ?? loading}
+                rows={otherProps?.rows ?? processedRows}
                 columns={processedColumns}
                 onRowClick={onRowClick}
                 onRowOrderChange={onRowOrderChange}
@@ -879,8 +879,8 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                         setAutoPageSize: setFooterAutoPageSize,
                     },
                     noRowsOverlay: {
-                        findDisabled,
-                        noRowsText: paginationNoRowsText,
+                        requestPending: findDisabled && !('rows' in otherProps),
+                        noRowsText: noRowsText,
                     },
                 }}
                 semiBordered={semiBordered}
