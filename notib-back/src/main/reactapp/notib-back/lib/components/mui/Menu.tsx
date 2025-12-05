@@ -109,6 +109,7 @@ const isCurrentMenuEntryOrAnyChildrenSelected = (
     menuEntry: MenuEntry,
     locationPath: string
 ): boolean => {
+    const anyChildSelected = menuEntry.children?.find((e) => isCurrentMenuEntryOrAnyChildrenSelected(e, locationPath)) != null;
     if (menuEntry.to != null) {
         const menuEntryTo = locationPath.startsWith('/')
             ? menuEntry.to.startsWith('/')
@@ -116,14 +117,9 @@ const isCurrentMenuEntryOrAnyChildrenSelected = (
                 : '/' + menuEntry.to
             : menuEntry.to;
         const selected = menuEntryTo === locationPath || locationPath.startsWith(menuEntryTo + '/');
-        return (
-            selected ||
-            menuEntry.children?.find((e) =>
-                isCurrentMenuEntryOrAnyChildrenSelected(e, locationPath)
-            ) != null
-        );
+        return selected || anyChildSelected;
     } else {
-        return false;
+        return anyChildSelected;
     }
 };
 
@@ -131,6 +127,11 @@ const MenuItem: React.FC<MenuItemProps> = (props) => {
     const { primary, to, icon, level = 0, selected, shrink, onMenuItemClick, children } = props;
     const { getLinkComponent } = useBaseAppContext();
     const [expanded, setExpanded] = React.useState<boolean>(selected ?? false);
+    /*React.useEffect(() => {
+        if (selected) {
+            setExpanded(true);
+        }
+    }, [selected])*/
     const itemButtonSx = {
         minHeight: 48,
         justifyContent: !shrink ? 'initial' : 'center',
@@ -211,6 +212,7 @@ const ListMenuContent: React.FC<ListMenuContentProps> = (props) => {
         <StyledList>
             {entries?.map((item, index) => {
                 const selected = isCurrentMenuEntryOrAnyChildrenSelected(item, locationPath);
+                console.log('>>> selected', item, selected)
                 const entryComponent = item.divider ? (
                     <Divider key={index} />
                 ) : (
