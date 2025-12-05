@@ -246,24 +246,16 @@ const ContentComponentDefault: React.FC<BaseAppContentComponentProps> = (props) 
                     flexGrow: 1,
                 }}>
                 {menuComponent}
-                <div
+                <main
                     style={{
-                        display: 'flex',
-                        flexDirection: 'column',
                         flexGrow: 1,
                         minWidth: 0,
+                        ...(!marginsDisabled ? { margin: '16px 24px' } : null),
                     }}>
-                    <main
-                        style={{
-                            flexGrow: 1,
-                            minWidth: 0,
-                            ...(!marginsDisabled ? { margin: '16px 24px' } : null),
-                        }}>
-                        {appReady ? childrenOrOfflineComponent : null}
-                    </main>
-                    <footer>{footerComponent}</footer>
-                </div>
+                    {appReady ? childrenOrOfflineComponent : null}
+                </main>
             </div>
+            <footer>{footerComponent}</footer>
         </div>
     );
 };
