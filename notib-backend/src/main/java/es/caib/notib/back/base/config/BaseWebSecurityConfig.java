@@ -20,10 +20,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.AuthenticationUserDetailsService;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -57,6 +61,8 @@ public abstract class BaseWebSecurityConfig {
 
 	@Value("${jwt.auth.converter.principal-claim:preferred_username}")
 	private String principalClaim;
+	@Value("${spring.security.oauth2.client.provider.keycloak.user-name-attribute:#{null}}")
+	private String clientProviderKeycloakUserNameAttribute;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -75,6 +81,10 @@ public abstract class BaseWebSecurityConfig {
 		if (isOauth2ClientActive()) {
 			log.info("OAUTH2 client active");
 			http.oauth2Login().userInfoEndpoint().userService(oauth2UserService());
+		}
+		if (isOidcClientActive()) {
+			log.info("OIDC client active");
+			http.oauth2Login().userInfoEndpoint().oidcUserService(oidcUserService());
 		}
 		var auth = http.authorizeHttpRequests().requestMatchers(internalPublicRequestMatchers()).permitAll();
 		customHttpSecurityConfiguration(http);
@@ -131,6 +141,14 @@ public abstract class BaseWebSecurityConfig {
 	 * @return true si està activa o false en cas contrari.
 	 */
 	protected boolean isOauth2ClientActive() {
+		return false;
+	}
+	/**
+	 * Indica si l'autenticació amb client OIDC està activa.
+	 *
+	 * @return true si està activa o false en cas contrari.
+	 */
+	protected boolean isOidcClientActive() {
 		return false;
 	}
 
@@ -241,6 +259,36 @@ public abstract class BaseWebSecurityConfig {
 					grantedAuthorities,
 					oauth2User.getAttributes(),
 					userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName());
+		};
+	}
+
+	protected OAuth2UserService<OidcUserRequest, OidcUser> oidcUserService() {
+		final OidcUserService delegate = new OidcUserService();
+		return (userRequest) -> {
+			OidcUser oidcUser = delegate.loadUser(userRequest);
+			OAuth2AccessToken accessToken = userRequest.getAccessToken();
+			Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
+			try {
+				JWT parsedJwt = JWTParser.parse(accessToken.getTokenValue());
+				JSONObject realmAccess = (JSONObject) parsedJwt.getJWTClaimsSet().getClaim("realm_access");
+				if (realmAccess != null) {
+					JSONArray roles = (JSONArray) realmAccess.get("roles");
+					if (roles != null) {
+						roles.stream().
+								map(r -> new SimpleGrantedAuthority((String)r)).
+								forEach(grantedAuthorities::add);
+					}
+				}
+			} catch (ParseException ex) {
+				log.warn("No s'han pogut obtenir els rols del token JWT", ex);
+			}
+			filterAllowedGrantedAuthorities(grantedAuthorities);
+			return new DefaultOidcUser(
+					grantedAuthorities,
+					oidcUser.getIdToken(),
+					oidcUser.getUserInfo(),
+					clientProviderKeycloakUserNameAttribute
+			);
 		};
 	}
 

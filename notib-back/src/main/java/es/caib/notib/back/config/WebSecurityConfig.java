@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.IDToken;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
@@ -17,6 +18,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.mapping.SimpleAttributes2GrantedAuthoritiesMapper;
 import org.springframework.security.core.authority.mapping.SimpleMappableAttributesRetriever;
+import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails;
 import org.springframework.security.web.authentication.preauth.j2ee.J2eeBasedPreAuthenticatedWebAuthenticationDetailsSource;
@@ -51,9 +54,12 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 	@Value("${" + BaseConfig.PROP_SECURITY_NAME_ATTRIBUTE_KEY + ":preferred_username}")
 	private String nameAttributeKey;
 
+	@Autowired
+	private ClientRegistrationRepository clientRegistrationRepository;
+
 	@Override
 	protected void customHttpSecurityConfiguration(HttpSecurity http) throws Exception {
-		LogoutHandler logoutHandler = (request, response, authentication) -> {
+		LogoutHandler deleteCookiesLogoutHandler = (request, response, authentication) -> {
 			try {
 				log.info("Logout called");
 				Cookie[] cookies = request.getCookies();
@@ -72,11 +78,16 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 				log.error("Error en el logout", ex);
 			}
 		};
-		http.logout(lo -> lo.addLogoutHandler(logoutHandler).
+		OidcClientInitiatedLogoutSuccessHandler oidcLogoutSuccessHandler = new OidcClientInitiatedLogoutSuccessHandler(
+				clientRegistrationRepository);
+		oidcLogoutSuccessHandler.setPostLogoutRedirectUri("{baseUrl}/");
+		http.logout(lo -> lo.
+				addLogoutHandler(deleteCookiesLogoutHandler).
 				logoutRequestMatcher(new AntPathRequestMatcher(LOGOUT_URL)).
 				invalidateHttpSession(true).
 				clearAuthentication(true).
 				deleteCookies("OAuth_Token_Request_State", "JSESSIONID").
+				logoutSuccessHandler(oidcLogoutSuccessHandler).
 				logoutSuccessUrl("/"));
 		http.authorizeHttpRequests().
 				requestMatchers(publicRequestMatchers()).permitAll();
@@ -111,7 +122,7 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 		return !isJboss();
 	}
 	@Override
-	protected boolean isOauth2ClientActive() {
+	protected boolean isOidcClientActive() {
 		return !isJboss();
 	}
 

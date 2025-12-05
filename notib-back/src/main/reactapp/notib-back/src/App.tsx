@@ -12,12 +12,7 @@ const version = '0.0.0';
 export const App = () => {
     const { t } = useTranslation();
     const { mode } = useColorScheme();
-    const menuEntries = [{
-        id: 'home',
-        title: t('menu.home'),
-        to: 'home',
-        icon: 'home'
-    }, {
+    const menuConfig = [{
         id: 'entitats',
         title: t('menu.entitats'),
         to: '/entitats',
@@ -29,6 +24,17 @@ export const App = () => {
         to: '/enviaments',
         icon: 'mail_outline',
         resourceName: 'enviamentResource',
+    }]
+    const menuEntries = [{
+        id: 'home',
+        title: t('menu.home'),
+        to: 'home',
+        icon: 'home'
+    }, {
+        id: 'config',
+        title: t('menu.config'),
+        icon: 'settings',
+        children: menuConfig
     }];
     const theme = useTheme();
     const bgColor = mode === 'light' ? theme.palette.background.paper : undefined;

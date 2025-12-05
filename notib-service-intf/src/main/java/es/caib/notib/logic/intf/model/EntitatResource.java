@@ -60,16 +60,17 @@ public class EntitatResource extends BaseResource<Long> {
 	@Size(max = 1024)
 	private String colorLletra;
 	private TipusDocumentEnumDto tipusDocDefault;
+	private boolean llibreEntitat;
+	private boolean oficinaEntitat;
+
 	@Size(max = 255)
 	private String nomOficinaVirtual;
-	@Size(max = 255)
-	private String oficina;
-	private boolean llibreEntitat;
 	@Size(max = 255)
 	protected String llibre;
 	@Size(max = 255)
 	protected String llibreNom;
-	private boolean oficinaEntitat;
+	@Size(max = 255)
+	private String oficina;
 
 	//private byte[] logoCapBytes;
 	//private boolean eliminarLogoCap;

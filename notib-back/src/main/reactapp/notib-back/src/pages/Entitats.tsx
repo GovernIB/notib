@@ -1,17 +1,19 @@
 import { useTranslation } from 'react-i18next';
 import { FormField, GridPage, MuiDataGrid, MuiDataGridColDef } from 'reactlib';
 
-const columns: MuiDataGridColDef[] = [
-    {
-        field: 'id',
-    },
-    {
-        field: 'entregaPostalActiva',
-    },
-    {
-        field: 'perEmail',
-    },
-];
+const columns: MuiDataGridColDef[] = [{
+    field: 'codi',
+    flex: 1,
+}, {
+    field: 'nom',
+    flex: 4,
+}, {
+    field: 'dir3Codi',
+    flex: 1,
+},  {
+    field: 'activa',
+    flex: .6,
+}];
 
 const Entitats = () => {
     const { t } = useTranslation();

@@ -1,6 +1,7 @@
 const translationEn = {
     menu: {
         home: "Home",
+        config: "Settings",
         entitats: "Entities",
         enviaments: "Deliveries",
     },

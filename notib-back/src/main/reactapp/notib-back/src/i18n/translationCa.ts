@@ -1,6 +1,7 @@
 const translationCa = {
     menu: {
         home: "Inici",
+        config: "Configuració",
         entitats: "Entitats",
         enviaments: "Enviaments",
     },
