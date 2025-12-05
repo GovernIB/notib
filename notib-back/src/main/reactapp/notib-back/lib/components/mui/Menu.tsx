@@ -127,11 +127,6 @@ const MenuItem: React.FC<MenuItemProps> = (props) => {
     const { primary, to, icon, level = 0, selected, shrink, onMenuItemClick, children } = props;
     const { getLinkComponent } = useBaseAppContext();
     const [expanded, setExpanded] = React.useState<boolean>(selected ?? false);
-    /*React.useEffect(() => {
-        if (selected) {
-            setExpanded(true);
-        }
-    }, [selected])*/
     const itemButtonSx = {
         minHeight: 48,
         justifyContent: !shrink ? 'initial' : 'center',
