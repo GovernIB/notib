@@ -97,26 +97,25 @@
         <c:if test="${not isRolActualAdministrador}">
             <c:choose>
     <%--		<c:when test="${sessionScope['EntitatHelper.entitatActual'].colorFons!=null  && not empty sessionScope['EntitatHelper.entitatActual'].colorFons}">--%>
-            <c:when test="${entitatActual.colorFons !=null  && not empty entitatActual.colorFons}">
-            .navbar-app {
-                background-color: ${entitatActual.colorFons} !important;
-            }
-            .navbar-app .list-inline li.dropdown>a {
-                background-color: ${entitatActual.colorFons} !important;
-            }
-            </c:when>
-            <c:otherwise>
-            <c:if test="${sessionScopedContext.capBackColor!=null  && not empty sessionScopedContext.capBackColor}">
-            .navbar-app {
-                background-color: ${sessionScopedContext.capBackColor} !important;
-            }
-            .navbar-app .list-inline li.dropdown>a {
-                background-color: ${sessionScopedContext.capBackColor} !important;
-            }
-            </c:if>
-            </c:otherwise>
+                <c:when test="${entitatActual.colorFons !=null  && not empty entitatActual.colorFons}">
+                .navbar-app {
+                    background-color: ${entitatActual.colorFons} !important;
+                }
+                .navbar-app .list-inline li.dropdown>a {
+                    background-color: ${entitatActual.colorFons} !important;
+                }
+                </c:when>
+                <c:otherwise>
+                    <c:if test="${sessionScopedContext.capBackColor!=null  && not empty sessionScopedContext.capBackColor}">
+                    .navbar-app {
+                        background-color: ${sessionScopedContext.capBackColor} !important;
+                    }
+                    .navbar-app .list-inline li.dropdown>a {
+                        background-color: ${sessionScopedContext.capBackColor} !important;
+                    }
+                    </c:if>
+                </c:otherwise>
             </c:choose>
-
             <c:choose>
             <c:when test="${entitatActual.colorLletra!=null  && not empty entitatActual.colorLletra}">
             .navbar-app .list-inline li.dropdown>a {
@@ -130,23 +129,23 @@
             }
             </c:when>
             <c:otherwise>
-            <c:if test="${sessionScopedContext.capColor!=null  && not empty sessionScopedContext.capColor}">
-            .navbar-app .list-inline li.dropdown>a {
-                color: ${sessionScopedContext.capColor};
-            }
-            .caret-white {
-                border-top-color: ${sessionScopedContext.capColor} !important;
-            }
-            .list-inline.pull-right {
-                color: ${sessionScopedContext.capColor} !important;
-            }
-            #capcalera .colorConfig {
-                color: ${sessionScopedContext.capColor} !important;
-            }
-            #text-logo {
-                color: ${sessionScopedContext.capColor} !important;
-            }
-            </c:if>
+                <c:if test="${sessionScopedContext.capColor!=null  && not empty sessionScopedContext.capColor}">
+                .navbar-app .list-inline li.dropdown>a {
+                    color: ${sessionScopedContext.capColor};
+                }
+                .caret-white {
+                    border-top-color: ${sessionScopedContext.capColor} !important;
+                }
+                .list-inline.pull-right {
+                    color: ${sessionScopedContext.capColor} !important;
+                }
+                #capcalera .colorConfig {
+                    color: ${sessionScopedContext.capColor} !important;
+                }
+                #text-logo {
+                    color: ${sessionScopedContext.capColor} !important;
+                }
+                </c:if>
             </c:otherwise>
             </c:choose>
         </c:if>
@@ -172,7 +171,7 @@
 			<div class="navbar-brand">
 				<div id="govern-logo" class="pull-left">
 					<c:choose>
-						<c:when test="${sessionScopedContext.capLogo!=null  && not empty sessionScopedContext.capLogo || sessionScope['EntitatHelper.entitatActual'].logoCapBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].logoCapBytes)!=0}">
+						<c:when test="${not isRolActualAdministrador && sessionScopedContext.capLogo!=null  && not empty sessionScopedContext.capLogo || sessionScope['EntitatHelper.entitatActual'].logoCapBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].logoCapBytes)!=0}">
 							<img src="<c:url value="/entitat/getEntitatLogoCap"/>"  height="65" alt="Govern de les Illes Balears" />
 						</c:when>
 						<c:otherwise>
@@ -490,7 +489,7 @@
 	<div class="pull-right govern-footer">
 		<p>
 			<c:choose>
-				<c:when test="${sessionScopedContext.peuLogo!=null  && not empty sessionScopedContext.peuLogo || sessionScope['EntitatHelper.entitatActual'].logoPeuBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].logoPeuBytes)!=0}">
+				<c:when test="${not isRolActualAdministrador && sessionScopedContext.peuLogo!=null  && not empty sessionScopedContext.peuLogo || sessionScope['EntitatHelper.entitatActual'].logoPeuBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].logoPeuBytes)!=0}">
 					<img src="<c:url value="/entitat/getEntitatLogoPeu"/>"  height="65" alt="Govern de les Illes Balears" />
 				</c:when>
 				<c:otherwise>
