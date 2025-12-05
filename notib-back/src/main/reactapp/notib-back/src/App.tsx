@@ -5,6 +5,7 @@ import goibLogoDark from './assets/goib_logo_dark.svg';
 import notibLogoLight from './assets/notib_logo_light.png';
 import notibLogoDark from './assets/notib_logo_dark.png';
 import { BaseApp } from './components/BaseApp';
+import DrassanaFooter from './components/DrassanaFooter';
 import AppRoutes from './AppRoutes';
 
 const version = '0.0.0';
@@ -58,7 +59,8 @@ export const App = () => {
         availableLanguages={['ca', 'es']}
         menuEntries={menuEntries}
         appbarBackgroundColor={bgColor}
-        appbarStyle={{ color: textColor }}>
+        appbarStyle={{ color: textColor }}
+        footer={<DrassanaFooter title="NOTIB" backgroundColor="#5F5D5D" />}>
         <AppRoutes />
     </BaseApp>;
 };

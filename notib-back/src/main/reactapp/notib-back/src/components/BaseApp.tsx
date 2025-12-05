@@ -42,6 +42,7 @@ export type BaseAppProps = React.PropsWithChildren & {
     appbarBackgroundColor?: string;
     appbarBackgroundImg?: string;
     appbarStyle?: any;
+    footer?: React.ReactElement;
 };
 
 
@@ -103,6 +104,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         appbarBackgroundColor,
         appbarBackgroundImg,
         appbarStyle,
+        footer,
         children
     } = props;
     const navigate = useNavigate();
@@ -141,6 +143,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
                 <HeaderThemeModeSelector />
             </Box>
         ]}
+        footer={footer}
         persistentSession
         persistentLanguage
         i18nUseTranslation={useTranslation}
