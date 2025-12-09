@@ -245,11 +245,15 @@ public class GestioDocumentalPluginFilesystem extends AbstractSalutPlugin implem
 
 	private String getBaseDir(String agrupacio) {
 
+		logger.info("[GestioDocumentalPluginFilesystem.getBaseDir] properties contains es.caib.notib.plugin.gesdoc.filesystem.base.dir ->" + properties.contains("es.caib.notib.plugin.gesdoc.filesystem.base.dir"));
+		logger.info("[GestioDocumentalPluginFilesystem.getBaseDir] properties es.caib.notib.plugin.gesdoc.filesystem.base.dir " + properties.getProperty("es.caib.notib.plugin.gesdoc.filesystem.base.dir"));
 		String baseDir = properties.getProperty("es.caib.notib.plugin.gesdoc.filesystem.base.dir");
 		if (baseDir == null) {
 			return null;
 		}
-		return baseDir.endsWith("/") ? baseDir + agrupacio : baseDir + "/" + agrupacio;
+		baseDir = baseDir.endsWith("/") ? baseDir + agrupacio : baseDir + "/" + agrupacio;
+		logger.info("[GestioDocumentalPluginFilesystem.getBaseDir] baseDir " + baseDir);
+		return baseDir;
 	}
 
 	private String generateUniqueName(String basedir) {
