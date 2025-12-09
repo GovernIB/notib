@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -27,6 +28,7 @@ import java.util.jar.Manifest;
 
 @RequiredArgsConstructor
 @RestController
+@RequestMapping("/v1/salut")
 public class SalutController {
 
     private final ServletContext servletContext;
@@ -35,7 +37,7 @@ public class SalutController {
 
     private ManifestInfo manifestInfo;
 
-    @GetMapping("/appInfo")
+    @GetMapping("/info")
     public AppInfo appInfo(HttpServletRequest request) throws IOException {
 
         var manifestInfo = getManifestInfo();
@@ -60,7 +62,7 @@ public class SalutController {
                 .toUriString();
     }
 
-    @GetMapping("/salut")
+    @GetMapping
     public SalutInfo health(HttpServletRequest request) throws IOException {
 
         var manifestInfo = getManifestInfo();

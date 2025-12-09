@@ -12,6 +12,8 @@ import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioDiagnostic;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
+import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.repository.DocumentRepository;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
@@ -184,6 +186,7 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 			return plugin;
 		}
 		var pluginClass = getPluginClassProperty();
+		NotibLogger.getInstance().info("Plugin class: " + pluginClass, log, LoggingTipus.GESDOC);
 		if (Strings.isNullOrEmpty(pluginClass)) {
 			var msg = "La classe del plugin de gestió documental no està configurada";
 			log.error(msg);
@@ -191,7 +194,9 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 		}
 		try {
 			var configuracioEspecifica = configHelper.hasEntityGroupPropertiesModified(codiEntitat, getConfigGrup());
+			NotibLogger.getInstance().info("Configuracio especifica: " + configuracioEspecifica, log, LoggingTipus.GESDOC);
 			var propietats = configHelper.getAllEntityProperties(codiEntitat);
+			NotibLogger.getInstance().info("Propietats get es.caib.notib.plugin.gesdoc.filesystem.base.dir: " + propietats.getProperty("es.caib.notib.plugin.gesdoc.filesystem.base.dir"), log, LoggingTipus.GESDOC);
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (GestioDocumentalPlugin) clazz.getDeclaredConstructor(Properties.class, boolean.class)
                     .newInstance(propietats, configuracioEspecifica);

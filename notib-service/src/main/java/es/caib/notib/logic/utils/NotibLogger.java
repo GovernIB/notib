@@ -41,6 +41,8 @@ public class NotibLogger {
         return INSTANCE;
     }
 
+    private static String PLUGIN_PREFIX = "plugin.";
+
 
     @PostConstruct
     public void postConstruct() {
@@ -108,7 +110,10 @@ public class NotibLogger {
     private void getLogTipus(LoggingTipus tipus) {
 
         try {
-            logs.put(tipus, configHelper.getConfigAsBoolean(PREFIX + tipus));
+            var isPlugin = LoggingTipus.KEYCLOAK.equals(tipus) || LoggingTipus.ROLSAC.equals(tipus) || LoggingTipus.UNITATS.equals(tipus) ||
+                            LoggingTipus.GESDOC.equals(tipus) || LoggingTipus.FIRMA_SERVIDOR.equals(tipus) || LoggingTipus.CARPETA.equals(tipus) || LoggingTipus.ARXIU.equals(tipus);
+            var key = PREFIX + (isPlugin ? PLUGIN_PREFIX : "") + tipus;
+            logs.put(tipus, configHelper.getConfigAsBoolean(key));
         } catch (Exception ex) {
             logs.put(tipus, false);
             log.error("Error obtenint la config key ", ex);
