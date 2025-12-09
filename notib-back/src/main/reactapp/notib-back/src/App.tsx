@@ -60,7 +60,8 @@ export const App = () => {
         menuEntries={menuEntries}
         appbarBackgroundColor={bgColor}
         appbarStyle={{ color: textColor }}
-        footer={<DrassanaFooter title="NOTIB" backgroundColor="#5F5D5D" />}>
+        footer={<DrassanaFooter title="NOTIB" backgroundColor="#5F5D5D" />}
+        footerHeight={36}>
         <AppRoutes />
     </BaseApp>;
 };

@@ -18,7 +18,6 @@ export const DrassanaFooter: React.FC<DrassanaFooterProps> = (props) => {
         style,
     } = props;
     const toolbarRef = React.useRef<HTMLDivElement | null>(null);
-    const [toolbarPosX, setToolbarPosX] = React.useState<number>();
     const [buildTimestamp, setBuildTimestamp] = React.useState<string | null>(null);
     const [scmRevision, setScmRevision] = React.useState<string | null>(null);
     const [comandaVersion, setComandaVersion] = React.useState<string | null>(null);
@@ -55,36 +54,17 @@ export const DrassanaFooter: React.FC<DrassanaFooterProps> = (props) => {
             };
         }
     }, []);
-    React.useEffect(() => {
-        const element = toolbarRef.current;
-        if (element) {
-            const checkPosition = () => {
-                const rect = element.getBoundingClientRect();
-                setToolbarPosX(rect.left)
-            };
-            checkPosition();
-            const resizeObserver = new ResizeObserver(checkPosition);
-            resizeObserver.observe(element);
-            const mutationObserver = new MutationObserver(checkPosition);
-            mutationObserver.observe(document.body, { childList: true, subtree: true });
-            return () => {
-                resizeObserver.disconnect();
-                mutationObserver.disconnect();
-            };
-        }
-    }, []);
     const backgroundStyle = backgroundColor ? toolbarBackgroundStyle(backgroundColor) : {};
     return <Toolbar
         ref={toolbarRef}
         style={{
             ...style,
             ...backgroundStyle,
-            width: 'calc(100vw - ' + (toolbarPosX ?? 0) + 'px)'
         }}
         sx={{
             minHeight: '36px !important',
             lineHeight: '0.5em',
-            zIndex: 1000
+            zIndex: (theme) => theme.zIndex.drawer + 100
         }}>
         <Typography
             variant="caption"

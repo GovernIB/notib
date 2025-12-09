@@ -29,6 +29,7 @@ export type MenuProps = {
     shrink?: boolean;
     iconClicked?: boolean;
     drawerWidth?: number;
+    footerHeight?: number;
 };
 
 type ListMenuContentProps = MenuProps & {
@@ -56,7 +57,6 @@ const openedMixin = (theme: Theme, width: number): CSSObject => ({
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.enteringScreen,
     }),
-    overflowX: 'hidden',
 });
 
 const closedMixin = (theme: Theme): CSSObject => ({
@@ -64,7 +64,6 @@ const closedMixin = (theme: Theme): CSSObject => ({
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
     }),
-    overflowX: 'hidden',
     width: `calc(${theme.spacing(6)} + 1px)`,
     [theme.breakpoints.up('sm')]: {
         width: `calc(${theme.spacing(7)} + 1px)`,
@@ -102,7 +101,9 @@ const StyledList = styled(List)<{ component?: React.ElementType }>({
         fontSize: 20,
     },
     paddingTop: 0,
-    paddingBottom: 0,
+    paddingBottom: '8px',
+    overflow: 'auto',
+    overflowX: 'hidden',
 });
 
 const isCurrentMenuEntryOrAnyChildrenSelected = (
@@ -207,7 +208,6 @@ const ListMenuContent: React.FC<ListMenuContentProps> = (props) => {
         <StyledList>
             {entries?.map((item, index) => {
                 const selected = isCurrentMenuEntryOrAnyChildrenSelected(item, locationPath);
-                console.log('>>> selected', item, selected)
                 const entryComponent = item.divider ? (
                     <Divider key={index} />
                 ) : (
@@ -258,7 +258,15 @@ const MenuTitle: React.FC<MenuTitleProps> = (props) => {
 };
 
 export const Menu: React.FC<MenuProps> = (props) => {
-    const { title, entries, onTitleClose, shrink, iconClicked, drawerWidth = 240 } = props;
+    const {
+        title,
+        entries,
+        onTitleClose,
+        shrink,
+        iconClicked,
+        drawerWidth = 240,
+        footerHeight,
+    } = props;
     const smallScreen = useSmallScreen();
     const smallHeader = useSmallHeader();
     const [open, setOpen] = React.useState<boolean>(false);
@@ -280,6 +288,7 @@ export const Menu: React.FC<MenuProps> = (props) => {
                 shrink={!smallScreen ? shrink : false}
                 onMenuItemClick={handleMenuItemClick}
             />
+            {footerHeight && <Box sx={{ mb: footerHeight + 'px' }} />}
         </>
     );
     return !smallScreen ? (

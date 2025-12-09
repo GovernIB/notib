@@ -43,6 +43,7 @@ export type BaseAppProps = React.PropsWithChildren & {
     appbarBackgroundImg?: string;
     appbarStyle?: any;
     footer?: React.ReactElement;
+    footerHeight?: number;
 };
 
 
@@ -105,6 +106,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         appbarBackgroundImg,
         appbarStyle,
         footer,
+        footerHeight,
         children
     } = props;
     const navigate = useNavigate();
@@ -144,6 +146,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             </Box>
         ]}
         footer={footer}
+        footerHeight={footerHeight}
         persistentSession
         persistentLanguage
         i18nUseTranslation={useTranslation}
