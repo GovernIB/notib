@@ -6,7 +6,10 @@ const translationCa = {
         enviaments: "Enviaments",
     },
     page: {
-        notFound: "No trobat",
+        notFound: {
+            title: "Pàgina no trobada",
+            toHome: "Anar a l'inici",
+        },
     },
     component: {
         HeaderThemeSelector: {

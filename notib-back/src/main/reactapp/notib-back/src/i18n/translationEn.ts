@@ -6,7 +6,10 @@ const translationEn = {
         enviaments: "Deliveries",
     },
     page: {
-        notFound: "Not found",
+        notFound: {
+            title: "Page not found",
+            toHome: "Go to home",
+        },
     },
     component: {
         HeaderThemeSelector: {

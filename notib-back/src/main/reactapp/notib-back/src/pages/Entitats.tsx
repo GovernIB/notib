@@ -18,12 +18,11 @@ const columns: MuiDataGridColDef[] = [{
 const Entitats = () => {
     const { t } = useTranslation();
     return (
-        <GridPage>
+        <GridPage disableMargins={false}>
             <MuiDataGrid
                 title={t('menu.entitats')}
                 resourceName="entitatResource"
                 columns={columns}
-                toolbarType="upper"
                 popupEditCreateActive
                 popupEditFormContent={<>
                     <FormField name="entregaPostalActiva" />
