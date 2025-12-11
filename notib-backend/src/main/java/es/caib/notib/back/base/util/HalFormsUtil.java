@@ -1,14 +1,14 @@
-package es.caib.notib.logic.intf.base.util;
+package es.caib.notib.back.base.util;
 
 import es.caib.notib.logic.intf.base.annotation.ResourceField;
 import es.caib.notib.logic.intf.base.exception.ComponentNotFoundException;
 import es.caib.notib.logic.intf.base.exception.ResourceNotCreatedException;
 import es.caib.notib.logic.intf.base.service.MutableResourceService;
-import es.caib.notib.logic.intf.base.service.ResourceServiceLocator;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,18 +19,24 @@ import java.util.Map;
  */
 public class HalFormsUtil {
 
-	public static Map<String, Object> getNewResourceValues(Class<?> resourceClass) throws ResourceNotCreatedException {
+	public static Map<String, Object> getNewResourceValues(
+			Class<?> resourceClass,
+			ResourceServiceLocator resourceServiceLocator) throws ResourceNotCreatedException {
 		Map<String, Object> values = new HashMap<>();
-		ResourceServiceLocator resourceServiceLocator = ResourceServiceLocator.getInstance();
 		if (resourceServiceLocator != null) {
 			try {
-				MutableResourceService<?, ?> mutableResourceService = ResourceServiceLocator.getInstance().
+				MutableResourceService<?, ?> mutableResourceService = resourceServiceLocator.
 						getMutableEntityResourceServiceForResourceClass(resourceClass);
 				Object newInstance = mutableResourceService.newResourceInstance();
 				if (newInstance != null) {
 					values.putAll(toMap(newInstance));
 				}
-			} catch (ComponentNotFoundException ignored) {}
+			} catch (ComponentNotFoundException ex) {
+				try {
+					values.putAll(toMap(resourceClass.getDeclaredConstructor().newInstance()));
+				} catch (InstantiationException | NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {
+				}
+			}
 		}
 		return values;
 	}

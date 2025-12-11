@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import es.caib.notib.back.base.util.ResourceServiceLocator;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.annotation.ResourceField;
 import es.caib.notib.logic.intf.base.config.PropertyConfig;
@@ -15,7 +16,6 @@ import es.caib.notib.logic.intf.base.model.*;
 import es.caib.notib.logic.intf.base.permission.ResourcePermissions;
 import es.caib.notib.logic.intf.base.service.ReadonlyResourceService;
 import es.caib.notib.logic.intf.base.service.ResourceApiService;
-import es.caib.notib.logic.intf.base.service.ResourceServiceLocator;
 import es.caib.notib.logic.intf.base.util.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -110,6 +110,8 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	protected ObjectMapper objectMapper;
 	@Autowired
 	protected SmartValidator validator;
+	@Autowired
+	protected ResourceServiceLocator resourceServiceLocator;
 
 	private Class<R> resourceClass;
 	private ExpressionParser parser;
@@ -1037,7 +1039,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			if (pageable != null) {
 				// Només es fa la consulta de recursos si la petició conté informació de paginació.
 				Class<?> referencedResourceClass = referencedResourceFieldAndClass.get().getClazz();
-				ReadonlyResourceService<RR, ?> resourceService = (ReadonlyResourceService<RR, ?>) ResourceServiceLocator.getInstance().
+				ReadonlyResourceService<RR, ?> resourceService = (ReadonlyResourceService<RR, ?>)resourceServiceLocator.
 						getReadOnlyEntityResourceServiceForResourceClass(referencedResourceClass);
 				Page<RR> page = resourceService.findPage(
 						quickFilter,
@@ -1101,7 +1103,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 				fieldName);
 		if (referencedResourceFieldAndClass.isPresent()) {
 			Class<?> referencedResourceClass = referencedResourceFieldAndClass.get().getClazz();
-			ReadonlyResourceService<RR, RID> resourceService = (ReadonlyResourceService<RR, RID>)ResourceServiceLocator.getInstance().
+			ReadonlyResourceService<RR, RID> resourceService = (ReadonlyResourceService<RR, RID>)resourceServiceLocator.
 					getReadOnlyEntityResourceServiceForResourceClass(referencedResourceClass);
 			RR resource = resourceService.getOne(id, perspectives);
 			EntityModel<RR> entityModel = toEntityModel(

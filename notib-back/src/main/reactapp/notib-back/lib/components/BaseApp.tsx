@@ -239,13 +239,13 @@ const ContentComponentDefault: React.FC<BaseAppContentComponentProps> = (props) 
                 flexDirection: 'column',
                 height: mainBoxHeight
             }}>
-            <div>{appbarComponent}</div>
+            {appbarComponent}
             <div
                 style={{
                     display: 'flex',
                     flexGrow: 1,
                 }}>
-                {menuComponent}
+                <nav>{menuComponent}</nav>
                 <main
                     style={{
                         flexGrow: 1,

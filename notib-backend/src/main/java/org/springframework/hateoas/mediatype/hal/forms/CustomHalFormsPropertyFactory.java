@@ -18,10 +18,11 @@
 // S'ha afegit el mètode GET a ENTITY_ALTERING_METHODS per a que aquest mètode inclogui properties a la resposta
 package org.springframework.hateoas.mediatype.hal.forms;
 
+import es.caib.notib.back.base.util.HalFormsUtil;
+import es.caib.notib.back.base.util.ResourceServiceLocator;
 import es.caib.notib.logic.intf.base.annotation.ResourceField;
 import es.caib.notib.logic.intf.base.model.FileReference;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
-import es.caib.notib.logic.intf.base.util.HalFormsUtil;
 import es.caib.notib.logic.intf.base.util.TypeUtil;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.hateoas.AffordanceModel.InputPayloadMetadata;
@@ -55,6 +56,7 @@ public class CustomHalFormsPropertyFactory {
 
 	private final HalFormsConfiguration configuration;
 	private final MessageResolver resolver;
+	private final ResourceServiceLocator resourceServiceLocator;
 
 	/**
 	 * Creates a new {@link CustomHalFormsPropertyFactory} for the given {@link HalFormsConfiguration} and
@@ -63,13 +65,17 @@ public class CustomHalFormsPropertyFactory {
 	 * @param configuration must not be {@literal null}.
 	 * @param resolver must not be {@literal null}.
 	 */
-	public CustomHalFormsPropertyFactory(HalFormsConfiguration configuration, MessageResolver resolver) {
+	public CustomHalFormsPropertyFactory(
+			HalFormsConfiguration configuration,
+			MessageResolver resolver,
+			ResourceServiceLocator resourceServiceLocator) {
 
 		Assert.notNull(configuration, "HalFormsConfiguration must not be null!");
 		Assert.notNull(resolver, "MessageResolver must not be null!");
 
 		this.configuration = configuration;
 		this.resolver = resolver;
+		this.resourceServiceLocator = resourceServiceLocator;
 	}
 
 	/**
@@ -149,7 +155,7 @@ public class CustomHalFormsPropertyFactory {
 
 			HalFormsOptions options = optionsFactory.getOptions(payload, metadata);
 
-			Map<String, Object> values = HalFormsUtil.getNewResourceValues(payload.getType());
+			Map<String, Object> values = HalFormsUtil.getNewResourceValues(payload.getType(), resourceServiceLocator);
 
 			HalFormsProperty property = new HalFormsProperty()
 					.withName(metadata.getName())

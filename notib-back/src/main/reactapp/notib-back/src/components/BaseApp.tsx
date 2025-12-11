@@ -20,6 +20,7 @@ import {
 } from 'reactlib';
 import HeaderThemeModeSelector from './HeaderThemeModeSelector';
 import HeaderLanguageSelector from './HeaderLanguageSelector';
+import Offline from './Offline';
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
@@ -145,6 +146,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
                 <HeaderThemeModeSelector />
             </Box>
         ]}
+        offline={<Offline />}
         footer={footer}
         footerHeight={footerHeight}
         persistentSession

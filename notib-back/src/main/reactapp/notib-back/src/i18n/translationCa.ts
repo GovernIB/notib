@@ -6,6 +6,10 @@ const translationCa = {
         enviaments: "Enviaments",
     },
     page: {
+        entitats: {
+            title: "Entitats",
+            resourceTitle: "entitat",
+        },
         notFound: {
             title: "Pàgina no trobada",
             toHome: "Anar a l'inici",
@@ -23,6 +27,10 @@ const translationCa = {
                 es: "Castellà",
             },
         },
+        Offline: {
+            message: "Sense connexió amb el servidor",
+            retry: "Tornar a provar"
+        }
     },
 };
 

@@ -3,13 +3,14 @@ package es.caib.notib.back.base.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.notib.back.base.controller.MutableResourceController;
 import es.caib.notib.back.base.controller.ReadonlyResourceController;
+import es.caib.notib.back.base.util.HalFormsUtil;
+import es.caib.notib.back.base.util.ResourceServiceLocator;
 import es.caib.notib.logic.intf.base.annotation.ResourceArtifact;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.annotation.ResourceField;
 import es.caib.notib.logic.intf.base.model.Resource;
 import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
-import es.caib.notib.logic.intf.base.util.HalFormsUtil;
 import es.caib.notib.logic.intf.base.util.I18nUtil;
 import es.caib.notib.logic.intf.base.util.StringUtil;
 import es.caib.notib.logic.intf.base.util.TypeUtil;
@@ -50,6 +51,8 @@ public class HalFormsConfig {
 
 	@Autowired(required = false)
 	private Set<ReadonlyResourceController> resourceControllers;
+	@Autowired
+	private ResourceServiceLocator resourceServiceLocator;
 	@Autowired
 	protected ObjectMapper objectMapper;
 
@@ -154,7 +157,9 @@ public class HalFormsConfig {
 						resourceClass,
 						resourceField.getName(),
 						metadata -> {
-							Map<String, Object> newResourceValues = HalFormsUtil.getNewResourceValues(resourceClass);
+							Map<String, Object> newResourceValues = HalFormsUtil.getNewResourceValues(
+									resourceClass,
+									resourceServiceLocator);
 							return HalFormsOptions.
 									inline(getInlineOptionsEnumConstants(resourceField)).
 									withValueField("id").
@@ -183,7 +188,9 @@ public class HalFormsConfig {
 									artifact,
 									resourceField,
 									resourceControllerClasses);
-							Map<String, Object> newResourceValues = HalFormsUtil.getNewResourceValues(optionsResourceClass);
+							Map<String, Object> newResourceValues = HalFormsUtil.getNewResourceValues(
+									resourceClass,
+									resourceServiceLocator);
 							return HalFormsOptions.
 									remote(remoteOptionsLink != null ? remoteOptionsLink : Link.of("_readonly_ref_")).
 									withValueField("id").
@@ -212,7 +219,9 @@ public class HalFormsConfig {
 									artifact,
 									resourceField,
 									resourceControllerClasses);
-							Map<String, Object> newResourceValues = HalFormsUtil.getNewResourceValues(optionsResourceClass);
+							Map<String, Object> newResourceValues = HalFormsUtil.getNewResourceValues(
+									resourceClass,
+									resourceServiceLocator);
 							return HalFormsOptions.
 									remote(remoteOptionsLink != null ? remoteOptionsLink : Link.of("_readonly_enum_")).
 									withValueField("value").

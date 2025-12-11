@@ -6,6 +6,10 @@ const translationEs = {
         enviaments: "Envíos",
     },
     page: {
+        entitats: {
+            title: "Entidades",
+            resourceTitle: "entidad",
+        },
         notFound: {
             title: "Página no encontrada",
             toHome: "Ir al inicio",
