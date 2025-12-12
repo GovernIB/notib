@@ -7,8 +7,16 @@ const translationCa = {
     },
     page: {
         entitats: {
-            title: "Entitats",
-            resourceTitle: "entitat",
+            grid: {
+                title: "Entitats",
+            },
+            form: {
+                titleCreate: "Crear entitat",
+                titleUpdate: "Modificar entitat",
+            },
+            tabs: {
+                dades: "Dades",
+            }
         },
         notFound: {
             title: "Pàgina no trobada",

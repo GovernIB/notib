@@ -7,8 +7,16 @@ const translationEn = {
     },
     page: {
         entitats: {
-            title: "Entities",
-            resourceTitle: "entity",
+            grid: {
+                title: "Entities",
+            },
+            form: {
+                titleCreate: "Create entity",
+                titleUpdate: "Update entity",
+            },
+            tabs: {
+                dades: "Data",
+            }
         },
         notFound: {
             title: "Page not found",
@@ -27,6 +35,10 @@ const translationEn = {
                 es: "Spanish",
             },
         },
+        Offline: {
+            message: "Server connection lost",
+            retry: "Retry"
+        }
     },
 };
 

@@ -1,12 +1,37 @@
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
-import { FormField, GridPage, MuiDataGrid } from 'reactlib';
+import {
+    GridPage,
+    FormPage,
+    MuiDataGrid,
+    MuiForm,
+    FormField,
+ } from 'reactlib';
 
 const EntitatFormContent: React.FC = () => {
     return <Grid container spacing={2}>
+        <Grid size={12}><FormField name="codi" /></Grid>
+        <Grid size={12}><FormField name="nom" /></Grid>
+        <Grid size={12}><FormField name="dir3Codi" /></Grid>
+        <Grid size={12}><FormField name="activa" /></Grid>
         <Grid size={12}><FormField name="entregaPostalActiva" /></Grid>
         <Grid size={12}><FormField name="campProva" /></Grid>
     </Grid>;
+}
+
+export const EntitatForm: React.FC = () => {
+    const { t } = useTranslation();
+    const { id } = useParams();
+    return <FormPage>
+        <MuiForm
+            componentProps={{ style: { height: '100%' } }}
+            id={id}
+            title={id != null ? t('page.entitats.form.titleUpdate') : t('page.entitats.form.titleCreate')}
+            resourceName="entitatResource">
+            <EntitatFormContent />
+        </MuiForm>
+    </FormPage>;
 }
 
 const Entitats = () => {
@@ -27,14 +52,12 @@ const Entitats = () => {
     return (
         <GridPage disableMargins={false}>
             <MuiDataGrid
-                title={t('page.entitats.title')}
+                title={t('page.entitats.grid.title')}
                 resourceName="entitatResource"
                 columns={columns}
                 paginationActive
-                popupEditCreateActive
-                popupEditFormDialogResourceTitle={t('page.entitats.resourceTitle')}
-                popupEditFormContent={<EntitatFormContent />}
-            />
+                toolbarCreateLink="form"
+                rowUpdateLink="form/{{id}}" />
         </GridPage>
     );
 };

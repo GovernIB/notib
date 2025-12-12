@@ -7,8 +7,16 @@ const translationEs = {
     },
     page: {
         entitats: {
-            title: "Entidades",
-            resourceTitle: "entidad",
+            grid: {
+                title: "Entidades",
+            },
+            form: {
+                titleCreate: "Crear entidad",
+                titleUpdate: "Modificar entidad",
+            },
+            tabs: {
+                dades: "Datos",
+            }
         },
         notFound: {
             title: "Página no encontrada",
