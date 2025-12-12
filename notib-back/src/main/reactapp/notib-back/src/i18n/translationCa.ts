@@ -13,6 +13,12 @@ const translationCa = {
             form: {
                 titleCreate: "Crear entitat",
                 titleUpdate: "Modificar entitat",
+                tabs: {
+                    dades: "Dades",
+                    personalitzar: "Personalitzar",
+                    aplicacions: "Aplicacions",
+                    permisos: "Permisos",
+                },
             },
             tabs: {
                 dades: "Dades",

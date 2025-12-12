@@ -13,6 +13,12 @@ const translationEn = {
             form: {
                 titleCreate: "Create entity",
                 titleUpdate: "Update entity",
+                tabs: {
+                    dades: "Data",
+                    personalitzar: "Customize",
+                    aplicacions: "Applications",
+                    permisos: "Permissions",
+                },
             },
             tabs: {
                 dades: "Data",

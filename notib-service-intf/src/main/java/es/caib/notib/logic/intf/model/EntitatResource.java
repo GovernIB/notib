@@ -1,5 +1,6 @@
 package es.caib.notib.logic.intf.model;
 
+import es.caib.notib.client.domini.Registre;
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
@@ -11,6 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -23,8 +25,10 @@ import javax.validation.constraints.Size;
 @Getter
 @Setter
 @NoArgsConstructor
+@FieldNameConstants
 @ResourceConfig(
-		descriptionField = "nom",
+		descriptionField = EntitatResource.Fields.nom,
+		quickFilterFields = { EntitatResource.Fields.codi, EntitatResource.Fields.nom },
 		accessConstraints = @ResourceAccessConstraint(
 				type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
 				roles = { BaseConfig.ROLE_SUPER },

@@ -1,7 +1,6 @@
 package es.caib.notib.persist.base.entity;
 
 import es.caib.notib.logic.intf.base.model.Resource;
-import es.caib.notib.persist.entity.UsuariEntity;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;
@@ -30,14 +29,12 @@ public abstract class BaseAuditableEntity<R extends Resource<?>, PK extends Seri
 		implements AuditableEntity {
 
 	@CreatedBy
-	@Convert(converter = UsuariEntityToStringConverter.class)
 	@Column(name = "createdby_codi", length = 64, nullable = false)
 	private String createdBy;
 	@CreatedDate
 	@Column(name = "createddate", nullable = false)
 	private LocalDateTime createdDate;
 	@LastModifiedBy
-	@Convert(converter = UsuariEntityToStringConverter.class)
 	@Column(name = "lastmodifiedby_codi", length = 64)
 	private String lastModifiedBy;
 	@LastModifiedDate
@@ -58,18 +55,6 @@ public abstract class BaseAuditableEntity<R extends Resource<?>, PK extends Seri
 			LocalDateTime lastModifiedDate) {
 		this.lastModifiedBy = lastModifiedBy;
 		this.lastModifiedDate = (lastModifiedDate != null) ? lastModifiedDate : LocalDateTime.now();
-	}
-
-	@Converter
-	public static class UsuariEntityToStringConverter implements AttributeConverter<UsuariEntity, String> {
-		@Override
-		public String convertToDatabaseColumn(UsuariEntity entity) {
-			return (entity != null) ? entity.getCodi() : null;
-		}
-		@Override
-		public UsuariEntity convertToEntityAttribute(String dbData) {
-			return null;
-		}
 	}
 
 }

@@ -1,23 +1,53 @@
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
+import Badge from '@mui/material/Badge';
 import {
     GridPage,
     FormPage,
     MuiDataGrid,
     MuiForm,
     FormField,
+    MuiFormTabs,
+    MuiFormTabContent,
  } from 'reactlib';
 
 const EntitatFormContent: React.FC = () => {
-    return <Grid container spacing={2}>
-        <Grid size={12}><FormField name="codi" /></Grid>
-        <Grid size={12}><FormField name="nom" /></Grid>
-        <Grid size={12}><FormField name="dir3Codi" /></Grid>
-        <Grid size={12}><FormField name="activa" /></Grid>
-        <Grid size={12}><FormField name="entregaPostalActiva" /></Grid>
-        <Grid size={12}><FormField name="campProva" /></Grid>
-    </Grid>;
+    const { t } = useTranslation();
+    const aplicacionsTabLabel = <Badge badgeContent={0} color="primary">
+        {t('page.entitats.form.tabs.aplicacions')}
+    </Badge>;
+    const permisosTabLabel = <Badge badgeContent={0} color="primary">
+        {t('page.entitats.form.tabs.permisos')}
+    </Badge>;
+    const tabs = [
+        t('page.entitats.form.tabs.dades'),
+        t('page.entitats.form.tabs.personalitzar'),
+        { label: aplicacionsTabLabel },
+        { label: permisosTabLabel },
+    ];
+    return <MuiFormTabs
+        tabs={tabs}
+        tabIndexesWithGrids={[1]}>
+        <MuiFormTabContent index={0} showOnCreate>
+            <Grid container spacing={2}>
+                <Grid size={12}><FormField name="codi" /></Grid>
+                <Grid size={12}><FormField name="nom" /></Grid>
+                <Grid size={12}><FormField name="dir3Codi" /></Grid>
+                <Grid size={12}><FormField name="activa" /></Grid>
+            </Grid>
+        </MuiFormTabContent>
+        <MuiFormTabContent index={1}>
+            <Grid container spacing={2}>
+                <Grid size={12}><FormField name="colorLletra" type="color" /></Grid>
+                <Grid size={12}><FormField name="colorFons" type="color" /></Grid>
+            </Grid>
+        </MuiFormTabContent>
+        <MuiFormTabContent index={2}>
+        </MuiFormTabContent>
+        <MuiFormTabContent index={3}>
+        </MuiFormTabContent>
+    </MuiFormTabs>;
 }
 
 export const EntitatForm: React.FC = () => {
@@ -57,6 +87,7 @@ const Entitats = () => {
                 columns={columns}
                 paginationActive
                 toolbarCreateLink="form"
+                rowLink="form/{{id}}"
                 rowUpdateLink="form/{{id}}" />
         </GridPage>
     );
