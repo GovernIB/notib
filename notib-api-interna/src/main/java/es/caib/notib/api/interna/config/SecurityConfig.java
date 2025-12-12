@@ -75,8 +75,6 @@ public class SecurityConfig {
 			"/adviser/**",
 			"/v1/salut",
 			"/v1/salut/**",
-			"/v1/estadistiques",
-			"/v1/estadistiques/**",
 			"/sir/adviser/sincronitzar"
 	};
 
