@@ -10,7 +10,31 @@ import {
     FormField,
     MuiFormTabs,
     MuiFormTabContent,
- } from 'reactlib';
+    useFormContext,
+} from 'reactlib';
+
+const EntitatFormTabPermisos: React.FC = () => {
+    const { id } = useFormContext();
+    const columns=[{
+        field: 'grantedAuthority',
+        sortable: false,
+        flex: 2
+    }, {
+        field: 'sidName',
+        sortable: false,
+        flex: 5
+    }, {
+        field: 'readAllowed',
+        sortable: false,
+        flex: 1
+    }];
+    return <MuiDataGrid
+        title={"permisos"}
+        resourceName="aclEntryResource"
+        staticFilter={"resourceName:'entitatResource' and resourceId:" + id}
+        columns={columns}
+        />;
+}
 
 const EntitatFormContent: React.FC = () => {
     const { t } = useTranslation();
@@ -28,7 +52,7 @@ const EntitatFormContent: React.FC = () => {
     ];
     return <MuiFormTabs
         tabs={tabs}
-        tabIndexesWithGrids={[1]}>
+        tabIndexesWithGrids={[2, 3]}>
         <MuiFormTabContent index={0} showOnCreate>
             <Grid container spacing={2}>
                 <Grid size={12}><FormField name="codi" /></Grid>
@@ -46,6 +70,7 @@ const EntitatFormContent: React.FC = () => {
         <MuiFormTabContent index={2}>
         </MuiFormTabContent>
         <MuiFormTabContent index={3}>
+            <EntitatFormTabPermisos />
         </MuiFormTabContent>
     </MuiFormTabs>;
 }

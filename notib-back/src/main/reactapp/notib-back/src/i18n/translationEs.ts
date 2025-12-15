@@ -41,6 +41,14 @@ const translationEs = {
                 es: "Castellano",
             },
         },
+        Offline: {
+            message: "Sin conexión con el servidor",
+            retry: "Volver a intentar"
+        },
+        AclPermissionManager: {
+            title: "Permisos",
+            resourceTitle: "Permiso",
+        },
     },
 };
 

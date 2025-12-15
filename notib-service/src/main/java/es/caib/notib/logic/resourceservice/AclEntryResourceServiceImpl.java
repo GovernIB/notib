@@ -2,26 +2,30 @@ package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.helper.AclHelper;
+import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
+import es.caib.notib.logic.intf.base.util.StringUtil;
 import es.caib.notib.logic.intf.model.AclEntryResource;
-import es.caib.notib.logic.intf.model.AclEntryResourceType;
 import es.caib.notib.logic.intf.model.EntitatResource;
 import es.caib.notib.logic.intf.resourceservice.AclEntryResourceService;
+import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.resourceentity.AclEntryResourceEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.data.domain.*;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.model.AccessControlEntry;
 import org.springframework.security.acls.model.Acl;
-import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
@@ -37,34 +41,6 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 	private final AclHelper aclHelper;
 
 	@Override
-	public boolean anyPermissionGranted(
-			AclEntryResourceType resourceType,
-			Serializable resourceId,
-			List<PermissionEnum> permissions) {
-		List<Permission> aclPermissions = Optional.ofNullable(permissions).
-				orElseGet(List::of).stream().
-				map(PermissionEnum::toPermission).
-				collect(Collectors.toList());
-		return aclHelper.anyPermissionGranted(
-				getClassFromResourceType(resourceType),
-				resourceId,
-				aclPermissions);
-	}
-
-	@Override
-	public Set<Serializable> findIdsWithAnyPermission(
-			AclEntryResourceType resourceType,
-			List<PermissionEnum> permissions) {
-		List<Permission> aclPermissions = Optional.ofNullable(permissions).
-				orElseGet(List::of).stream().
-				map(PermissionEnum::toPermission).
-				collect(Collectors.toList());
-		return aclHelper.findIdsWithAnyPermission(
-				getClassFromResourceType(resourceType),
-				aclPermissions);
-	}
-
-	@Override
 	protected boolean isEntityRepositoryOptional() {
 		return true;
 	}
@@ -72,7 +48,7 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 	@Override
 	protected Optional<AclEntryResourceEntity> entityRepositoryFindOne(String id) {
 		AclEntryResource.AclEntryPk pk = AclEntryResource.AclEntryPk.deserializeFromString(id);
-		Class<?> resourceClass = getClassFromResourceType(pk.getResourceType());
+		Class<?> resourceClass = getClassFromResourceName(pk.getResourceName());
 		if (resourceClass != null) {
 			Acl acl = aclHelper.get(
 					resourceClass,
@@ -101,8 +77,8 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 			Pageable pageable) {
 		boolean filterContainsOr = filter != null && filter.contains(" or ");
 		List<String[]> filterTriplets = extractFilterTriplets(filter);
-		String filterResourceType = filterTriplets.stream().
-				filter(t -> t[0].equals("resourceType") && t[1].equals(":")).
+		String filterResourceName = filterTriplets.stream().
+				filter(t -> t[0].equals("resourceName") && t[1].equals(":")).
 				findFirst().
 				map(t-> t[2]).
 				orElse(null);
@@ -111,9 +87,9 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 				findFirst().
 				map(t-> t[2]).
 				orElse(null);
-		boolean filterOk = filter != null && !filterContainsOr && filterResourceType != null && filterResourceId != null;
+		boolean filterOk = filter != null && !filterContainsOr && filterResourceName != null && filterResourceId != null;
 		if (filterOk) {
-			Class<?> resourceClass = getClassFromResourceType(AclEntryResourceType.valueOf(filterResourceType));
+			Class<?> resourceClass = getClassFromResourceName(filterResourceName);
 			Long resourceId = Long.parseLong(filterResourceId);
 			Acl acl = aclHelper.get(
 					resourceClass,
@@ -155,7 +131,7 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 		if (resource.isPerm8Allowed()) permissionsGranted.add(PermissionEnum.PERM8);
 		if (resource.isPerm9Allowed()) permissionsGranted.add(PermissionEnum.PERM9);
 		aclHelper.set(
-				getClassFromResourceType(resource.getResourceType()),
+				getClassFromResourceName(resource.getResourceName()),
 				resource.getResourceId(),
 				resource.getSidName(),
 				resource.isGrantedAuthority(),
@@ -177,7 +153,7 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 	protected void entityRepositoryDelete(AclEntryResourceEntity entity) {
 		AclEntryResource resource = entity.getResource();
 		aclHelper.delete(
-				getClassFromResourceType(resource.getResourceType()),
+				getClassFromResourceName(resource.getResourceName()),
 				resource.getResourceId(),
 				resource.getSidName(),
 				resource.isGrantedAuthority());
@@ -242,11 +218,11 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 			aclEntry.setGrantedAuthority(true);
 			aclEntry.setSidName(((GrantedAuthoritySid)sid).getGrantedAuthority());
 		}
-		AclEntryResourceType resourceType = getResourceTypeFromClassName(resourceClassName);
-		aclEntry.setResourceType(resourceType);
+		String resourceName = getResourceNameFromClassName(resourceClassName);
+		aclEntry.setResourceName(resourceName);
 		aclEntry.setResourceId(resourceId);
 		AclEntryResource.AclEntryPk pk = new AclEntryResource.AclEntryPk(
-				resourceType,
+				resourceName,
 				resourceId,
 				aclEntry.isGrantedAuthority(),
 				aclEntry.getSidName());
@@ -283,6 +259,9 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 					"(\\[[^\\]]*\\]|'[^']*'|\"[^\"]*\"|\\d+\\.?\\d*|[^\\s\\)]+)",
 			Pattern.CASE_INSENSITIVE);
 
+	private static final List<Map.Entry<Class<?>, Class<?>>> aclClassMapping = List.of(
+			Map.entry(EntitatResource.class, EntitatEntity.class));
+
 	private List<String[]> extractFilterTriplets(String filter) {
 		Matcher matcher = TRIPLET_PATTERN.matcher(filter);
 		List<String[]> triplets = new ArrayList<>();
@@ -298,24 +277,58 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 		return triplets;
 	}
 
-	private Class<?> getClassFromResourceType(AclEntryResourceType resourceType) {
-		if (resourceType != null) {
-			if (resourceType == AclEntryResourceType.ENTITAT) {
-				return EntitatResource.class;
+	private Class<?> getClassFromResourceName(String resourceName) {
+		if (resourceName != null) {
+			try {
+				ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+				String basePath = BaseConfig.BASE_PACKAGE.replace(".", "/");
+				org.springframework.core.io.Resource[] resources = resolver.getResources(
+						"classpath*:" + basePath + "/**/" +
+								StringUtil.capitalize(resourceName) +
+								".class");
+				for (org.springframework.core.io.Resource resource: resources) {
+					String path = resource.getURL().getPath();
+					String className = path.
+							substring(path.indexOf(basePath)).
+							replace("/", ".").
+							replace(".class", "");
+					return getAclClassMappingForKey(Class.forName(className));
+				}
+			} catch (IOException | ClassNotFoundException ex) {
+				log.warn("Couldn't find class for resource name {}", resourceName, ex);
 			}
 		}
 		return null;
 	}
 
-	private AclEntryResourceType getResourceTypeFromClassName(String className) {
+	private String getResourceNameFromClassName(String className) {
 		if (className != null) {
-			if (className.equals(EntitatResource.class.getName())) {
-				return AclEntryResourceType.ENTITAT;
-			} else {
-				log.error("Couldn't find ResourceType for className " + className);
+			try {
+				Class<?> clazz = getAclClassMappingForValue(Class.forName(className));
+				return StringUtil.decapitalize(clazz.getSimpleName());
+			} catch (ClassNotFoundException ex) {
+				log.warn("Couldn't find class for {}", className, ex);
 			}
 		}
 		return null;
+	}
+
+	private Class<?> getAclClassMappingForKey(Class<?> key) {
+		for (Map.Entry<Class<?>, Class<?>> mapping: aclClassMapping) {
+			if (mapping.getKey().equals(key)) {
+				return mapping.getValue();
+			}
+		}
+		return key;
+	}
+
+	private Class<?> getAclClassMappingForValue(Class<?> value) {
+		for (Map.Entry<Class<?>, Class<?>> mapping: aclClassMapping) {
+			if (mapping.getValue().equals(value)) {
+				return mapping.getKey();
+			}
+		}
+		return value;
 	}
 
 	private <T> Comparator<T> createGetterBasedComparator(Sort sort) {

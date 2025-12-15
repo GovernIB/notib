@@ -44,7 +44,11 @@ const translationCa = {
         Offline: {
             message: "Sense connexió amb el servidor",
             retry: "Tornar a provar"
-        }
+        },
+        AclPermissionManager: {
+            title: "Permisos",
+            resourceTitle: "Permís",
+        },
     },
 };
 

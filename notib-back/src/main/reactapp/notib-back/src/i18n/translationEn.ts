@@ -44,7 +44,11 @@ const translationEn = {
         Offline: {
             message: "Server connection lost",
             retry: "Retry"
-        }
+        },
+        AclPermissionManager: {
+            title: "Permissions",
+            resourceTitle: "Permission",
+        },
     },
 };
 

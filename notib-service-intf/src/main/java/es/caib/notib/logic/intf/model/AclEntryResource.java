@@ -40,7 +40,7 @@ public class AclEntryResource extends BaseResource<String> {
 	@Size(max = 128)
 	private String sidName;
 	@NotNull
-	private AclEntryResourceType resourceType;
+	private String resourceName;
 	@NotNull
 	private Serializable resourceId;
 	private boolean readAllowed;
@@ -64,19 +64,19 @@ public class AclEntryResource extends BaseResource<String> {
 	@Getter
 	@RequiredArgsConstructor
 	public static class AclEntryPk {
-		private final AclEntryResourceType resourceType;
+		private final String resourceName;
 		private final Serializable resourceId;
 		private final boolean sidPrincipal;
 		private final String sidName;
 		public String serializeToString() {
-			String joined = resourceType + "|" + resourceId + "|" + (sidPrincipal ? 0 : 1) + "|" + sidName;
+			String joined = resourceName + "|" + resourceId + "|" + (sidPrincipal ? 0 : 1) + "|" + sidName;
 			return Base64.getEncoder().encodeToString(joined.getBytes());
 		}
 		public static AclEntryPk deserializeFromString(String str) {
 			String decoded = new String(Base64.getDecoder().decode(str));
 			String[] parts = decoded.split("\\|");
 			return new AclEntryPk(
-					AclEntryResourceType.valueOf(parts[0]),
+					parts[0],
 					Long.parseLong(parts[1]),
 					"1".equals(parts[2]),
 					parts[3]);
