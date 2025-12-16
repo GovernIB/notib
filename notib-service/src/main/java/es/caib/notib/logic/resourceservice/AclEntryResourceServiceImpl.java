@@ -130,6 +130,7 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 		if (resource.isPerm7Allowed()) permissionsGranted.add(PermissionEnum.PERM7);
 		if (resource.isPerm8Allowed()) permissionsGranted.add(PermissionEnum.PERM8);
 		if (resource.isPerm9Allowed()) permissionsGranted.add(PermissionEnum.PERM9);
+		if (resource.isPermXAllowed()) permissionsGranted.add(PermissionEnum.PERMX);
 		aclHelper.set(
 				getClassFromResourceName(resource.getResourceName()),
 				resource.getResourceId(),
@@ -244,6 +245,7 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 			if ((mask & ExtendedPermission.PERM7.getMask()) != 0) aclEntry.setPerm7Allowed(true);
 			if ((mask & ExtendedPermission.PERM8.getMask()) != 0) aclEntry.setPerm8Allowed(true);
 			if ((mask & ExtendedPermission.PERM9.getMask()) != 0) aclEntry.setPerm9Allowed(true);
+			if ((mask & ExtendedPermission.PERMX.getMask()) != 0) aclEntry.setPermXAllowed(true);
 		});
 		return resourceToEntity(
 				aclEntry,

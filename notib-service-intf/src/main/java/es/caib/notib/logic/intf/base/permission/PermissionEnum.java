@@ -13,7 +13,6 @@ public enum PermissionEnum {
 	CREATE,
 	DELETE,
 	ADMINISTRATION,
-	SYNCHRONIZATION,
 	PERM0,
 	PERM1,
 	PERM2,
@@ -24,6 +23,7 @@ public enum PermissionEnum {
 	PERM7,
 	PERM8,
 	PERM9,
+	PERMX,
 	NULL;
 
 	public static Permission toPermission(PermissionEnum permissionEnum) {
@@ -33,7 +33,6 @@ public enum PermissionEnum {
 		case CREATE: return ExtendedPermission.CREATE;
 		case DELETE: return ExtendedPermission.DELETE;
 		case ADMINISTRATION: return ExtendedPermission.ADMINISTRATION;
-		case SYNCHRONIZATION: return ExtendedPermission.SYNCHRONIZATION;
 		case PERM0: return ExtendedPermission.PERM0;
 		case PERM1: return ExtendedPermission.PERM1;
 		case PERM2: return ExtendedPermission.PERM2;
@@ -44,6 +43,7 @@ public enum PermissionEnum {
 		case PERM7: return ExtendedPermission.PERM7;
 		case PERM8: return ExtendedPermission.PERM8;
 		case PERM9: return ExtendedPermission.PERM9;
+		case PERMX: return ExtendedPermission.PERMX;
 		default: return null;
 		}
 	}
@@ -59,8 +59,6 @@ public enum PermissionEnum {
 			return DELETE;
 		} else if (ExtendedPermission.ADMINISTRATION.equals(permission)) {
 			return ADMINISTRATION;
-		} else if (ExtendedPermission.SYNCHRONIZATION.equals(permission)) {
-			return SYNCHRONIZATION;
 		} else if (ExtendedPermission.PERM0.equals(permission)) {
 			return PERM0;
 		} else if (ExtendedPermission.PERM1.equals(permission)) {
@@ -81,6 +79,8 @@ public enum PermissionEnum {
 			return PERM8;
 		} else if (ExtendedPermission.PERM9.equals(permission)) {
 			return PERM9;
+		} else if (ExtendedPermission.PERMX.equals(permission)) {
+			return PERMX;
 		} else {
 			return null;
 		}

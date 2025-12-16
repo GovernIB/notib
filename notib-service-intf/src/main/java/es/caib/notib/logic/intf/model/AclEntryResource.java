@@ -58,6 +58,7 @@ public class AclEntryResource extends BaseResource<String> {
 	private boolean perm7Allowed;
 	private boolean perm8Allowed;
 	private boolean perm9Allowed;
+	private boolean permXAllowed;
 
 	private String subjectName;
 

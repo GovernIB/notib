@@ -1,3 +1,4 @@
+import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
@@ -13,35 +14,119 @@ import {
     useFormContext,
 } from 'reactlib';
 
-const EntitatFormTabPermisos: React.FC = () => {
+const EntitatFormTabAplicacionsFormContent: React.FC = () => {
+    return <Grid container spacing={2}>
+        <Grid size={4}><FormField name="usuariCodi" /></Grid><Grid size={8} />
+        <Grid size={12}><FormField name="callbackUrl" /></Grid>
+        <Grid size={6}><FormField name="activa" /></Grid>
+        <Grid size={6}><FormField name="headerCsrf" /></Grid>
+        <Grid size={6}><FormField name="horariLaboralInici" /></Grid>
+        <Grid size={6}><FormField name="horariLaboralFi" /></Grid>
+        <Grid size={6}><FormField name="maxEnviamentsMinutLaboral" /></Grid>
+        <Grid size={6}><FormField name="maxEnviamentsMinutNoLaboral" /></Grid>
+        <Grid size={6}><FormField name="maxEnviamentsDiaLaboral" /></Grid>
+        <Grid size={6}><FormField name="maxEnviamentsDiaNoLaboral" /></Grid>
+    </Grid>;
+}
+
+const EntitatFormTabAplicacions: React.FC = () => {
+    const { t } = useTranslation();
     const { id } = useFormContext();
-    const columns=[{
+    const columns = React.useMemo(() => [{
+        field: 'usuariCodi',
+        sortable: false,
+        flex: 1
+    }, {
+        field: 'callbackUrl',
+        sortable: false,
+        flex: 4
+    }, {
+        field: 'activa',
+        sortable: false,
+        flex: 1
+    }], []);
+    return <MuiDataGrid
+        title=""
+        resourceName="aplicacioResource"
+        staticFilter={"entitat.id:" + id}
+        columns={columns}
+        paginationActive
+        popupEditActive
+        popupEditFormDialogResourceTitle={t('page.entitats.form.resourceNames.aplicacio')}
+        popupEditFormContent={<EntitatFormTabAplicacionsFormContent />} />;
+}
+
+
+const EntitatFormTabPermisosFormContent: React.FC = () => {
+    const { t } = useTranslation();
+    return <Grid container spacing={2}>
+        <Grid size={4}><FormField name="grantedAuthority" /></Grid>
+        <Grid size={8}><FormField name="sidName" /></Grid>
+        <Grid size={12}><FormField name="perm0Allowed" label={t('page.entitats.form.permisos.usuariAllowed')} /></Grid>
+        <Grid size={12}><FormField name="perm2Allowed" label={t('page.entitats.form.permisos.admEntitatAllowed')} /></Grid>
+        <Grid size={12}><FormField name="permXAllowed" label={t('page.entitats.form.permisos.admLecturaAllowed')} /></Grid>
+        <Grid size={12}><FormField name="perm3Allowed" label={t('page.entitats.form.permisos.aplicacioAllowed')} /></Grid>
+    </Grid>;
+}
+
+const EntitatFormTabPermisos: React.FC = () => {
+    const { t } = useTranslation();
+    const { id } = useFormContext();
+    const columns = React.useMemo(() => [{
+        headerName: t('page.entitats.form.permisos.tipus'),
         field: 'grantedAuthority',
         sortable: false,
-        flex: 2
+        flex: 1,
+        valueFormatter: (value: any) => value ?
+            t('page.entitats.form.permisos.grantedAuthority.role') :
+            t('page.entitats.form.permisos.grantedAuthority.user'),
     }, {
         field: 'sidName',
         sortable: false,
-        flex: 5
+        flex: 4
     }, {
-        field: 'readAllowed',
+        headerName: t('page.entitats.form.permisos.usuariAllowed'),
+        field: 'perm0Allowed',
         sortable: false,
         flex: 1
-    }];
+    }, {
+        headerName: t('page.entitats.form.permisos.admEntitatAllowed'),
+        field: 'perm2Allowed',
+        sortable: false,
+        flex: 1
+    }, {
+        headerName: t('page.entitats.form.permisos.admLecturaAllowed'),
+        field: 'permXAllowed',
+        sortable: false,
+        flex: 1
+    }, {
+        headerName: t('page.entitats.form.permisos.aplicacioAllowed'),
+        field: 'perm3Allowed',
+        sortable: false,
+        flex: 1
+    }], [t]);
     return <MuiDataGrid
-        title={"permisos"}
+        title=""
         resourceName="aclEntryResource"
-        staticFilter={"resourceName:'entitatResource' and resourceId:" + id}
         columns={columns}
-        />;
+        staticFilter={"resourceName:'entitatResource' and resourceId:" + id}
+        formAdditionalData={{ resourceName: 'entitatResource', resourceId: id }}
+        paginationActive
+        popupEditActive
+        popupEditFormContent={<EntitatFormTabPermisosFormContent />} />;
 }
 
-const EntitatFormContent: React.FC = () => {
+const EntitatFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
+    const { setSubtitle } = props;
     const { t } = useTranslation();
-    const aplicacionsTabLabel = <Badge badgeContent={0} color="primary">
+    const { data } = useFormContext();
+    React.useEffect(() => {
+        setSubtitle(data?.codi + ', ' + data?.nom);
+    }, [data]);
+    const aplicacionsTabLabel = <Badge badgeContent={data.aplicacioCount} color="primary">
         {t('page.entitats.form.tabs.aplicacions')}
     </Badge>;
-    const permisosTabLabel = <Badge badgeContent={0} color="primary">
+    const permisosTabLabel = <Badge badgeContent={data.aclEntryCount} color="primary">
         {t('page.entitats.form.tabs.permisos')}
     </Badge>;
     const tabs = [
@@ -68,6 +153,7 @@ const EntitatFormContent: React.FC = () => {
             </Grid>
         </MuiFormTabContent>
         <MuiFormTabContent index={2}>
+            <EntitatFormTabAplicacions />
         </MuiFormTabContent>
         <MuiFormTabContent index={3}>
             <EntitatFormTabPermisos />
@@ -78,13 +164,15 @@ const EntitatFormContent: React.FC = () => {
 export const EntitatForm: React.FC = () => {
     const { t } = useTranslation();
     const { id } = useParams();
+    const [subtitle, setSubtitle] = React.useState<string>();
     return <FormPage>
         <MuiForm
             componentProps={{ style: { height: '100%' } }}
             id={id}
             title={id != null ? t('page.entitats.form.titleUpdate') : t('page.entitats.form.titleCreate')}
+            toolbarSubtitle={subtitle}
             resourceName="entitatResource">
-            <EntitatFormContent />
+            <EntitatFormContent setSubtitle={setSubtitle} />
         </MuiForm>
     </FormPage>;
 }

@@ -19,10 +19,22 @@ const translationCa = {
                     aplicacions: "Aplicacions",
                     permisos: "Permisos",
                 },
+                resourceNames: {
+                    aplicacio: "aplicació",
+                    permis: "permís",
+                },
+                permisos: {
+                    tipus: "Tipus",
+                    grantedAuthority: {
+                        user: "Usuari",
+                        role: "Rol",
+                    },
+                    usuariAllowed: "Usuari",
+                    admEntitatAllowed: "Adm. entitat",
+                    admLecturaAllowed: "Adm. lectura",
+                    aplicacioAllowed: "Aplicació",
+                }
             },
-            tabs: {
-                dades: "Dades",
-            }
         },
         notFound: {
             title: "Pàgina no trobada",

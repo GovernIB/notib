@@ -51,7 +51,7 @@ public class AclHelper {
 	 *            l'id del recurs.
 	 * @param sids
 	 *            els SIDs per a filtrar les ACEs que retornarà l'ACL. Si es passa null es retornaran totes les ACEs.
-	 * @return la informació de l'ACL.
+	 * @return la informació de l'ACL o null si no està creada.
 	 */
 	public Acl get(
 			Class<?> resourceClass,
@@ -62,6 +62,35 @@ public class AclHelper {
 				resourceId,
 				sids,
 				false);
+	}
+
+	/**
+	 * Conta el nombre d'entrades de permisos d'una ACL.
+	 *
+	 * @param resourceClass
+	 *            la classe del recurs.
+	 * @param resourceId
+	 *            l'id del recurs.
+	 * @param sids
+	 *            els SIDs per a filtrar les ACEs que retornarà l'ACL. Si es passa null es contaran totes les ACEs.
+	 * @return el nombre d'entrades de ACEs.
+	 */
+	public int count(
+			Class<?> resourceClass,
+			Serializable resourceId,
+			List<Sid> sids) {
+		Acl acl = getMutableAcl(
+				resourceClass,
+				resourceId,
+				sids,
+				false);
+		if (acl != null && acl.getEntries() != null) {
+			Map<Sid, List<AccessControlEntry>> entriesBySid = acl.getEntries().stream().
+					collect(Collectors.groupingBy(AccessControlEntry::getSid));
+			return entriesBySid.size();
+		} else {
+			return 0;
+		}
 	}
 
 	/**

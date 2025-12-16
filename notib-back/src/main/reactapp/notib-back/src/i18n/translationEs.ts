@@ -19,10 +19,22 @@ const translationEs = {
                     aplicacions: "Aplicaciones",
                     permisos: "Permisos",
                 },
+                resourceNames: {
+                    aplicacio: "aplicación",
+                    permis: "permiso",
+                },
+                permisos: {
+                    tipus: "Tipo",
+                    grantedAuthority: {
+                        user: "Usuario",
+                        role: "Rol",
+                    },
+                    usuariAllowed: "Usuario",
+                    admEntitatAllowed: "Adm. entidad",
+                    admLecturaAllowed: "Adm. lectura",
+                    aplicacioAllowed: "Aplicación",
+                }
             },
-            tabs: {
-                dades: "Datos",
-            }
         },
         notFound: {
             title: "Página no encontrada",

@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -80,29 +81,31 @@ public class EntitatResourceEntity extends BaseAuditableResourceEntity<EntitatRe
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "entitat_entrega_cie_fk"))
 	private EntregaCieEntity entregaCie;
 
+	@Formula("(select count(*) from " + BaseConfig.DB_PREFIX + "aplicacio apl where apl.entitat_id = id)")
+	private Integer aplicacioCount;
 
 	@Builder
 	public EntitatResourceEntity(
-			EntitatResource entitatResource,
+			EntitatResource resource,
 			EntregaCieEntity entregaCie) {
-		this.codi = entitatResource.getCodi();
-		this.nom = entitatResource.getNom();
-		this.tipus = entitatResource.getTipus();
-		this.dir3Codi = entitatResource.getDir3Codi();
-		this.dir3CodiReg = entitatResource.getDir3CodiReg();
-		this.apiKey = entitatResource.getApiKey();
-		this.ambEntregaDeh = entitatResource.isAmbEntregaDeh();
-		this.descripcio = entitatResource.getDescripcio();
-		this.activa = entitatResource.isActiva();
-		this.colorFons = entitatResource.getColorFons();
-		this.colorLletra = entitatResource.getColorLletra();
-		this.tipusDocDefault = entitatResource.getTipusDocDefault();
-		this.nomOficinaVirtual = entitatResource.getNomOficinaVirtual();
-		this.oficina = entitatResource.getOficina();
-		this.llibreEntitat = entitatResource.isLlibreEntitat();
-		this.llibre = entitatResource.getLlibre();
-		this.llibreNom = entitatResource.getLlibreNom();
-		this.oficinaEntitat = entitatResource.isOficinaEntitat();
+		this.codi = resource.getCodi();
+		this.nom = resource.getNom();
+		this.tipus = resource.getTipus();
+		this.dir3Codi = resource.getDir3Codi();
+		this.dir3CodiReg = resource.getDir3CodiReg();
+		this.apiKey = resource.getApiKey();
+		this.ambEntregaDeh = resource.isAmbEntregaDeh();
+		this.descripcio = resource.getDescripcio();
+		this.activa = resource.isActiva();
+		this.colorFons = resource.getColorFons();
+		this.colorLletra = resource.getColorLletra();
+		this.tipusDocDefault = resource.getTipusDocDefault();
+		this.nomOficinaVirtual = resource.getNomOficinaVirtual();
+		this.oficina = resource.getOficina();
+		this.llibreEntitat = resource.isLlibreEntitat();
+		this.llibre = resource.getLlibre();
+		this.llibreNom = resource.getLlibreNom();
+		this.oficinaEntitat = resource.isOficinaEntitat();
 		this.entregaCie = entregaCie;
 	}
 
