@@ -51,16 +51,29 @@ const EntitatFormTabAplicacions: React.FC = () => {
         staticFilter={"entitat.id:" + id}
         columns={columns}
         paginationActive
+        toolbarHideQuickFilter
         popupEditActive
         popupEditFormDialogResourceTitle={t('page.entitats.form.resourceNames.aplicacio')}
         popupEditFormContent={<EntitatFormTabAplicacionsFormContent />} />;
 }
 
-
 const EntitatFormTabPermisosFormContent: React.FC = () => {
     const { t } = useTranslation();
+    const enumOptions = [{
+        value: false,
+        description: t('page.entitats.form.permisos.grantedAuthority.user')
+    }, {
+        value: true,
+        description: t('page.entitats.form.permisos.grantedAuthority.role')
+    }];
     return <Grid container spacing={2}>
-        <Grid size={4}><FormField name="grantedAuthority" /></Grid>
+        <Grid size={4}><FormField
+            name="sidGrantedAuthority"
+            label={t('page.entitats.form.permisos.tipus')}
+            type="enum"
+            options={enumOptions}
+            required />
+        </Grid>
         <Grid size={8}><FormField name="sidName" /></Grid>
         <Grid size={12}><FormField name="perm0Allowed" label={t('page.entitats.form.permisos.usuariAllowed')} /></Grid>
         <Grid size={12}><FormField name="perm2Allowed" label={t('page.entitats.form.permisos.admEntitatAllowed')} /></Grid>
@@ -74,7 +87,7 @@ const EntitatFormTabPermisos: React.FC = () => {
     const { id } = useFormContext();
     const columns = React.useMemo(() => [{
         headerName: t('page.entitats.form.permisos.tipus'),
-        field: 'grantedAuthority',
+        field: 'sidGrantedAuthority',
         sortable: false,
         flex: 1,
         valueFormatter: (value: any) => value ?
@@ -112,7 +125,9 @@ const EntitatFormTabPermisos: React.FC = () => {
         staticFilter={"resourceName:'entitatResource' and resourceId:" + id}
         formAdditionalData={{ resourceName: 'entitatResource', resourceId: id }}
         paginationActive
+        toolbarHideQuickFilter
         popupEditActive
+        popupEditFormDialogResourceTitle={t('page.entitats.form.resourceNames.permis')}
         popupEditFormContent={<EntitatFormTabPermisosFormContent />} />;
 }
 
@@ -168,7 +183,7 @@ export const EntitatForm: React.FC = () => {
     return <FormPage>
         <MuiForm
             componentProps={{ style: { height: '100%' } }}
-            id={id}
+            id={id != null ? parseInt(id) : id}
             title={id != null ? t('page.entitats.form.titleUpdate') : t('page.entitats.form.titleCreate')}
             toolbarSubtitle={subtitle}
             resourceName="entitatResource">

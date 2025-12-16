@@ -11,6 +11,8 @@ import { useResourceApiContext } from '../../ResourceApiContext';
 import { useFormFieldCommon } from './FormFieldText';
 
 type FormFieldEnumProps = FormFieldCustomProps & {
+    /** Opcions disponibles */
+    options?: EnumOption[];
     /** Indica si el camp permet múltiples valors */
     multiple?: boolean;
     /** Llista de les opcions que s'han d'ocultar */
@@ -39,6 +41,7 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
         readOnly,
         onChange,
         componentProps,
+        options: optionsProp,
         multiple: multipleProp,
         hiddenEnumValues,
         requestParams,
@@ -105,7 +108,9 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
         setAutocompleteInputValue(newValue);
     };
     React.useEffect(() => {
-        if (field.options != null) {
+        if (optionsProp != null) {
+            setEnumOptions(optionsProp);
+        } else if (field.options != null) {
             const optionsObj = { ...field.options };
             hiddenEnumValues?.forEach((v: any) => {
                 delete optionsObj[v];
@@ -136,7 +141,7 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
         } else {
             setEnumOptions([]);
         }
-    }, [field, requestParams, hiddenEnumValues, requestHref]);
+    }, [optionsProp, field, requestParams, hiddenEnumValues, requestHref]);
     const isRequired = required ?? field.required;
     return (
         enumOptions &&
