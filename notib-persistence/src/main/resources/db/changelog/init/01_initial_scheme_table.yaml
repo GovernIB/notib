@@ -1,0 +1,4513 @@
+databaseChangeLog:
+- changeSet:
+    id: 1765358456691-1
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: SYS_C007112
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CADUCITAT
+            type: date
+        - column:
+            constraints:
+              nullable: false
+            name: COM_TIPUS
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: CONCEPTE
+            type: VARCHAR(240 ${varcharUnit})
+        - column:
+            name: DESCRIPCIO
+            type: VARCHAR(1000 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: EMISOR_DIR3CODI
+            type: VARCHAR(9 ${varcharUnit})
+        - column:
+            name: ENV_DATA_PROG
+            type: date
+        - column:
+            constraints:
+              nullable: false
+            name: ENV_TIPUS
+            type: INTEGER
+        - column:
+            name: CALLBACK_ERROR
+            type: boolean
+        - column:
+            constraints:
+              nullable: false
+            name: ESTAT
+            type: INTEGER
+        - column:
+            name: ESTAT_DATE
+            type: TIMESTAMP(6)
+        - column:
+            name: GRUP_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: MOTIU
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: NOT_ENV_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: NOT_ENV_INTENT
+            type: INTEGER
+        - column:
+            name: NOT_ERROR_TIPUS
+            type: INTEGER
+        - column:
+            name: REGISTRE_NUM_EXPEDIENT
+            type: VARCHAR(80 ${varcharUnit})
+        - column:
+            name: PROC_CODI_NOTIB
+            type: VARCHAR(9 ${varcharUnit})
+        - column:
+            name: REGISTRE_DATA
+            type: date
+        - column:
+            name: REGISTRE_ENV_INTENT
+            type: INTEGER
+        - column:
+            name: REGISTRE_NUMERO
+            type: INTEGER
+        - column:
+            name: REGISTRE_NUMERO_FORMATAT
+            type: VARCHAR(200 ${varcharUnit})
+        - column:
+            defaultValue: 0
+            name: RETARD_POSTAL
+            type: INTEGER
+        - column:
+            name: TIPUS_USUARI
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: USUARI_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: DOCUMENT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: PROCEDIMENT_ID
+            type: BIGINT
+        - column:
+            name: PROCEDIMENT_ORGAN_ID
+            type: BIGINT
+        - column:
+            name: NOT_ENV_DATA_NOTIFICA
+            type: TIMESTAMP(6)
+        - column:
+            name: IDIOMA
+            type: INTEGER
+        - column:
+            name: DOCUMENT2_ID
+            type: BIGINT
+        - column:
+            name: DOCUMENT3_ID
+            type: BIGINT
+        - column:
+            name: DOCUMENT4_ID
+            type: BIGINT
+        - column:
+            name: DOCUMENT5_ID
+            type: BIGINT
+        - column:
+            name: REGISTRE_OFICINA_NOM
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: REGISTRE_LLIBRE_NOM
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            defaultValue: 0
+            name: IS_ERROR_LAST_EVENT
+            type: boolean
+        - column:
+            name: NOTIFICACIO_MASSIVA_ID
+            type: BIGINT
+        - column:
+            name: ESTAT_PROCESSAT_DATE
+            type: TIMESTAMP(6)
+        - column:
+            name: REFERENCIA
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: JUSTIFICANT_CREAT
+            type: boolean
+        - column:
+            defaultValue: 0
+            name: DELETED
+            type: boolean
+        - column:
+            name: CADUCITAT_ORIGINAL
+            type: date
+        - column:
+            constraints:
+              nullable: false
+            name: ORGAN_GESTOR
+            type: BIGINT
+        - column:
+            name: SEGUENT_REMESA
+            type: VARCHAR(36 ${varcharUnit})
+        - column:
+            name: NUM_REGISTRE_PREVI
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: ORIGEN
+            type: VARCHAR(8 ${varcharUnit})
+        tableName: ${db_prefix}NOTIFICACIO   
+- changeSet:
+    id: 1765358456691-2
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: SYS_C007107
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: DEH_NIF
+            type: VARCHAR(9 ${varcharUnit})
+        - column:
+            name: DEH_OBLIGAT
+            type: boolean
+        - column:
+            name: DEH_PROC_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: NOTIFICA_ARR_DIR3DESC
+            type: VARCHAR(100 ${varcharUnit})
+        - column:
+            name: NOTIFICA_ARR_DIR3CODI
+            type: VARCHAR(9 ${varcharUnit})
+        - column:
+            name: NOTIFICA_ARR_DIR3NIF
+            type: VARCHAR(9 ${varcharUnit})
+        - column:
+            name: NOTIFICA_CER_ARXIUID
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: NOTIFICA_CER_ARXTIP
+            type: INTEGER
+        - column:
+            name: NOTIFICA_CER_CSV
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: NOTIFICA_CER_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_CER_HASH
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: NOTIFICA_CER_METAS
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: NOTIFICA_CER_MIME
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: NOTIFICA_CER_NUMSEG
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: NOTIFICA_CER_ORIGEN
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: NOTIFICA_CER_TAMANY
+            type: INTEGER
+        - column:
+            name: NOTIFICA_CER_TIPUS
+            type: INTEGER
+        - column:
+            name: NOTIFICA_DATCAD
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_DATCRE
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_DATDISP
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_DATAT_ERRDES
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: NOTIFICA_DATAT_NUMSEG
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: NOTIFICA_DATAT_ORIGEN
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: NOTIFICA_DATAT_RECNIF
+            type: VARCHAR(9 ${varcharUnit})
+        - column:
+            name: NOTIFICA_DATAT_RECNOM
+            type: VARCHAR(400 ${varcharUnit})
+        - column:
+            name: NOTIFICA_EMI_DIR3DESC
+            type: VARCHAR(100 ${varcharUnit})
+        - column:
+            name: NOTIFICA_EMI_DIR3CODI
+            type: VARCHAR(9 ${varcharUnit})
+        - column:
+            name: NOTIFICA_EMI_DIR3NIF
+            type: VARCHAR(9 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: NOTIFICA_ERROR
+            type: boolean
+        - column:
+            constraints:
+              nullable: false
+            name: NOTIFICA_ESTAT
+            type: INTEGER
+        - column:
+            name: NOTIFICA_ESTAT_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_ESTAT_DATAACT
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_ESTAT_DESC
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: NOTIFICA_ESTAT_FINAL
+            type: boolean
+        - column:
+            name: NOTIFICA_ID
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: NOTIFICA_INTENT_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_INTENT_NUM
+            type: INTEGER
+        - column:
+            name: NOTIFICA_REF
+            type: VARCHAR(36 ${varcharUnit})
+        - column:
+            name: NOTIFICACIO_ID
+            type: BIGINT
+        - column:
+            name: REGISTRE_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: ESTAT_REGISTRE
+            type: INTEGER
+        - column:
+            name: REGISTRE_ESTAT_FINAL
+            type: boolean
+        - column:
+            name: REGISTRE_NUMERO_FORMATAT
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: SERVEI_TIPUS
+            type: INTEGER
+        - column:
+            name: SIR_CON_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: SIR_CON_INTENT
+            type: INTEGER
+        - column:
+            name: SIR_REC_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: SIR_REG_DESTI_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: ULTIM_EVENT
+            type: BIGINT
+        - column:
+            name: TITULAR_ID
+            type: BIGINT
+        - column:
+            defaultValueNumeric: 0
+            name: DEH_CERT_INTENT_NUM
+            type: INTEGER
+        - column:
+            name: DEH_CERT_INTENT_DATA
+            type: TIMESTAMP(6)
+        - column:
+            defaultValueNumeric: 0
+            name: CIE_CERT_INTENT_NUM
+            type: INTEGER
+        - column:
+            name: CIE_CERT_INTENT_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: ENTREGA_POSTAL_ID
+            type: BIGINT
+        - column:
+            name: PER_EMAIL
+            type: boolean
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: 0
+            name: CALLBACK_ERROR
+            type: boolean
+        - column:
+            defaultValue: 0
+            name: SIR_FI_POOLING
+            type: boolean
+        - column:
+            name: CALLBACK_ERROR_EVENT_ID
+            type: BIGINT
+        - column:
+            name: API_CARPETA_ERROR_EVENT_ID
+            type: BIGINT
+        - column:
+            name: NOTIFICA_ERROR_EVENT_ID
+            type: BIGINT
+        - column:
+            defaultValue: 0
+            name: PLAZO_AMPLIADO
+            type: boolean
+        - column:
+            defaultValue: 0
+            name: ENTREGA_POSTAL
+            type: boolean
+        - column:
+            name: REGISTRE_MOTIU
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            defaultValueComputed: GENERATED ALWAYS AS (TRUNC("NOTIFICA_ESTAT_DATAACT"))
+            name: ESTAT_DIA
+            type: date
+        - column:
+            defaultValueComputed: GENERATED ALWAYS AS (TRUNC("SIR_REC_DATA"))
+            name: SIR_DIA
+            type: date
+        - column:
+            defaultValueComputed: GENERATED ALWAYS AS (CASE "NOTIFICA_ESTAT" WHEN
+              0 THEN 'PENDENT' WHEN 10 THEN 'EXPIRADA' WHEN 13 THEN 'NOTIFICADA' WHEN
+              14 THEN 'NOTIFICADA' WHEN 20 THEN 'REBUTJADA' WHEN 24 THEN 'PEND_ENV'
+              WHEN 2 THEN 'NOT_ERR' WHEN 3 THEN 'NOT_ERR' WHEN 9 THEN 'NOT_ERR' WHEN
+              11 THEN 'NOT_ERR' WHEN 12 THEN 'NOT_ERR' WHEN 21 THEN 'NOT_ERR' ELSE
+              'ALTRES' END)
+            name: ESTAT_NOM
+            type: VARCHAR(10 ${varcharUnit})
+        - column:
+            defaultValueComputed: GENERATED ALWAYS AS (CASE "ESTAT_REGISTRE" WHEN
+              9 THEN 'REBUTJADA' WHEN 5 THEN 'NOTIFICADA' ELSE 'ALTRES' END)
+            name: SIR_ESTAT
+            type: VARCHAR(10 ${varcharUnit})
+        - column:
+            defaultValueNumeric: 0
+            name: ANULAT
+            type: boolean
+        - column:
+            name: MOTIU_ANULACIO
+            type: VARCHAR(250 ${varcharUnit})
+        tableName: ${db_prefix}NOTIFICACIO_ENV  
+- changeSet:
+    id: 1765358456691-3
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: NOTIFICACIO_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            defaultValue: ''
+            name: DESTINATARIS
+            type: VARCHAR(4000 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUS_ENVIAMENT
+            type: INTEGER
+        - column:
+            name: TITULAR_NIF
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: TITULAR_NOM
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            name: TITULAR_EMAIL
+            type: VARCHAR(160 ${varcharUnit})
+        - column:
+            name: TITULAR_LLINATGE1
+            type: VARCHAR(40 ${varcharUnit})
+        - column:
+            name: TITULAR_LLINATGE2
+            type: VARCHAR(40 ${varcharUnit})
+        - column:
+            name: TITULAR_RAOSOCIAL
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: DATA_PROGRAMADA
+            type: date
+        - column:
+            name: PROCEDIMENT_CODI_NOTIB
+            type: VARCHAR(9 ${varcharUnit})
+        - column:
+            name: GRUP_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: EMISOR_DIR3
+            type: VARCHAR(9 ${varcharUnit})
+        - column:
+            name: USUARI_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: NOT_ORGAN_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: CONCEPTE
+            type: VARCHAR(240 ${varcharUnit})
+        - column:
+            name: DESCRIPCIO
+            type: VARCHAR(1000 ${varcharUnit})
+        - column:
+            name: LLIBRE
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: NOT_ESTAT
+            type: INTEGER
+        - column:
+            name: CSV_UUID
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: 0
+            name: HAS_ERRORS
+            type: boolean
+        - column:
+            defaultValue: 0
+            name: PROCEDIMENT_IS_COMU
+            type: boolean
+        - column:
+            name: PROCEDIMENT_PROCORGAN_ID
+            type: BIGINT
+        - column:
+            name: REGISTRE_NUMERO
+            type: INTEGER
+        - column:
+            name: REGISTRE_DATA
+            type: date
+        - column:
+            name: REGISTRE_ENVIAMENT_INTENT
+            type: INTEGER
+        - column:
+            name: NOTIFICA_DATA_CADUCITAT
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_IDENTIFICADOR
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: NOTIFICA_CERT_NUM_SEGUIMENT
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: NOTIFICA_ESTAT
+            type: INTEGER
+        - column:
+            name: NOTIFICA_REF
+            type: VARCHAR(36 ${varcharUnit})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            defaultValueNumeric: 0
+            name: ORGAN_ESTAT
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: 0
+            name: PROCEDIMENT_REQUIRE_PERMISSION
+            type: boolean
+        - column:
+            name: PROCEDIMENT_TIPUS
+            type: VARCHAR(32 ${varcharUnit})
+        - column:
+            name: NO_VIGENT
+            type: boolean
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: 0
+            name: CALLBACK_ERROR
+            type: boolean
+        - column:
+            name: TITULAR_NIF_bar
+            type: VARCHAR(100 ${varcharUnit})
+        - column:
+            defaultValue: 0
+            name: ENTREGA_POSTAL
+            type: boolean
+        - column:
+            defaultValueComputed: GENERATED ALWAYS AS (TRUNC("REGISTRE_DATA"))
+            name: REGISTRE_DIA
+            type: date
+        - column:
+            defaultValueNumeric: 0
+            name: ANULAT
+            type: boolean
+        - column:
+            name: MOTIU_ANULACIO
+            type: VARCHAR(250 ${varcharUnit})
+        - column:
+            name: ANULABLE
+            type: boolean
+        - column:
+            name: ORGAN_NOM
+            type: VARCHAR(1000 ${varcharUnit})
+        - column:
+            name: PROCEDIMENT_NOM
+            type: VARCHAR(1000 ${varcharUnit})
+        - column:
+            name: REFERENCIA_NOTIFICACIO
+            type: VARCHAR(36 ${varcharUnit})
+        - column:
+            name: NOT_ID
+            type: BIGINT
+        - column:
+            name: ULTIM_EVENT_DATA
+            type: date
+        tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
+- changeSet:
+    id: 1765358456691-4
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_ORGAN_GESTOR_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: ENTITAT
+            type: BIGINT
+        - column:
+            name: NOM
+            type: VARCHAR(1000 ${varcharUnit})
+        - column:
+            name: LLIBRE
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: LLIBRE_NOM
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: OFICINA
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: OFICINA_NOM
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: ENTREGA_CIE_ID
+            type: BIGINT
+        - column:
+            name: CODI_PARE
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            defaultValue: 0
+            name: SIR
+            type: boolean
+        - column:
+            name: TIPUS_TRANSICIO
+            type: VARCHAR(12 ${varcharUnit})
+        - column:
+            defaultValue: V
+            name: ESTAT
+            type: VARCHAR(1 ${varcharUnit})
+        - column:
+            name: NO_VIGENT
+            type: boolean
+        - column:
+            name: NOM_ES
+            type: VARCHAR(1000 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: 0
+            name: PERMETRE_SIR
+            type: boolean
+        - column:
+            defaultValue: 0
+            name: ENTREGA_CIE_DESACTIVADA
+            type: boolean
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: 0
+            name: SOBRESCRIURE_CIE_ORGAN_EMISOR
+            type: boolean
+        tableName: ${db_prefix}ORGAN_GESTOR
+- changeSet:
+    id: 1765358456691-5
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_NOTIFICACIO_TABLE_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: ENTITAT_NOM
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            name: PROC_CODI_NOTIB
+            type: VARCHAR(9 ${varcharUnit})
+        - column:
+            name: PROCEDIMENT_ORGAN_ID
+            type: BIGINT
+        - column:
+            name: GRUP_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: USUARI_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: TIPUS_USUARI
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: 0
+            name: ERROR_LAST_CALLBACK
+            type: boolean
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: 0
+            name: ERROR_LAST_EVENT
+            type: boolean
+        - column:
+            name: REGISTRE_ENV_INTENT
+            type: INTEGER
+        - column:
+            name: REGISTRE_NUM_EXPEDIENT
+            type: VARCHAR(80 ${varcharUnit})
+        - column:
+            name: NOTIFICA_ERROR_DATE
+            type: date
+        - column:
+            name: NOTIFICA_ERROR_DESCRIPCIO
+            type: VARCHAR(2048 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: ENV_TIPUS
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: CONCEPTE
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: ESTAT
+            type: INTEGER
+        - column:
+            name: ESTAT_DATE
+            type: TIMESTAMP(6)
+        - column:
+            name: PROCEDIMENT_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: PROCEDIMENT_NOM
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: 0
+            name: PROCEDIMENT_IS_COMU
+            type: boolean
+        - column:
+            name: ORGAN_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: ORGAN_NOM
+            type: VARCHAR(1000 ${varcharUnit})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICACIO_MASSIVA_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            defaultValueNumeric: 0
+            name: ORGAN_ESTAT
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: 0
+            name: PROCEDIMENT_REQUIRE_PERMISSION
+            type: boolean
+        - column:
+            name: ESTAT_PROCESSAT_DATE
+            type: TIMESTAMP(6)
+        - column:
+            name: PROCEDIMENT_TIPUS
+            type: VARCHAR(32 ${varcharUnit})
+        - column:
+            name: ENVIADA_DATE
+            type: TIMESTAMP(6)
+        - column:
+            name: REFERENCIA
+            type: VARCHAR(36 ${varcharUnit})
+        - column:
+            name: TITULAR
+            type: VARCHAR(1024 ${varcharUnit})
+        - column:
+            name: NOTIFICA_IDS
+            type: VARCHAR(1024 ${varcharUnit})
+        - column:
+            name: ESTAT_MASK
+            type: NUMERIC(19, 0)
+        - column:
+            defaultValue: 1
+            name: PER_ACTUALITZAR
+            type: boolean
+        - column:
+            defaultValue: 0
+            name: REG_ENV_PENDENTS
+            type: boolean
+        - column:
+            name: ESTAT_STRING
+            type: VARCHAR(2000 ${varcharUnit})
+        - column:
+            name: DOCUMENT_ID
+            type: NUMERIC(38, 0)
+        - column:
+            name: ENV_CER_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: REGISTRE_NUMS
+            type: VARCHAR(2048 ${varcharUnit})
+        - column:
+            defaultValue: 0
+            name: DELETED
+            type: boolean
+        - column:
+            defaultValue: 0
+            name: ENTREGA_POSTAL
+            type: boolean
+        - column:
+            name: CADUCITAT
+            type: TIMESTAMP(6)
+        - column:
+            defaultValue: 0
+            name: ENTREGA_POSTAL_ERROR
+            type: boolean
+        - column:
+            name: FOO
+            type: VARCHAR(100 ${varcharUnit})
+        - column:
+            defaultValueComputed: GENERATED ALWAYS AS (TRUNC("CREATEDDATE"))
+            name: CREATED_DIA
+            type: date
+        - column:
+            defaultValueComputed: GENERATED ALWAYS AS (TRUNC("ENVIADA_DATE"))
+            name: ENVIADA_DIA
+            type: date
+        - column:
+            defaultValue: 0
+            name: ANULABLE
+            type: boolean
+        - column:
+            defaultValue: 0
+            name: LAST_EVENT_FI_REINTENTS
+            type: boolean
+        tableName: ${db_prefix}NOTIFICACIO_TABLE
+- changeSet:
+    id: 1765358456691-6
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: PRINCIPAL
+            type: boolean
+        - column:
+            constraints:
+              nullable: false
+            name: SID
+            type: VARCHAR(100 ${varcharUnit})
+        tableName: ${db_prefix}ACL_SID        
+- changeSet:
+    id: 1765358456691-8
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: OBJECT_ID_CLASS
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: OBJECT_ID_IDENTITY
+            type: BIGINT
+        - column:
+            name: PARENT_OBJECT
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: OWNER_SID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ENTRIES_INHERITING
+            type: boolean
+        tableName: ${db_prefix}ACL_OBJECT_IDENTITY      
+- changeSet:
+    id: 1765358456691-10
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ACL_OBJECT_IDENTITY
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ACE_ORDER
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: SID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: MASK
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: GRANTING
+            type: boolean
+        - column:
+            constraints:
+              nullable: false
+            name: AUDIT_SUCCESS
+            type: boolean
+        - column:
+            constraints:
+              nullable: false
+            name: AUDIT_FAILURE
+            type: boolean
+        tableName: ${db_prefix}ACL_ENTRY   
+- changeSet:
+    id: 1765358456691-12
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CLASS
+            type: VARCHAR(100 ${varcharUnit})
+        tableName: ${db_prefix}ACL_CLASS   
+- changeSet:
+    id: 1765358456691-14
+    author: limit (generated)
+    changes:
+    - createView:
+        fullDefinition: true
+        selectQuery: |-
+          CREATE OR REPLACE FORCE VIEW "NOT_SIR_VIEW" ("ENTITAT_ID", "PROCEDIMENT_ID", "ORGAN_CODI", "USUARI_CODI", "ENV_TIPUS", "ORIGEN", "TIPUS", "DIA", "TOTAL") AS WITH notificacions AS (
+              SELECT
+                  n.entitat_id,
+                  n.procediment_id,
+                  o.codi as organ_codi,
+                  n.usuari_codi,
+                  n.env_tipus,
+                  n.origen,
+                  e.SIR_ESTAT as estat,
+                  e.SIR_DIA
+              FROM NOT_NOTIFICACIO_ENV e
+                  JOIN NOT_NOTIFICACIO_ENV_TABLE et on et.id = e.id
+                  JOIN NOT_NOTIFICACIO n ON e.notificacio_id = n.id
+                  JOIN NOT_ORGAN_GESTOR o ON n.organ_gestor = o.id
+              WHERE e.SIR_DIA IS NOT NULL AND e.registre_estat_final = 1
+          )
+          SELECT entitat_id,
+                 procediment_id,
+                 organ_codi,
+                 usuari_codi,
+                 env_tipus,
+                 origen,
+                 estat AS tipus,
+                 SIR_DIA AS dia,
+                 COUNT(*) AS total
+          FROM notificacions
+          WHERE SIR_DIA IS NOT NULL
+          GROUP BY entitat_id, procediment_id, organ_codi, usuari_codi, env_tipus, origen, estat, SIR_DIA
+        viewName: NOT_SIR_VIEW
+- changeSet:
+    id: 1765358456691-15
+    author: limit (generated)
+    changes:
+    - createView:
+        fullDefinition: true
+        selectQuery: |-
+          CREATE OR REPLACE FORCE VIEW "NOT_REGISTRADES_VIEW" ("ENTITAT_ID", "PROCEDIMENT_ID", "ORGAN_CODI", "USUARI_CODI", "ENV_TIPUS", "ORIGEN", "TIPUS", "DIA", "TOTAL") AS WITH notificacions AS (
+              SELECT
+                  et.entitat_id,
+                  n.procediment_id,
+                  o.codi as organ_codi,
+                  et.usuari_codi,
+                  et.tipus_enviament as env_tipus,
+                  n.origen,
+                  et.REGISTRE_DIA
+              FROM NOT_NOTIFICACIO_ENV_TABLE et
+              JOIN NOT_NOTIFICACIO n ON et.notificacio_id = n.id
+              JOIN NOT_ORGAN_GESTOR o ON n.organ_gestor = o.id
+              WHERE et.REGISTRE_DIA IS NOT NULL
+          )
+          SELECT entitat_id,
+                 procediment_id,
+                 organ_codi,
+                 usuari_codi,
+                 env_tipus,
+                 origen,
+                 'REGISTRADA' AS tipus,
+                 REGISTRE_DIA AS dia,
+                 COUNT(*) AS total
+          FROM notificacions
+          WHERE REGISTRE_DIA IS NOT NULL
+          GROUP BY entitat_id, procediment_id, organ_codi, usuari_codi, env_tipus, origen, REGISTRE_DIA
+        viewName: NOT_REGISTRADES_VIEW
+- changeSet:
+    id: 1765358456691-16
+    author: limit (generated)
+    changes:
+    - createView:
+        fullDefinition: true
+        selectQuery: |-
+          CREATE OR REPLACE FORCE VIEW "NOT_ESTAT_VIEW" ("ENTITAT_ID", "PROCEDIMENT_ID", "ORGAN_CODI", "USUARI_CODI", "ENV_TIPUS", "ORIGEN", "TIPUS", "DIA", "TOTAL") AS WITH notificacions AS (
+              SELECT
+                  n.entitat_id,
+                  n.procediment_id,
+                  o.codi as organ_codi,
+                  n.usuari_codi,
+                  n.env_tipus,
+                  n.origen,
+                  e.ESTAT_NOM as estat,
+                  nt.error_last_event as error,
+                  e.ESTAT_DIA
+              FROM NOT_NOTIFICACIO_ENV e
+                  JOIN NOT_NOTIFICACIO n ON e.notificacio_id = n.id
+                  JOIN NOT_NOTIFICACIO_TABLE nt ON nt.id = n.id
+                  JOIN NOT_ORGAN_GESTOR o ON n.organ_gestor = o.id
+              WHERE e.ESTAT_DIA IS NOT NULL
+          )
+          SELECT entitat_id,
+                 procediment_id,
+                 organ_codi,
+                 usuari_codi,
+                 env_tipus,
+                 origen,
+                 CASE
+                     WHEN error = 1 AND estat = 'PENDENT' THEN 'REG_ERR'
+                     WHEN error = 1 AND estat = 'PEND_ENV' THEN 'ENV_ERR'
+                     ELSE estat
+                 END AS tipus,
+                 ESTAT_DIA AS dia,
+                 COUNT(*) AS total
+          FROM notificacions
+          WHERE ESTAT_DIA IS NOT NULL
+          GROUP BY entitat_id, procediment_id, organ_codi, usuari_codi, env_tipus, origen, estat, error, ESTAT_DIA
+        viewName: NOT_ESTAT_VIEW
+- changeSet:
+    id: 1765358456691-17
+    author: limit (generated)
+    changes:
+    - createView:
+        fullDefinition: true
+        selectQuery: |-
+          CREATE OR REPLACE FORCE VIEW "NOT_CREADES_ENVIADES_VIEW" ("ENTITAT_ID", "PROCEDIMENT_ID", "ORGAN_CODI", "USUARI_CODI", "ENV_TIPUS", "ORIGEN", "TIPUS", "DIA", "TOTAL") AS WITH notificacions AS (
+              SELECT
+                  nt.entitat_id,
+                  n.procediment_id,
+                  o.codi as organ_codi,
+                  nt.usuari_codi,
+                  nt.env_tipus,
+                  n.origen,
+                  nt.CREATED_DIA,
+                  nt.ENVIADA_DIA
+              FROM NOT_NOTIFICACIO_TABLE nt
+              JOIN NOT_NOTIFICACIO n ON nt.id = n.id
+              JOIN NOT_ORGAN_GESTOR o ON n.organ_gestor = o.id
+              WHERE nt.CREATED_DIA IS NOT NULL OR nt.ENVIADA_DIA IS NOT NULL
+          )
+          SELECT entitat_id,
+                 procediment_id,
+                 organ_codi,
+                 usuari_codi,
+                 env_tipus,
+                 origen,
+                 'CREADA' AS tipus,
+                 CREATED_DIA AS dia,
+                 COUNT(*) AS total
+          FROM notificacions
+          WHERE CREATED_DIA IS NOT NULL
+          GROUP BY entitat_id, procediment_id, organ_codi, usuari_codi, env_tipus, origen, CREATED_DIA
+        viewName: NOT_CREADES_ENVIADES_VIEW
+- changeSet:
+    id: 1765358456691-18
+    author: limit (generated)
+    changes:
+    - createView:
+        fullDefinition: true
+        selectQuery: "CREATE OR REPLACE FORCE VIEW \"NOT_STATS_VIEW\" (\"ID\", \"\
+          ENTITAT_ID\", \"PROCEDIMENT_ID\", \"ORGAN_CODI\", \"USUARI_CODI\", \"ENV_TIPUS\"\
+          , \"ORIGEN\", \"TIPUS\", \"DIA\", \"TOTAL\") AS SELECT\n    ROW_NUMBER()\
+          \ OVER (ORDER BY entitat_id, dia) AS id,\n    entitat_id,\n    procediment_id,\n\
+          \    organ_codi,\n    usuari_codi,\n    env_tipus,\n    origen,\n    tipus,\n\
+          \    dia,\n    total\nFROM (SELECT entitat_id,\n             procediment_id,\n\
+          \             organ_codi,\n             usuari_codi,\n             env_tipus,\n\
+          \             origen,\n             tipus,\n             dia,\n        \
+          \     total\n      FROM NOT_CREADES_ENVIADES_VIEW\n \n      UNION ALL\n\
+          \ \n      SELECT entitat_id,\n             procediment_id,\n           \
+          \  organ_codi,\n             usuari_codi,\n             env_tipus,\n   \
+          \          origen,\n             tipus,\n             dia,\n           \
+          \  total\n      FROM NOT_REGISTRADES_VIEW\n \n      UNION ALL\n \n     \
+          \ SELECT entitat_id,\n             procediment_id,\n             organ_codi,\n\
+          \             usuari_codi,\n             env_tipus,\n             origen,\n\
+          \             tipus,\n             dia,\n             total\n      FROM\
+          \ NOT_ESTAT_VIEW\n \n      UNION ALL\n \n      SELECT entitat_id,\n    \
+          \         procediment_id,\n             organ_codi,\n             usuari_codi,\n\
+          \             env_tipus,\n             origen,\n             tipus,\n  \
+          \           dia,\n             total\n      FROM NOT_SIR_VIEW\n)"
+        viewName: NOT_STATS_VIEW
+- changeSet:
+    id: 1765358456691-21
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_ACC_MASS_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: TIPUS
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: DATA_INICI
+            type: TIMESTAMP(6)
+        - column:
+            name: DATA_FI
+            type: TIMESTAMP(6)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: ENTITAT_ID
+            type: NUMERIC(38, 0)
+        - column:
+            name: ERROR
+            type: boolean
+        - column:
+            name: NUM_ERRORS
+            type: NUMERIC(19, 0)
+        - column:
+            name: ERROR_DESCRIPCIO
+            type: VARCHAR(1024 ${varcharUnit})
+        - column:
+            name: EXCEPCIO_STACKTRACE
+            type: VARCHAR(2048 ${varcharUnit})
+        tableName: ${db_prefix}ACCIO_MASSIVA   
+- changeSet:
+    id: 1765358456691-22
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_ACC_MASS_ELEM_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: ACCIO_MASSIVA_ID
+            type: BIGINT
+        - column:
+            name: SELECCIO_TIPUS
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: ELEMENT_ID
+            type: BIGINT
+        - column:
+            name: DATA_EXECUCIO
+            type: TIMESTAMP(6)
+        - column:
+            name: ERROR_DESCRIPCIO
+            type: VARCHAR(1024 ${varcharUnit})
+        - column:
+            name: EXCEPCIO_STACKTRACE
+            type: VARCHAR(2048 ${varcharUnit})
+        tableName: ${db_prefix}ACCIO_MASSIVA_ELEMENT   
+- changeSet:
+    id: 1765358456691-23
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: SYS_C007133
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CALLBACK_URL
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            name: USUARI_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: 1
+            name: ACTIVA
+            type: boolean
+        - column:
+            defaultValue: 1
+            name: HEADER_CSRF
+            type: boolean
+        - column:
+            constraints:
+              nullable: false
+            defaultValueNumeric: 4
+            name: MAX_ENV_MIN_LABORAL
+            type: NUMERIC(19, 0)
+        - column:
+            constraints:
+              nullable: false
+            defaultValueNumeric: 8
+            name: MAX_ENV_MIN_NO_LABORAL
+            type: NUMERIC(19, 0)
+        - column:
+            constraints:
+              nullable: false
+            defaultValueNumeric: 8000
+            name: MAX_ENV_DIA_LABORAL
+            type: NUMERIC(19, 0)
+        - column:
+            constraints:
+              nullable: false
+            defaultValueNumeric: 100000
+            name: MAX_ENV_DIA_NO_LABORAL
+            type: NUMERIC(19, 0)
+        - column:
+            constraints:
+              nullable: false
+            defaultValueComputed: TO_DATE('07:00:00', 'HH24:MI:SS')
+            name: HORARI_LABORAL_INICI
+            type: date
+        - column:
+            constraints:
+              nullable: false
+            defaultValueComputed: TO_DATE('16:00:00', 'HH24:MI:SS')
+            name: HORARI_LABORAL_FI
+            type: date
+        tableName: ${db_prefix}APLICACIO    
+- changeSet:
+    id: 1765358456691-24
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_APLICACIO_AUDIT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUSOPERACIO
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: JOINPOINT
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: APLICACIO_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: USUARI_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: CALLBACK_URL
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            name: ACTIVA
+            type: boolean
+        tableName: ${db_prefix}APLICACIO_AUDIT   
+- changeSet:
+    id: 1765358456691-25
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_AVIS_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ASSUMPTE
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: MISSATGE
+            type: VARCHAR(2048 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: DATA_INICI
+            type: TIMESTAMP(6)
+        - column:
+            name: DATA_FINAL
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: ACTIU
+            type: boolean
+        - column:
+            constraints:
+              nullable: false
+            name: AVIS_NIVELL
+            type: VARCHAR(10 ${varcharUnit})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            defaultValue: 0
+            name: AVIS_ADMIN
+            type: boolean
+        - column:
+            name: ENTITAT_ID
+            type: NUMERIC(38, 0)
+        tableName: ${db_prefix}AVIS   
+- changeSet:
+    id: 1765358456691-26
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_CALLBACK_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: USUARI_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: NOTIFICACIO_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ENVIAMENT_ID
+            type: BIGINT
+        - column:
+            name: DATA
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: 0
+            name: ERROR
+            type: boolean
+        - column:
+            name: ERROR_DESC
+            type: VARCHAR(2048 ${varcharUnit})
+        - column:
+            name: ESTAT
+            type: VARCHAR(10 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            defaultValueNumeric: 0
+            name: INTENTS
+            type: NUMERIC(19, 0)
+        - column:
+            name: DATA_CREACIO
+            type: TIMESTAMP(6)
+        - column:
+            defaultValue: 0
+            name: PAUSAT
+            type: boolean
+        - column:
+            name: ULTIM_INTENT
+            type: TIMESTAMP(6)
+        tableName: ${db_prefix}CALLBACK    
+- changeSet:
+    id: 1765358456691-27
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: SYS_C006987
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CODI_NOTIB_ENV
+            type: boolean
+        - column:
+            name: CONCEPTE
+            type: boolean
+        - column:
+            name: CSV_UUID
+            type: boolean
+        - column:
+            name: DATA_CADUCITAT
+            type: boolean
+        - column:
+            name: DATA_ENVIAMENT
+            type: boolean
+        - column:
+            name: DATA_PROGRAMADA
+            type: boolean
+        - column:
+            name: DESCRIPCIO
+            type: boolean
+        - column:
+            name: DESTINATARIS
+            type: boolean
+        - column:
+            name: DIR3_CODI
+            type: boolean
+        - column:
+            name: ENVIAMENT_TIPUS
+            type: boolean
+        - column:
+            name: ESTAT
+            type: boolean
+        - column:
+            name: GRUP_CODI
+            type: boolean
+        - column:
+            name: NOT_IDENTIFICADOR
+            type: boolean
+        - column:
+            name: NUMERO_REGISTRE
+            type: boolean
+        - column:
+            name: PRO_CODI
+            type: boolean
+        - column:
+            name: TITULAR_NOM_LLINATGE
+            type: boolean
+        - column:
+            name: USUARI
+            type: boolean
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: USUARI_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: REFERENCIA_NOTIFICACIO
+            type: boolean
+        - column:
+            defaultValue: 0
+            name: DATA_CREACIO
+            type: boolean
+        - column:
+            defaultValue: 1
+            name: DATA_CREACIO_REMESA
+            type: boolean
+        - column:
+            defaultValue: 1
+            name: DATA_ENVIAMENT_REMESA
+            type: boolean
+        - column:
+            defaultValue: 0
+            name: NUM_REGISTRE_REMESA
+            type: boolean
+        - column:
+            defaultValue: 1
+            name: ORGAN_EMISOR_REMESA
+            type: boolean
+        - column:
+            defaultValue: 1
+            name: PROC_SER_CODI_REMESA
+            type: boolean
+        - column:
+            defaultValue: 1
+            name: NUM_EXPEDIENT_REMESA
+            type: boolean
+        - column:
+            defaultValue: 1
+            name: CONCEPTE_REMESA
+            type: boolean
+        - column:
+            defaultValue: 0
+            name: CREADA_PER_REMESA
+            type: boolean
+        - column:
+            defaultValue: 1
+            name: INTERESSATS_REMESA
+            type: boolean
+        - column:
+            defaultValue: 1
+            name: ESTAT_REMESA
+            type: boolean
+        - column:
+            defaultValueNumeric: 1
+            name: ENTREGA_POSTAL
+            type: boolean
+        tableName: ${db_prefix}COLUMNES   
+- changeSet:
+    id: 1765358456691-28
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_CONFIG_PK
+            name: KEY
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            name: VALUE
+            type: VARCHAR(2048 ${varcharUnit})
+        - column:
+            name: DESCRIPTION
+            type: VARCHAR(2048 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: GROUP_CODE
+            type: VARCHAR(128 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            defaultValueNumeric: 0
+            name: POSITION
+            type: NUMERIC(3, 0)
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: 0
+            name: JBOSS_PROPERTY
+            type: boolean
+        - column:
+            defaultValue: TEXT
+            name: TYPE_CODE
+            type: VARCHAR(128 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: ENTITAT_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            defaultValue: 0
+            name: CONFIGURABLE
+            type: boolean
+        tableName: ${db_prefix}CONFIG
+- changeSet:
+    id: 1765358456691-29
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_CONFIG_GROUP_PK
+            name: CODE
+            type: VARCHAR(128 ${varcharUnit})
+        - column:
+            name: PARENT_CODE
+            type: VARCHAR(128 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            defaultValueNumeric: 0
+            name: POSITION
+            type: NUMERIC(3, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: DESCRIPTION
+            type: VARCHAR(512 ${varcharUnit})
+        tableName: ${db_prefix}CONFIG_GROUP      
+- changeSet:
+    id: 1765358456691-30
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_CONFIG_TYPE_PK
+            name: CODE
+            type: VARCHAR(128 ${varcharUnit})
+        - column:
+            name: VALUE
+            type: VARCHAR(2048 ${varcharUnit})
+        tableName: ${db_prefix}CONFIG_TYPE      
+- changeSet:
+    id: 1765358456691-31
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: SYS_C007186
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: ARXIU_GEST_DOC_ID
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: ARXIU_NOM
+            type: VARCHAR(200 ${varcharUnit})
+        - column:
+            name: CSV
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            name: HASH
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            name: NORMALITZAT
+            type: boolean
+        - column:
+            name: URL
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            name: UUID
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: MEDIA
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            name: MIDA
+            type: BIGINT
+        - column:
+            name: ORIGEN
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: VALIDESA
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: TIPUS_DOCUMENTAL
+            type: VARCHAR(30 ${varcharUnit})
+        - column:
+            name: FIRMAT
+            type: boolean
+        tableName: ${db_prefix}DOCUMENT     
+- changeSet:
+    id: 1765358456691-32
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: SYS_C007189
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: ACTIVA
+            type: boolean
+        - column:
+            constraints:
+              nullable: false
+            name: AMB_ENTREGA_DEH
+            type: boolean
+        - column:
+            constraints:
+              nullable: false
+            name: API_KEY
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: COLOR_FONS
+            type: VARCHAR(1024 ${varcharUnit})
+        - column:
+            name: COLOR_LLETRA
+            type: VARCHAR(1024 ${varcharUnit})
+        - column:
+            name: DESCRIPCIO
+            type: VARCHAR(1024 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: DIR3_CODI
+            type: VARCHAR(9 ${varcharUnit})
+        - column:
+            name: DIR3_CODI_REG
+            type: VARCHAR(9 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUS
+            type: VARCHAR(32 ${varcharUnit})
+        - column:
+            name: TIPUS_DOC_DEFAULT
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: VERSION
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: NOM_OFICINA_VIRTUAL
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: OFICINA
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: LLIBRE
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: LLIBRE_NOM
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: LLIBRE_ENTITAT
+            type: boolean
+        - column:
+            defaultValue: 1
+            name: OFICINA_ENTITAT
+            type: boolean
+        - column:
+            name: ENTREGA_CIE_ID
+            type: BIGINT
+        - column:
+            name: DATA_SINCRONITZACIO
+            type: TIMESTAMP(6)
+        - column:
+            name: DATA_ACTUALITZACIO
+            type: TIMESTAMP(6)
+        - column:
+            name: LOGO_CAP
+            type: BLOB
+        - column:
+            name: LOGO_PEU
+            type: BLOB
+        tableName: ${db_prefix}ENTITAT    
+- changeSet:
+    id: 1765358456691-33
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_ENTITAT_AUDIT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUSOPERACIO
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: JOINPOINT
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            name: TIPUS
+            type: VARCHAR(32 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: DIR3_CODI
+            type: VARCHAR(9 ${varcharUnit})
+        - column:
+            name: DIR3_CODI_REG
+            type: VARCHAR(9 ${varcharUnit})
+        - column:
+            name: API_KEY
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: AMB_ENTREGA_DEH
+            type: boolean
+        - column:
+            name: AMB_ENTREGA_CIE
+            type: boolean
+        - column:
+            name: DESCRIPCIO
+            type: VARCHAR(1024 ${varcharUnit})
+        - column:
+            name: ACTIVA
+            type: boolean
+        - column:
+            name: OFICINA
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: LLIBRE_ENTITAT
+            type: boolean
+        - column:
+            name: LLIBRE
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: LLIBRE_NOM
+            type: VARCHAR(255 ${varcharUnit})
+        tableName: ${db_prefix}ENTITAT_AUDIT   
+- changeSet:
+    id: 1765358456691-34
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: SYS_C007237
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: TIPUS_DOC
+            type: INTEGER
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: ENTITAT_ID
+            type: BIGINT
+        tableName: ${db_prefix}ENTITAT_TIPUS_DOC    
+- changeSet:
+    id: 1765358456691-35
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_ENTREGA_CIE_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: OPERADOR_POSTAL_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CIE_ID
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        tableName: ${db_prefix}ENTREGA_CIE 
+- changeSet:
+    id: 1765358456691-36
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_ENTREGA_POSTAL_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: DOM_TIPUS
+            type: INTEGER
+        - column:
+            name: DOM_CON_TIPUS
+            type: INTEGER
+        - column:
+            name: DOM_VIA_TIPUS
+            type: INTEGER
+        - column:
+            name: DOM_VIA_NOM
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: DOM_NUM_TIPUS
+            type: INTEGER
+        - column:
+            name: DOM_NUM_NUM
+            type: VARCHAR(5 ${varcharUnit})
+        - column:
+            name: DOM_NUM_QUALIF
+            type: VARCHAR(3 ${varcharUnit})
+        - column:
+            name: DOM_NUM_PUNTKM
+            type: VARCHAR(10 ${varcharUnit})
+        - column:
+            name: DOM_APARTAT
+            type: VARCHAR(10 ${varcharUnit})
+        - column:
+            name: DOM_BLOC
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: DOM_PORTAL
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: DOM_ESCALA
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: DOM_PLANTA
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: DOM_PORTA
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: DOM_COMPLEM
+            type: VARCHAR(250 ${varcharUnit})
+        - column:
+            name: DOM_POBLACIO
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: DOM_MUN_CODINE
+            type: VARCHAR(6 ${varcharUnit})
+        - column:
+            name: DOM_MUN_NOM
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: DOM_CODI_POSTAL
+            type: VARCHAR(10 ${varcharUnit})
+        - column:
+            name: DOM_PRV_CODI
+            type: VARCHAR(2 ${varcharUnit})
+        - column:
+            name: DOM_PRV_NOM
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: DOM_PAI_CODISO
+            type: VARCHAR(3 ${varcharUnit})
+        - column:
+            name: DOM_PAI_NOM
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: DOM_LINEA1
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: DOM_LINEA2
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: DOM_CIE
+            type: INTEGER
+        - column:
+            name: FORMAT_SOBRE
+            type: VARCHAR(10 ${varcharUnit})
+        - column:
+            name: FORMAT_FULLA
+            type: VARCHAR(10 ${varcharUnit})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CIE_ID
+            type: VARCHAR(100 ${varcharUnit})
+        - column:
+            defaultValueNumeric: 0
+            name: CIE_CANCELAT
+            type: boolean
+        - column:
+            name: CIE_ESTAT
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: CIE_ERROR_DESC
+            type: VARCHAR(250 ${varcharUnit})
+        - column:
+            name: CIE_DATAT_RECNIF
+            type: VARCHAR(9 ${varcharUnit})
+        - column:
+            name: CIE_DATAT_RECNOM
+            type: VARCHAR(400 ${varcharUnit})
+        - column:
+            name: CIE_CER_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: CIE_CER_ARXIUID
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: CIE_CER_HASH
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: CIE_CER_ORIGEN
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: CIE_CER_METAS
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: CIE_CER_CSV
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: CIE_CER_MIME
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: CIE_CER_TAMANY
+            type: NUMERIC(19, 0)
+        - column:
+            name: CIE_CER_TIPUS
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: CIE_CER_ARXTIP
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: CIE_CER_NUMSEG
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: CIE_ESTAT_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: CIE_ESTAT_DESC
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: CIE_DATAT_ORIGEN
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: CIE_DATAT_NUMSEG
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: CIE_DATAT_ERRDES
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: CIE_ESTAT_DATAACT
+            type: TIMESTAMP(6)
+        tableName: ${db_prefix}ENTREGA_POSTAL  
+- changeSet:
+    id: 1765358456691-37
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: PK_NOT_EXPLOT_DIM
+            name: ID
+            type: NUMERIC(38, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: NUMERIC(38, 0)
+        - column:
+            name: PROCEDIMENT_ID
+            type: NUMERIC(38, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: ORGAN_CODI
+            type: VARCHAR(100 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: USUARI_CODI
+            type: VARCHAR(100 ${varcharUnit})
+        - column:
+            name: TIPUS
+            type: VARCHAR(16 ${varcharUnit})
+        - column:
+            name: ORIGEN
+            type: VARCHAR(16 ${varcharUnit})
+        - column:
+            name: ENTITAT_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: PROCEDIMENT_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        tableName: ${db_prefix}EXPLOT_DIM  
+- changeSet:
+    id: 1765358456691-38
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: PK_NOT_EXPLOT_ENV_INFO
+            name: ID
+            type: NUMERIC(38, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: NUMERIC(38, 0)
+        - column:
+            name: PROCEDIMENT_ID
+            type: NUMERIC(38, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: ORGAN_GESTOR_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: USUARI_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: ENVIAMENT_TIPUS
+            type: VARCHAR(16 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: ORIGEN
+            type: VARCHAR(16 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: DATA_CREACIO
+            type: TIMESTAMP(6)
+        - column:
+            name: TEMPS_PENDENT
+            type: NUMERIC(38, 0)
+        - column:
+            name: DATA_REG_ENV_ERROR
+            type: TIMESTAMP(6)
+        - column:
+            name: INTENTS_REG_ENVIAMENT
+            type: NUMERIC(19, 0)
+        - column:
+            name: DATA_REGISTRADA
+            type: TIMESTAMP(6)
+        - column:
+            name: TEMPS_REGISTRADA
+            type: NUMERIC(38, 0)
+        - column:
+            name: INTENTS_SIR_CONSULTA
+            type: NUMERIC(19, 0)
+        - column:
+            name: DATA_REG_ACCEPTADA
+            type: TIMESTAMP(6)
+        - column:
+            name: DATA_REG_REBUTJADA
+            type: TIMESTAMP(6)
+        - column:
+            name: DATA_NOT_ENVIAMENT_ERROR
+            type: TIMESTAMP(6)
+        - column:
+            name: INTENTS_NOT_ENVIAMENT
+            type: NUMERIC(19, 0)
+        - column:
+            name: DATA_NOT_ENVIADA
+            type: TIMESTAMP(6)
+        - column:
+            name: TEMPS_NOT_ENVIADA
+            type: NUMERIC(38, 0)
+        - column:
+            name: DATA_NOT_NOTIFICADA
+            type: TIMESTAMP(6)
+        - column:
+            name: DATA_NOT_REBUTJADA
+            type: TIMESTAMP(6)
+        - column:
+            name: DATA_NOT_EXPIRADA
+            type: TIMESTAMP(6)
+        - column:
+            name: DATA_NOT_ERROR
+            type: TIMESTAMP(6)
+        - column:
+            name: DATA_CIE_ENVIAMENT_ERROR
+            type: TIMESTAMP(6)
+        - column:
+            name: INTENTS_CIE_ENVIAMENT
+            type: NUMERIC(19, 0)
+        - column:
+            name: DATA_CIE_ENVIADA
+            type: TIMESTAMP(6)
+        - column:
+            name: TEMPS_CIE_ENVIADA
+            type: NUMERIC(38, 0)
+        - column:
+            name: DATA_CIE_NOTIFICADA
+            type: TIMESTAMP(6)
+        - column:
+            name: DATA_CIE_REBUTJADA
+            type: TIMESTAMP(6)
+        - column:
+            name: DATA_CIE_CANCELADA
+            type: TIMESTAMP(6)
+        - column:
+            name: DATA_CIE_ERROR
+            type: TIMESTAMP(6)
+        - column:
+            name: DATA_EMAIL_ENVIAMENT_ERROR
+            type: TIMESTAMP(6)
+        - column:
+            name: INTENTS_EMAIL_ENVIAMENT
+            type: NUMERIC(19, 0)
+        - column:
+            name: DATA_EMAIL_ENVIADA
+            type: TIMESTAMP(6)
+        - column:
+            name: TEMPS_TOTAL
+            type: NUMERIC(38, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: ENVIAMENT_ID
+            type: NUMERIC(38, 0)
+        tableName: ${db_prefix}EXPLOT_ENV_INFO 
+- changeSet:
+    id: 1765358456691-39
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: PK_NOT_EXPLOT_FET
+            name: ID
+            type: NUMERIC(38, 0)
+        - column:
+            name: TOT_PENDENT
+            type: NUMERIC(38, 0)
+        - column:
+            name: TOT_REG_ERR
+            type: NUMERIC(38, 0)
+        - column:
+            name: TOT_REGISTR
+            type: NUMERIC(38, 0)
+        - column:
+            name: TOT_SIR_ACC
+            type: NUMERIC(38, 0)
+        - column:
+            name: TOT_SIR_REB
+            type: NUMERIC(38, 0)
+        - column:
+            name: TOT_NOT_ERR
+            type: NUMERIC(38, 0)
+        - column:
+            name: TOT_NOT_ENV
+            type: NUMERIC(38, 0)
+        - column:
+            name: TOT_NOT_NOT
+            type: NUMERIC(38, 0)
+        - column:
+            name: TOT_NOT_REB
+            type: NUMERIC(38, 0)
+        - column:
+            name: TOT_NOT_EXP
+            type: NUMERIC(38, 0)
+        - column:
+            name: TOT_CIE_ERR
+            type: NUMERIC(38, 0)
+        - column:
+            name: TOT_CIE_ENV
+            type: NUMERIC(38, 0)
+        - column:
+            name: TOT_CIE_NOT
+            type: NUMERIC(38, 0)
+        - column:
+            name: TOT_CIE_REB
+            type: NUMERIC(38, 0)
+        - column:
+            name: TOT_CIE_FAL
+            type: NUMERIC(38, 0)
+        - column:
+            name: TOT_PROCESS
+            type: NUMERIC(38, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: DIMENSIO_ID
+            type: NUMERIC(38, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: TEMPS_ID
+            type: NUMERIC(38, 0)
+        - column:
+            name: TR_CREADES
+            type: NUMERIC(38, 0)
+        - column:
+            name: TR_REG_ERR
+            type: NUMERIC(38, 0)
+        - column:
+            name: TR_REGISTR
+            type: NUMERIC(38, 0)
+        - column:
+            name: TR_SIR_ACC
+            type: NUMERIC(38, 0)
+        - column:
+            name: TR_SIR_REB
+            type: NUMERIC(38, 0)
+        - column:
+            name: TR_NOT_ERR
+            type: NUMERIC(38, 0)
+        - column:
+            name: TR_NOT_ENV
+            type: NUMERIC(38, 0)
+        - column:
+            name: TR_NOT_NOT
+            type: NUMERIC(38, 0)
+        - column:
+            name: TR_NOT_REB
+            type: NUMERIC(38, 0)
+        - column:
+            name: TR_NOT_EXP
+            type: NUMERIC(38, 0)
+        - column:
+            name: TR_NOT_FAL
+            type: NUMERIC(38, 0)
+        - column:
+            name: TR_CIE_ERR
+            type: NUMERIC(38, 0)
+        - column:
+            name: TR_CIE_ENV
+            type: NUMERIC(38, 0)
+        - column:
+            name: TR_CIE_NOT
+            type: NUMERIC(38, 0)
+        - column:
+            name: TR_CIE_REB
+            type: NUMERIC(38, 0)
+        - column:
+            name: TR_CIE_CAN
+            type: NUMERIC(38, 0)
+        - column:
+            name: TR_CIE_FAL
+            type: NUMERIC(38, 0)
+        - column:
+            name: TR_EML_ERR
+            type: NUMERIC(38, 0)
+        - column:
+            name: TR_EML_ENV
+            type: NUMERIC(38, 0)
+        - column:
+            name: TMP_PND
+            type: NUMERIC(38, 0)
+        - column:
+            name: TMP_REG
+            type: NUMERIC(38, 0)
+        - column:
+            name: TMP_NOT
+            type: NUMERIC(38, 0)
+        - column:
+            name: TMP_CIE
+            type: NUMERIC(38, 0)
+        - column:
+            name: TMP_TOT
+            type: NUMERIC(38, 0)
+        - column:
+            name: TMP_REG_SAC
+            type: NUMERIC(38, 0)
+        - column:
+            name: TMP_REG_SRB
+            type: NUMERIC(38, 0)
+        - column:
+            name: TMP_REG_NOT
+            type: NUMERIC(38, 0)
+        - column:
+            name: TMP_REG_EML
+            type: NUMERIC(38, 0)
+        - column:
+            name: TMP_NOT_NOT
+            type: NUMERIC(38, 0)
+        - column:
+            name: TMP_NOT_REB
+            type: NUMERIC(38, 0)
+        - column:
+            name: TMP_NOT_EXP
+            type: NUMERIC(38, 0)
+        - column:
+            name: TMP_NOT_FAL
+            type: NUMERIC(38, 0)
+        - column:
+            name: TMP_CIE_NOT
+            type: NUMERIC(38, 0)
+        - column:
+            name: TMP_CIE_REB
+            type: NUMERIC(38, 0)
+        - column:
+            name: TMP_CIE_CAN
+            type: NUMERIC(38, 0)
+        - column:
+            name: TMP_CIE_FAL
+            type: NUMERIC(38, 0)
+        - column:
+            name: TMP_TOT_NAC
+            type: NUMERIC(38, 0)
+        - column:
+            name: TMP_TOT_NRB
+            type: NUMERIC(38, 0)
+        - column:
+            name: TMP_TOT_NEX
+            type: NUMERIC(38, 0)
+        - column:
+            name: TMP_TOT_NFL
+            type: NUMERIC(38, 0)
+        - column:
+            name: TMP_TOT_CAC
+            type: NUMERIC(38, 0)
+        - column:
+            name: INT_REG
+            type: NUMERIC(38, 0)
+        - column:
+            name: INT_SIR
+            type: NUMERIC(38, 0)
+        - column:
+            name: INT_NOT
+            type: NUMERIC(38, 0)
+        - column:
+            name: INT_CIE
+            type: NUMERIC(38, 0)
+        - column:
+            name: INT_EML
+            type: NUMERIC(38, 0)
+        tableName: ${db_prefix}EXPLOT_FET        
+- changeSet:
+    id: 1765358456691-40
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: PK_NOT_EXPLOT_TEMPS
+            name: ID
+            type: NUMERIC(38, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: DATA
+            type: date
+        - column:
+            constraints:
+              nullable: false
+            name: ANUALITAT
+            type: NUMERIC(19, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: MES
+            type: NUMERIC(19, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: TRIMESTRE
+            type: NUMERIC(19, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: SETMANA
+            type: NUMERIC(19, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: DIA
+            type: NUMERIC(19, 0)
+        - column:
+            name: DIA_SETMANA
+            type: VARCHAR(2 ${varcharUnit})
+        tableName: ${db_prefix}EXPLOT_TEMPS
+- changeSet:
+    id: 1765358456691-41
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: SYS_C007272
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: PAGADOR_CIE_ID
+            type: BIGINT
+        tableName: ${db_prefix}FORMATS_FULLA  
+- changeSet:
+    id: 1765358456691-42
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: SYS_C007278
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: PAGADOR_CIE_ID
+            type: BIGINT
+        tableName: ${db_prefix}FORMATS_SOBRE
+- changeSet:
+    id: 1765358456691-43
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: SYS_C007129
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: NOM
+            type: VARCHAR(100 ${varcharUnit})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: ENTITAT
+            type: BIGINT
+        - column:
+            name: ORGAN_GESTOR
+            type: BIGINT
+        tableName: ${db_prefix}GRUP   
+- changeSet:
+    id: 1765358456691-44
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_GRUP_AUDIT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUSOPERACIO
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: JOINPOINT
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: GRUP_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: NOM
+            type: VARCHAR(100 ${varcharUnit})
+        - column:
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: ORGAN
+            type: VARCHAR(64 ${varcharUnit})
+        tableName: ${db_prefix}GRUP_AUDIT  
+- changeSet:
+    id: 1765358456691-45
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_HIST_ENVI_OID_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: ORGAN_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUS
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: PROCEDIMENT_ID
+            type: BIGINT
+        - column:
+            name: COMU
+            type: boolean
+        - column:
+            name: GRUP_CODI
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: USUARI_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: ESTAT
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: ESTAT_NOT
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: ENV_TIPUS
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: N_TOTAL
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_CORRECTES
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_AMB_ERROR
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_ORIGEN_API
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_ORIGEN_WEB
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_DESTI_ADM
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_DESTI_CIUTADA
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: VERSION
+            type: BIGINT
+        tableName: ${db_prefix}HIST_ENVIAMENTS
+- changeSet:
+    id: 1765358456691-46
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_HIST_NOTIF_OID_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: ORGAN_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUS
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: PROCEDIMENT_ID
+            type: BIGINT
+        - column:
+            name: COMU
+            type: boolean
+        - column:
+            name: GRUP_CODI
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: USUARI_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: ESTAT
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: N_NOT_TOTAL
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_NOT_CORRECTES
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_NOT_AMB_ERROR
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_NOT_ORIGEN_API
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_NOT_ORIGEN_WEB
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_NOT_DESTI_ADM
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_NOT_DESTI_CIUTADA
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_COM_TOTAL
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_COM_CORRECTES
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_COM_AMB_ERROR
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_COM_ORIGEN_API
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_COM_ORIGEN_WEB
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_COM_DESTI_ADM
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_COM_DESTI_CIUTADA
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: VERSION
+            type: BIGINT
+        tableName: ${db_prefix}HIST_NOTIF 
+- changeSet:
+    id: 1765358456691-47
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_HIST_ORGAN_OID_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: ORGAN_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUS
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: DATA
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: CODI_DIR3
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: N_PROCEDIMENTS
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_GRUPS
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_PERM_CONSULTA
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_PERM_NOTIFICACIO
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_PERM_GESTIO
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_PERM_PROCESSAR
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_PERM_ADMINISTRAR
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: VERSION
+            type: BIGINT
+        tableName: ${db_prefix}HIST_ORGAN
+- changeSet:
+    id: 1765358456691-48
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_HIST_PROC_OID_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: ORGAN_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUS
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: DATA
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: PROCEDIMENT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: COMU
+            type: boolean
+        - column:
+            constraints:
+              nullable: false
+            name: CODI_SIA
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: N_GRUPS
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_PERM_CONSULTA
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_PERM_NOTIFICACIO
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_PERM_GESTIO
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_PERM_PROCESSAR
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: VERSION
+            type: BIGINT
+        tableName: ${db_prefix}HIST_PROCEDIMENT
+- changeSet:
+    id: 1765358456691-49
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_MON_INT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR(100 ${varcharUnit})
+        - column:
+            name: DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: DESCRIPCIO
+            type: VARCHAR(1024 ${varcharUnit})
+        - column:
+            name: TIPUS
+            type: VARCHAR(10 ${varcharUnit})
+        - column:
+            name: TEMPS_RESPOSTA
+            type: BIGINT
+        - column:
+            name: ESTAT
+            type: VARCHAR(5 ${varcharUnit})
+        - column:
+            name: CODI_USUARI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: ERROR_DESCRIPCIO
+            type: VARCHAR(1024 ${varcharUnit})
+        - column:
+            name: EXCEPCIO_MSG
+            type: VARCHAR(1024 ${varcharUnit})
+        - column:
+            name: EXCEPCIO_STACKTRACE
+            type: VARCHAR(2048 ${varcharUnit})
+        - column:
+            name: CODI_ENTITAT
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: EXCEPCIO_STACKTRACE_BLOB
+            type: BLOB
+        - column:
+            name: APLICACIO
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: NOTIFICACIO_ID
+            type: BIGINT
+        tableName: ${db_prefix}MON_INT 
+- changeSet:
+    id: 1765358456691-50
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_MON_INT_PARAM_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: MON_INT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            name: VALOR
+            type: VARCHAR(1024 ${varcharUnit})
+        - column:
+            name: NOTIFICACIO_ID
+            type: BIGINT
+        tableName: ${db_prefix}MON_INT_PARAM   
+- changeSet:
+    id: 1765358456691-51
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_NOTIFICACIO_AUDIT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUSOPERACIO
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: JOINPOINT
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: NOTIFICACIO_ID
+            type: BIGINT
+        - column:
+            name: SINCRON
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: TIPUS_USUARI
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: USUARI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: EMISOR
+            type: VARCHAR(9 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUS
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: ORGAN
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: PROCEDIMENT
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: GRUP
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: CONCEPTE
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: DESCRIPCIO
+            type: VARCHAR(1000 ${varcharUnit})
+        - column:
+            name: NUM_EXPEDIENT
+            type: VARCHAR(80 ${varcharUnit})
+        - column:
+            name: ENV_DATA_PROG
+            type: date
+        - column:
+            name: RETARD_POSTAL
+            type: INTEGER
+        - column:
+            name: CADUCITAT
+            type: date
+        - column:
+            constraints:
+              nullable: false
+            name: DOCUMENT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ESTAT
+            type: VARCHAR(32 ${varcharUnit})
+        - column:
+            name: ESTAT_DATE
+            type: TIMESTAMP(6)
+        - column:
+            name: MOTIU
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: REGISTRE_ENV_INTENT
+            type: INTEGER
+        - column:
+            name: REGISTRE_NUMERO
+            type: INTEGER
+        - column:
+            name: REGISTRE_NUMERO_FORMATAT
+            type: VARCHAR(200 ${varcharUnit})
+        - column:
+            name: REGISTRE_DATA
+            type: date
+        - column:
+            name: NOT_ENV_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: NOT_ENV_INTENT
+            type: INTEGER
+        - column:
+            name: NOT_ERROR_TIPUS
+            type: VARCHAR(30 ${varcharUnit})
+        - column:
+            name: CALLBACK_ERROR
+            type: boolean
+        - column:
+            name: EVENT_ERROR
+            type: BIGINT
+        - column:
+            name: ESTAT_PROCESSAT_DATE
+            type: TIMESTAMP(6)
+        - column:
+            name: REFERENCIA
+            type: VARCHAR(36 ${varcharUnit})
+        tableName: ${db_prefix}NOTIFICACIO_AUDIT  
+- changeSet:
+    id: 1765358456691-52
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_NOTIFICACIO_ENV_AUDIT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUSOPERACIO
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: JOINPOINT
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: ENVIAMENT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: NOTIFICACIO_ID
+            type: BIGINT
+        - column:
+            name: TITULAR_ID
+            type: BIGINT
+        - column:
+            name: DESTINATARIS_ID
+            type: VARCHAR(200 ${varcharUnit})
+        - column:
+            name: DOMICILI_TIPUS
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: DOMICILI
+            type: VARCHAR(500 ${varcharUnit})
+        - column:
+            name: SERVEI_TIPUS
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: CIE
+            type: INTEGER
+        - column:
+            name: FORMAT_SOBRE
+            type: VARCHAR(10 ${varcharUnit})
+        - column:
+            name: FORMAT_FULLA
+            type: VARCHAR(10 ${varcharUnit})
+        - column:
+            name: DEH_OBLIGAT
+            type: boolean
+        - column:
+            name: DEH_NIF
+            type: VARCHAR(9 ${varcharUnit})
+        - column:
+            name: NOTIFICA_REF
+            type: VARCHAR(36 ${varcharUnit})
+        - column:
+            name: NOTIFICA_ID
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: NOTIFICA_DATCRE
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_DATDISP
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_DATCAD
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_EMI_DIR3CODI
+            type: VARCHAR(9 ${varcharUnit})
+        - column:
+            name: NOTIFICA_ARR_DIR3CODI
+            type: VARCHAR(9 ${varcharUnit})
+        - column:
+            name: NOTIFICA_ESTAT
+            type: INTEGER
+        - column:
+            name: NOTIFICA_ESTAT_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_ESTAT_FINAL
+            type: boolean
+        - column:
+            name: NOTIFICA_DATAT_ORIGEN
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: NOTIFICA_DATAT_RECNIF
+            type: VARCHAR(9 ${varcharUnit})
+        - column:
+            name: NOTIFICA_DATAT_NUMSEG
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: NOTIFICA_CER_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_CER_ARXIUID
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: NOTIFICA_CER_ORIGEN
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: NOTIFICA_CER_TIPUS
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: NOTIFICA_CER_ARXTIP
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: NOTIFICA_CER_NUMSEG
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: REGISTRE_NUMERO_FORMATAT
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: REGISTRE_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: REGISTRE_ESTAT
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: REGISTRE_ESTAT_FINAL
+            type: boolean
+        - column:
+            name: SIR_CON_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: SIR_REC_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: SIR_REG_DESTI_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_ERROR_EVENT_ID
+            type: BIGINT
+        - column:
+            name: NOTIFICA_ERROR
+            type: boolean
+        - column:
+            name: NOTIFICA_DATAT_ERRDES
+            type: VARCHAR(255 ${varcharUnit})
+        tableName: ${db_prefix}NOTIFICACIO_ENV_AUDIT    
+- changeSet:
+    id: 1765358456691-53
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: SYS_C007264
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CALLBACK_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: CALLBACK_ERROR_DESC
+            type: VARCHAR(2048 ${varcharUnit})
+        - column:
+            name: CALLBACK_ESTAT
+            type: VARCHAR(10 ${varcharUnit})
+        - column:
+            name: CALLBACK_INTENTS
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: DESCRIPCIO
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: ERROR
+            type: boolean
+        - column:
+            name: ERROR_DESC
+            type: VARCHAR(2048 ${varcharUnit})
+        - column:
+            name: NOTIFICACIO_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUS
+            type: INTEGER
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: NOTIFICACIO_ENV_ID
+            type: BIGINT
+        - column:
+            name: NOTIFICA_ERROR_TIPUS
+            type: INTEGER
+        - column:
+            defaultValue: 0
+            name: FI_REINTENTS
+            type: boolean
+        - column:
+            constraints:
+              nullable: false
+            defaultValueNumeric: 0
+            name: INTENTS
+            type: INTEGER
+        tableName: ${db_prefix}NOTIFICACIO_EVENT
+- changeSet:
+    id: 1765358456691-54
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_NOTIFICACIO_MASSIVA_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CSV_GESDOC_ID
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: ZIP_GESDOC_ID
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: CSV_FILENAME
+            type: VARCHAR(200 ${varcharUnit})
+        - column:
+            name: ZIP_FILENAME
+            type: VARCHAR(200 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: CADUCITAT
+            type: TIMESTAMP(6)
+        - column:
+            name: EMAIL
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: PAGADOR_POSTAL_ID
+            type: BIGINT
+        - column:
+            name: RESUM_GESDOC_ID
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: ERRORS_GESDOC_ID
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            defaultValueNumeric: 0
+            name: PROGRESS
+            type: NUMERIC(3, 0)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: ESTAT_VALIDACIO
+            type: VARCHAR(32 ${varcharUnit})
+        - column:
+            name: ESTAT_PROCES
+            type: VARCHAR(32 ${varcharUnit})
+        - column:
+            name: NUM_NOTIFICACIONS
+            type: NUMERIC(19, 0)
+        - column:
+            name: NUM_VALIDADES
+            type: NUMERIC(19, 0)
+        - column:
+            name: NUM_PROCESSADES
+            type: NUMERIC(19, 0)
+        - column:
+            name: NUM_ERROR
+            type: NUMERIC(19, 0)
+        - column:
+            defaultValueNumeric: 0
+            name: NUM_CANCELADES
+            type: NUMERIC(38, 0)
+        tableName: ${db_prefix}NOTIFICACIO_MASSIVA    
+- changeSet:
+    id: 1765358456691-55
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_OFI_PK
+            name: CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: NOM
+            type: VARCHAR(1024 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: SIR
+            type: boolean
+        - column:
+            constraints:
+              nullable: false
+            name: ACTIU
+            type: boolean
+        - column:
+            name: ENTITAT_ID
+            type: NUMERIC(38, 0)
+        - column:
+            name: ORGAN_GESTOR
+            type: BIGINT
+        tableName: ${db_prefix}OFICINA 
+- changeSet:
+    id: 1765358456691-56
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: ANTIC_OG
+            type: NUMERIC(38, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: NOU_OG
+            type: NUMERIC(38, 0)
+        tableName: ${db_prefix}OG_SINC_REL    
+- changeSet:
+    id: 1765358456691-57
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: SYS_C007123
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CONTRACTE_DATA_VIG
+            type: date
+        - column:
+            name: DIR3_CODI
+            type: VARCHAR(9 ${varcharUnit})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: ENTITAT
+            type: BIGINT
+        - column:
+            name: ORGAN_GESTOR
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: 0
+            name: CIE_EXTERN
+            type: boolean
+        - column:
+            name: API_KEY
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: SALT
+            type: VARCHAR(88 ${varcharUnit})
+        - column:
+            name: ORGAN_EMISOR
+            type: BIGINT
+        tableName: ${db_prefix}PAGADOR_CIE
+- changeSet:
+    id: 1765358456691-58
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: SYS_C007048
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CONTRACTE_DATA_VIG
+            type: date
+        - column:
+            name: CONTRACTE_NUM
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: DIR3_CODI
+            type: VARCHAR(9 ${varcharUnit})
+        - column:
+            name: FACTURACIO_CODI_CLIENT
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: ENTITAT
+            type: BIGINT
+        - column:
+            name: ORGAN_GESTOR
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR(256 ${varcharUnit})
+        tableName: ${db_prefix}PAGADOR_POSTAL
+- changeSet:
+    id: 1765358456691-59
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: SYS_C007037
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: COD_ENTITAT_DESTI
+            type: VARCHAR(9 ${varcharUnit})
+        - column:
+            name: EMAIL
+            type: VARCHAR(160 ${varcharUnit})
+        - column:
+            name: INCAPACITAT
+            type: boolean
+        - column:
+            constraints:
+              nullable: false
+            name: INTERESSATTIPUS
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: LLINATGE1
+            type: VARCHAR(40 ${varcharUnit})
+        - column:
+            name: LLINATGE2
+            type: VARCHAR(40 ${varcharUnit})
+        - column:
+            name: NIF
+            type: VARCHAR(50 ${varcharUnit})
+        - column:
+            name: NOM
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: RAO_SOCIAL
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: TELEFON
+            type: VARCHAR(16 ${varcharUnit})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: NOTIFICACIO_ENV_ID
+            type: BIGINT
+        - column:
+            name: DOCUMENT_TIPUS
+            type: VARCHAR(32 ${varcharUnit})
+        - column:
+            name: NIF_bar
+            type: VARCHAR(100 ${varcharUnit})
+        tableName: ${db_prefix}PERSONA
+- changeSet:
+    id: 1765358456691-60
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: SYS_C007023
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: AGRUPAR
+            type: boolean
+        - column:
+            name: CADUCITAT
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: CODIASSUMPTE
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: CODIASSUMPTE_NOM
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            name: RETARD
+            type: INTEGER
+        - column:
+            name: TIPUSASSUMPTE
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: TIPUSASSUMPTE_NOM
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: ENTITAT
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: 0
+            name: COMU
+            type: boolean
+        - column:
+            name: ULTIMA_ACT
+            type: date
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: 0
+            name: DIRECT_PERMISSION_REQUIRED
+            type: boolean
+        - column:
+            name: ENTREGA_CIE_ID
+            type: BIGINT
+        - column:
+            name: TIPUS
+            type: VARCHAR(32 ${varcharUnit})
+        - column:
+            name: ORGAN_NO_SINC
+            type: boolean
+        - column:
+            defaultValue: 1
+            name: ACTIU
+            type: boolean
+        - column:
+            defaultValue: 0
+            name: MANUAL
+            type: boolean
+        - column:
+            name: ORGAN_GESTOR
+            type: BIGINT
+        - column:
+            name: ORGAN_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: ORGAN_GESTOR_AUX
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: ORGAN_GESTOR_AUX_FOO
+            type: VARCHAR(64 ${varcharUnit})
+        tableName: ${db_prefix}PROCEDIMENT    
+- changeSet:
+    id: 1765358456691-61
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_PROCEDIMENT_AUDIT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUSOPERACIO
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: JOINPOINT
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: PROCEDIMENT_ID
+            type: BIGINT
+        - column:
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: ORGAN
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: NOM
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            name: RETARD
+            type: INTEGER
+        - column:
+            name: CADUCITAT
+            type: INTEGER
+        - column:
+            name: AGRUPAR
+            type: boolean
+        - column:
+            name: COMU
+            type: boolean
+        - column:
+            name: PAGADORPOSTAL_ID
+            type: BIGINT
+        - column:
+            name: PAGADORCIE_ID
+            type: BIGINT
+        tableName: ${db_prefix}PROCEDIMENT_AUDIT
+- changeSet:
+    id: 1765358456691-62
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR(100 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: 0
+            name: INIT
+            type: boolean
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_PROCESSOS_INICIALS_PK
+            name: ID
+            type: BIGINT
+        tableName: ${db_prefix}PROCESSOS_INICIALS
+- changeSet:
+    id: 1765358456691-63
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: SYS_C007028
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: GRUP
+            type: BIGINT
+        - column:
+            name: PROCEDIMENT
+            type: BIGINT
+        tableName: ${db_prefix}PRO_GRUP    
+- changeSet:
+    id: 1765358456691-64
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_PRO_GRUP_AUDIT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUSOPERACIO
+            type: VARCHAR(20 ${varcharUnit})
+        - column:
+            name: JOINPOINT
+            type: VARCHAR(256 ${varcharUnit})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: PROGRUP_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: PROCEDIMENT
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            constraints:
+              nullable: false
+            name: GRUP
+            type: VARCHAR(64 ${varcharUnit})
+        tableName: ${db_prefix}PRO_GRUP_AUDIT
+- changeSet:
+    id: 1765358456691-65
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_PRO_ORGAN_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: PROCEDIMENT_ID
+            type: BIGINT
+        - column:
+            name: ORGANGESTOR_ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${varcharUnit})
+        tableName: ${db_prefix}PRO_ORGAN 
+- changeSet:
+    id: 1765358456691-66
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: SYS_C007031
+            name: CODI
+            type: VARCHAR(64 ${varcharUnit})
+        - column:
+            name: EMAIL
+            type: VARCHAR(200 ${varcharUnit})
+        - column:
+            name: IDIOMA
+            type: VARCHAR(2 ${varcharUnit})
+        - column:
+            name: LLINATGES
+            type: VARCHAR(100 ${varcharUnit})
+        - column:
+            name: NOM
+            type: VARCHAR(100 ${varcharUnit})
+        - column:
+            name: NOM_SENCER
+            type: VARCHAR(200 ${varcharUnit})
+        - column:
+            name: REBRE_EMAILS
+            type: boolean
+        - column:
+            constraints:
+              nullable: false
+            name: VERSION
+            type: BIGINT
+        - column:
+            name: ULTIM_ROL
+            type: VARCHAR(40 ${varcharUnit})
+        - column:
+            name: ULTIMA_ENTITAT
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: 0
+            name: REBRE_EMAILS_CREATS
+            type: boolean
+        - column:
+            name: EMAIL_ALT
+            type: VARCHAR(200 ${varcharUnit})
+        - column:
+            defaultValue: DEU
+            name: NUM_ELEMENTS_PAGINA_DEFECTE
+            type: VARCHAR(30 ${varcharUnit})
+        - column:
+            name: NIF
+            type: VARCHAR(40 ${varcharUnit})
+        - column:
+            name: ENTITAT_DEFECTE
+            type: NUMBER
+        - column:
+            name: ORGAN_DEFECTE
+            type: NUMBER
+        - column:
+            name: PROCEDIMENT_DEFECTE
+            type: NUMBER
+        tableName: ${db_prefix}USUARI   
+- changeSet:
+    id: 1765358456691-67
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: SYS_C007079
+            name: MACHINE_ID
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: STATE
+            type: VARCHAR(255 ${varcharUnit})
+        - column:
+            name: STATE_MACHINE_CONTEXT
+            type: BLOB
+        tableName: STATE_MACHINE   

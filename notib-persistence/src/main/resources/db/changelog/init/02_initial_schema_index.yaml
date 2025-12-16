@@ -1,0 +1,769 @@
+databaseChangeLog:
+- changeSet:
+    id: 1765358456691-68
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ENTITAT_ID
+        - column:
+            name: PROCEDIMENT_ID
+        - column:
+            name: ORGAN_CODI
+        - column:
+            name: USUARI_CODI
+        - column:
+            name: TIPUS
+        - column:
+            name: ORIGEN
+        indexName: NOT_EXPLOT_DIM_UK
+        tableName: NOT_EXPLOT_DIM
+        unique: true
+- changeSet:
+    id: 1765358456691-70
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ENVIAMENT_ID
+        indexName: NOT_EXPLOT_ENV_UK
+        tableName: NOT_EXPLOT_ENV_INFO
+        unique: true
+- changeSet:
+    id: 1765358456691-72
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: REFERENCIA
+        indexName: NOT_NOTIFICACIO_TABLE_UN
+        tableName: NOT_NOTIFICACIO_TABLE
+        unique: true
+- changeSet:
+    id: 1765358456691-74
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: REFERENCIA
+        indexName: NOT_NOTIFICACIO_UN
+        tableName: NOT_NOTIFICACIO
+        unique: true
+- changeSet:
+    id: 1765358456691-76
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: CODI
+        - column:
+            name: ENTITAT
+        indexName: NOT_ORGAN_ENTITAT_UNIQUE
+        tableName: NOT_ORGAN_GESTOR
+        unique: true
+- changeSet:
+    id: 1765358456691-78
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ANTIC_OG
+        - column:
+            name: NOU_OG
+        indexName: NOT_UO_SINC_REL_MULT_UK
+        tableName: NOT_OG_SINC_REL
+        unique: true
+- changeSet:
+    id: 1765358456691-80
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: CODI
+        indexName: NOT_ENTITAT_UK
+        tableName: NOT_ENTITAT
+        unique: true
+- changeSet:
+    id: 1765358456691-82
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ENVIAMENT_ID
+        indexName: SYS_C007644
+        tableName: NOT_CALLBACK
+        unique: true
+- changeSet:
+    id: 1765358456691-84
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: TIPUS
+        - column:
+            name: NOTIFICACIO_ENV_ID
+        indexName: EVENT_TIPUS_ENV_ID_IDX
+        tableName: NOT_NOTIFICACIO_EVENT
+- changeSet:
+    id: 1765358456691-85
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: NIF
+        indexName: NIF_INDEX
+        tableName: NOT_PERSONA
+- changeSet:
+    id: 1765358456691-86
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: APLICACIO_ID
+        indexName: NOT_APLICACIO_AUDIT_EK
+        tableName: NOT_APLICACIO_AUDIT
+- changeSet:
+    id: 1765358456691-87
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: DATA_FINAL
+        indexName: NOT_AVIS_DATA_FINAL_I
+        tableName: NOT_AVIS
+- changeSet:
+    id: 1765358456691-88
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: DATA_INICI
+        indexName: NOT_AVIS_DATA_INICI_I
+        tableName: NOT_AVIS
+- changeSet:
+    id: 1765358456691-89
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            computed: true
+            name: CREATEDDATE
+        indexName: NOT_CREATED_DIA_I
+        tableName: NOT_NOTIFICACIO_TABLE
+- changeSet:
+    id: 1765358456691-90
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ENTITAT_ID
+        indexName: NOT_ENTITAT_AUDIT_EK
+        tableName: NOT_ENTITAT_AUDIT
+- changeSet:
+    id: 1765358456691-91
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ENTITAT_ID
+        indexName: NOT_ENTITAT_EK
+        tableName: NOT_NOTIFICACIO_MASSIVA
+- changeSet:
+    id: 1765358456691-92
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ENTREGA_CIE_ID
+        indexName: NOT_ENTITAT_ENTREGA_CIE_EK
+        tableName: NOT_ENTITAT
+- changeSet:
+    id: 1765358456691-93
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: CIE_ID
+        indexName: NOT_ENTREGA_CIE_CIE_EK
+        tableName: NOT_ENTREGA_CIE
+- changeSet:
+    id: 1765358456691-94
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: OPERADOR_POSTAL_ID
+        indexName: NOT_ENTREGA_CIE_OPERADOR_EK
+        tableName: NOT_ENTREGA_CIE
+- changeSet:
+    id: 1765358456691-95
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            computed: true
+            name: ENVIADA_DATE
+        indexName: NOT_ENVIADA_DIA_I
+        tableName: NOT_NOTIFICACIO_TABLE
+- changeSet:
+    id: 1765358456691-96
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ENTITAT_ID
+        indexName: NOT_ENVTBL_ENTITAT_IDX
+        tableName: NOT_NOTIFICACIO_ENV_TABLE
+- changeSet:
+    id: 1765358456691-97
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ENTREGA_POSTAL_ID
+        indexName: NOT_ENV_ENTREGA_POSTAL_EK
+        tableName: NOT_NOTIFICACIO_ENV
+- changeSet:
+    id: 1765358456691-98
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: CREATEDDATE
+        indexName: NOT_ENV_TABLE_CREATEDDATE_IDX
+        tableName: NOT_NOTIFICACIO_ENV_TABLE
+- changeSet:
+    id: 1765358456691-99
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: NOT_ORGAN_CODI
+        indexName: NOT_ENV_TABLE_ORGAN_CODI_IDX
+        tableName: NOT_NOTIFICACIO_ENV_TABLE
+- changeSet:
+    id: 1765358456691-100
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            computed: true
+            name: NOTIFICA_ESTAT_DATAACT
+        indexName: NOT_ESTAT_DIA_I
+        tableName: NOT_NOTIFICACIO_ENV
+- changeSet:
+    id: 1765358456691-101
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            computed: true
+            name: DATA_CIE_CANCELADA
+        indexName: NOT_EXPINFO_DCIE_CANCELADA_I
+        tableName: NOT_EXPLOT_ENV_INFO
+- changeSet:
+    id: 1765358456691-102
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            computed: true
+            name: DATA_CIE_ENVIADA
+        indexName: NOT_EXPINFO_DCIE_ENVIADA_I
+        tableName: NOT_EXPLOT_ENV_INFO
+- changeSet:
+    id: 1765358456691-103
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            computed: true
+            name: DATA_CIE_ENVIAMENT_ERROR
+        indexName: NOT_EXPINFO_DCIE_ENV_ERROR_I
+        tableName: NOT_EXPLOT_ENV_INFO
+- changeSet:
+    id: 1765358456691-104
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            computed: true
+            name: DATA_CIE_ERROR
+        indexName: NOT_EXPINFO_DCIE_ERROR_I
+        tableName: NOT_EXPLOT_ENV_INFO
+- changeSet:
+    id: 1765358456691-105
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            computed: true
+            name: DATA_CIE_NOTIFICADA
+        indexName: NOT_EXPINFO_DCIE_NOTIFICADA_I
+        tableName: NOT_EXPLOT_ENV_INFO
+- changeSet:
+    id: 1765358456691-106
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            computed: true
+            name: DATA_CIE_REBUTJADA
+        indexName: NOT_EXPINFO_DCIE_REBUTJADA_I
+        tableName: NOT_EXPLOT_ENV_INFO
+- changeSet:
+    id: 1765358456691-107
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            computed: true
+            name: DATA_CREACIO
+        indexName: NOT_EXPINFO_DCREACIO_I
+        tableName: NOT_EXPLOT_ENV_INFO
+- changeSet:
+    id: 1765358456691-108
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            computed: true
+            name: DATA_EMAIL_ENVIADA
+        indexName: NOT_EXPINFO_DEMAIL_ENVIADA_I
+        tableName: NOT_EXPLOT_ENV_INFO
+- changeSet:
+    id: 1765358456691-109
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            computed: true
+            name: DATA_EMAIL_ENVIAMENT_ERROR
+        indexName: NOT_EXPINFO_DEMAIL_ENV_ERROR_I
+        tableName: NOT_EXPLOT_ENV_INFO
+- changeSet:
+    id: 1765358456691-110
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            computed: true
+            name: DATA_NOT_ENVIADA
+        indexName: NOT_EXPINFO_DNOT_ENVIADA_I
+        tableName: NOT_EXPLOT_ENV_INFO
+- changeSet:
+    id: 1765358456691-111
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            computed: true
+            name: DATA_NOT_ENVIAMENT_ERROR
+        indexName: NOT_EXPINFO_DNOT_ENV_ERROR_I
+        tableName: NOT_EXPLOT_ENV_INFO
+- changeSet:
+    id: 1765358456691-112
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            computed: true
+            name: DATA_NOT_ERROR
+        indexName: NOT_EXPINFO_DNOT_ERROR_I
+        tableName: NOT_EXPLOT_ENV_INFO
+- changeSet:
+    id: 1765358456691-113
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            computed: true
+            name: DATA_NOT_EXPIRADA
+        indexName: NOT_EXPINFO_DNOT_EXPIRADA_I
+        tableName: NOT_EXPLOT_ENV_INFO
+- changeSet:
+    id: 1765358456691-114
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            computed: true
+            name: DATA_NOT_NOTIFICADA
+        indexName: NOT_EXPINFO_DNOT_NOTIFICADA_I
+        tableName: NOT_EXPLOT_ENV_INFO
+- changeSet:
+    id: 1765358456691-115
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            computed: true
+            name: DATA_NOT_REBUTJADA
+        indexName: NOT_EXPINFO_DNOT_REBUTJADA_I
+        tableName: NOT_EXPLOT_ENV_INFO
+- changeSet:
+    id: 1765358456691-116
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            computed: true
+            name: DATA_REGISTRADA
+        indexName: NOT_EXPINFO_DREGISTRADA_I
+        tableName: NOT_EXPLOT_ENV_INFO
+- changeSet:
+    id: 1765358456691-117
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            computed: true
+            name: DATA_REG_ACCEPTADA
+        indexName: NOT_EXPINFO_DREG_ACCEPTADA_I
+        tableName: NOT_EXPLOT_ENV_INFO
+- changeSet:
+    id: 1765358456691-118
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            computed: true
+            name: DATA_REG_ENV_ERROR
+        indexName: NOT_EXPINFO_DREG_ENV_ERROR_I
+        tableName: NOT_EXPLOT_ENV_INFO
+- changeSet:
+    id: 1765358456691-119
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            computed: true
+            name: DATA_REG_REBUTJADA
+        indexName: NOT_EXPINFO_DREG_REBUTJADA_I
+        tableName: NOT_EXPLOT_ENV_INFO
+- changeSet:
+    id: 1765358456691-120
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: GRUP_ID
+        indexName: NOT_GRUP_AUDIT_EK
+        tableName: NOT_GRUP_AUDIT
+- changeSet:
+    id: 1765358456691-121
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: CODI
+        indexName: NOT_MONINT_CODI_IDX
+        tableName: NOT_MON_INT
+- changeSet:
+    id: 1765358456691-122
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: DATA
+        indexName: NOT_MONINT_DATA_IDX
+        tableName: NOT_MON_INT
+- changeSet:
+    id: 1765358456691-123
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: NOTIFICACIO_ID
+        indexName: NOT_NOTIFICACIO_AUDIT_EK
+        tableName: NOT_NOTIFICACIO_AUDIT
+- changeSet:
+    id: 1765358456691-124
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ENVIAMENT_ID
+        indexName: NOT_NOTIFICACIO_ENV_AUDIT_EK
+        tableName: NOT_NOTIFICACIO_ENV_AUDIT
+- changeSet:
+    id: 1765358456691-125
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: NOTIFICACIO_ID
+        indexName: NOT_NOTIFICACIO_EVENT
+        tableName: NOT_NOTIFICACIO_EVENT
+- changeSet:
+    id: 1765358456691-126
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ESTAT
+        indexName: NOT_NOTIF_ESTAT_I
+        tableName: NOT_NOTIFICACIO
+- changeSet:
+    id: 1765358456691-127
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: PROCEDIMENT_ID
+        indexName: NOT_NOTIF_PROCEDIMENT_FK_I
+        tableName: NOT_NOTIFICACIO
+- changeSet:
+    id: 1765358456691-128
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: PROC_CODI_NOTIB
+        indexName: NOT_NOTIF_PROCOD_I
+        tableName: NOT_NOTIFICACIO
+- changeSet:
+    id: 1765358456691-129
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: PROCEDIMENT_ORGAN_ID
+        indexName: NOT_NOTIF_PROORGAN_FK_I
+        tableName: NOT_NOTIFICACIO
+- changeSet:
+    id: 1765358456691-130
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: USUARI_CODI
+        indexName: NOT_NOTIF_USUARI_I
+        tableName: NOT_NOTIFICACIO
+- changeSet:
+    id: 1765358456691-131
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: USUARI_CODI
+        indexName: NOT_NOT_ENV_TABLE_USR_CODI_IDX
+        tableName: NOT_NOTIFICACIO_ENV_TABLE
+- changeSet:
+    id: 1765358456691-132
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: NOTIFICACIO_MASSIVA_ID
+        indexName: NOT_NOT_TABLE_NOT_MASSIVA_EK
+        tableName: NOT_NOTIFICACIO_TABLE
+- changeSet:
+    id: 1765358456691-133
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ORGAN_CODI
+        indexName: NOT_NOT_TABLE_ORGAN_CODI_IDX
+        tableName: NOT_NOTIFICACIO_TABLE
+- changeSet:
+    id: 1765358456691-134
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: PROCEDIMENT_ORGAN_ID
+        indexName: NOT_NOT_TABLE_PROCORGAN_ID_IDX
+        tableName: NOT_NOTIFICACIO_TABLE
+- changeSet:
+    id: 1765358456691-135
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: USUARI_CODI
+        indexName: NOT_NOT_TABLE_USUARI_CODI_IDX
+        tableName: NOT_NOTIFICACIO_TABLE
+- changeSet:
+    id: 1765358456691-136
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ORGANGESTOR_ID
+        indexName: NOT_ORGAN_EK
+        tableName: NOT_PRO_ORGAN
+- changeSet:
+    id: 1765358456691-137
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ENTITAT
+        indexName: NOT_ORGAN_ENTITAT_FK_I
+        tableName: NOT_ORGAN_GESTOR
+- changeSet:
+    id: 1765358456691-138
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ENTREGA_CIE_ID
+        indexName: NOT_ORGAN_ENTREGA_CIE_EK
+        tableName: NOT_ORGAN_GESTOR
+- changeSet:
+    id: 1765358456691-139
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: PAGADOR_POSTAL_ID
+        indexName: NOT_PAGADOR_EK
+        tableName: NOT_NOTIFICACIO_MASSIVA
+- changeSet:
+    id: 1765358456691-140
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: PROCEDIMENT_ID
+        indexName: NOT_PROCEDIMENT_AUDIT_EK
+        tableName: NOT_PROCEDIMENT_AUDIT
+- changeSet:
+    id: 1765358456691-141
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: PROCEDIMENT_ID
+        indexName: NOT_PROCEDIMENT_EK
+        tableName: NOT_PRO_ORGAN
+- changeSet:
+    id: 1765358456691-142
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ENTREGA_CIE_ID
+        indexName: NOT_PROCEDIMENT_ENTREGA_CIE_EK
+        tableName: NOT_PROCEDIMENT
+- changeSet:
+    id: 1765358456691-143
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: PROGRUP_ID
+        indexName: NOT_PRO_GRUP_AUDIT_EK
+        tableName: NOT_PRO_GRUP_AUDIT
+- changeSet:
+    id: 1765358456691-144
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            computed: true
+            name: REGISTRE_DATA
+        indexName: NOT_REGISTRE_DIA_I
+        tableName: NOT_NOTIFICACIO_ENV_TABLE
+- changeSet:
+    id: 1765358456691-145
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            computed: true
+            name: SIR_REC_DATA
+        indexName: NOT_SIR_DIA_I
+        tableName: NOT_NOTIFICACIO_ENV
+- changeSet:
+    id: 1765358456691-146
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ENTITAT_ID
+        indexName: NOT_TABLE_ENTITAT_INDEX
+        tableName: NOT_NOTIFICACIO_TABLE
+- changeSet:
+    id: 1765358456691-147
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: NOTIFICACIO_ID
+        indexName: NOT_TABLE_ENV_INDEX
+        tableName: NOT_NOTIFICACIO_ENV_TABLE
