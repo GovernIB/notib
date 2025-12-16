@@ -12,3 +12,5 @@ INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PRO
 INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugin.digitalitzacio.scanner.mock', 0,'Resultat de l''escanneig fictici','DIGITALITZACIO', 5, 0, 'BOOL', 0);
 INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugin.fitxer.logs.path', null,'Ruta on es guarden el fitxers de logs del servidor','LOGS', 0, 1, 'TEXT', 0);
 DELETE FROM not_config WHERE key = 'es.caib.notib.tasques.actives';
+UPDATE NOT_CONFIG SET JBOSS_PROPERTY = 1 WHERE key = 'es.caib.notib.plugin.gesdoc.filesystem.base.dir';
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.plugin.GESDOC', 'false', 'Mostrar logs del plugin del gestor documental', 'LOGS', 11, 0, 'BOOL', 0);
