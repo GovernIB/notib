@@ -1,7 +1,7 @@
 package es.caib.notib.ejb;
 
-import es.caib.notib.logic.intf.dto.logs.FitxerContingut;
-import es.caib.notib.logic.intf.dto.logs.FitxerInfo;
+import es.caib.comanda.model.v1.log.FitxerContingut;
+import es.caib.comanda.model.v1.log.FitxerInfo;
 import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.RolesAllowed;
