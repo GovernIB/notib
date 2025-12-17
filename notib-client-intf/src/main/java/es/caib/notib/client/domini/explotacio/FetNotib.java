@@ -1,7 +1,7 @@
 package es.caib.notib.client.domini.explotacio;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import es.caib.comanda.ms.estadistica.model.Fet;
+import es.caib.comanda.model.v1.estadistica.Fet;
 import lombok.Getter;
 
 @Getter

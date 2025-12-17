@@ -2,8 +2,8 @@ package es.caib.notib.plugin.valsig;
 
 
 import com.google.common.base.Strings;
-import es.caib.comanda.ms.salut.model.EstatSalut;
-import es.caib.comanda.ms.salut.model.IntegracioPeticions;
+import es.caib.comanda.model.v1.salut.EstatSalut;
+import es.caib.comanda.model.v1.salut.IntegracioPeticions;
 import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.validatesignature.api.IValidateSignaturePlugin;
 import es.caib.notib.plugin.validatesignature.api.SignatureRequestedInformation;

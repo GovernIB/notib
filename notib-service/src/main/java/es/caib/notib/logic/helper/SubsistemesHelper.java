@@ -1,8 +1,8 @@
 package es.caib.notib.logic.helper;
 
+import es.caib.comanda.model.v1.salut.EstatSalutEnum;
+import es.caib.comanda.model.v1.salut.SubsistemaSalut;
 import es.caib.comanda.ms.salut.helper.EstatHelper;
-import es.caib.comanda.ms.salut.model.EstatSalutEnum;
-import es.caib.comanda.ms.salut.model.SubsistemaSalut;
 import es.caib.notib.plugin.utils.CuaFifoBool;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
