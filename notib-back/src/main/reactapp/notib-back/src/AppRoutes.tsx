@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate} from 'react-router-dom';
-import Entitats, { EntitatForm } from './pages/Entitats';
+import EntitatGrid from './pages/entitat/EntitatGrid';
+import EntitatForm from './pages/entitat/EntitatForm';
 import Enviaments from './pages/Enviaments';
 import NotFoundPage from './pages/NotFound';
 
@@ -7,9 +8,8 @@ const AppRoutes = () => {
     return (
         <Routes>
             <Route index element={<Navigate to="/entitats" replace />} />
-            <Route path="entitats" element={<Entitats />} />
             <Route path="entitats">
-                <Route index element={<Entitats />} />
+                <Route index element={<EntitatGrid />} />
                 <Route path="form">
                     <Route index element={<EntitatForm />} />
                     <Route path=":id" element={<EntitatForm />} />

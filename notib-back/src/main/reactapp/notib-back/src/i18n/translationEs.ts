@@ -16,12 +16,23 @@ const translationEs = {
                 tabs: {
                     dades: "Datos",
                     personalitzar: "Personalizar",
+                    tipusDocs: "Tipos doc.",
                     aplicacions: "Aplicaciones",
                     permisos: "Permisos",
                 },
                 resourceNames: {
                     aplicacio: "aplicación",
                     permis: "permiso",
+                },
+                tipusDocuments: {
+                    enable: {
+                        success: "Tipo de documento activado",
+                        error: "Error al activar el tipo de documento",
+                    },
+                    disable: {
+                        success: "Tipo de documento desactivado",
+                        error: "Error al desactivar el tipo de documento",
+                    },
                 },
                 permisos: {
                     tipus: "Tipo",

@@ -2,6 +2,7 @@ import React from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab, { TabProps } from '@mui/material/Tab';
 import Box from '@mui/material/Box';
+import { useTheme } from '@mui/material/styles';
 import { useBaseAppContext } from '../../BaseAppContext';
 import { useFormContext } from '../../form/FormContext';
 
@@ -80,6 +81,7 @@ export const MuiFormTabContent: React.FC<FormTabContentProps> = (props) => {
  */
 export const MuiFormTabs: React.FC<FormTabsProps> = (props) => {
     const { tabs, tabIndexesWithGrids, onIndexChange, children } = props;
+    const theme = useTheme();
     const { id } = useFormContext();
     const [index, setIndex] = React.useState<number>(0);
     const { setContentExpandsToAvailableHeight } = useBaseAppContext();
@@ -105,7 +107,7 @@ export const MuiFormTabs: React.FC<FormTabsProps> = (props) => {
                 <Tabs
                     value={index}
                     onChange={handleIndexChange}
-                    sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.23)' }}>
+                    sx={{ borderBottom: '1px solid ' + theme.palette.divider }}>
                     {tabs.map((t, i) => {
                         if (typeof t === 'string') {
                             return <Tab key={i} value={i} label={t} sx={tabsHeightFix} />;

@@ -1,6 +1,5 @@
 package es.caib.notib.logic.intf.model;
 
-import es.caib.notib.client.domini.Registre;
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.config.BaseConfig;

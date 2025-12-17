@@ -16,12 +16,23 @@ const translationEn = {
                 tabs: {
                     dades: "Data",
                     personalitzar: "Customize",
+                    tipusDocs: "Doc. types",
                     aplicacions: "Applications",
                     permisos: "Permissions",
                 },
                 resourceNames: {
                     aplicacio: "application",
                     permis: "permission",
+                },
+                tipusDocuments: {
+                    enable: {
+                        success: "Document type enabled",
+                        error: "Error enabling document type",
+                    },
+                    disable: {
+                        success: "Document type disabled",
+                        error: "Error disabling document type",
+                    },
                 },
                 permisos: {
                     tipus: "Type",
