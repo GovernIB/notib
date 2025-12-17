@@ -9,6 +9,7 @@ import es.caib.comanda.model.v1.salut.Manual;
 import es.caib.comanda.model.v1.salut.MissatgeSalut;
 import es.caib.comanda.model.v1.salut.SalutInfo;
 import es.caib.comanda.model.v1.salut.SubsistemaInfo;
+import es.caib.comanda.ms.salut.helper.MonitorHelper;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.helper.SubsistemesHelper;
 import es.caib.notib.logic.helper.plugin.AbstractPluginHelper;
@@ -129,6 +130,7 @@ public class SalutServiceImpl implements SalutService {
                 .integracions(integracions)
                 .subsistemes(subsistemes)
                 .missatges(missatges)
+                .informacioSistema(MonitorHelper.getInfoSistema())
                 .build();
     }
 

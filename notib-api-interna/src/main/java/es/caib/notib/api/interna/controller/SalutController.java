@@ -2,6 +2,7 @@ package es.caib.notib.api.interna.controller;
 
 import es.caib.comanda.model.v1.salut.AppInfo;
 import es.caib.comanda.model.v1.salut.SalutInfo;
+import es.caib.comanda.ms.salut.helper.MonitorHelper;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.SalutService;
 import lombok.Builder;
@@ -50,6 +51,7 @@ public class SalutController {
                 .integracions(salutService.getIntegracions())
                 .subsistemes(salutService.getSubsistemes())
                 .contexts(salutService.getContexts(getBaseUrl(request)))
+                .versioJboss(MonitorHelper.getApplicationServerInfo())
                 .build();
     }
 
