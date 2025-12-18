@@ -1,7 +1,7 @@
 package es.caib.notib.api.interna.controller;
 
-import es.caib.notib.logic.intf.dto.logs.FitxerContingut;
-import es.caib.notib.logic.intf.dto.logs.FitxerInfo;
+import es.caib.comanda.model.v1.log.FitxerContingut;
+import es.caib.comanda.model.v1.log.FitxerInfo;
 import es.caib.notib.logic.intf.service.LogService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -152,26 +152,28 @@ public class EmailNotificacioSenseNifHelper {
 		var htmlBody = getComunicacioMailHtmlBody(enviament);
 		var textBody = getComunicacioMailPlainTextBody(enviament);
 		var subject = "[Notib] Nova comunicació / Nueva comunicación";
-        var capLogo = getLogoBytes(entitat.getCodi(), "es.caib.notib.capsalera.logo");
-        var peuLogo = getLogoBytes(entitat.getCodi(), "es.caib.notib.capsalera.logo");
-		sendEmail(email, subject, htmlBody, textBody, entitat.getNom(), attachments, capLogo, peuLogo);
+//        var capLogo = getLogoBytes(entitat.getCodi(), "es.caib.notib.capsalera.logo");
+//        var peuLogo = getLogoBytes(entitat.getCodi(), "es.caib.notib.capsalera.logo");
+//		sendEmail(email, subject, htmlBody, textBody, entitat.getNom(), attachments, capLogo, peuLogo);
+		sendEmail(email, subject, htmlBody, textBody, entitat.getNom(), attachments, entitat.getLogoCapBytes(), entitat.getLogoPeuBytes());
+
 		return null;
 	}
 
-    private byte[] getLogoBytes(String entitatCodi, String key) {
-
-        try {
-            var logo = configHelper.getConfigByEntitat(entitatCodi, "es.caib.notib.capsalera.logo");
-            if (logo == null) {
-                return null;
-            }
-            var path = Paths.get(logo);
-            return Files.readAllBytes(path);
-        } catch (Exception ex) {
-            log.error("[EmailNotifiacioSenseNifHelper.getLogoBytes] Error obtinguent el fitxer per la propietat: " + key + " entitat:" + entitatCodi);
-            return new byte[0];
-        }
-    }
+//    private byte[] getLogoBytes(String entitatCodi, String key) {
+//
+//        try {
+//            var logo = configHelper.getConfigByEntitat(entitatCodi, "es.caib.notib.capsalera.logo");
+//            if (logo == null) {
+//                return null;
+//            }
+//            var path = Paths.get(logo);
+//            return Files.readAllBytes(path);
+//        } catch (Exception ex) {
+//            log.error("[EmailNotifiacioSenseNifHelper.getLogoBytes] Error obtinguent el fitxer per la propietat: " + key + " entitat:" + entitatCodi);
+//            return new byte[0];
+//        }
+//    }
 
 	public String sendEmailInfoEnviamentNotificacioSenseNif(NotificacioEnviamentEntity enviament) throws Exception {
 
@@ -181,9 +183,10 @@ public class EmailNotificacioSenseNifHelper {
 		var htmlBody = getNotificacioMailHtmlBody(enviament);
 		var textBody = getNotificacioMailPlainTextBody(enviament);
 		var subject = "Avís de nova notificació / Aviso de nueva notificación";
-        var capLogo = getLogoBytes(entitat.getCodi(), "es.caib.notib.capsalera.logo");
-        var peuLogo = getLogoBytes(entitat.getCodi(), "es.caib.notib.capsalera.logo");
-		sendEmail(enviament.getTitular().getEmail(), subject, htmlBody, textBody, entitat.getNom(), null, capLogo, peuLogo);
+//        var capLogo = getLogoBytes(entitat.getCodi(), "es.caib.notib.capsalera.logo");
+//        var peuLogo = getLogoBytes(entitat.getCodi(), "es.caib.notib.capsalera.logo");
+//		sendEmail(enviament.getTitular().getEmail(), subject, htmlBody, textBody, entitat.getNom(), null, capLogo, peuLogo);
+		sendEmail(enviament.getTitular().getEmail(), subject, htmlBody, textBody, entitat.getNom(), null, entitat.getLogoCapBytes(), entitat.getLogoPeuBytes());
 		return null;
 	}
 

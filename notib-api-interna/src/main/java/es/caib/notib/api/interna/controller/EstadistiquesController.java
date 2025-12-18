@@ -1,9 +1,9 @@
 package es.caib.notib.api.interna.controller;
 
-import es.caib.comanda.ms.estadistica.model.DimensioDesc;
-import es.caib.comanda.ms.estadistica.model.EstadistiquesInfo;
-import es.caib.comanda.ms.estadistica.model.IndicadorDesc;
-import es.caib.comanda.ms.estadistica.model.RegistresEstadistics;
+import es.caib.comanda.model.v1.estadistica.DimensioDesc;
+import es.caib.comanda.model.v1.estadistica.EstadistiquesInfo;
+import es.caib.comanda.model.v1.estadistica.IndicadorDesc;
+import es.caib.comanda.model.v1.estadistica.RegistresEstadistics;
 import es.caib.notib.logic.intf.service.EstadisticaService;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;

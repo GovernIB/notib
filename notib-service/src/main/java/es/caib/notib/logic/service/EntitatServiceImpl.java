@@ -124,8 +124,8 @@ public class EntitatServiceImpl implements EntitatService {
 			log.debug("Creant una nova entitat (entitat=" + entitat + ")");
 			entityComprovarHelper.comprovarPermisos(null,true,false,false, false);
 			var entitatBuilder = EntitatEntity.getBuilder(entitat.getCodi(), entitat.getNom(), entitat.getTipus(), entitat.getDir3Codi(),
-					entitat.getDir3CodiReg(), entitat.getApiKey(), entitat.isAmbEntregaDeh(),/* entitat.getLogoCapBytes(), entitat.getLogoPeuBytes(),
-					entitat.getColorFons(), entitat.getColorLletra(),*/ entitat.getTipusDocDefault().getTipusDocEnum(), entitat.getOficina(), entitat.getNomOficinaVirtual(),
+					entitat.getDir3CodiReg(), entitat.getApiKey(), entitat.isAmbEntregaDeh(), entitat.getLogoCapBytes(), entitat.getLogoPeuBytes()
+					/*entitat.getColorFons(), entitat.getColorLletra()*/, entitat.getTipusDocDefault().getTipusDocEnum(), entitat.getOficina(), entitat.getNomOficinaVirtual(),
 					entitat.isLlibreEntitat(), entitat.getLlibre(), entitat.getLlibreNom(), entitat.isOficinaEntitat()).descripcio(entitat.getDescripcio());
 
 			if (entitat.isEntregaCieActiva()) {
@@ -142,10 +142,10 @@ public class EntitatServiceImpl implements EntitatService {
 			}
 			updateEntitatsSessio();
 			configHelper.crearConfigsEntitat(entitat.getCodi());
-            var configCap = configHelper.getConfigEntityByEntitat(entitat.getCodi(), "es.caib.notib.capsalera.logo");
-            configCap.setValue(entitat.getLogoCap());
-            var configPeu = configHelper.getConfigEntityByEntitat(entitat.getCodi(), "es.caib.notib.peu.logo");
-            configPeu.setValue(entitat.getLogoPeu());
+//            var configCap = configHelper.getConfigEntityByEntitat(entitat.getCodi(), "es.caib.notib.capsalera.logo");
+//            configCap.setValue(entitat.getLogoCap());
+//            var configPeu = configHelper.getConfigEntityByEntitat(entitat.getCodi(), "es.caib.notib.peu.logo");
+//            configPeu.setValue(entitat.getLogoPeu());
             var colorFons = configHelper.getConfigEntityByEntitat(entitat.getCodi(), "es.caib.notib.capsalera.color.fons");
             colorFons.setValue(entitat.getColorFons());
             var colorLletra = configHelper.getConfigEntityByEntitat(entitat.getCodi(), "es.caib.notib.capsalera.color.lletra");
@@ -193,12 +193,12 @@ public class EntitatServiceImpl implements EntitatService {
 					entitatTipusDocRepository.save(tipusDocEntity);
 				}
 			}
-//			if (!entitat.isEliminarLogoCap()) {
-//				logoCapActual = entitat.getLogoCapBytes() != null && entitat.getLogoCapBytes().length != 0 ? entitat.getLogoCapBytes() : entity.getLogoCapBytes();
-//			}
-//			if (!entitat.isEliminarLogoPeu()) {
-//				logoPeuActual = entitat.getLogoPeuBytes() != null && entitat.getLogoPeuBytes().length != 0 ? entitat.getLogoPeuBytes() : entity.getLogoPeuBytes();
-//			}
+			if (!entitat.isEliminarLogoCap()) {
+				logoCapActual = entitat.getLogoCapBytes() != null && entitat.getLogoCapBytes().length != 0 ? entitat.getLogoCapBytes() : entity.getLogoCapBytes();
+			}
+			if (!entitat.isEliminarLogoPeu()) {
+				logoPeuActual = entitat.getLogoPeuBytes() != null && entitat.getLogoPeuBytes().length != 0 ? entitat.getLogoPeuBytes() : entity.getLogoPeuBytes();
+			}
 			var entregaCie = entity.getEntregaCie();
 			if (entitat.isEntregaCieActiva()) {
 				if (entregaCie == null) {
@@ -208,13 +208,13 @@ public class EntitatServiceImpl implements EntitatService {
 				}
 			}
 			entity.update(entitat.getNom(), entitat.getTipus(), entitat.getDir3Codi(), entitat.getDir3CodiReg(), entitat.getApiKey(),
-					entitat.isAmbEntregaDeh(), entitat.isEntregaCieActiva() ? entregaCie : null, entitat.getDescripcio(), /*logoCapActual, logoPeuActual,
+					entitat.isAmbEntregaDeh(), entitat.isEntregaCieActiva() ? entregaCie : null, entitat.getDescripcio(), logoCapActual, logoPeuActual,/*
 					entitat.getColorFons(), entitat.getColorLletra(),*/ entitat.getTipusDocDefault().getTipusDocEnum(), entitat.getOficina(),
 					entitat.getNomOficinaVirtual(), entitat.isLlibreEntitat(), entitat.getLlibre(), entitat.getLlibreNom(), entitat.isOficinaEntitat());
             var configCap = configHelper.getConfigEntityByEntitat(entitat.getCodi(), "es.caib.notib.capsalera.logo");
-            configCap.setValue(entitat.getLogoCap());
-            var configPeu = configHelper.getConfigEntityByEntitat(entitat.getCodi(), "es.caib.notib.peu.logo");
-            configPeu.setValue(entitat.getLogoPeu());
+//            configCap.setValue(entitat.getLogoCap());
+//            var configPeu = configHelper.getConfigEntityByEntitat(entitat.getCodi(), "es.caib.notib.peu.logo");
+//            configPeu.setValue(entitat.getLogoPeu());
             var colorFons = configHelper.getConfigEntityByEntitat(entitat.getCodi(), "es.caib.notib.capsalera.color.fons");
             colorFons.setValue(entitat.getColorFons());
             var colorLletra = configHelper.getConfigEntityByEntitat(entitat.getCodi(), "es.caib.notib.capsalera.color.lletra");
