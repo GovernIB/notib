@@ -28,7 +28,7 @@ import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.Receptor;
 import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.ResultadoSincronizarEnvio;
 import es.caib.notib.logic.intf.ws.adviser.sincronizarenvio.SincronizarEnvio;
 import es.caib.notib.logic.objectes.LoggingTipus;
-import es.caib.notib.logic.utils.DatesUtils;
+import es.caib.notib.logic.intf.util.DatesUtils;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
@@ -43,7 +43,6 @@ import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.CIE;
 import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.CNT;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 

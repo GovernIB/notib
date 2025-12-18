@@ -5,6 +5,7 @@ import es.caib.comanda.model.v1.salut.SalutInfo;
 import es.caib.comanda.ms.salut.helper.MonitorHelper;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.SalutService;
+import es.caib.notib.logic.intf.util.DatesUtils;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +45,7 @@ public class SalutController {
         return AppInfo.builder()
                 .codi("NOT")
                 .nom("Notib")
-                .data(manifestInfo.getBuildDate())
+                .data(DatesUtils.toOffsetDateTime(manifestInfo.getBuildDate()))
                 .versio(manifestInfo.getVersion())
                 .revisio(manifestInfo.getBuildScmRevision())
                 .jdkVersion(manifestInfo.getBuildJDK())

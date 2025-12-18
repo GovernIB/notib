@@ -1,4 +1,4 @@
-package es.caib.notib.logic.utils;
+package es.caib.notib.logic.intf.util;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.sql.Timestamp;
@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
@@ -139,5 +140,13 @@ public class DatesUtils {
         }
         var now = LocalTime.of(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
         return !now.isBefore(horaInici) && now.isBefore(horaFi);
+    }
+
+    public static Date toLocalDateTime(OffsetDateTime offsetDateTime) {
+        return offsetDateTime != null ? Date.from(offsetDateTime.toInstant()) : null;
+    }
+
+    public static OffsetDateTime toOffsetDateTime(Date data) {
+        return data != null ? data.toInstant().atZone(ZoneId.systemDefault()).toOffsetDateTime() : null;
     }
 }
