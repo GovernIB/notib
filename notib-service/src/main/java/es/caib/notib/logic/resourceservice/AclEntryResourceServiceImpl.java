@@ -58,7 +58,7 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 				List<AclEntryResourceEntity> entries = toAclEntries(acl).stream().
 						filter(e -> {
 							AclEntryResource.AclEntryPk epk = AclEntryResource.AclEntryPk.deserializeFromString(e.getId());
-							return epk.getSidName().equals(pk.getSidName()) && epk.isSidPrincipal() == pk.isSidPrincipal();
+							return epk.getSidName().equals(pk.getSidName()) && epk.isSidGrantedAuthority() == pk.isSidGrantedAuthority();
 						}).
 						collect(Collectors.toList());
 				if (!entries.isEmpty()) {
@@ -130,11 +130,12 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 		if (resource.isPerm7Allowed()) permissionsGranted.add(PermissionEnum.PERM7);
 		if (resource.isPerm8Allowed()) permissionsGranted.add(PermissionEnum.PERM8);
 		if (resource.isPerm9Allowed()) permissionsGranted.add(PermissionEnum.PERM9);
+		if (resource.isPermXAllowed()) permissionsGranted.add(PermissionEnum.PERMX);
 		aclHelper.set(
 				getClassFromResourceName(resource.getResourceName()),
 				resource.getResourceId(),
 				resource.getSidName(),
-				resource.isGrantedAuthority(),
+				resource.isSidGrantedAuthority(),
 				permissionsGranted);
 		return entity;
 	}
@@ -156,7 +157,7 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 				getClassFromResourceName(resource.getResourceName()),
 				resource.getResourceId(),
 				resource.getSidName(),
-				resource.isGrantedAuthority());
+				resource.isSidGrantedAuthority());
 	}
 
 	@Override
@@ -177,6 +178,21 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 				id(pk).
 				resource(resource).
 				build();
+	}
+
+	@Override
+	protected void beforeUpdateSave(
+			AclEntryResourceEntity entity,
+			AclEntryResource resource,
+			Map<String, AnswerRequiredException.AnswerValue> answers) {
+		AclEntryResource.AclEntryPk pk = AclEntryResource.AclEntryPk.deserializeFromString(resource.getId());
+		if (pk.isSidGrantedAuthority() != resource.isSidGrantedAuthority() || !pk.getSidName().equals(resource.getSidName())) {
+			aclHelper.delete(
+					getClassFromResourceName(pk.getResourceName()),
+					pk.getResourceId(),
+					pk.getSidName(),
+					pk.isSidGrantedAuthority());
+		}
 	}
 
 	@Override
@@ -212,10 +228,10 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 			List<AccessControlEntry> aces) {
 		AclEntryResource aclEntry = new AclEntryResource();
 		if (sid instanceof PrincipalSid) {
-			aclEntry.setGrantedAuthority(false);
+			aclEntry.setSidGrantedAuthority(false);
 			aclEntry.setSidName(((PrincipalSid)sid).getPrincipal());
 		} else if (sid instanceof GrantedAuthoritySid) {
-			aclEntry.setGrantedAuthority(true);
+			aclEntry.setSidGrantedAuthority(true);
 			aclEntry.setSidName(((GrantedAuthoritySid)sid).getGrantedAuthority());
 		}
 		String resourceName = getResourceNameFromClassName(resourceClassName);
@@ -224,7 +240,7 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 		AclEntryResource.AclEntryPk pk = new AclEntryResource.AclEntryPk(
 				resourceName,
 				resourceId,
-				aclEntry.isGrantedAuthority(),
+				aclEntry.isSidGrantedAuthority(),
 				aclEntry.getSidName());
 		aclEntry.setId(pk.serializeToString());
 		aces.forEach(a -> {
@@ -244,6 +260,7 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 			if ((mask & ExtendedPermission.PERM7.getMask()) != 0) aclEntry.setPerm7Allowed(true);
 			if ((mask & ExtendedPermission.PERM8.getMask()) != 0) aclEntry.setPerm8Allowed(true);
 			if ((mask & ExtendedPermission.PERM9.getMask()) != 0) aclEntry.setPerm9Allowed(true);
+			if ((mask & ExtendedPermission.PERMX.getMask()) != 0) aclEntry.setPermXAllowed(true);
 		});
 		return resourceToEntity(
 				aclEntry,
@@ -341,7 +358,7 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 	private <T> Comparator<T> createComparatorForOrder(Sort.Order order) {
 		switch (order.getProperty()) {
 			case "subjectType":
-				return (Comparator<T>)createComparator(AclEntryResourceEntity::getGrantedAuthority, order.getDirection());
+				return (Comparator<T>)createComparator(AclEntryResourceEntity::getSidGrantedAuthority, order.getDirection());
 			case "subjectValue":
 				return (Comparator<T>)createComparator(AclEntryResourceEntity::getSidName, order.getDirection());
 			default:

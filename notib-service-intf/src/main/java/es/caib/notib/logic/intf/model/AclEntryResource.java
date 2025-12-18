@@ -35,7 +35,7 @@ import java.util.Base64;
 )
 public class AclEntryResource extends BaseResource<String> {
 
-	private boolean grantedAuthority;
+	private boolean sidGrantedAuthority;
 	@NotBlank
 	@Size(max = 128)
 	private String sidName;
@@ -58,6 +58,7 @@ public class AclEntryResource extends BaseResource<String> {
 	private boolean perm7Allowed;
 	private boolean perm8Allowed;
 	private boolean perm9Allowed;
+	private boolean permXAllowed;
 
 	private String subjectName;
 
@@ -66,10 +67,10 @@ public class AclEntryResource extends BaseResource<String> {
 	public static class AclEntryPk {
 		private final String resourceName;
 		private final Serializable resourceId;
-		private final boolean sidPrincipal;
+		private final boolean sidGrantedAuthority;
 		private final String sidName;
 		public String serializeToString() {
-			String joined = resourceName + "|" + resourceId + "|" + (sidPrincipal ? 0 : 1) + "|" + sidName;
+			String joined = resourceName + "|" + resourceId + "|" + (sidGrantedAuthority ? 1 : 0) + "|" + sidName;
 			return Base64.getEncoder().encodeToString(joined.getBytes());
 		}
 		public static AclEntryPk deserializeFromString(String str) {

@@ -32,9 +32,9 @@ public class AclEntryResourceEntity implements es.caib.notib.persist.base.entity
 		return null == getId();
 	}
 
-	public Boolean getGrantedAuthority() {
+	public Boolean getSidGrantedAuthority() {
 		if (getResource() != null) {
-			return getResource().isGrantedAuthority();
+			return getResource().isSidGrantedAuthority();
 		} else {
 			return null;
 		}

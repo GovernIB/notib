@@ -15,7 +15,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -240,6 +243,32 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			}
 		}
 		return super.artifactGetOne(type, code);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public DownloadableFile fieldDownload(
+			ID id,
+			String fieldName,
+			OutputStream out) throws ResourceNotFoundException, ResourceFieldNotFoundException, FieldArtifactNotFoundException, IOException {
+		Field field = ReflectionUtils.findField(getResourceClass(), fieldName);
+		if (field != null) {
+			FieldFileManager<E> fieldFileManager = fieldFileManagerMap.get(fieldName);
+			if (fieldFileManager != null) {
+				FileReference fileReference = fieldFileManager.read(
+						getEntity(id),
+						fieldName);
+				out.write(fileReference.getContent());
+				return new DownloadableFile(
+						fileReference.getName(),
+						fileReference.getContentType(),
+						null);
+			} else {
+				return super.fieldDownload(id, fieldName, out);
+			}
+		} else {
+			throw new ResourceFieldNotFoundException(getResourceClass(), fieldName);
+		}
 	}
 
 	protected ID getPkFromResource(R resource) {

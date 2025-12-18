@@ -16,13 +16,39 @@ const translationEn = {
                 tabs: {
                     dades: "Data",
                     personalitzar: "Customize",
+                    tipusDocs: "Doc. types",
                     aplicacions: "Applications",
                     permisos: "Permissions",
                 },
+                resourceNames: {
+                    aplicacio: "application",
+                    permis: "permission",
+                },
+                personalitzar: {
+                    capsalera: "Header",
+                },
+                tipusDocuments: {
+                    enable: {
+                        success: "Document type enabled",
+                        error: "Error enabling document type",
+                    },
+                    disable: {
+                        success: "Document type disabled",
+                        error: "Error disabling document type",
+                    },
+                },
+                permisos: {
+                    tipus: "Type",
+                    grantedAuthority: {
+                        user: "User",
+                        role: "Role",
+                    },
+                    usuariAllowed: "User",
+                    admEntitatAllowed: "Adm. entity",
+                    admLecturaAllowed: "Adm. read",
+                    aplicacioAllowed: "Application",
+                }
             },
-            tabs: {
-                dades: "Data",
-            }
         },
         notFound: {
             title: "Page not found",

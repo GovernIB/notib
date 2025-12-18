@@ -16,13 +16,39 @@ const translationEs = {
                 tabs: {
                     dades: "Datos",
                     personalitzar: "Personalizar",
+                    tipusDocs: "Tipos doc.",
                     aplicacions: "Aplicaciones",
                     permisos: "Permisos",
                 },
+                resourceNames: {
+                    aplicacio: "aplicación",
+                    permis: "permiso",
+                },
+                personalitzar: {
+                    capsalera: "Cabecera",
+                },
+                tipusDocuments: {
+                    enable: {
+                        success: "Tipo de documento activado",
+                        error: "Error al activar el tipo de documento",
+                    },
+                    disable: {
+                        success: "Tipo de documento desactivado",
+                        error: "Error al desactivar el tipo de documento",
+                    },
+                },
+                permisos: {
+                    tipus: "Tipo",
+                    grantedAuthority: {
+                        user: "Usuario",
+                        role: "Rol",
+                    },
+                    usuariAllowed: "Usuario",
+                    admEntitatAllowed: "Adm. entidad",
+                    admLecturaAllowed: "Adm. lectura",
+                    aplicacioAllowed: "Aplicación",
+                }
             },
-            tabs: {
-                dades: "Datos",
-            }
         },
         notFound: {
             title: "Página no encontrada",

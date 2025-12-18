@@ -92,7 +92,9 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 		http.authorizeHttpRequests().
 				requestMatchers(publicRequestMatchers()).permitAll();
 		if (!isJboss()) {
-			http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
+			http.sessionManagement(session -> session
+							.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+							.invalidSessionUrl("/"));
 		}
 		super.customHttpSecurityConfiguration(http);
 	}

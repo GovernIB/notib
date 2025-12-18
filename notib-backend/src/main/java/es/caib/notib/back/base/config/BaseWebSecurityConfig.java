@@ -80,11 +80,21 @@ public abstract class BaseWebSecurityConfig {
 		}
 		if (isOauth2ClientActive()) {
 			log.info("OAUTH2 client active");
-			http.oauth2Login().userInfoEndpoint().userService(oauth2UserService());
+			http.oauth2Login(oauth2 -> oauth2.
+					userInfoEndpoint(userInfo -> userInfo.userService(oauth2UserService())).
+					failureHandler((request, response, exception) -> {
+						request.getSession().invalidate();
+						response.sendRedirect("/");
+					}));
 		}
 		if (isOidcClientActive()) {
 			log.info("OIDC client active");
-			http.oauth2Login().userInfoEndpoint().oidcUserService(oidcUserService());
+			http.oauth2Login(oauth2 -> oauth2.
+					userInfoEndpoint(userInfo -> userInfo.oidcUserService(oidcUserService())).
+					failureHandler((request, response, exception) -> {
+						request.getSession().invalidate();
+						response.sendRedirect("/");
+					}));
 		}
 		var auth = http.authorizeHttpRequests().requestMatchers(internalPublicRequestMatchers()).permitAll();
 		customHttpSecurityConfiguration(http);
