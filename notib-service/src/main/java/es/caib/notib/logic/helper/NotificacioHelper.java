@@ -17,7 +17,7 @@ import es.caib.notib.logic.intf.exception.NoMetadadesException;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
-import es.caib.notib.logic.utils.DatesUtils;
+import es.caib.notib.logic.intf.util.DatesUtils;
 import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.GrupEntity;

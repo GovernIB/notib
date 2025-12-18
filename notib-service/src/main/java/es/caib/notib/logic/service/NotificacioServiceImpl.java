@@ -62,7 +62,7 @@ import es.caib.notib.logic.plugin.cie.CiePluginHelper;
 import es.caib.notib.logic.plugin.cie.CiePluginJms;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.utils.NotibLogger;
-import es.caib.notib.logic.utils.DatesUtils;
+import es.caib.notib.logic.intf.util.DatesUtils;
 import es.caib.notib.persist.entity.CallbackEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;

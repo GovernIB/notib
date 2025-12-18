@@ -10,6 +10,10 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ValueMapping;
 import org.mapstruct.ValueMappings;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+
 @Mapper
 public interface MissatgeSalutMapper {
 
@@ -25,4 +29,12 @@ public interface MissatgeSalutMapper {
         @ValueMapping(source = "ERROR", target = "ERROR")
     })
     SalutNivell avisNivellToSalutNivell(AvisNivellEnumDto nivell);
+
+    default Date toLocalDateTime(OffsetDateTime offsetDateTime) {
+        return Date.from(offsetDateTime.toInstant());
+    }
+
+    default OffsetDateTime toOffsetDateTime(Date data) {
+        return data.toInstant().atZone(ZoneId.systemDefault()).toOffsetDateTime();
+    }
 }
