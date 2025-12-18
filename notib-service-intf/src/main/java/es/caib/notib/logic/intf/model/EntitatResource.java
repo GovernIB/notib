@@ -4,6 +4,7 @@ import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
+import es.caib.notib.logic.intf.base.model.FileReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import es.caib.notib.logic.intf.dto.EntitatTipusEnumDto;
 import es.caib.notib.logic.intf.dto.TipusDocumentEnumDto;
@@ -75,7 +76,7 @@ public class EntitatResource extends BaseResource<Long> {
 	@Size(max = 255)
 	private String oficina;
 
-	//private byte[] logoCapBytes;
+	private FileReference logoCapsalera;
 	//private boolean eliminarLogoCap;
 	//private byte[] logoPeuBytes;
 	//private boolean eliminarLogoPeu;

@@ -24,6 +24,9 @@ const translationEs = {
                     aplicacio: "aplicación",
                     permis: "permiso",
                 },
+                personalitzar: {
+                    capsalera: "Cabecera",
+                },
                 tipusDocuments: {
                     enable: {
                         success: "Tipo de documento activado",

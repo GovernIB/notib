@@ -24,6 +24,9 @@ const translationEn = {
                     aplicacio: "application",
                     permis: "permission",
                 },
+                personalitzar: {
+                    capsalera: "Header",
+                },
                 tipusDocuments: {
                     enable: {
                         success: "Document type enabled",

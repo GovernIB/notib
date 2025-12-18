@@ -74,6 +74,11 @@ public class EntitatResourceEntity extends BaseAuditableResourceEntity<EntitatRe
 	@Column(name = "data_actualitzacio")
 	LocalDate dataActualitzacio;
 
+	@Lob
+	@Basic(fetch = FetchType.LAZY)
+	@Column(name = "logo_cap2")
+	private byte[] logoCapsalera;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(
 			name = "entrega_cie_id",

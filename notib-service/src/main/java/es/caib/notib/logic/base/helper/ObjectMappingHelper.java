@@ -3,6 +3,7 @@ package es.caib.notib.logic.base.helper;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.annotation.ResourceField;
 import es.caib.notib.logic.intf.base.exception.ObjectMappingException;
+import es.caib.notib.logic.intf.base.model.FileReference;
 import es.caib.notib.logic.intf.base.model.Resource;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.util.TypeUtil;
@@ -85,10 +86,15 @@ public class ObjectMappingHelper {
 					Field targetField = ReflectionUtils.findField(target.getClass(), sourceField.getName());
 					if (targetField != null) {
 						if (isSimpleType(sourceField.getType())) {
-							setFieldValue(
-									target,
-									targetField,
-									sourceField.get(source));
+							boolean isFileReferenceMapping =
+									(sourceField.getType().equals(byte[].class) && targetField.getType().equals(FileReference.class)) ||
+									(targetField.getType().equals(byte[].class) && sourceField.getType().equals(FileReference.class));
+							if (!isFileReferenceMapping) {
+								setFieldValue(
+										target,
+										targetField,
+										sourceField.get(source));
+							}
 						} else if (ResourceEntity.class.isAssignableFrom(sourceField.getType()) && ResourceReference.class.isAssignableFrom(targetField.getType())) {
 							ResourceEntity<?, ?> entity = (ResourceEntity<?, ?>)sourceField.get(source);
 							ResourceReference<?, ?> resourceReference = null;
