@@ -64,28 +64,29 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 
 		var rc = new RespostaConsultaRegistre();
 		try {
-            long startTime = System.currentTimeMillis();
+			long startTime = System.currentTimeMillis();
 			var asiento = toAsientoRegistralBean(arb);
 			logger.info("[REGISTRE] Creant assentament registral codiDir3Entitat " + codiDir3Entitat  + " tipusOperacio " + tipusOperacio + " generarJustificant " + generarJustificant);
 			var resposta = getAsientoRegistralApi().crearAsientoRegistral(null, codiDir3Entitat, asiento, tipusOperacio, generarJustificant, false);
 			logger.info("[REGISTRE] Resposta assentament registral " + resposta);
-            salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
-			return toRespostaConsultaRegistre(resposta);
+			var respostaConsulta = toRespostaConsultaRegistre(resposta);
+			salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
+			return respostaConsulta;
 		} catch (WsI18NException e) {
 			rc.setErrorCodi("0");
 			rc.setErrorDescripcio(e.getMessage());
-            salutPluginComponent.incrementarOperacioError();
+			salutPluginComponent.incrementarOperacioError();
 			return rc;
 		} catch (WsValidationException e) {
 			rc.setErrorCodi("1");
 			rc.setErrorDescripcio(e.getMessage());
-            salutPluginComponent.incrementarOperacioError();
+			salutPluginComponent.incrementarOperacioError();
 			return rc;
 		} catch (Exception e) {
 			log.error(ERROR_TO_RESPOSTA_CONSULTA, e);
 			rc.setErrorCodi("2");
 			rc.setErrorDescripcio(!Strings.isNullOrEmpty(e.getMessage()) ? e.getMessage() : e.getCause().getMessage());
-            salutPluginComponent.incrementarOperacioError();
+			salutPluginComponent.incrementarOperacioError();
 			return rc;
 		}
 	}
