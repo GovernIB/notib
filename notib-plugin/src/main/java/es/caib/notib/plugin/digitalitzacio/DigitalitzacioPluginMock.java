@@ -81,7 +81,7 @@ public class DigitalitzacioPluginMock extends AbstractSalutPlugin implements Dig
 		resposta.setReturnSignedFile(false);
 		var partes = returnUrl.split("/");
 		var ultimaParte = partes[partes.length - 1];
-		resposta.setUrlRedireccio("http://localhost:8080/ripeaback/modal/digitalitzacio/mock?idExpedient="+ultimaParte+"&idTransaccio="+idTransaccio);
+		resposta.setUrlRedireccio("http://localhost:8082/notibback/modal/digitalitzacio/mock?idExpedient="+ultimaParte+"&idTransaccio="+idTransaccio);
 		return resposta;
 	}
 
