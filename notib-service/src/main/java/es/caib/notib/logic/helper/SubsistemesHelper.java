@@ -144,7 +144,7 @@ public class SubsistemesHelper {
         if (m.timerOkLocal != null) {
             m.timerOkLocal.record(duracio, TimeUnit.MILLISECONDS);
         }
-        cuaPeticions.add(true);
+        cuaPeticions.add(false);
     }
 
     public static void addErrorOperation(SubsistemesEnum subsistema) {

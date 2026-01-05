@@ -761,6 +761,10 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
         // Notificacions creades
         for (ExplotEnvStats explotEnvStats : explotFetsRepository.getStatsCreacioPerDay(iniciDelDia, finalDelDia)) {
+            if (statsMap.get(explotEnvStats.getKey()) == null) {
+                log.warn("[EstadisticaService.getStatsCreacioPerDay] statMap no conte la key " + explotEnvStats.getKey());
+                return;
+            }
             statsMap.get(explotEnvStats.getKey()).setTrCreades(explotEnvStats.getTotalEnviaments());
         }
 
