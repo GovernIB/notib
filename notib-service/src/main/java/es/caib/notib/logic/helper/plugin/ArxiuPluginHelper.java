@@ -66,10 +66,15 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<ArxiuPlugin> {
 					continue;
 				}
 				var document = notificacioRepository.findTopByEntitatAndDocumentUuidNotNull(entitat).getDocument();
-				var arxiu = plugin.documentDetalls(document.getUuid(), null, true);
+				var arxiu = arxiuDocumentConsultar(document.getUuid(), null, false, true);
 				diagnostic = new IntegracioDiagnostic();
 				diagnostic.setCorrecte(arxiu != null);
 				diagnostics.put(codi, diagnostic);
+			} catch(DocumentNotFoundException ex) {
+				diagnostic = new IntegracioDiagnostic();
+				diagnostic.setErrMsg(ex.getMessage());
+				diagnostics.put(codi, diagnostic);
+				diagnosticOk = true;
 			} catch(Exception ex) {
 				diagnostic = new IntegracioDiagnostic();
 				diagnostic.setErrMsg(ex.getMessage());
@@ -80,9 +85,13 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<ArxiuPlugin> {
 		if (diagnostics.isEmpty() && !entitats.isEmpty()) {
 			var entitat = entitatRepository.findByCodi(getCodiEntitatActual());
 			var document = notificacioRepository.findTopByEntitatAndDocumentUuidNotNull(entitat).getDocument();
-			var arxiu = arxiuDocumentConsultar(document.getUuid(), null, true, true);
 			diagnostic = new IntegracioDiagnostic();
-			diagnostic.setCorrecte(arxiu != null);
+			try {
+				var arxiu = arxiuDocumentConsultar(document.getUuid(), null, false, true);
+				diagnostic.setCorrecte(arxiu != null);
+			} catch (DocumentNotFoundException ex) {
+				diagnostic.setCorrecte(true);
+			}
 			diagnostics.put(entitat.getCodi(), diagnostic);
 		}
 		return diagnosticOk;

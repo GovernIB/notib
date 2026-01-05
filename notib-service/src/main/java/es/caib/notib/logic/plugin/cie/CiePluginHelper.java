@@ -367,11 +367,13 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
     @Transactional
     public InfoCie consultarEstatEntregaPostal(Long enviamentId) {
 
+        NotibLogger.getInstance().info("[CiePluginHelper] Consulta d'estat per l'enviament " + enviamentId, log, LoggingTipus.ENTREGA_CIE);
         var enviament = enviamentRepository.findById(enviamentId).orElse(null);
         if (enviament == null) {
             log.error("[ENTREGA_POSTAL] Error al consultar l'estat de l'entrega postal l'enviament CIE. enviamentId " + enviamentId + " no trobat");
             return null;
         }
+        NotibLogger.getInstance().info("[CiePluginHelper] Obtingut " + enviamentId, log, LoggingTipus.ENTREGA_CIE);
         var codiDir3Entitat = enviament.getNotificacio().getEntitat().getDir3Codi();
         var info = new IntegracioInfo(IntegracioCodi.CIE, "Consulta estat entrega postal", IntegracioAccioTipusEnumDto.ENVIAMENT,
                 new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
@@ -381,10 +383,12 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
         info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getCreatedBy().get().getCodi());
         var infoCie = new InfoCie();
         try {
+            NotibLogger.getInstance().info("[CiePluginHelper] Consulta de l'entitat " + codiDir3Entitat, log, LoggingTipus.ENTREGA_CIE);
             var entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
             if (entitat == null) {
                 throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
             }
+            NotibLogger.getInstance().info("[CiePluginHelper] Obtinguda " + codiDir3Entitat, log, LoggingTipus.ENTREGA_CIE);
             configHelper.setEntitatCodi(entitat.getCodi());
             info.setCodiEntitat(entitat.getCodi());
 //            var cieEntity = notificacio.getProcediment().getEntregaCieEfectiva();
@@ -396,7 +400,7 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
             var enviamentCie = new EnviamentCie();
             enviamentCie.setIdentificador(enviament.getEntregaPostal().getCieId());
             enviamentCie.setEntregaCie(cie);
-            NotibLogger.getInstance().info("[CiePluginHelper] Consulta d'estat per l'envimanet " + enviamentId + " amb CIE id " + enviamentCie.getIdentificador(), log, LoggingTipus.ENTREGA_CIE);
+            NotibLogger.getInstance().info("[CiePluginHelper] Consulta d'estat per l'enviament " + enviamentId + " amb CIE id " + enviamentCie.getIdentificador(), log, LoggingTipus.ENTREGA_CIE);
             infoCie = getPlugin().consultarEstat(enviamentCie);
             if ("000".equals(infoCie.getCodiResposta())) {
                 integracioHelper.addAccioOk(info);

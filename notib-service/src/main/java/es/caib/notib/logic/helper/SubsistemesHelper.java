@@ -211,11 +211,13 @@ public class SubsistemesHelper {
 
     private static EstatSalutEnum calculaEstat(Long totalPeticionsOk, Long totalPeticionsError, SubsistemesEnum subsistema) {
 
-
         var totalPeticions = totalPeticionsOk + totalPeticionsError;
+        if (totalPeticions == 0L) {
+            return getDarrerEstat(subsistema);
+        }
         long ok;
         long ko;
-        if (totalPeticions < 20) {
+        if (totalPeticions >= 20) {
             ok = totalPeticionsOk;
             ko = totalPeticionsError;
         } else {
@@ -223,9 +225,6 @@ public class SubsistemesHelper {
             ko = !cuaPeticions.isEmpty() ? cuaPeticions.getError() : 0L;
         }
         final long total = ok + ko;
-        if (total == 0L) {
-            return getDarrerEstat(subsistema);
-        }
         // Percentatge d'errors arrodonit correctament evitant divisió d'enters
         final int errorRatePct = (int) Math.round((ko * 100.0) / Math.max(1L, total));
         EstatSalutEnum estat = EstatByPercent.calculaEstat(errorRatePct);
