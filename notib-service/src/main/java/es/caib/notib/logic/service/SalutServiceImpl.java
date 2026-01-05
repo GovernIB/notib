@@ -330,8 +330,7 @@ public class SalutServiceImpl implements SalutService {
                     missatges.add(missatgeSalutMapper.toMissatgeSalut(avis));
                 });
             }
-
-            return null;
+            return missatges;
         } catch (Exception e) {
             return null;
         }
