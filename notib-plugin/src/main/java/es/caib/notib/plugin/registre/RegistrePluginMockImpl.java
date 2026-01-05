@@ -1,10 +1,13 @@
 package es.caib.notib.plugin.registre;
 
 import com.google.common.base.Strings;
+import es.caib.comanda.ms.salut.model.EstatSalut;
+import es.caib.comanda.ms.salut.model.IntegracioPeticions;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
 import es.caib.notib.logic.intf.dto.DatosInteresadoWsDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.plugin.AbstractSalutPlugin;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -48,6 +51,7 @@ public class RegistrePluginMockImpl extends AbstractSalutPlugin implements Regis
 	@Override
 	public RespostaConsultaRegistre salidaAsientoRegistral(String codiDir3Entitat, AsientoRegistralBeanDto arb, Long tipusOperacio, boolean generarJustificant) {
 
+		long startTime = System.currentTimeMillis();
 		RespostaConsultaRegistre resposta = new RespostaConsultaRegistre();
 		log.info(arb.toString());
 		DatosInteresadoWsDto interesado = arb.getInteresados().get(0).getInteresado();
@@ -71,6 +75,7 @@ public class RegistrePluginMockImpl extends AbstractSalutPlugin implements Regis
 		if (resposta.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT)) {
 			resposta.setSirRegistreDestiData(data);
 		}
+		salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
 //        resposta.setErrorCodi("OK");
 		return resposta;
 	}
@@ -78,6 +83,7 @@ public class RegistrePluginMockImpl extends AbstractSalutPlugin implements Regis
 	@Override
 	public RespostaConsultaRegistre obtenerAsientoRegistral(String codiDir3Entitat, String numeroRegistreFormatat, Long tipusOperacio, boolean ambAnnexos) {
 
+		long startTime = System.currentTimeMillis();
 		boolean respostaAmbError = false;
 		RespostaConsultaRegistre respostaConsultaRegistre = new RespostaConsultaRegistre();
 		Date data = new Date();
@@ -104,193 +110,205 @@ public class RegistrePluginMockImpl extends AbstractSalutPlugin implements Regis
 		respostaConsultaRegistre.setMotivo("motiu per el qual s’ha reenviat o rebutjat l’assentament en destí");
 		respostaConsultaRegistre.setCodigoEntidadRegistralProcesado("A04026906"); // Codi oficina que ha acceptat/rebutjat
 		respostaConsultaRegistre.setDecodificacionEntidadRegistralProcesado("Nom oficina que ha acceptat/rebutjat ");
+		salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
 		return respostaConsultaRegistre;
 	}
-	
+
 	@Override
 	public RespostaJustificantRecepcio obtenerJustificante(String codiDir3Entitat, String numeroRegistreFormatat, long tipusRegistre) {
 
+		long startTime = System.currentTimeMillis();
 		RespostaJustificantRecepcio resposta = new RespostaJustificantRecepcio();
 		resposta.setJustificant(getJustificant());
 		resposta.setErrorCodi("OK");
+		salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
 		return resposta;
-		
+
 	}
-	
+
 	@Override
 	public RespostaJustificantRecepcio obtenerOficioExterno(String codiDir3Entitat, String numeroRegistreFormatat) {
+
+		long startTime = System.currentTimeMillis();
+		salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
 		return null;
 	}
-	
-	
+
+
 	@Override
 	public List<TipusAssumpte> llistarTipusAssumpte(String entitat) throws RegistrePluginException {
-		
+
+		long startTime = System.currentTimeMillis();
 		List<TipusAssumpte> tipusAssumptes = new ArrayList<>();
-		
+
 //		TipusAssumpte tipusAssumpte1 = new TipusAssumpte();
 //		tipusAssumpte1.setCodi("");
 //		tipusAssumpte1.setNom("");
 //		tipusAssumptes.add(tipusAssumpte1);
-		
+		salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
 		return tipusAssumptes;
 	}
-	
+
 	@Override
 	public List<CodiAssumpte> llistarCodisAssumpte(String entitat, String tipusAssumpte) {
 
+		long startTime = System.currentTimeMillis();
 		List<CodiAssumpte> codiAssumptes = new ArrayList<>();
 //		CodiAssumpte codiAssumpte1 = new CodiAssumpte();
 //		codiAssumpte1.setCodi("");
 //		codiAssumpte1.setNom("");
 //		codiAssumpte1.setTipusAssumpte(tipusAssumpte);
 //		codiAssumptes.add(codiAssumpte1);
-
+		salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
 		return codiAssumptes;
 	}
-	
+
 	@Override
 	public Oficina llistarOficinaVirtual(String entitatCodi, String nomOficinaVirtualEntitat, Long autoritzacioValor) {
 
+		long startTime = System.currentTimeMillis();
 		Oficina oficina = new Oficina();
 		oficina.setCodi("O00009390");
 		oficina.setNom(("DGTIC"));
+		salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
 		return oficina;
 	}
-	
+
 	@Override
 	public List<Oficina> llistarOficines(String entitat, Long autoritzacio) {
-		
+
+		long startTime = System.currentTimeMillis();
 		List<Oficina> oficines = new ArrayList<>();
-		
+
 		Oficina oficina1 = new Oficina();
 		oficina1.setCodi("O00001496");
 		oficina1.setNom("Fogaiba Servicios Centrales");
 		oficines.add(oficina1);
-		
+
 		Oficina oficina2 = new Oficina();
 		oficina2.setCodi("O00001497");
 		oficina2.setNom("Fogaiba Palma");
 		oficines.add(oficina2);
-		
+
 		Oficina oficina3 = new Oficina();
 		oficina3.setCodi("O00001502");
 		oficina3.setNom("Fogaiba SA Pobla");
 		oficines.add(oficina3);
-		
+
 		Oficina oficina4 = new Oficina();
 		oficina4.setCodi("O00001500");
 		oficina4.setNom("Fogaiba Inca");
 		oficines.add(oficina4);
-		
+
 		Oficina oficina5 = new Oficina();
 		oficina5.setCodi("O00001501");
 		oficina5.setNom("Fogaiba Manacor");
 		oficines.add(oficina5);
-		
+
 		Oficina oficina6 = new Oficina();
 		oficina6.setCodi("O00009385");
 		oficina6.setNom("Fogaiba Maó");
 		oficines.add(oficina6);
-		
+
 		Oficina oficina7 = new Oficina();
 		oficina7.setCodi("O00009386");
 		oficina7.setNom("Fogaiba Ciutadella");
 		oficines.add(oficina7);
-		
+
 		Oficina oficina8 = new Oficina();
 		oficina8.setCodi("O00001498");
 		oficina8.setNom("Fogaiba Campos");
 		oficines.add(oficina8);
-		
+
 		Oficina oficina9 = new Oficina();
 		oficina9.setCodi("O00009384");
 		oficina9.setNom("Fogaiba Eivissa");
 		oficines.add(oficina9);
-		
+
 		Oficina oficina10 = new Oficina();
 		oficina10.setCodi("O00001499");
 		oficina10.setNom("Fogaiba Felanitx");
 		oficines.add(oficina10);
-		
+
 		Oficina oficina11 = new Oficina();
 		oficina11.setCodi("O00009436");
 		oficina11.setNom("Oficina Conveni Consell D'Eivissa");
 		oficines.add(oficina11);
-		
+
 		Oficina oficina12 = new Oficina();
 		oficina12.setCodi("O00009437");
 		oficina12.setNom("Oficina Conveni Consell de Menorca");
 		oficines.add(oficina12);
-		
+
 		Oficina oficina13 = new Oficina();
 		oficina13.setCodi("O00010444");
 		oficina13.setNom("Oficina Conveni Consell D'Eivissa");
 		oficines.add(oficina13);
-		
+		salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
 		return oficines;
 	}
-	
+
 	@Override
 	public List<Llibre> llistarLlibres(String entitat, String oficina, Long autoritzacio) throws RegistrePluginException {
-		
+
+		long startTime = System.currentTimeMillis();
 		List<Llibre> llibres = new ArrayList<>();
-	
+
 		Llibre llibre1 = new Llibre();
 		llibre1.setCodi("L95");
 		llibre1.setOrganisme(ENTITAT_DIR3_CODI);
 		llibre1.setNomCurt("L95");
 		llibre1.setNomLlarg("FOGAIBA");
 		llibres.add(llibre1);
-		
+
 		Llibre llibre2 = new Llibre();
 		llibre2.setCodi("L2");
 		llibre2.setOrganisme(ENTITAT_DIR3_CODI);
 		llibre2.setNomCurt("L2");
 		llibre2.setNomLlarg("OF. CONVENI CONSELL MENORCA");
 		llibres.add(llibre2);
-		
+
 		Llibre llibre3 = new Llibre();
 		llibre3.setCodi("L3");
 		llibre3.setOrganisme(ENTITAT_DIR3_CODI);
 		llibre3.setNomCurt("L3");
 		llibre3.setNomLlarg("OF. CONVENI CONSELL EIVISSA");
 		llibres.add(llibre3);
-		
+		salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
 		return llibres;
 	}
-	
+
 	@Override
 	public List<LlibreOficina> llistarLlibresOficines(String entitatCodi, String usuariCodi, Long tipusRegistre){
 		return new ArrayList<>();
 	}
-	
+
 	@Override
 	public Llibre llistarLlibreOrganisme(String entitatCodi, String organismeCodi) {
 
-
+		long startTime = System.currentTimeMillis();
 		Integer num = rand.nextInt(100);
 		Llibre llibre = new Llibre();
 		llibre.setCodi("L" + num);
 		llibre.setNomCurt("Llibre " + num + " de prova");
 		llibre.setNomLlarg("Llibre " + num + " de prova llarg");
+		salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
 		return llibre;
 	}
-	
+
 	@Override
 	public List<Organisme> llistarOrganismes(String entitat) throws RegistrePluginException {
-		
+
 		List<Organisme> organismes = new ArrayList<>();
-		
+		long startTime = System.currentTimeMillis();
 		Organisme organisme = new Organisme();
 		organisme.setCodi(ENTITAT_DIR3_CODI);
 		organisme.setNom("FOGAIBA");
 		organismes.add(organisme);
-			
+		salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
 		return organismes;
 	}
-	
-	
+
 	private Integer[] readRegistreFile(Date data, boolean update) {
 		
 		Integer anualitat =  null;
@@ -355,6 +373,29 @@ public class RegistrePluginMockImpl extends AbstractSalutPlugin implements Regis
 	@Override
 	public String toString() {
 	    return getClass().getName() + "@" + Integer.toHexString(hashCode());
+	}
+
+
+	// Mètodes de SALUT
+	// /////////////////////////////////////////////////////////////////////////////////////////////
+	private AbstractSalutPlugin salutPluginComponent = new AbstractSalutPlugin();
+	public void init(MeterRegistry registry, String codiPlugin, String codiEntiat) {
+		salutPluginComponent.init(registry, codiPlugin, codiEntiat);
+	}
+
+	@Override
+	public boolean teConfiguracioEspecifica() {
+		return salutPluginComponent.teConfiguracioEspecifica();
+	}
+
+	@Override
+	public EstatSalut getEstatPlugin() {
+		return salutPluginComponent.getEstatPlugin();
+	}
+
+	@Override
+	public IntegracioPeticions getPeticionsPlugin() {
+		return salutPluginComponent.getPeticionsPlugin();
 	}
 
 }

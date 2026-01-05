@@ -174,9 +174,9 @@ public class SalutServiceImpl implements SalutService {
                 restTemplate.getForObject(performanceUrl, String.class);
                 break;
             } catch (Exception e) {
-                if (i == MAX_CONNECTION_RETRY) {
-                    estat = EstatSalutEnum.DOWN; // After 3 connection failed attempts
-                }
+//                if (i == MAX_CONNECTION_RETRY) {
+//                    estat = EstatSalutEnum.DOWN; // After 3 connection failed attempts
+//                }
             }
         }
         Instant end = Instant.now();

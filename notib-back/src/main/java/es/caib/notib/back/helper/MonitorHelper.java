@@ -108,7 +108,7 @@ public class MonitorHelper {
 
 		try {
 			result.upTime = rmBean.getUptime();
-			result.processCpuTime = sunOSMBean.getProcessCpuTime();
+			result.upTime = rmBean.getUptime();
 			if (result.upTime > 0L && result.processCpuTime >= 0L) {
 				updateCPUInfo();
 			}
