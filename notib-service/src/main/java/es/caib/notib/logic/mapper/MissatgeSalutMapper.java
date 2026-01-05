@@ -4,7 +4,11 @@ import es.caib.comanda.ms.salut.model.MissatgeSalut;
 import es.caib.comanda.ms.salut.model.SalutNivell;
 import es.caib.notib.logic.intf.dto.AvisNivellEnumDto;
 import es.caib.notib.persist.entity.AvisEntity;
-import org.mapstruct.*;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.ValueMapping;
+import org.mapstruct.ValueMappings;
 
 @Mapper
 public interface MissatgeSalutMapper {
@@ -21,5 +25,4 @@ public interface MissatgeSalutMapper {
 			@ValueMapping(source = "ERROR", target = "ERROR")
 	})
 	SalutNivell avisNivellToSalutNivell(AvisNivellEnumDto nivell);
-
 }
