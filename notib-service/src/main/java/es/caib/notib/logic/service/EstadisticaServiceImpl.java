@@ -766,12 +766,20 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
         // Notificacions amb error a l'intentar registrar
         explotFetsRepository.getStatsRegEnviamentErrorPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            if (statsMap.get(stat.getKey()) == null) {
+                log.warn("[EstadisticaService.getStatsRegEnviamentErrorPerDay] statMap no conte la key " + stat.getKey());
+                return;
+            }
             statsMap.get(stat.getKey()).setTrRegEnviadesError(stat.getTotalEnviaments());
             statsMap.get(stat.getKey()).setIntentsRegistre(stat.getIntentsMig().longValue());
         });
 
         // Notificacions registrades
         explotFetsRepository.getStatsRegistradaPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            if (statsMap.get(stat.getKey()) == null) {
+                log.warn("[EstadisticaService.getStatsRegistradaPerDay] statMap no conte la key " + stat.getKey());
+                return;
+            }
             statsMap.get(stat.getKey()).setTrRegistrades(stat.getTotalEnviaments());
             statsMap.get(stat.getKey()).setTemsMigPendent(stat.getTempsMigEstat().longValue());
             statsMap.get(stat.getKey()).setIntentsRegistre(stat.getIntentsMig().longValue());
@@ -779,6 +787,10 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
         // Comunicacions acceptades via SIR
         explotFetsRepository.getStatsRegAcceptadaPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            if (statsMap.get(stat.getKey()) == null) {
+                log.warn("[EstadisticaService.getStatsRegAcceptadaPerDay] statMap no conte la key " + stat.getKey());
+                return;
+            }
             statsMap.get(stat.getKey()).setTrSirAcceptades(stat.getTotalEnviaments());
             statsMap.get(stat.getKey()).setTemsMigRegistrada(stat.getTempsMigEstat().longValue());
             statsMap.get(stat.getKey()).setTemsMigRegistradaPerSirAcceptada(stat.getTempsMigEstat().longValue());
@@ -788,6 +800,10 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
         // Comunicacions rebutjades via SIR
         explotFetsRepository.getStatsRegRebutjadaPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            if (statsMap.get(stat.getKey()) == null) {
+                log.warn("[EstadisticaService.getStatsRegRebutjadaPerDay] statMap no conte la key " + stat.getKey());
+                return;
+            }
             statsMap.get(stat.getKey()).setTrSirRebutjades(stat.getTotalEnviaments());
             statsMap.get(stat.getKey()).setTemsMigRegistrada(stat.getTempsMigEstat().longValue());
             statsMap.get(stat.getKey()).setTemsMigRegistradaPerSirRebutjada(stat.getTempsMigEstat().longValue());
@@ -797,12 +813,20 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
         // Notificacions amb error a l'intentar enviar a Notifica
         explotFetsRepository.getStatsNotEnviamentErrorPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            if (statsMap.get(stat.getKey()) == null) {
+                log.warn("[EstadisticaService.getStatsNotEnviamentErrorPerDay] statMap no conte la key " + stat.getKey());
+                return;
+            }
             statsMap.get(stat.getKey()).setTrNotEnviadesError(stat.getTotalEnviaments());
             statsMap.get(stat.getKey()).setIntentsRegistre(stat.getIntentsMig().longValue());
         });
 
         // Notificacions enviades a Notifica
         explotFetsRepository.getStatsNotEnviadaPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            if (statsMap.get(stat.getKey()) == null) {
+                log.warn("[EstadisticaService.getStatsNotEnviadaPerDay] statMap no conte la key " + stat.getKey());
+                return;
+            }
             statsMap.get(stat.getKey()).setTrNotEnviades(stat.getTotalEnviaments());
             statsMap.get(stat.getKey()).setTemsMigRegistrada(stat.getTempsMigEstat().longValue());
             statsMap.get(stat.getKey()).setTemsMigRegistradaPerNotificada(stat.getTempsMigEstat().longValue());
@@ -811,6 +835,10 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
         // Notificacions notificades via Notifica
         explotFetsRepository.getStatsNotNotificadaPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            if (statsMap.get(stat.getKey()) == null) {
+                log.warn("[EstadisticaService.getStatsNotNotificadaPerDay] statMap no conte la key " + stat.getKey());
+                return;
+            }
             statsMap.get(stat.getKey()).setTrNotNotificades(stat.getTotalEnviaments());
             statsMap.get(stat.getKey()).setTemsMigNotEnviada(stat.getTempsMigEstat().longValue());
             statsMap.get(stat.getKey()).setTemsMigNotEnviadaPerNotificada(stat.getTempsMigEstat().longValue());
@@ -820,6 +848,10 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
         // Notificacions rebutjades via Notifica
         explotFetsRepository.getStatsNotRebutjadaPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            if (statsMap.get(stat.getKey()) == null) {
+                log.warn("[EstadisticaService.getStatsNotRebutjadaPerDay] statMap no conte la key " + stat.getKey());
+                return;
+            }
             statsMap.get(stat.getKey()).setTrNotRebujtades(stat.getTotalEnviaments());
             statsMap.get(stat.getKey()).setTemsMigNotEnviada(stat.getTempsMigEstat().longValue());
             statsMap.get(stat.getKey()).setTemsMigNotEnviadaPerRebubjada(stat.getTempsMigEstat().longValue());
@@ -829,6 +861,10 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
         // Notificacions expirades via Notifica
         explotFetsRepository.getStatsNotExpiradaPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            if (statsMap.get(stat.getKey()) == null) {
+                log.warn("[EstadisticaService.getStatsNotExpiradaPerDay] statMap no conte la key " + stat.getKey());
+                return;
+            }
             statsMap.get(stat.getKey()).setTrNotExpirades(stat.getTotalEnviaments());
             statsMap.get(stat.getKey()).setTemsMigNotEnviada(stat.getTempsMigEstat().longValue());
             statsMap.get(stat.getKey()).setTemsMigNotEnviadaPerExpirada(stat.getTempsMigEstat().longValue());
@@ -838,6 +874,10 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
         // Notificacions fallades via Notifica
         explotFetsRepository.getStatsNotErrorPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            if (statsMap.get(stat.getKey()) == null) {
+                log.warn("[EstadisticaService.getStatsNotErrorPerDay] statMap no conte la key " + stat.getKey());
+                return;
+            }
             statsMap.get(stat.getKey()).setTrNotFallades(stat.getTotalEnviaments());
             statsMap.get(stat.getKey()).setTemsMigNotEnviada(stat.getTempsMigEstat().longValue());
             statsMap.get(stat.getKey()).setTemsMigNotEnviadaPerFallada(stat.getTempsMigEstat().longValue());
@@ -847,18 +887,30 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
         // Notificacions amb error a l'intentar enviar al CIE
         explotFetsRepository.getStatsCieEnviamentErrorPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            if (statsMap.get(stat.getKey()) == null) {
+                log.warn("[EstadisticaService.getStatsCieEnviamentErrorPerDay] statMap no conte la key " + stat.getKey());
+                return;
+            }
             statsMap.get(stat.getKey()).setTrCieEnviadesError(stat.getTotalEnviaments());
             statsMap.get(stat.getKey()).setIntentsCieEnviament(stat.getIntentsMig().longValue());
         });
 
         // Notificacions enviades al CIE
         explotFetsRepository.getStatsCieEnviadaPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            if (statsMap.get(stat.getKey()) == null) {
+                log.warn("[EstadisticaService.getStatsCieEnviadaPerDay] statMap no conte la key " + stat.getKey());
+                return;
+            }
             statsMap.get(stat.getKey()).setTrCieEnviades(stat.getTotalEnviaments());
             statsMap.get(stat.getKey()).setIntentsCieEnviament(stat.getIntentsMig().longValue());
         });
 
         // Notificacions notificades via CIE
         explotFetsRepository.getStatsCieNotificadaPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            if (statsMap.get(stat.getKey()) == null) {
+                log.warn("[EstadisticaService.getStatsCieNotificadaPerDay] statMap no conte la key " + stat.getKey());
+                return;
+            }
             statsMap.get(stat.getKey()).setTrCieNotificades(stat.getTotalEnviaments());
             statsMap.get(stat.getKey()).setTemsMigCieEnviada(stat.getTempsMigEstat().longValue());
             statsMap.get(stat.getKey()).setTemsMigCieEnviadaPerNotificada(stat.getTempsMigEstat().longValue());
@@ -868,6 +920,10 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
         // Notificacions rebutjades via CIE
         explotFetsRepository.getStatsCieRebutjadaPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            if (statsMap.get(stat.getKey()) == null) {
+                log.warn("[EstadisticaService.getStatsCieRebutjadaPerDay] statMap no conte la key " + stat.getKey());
+                return;
+            }
             statsMap.get(stat.getKey()).setTrCieRebutjades(stat.getTotalEnviaments());
             statsMap.get(stat.getKey()).setTemsMigCieEnviada(stat.getTempsMigEstat().longValue());
             statsMap.get(stat.getKey()).setTemsMigCieEnviadaPerRebubjada(stat.getTempsMigEstat().longValue());
@@ -875,6 +931,10 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
         // Notificacions cancel·lades via CIE
         explotFetsRepository.getStatsCieCanceladaPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            if (statsMap.get(stat.getKey()) == null) {
+                log.warn("[EstadisticaService.getStatsCieCanceladaPerDay] statMap no conte la key " + stat.getKey());
+                return;
+            }
             statsMap.get(stat.getKey()).setTrCieCancelades(stat.getTotalEnviaments());
             statsMap.get(stat.getKey()).setTemsMigCieEnviada(stat.getTempsMigEstat().longValue());
             statsMap.get(stat.getKey()).setTemsMigCieEnviadaPerCancelada(stat.getTempsMigEstat().longValue());
@@ -882,6 +942,10 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
         // Notificacions fallades via CIE
         explotFetsRepository.getStatsCieErrorPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            if (statsMap.get(stat.getKey()) == null) {
+                log.warn("[EstadisticaService.getStatsCieErrorPerDay] statMap no conte la key " + stat.getKey());
+                return;
+            }
             statsMap.get(stat.getKey()).setTrCieFallades(stat.getTotalEnviaments());
             statsMap.get(stat.getKey()).setTemsMigCieEnviada(stat.getTempsMigEstat().longValue());
             statsMap.get(stat.getKey()).setTemsMigCieEnviadaPerFallada(stat.getTempsMigEstat().longValue());
@@ -889,12 +953,20 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
         // Notificacions amb error a l'intentar enviar via email
         explotFetsRepository.getStatsEmailEnviamentErrorPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            if (statsMap.get(stat.getKey()) == null) {
+                log.warn("[EstadisticaService.getStatsEmailEnviamentErrorPerDay] statMap no conte la key " + stat.getKey());
+                return;
+            }
             statsMap.get(stat.getKey()).setTrEmailEnviadesError(stat.getTotalEnviaments());
             statsMap.get(stat.getKey()).setIntentsEmailEnviament(stat.getIntentsMig().longValue());
         });
 
         // Notificacions enviades via email
         explotFetsRepository.getStatsEmailEnviadaPerDay(iniciDelDia, finalDelDia).forEach(stat -> {
+            if (statsMap.get(stat.getKey()) == null) {
+                log.warn("[EstadisticaService.getStatsEmailEnviadaPerDay] statMap no conte la key " + stat.getKey());
+                return;
+            }
             statsMap.get(stat.getKey()).setTrEmailEnviades(stat.getTotalEnviaments());
             statsMap.get(stat.getKey()).setTemsMigRegistrada(stat.getTempsMigEstat().longValue());
             statsMap.get(stat.getKey()).setTemsMigRegistradaPerEmail(stat.getTempsMigEstat().longValue());
