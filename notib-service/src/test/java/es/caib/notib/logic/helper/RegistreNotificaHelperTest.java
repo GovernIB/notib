@@ -141,25 +141,25 @@ public class RegistreNotificaHelperTest {
 	}
 
 	private EntitatEntity initEntitat() {
-		 return EntitatEntity.getBuilder("codi",
-				"nom",
-				null,
-				"dir3Codi",
-				"dir3CodiReg",
-				"apiKey",
-				false,
+		return EntitatEntity.getBuilder("codi",
+						"nom",
+						null,
+						"dir3Codi",
+						"dir3CodiReg",
+						"apiKey",
+						false,
 //				false,
-				null,
-				null,
-				"colorFons",
-				"colorLletra",
-				null,
-				"oficina",
-				"nomOficinaVirtual",
-				false,
-				"llibre",
-				"llibreNom",
-				false)
+//				null,
+//				null,
+//				"colorFons",
+//				"colorLletra",
+						null,
+						"oficina",
+						"nomOficinaVirtual",
+						false,
+						"llibre",
+						"llibreNom",
+						false)
 				.build();
 	}
 	private PersonaEntity initPersonaAdministracio(InteressatTipus interessatTipus) {

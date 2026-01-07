@@ -430,24 +430,24 @@ public class PluginHelperTest {
 	}
 
 	private EntitatEntity initEntitat() {
-		 return EntitatEntity.getBuilder("CAIB",
-				"nom",
-				null,
-				"dir3Codi",
-				"dir3CodiReg",
-				"apiKey",
-				false,
-				null,
-				null,
-				"colorFons",
-				"colorLletra",
-				null,
-				"oficina",
-				"nomOficinaVirtual",
-				true,                // llibreEntitat
-				"llibre",
-				"llibreNom",
-				true)                // oficinaEntitat
+		return EntitatEntity.getBuilder("CAIB",
+						"nom",
+						null,
+						"dir3Codi",
+						"dir3CodiReg",
+						"apiKey",
+						false,
+//				null,
+//				null,
+//				"colorFons",
+//				"colorLletra",
+						null,
+						"oficina",
+						"nomOficinaVirtual",
+						true,                // llibreEntitat
+						"llibre",
+						"llibreNom",
+						true)                // oficinaEntitat
 				.build();
 	}
 

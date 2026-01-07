@@ -113,25 +113,25 @@ public class ProcedimentServiceTest {
 		PaginacioParamsDto paginacioParams = new PaginacioParamsDto();
 		
 		List<ProcSerOrganEntity> procedimentOrgans = new ArrayList<ProcSerOrganEntity>();
-		EntitatEntity entitat = EntitatEntity.getBuilder("codi", 
-				"nom", 
-				null, 
-				"dir3Codi", 
-				"dir3CodiReg", 
-				"apiKey", 
-				false, 
+		EntitatEntity entitat = EntitatEntity.getBuilder("codi",
+						"nom",
+						null,
+						"dir3Codi",
+						"dir3CodiReg",
+						"apiKey",
+						false,
 //				false,
-				null, 
-				null, 
-				"colorFons", 
-				"colorLletra", 
-				null, 
-				"oficina", 
-				"nomOficinaVirtual", 
-				false, 
-				"llibre", 
-				"llibreNom", 
-				false)
+//				null,
+//				null,
+//				"colorFons",
+//				"colorLletra",
+						null,
+						"oficina",
+						"nomOficinaVirtual",
+						false,
+						"llibre",
+						"llibreNom",
+						false)
 				.build();
 		ProcedimentEntity procediment = ProcedimentEntity.getBuilder(
 				"",
