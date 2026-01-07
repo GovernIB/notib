@@ -921,9 +921,10 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @GetMapping(value = "/{notificacioId}/enviament/{enviamentId}/anular")
     public String anularOEGetEnviament(HttpServletResponse response, HttpServletRequest request, Model model, @PathVariable Long notificacioId, @PathVariable Long enviamentId) {
 
-        var anular = new AnularCommand();
-        anular.setEnviamentId(enviamentId);
-        model.addAttribute(anular);
+        var command = new AnularCommand();
+        command.setEnviamentId(enviamentId);
+        model.addAttribute(command);
+        model.addAttribute("motiuSize", command.getMotiuDefaultSize());
         return "anularForm";
     }
 
@@ -938,44 +939,46 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         if (seleccio.size() == 1 && seleccio.contains(-1L)) {
             return getModalControllerReturnValueError(request, redirect,"accio.massiva.creat.ko");
         }
-        var anulacio = new AnularCommand();
-        anulacio.setMassiu(true);
-        anulacio.setNotificacionsId(new ArrayList<>(seleccio));
-        anulacio.setSeleccioTipus(SeleccioTipus.NOTIFICACIO);
-        model.addAttribute(anulacio);
+        var command = new AnularCommand();
+        command.setMassiu(true);
+        command.setNotificacionsId(new ArrayList<>(seleccio));
+        command.setSeleccioTipus(SeleccioTipus.NOTIFICACIO);
+        model.addAttribute(command);
+        model.addAttribute("motiuSize", command.getMotiuDefaultSize());
         return "anularForm";
     }
 
     @PostMapping(value = "/anular")
-    public String anularPost(HttpServletResponse response, HttpServletRequest request, Model model, AnularCommand command) {
+    public String anularPost(HttpServletResponse response, HttpServletRequest request, Model model, @Valid AnularCommand command, BindingResult bindingResult) {
 
         try {
+            if (bindingResult.hasErrors()) {
+                model.addAttribute("motiuSize", command.getMotiuDefaultSize());
+                return "anularForm";
+            }
 
-            /*TODO
-                FALTA COMPROVAR QUE EL COMMAND S'EMPLENA BÉ JA SIGUI PER REMESES, ENVIAMENTS O ACCIONS MASSIVES D'ENVIAMENTS O REMESES
-                FALTA MODIFICAR ENVIAMENTS PER MARCARLOS COM ANULATS SI LA CRIDA A NOTIFICA HA FUNCIONAT
-                FALTA VALIDAR ELS ENVIAMENTS ABANS D'ENVIAR A NOTIFICA QUE REALMENT SIGUINT ANULABLES.
-                FALTA COMPROBAR QUE ELS MISSATGES D'ERROR ES MOSTREN BÉ
-                FALTA IMPLEMENTAR LES ACCIONS MASSIVES D'ANULAR
-            * */
-//            var ampliarPlazoOE = new AmpliarPlazoOE();
-//            ampliarPlazoOE.setPlazo(ampliacionPlazo.getDies());
-//            ampliarPlazoOE.setMotivo(ampliacionPlazo.getMotiu());
-//            Long accioMassivaId;
-//            if (ampliacionPlazo.isMassiu()) {
-//                var entitatActual = sessionScopedContext.getEntitatActual();
-//                var seleccio = ampliacionPlazo.getNotificacionsId() != null && !ampliacionPlazo.getNotificacionsId().isEmpty() ? ampliacionPlazo.getNotificacionsId() : ampliacionPlazo.getEnviamentsId();
-//                var seleccioTipus = requestIsRemesesEnviamentMassiu(request) ? SeleccioTipus.NOTIFICACIO : SeleccioTipus.ENVIAMENT;
-//                var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
-//                var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.AMPLIAR_TERMINI).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
-//                accioMassivaId = accioMassivaService.altaAccioMassiva(accio);
-//                accio.setAccioId(accioMassivaId);
-//                accio.setAmpliacionPlazo(ConversioTipusHelper.convertir(ampliacionPlazo, AmpliacionPlazoDto.class));
-//                accioMassivaService.executarAccio(accio);
-//            }
+            Long accioMassivaId;
+            if (command.isMassiu()) {
+                var entitatActual = sessionScopedContext.getEntitatActual();
+                var seleccio = command.getNotificacionsId() != null && !command.getNotificacionsId().isEmpty() ? command.getNotificacionsId() : command.getEnviamentsId();
+                var seleccioTipus = command.getSeleccioTipus();
+                var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
+                var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.ANULAR).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+                accioMassivaId = accioMassivaService.altaAccioMassiva(accio);
+                accio.setAccioId(accioMassivaId);
+                accio.setAnulacio(ConversioTipusHelper.convertir(command, AnularDto.class));
+                accioMassivaService.executarAccio(accio);
+                return getModalControllerReturnValueSuccess(request, "redirect:/enviament", "anular.massiva.ok");
+            }
             var resposta = notificacioService.anular(ConversioTipusHelper.convertir(command, AnularDto.class));
-            return resposta != null && resposta.isOk() ? getModalControllerReturnValueSuccess(request, "redirect:/enviament", "anular.ok")
-                    : getModalControllerReturnValueError(request, "redirect:/enviament", "anular.error", new Object[]{resposta.getErrors()});
+            var noExecutades = !resposta.getNoExecutades().isEmpty();
+            var ok = resposta != null && resposta.isOk();
+            var msgKey = ok ? noExecutades ? "anular.ok.no.executades" : "anular.ok" :
+                    resposta.getErrors().isEmpty() ?  noExecutades ? "anular.no.executades" : "anular.error" : noExecutades ? "anular.error.no.executades" : "anular.error";
+            Object[] params = "anular.no.executades".equals(msgKey) ? new Object[]{resposta.getNoExecutades()} : new Object[]{resposta.getErrors(), resposta.getNoExecutades()};
+
+            return ok ? getModalControllerReturnValueSuccess(request, "redirect:/enviament", msgKey, params)
+                    : getModalControllerReturnValueError(request, "redirect:/enviament", msgKey, params);
         } catch (Exception ex) {
             log.error("Error anulat enviaments ", ex);
             return getModalControllerReturnValueError(request, "redirect:/enviament", "anular.error");
@@ -1026,7 +1029,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
 
     @PostMapping(value = "/ampliacion/plazo")
-    public String ampliarPlazoOEPost(HttpServletResponse response, HttpServletRequest request, Model model, AmpliacionPlazoCommand ampliacionPlazo, BindingResult bindingResult) {
+    public String ampliarPlazoOEPost(HttpServletResponse response, HttpServletRequest request, Model model, @Valid AmpliacionPlazoCommand ampliacionPlazo, BindingResult bindingResult) {
 
         try {
             if (bindingResult.hasErrors()) {
