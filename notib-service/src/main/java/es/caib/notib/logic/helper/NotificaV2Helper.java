@@ -200,9 +200,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					for (var enviament: notificacio.getEnviamentsPerNotifica()) {
 						enviament.setNotificaDataCaducitat(dataCaducitat);
 						enviament.setNotificaDataDisposicio(dataDisposicio);
-                        //Enviar estat pendent a Comanda
-                        comandaListener.enviarTasca(enviament);
+						//Enviar estat pendent a Comanda
+//                        comandaListener.enviarTasca(enviament);
+						comandaListener.enviarAvis(enviament, AvisDescripcio.ENVIAMENT_NOTIFICA);
 					}
+
 
 					for (NotificacioEnviamentEntity e : notificacio.getEnviaments()) {
 						if (pluginHelper.enviarCarpeta()) {
@@ -706,7 +708,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				null,
 				enviament);
         //Enviar la informacio del canvi d'estat a Comanda
-        comandaListener.enviarTasca(enviament);
+		comandaListener.enviarAvis(enviament, AvisDescripcio.ACTUALTIZAR_ESTAT_NOTIFICA);
 		log.info(" [EST] Fi actualització Datat");
 	}
 

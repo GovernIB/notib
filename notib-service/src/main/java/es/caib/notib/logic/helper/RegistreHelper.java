@@ -95,10 +95,11 @@ public class RegistreHelper {
 				accioMassivaHelper.actualitzar(consulta.getAccioMassivaId(), enviamentId, "", "");
 			}
 			canviEstat = !enviament.getRegistreEstat().equals(resposta.getEstat());
-            if (canviEstat) {
-                comandaListener.enviarTasca(enviament);
-            }
 			enviamentUpdateDatat(resposta, enviament);
+			if (canviEstat) {
+//                comandaListener.enviarTasca(enviament);
+				comandaListener.enviarAvis(enviament, AvisDescripcio.ACTUALITZAR_ESTAT_REGISTRE);
+			}
 			logTimeHelper.info(" [TIMER-SIR] Actualitzar estat comunicació SIR [Id: " + enviamentId + "]: ");
 			if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA && canviEstat) {
 				try {

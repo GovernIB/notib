@@ -133,7 +133,8 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 					}
 				}
 				for (var enviament : notificacio.getEnviaments()) {
-					comandaListener.enviarTasca(enviament);
+//                    comandaListener.enviarTasca(enviament);
+					comandaListener.enviarAvis(enviament, AvisDescripcio.ENVIAMENT_NOTIFICA);
 					if (enviament.getEntregaPostal() == null) {
 						callbackHelper.crearCallback(notificacio, enviament, error, errorDescripcio);
 					}
@@ -281,6 +282,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 				var datatData = toDate(datado.getFecha());
 				if (datatDarrer == null) {
 					datatDarrer = datado;
+					dataUltimDatat = datatData;
 				} else if (datado.getFecha() != null) {
 					var datatDarrerData = toDate(datatDarrer.getFecha());
 					if (datatData.after(datatDarrerData)) {
@@ -288,9 +290,12 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 					}
 				}
                 var estat = getEstatNotifica(datatDarrer.getResultado());
-                if (!datatData.equals(dataUltimDatat) || !estat.equals(enviament.getNotificaEstat())) {
-                    comandaListener.enviarTasca(enviament);
-                }
+				if (!datatData.equals(dataUltimDatat) || !estat.equals(enviament.getNotificaEstat())) {
+					enviament.setNotificaEstat(estat);
+					enviament.setNotificaEstatData(datatData);
+//                    comandaListener.enviarTasca(enviament);
+					comandaListener.enviarAvis(enviament, AvisDescripcio.ACTUALTIZAR_ESTAT_NOTIFICA);
+				}
 				var event = new NotificaRespostaDatatDto.NotificaRespostaDatatEventDto();
 				event.setData(datatData);
 				event.setEstat(datado.getResultado());
