@@ -94,6 +94,12 @@ public class PermisosService extends AbstractService<es.caib.notib.logic.intf.se
 
 	@Override
 	@RolesAllowed("**")
+	public List<CodiValorOrganGestorComuDto> getProcedimentsAmbPermis(Long entitatId, String usuariCodi) {
+		return getDelegateService().getProcedimentsAmbPermis(entitatId, usuariCodi);
+	}
+
+	@Override
+	@RolesAllowed("**")
 	public List<CodiValorOrganGestorComuDto> getProcedimentsAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
 		return getDelegateService().getProcedimentsAmbPermis(entitatId, usuariCodi, permis);
 	}
