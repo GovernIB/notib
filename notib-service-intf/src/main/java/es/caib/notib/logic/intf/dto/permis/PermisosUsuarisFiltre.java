@@ -15,6 +15,7 @@ import org.bouncycastle.util.Strings;
 public class PermisosUsuarisFiltre {
 
     private String usuariCodi;
+    private String organGestor;
 
     public boolean usuariCodiNull() {
         return Strings.isNullOrEmpty(usuariCodi);

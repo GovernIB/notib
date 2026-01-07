@@ -60,7 +60,7 @@ public interface PermisosService {
     List<CodiValorDto> getOrgansAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis);
 
     @PreAuthorize("isAuthenticated()")
-    List<CodiValorDto> getOrgansAmbPermis(Long entitatId, String usuariCodi);
+    List<CodiValorDto> getOrgansAmbPermis(Long entitatId, String usuariCodi, boolean incloureNoVigents);
 
     @PreAuthorize("isAuthenticated()")
     List<CodiValorDto> getOrgansAmbPermisPerConsulta(Long entitatId, String usuariCodi, PermisEnum permis);
