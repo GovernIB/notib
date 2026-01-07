@@ -5,6 +5,7 @@ package es.caib.notib.logic.helper;
 
 import es.caib.notib.client.domini.EntregaPostalVia;
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.RespostaAnulacio;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.email.EmailConstants;
@@ -89,6 +90,8 @@ public abstract class AbstractNotificaHelper {
 	public abstract NotificacioEnviamentEntity enviamentRefrescarEstat(ConsultaNotificaRequest consulta) throws Exception;
 
 	public abstract NotificacioEnviamentEntity enviamentRefrescarEstat(ConsultaNotificaRequest consulta, boolean raiseExceptions) throws Exception;
+
+	public abstract RespostaAnulacio anular(String identificador);
 
 	public abstract RespuestaSincronizarEnvioOE enviamentEntregaPostalNotificada(SincronizarEnvio sincronizarEnvio) throws Exception;
 

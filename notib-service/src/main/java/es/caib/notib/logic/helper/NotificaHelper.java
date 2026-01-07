@@ -10,6 +10,8 @@ import es.caib.notib.client.domini.ampliarPlazo.AmpliacionesPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.logic.intf.dto.anular.Anulacio;
+import es.caib.notib.logic.intf.dto.anular.RespostaAnular;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.intf.ws.adviser.nexea.NexeaAdviserWs;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnvio;
@@ -73,6 +75,16 @@ public class NotificaHelper {
 
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(ConsultaNotificaRequest consulta, boolean raiseException) throws Exception {
 		return getNotificaHelper().enviamentRefrescarEstat(consulta, raiseException);
+	}
+
+	public RespostaAnular anular(Anulacio anulacio) {
+
+		var respostaAnular = new RespostaAnular();
+		for (var identificador : anulacio.getIdentificadors()) {
+			var resposta = getNotificaHelper().anular(identificador);
+			respostaAnular.addResposta(resposta);
+		}
+		return respostaAnular;
 	}
 
 	@Transactional
