@@ -114,6 +114,8 @@
 			$("#filtreAvancat").hide();
 			$("#filtreSimple").show();
 			$("#filtreSimpleActiu").val(false);
+			$('#btn-netejar-filtre').appendTo('#botons-filtre-avancat');
+			$('#filtrar').appendTo('#botons-filtre-avancat');
 		});
 
 		$("#filtreSimple").on("click", e => {
@@ -124,6 +126,8 @@
 			$("#filtreAvancat").show();
 			$("#filtreSimple").hide();
 			$("#filtreSimpleActiu").val(true);
+			$('#btn-netejar-filtre').appendTo('#botons-filtre-simple');
+			$('#filtrar').appendTo('#botons-filtre-simple');
 		});
 
 		<c:if test="${mostrarFiltreAvancat == true}">
@@ -301,11 +305,11 @@
 		</div>
 	</script>
 
-	<script id="cellFilterTemplate" type="text/x-jsrender">
-		<div class="dropdown">
-			<button type="submit" id="btnFiltrar" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-search"></span></button>
-		</div>
-	</script>
+<%--	<script id="cellFilterTemplate" type="text/x-jsrender">--%>
+<%--		<div class="dropdown">--%>
+<%--			<button type="submit" id="btnFiltrar" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-search"></span></button>--%>
+<%--		</div>--%>
+<%--	</script>--%>
 	<script id="rowhrefTemplate" type="text/x-jsrender">enviament/{{:id}}/detall</script>
 	<div id="cover-spin"></div>
 	<form:form id="form-filtre" action="" method="post" cssClass="well" modelAttribute="enviamentFiltreCommand">
@@ -400,22 +404,24 @@
 		</div>
 	</form:form>
 	<table
-		id="enviament"
-		data-toggle="datatable"
-		data-url="<c:url value="/enviament/datatable"/>"
-		class="table table-striped table-bordered"
-		data-default-order="0"
-		data-default-dir="desc"
-<%--		data-individual-filter="true"--%>
-		data-botons-template="#botonsTemplate"
-		data-date-template="#dataTemplate"
-		data-cell-template="#cellFilterTemplate"
-		data-paging-style-x="true"
-		data-scroll-overflow="adaptMax"
-		data-selection-enabled="true"
-		data-save-state="true"
-		data-mantenir-paginacio="${mantenirPaginacio}"
-		style="width:100%">
+			id="enviament"
+			data-toggle="datatable"
+			data-url="<c:url value="/enviament/datatable"/>"
+			data-search-enabled="false"
+			class="table table-striped table-bordered"
+			data-default-order="0"
+			data-default-dir="desc"
+	<%--		data-individual-filter="true"--%>
+			data-botons-template="#botonsTemplate"
+	<%--		data-date-template="#dataTemplate"--%>
+	<%--		data-cell-template="#cellFilterTemplate"--%>
+			data-rowhref-template="#rowhrefTemplate"
+			data-paging-style-x="true"
+			data-scroll-overflow="adaptMax"
+			data-selection-enabled="true"
+			data-save-state="true"
+			data-mantenir-paginacio="${mantenirPaginacio}"
+			style="width:100%">
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false"></th>

@@ -90,10 +90,12 @@ public class EnviamentController extends TableAccionsMassivesController {
         if (usuari.getOrganDefecte() != null) {
             var o = organGestorService.findById(entitat.getId(), usuari.getOrganDefecte());
             filtre.setDir3Codi(o.getCodi());
+			filtre.setFiltreSimpleActiu(false);
         }
         if (usuari.getProcedimentDefecte() != null) {
             var p = procedimentService.findById(entitat.getId(), isAdministrador(), usuari.getProcedimentDefecte());
             filtre.setCodiProcediment(p.getCodi());
+			filtre.setFiltreSimpleActiu(false);
         }
 		model.addAttribute("mostrarFiltreAvancat", !filtre.isFiltreSimpleActiu());
 		model.addAttribute(filtre);
@@ -141,8 +143,21 @@ public class EnviamentController extends TableAccionsMassivesController {
 		if (!command.getErrors().isEmpty()) {
 			MissatgesHelper.error(request, getErrorMsg(request, command.getErrors()));
 		}
+		var entitatActual = sessionScopedContext.getEntitatActual();
+		ColumnesDto columnes = null;
+		if(entitatActual != null) {
+			var codiUsuari = getCodiUsuariActual();
+			columnes = columnesService.getColumnesUsuari(entitatActual.getId(), codiUsuari);
+			if (columnes == null) {
+				columnesService.columnesCreate(codiUsuari, entitatActual.getId(), columnes);
+			}
+		} else {
+			MissatgesHelper.error(request, getMessage(request, "enviament.controller.entitat.cap.creada"));
+		}
 		model.addAttribute("mostrarFiltreAvancat", !command.isFiltreSimpleActiu());
-		return "redirect:enviament";
+		model.addAttribute("columnes", ColumnesCommand.asCommand(columnes));
+
+		return "enviamentList";
 	}
 
 	@GetMapping(value = "/datatable")
@@ -207,11 +222,12 @@ public class EnviamentController extends TableAccionsMassivesController {
 		if (seleccio.size() == 1 && seleccio.contains(-1L)) {
 			return getModalControllerReturnValueError(request, redirect,"accio.massiva.creat.ko");
 		}
-		var anulacio = new AnularCommand();
-		anulacio.setMassiu(true);
-		anulacio.setEnviamentsId(new ArrayList<>(seleccio));
-		anulacio.setSeleccioTipus(SeleccioTipus.ENVIAMENT);
-		model.addAttribute(anulacio);
+		var command = new AnularCommand();
+		command.setMassiu(true);
+		command.setEnviamentsId(new ArrayList<>(seleccio));
+		command.setSeleccioTipus(SeleccioTipus.ENVIAMENT);
+		model.addAttribute(command);
+		model.addAttribute("motiuSize", command.getMotiuDefaultSize());
 		return "anularForm";
 	}
 
@@ -229,6 +245,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 		var ampliacion = new AmpliacionPlazoCommand();
 		ampliacion.setEnviamentsId(new ArrayList<>(seleccio));
 		model.addAttribute(ampliacion);
+		model.addAttribute("motiuSize", ampliacion.getMotiuDefaultSize());
 		return "ampliarPlazoForm";
 	}
 
