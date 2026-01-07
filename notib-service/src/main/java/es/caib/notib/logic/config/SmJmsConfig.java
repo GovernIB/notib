@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFac
 import org.springframework.boot.autoconfigure.jms.JmsProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
@@ -32,6 +33,8 @@ public class SmJmsConfig {
     private String BROKER_PASSWORD;
     @Value("${es.caib.notib.plugin.gesdoc.filesystem.base.dir:target}")
     private String fileBaseDir;
+    @Value("${es.caib.notib.activemq.max.concurrency:50}")
+    private Integer BROKER_MAX_CONCURRENCY;
 
     @Bean
     public MessageConverter jacksonJmsMessageConverter() {
@@ -47,7 +50,7 @@ public class SmJmsConfig {
         // This provides all auto-configured defaults to this factory, including the message converter
         factory.setConnectionFactory(new PooledConnectionFactory(BROKER_URL));
         factory.setSessionAcknowledgeMode(JmsProperties.AcknowledgeMode.CLIENT.getMode());
-        factory.setConcurrency("5-50");
+        factory.setConcurrency("5-" + BROKER_MAX_CONCURRENCY);
         configurer.configure(factory, connectionFactory);
         // You could still override some settings if necessary.
         return factory;
@@ -64,6 +67,7 @@ public class SmJmsConfig {
     }
 
     @Bean(initMethod = "start", destroyMethod = "stop")
+    @Profile("!remoteBoker")
     public BrokerService broker() throws Exception {
         final BrokerService broker = new BrokerService();
         broker.addConnector(BROKER_URL);

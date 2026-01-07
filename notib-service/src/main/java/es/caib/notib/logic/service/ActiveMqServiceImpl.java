@@ -15,23 +15,22 @@ import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.jmx.BrokerViewMBean;
 import org.apache.activemq.broker.jmx.QueueViewMBean;
 import org.apache.activemq.store.kahadb.KahaDBPersistenceAdapter;
-import org.codehaus.jettison.json.JSONObject;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import javax.management.JMX;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-import javax.management.openmbean.OpenDataException;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
+@Profile("!remoteBroker")
 public class ActiveMqServiceImpl implements ActiveMqService {
 
     private final BrokerService brokerService;
