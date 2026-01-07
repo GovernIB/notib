@@ -85,6 +85,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
@@ -217,16 +218,17 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	@Override
 	public RespostaAlta alta(Notificacio notificacio) throws NotificacioServiceWsException {
 
-        EntitatEntity entitat = null;
-        try {
-            entitat = entitatRepository.findByDir3Codi(notificacio.getEmisorDir3Codi());
-        } catch (Exception ex) {
-            log.error("Error entitat no trobada a la bdd " + notificacio.getEmisorDir3Codi(), ex);
-        }
-        var msg = notificacioHelper.checkLimitEnviamentsAplicacioSuperat(notificacio.getUsuariCodi(), entitat.getId());
-        if (!Strings.isNullOrEmpty(msg)) {
-            return RespostaAlta.builder().error(true).errorDescripcio(msg).build();
-        }
+		EntitatEntity entitat = null;
+		try {
+			entitat = entitatRepository.findByDir3Codi(notificacio.getEmisorDir3Codi());
+		} catch (Exception ex) {
+			log.error("Error entitat no trobada a la bdd " + notificacio.getEmisorDir3Codi(), ex);
+		}
+		var usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
+		var msg = notificacioHelper.checkLimitEnviamentsAplicacioSuperat(usuariCodi, entitat.getId());
+		if (!Strings.isNullOrEmpty(msg)) {
+			return RespostaAlta.builder().error(true).errorDescripcio(msg).build();
+		}
 		var resposta = altaV2(notificacio);
 		resposta.getReferenciesAsV1().forEach(r -> enviamentSmService.altaEnviament(r.getReferencia()));
 		return RespostaAlta.builder().identificador(resposta.getIdentificador()).estat(resposta.getEstat()).referencies(resposta.getReferenciesAsV1())
@@ -249,11 +251,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 //		var info = generateInfoAlta(notificacio, entitat != null ? entitat.getId() : null);
 		try {
 			log.debug("[ALTA] Alta de notificació: " + notificacio.toString());
-
-            var msg = notificacioHelper.checkLimitEnviamentsAplicacioSuperat(notificacio.getUsuariCodi(), entitat.getId());
-            if (!Strings.isNullOrEmpty(msg)) {
-			    return RespostaAltaV2.builder().error(true).errorData(new Date()).errorDescripcio(msg).build();
-            }
+			var usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
+			var msg = notificacioHelper.checkLimitEnviamentsAplicacioSuperat(usuariCodi, entitat.getId());
+			if (!Strings.isNullOrEmpty(msg)) {
+				return RespostaAltaV2.builder().error(true).errorData(new Date()).errorDescripcio(msg).build();
+			}
 			// Obtenir dades bàsiques per a la notificació
 			ProcSerEntity procediment = null;
 			OrganGestorEntity organGestor = null;
