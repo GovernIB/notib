@@ -121,6 +121,7 @@ public class ValidacioErrorCodes {
     public static final int POSTAL_VIA_NOM_SIZE = 1165;
     public static final int POSTAL_VIA_NOM_CAMPS_NO_VALIDS = 11655;
     public static final int POSTAL_NUM_KM_NULL = 1166;
+    public static final int POSTAL_NUM_KM_NUM_CASA = 11666;
     public static final int POSTAL_NUM_CASA_SIZE = 1167;
     public static final int POSTAL_PUNT_KM_SIZE = 1168;
     public static final int POSTAL_PORTAL_SIZE = 1169;

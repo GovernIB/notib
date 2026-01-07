@@ -1,5 +1,6 @@
 package es.caib.notib.back.validation;
 
+import com.google.common.base.Strings;
 import es.caib.notib.back.command.EntregapostalCommand;
 import es.caib.notib.back.config.scopedata.SessionScopedContext;
 import es.caib.notib.back.helper.MessageHelper;
@@ -78,10 +79,16 @@ public class ValidEntregaPostalValidator implements ConstraintValidator<ValidEnt
 				context.buildConstraintViolationWithTemplate(msg).addNode("viaNom").addConstraintViolation();
 			}
 		}
-		if ((entregaPostal.getPuntKm() == null || entregaPostal.getPuntKm().isEmpty())
-				&& (entregaPostal.getNumeroCasa() == null || entregaPostal.getNumeroCasa().isEmpty())) {
+		if (Strings.isNullOrEmpty(entregaPostal.getPuntKm()) && Strings.isNullOrEmpty(entregaPostal.getNumeroCasa())) {
+
 			valid = false;
 			var nacionalPuntKm = MessageHelper.getInstance().getMessage("entregapostal.form.valid.nacional.puntkm.numcasa");
+			context.buildConstraintViolationWithTemplate(nacionalPuntKm).addNode("numeroCasa").addConstraintViolation();
+			context.buildConstraintViolationWithTemplate(nacionalPuntKm).addNode("puntKm").addConstraintViolation();
+		}
+		if (!Strings.isNullOrEmpty(entregaPostal.getPuntKm()) && !Strings.isNullOrEmpty(entregaPostal.getNumeroCasa())) {
+			valid = false;
+			var nacionalPuntKm = MessageHelper.getInstance().getMessage("entregapostal.form.valid.nacional.punkkm.numcasa.plens");
 			context.buildConstraintViolationWithTemplate(nacionalPuntKm).addNode("numeroCasa").addConstraintViolation();
 			context.buildConstraintViolationWithTemplate(nacionalPuntKm).addNode("puntKm").addConstraintViolation();
 		}
