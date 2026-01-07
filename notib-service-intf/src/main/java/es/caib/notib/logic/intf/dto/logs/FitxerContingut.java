@@ -13,7 +13,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class FitxerContingut extends FitxerInfo {
 
-    private byte[] continugt;
+    private byte[] contingut;
 
 
 }

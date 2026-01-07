@@ -1,5 +1,7 @@
 package es.caib.notib.ejb;
 
+import es.caib.notib.logic.intf.dto.logs.FitxerContingut;
+import es.caib.notib.logic.intf.dto.logs.FitxerInfo;
 import org.springframework.context.annotation.Primary;
 
 import javax.ejb.Stateless;

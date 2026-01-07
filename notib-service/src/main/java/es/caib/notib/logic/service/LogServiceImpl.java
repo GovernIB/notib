@@ -1,6 +1,8 @@
 package es.caib.notib.logic.service;
 
 import es.caib.notib.logic.helper.ConfigHelper;
+import es.caib.notib.logic.intf.dto.logs.FitxerContingut;
+import es.caib.notib.logic.intf.dto.logs.FitxerInfo;
 import joptsimple.internal.Strings;
 import liquibase.logging.LogService;
 import lombok.extern.slf4j.Slf4j;
@@ -41,8 +43,11 @@ public class LogServiceImpl implements LogService {
                     var attr = Files.readAttributes(f, BasicFileAttributes.class);
                     var dataCreacio = sdf.format(new Date(attr.creationTime().toMillis()));
                     var dataModificacio = sdf.format(new Date(attr.lastModifiedTime().toMillis()));
-                    double sizeMB = file.length() / 1048576.0; //(1024.0 * 1024.0)
-                    var fitxer = FitxerInfo.builder().nom(file.getName()).mida(sizeMB + "MB").dataCreacio(dataCreacio).dataModificacio(dataModificacio).build();
+                    var mida = file.length();
+                    var fitxer = FitxerInfo.builder().nom(file.getName())
+                            .mida(mida)
+                            .dataCreacio(dataCreacio)
+                            .dataModificacio(dataModificacio).build();
                     fitxers.add(fitxer);
                 } catch (Exception ex) {
                     log.error("Errror obtenint la info del fitxer " + f.getFileName(), ex);
@@ -53,6 +58,7 @@ public class LogServiceImpl implements LogService {
         }
         return fitxers;
     }
+
 
     @Override
     public FitxerContingut getFitxerByNom(String nom) {
