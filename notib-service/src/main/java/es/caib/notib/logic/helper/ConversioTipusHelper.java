@@ -4,6 +4,7 @@
 package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
+import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliacionPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliacionesPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
@@ -77,6 +78,7 @@ import es.caib.notib.persist.entity.cie.PagadorCieFormatSobreEntity;
 import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
 import es.caib.notib.persist.repository.AplicacioRepository;
 import es.caib.notib.persist.repository.CallbackRepository;
+import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.plugin.cie.EnviamentCie;
 import es.caib.notib.plugin.unitat.CodiValor;
@@ -123,6 +125,8 @@ public class ConversioTipusHelper {
     private NotificacioRepository notificacioRepository;
     @Autowired
     private ConfigHelper configHelper;
+	@Autowired
+	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 
 	public ConversioTipusHelper() {
 		MappingContext.Factory mappingContextFactory = new MappingContext.Factory();
@@ -659,6 +663,8 @@ public class ConversioTipusHelper {
 			notEnviamentTableItemDto.setEnviadaDate(notificacioTableHelper.getEnviadaDate(enviamentTableEntity.getNotificacio()));
 			notEnviamentTableItemDto.setProcedimentNom(enviamentTableEntity.getNotificacio().getProcediment().getNom());
 			notEnviamentTableItemDto.setOrganNom(enviamentTableEntity.getNotificacio().getOrganGestor().getNom());
+			var enviament = notificacioEnviamentRepository.findById(enviamentTableEntity.getId()).orElseThrow();
+			notEnviamentTableItemDto.setAnulable(isAnulable(enviament));
 			if (enviamentTableEntity.getDestinataris() == null || enviamentTableEntity.getDestinataris().isEmpty()) {
 				return;
 			}
@@ -675,6 +681,12 @@ public class ConversioTipusHelper {
 			}
 			enviamentTableEntity.setDestinataris(destinatarisFormat.toString());
 			notEnviamentTableItemDto.setDestinataris(destinatarisFormat.toString());
+		}
+
+		public boolean isAnulable(NotificacioEnviamentEntity enviament) {
+			return !enviament.isAnulat() && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador()) && !enviament.isNotificaEstatFinal() && !enviament.isCieEstatFinal()
+					&& (enviament.getEntregaPostal() == null || CieEstat.ENVIADO_CI.equals(enviament.getEntregaPostal().getCieEstat())
+					&& enviament.getNotificacio().getOrganGestor().getEntregaCie().getCie().isCieExtern());
 		}
 
 		private String getNomLlinatgeNif(String destinatari) {

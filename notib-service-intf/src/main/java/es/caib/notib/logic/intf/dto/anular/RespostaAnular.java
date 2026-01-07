@@ -46,7 +46,7 @@ public class RespostaAnular {
             if (!resposta.isError()) {
                 continue;
             }
-            errors.add(resposta.getCodiResposta() + " - " + resposta.getCodiResposta());
+            errors.add(resposta.getCodiResposta() + " - " + resposta.getDescripcioResposta());
         }
         return errors;
     }

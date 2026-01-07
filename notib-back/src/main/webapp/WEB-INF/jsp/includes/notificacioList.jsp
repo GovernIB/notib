@@ -387,6 +387,9 @@
                     }
                     contingutTbody += ' <span class="fa fa-warning text-danger" title="' + errorTitle + '"></span>';
                 }
+                if (data[i].anulat) {
+                    contingutTbody += ' <span class="fa fa-ban" title="' + data[i].motiuAnulacio + '"></span>';
+                }
                 if (!isUltimEventCie && data[i].fiReintents) {
                     contingutTbody += ' <span class="fa fa-warning text-warning" title="' + data[i].fiReintentsDesc + '"></span>';
                 }
@@ -865,6 +868,7 @@
                     <li><a id="descarregarJustificantMassiu" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.descarregar.justificant"/></a></li>
                     <li><a id="descarregarCertificacioMassiu" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.descarregar.certificacio"/></a></li>
                     <c:if test="${!isRolActualAdministradorLectura}">
+                        <li><a id="anular" href="<c:url value="/notificacio/anular/massiu"/>" data-toggle="modal" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.anular"/></a></li>
                         <li><a id="ampliarPlazoOE" href="<c:url value="/notificacio/ampliacion/plazo/massiu"/>" data-toggle="modal" style="cursor: pointer;"><spring:message code="notificacio.list.accio.massiva.ampliar.plazo.oe"/></a></li>
                     </c:if>
                     <c:if test="${isRolActualAdministradorEntitat}">
@@ -992,6 +996,7 @@
             <%--        <th data-col-name="enviamentId" data-visible="false" style="visibility: hidden">--%>
         <th data-col-name="envCerData" data-visible="false" style="visibility: hidden">
         <th data-col-name="plazoAmpliable" data-visible="false">
+        <th data-col-name="anulable" data-visible="false">
         <th data-col-name="id" data-orderable="false" data-disable-events="true" data-template="#cellAccionsTemplate" width="60px" style="z-index:99999;">
             <script id="cellAccionsTemplate" type="text/x-jsrender">
                 <div class="dropdown">
@@ -999,7 +1004,9 @@
                     <ul class="dropdown-menu dropdown-menu-right">
                         <li><a href="<c:url value="/notificacio/{{:id}}/info"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-info-circle"></span>&nbsp; <spring:message code="comu.boto.detalls"/></a></li>
                         <li><a href="<c:url value="/notificacio/{{:id}}/documentDescarregar/{{:documentId}}"/>" target="_blank" rel=”noopener noreferrer”><span class="fa fa-download"></span>&nbsp; <spring:message code="notificacio.info.document.descarregar"/></a></li>
-                        <li><a href="<c:url value="/notificacio/{{:id}}/anular"/>" data-toggle="modal"><span class="fa fa-ban"></span>&nbsp; <spring:message code="comu.boto.anular"/></a></li>
+                        {{if anulable == true}}
+                            <li><a href="<c:url value="/notificacio/{{:id}}/anular"/>" data-toggle="modal"><span class="fa fa-ban"></span>&nbsp; <spring:message code="comu.boto.anular"/></a></li>
+                        {{/if}}
                         {^{if envCerData != null }}
                             <li><a href="<c:url value="/notificacio/{{:id}}/enviament/certificacionsDescarregar"/>" download><span class="fa fa-download"></span>&nbsp; <spring:message code="enviament.info.notifica.certificacio.num.descarregar"/></a></li>
                         {{/if}}

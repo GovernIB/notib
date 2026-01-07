@@ -933,6 +933,25 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         return "anularForm";
     }
 
+    @GetMapping(value = "/anular/massiu")
+    public String anularMassiu(HttpServletResponse response, HttpServletRequest request, Model model) {
+
+        var seleccio = getIdsSeleccionats(request);
+        var redirect = "redirect:../../..";
+        if (seleccio == null || seleccio.isEmpty()) {
+            return getModalControllerReturnValueError(request,redirect,SELECCIO_BUIDA);
+        }
+        if (seleccio.size() == 1 && seleccio.contains(-1L)) {
+            return getModalControllerReturnValueError(request, redirect,"accio.massiva.creat.ko");
+        }
+        var anulacio = new AnularCommand();
+        anulacio.setMassiu(true);
+        anulacio.setNotificacionsId(new ArrayList<>(seleccio));
+        anulacio.setSeleccioTipus(SeleccioTipus.NOTIFICACIO);
+        model.addAttribute(anulacio);
+        return "anularForm";
+    }
+
     @PostMapping(value = "/anular")
     public String anularPost(HttpServletResponse response, HttpServletRequest request, Model model, AnularCommand command) {
 

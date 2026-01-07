@@ -71,6 +71,10 @@ public class NotEnviamentTableItemDto implements Serializable {
 
 	private boolean isEnviant;
 
+	private boolean anulable;
+	private boolean anulat;
+	private String motiuAnulacio;
+
 	public NotEnviamentTableItemDto() {
 	}
 

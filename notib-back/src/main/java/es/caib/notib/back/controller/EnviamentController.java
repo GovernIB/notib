@@ -11,6 +11,7 @@ import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.back.helper.RolHelper;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
+import es.caib.notib.logic.intf.dto.accioMassiva.SeleccioTipus;
 import es.caib.notib.logic.intf.dto.notenviament.ColumnesDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.logic.intf.service.*;
@@ -53,6 +54,8 @@ public class EnviamentController extends TableAccionsMassivesController {
     private OrganGestorService organGestorService;
 	@Autowired
     private ProcedimentService procedimentService;
+
+	private static final String SELECCIO_BUIDA = "accio.massiva.seleccio.buida";
 
 
     public EnviamentController() {
@@ -191,6 +194,25 @@ public class EnviamentController extends TableAccionsMassivesController {
 		model.addAttribute(new NotificacioFiltreCommand());
 		columnesService.columnesUpdate(entitat.getId(), ColumnesCommand.asDto(columnesCommand));
 		return getModalControllerReturnValueSuccess(request, "redirect:enviament", "enviament.controller.modificat.ok");
+	}
+
+	@GetMapping(value = "/anular/massiu")
+	public String anularMassiu(HttpServletResponse response, HttpServletRequest request, Model model) {
+
+		var seleccio = getIdsSeleccionats(request);
+		var redirect = "redirect:../../..";
+		if (seleccio == null || seleccio.isEmpty()) {
+			return getModalControllerReturnValueError(request, redirect,SELECCIO_BUIDA);
+		}
+		if (seleccio.size() == 1 && seleccio.contains(-1L)) {
+			return getModalControllerReturnValueError(request, redirect,"accio.massiva.creat.ko");
+		}
+		var anulacio = new AnularCommand();
+		anulacio.setMassiu(true);
+		anulacio.setEnviamentsId(new ArrayList<>(seleccio));
+		anulacio.setSeleccioTipus(SeleccioTipus.ENVIAMENT);
+		model.addAttribute(anulacio);
+		return "anularForm";
 	}
 
 	@GetMapping(value = "/ampliacion/plazo/massiu")

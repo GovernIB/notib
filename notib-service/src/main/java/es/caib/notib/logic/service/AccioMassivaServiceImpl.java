@@ -136,7 +136,7 @@ public class AccioMassivaServiceImpl implements AccioMassivaService {
             AccioMassivaElementEntity elem;
             for (var element : accio.getSeleccio()) {
                 elem = AccioMassivaElementEntity.builder().accioMassiva(entity).elementId(element).seleccioTipus(accio.getSeleccioTipus()).build();
-                var elementEntity = accioMassivaElementRepository.saveAndFlush(elem);
+                accioMassivaElementRepository.saveAndFlush(elem);
             }
             return entity.getId();
         } catch (Exception ex) {

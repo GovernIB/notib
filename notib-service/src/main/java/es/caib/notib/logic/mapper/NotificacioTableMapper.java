@@ -73,9 +73,22 @@ public abstract class NotificacioTableMapper {
     @Mapping(target = "createdByCodi", source = "not.createdBy", qualifiedByName = "optionalUserCode")
     @Mapping(target = "permisProcessar", source = "params.permisProcessar")
     @Mapping(target = "organEstat", source = "params.organEstat")
+    @Mapping(target = "anulable", expression = "java(isAnulable(not))")
     public abstract NotificacioTableItemDto toNotificacioTableItemDto(NotificacioTableEntity not, NotificacioTableItemConversioParams params);
 
     public abstract List<NotificacioTableItemDto> toNotificacionsTableItemDto(List<NotificacioTableEntity> nots, @Context List<String> codis, @Context Map<String, OrganismeDto> organs);
+
+    protected boolean isAnulable(NotificacioTableEntity notificacio) {
+
+        for (var enviament : notificacio.getEnviaments()) {
+            if (!(!enviament.isAnulat() && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador()) && !enviament.isNotificaEstatFinal() && !enviament.isCieEstatFinal()
+                    && (enviament.getEntregaPostal() == null || CieEstat.ENVIADO_CI.equals(enviament.getEntregaPostal().getCieEstat())
+                    && enviament.getNotificacio().getOrganGestor().getEntregaCie().getCie().isCieExtern()))) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public NotificacioTableItemDto mapNotificacioTableItemDtoContext(NotificacioTableEntity not, @Context List<String> codis, @Context Map<String, OrganismeDto> organs) {
 

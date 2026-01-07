@@ -485,6 +485,9 @@ $(document).ready(function() {
 								<c:if test="${not empty notificacio.notificaErrorData}">
 									<span class="fa fa-warning text-danger" title="<c:out value='${notificacio.notificaErrorDescripcio}' escapeXml='true'/>"></span>
 								</c:if>
+								<c:if test="${notificacio.anulat}">
+									<span class="fa fa-ban" title="<spring:message code="notificacio.enviament.anulat"/>"></span>
+								</c:if>
 								<c:if test="${notificacio.fiReintents}">
 									<span class="fa fa-warning text-warning" title="<c:out value='${notificacio.fiReintentsDesc}' escapeXml='true'/>"></span>
 								</c:if>

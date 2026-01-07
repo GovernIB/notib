@@ -258,7 +258,7 @@ public class NotificacioEventHelper {
 
     public void addNotificaAnular(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio, boolean errorMaxReintents) {
 
-        addEvent(EventInfo.builder().enviament(enviament).tipus(NotificacioEventTipusEnumDto.NOTIFICA_ENVIO_OE).error(error)
+        addEvent(EventInfo.builder().enviament(enviament).tipus(NotificacioEventTipusEnumDto.NOTIFICA_ANULAR).error(error)
                 .errorDescripcio(errorDescripcio).fiReintents(errorMaxReintents).build());
     }
 
