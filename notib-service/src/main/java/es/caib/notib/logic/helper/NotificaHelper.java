@@ -98,7 +98,7 @@ public class NotificaHelper {
 				respostaAnular.addResposta(respostaAnulacio);
 				continue;
 			}
-			var resposta = getNotificaHelper().anular(identificador);
+			var resposta = getNotificaHelper().anular(identificador, anulacio.getMotiu());
 			respostaAnular.addResposta(resposta);
 			if (resposta.isError()) {
 				continue;

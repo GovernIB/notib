@@ -376,8 +376,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	}
 
 	@Transactional
-	public RespostaAnulacio anular(String identificador) {
-
+	public RespostaAnulacio anular(String identificador, String motiu) {
 
 		var enviament = notificacioEnviamentRepository.findByNotificaReferencia(identificador);
 		try {
@@ -402,7 +401,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			Holder<es.caib.notib.logic.wsdl.notificaV2.common.Opciones> opcionesRespuestaSincronizarOE = new Holder<>();
 
 			getSincronizarEnvioWs(apiKey).sincronizarEnvioOE(organEmisor, id, tipoEntrega, modoNotificacion, estat, dataHolder,
-					null, receptor, null, null, null, codigoRespuesta, descripcionRespuesta, opcionesRespuestaSincronizarOE);
+					motiu, receptor, null, null, null, codigoRespuesta, descripcionRespuesta, opcionesRespuestaSincronizarOE);
 
 			var error = !"200".equals(codigoRespuesta.value);
 			var errorDesc = error ? codigoRespuesta.value + " - " + descripcionRespuesta.value : "";

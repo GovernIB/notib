@@ -10,6 +10,7 @@ import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.comanda.ComandaListener;
 import es.caib.notib.logic.intf.dto.AccioParam;
+import es.caib.notib.logic.intf.dto.AvisDescripcio;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
@@ -389,7 +390,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	}
 
 	@Override
-	public RespostaAnulacio anular(String identificador) {
+	public RespostaAnulacio anular(String identificador, String motiu) {
 
 		var enviament = notificacioEnviamentRepository.findByNotificaReferencia(identificador);
 		try {
