@@ -54,6 +54,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -180,7 +181,7 @@ public class UsuariServiceImpl implements UsuariService {
     }
 
     @Override
-    public PermisosUsuari getPermisosUsuari(EntitatDto entitat, String usuariCodi) {
+    public PermisosUsuari getPermisosUsuari(EntitatDto entitat, String usuariCodi, OrganGestorDto organAdmin) {
 
         try {
             var permisosUsuari = new PermisosUsuari();
@@ -190,8 +191,12 @@ public class UsuariServiceImpl implements UsuariService {
             List<String> organsFillsNom = new ArrayList<>();
             var rols = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
             List<PermisDto> p;
+            var isOrganAdmin = organAdmin != null;
             OrganGestorDto organEntity;
             for (var organ : organsAmbPermis) {
+                if (isOrganAdmin && !organAdmin.getId().equals(Long.valueOf(organ.getCodi()))) {
+                    continue;
+                }
                 var permisos = organGestorService.permisFind(entitat.getId(), Long.valueOf(organ.getCodi()));
                 if (permisos.isEmpty()) {
                     continue;
@@ -215,6 +220,8 @@ public class UsuariServiceImpl implements UsuariService {
                 }
                 organsFills.put(organ.getCodi(), organsFillsNom);
                 permisosOrgans.put(organ.getCodi(), p);
+
+
             }
             var objectMapper = new ObjectMapper();
             String map = "";
@@ -227,12 +234,22 @@ public class UsuariServiceImpl implements UsuariService {
             Map<String, List<CodiValorOrganGestorComuDto>> procSerOrgan = new HashMap<>();
             List<PermisCodivalorOrganGestorComu> procSerOrganList = new ArrayList<>();
             for (var procediment : procedimentsAmbPermis) {
-                var permisos = procedimentService.permisFind(entitat.getId(), false, procediment.getId(), procediment.getOrganGestor(), null, null, null);
+                if (isOrganAdmin && !organAdmin.getCodi().equals(procediment.getOrganGestor())) {
+                    continue;
+                }
+                var permisos = procedimentService.permisFind(entitat.getId(), false, procediment.getId(), procediment.getOrganGestor(), procediment.getOrganGestor(), null, null);
                 if (permisos.isEmpty()) {
                     var organ = organGestorService.findByCodi(entitat.getId(), procediment.getOrganGestor());
                     var permisosOrgan = organGestorService.permisFind(entitat.getId(), organ.getId());
                     if (permisosOrgan.isEmpty()) {
-                        continue;
+                        var organFill = organsAmbPermis.stream().filter(x -> x.getCodi().equals(organ.getId()+"")).collect(Collectors.toList());
+                        if (organFill.isEmpty()) {
+                            continue;
+                        }
+                        var fill = organFill.get(0);
+                        var key = organsFills.keySet().stream().filter(o -> !organsFills.get(o).stream().filter(c -> c.equals(fill.getValor())).collect(Collectors.toList()).isEmpty()).collect(Collectors.toList());
+                        if (!key.isEmpty())
+                            permisosOrgan = permisosOrgans.get(key.get(0));
                     }
                     for (var permisOrgan : permisosOrgan) {
                         if (permisOrgan.getPrincipal().equals(usuariCodi) || rols.contains(permisOrgan.getPrincipal())) {

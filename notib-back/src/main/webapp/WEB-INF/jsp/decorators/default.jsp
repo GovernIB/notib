@@ -410,6 +410,12 @@
 									<a id="ml_enviament" href="<c:url value="/enviament"/>" class="btn btn-primary"><spring:message code="decorator.menu.enviaments"/></a>
 								</div>
 								<div class="btn-group">
+									<button id="m_gestio" data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.gestio"/>&nbsp;<span class="caret caret-white"></span></button>
+									<ul class="dropdown-menu">
+										<li><a id="mg_permisos_usuaris" href="<c:url value="/permisos"/>"><spring:message code="decorator.menu.permisos.usuaris"/></a></li>
+									</ul>
+								</div>
+								<div class="btn-group">
 									<button id="m_conf" data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>
 									<ul class="dropdown-menu">
 										<li><a id="mc_procediments" href="<c:url value="/procediment"/>"><spring:message code="decorator.menu.procediment"/><c:if test="${organsProcNoSincronitzats > 0}"><span class="badge small" title="<spring:message code='procediment.actualitzacio.organs.no.sync'/>" style="background-color: #a94442; float: right;">${organsProcNoSincronitzats}</span></c:if></a></li>
