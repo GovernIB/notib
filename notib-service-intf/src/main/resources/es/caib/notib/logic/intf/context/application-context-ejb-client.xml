@@ -43,4 +43,5 @@
 	<jee:local-slsb id="UsuariService" jndi-name="notib/UsuariServiceBean/local" business-interface="es.caib.notib.logic.intf.service.UsuariService"/>
 	<jee:local-slsb id="AccioMassivaService" jndi-name="notib/AccioMassivaServiceBean/local" business-interface="es.caib.notib.logic.intf.service.AccioMassivaService"/>
 	<jee:local-slsb id="DigitalitzacioService" jndi-name="notib/DigitalitzacioServiceBean/local" business-interface="es.caib.notib.logic.intf.service.DigitalitzacioService"/>
+	<jee:local-slsb id="LogService" jndi-name="notib/LogServiceBean/local" business-interface="es.caib.notib.logic.intf.service.LogService"/>
 </beans>
