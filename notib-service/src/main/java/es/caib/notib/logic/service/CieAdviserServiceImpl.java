@@ -372,7 +372,9 @@ public class CieAdviserServiceImpl implements CieAdviserService {
             }
             updateEntregaPostal(enviament, sincronizarEnvio);
             sincronitzarEnviamentAmbNotifica(enviament, sincronizarEnvio);
-            callbackHelper.updateCallback(enviament, isError, eventErrorDescripcio);
+            if (enviament.isCieEstatFinal()) {
+                callbackHelper.updateCallback(enviament, isError, eventErrorDescripcio);
+            }
             auditHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "NotificaAdviserWsV2Impl.sincronizarEnvio");
             log.info("[ADV] Fi sincronització enviament Adviser [Id: " + (identificador != null ? identificador : "") + "]");
             if (errorSbs) {

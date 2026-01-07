@@ -89,7 +89,7 @@ public class EmailNotificacioSenseNifHelper {
 			}
 			var fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
 			notificacioEventHelper.addEmailEnviamentEvent(enviament, error != null, error, fiReintents) ;
-			callbackHelper.updateCallback(enviament, Strings.isNullOrEmpty(error), error);
+//			callbackHelper.updateCallback(enviament, Strings.isNullOrEmpty(error), error);
 			hasErrors = hasErrors || error != null;
 		}
 		NotificacioEstatEnumDto estatActualitzar = null;

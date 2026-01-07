@@ -97,7 +97,7 @@ public class EnviamentNotificaAction implements Action<EnviamentSmEstat, Enviame
                 notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS);
             }
             notificacioEventHelper.addNotificaEnviamentEvent(notificacio, true, errorDescripcio, fiReintents);
-            callbackHelper.updateCallbacks(notificacio, true, errorDescripcio);
+//            callbackHelper.updateCallbacks(notificacio, true, errorDescripcio);
             notificacioTableHelper.actualitzarRegistre(notificacio);
         } catch (Exception ex) {
             log.error("[SM] Error al modificar enviament després d'una recuperació a EnviamentNotificaAction.", ex);

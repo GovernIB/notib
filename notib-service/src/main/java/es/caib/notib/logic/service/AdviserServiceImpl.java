@@ -246,7 +246,7 @@ public class AdviserServiceImpl implements AdviserService {
         } catch (Exception ex) {
             certificacioAmbError(identificador, enviament, resultadoSincronizarEnvio, resultat, ex);
         }
-        callbackHelper.updateCallback(enviament, resultat.isError(), resultat.getErrorDescripcio());
+//        callbackHelper.updateCallback(enviament, resultat.isError(), resultat.getErrorDescripcio());
         NotibLogger.getInstance().info("Sortint de la certificació...", log, LoggingTipus.ENTREGA_CIE);
     }
 
