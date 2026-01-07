@@ -42,6 +42,7 @@ public class NotificacioFiltreDto implements Serializable {
 	private String referencia;
 	private boolean nomesAmbErrors;
 	private boolean nomesAmbEntregaPostal;
+	private boolean nomesLesMeves;
 	private boolean nomesFiReintents;
 	private boolean deleted;
 
