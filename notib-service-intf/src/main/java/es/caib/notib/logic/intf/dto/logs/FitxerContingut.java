@@ -14,6 +14,6 @@ import lombok.experimental.SuperBuilder;
 public class FitxerContingut extends FitxerInfo {
 
     private byte[] contingut;
-
+    private String mimeType;
 
 }
