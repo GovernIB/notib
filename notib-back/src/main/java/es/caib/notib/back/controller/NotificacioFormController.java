@@ -229,7 +229,11 @@ public class NotificacioFormController extends BaseUserController {
 
         var entitat = getEntitatActualComprovantPermisos(request);
         try {
-            var o = organGestorService.findByCodi(entitat.getId(), organCodi);
+            if ("-".equals(organCodi)) {
+                return null;
+            }
+            var id = Long.parseLong(organCodi);
+            var o = organGestorService.findById(entitat.getId(), id);
             return o == null ? null : o.getOficina();
         } catch (Exception ex) {
             log.error("Error obtinguent la oficina de l'órgan " + organCodi, ex);
@@ -460,9 +464,15 @@ public class NotificacioFormController extends BaseUserController {
 
         var entitatActual = sessionScopedContext.getEntitatActual();
         var procedimentActual = procedimentService.findById(entitatActual.getId(),false, procedimentId);
+        String organCodi = null;
+        try {
+            organCodi = organGestorService.findById(entitatActual.getId(), Long.valueOf(organId)).getCodi();
+        } catch (Exception ex) {
+            log.error("Error obtinguent el codi de l'organ", ex);
+        }
         var enviamentTipus = (EnviamentTipus) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENT_TIPUS);
         var dadesProcediment = new DadesProcediment();
-        dadesProcediment.setOrganCodi(procedimentActual.isComu() ? organId : procedimentActual.getOrganGestor());
+        dadesProcediment.setOrganCodi(procedimentActual.isComu() ? organCodi : procedimentActual.getOrganGestor());
         dadesProcediment.setCaducitat(CaducitatHelper.sumarDiesNaturals(procedimentActual.getCaducitat()));
         dadesProcediment.setCaducitatDiesNaturals(procedimentActual.getCaducitat());
         dadesProcediment.setRetard(procedimentActual.getRetard());
@@ -480,7 +490,7 @@ public class NotificacioFormController extends BaseUserController {
 //        if (!procedimentActual.isComu()) {
 //            return dadesProcediment;
 //        }
-            // Obtenim òrgans seleccionables
+        // Obtenim òrgans seleccionables
         var permis = EnviamentTipus.SIR.equals(enviamentTipus) ? PermisEnum.COMUNICACIO_SIR :
                 EnviamentTipus.COMUNICACIO.equals(enviamentTipus) ? PermisEnum.COMUNICACIO : PermisEnum.NOTIFICACIO;
         var organsDisponibles = permisosService.getOrgansCodisAmbPermisPerProcedimentComu(entitatActual.getId(), getCodiUsuariActual(), permis, procedimentActual);
@@ -496,9 +506,9 @@ public class NotificacioFormController extends BaseUserController {
 //            return dadesProcediment;
 //        }
         // Mirar si organ seleccionat te entrega postal activa.
-        organId = dadesProcediment.getOrganCodi();
-        if (organId != null) {
-            var organ = organGestorService.findByCodi(entitatActual.getId(), organId);
+        var codi = dadesProcediment.getOrganCodi();
+        if (codi != null) {
+            var organ = organGestorService.findByCodi(entitatActual.getId(), codi);
             var cieActiuPerPare = organGestorService.entregaCieActiva(entitatActual, organ.getCodi());
             dadesProcediment.setEntregaCieActiva(organ.isEntregaCieActiva() || cieActiuPerPare);
         }

@@ -1545,7 +1545,7 @@
 			let organ = $("#organGestor").val();
 			$.ajax({
 				type: 'GET',
-				url: "<c:url value="/notificacio/procediment/"/>" + procediment + "/dades" + (organ ? "?organCodi=" + organ : ""),
+				url: "<c:url value="/notificacio/procediment/"/>" + procediment + "/dades" + (organ ? "?organId=" + organ : ""),
 				success: function(data) {
                     if (!data) {
                         return;
