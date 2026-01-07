@@ -82,10 +82,10 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
     private final EntregaPostalRepository entregaPostalRepository;
     private final NotificacioEnviamentRepository enviamentRepository;
     private final OrganGestorRepository organGestorRepository;
+    private final CallbackHelper callbackHelper;
 
     public static final String GRUP = "CIE";
     private static final String ERROR_INESPERAT = "Error inesperat";
-    private final CallbackHelper callbackHelper;
 
     public CiePluginHelper(ConfigHelper configHelper,
                            EntitatRepository entitatRepository,
@@ -465,7 +465,6 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
         }
         return getEntregaCiePare(entitat, o);
     }
-
     private String getApiKey(PagadorCieEntity pagadorCieEntity) {
 
         var encripter = new EncryptionUtil(configHelper.getConfig("es.caib.notib.plugin.cie.encriptor.key"), pagadorCieEntity.getSalt());
