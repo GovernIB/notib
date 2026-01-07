@@ -30,6 +30,10 @@
 			<artifactId>spring-boot-starter-websocket</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>dev.akkinoc.spring.boot</groupId>
 			<artifactId>orika-spring-boot-starter</artifactId>
 			<version>${orika.starter.version}</version>
