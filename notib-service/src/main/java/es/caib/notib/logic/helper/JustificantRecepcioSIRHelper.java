@@ -90,7 +90,7 @@ public class JustificantRecepcioSIRHelper extends JustificantHelper<NotificacioE
 		}
 		var out = new ByteArrayOutputStream();
 		try {
-			var justificant = inicialitzaDocument(out, progres);
+			var justificant = inicialitzaDocument(out, progres, enviament.getNotificacio().getEntitat().getCodi());
 			progres.setProgres(50);
 			progres.addInfo(ProgresDescarregaDto.TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.generant.titol"));
 			crearTitolAndIntroduccio(justificant, conversioTipusHelper.convertir(enviament.getNotificacio(), NotificacioDtoV2.class), progres);
