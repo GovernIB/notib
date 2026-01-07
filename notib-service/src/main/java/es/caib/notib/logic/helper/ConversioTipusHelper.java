@@ -216,12 +216,12 @@ public class ConversioTipusHelper {
 							}
 				}).register();
 
-		mapperFactory.classMap(EnviamentTableEntity.class, NotEnviamentTableItemDto.class).
-				field("notificaReferencia", "codiNotibEnviament").
-				field("notificacio.referencia", "referenciaNotificacio").
-				field("notificacio.id", "notificacioId").
-				field("csv_uuid", "csvUuid").
-				customize(new EnviamentTableItemMapper()).byDefault().register();
+//		mapperFactory.classMap(EnviamentTableEntity.class, NotEnviamentTableItemDto.class).
+//				field("notificaReferencia", "codiNotibEnviament").
+//				field("notificacio.referencia", "referenciaNotificacio").
+//				field("notificacio.id", "notificacioId").
+//				field("csv_uuid", "csvUuid").
+//				customize(new EnviamentTableItemMapper()).byDefault().register();
 
 		mapperFactory.classMap(NotificacioEnviamentEntity.class, NotificacioEnviamentDto.class).
 				customize(new NotificacioEnviamentEntitytoMapper()).byDefault().register();
@@ -663,9 +663,9 @@ public class ConversioTipusHelper {
 			notEnviamentTableItemDto.setEnviadaDate(notificacioTableHelper.getEnviadaDate(enviamentTableEntity.getNotificacio()));
 			notEnviamentTableItemDto.setProcedimentNom(enviamentTableEntity.getNotificacio().getProcediment().getNom());
 			notEnviamentTableItemDto.setOrganNom(enviamentTableEntity.getNotificacio().getOrganGestor().getNom());
-			var enviament = notificacioEnviamentRepository.findById(enviamentTableEntity.getId()).orElseThrow();
-			notEnviamentTableItemDto.setEntregaPostal(enviament.getEntregaPostal() != null);
-			notEnviamentTableItemDto.setAnulable(isAnulable(enviament));
+//			var enviament = notificacioEnviamentRepository.findById(enviamentTableEntity.getId()).orElseThrow();
+//			notEnviamentTableItemDto.setEntregaPostal(enviament.getEntregaPostal() != null);
+//			notEnviamentTableItemDto.setAnulable(isAnulable(enviament));
 			if (enviamentTableEntity.getDestinataris() == null || enviamentTableEntity.getDestinataris().isEmpty()) {
 				return;
 			}
@@ -682,12 +682,6 @@ public class ConversioTipusHelper {
 			}
 			enviamentTableEntity.setDestinataris(destinatarisFormat.toString());
 			notEnviamentTableItemDto.setDestinataris(destinatarisFormat.toString());
-		}
-
-		public boolean isAnulable(NotificacioEnviamentEntity enviament) {
-			return !enviament.isAnulat() && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador()) && !enviament.isNotificaEstatFinal() && !enviament.isCieEstatFinal()
-					&& (enviament.getEntregaPostal() == null || CieEstat.ENVIADO_CI.equals(enviament.getEntregaPostal().getCieEstat())
-					&& enviament.getNotificacio().getOrganGestor().getEntregaCie().getCie().isCieExtern());
 		}
 
 		private String getNomLlinatgeNif(String destinatari) {

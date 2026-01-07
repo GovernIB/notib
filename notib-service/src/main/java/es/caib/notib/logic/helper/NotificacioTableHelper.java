@@ -31,8 +31,6 @@ public class NotificacioTableHelper {
     @Autowired
     private NotificacioTableViewRepository notificacioTableViewRepository;
     @Autowired
-    private NotificacioEventRepository notificacioEventRepository;
-    @Autowired
     private NotificacioMassivaRepository notificacioMassivaRepository;
 
 
@@ -154,6 +152,19 @@ public class NotificacioTableHelper {
         }
     }
 
+    public boolean isAnulable(NotificacioEntity notificacio) {
+
+        for (var enviament : notificacio.getEnviaments()) {
+            if (!enviament.isAnulat() && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador()) && !enviament.isNotificaEstatFinal() && !enviament.isCieEstatFinal()
+                    && (enviament.getEntregaPostal() == null || enviament.getEntregaPostal().getCieEstat() == null
+                    || CieEstat.ENVIADO_CI.equals(enviament.getEntregaPostal().getCieEstat()) || CieEstat.ERROR.equals(enviament.getEntregaPostal().getCieEstat())
+                    && enviament.getNotificacio().getOrganGestor().getEntregaCie().getCie().isCieExtern())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Transactional(propagation = Propagation.MANDATORY)
     public void actualitzarRegistre(NotificacioEntity notificacio) {
 
@@ -174,6 +185,7 @@ public class NotificacioTableHelper {
             tableViewItem.setGrupCodi(notificacio.getGrupCodi());
             tableViewItem.setTipusUsuari(notificacio.getTipusUsuari());
             tableViewItem.setNotificacioMassiva(notificacio.getNotificacioMassivaEntity());
+            tableViewItem.setAnulable(isAnulable(notificacio));
 
             // Camps calcaulats a partir de valors dels enviaments
             var titular = new StringBuilder();
@@ -239,6 +251,12 @@ public class NotificacioTableHelper {
                             :  eventsError.get(0).getErrorDescripcio();
                 tableViewItem.setNotificaErrorDescripcio(desc);
                 tableViewItem.setErrorLastEvent(true);
+                for (var event : eventsError) {
+                    if (event.getFiReintents()) {
+                        tableViewItem.setLastEventFiReintents(true);
+                        break;
+                    }
+                }
             }
 
             tableViewItem.setEnviamentTipus(notificacio.getEnviamentTipus());
