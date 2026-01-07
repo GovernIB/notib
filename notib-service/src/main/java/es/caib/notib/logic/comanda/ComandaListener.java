@@ -10,6 +10,7 @@ import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.ProcSerHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
+import es.caib.notib.logic.intf.dto.AvisDescripcio;
 import es.caib.notib.logic.intf.dto.AvisDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
