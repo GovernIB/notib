@@ -94,8 +94,9 @@
 		.container-custom {
 			width: 96%;
 		}
+		<c:if test="${not isRolActualAdministrador}">
 		<c:choose>
-<%--		<c:when test="${sessionScope['EntitatHelper.entitatActual'].colorFons!=null  && not empty sessionScope['EntitatHelper.entitatActual'].colorFons}">--%>
+		<%--		<c:when test="${sessionScope['EntitatHelper.entitatActual'].colorFons!=null  && not empty sessionScope['EntitatHelper.entitatActual'].colorFons}">--%>
 		<c:when test="${entitatActual.colorFons !=null  && not empty entitatActual.colorFons}">
 		.navbar-app {
 			background-color: ${entitatActual.colorFons} !important;
@@ -148,6 +149,7 @@
 		</c:if>
 		</c:otherwise>
 		</c:choose>
+		</c:if>
 
 		.panel-heading.processarButton {
 			height: 65px;
