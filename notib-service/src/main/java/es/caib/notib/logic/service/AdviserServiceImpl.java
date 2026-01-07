@@ -189,11 +189,13 @@ public class AdviserServiceImpl implements AdviserService {
             SubsistemesHelper.addErrorOperation(CNT);
             return resultadoSincronizarEnvio;
         }
-        var isError = !Strings.isNullOrEmpty(eventErrorDescripcio);
+        var isError = !Strings.isNullOrEmpty(eventErrorDescripcio) || !"000".equals(resultadoSincronizarEnvio.getCodigoRespuesta());
+        var errorDesc = !Strings.isNullOrEmpty(eventErrorDescripcio) ? eventErrorDescripcio :
+                !"000".equals(resultadoSincronizarEnvio.getCodigoRespuesta()) ? resultadoSincronizarEnvio.getDescripcionRespuesta() : "";
         if (tipoEntrega == DATAT || tipoEntrega == DATAT_CERT) {
-            notificacioEventHelper.addAdviserDatatEvent(enviament, isError, eventErrorDescripcio);
+            notificacioEventHelper.addAdviserDatatEvent(enviament, isError, errorDesc);
         }
-        callbackHelper.updateCallback(enviament, isError, eventErrorDescripcio);
+        callbackHelper.updateCallback(enviament, isError, errorDesc);
         auditHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "NotificaAdviserWsV2Impl.sincronizarEnvio");
         log.info("[ADV] Fi sincronització enviament Adviser [Id: " + (identificador != null ? identificador : "") + "]");
         if (errorSbs) {
