@@ -31,8 +31,7 @@
             <not:inputText name="dies" textKey="ampliar.plazo.form.dies" required="true"/>
         </div>
         <div class="col-md-2">
-            <not:inputTextarea name="motiu" textKey="ampliar.plazo.form.motiu" inputMaxLength="250" required="true"/>
-<%--            <not:inputText name="motiu" textKey="ampliar.plazo.form.motiu" inputMaxLength="250" required="true"/>--%>
+            <not:inputTextarea name="motiu" textKey="ampliar.plazo.form.motiu" required="true" inputMaxLength="${motiuSize}"/>
         </div>
         <div id="modal-botons">
             <button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
