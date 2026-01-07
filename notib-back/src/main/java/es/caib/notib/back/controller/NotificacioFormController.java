@@ -464,15 +464,17 @@ public class NotificacioFormController extends BaseUserController {
 
         var entitatActual = sessionScopedContext.getEntitatActual();
         var procedimentActual = procedimentService.findById(entitatActual.getId(),false, procedimentId);
-        String organCodi = null;
-        try {
-            organCodi = organGestorService.findById(entitatActual.getId(), Long.valueOf(organId)).getCodi();
-        } catch (Exception ex) {
-            log.error("Error obtinguent el codi de l'organ", ex);
+        OrganGestorDto organDto = null;
+        if (procedimentActual.isComu()) {
+            try {
+                organDto = organGestorService.findByCodi(entitatActual.getId(), procedimentActual.getOrganGestor());
+            } catch (Exception ex) {
+                log.error("Error obtinguent el codi de l'organ", ex);
+            }
         }
         var enviamentTipus = (EnviamentTipus) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENT_TIPUS);
         var dadesProcediment = new DadesProcediment();
-        dadesProcediment.setOrganCodi(procedimentActual.isComu() ? organCodi : procedimentActual.getOrganGestor());
+        dadesProcediment.setOrganCodi(procedimentActual.isComu() ? organDto != null ? organDto.getId() : null : procedimentActual.getOrganGestorId());
         dadesProcediment.setCaducitat(CaducitatHelper.sumarDiesNaturals(procedimentActual.getCaducitat()));
         dadesProcediment.setCaducitatDiesNaturals(procedimentActual.getCaducitat());
         dadesProcediment.setRetard(procedimentActual.getRetard());
@@ -508,7 +510,7 @@ public class NotificacioFormController extends BaseUserController {
         // Mirar si organ seleccionat te entrega postal activa.
         var codi = dadesProcediment.getOrganCodi();
         if (codi != null) {
-            var organ = organGestorService.findByCodi(entitatActual.getId(), codi);
+            var organ = organGestorService.findById(entitatActual.getId(), Long.valueOf(codi));
             var cieActiuPerPare = organGestorService.entregaCieActiva(entitatActual, organ.getCodi());
             dadesProcediment.setEntregaCieActiva(organ.isEntregaCieActiva() || cieActiuPerPare);
         }
@@ -793,7 +795,7 @@ public class NotificacioFormController extends BaseUserController {
         private String caducitat;
         private Integer caducitatDiesNaturals;
         private Integer retard;
-        private String organCodi;
+        private Long organCodi;
         private List<String> organsDisponibles;
         private boolean agrupable = false;
         private List<GrupDto> grups = new ArrayList<>();
