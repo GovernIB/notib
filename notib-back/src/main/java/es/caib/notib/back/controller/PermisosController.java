@@ -80,12 +80,13 @@ public class PermisosController extends BaseUserController {
     public DatatablesHelper.DatatablesResponse datatable(HttpServletRequest request) {
 
         var notificacions = new PaginaDto<UsuariDto>();
-//        var filtreCommand = getFiltreCommand(request);
+//        var filtreCommand = getFiltreCommand(request, PERMISOS_USUARIS);
 //        if (!filtreCommand.getErrors().isEmpty()) {
 //            return DatatablesHelper.getDatatableResponse(request, notificacions, "id", SESSION_ATTRIBUTE_SELECCIO);
 //        }
 //        var filtre = filtreCommand.asDto();
 //        var isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
+//        var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());
         var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(sessionScopedContext.getRolActual());
 
         try {
@@ -93,13 +94,18 @@ public class PermisosController extends BaseUserController {
 //            if (isUsuariEntitat && filtre != null) {
 //                filtre.setEntitatId(entitatActual.getId());
 //            }
+//            var organGestorCodi = filtre.getOrganGestor();
+//            if (isAdminOrgan && entitatActual != null && Strings.isNullOrEmpty(organGestorCodi)) {
+//                OrganGestorDto organGestorActual = getOrganGestorActual(request);
+//                organGestorCodi = organGestorActual.getCodi();
+//            }
+//            filtre.setDeleted(false);
             var filtre = getFiltreCommand(request).asDto();
             var organGestorCodi = filtre.getOrganGestor();
             if (isAdminOrgan && entitatActual != null && Strings.isNullOrEmpty(organGestorCodi)) {
                 var organGestorActual = getOrganGestorActual(request);
                 organGestorCodi = organGestorActual.getCodi();
             }
-//            filtre.setDeleted(false);
             notificacions = usuariService.findAmbFiltre(filtre, DatatablesHelper.getPaginacioDtoFromRequest(request));
         } catch (SecurityException e) {
             MissatgesHelper.error(request, e.getMessage());
@@ -113,9 +119,8 @@ public class PermisosController extends BaseUserController {
 
         try {
             var entitat = getEntitatActualComprovantPermisos(request);
-            return usuariService.getPermisosUsuari(entitat, usuariCodi);
-//        model.addAttribute("tipusAccions", EnumHelper.getOptionsForEnum(AccioMassivaTipus.class, "es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaTipus."));
-//        model.addAttribute("elementEstats", EnumHelper.getOptionsForEnum(AccioMassivaElementEstat.class, "es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaElementEstat."));
+            var organAdmin = getOrganGestorActual(request);
+            return usuariService.getPermisosUsuari(entitat, usuariCodi, organAdmin);
         } catch (Exception ex) {
             log.error("Error obtinguent els permisos assigants a l'usuari " + usuariCodi);
             return new PermisosUsuari();

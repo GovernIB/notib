@@ -90,7 +90,6 @@ public interface PermisosService {
     @PreAuthorize("isAuthenticated()")
     List<CodiValorOrganGestorComuDto> getProcedimentsAmbPermis(Long entitatId, String usuariCodi);
 
-
     @PreAuthorize("isAuthenticated()")
     List<CodiValorOrganGestorComuDto> getProcedimentsAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis);
 
