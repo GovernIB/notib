@@ -803,7 +803,7 @@ public class PermisosServiceImpl implements PermisosService {
                     .organGestor(procSer.getOrganGestor() != null ? procSer.getOrganGestor().getCodi() : "")
                     .organNom(procSer.getOrganGestor() != null ? procSer.getOrganGestor().getNom() : "")
                     .comu(procSer.isComu())
-                    .actiu(procSer.isActiu()).build());;
+                    .actiu(procSer.isActiu()).build());
         }
         if (!response.isEmpty()) {
             response.sort(Comparator.comparing(CodiValorOrganGestorComuDto::getCodi));

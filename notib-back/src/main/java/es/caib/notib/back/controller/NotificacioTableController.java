@@ -326,20 +326,20 @@ public class NotificacioTableController extends TableAccionsMassivesController {
      */
     @GetMapping(value = "/procedimentsOrgan/{organGestor}")
     @ResponseBody
-    public List<CodiValorOrganGestorComuDto> getProcedimentByOrganGestor(HttpServletRequest request, @PathVariable Long organGestor, Model model) {
+    public List<CodiValorOrganGestorComuDto> getProcediments(HttpServletRequest request, Model model) {
 
         var entitatId = sessionScopedContext.getEntitatActualId();
         String organCodi = null;
         var permis = PermisEnum.CONSULTA;
-        var organActual = getOrganGestorActual(request);
-        if (organActual != null) {
-            organCodi = organActual.getCodi();
+        var organGestor = getOrganGestorActual(request);
+        if (organGestor != null) {
+            organCodi = organGestor.getCodi();
         }
         var rol = RolEnumDto.valueOf(sessionScopedContext.getRolActual());
-        var organ = organGestorService.findById(entitatId, organGestor);
-        var procediments = procedimentService.getProcedimentsOrgan(entitatId, organ.getCodi(), organGestor, rol, permis);
+        var procediments = procedimentService.getProcedimentsOrgan(entitatId, organCodi, null, rol, permis);
         return procediments.stream().filter(p -> p.isActiu()).collect(Collectors.toList());
     }
+
 
     @GetMapping(value = "/serveisOrgan/{organGestor}")
     @ResponseBody
