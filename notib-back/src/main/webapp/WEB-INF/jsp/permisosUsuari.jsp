@@ -301,10 +301,6 @@
                 mostraElementsAccio(td, rowData)
             });
 
-            $("#filtrar").click(() => {
-                deselecciona()
-            });
-
             $('#btn-netejar-filtre').click(function () {
                 $(':input', $('#form-filtre')).each(function () {
                     let type = this.type, tag = this.tagName.toLowerCase();
