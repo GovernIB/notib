@@ -802,6 +802,7 @@ public class PermisosServiceImpl implements PermisosService {
                     .valor(procSer.getCodi() + ((procSer.getNom() != null && !procSer.getNom().isEmpty()) ? " - " + procSer.getNom() : ""))
                     .organGestor(procSer.getOrganGestor() != null ? procSer.getOrganGestor().getCodi() : "")
                     .organNom(procSer.getOrganGestor() != null ? procSer.getOrganGestor().getNom() : "")
+                    .organId(procSer.getOrganGestor() != null ? procSer.getOrganGestor().getId() + "" : "")
                     .comu(procSer.isComu())
                     .actiu(procSer.isActiu()).build());
         }
