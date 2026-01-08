@@ -328,14 +328,12 @@ export const Form: React.FC<FormProps> = (props) => {
                     }));
                 setApiFieldErrors(fieldErrors);
                 onValidationErrorsChange?.(getId(), fieldErrors);
-                reject?.();
             } else {
                 temporalMessageShow(
                     temporalMessageTitle ?? '',
                     error.description ?? error.message,
                     'error'
                 );
-                reject?.(error);
             }
         } else {
             temporalMessageShow(
@@ -343,8 +341,8 @@ export const Form: React.FC<FormProps> = (props) => {
                 error.description ?? error.message,
                 'error'
             );
-            reject?.(error);
         }
+        reject?.(error);
     };
     const reset = (data: any) => {
         dataDispatchAction({

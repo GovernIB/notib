@@ -52,6 +52,7 @@ export const FormIsolatedField: React.FC<FormIsolatedFieldProps> = (props) => {
             ),
         validate: () => new Promise<void>((resolve) => resolve()),
         delete: () => null,
+        focus: (_name?: string) => null,
         setFieldValue: (_name: string, _value: any) => null,
         handleSubmissionErrors: (
             _error: ResourceApiError,

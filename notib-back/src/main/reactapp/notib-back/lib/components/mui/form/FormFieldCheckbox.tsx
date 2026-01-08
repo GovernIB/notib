@@ -27,7 +27,12 @@ export const FormFieldCheckbox: React.FC<FormFieldCheckboxProps> = (props) => {
         typeSwitch,
         componentProps,
     } = props;
-    const { helperText, title } = useFormFieldCommon(field, fieldError, inline, componentProps);
+    const { helperText, title, startAdornment } = useFormFieldCommon(
+        field,
+        fieldError,
+        inline,
+        componentProps
+    );
     const control = typeSwitch ? (
         <Switch
             checked={value ? true : false}
@@ -58,7 +63,13 @@ export const FormFieldCheckbox: React.FC<FormFieldCheckboxProps> = (props) => {
             <FormControlLabel
                 name={name}
                 required={required}
-                label={!inline ? label : undefined}
+                label={
+                    !inline ? (
+                        label
+                    ) : (
+                        <div style={{ position: 'relative', top: '4px' }}>{startAdornment}</div>
+                    )
+                }
                 slotProps={{
                     typography: {
                         color: fieldError != null ? 'error' : undefined,

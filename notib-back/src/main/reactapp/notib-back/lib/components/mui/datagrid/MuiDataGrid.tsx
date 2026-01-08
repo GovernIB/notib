@@ -443,7 +443,7 @@ const useGridColumns = (
                 exportable: field != null,
                 editable: rowInlineEditActive,
                 renderEditCell: (params) => {
-                    return <FormField name={params.field} label="" />;
+                    return <FormField name={params.field} label="" inline />;
                 },
                 ...c,
             };
@@ -926,10 +926,17 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         processRowUpdate: () => {
             return formApiRef.current?.save();
         },
-        onProcessRowUpdateError: (err: any) => {
-            // TODO posar el focus sobre el primer camp amb errors
-            console.log('>>> onProcessRowUpdateError', err)
-        }
+        onProcessRowUpdateError: (error: any) => {
+            if (!error.modificationCanceledError && error.status === 422) {
+                const errors = error.errors ?? error.validationErrors;
+                const fieldErrors = errors
+                    ?.filter((e: any) => e.field != null)
+                    .map((e: any) => e.field);
+                if (fieldErrors?.length) {
+                    setTimeout(() => formApiRef.current.focus(fieldErrors[0]));
+                }
+            }
+        },
     } : null;
     const stripedProps: any = striped
         ? {
@@ -1023,6 +1030,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                     {inlineEditable ? <Form
                         resourceName={resourceName}
                         apiRef={formApiRef}
+                        additionalData={formAdditionalData}
                         commonFieldComponentProps={{ size: 'small' }}>
                         {content}
                     </Form> : content}
