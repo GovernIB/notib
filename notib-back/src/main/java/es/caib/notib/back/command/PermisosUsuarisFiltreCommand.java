@@ -1,5 +1,6 @@
 package es.caib.notib.back.command;
 
+import es.caib.notib.logic.intf.dto.permis.PermisosUsuarisFiltre;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
