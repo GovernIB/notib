@@ -32,6 +32,8 @@ public interface ConfigService {
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	List<ConfigGroupDto> findAll();
 
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	List<ConfigGroupDto> findByFiltre(String filtre);
 
 	/**
 	 * Procediment que actualitza totes les propietats de configuració per a configurar-les amb

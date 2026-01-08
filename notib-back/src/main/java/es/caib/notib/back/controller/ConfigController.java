@@ -1,6 +1,9 @@
 package es.caib.notib.back.controller;
 
+import com.google.common.base.Strings;
 import es.caib.notib.back.command.ConfigCommand;
+import es.caib.notib.back.command.PropietatsConfigurablesCommand;
+import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.back.helper.RolHelper;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.config.ConfigDto;
@@ -39,6 +42,8 @@ public class ConfigController extends BaseUserController{
     @Autowired
     private EntitatService entitatService;
 
+    private static final String PROPIETATS_CONFIGURABLES_FILTRE = "propietats_configurables_filtre";
+
 
     @GetMapping
     public String get(HttpServletRequest request, Model model) {
@@ -49,11 +54,37 @@ public class ConfigController extends BaseUserController{
         }
         var configGroups = configService.findAll();
         var pluginGroup = configGroups.stream().filter(x -> "PLUGINS".equals(x.getKey())).collect(Collectors.toList());
-        var pluginGroups = pluginGroup.get(0).getInnerConfigs();
-        configGroups.addAll(pluginGroups);
+        if (!pluginGroup.isEmpty()) {
+            var pluginGroups = pluginGroup.get(0).getInnerConfigs();
+            configGroups.addAll(pluginGroups);
+        }
+        model.addAttribute(getFiltreCommand(request));
         model.addAttribute("config_groups", configGroups);
         for (var cGroup: configGroups) {
-            fillFormsModel(cGroup, model, entitats);
+            fillFormsModel(cGroup, model, entitats, false);
+        }
+        return "config";
+    }
+
+    @PostMapping
+    public String post(HttpServletRequest request, PropietatsConfigurablesCommand command, Model model ) {
+
+        List<EntitatDto> entitats = new ArrayList<>();
+        if (RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual())) {
+            entitats = entitatService.findAll();
+        }
+        var configGroups = configService.findByFiltre(command.getPropietat());
+        var pluginGroup = configGroups.stream().filter(x -> "PLUGINS".equals(x.getKey())).collect(Collectors.toList());
+        if (!pluginGroup.isEmpty()) {
+            var pluginGroups = pluginGroup.get(0).getInnerConfigs();
+            configGroups.addAll(pluginGroups);
+        }
+        RequestSessionHelper.actualitzarObjecteSessio(request, PROPIETATS_CONFIGURABLES_FILTRE, command);
+        model.addAttribute( command);
+        model.addAttribute(getFiltreCommand(request));
+        model.addAttribute("config_groups", configGroups);
+        for (var cGroup: configGroups) {
+            fillFormsModel(cGroup, model, entitats, !Strings.isNullOrEmpty(command.getPropietat()));
         }
         return "config";
     }
