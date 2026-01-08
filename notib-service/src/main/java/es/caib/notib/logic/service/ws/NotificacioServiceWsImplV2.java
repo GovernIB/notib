@@ -291,12 +291,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			var enviamentTipus = getEnviamentTipus(notificacio);
 			var comunicacioSir = EnviamentTipus.SIR.equals(enviamentTipus);
 			// Documents
-			document = documentHelper.getDocument(notificacio.getDocument());
+			document = documentHelper.getDocument(notificacio.getDocument(), true);
 			if (comunicacioSir) {
-				document2 = documentHelper.getDocument(notificacio.getDocument2());
-				document3 = documentHelper.getDocument(notificacio.getDocument3());
-				document4 = documentHelper.getDocument(notificacio.getDocument4());
-				document5 = documentHelper.getDocument(notificacio.getDocument5());
+				document2 = documentHelper.getDocument(notificacio.getDocument2(), true);
+				document3 = documentHelper.getDocument(notificacio.getDocument3(), true);
+				document4 = documentHelper.getDocument(notificacio.getDocument4(), true);
+				document5 = documentHelper.getDocument(notificacio.getDocument5(), true);
 			}
 
 			// Calcular la data de caducitat. Depenent de procediment (Procediment NO obligatori per a comunicacions a administracions)
