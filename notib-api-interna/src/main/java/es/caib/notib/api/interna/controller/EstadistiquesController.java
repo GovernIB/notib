@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
-@RequestMapping("/consulta/v3")
+//@RequestMapping("/consulta/v3")
 public class EstadistiquesController {
 
     private final EstadisticaService estadisticaService;
