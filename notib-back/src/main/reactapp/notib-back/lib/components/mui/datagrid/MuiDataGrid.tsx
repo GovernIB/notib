@@ -11,14 +11,15 @@ import {
     GridPaginationModel,
     GridRowSelectionModel,
     GridSlots,
-    GridRowModes,
-    GridRowModesModel,
     GridApiPro,
     GridEventListener,
     GridCallbackDetails,
     GridInitialState,
     MuiEvent,
     useGridApiRef as useMuiDatagridApiRef,
+    useGridApiContext,
+    useGridSelector,
+    gridEditRowsStateSelector,
 } from '@mui/x-data-grid-pro';
 import Box from '@mui/material/Box';
 import { capitalize } from '../../../util/text';
@@ -29,8 +30,9 @@ import {
     ReactElementWithPosition,
     joinReactElementsWithPositionWithReactElementsWithPositions,
 } from '../../../util/reactNodePosition';
-import { FormI18nKeys } from '../../form/Form';
-import { DialogButton } from '../../BaseAppContext';
+import { Form, FormI18nKeys, useFormApiRef } from '../../form/Form';
+import { FormField } from '../../form/FormField';
+import { useBaseAppContext, DialogButton } from '../../BaseAppContext';
 import { useMuiBaseAppContext } from '../MuiBaseAppContext';
 import { useResourceApiService } from '../../ResourceApiProvider';
 import { useResourceApiContext, ResourceType, ExportFileType } from '../../ResourceApiContext';
@@ -39,8 +41,8 @@ import {
     useApiDataCommon,
     useDataCommonEditable,
     DataCommonAdditionalAction,
-    DataCommonShowCreateDialogFn,
-    DataCommonShowUpdateDialogFn,
+    DataCommonTriggerCreateFn,
+    DataCommonTriggerUpdateFn,
     DataCommonTriggerDeleteFn,
 } from '../datacommon/MuiDataCommon';
 import { useDataToolbar, DataToolbarType } from '../datacommon/DataToolbar';
@@ -56,6 +58,7 @@ import DataGridContext, {
 } from './DataGridContext';
 
 export const LOG_PREFIX = 'GRID';
+const CREATE_ROW_ID = '###_CREATE_ID_###';
 
 /**
  * Propietats de les columnes del component MuiDataGrid (també conté totes les propietats de les columnes del DataGrid de MUI).
@@ -189,6 +192,12 @@ export type MuiDataGridProps = {
     rowAdditionalActions?: DataCommonAdditionalAction[];
     /** Model amb les files seleccionades */
     rowSelectionModel?: GridRowSelectionModel;
+    /** Indica que la creació i modificació en la mateixa fila està activa */
+    inlineEditActive?: boolean;
+    /** Indica que només la creació en la mateixa fila està activa */
+    inlineEditCreateActive?: boolean;
+    /** Indica que només la modificació en la mateixa fila està activa */
+    inlineEditUpdateActive?: boolean;
     /** Indica que la creació i modificació amb finestra emergent està activa */
     popupEditActive?: boolean;
     /** Indica que només la creació amb finestra emergent està activa */
@@ -289,14 +298,14 @@ const rowArtifactShowCheck = (
 };
 const getRowActionOnClick = (
     rowAction: DataCommonAdditionalAction,
-    showCreateDialog: DataCommonShowCreateDialogFn,
-    showUpdateDialog: DataCommonShowUpdateDialogFn,
+    triggerCreate: DataCommonTriggerCreateFn,
+    triggerUpdate: DataCommonTriggerUpdateFn,
     triggerDelete: DataCommonTriggerDeleteFn
 ): DataGridActionItemOnClickFn | undefined => {
     if (rowAction.clickShowCreateDialog) {
-        return (_id, row) => showCreateDialog(row);
+        return (_id, row) => triggerCreate(row);
     } else if (rowAction.clickShowUpdateDialog) {
-        return (id, row) => showUpdateDialog(id, row);
+        return (id, row) => triggerUpdate(id, row);
     } else if (rowAction.clickTriggerDelete) {
         return (id) => triggerDelete(id);
     } else {
@@ -307,8 +316,8 @@ const getRowActionOnClick = (
 const rowActionsToGridActionsCellItems = (
     rowActions: DataCommonAdditionalAction[],
     params: GridRowParams,
-    showCreateDialog: DataCommonShowCreateDialogFn,
-    showUpdateDialog: DataCommonShowUpdateDialogFn,
+    triggerCreate: DataCommonTriggerCreateFn,
+    triggerUpdate: DataCommonTriggerUpdateFn,
     triggerDelete: DataCommonTriggerDeleteFn,
     artifacts: any[] | undefined,
     forceDisabled?: boolean
@@ -332,8 +341,8 @@ const rowActionsToGridActionsCellItems = (
                 : rowAction.linkTarget;
         const rowActionOnClick = getRowActionOnClick(
             rowAction,
-            showCreateDialog,
-            showUpdateDialog,
+            triggerCreate,
+            triggerUpdate,
             triggerDelete
         );
         const label =
@@ -382,14 +391,15 @@ const useGridColumns = (
     rowActionsColumnIndex: number | undefined,
     rowActionsColumnProps: any,
     rowActions: DataCommonAdditionalAction[],
-    rowEditActions: DataCommonAdditionalAction[],
+    rowInlineEditActive: boolean,
     fields: any[] | undefined,
-    showCreateDialog: DataCommonShowCreateDialogFn,
-    showUpdateDialog: DataCommonShowUpdateDialogFn,
+    triggerCreate: DataCommonTriggerCreateFn,
+    triggerUpdate: DataCommonTriggerUpdateFn,
     triggerDelete: DataCommonTriggerDeleteFn,
-    artifacts: any[] | undefined,
-    rowModesModel?: GridRowModesModel
+    inlineStopRowEditMode: (id: any, ignoreModifications?: boolean) => void,
+    artifacts: any[] | undefined
 ) => {
+    const { t } = useBaseAppContext();
     const { currentLanguage } = useResourceApiContext();
     const processedColumns = React.useMemo(() => {
         const processedColumns: MuiDataGridColDef[] = columns.map((c) => {
@@ -431,6 +441,10 @@ const useGridColumns = (
                 align: isNumericType ? 'right' : undefined,
                 display: 'flex',
                 exportable: field != null,
+                editable: rowInlineEditActive,
+                renderEditCell: (params) => {
+                    return <FormField name={params.field} label="" />;
+                },
                 ...c,
             };
         });
@@ -439,21 +453,30 @@ const useGridColumns = (
                 field: ' ',
                 type: 'actions',
                 getActions: (params: GridRowParams) => {
-                    const anyRowInEditMode =
-                        rowModesModel &&
-                        Object.keys(rowModesModel).filter(
-                            (m) => rowModesModel[m].mode === GridRowModes.Edit
-                        ).length > 0;
-                    const isEditMode =
-                        rowModesModel && rowModesModel[params.id]?.mode === GridRowModes.Edit;
+                    const apiRef = useGridApiContext();
+                    const rowModesModel = useGridSelector(apiRef, gridEditRowsStateSelector);
+                    const anyRowInEditMode = Object.keys(rowModesModel).length > 0;
+                    const currentRowInEditMode = typeof rowModesModel[params.id] !== 'undefined';
+                    const rowEditActions = [
+                        {
+                            label: t('grid.edit.save'),
+                            icon: 'save',
+                            onClick: () => inlineStopRowEditMode(params.id),
+                        },
+                        {
+                            label: t('grid.edit.cancel'),
+                            icon: 'clear',
+                            onClick: () => inlineStopRowEditMode(params.id, true),
+                        },
+                    ];
                     return rowActionsToGridActionsCellItems(
-                        isEditMode ? rowEditActions : rowActions,
+                        currentRowInEditMode ? rowEditActions : rowActions,
                         params,
-                        showCreateDialog,
-                        showUpdateDialog,
+                        triggerCreate,
+                        triggerUpdate,
                         triggerDelete,
                         artifacts,
-                        anyRowInEditMode && !isEditMode
+                        anyRowInEditMode && !currentRowInEditMode
                     );
                 },
                 ...rowActionsColumnProps,
@@ -465,7 +488,7 @@ const useGridColumns = (
             );
         }
         return processedColumns;
-    }, [columns, fields, rowModesModel, artifacts]);
+    }, [columns, fields, artifacts]);
     return processedColumns;
 };
 
@@ -548,6 +571,9 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         rowActionsColumnProps,
         rowAdditionalActions = [],
         rowSelectionModel: rowSelectionModelProp = DEFAULT_ROW_SELECTION,
+        inlineEditActive,
+        inlineEditCreateActive,
+        inlineEditUpdateActive,
         popupEditActive,
         popupEditCreateActive,
         popupEditUpdateActive,
@@ -576,6 +602,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     const logConsole = useLogConsole(LOG_PREFIX);
     const datagridApiRefInternal = useMuiDatagridApiRef();
     const datagridApiRef = datagridApiRefProp ?? datagridApiRefInternal;
+    const formApiRef = useFormApiRef();
     const anyArtifactRowAction =
         rowAdditionalActions?.find((a) => a.action != null || a.report != null) != null;
     const treeDataAdditionalRowsIsFunction = treeDataAdditionalRows
@@ -687,18 +714,61 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
             }
         }
     }, [state, stateIsReady]);
+    const inlineCreate = () => {
+        const sortedRowIds = datagridApiRef.current?.getSortedRowIds();
+        const page = datagridApiRef.current?.state.pagination.paginationModel.page ?? 0;
+        const pageSize = datagridApiRef.current?.state.pagination.paginationModel.pageSize ?? 0;
+        const start = page * pageSize;
+        const end = start + pageSize;
+        const numRowsInPage = sortedRowIds?.slice(start, end).length;
+        if (sortedRowIds != null && numRowsInPage === pageSize) {
+            const lastRowId = sortedRowIds[end - 1];
+            const lastRowData = datagridApiRef.current?.getRow(lastRowId);
+            datagridApiRef.current?.updateRows([{ id: lastRowId, _action: 'delete' }]);
+            datagridApiRef.current?.updateRows([
+                { id: CREATE_ROW_ID, _previousRowData: lastRowData, isNew: true },
+            ]);
+        } else {
+            datagridApiRef.current?.updateRows([{ id: CREATE_ROW_ID, isNew: true }]);
+        }
+        formApiRef.current.reset();
+        datagridApiRef.current?.startRowEditMode({ id: CREATE_ROW_ID });
+        setTimeout(() => formApiRef.current.focus());
+    }
+    const inlineUpdate = (id: any, row?: any) => {
+        formApiRef.current.reset(row, id);
+        datagridApiRef.current?.startRowEditMode({ id });
+        setTimeout(() => formApiRef.current.focus());
+    }
+    const inlineStopRowEditMode = (id: any, ignoreModifications?: boolean) => {
+        if (ignoreModifications) {
+            datagridApiRef.current?.stopRowEditMode({ id, ignoreModifications });
+            if (id === CREATE_ROW_ID) {
+                const rowData = datagridApiRef.current?.getRow(id);
+                const previousRowData = rowData?._previousRowData;
+                datagridApiRef.current?.updateRows([{ id, _action: 'delete' }]);
+                if (previousRowData != null) {
+                    datagridApiRef.current?.updateRows([previousRowData]);
+                }
+            }
+        } else {
+            datagridApiRef.current?.stopRowEditMode({ id });
+        }
+    }
     const {
         toolbarAddElement,
         rowEditActions,
         formDialogComponent,
-        showCreateDialog,
-        showUpdateDialog,
+        triggerCreate,
+        triggerUpdate,
         triggerDelete,
     } = useDataCommonEditable(
         resourceName,
         readOnly ?? false,
         formAdditionalData,
         toolbarCreateLink,
+        (inlineEditActive || inlineEditCreateActive) ? inlineCreate : undefined,
+        (inlineEditActive || inlineEditUpdateActive) ? inlineUpdate : undefined,
         rowDetailLink,
         rowUpdateLink,
         rowDisableUpdateButton,
@@ -707,6 +777,9 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         rowHideUpdateButton,
         rowHideDeleteButton,
         rowHideDetailsButton,
+        inlineEditActive,
+        inlineEditCreateActive,
+        inlineEditUpdateActive,
         popupEditActive,
         popupEditCreateActive,
         popupEditUpdateActive,
@@ -769,27 +842,27 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         rowActionsColumnIndex,
         rowActionsColumnProps,
         [...rowAdditionalActions, ...rowEditActions],
-        rowEditActions,
+        (inlineEditActive ?? false) || (inlineEditUpdateActive ?? false),
         fields,
-        showCreateDialog,
-        showUpdateDialog,
+        triggerCreate,
+        triggerUpdate,
         triggerDelete,
+        inlineStopRowEditMode,
         artifacts,
-        otherProps.rowModesModel
     );
     const apiRef = React.useRef<MuiDataGridApi>({
         refresh,
         export: gridExport,
-        showCreateDialog,
-        showUpdateDialog,
+        triggerCreate,
+        triggerUpdate,
         setFilter: (filter) => setInternalFilter(filter ?? undefined),
     });
     if (apiRefProp) {
         if (apiRefProp.current) {
             apiRefProp.current.refresh = refresh;
             apiRefProp.current.export = gridExport;
-            apiRefProp.current.showCreateDialog = showCreateDialog;
-            apiRefProp.current.showUpdateDialog = showUpdateDialog;
+            apiRefProp.current.triggerCreate = triggerCreate;
+            apiRefProp.current.triggerUpdate = triggerUpdate;
             apiRefProp.current.setFilter = (filter) => setInternalFilter(filter ?? undefined);
         } else {
             logConsole.warn('apiRef prop must be initialized with an empty object');
@@ -797,6 +870,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     }
     const filteringProps: any = {
         filterMode: 'server',
+        disableColumnFilter: true,
         onFilterModelChange: setFilterModel,
     };
     const sortingProps: any = {
@@ -832,6 +906,31 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         : {
               disableRowSelectionOnClick: true,
           };
+    const inlineEditingProps: any = inlineEditActive || inlineEditCreateActive ? {
+        editMode: 'row',
+        onRowEditStart: (params: any) => {
+            formApiRef.current.reset(params.row, params.id);
+            setTimeout(() => formApiRef.current.focus(params.field));
+        },
+        onRowEditStop: (params: any) => {
+            if (params.id === CREATE_ROW_ID) {
+                const previousRowData = params.row._previousRowData;
+                datagridApiRef.current?.updateRows([
+                    { id: CREATE_ROW_ID, _action: 'delete' },
+                ]);
+                if (previousRowData != null) {
+                    datagridApiRef.current?.updateRows([previousRowData]);
+                }
+            }
+        },
+        processRowUpdate: () => {
+            return formApiRef.current?.save();
+        },
+        onProcessRowUpdateError: (err: any) => {
+            // TODO posar el focus sobre el primer camp amb errors
+            console.log('>>> onProcessRowUpdateError', err)
+        }
+    } : null;
     const stripedProps: any = striped
         ? {
               getRowClassName: (params: GridRowClassNameParams) =>
@@ -855,11 +954,11 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                 onRowOrderChange={onRowOrderChange}
                 initialState={persistentState && initialState ? initialState : undefined}
                 apiRef={datagridApiRef}
-                disableColumnFilter
                 {...filteringProps}
                 {...sortingProps}
                 {...paginationProps}
                 {...selectionProps}
+                {...inlineEditingProps}
                 {...stripedProps}
                 slots={{
                     row: DataGridRow as GridSlots['row'],
@@ -908,6 +1007,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         selection: rowSelectionModel,
         apiRef,
     };
+    const inlineEditable = inlineEditActive || inlineEditCreateActive || inlineEditUpdateActive;
     return (
         <DataGridContext.Provider value={context}>
             {autoHeight ? (
@@ -920,7 +1020,12 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                         height: height ? height : '100%',
                         ...virtualScrollerStyles,
                     }}>
-                    {content}
+                    {inlineEditable ? <Form
+                        resourceName={resourceName}
+                        apiRef={formApiRef}
+                        commonFieldComponentProps={{ size: 'small' }}>
+                        {content}
+                    </Form> : content}
                 </Box>
             )}
         </DataGridContext.Provider>

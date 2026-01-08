@@ -54,6 +54,10 @@ const componentsCa = {
             one: '1 fila seleccionada',
             multiple: '{{count}} files seleccionades',
         },
+        edit: {
+            save: 'Desar',
+            cancel: 'Cancel·lar'
+        },
         pageInfo: '{{from}} a {{to}} de {{count}}',
         sizeAuto: 'Automàtic',
         requestPending: 'Pendent de consultar',

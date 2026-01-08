@@ -183,6 +183,7 @@ export const Form: React.FC<FormProps> = (props) => {
         t,
     } = useBaseAppContext();
     const locationPath = useLocationPath();
+    const divRef = React.useRef<HTMLDivElement>(null);
     const {
         isReady: apiIsReady,
         currentFields: apiCurrentFields,
@@ -307,9 +308,8 @@ export const Form: React.FC<FormProps> = (props) => {
     const handleSubmissionErrors = (
         error: ResourceApiError,
         temporalMessageTitle?: string,
-        reject?: (reason: any) => void
+        reject?: (reason?: any) => void
     ) => {
-        // S'ignoren els errors de tipus cancel·lació
         if (!error.modificationCanceledError) {
             // Quan es produeixen errors es fa un reject de la promesa.
             // Si els errors els tracta el mateix component Form aleshores la
@@ -328,6 +328,7 @@ export const Form: React.FC<FormProps> = (props) => {
                     }));
                 setApiFieldErrors(fieldErrors);
                 onValidationErrorsChange?.(getId(), fieldErrors);
+                reject?.();
             } else {
                 temporalMessageShow(
                     temporalMessageTitle ?? '',
@@ -336,6 +337,13 @@ export const Form: React.FC<FormProps> = (props) => {
                 );
                 reject?.(error);
             }
+        } else {
+            temporalMessageShow(
+                temporalMessageTitle ?? '',
+                error.description ?? error.message,
+                'error'
+            );
+            reject?.(error);
         }
     };
     const reset = (data: any) => {
@@ -547,6 +555,12 @@ export const Form: React.FC<FormProps> = (props) => {
             }
         });
     };
+    const focus = (name?: string) => {
+        const input = divRef.current?.querySelector<HTMLInputElement>('input' + (name != null ? '[name="' + name + '"]' : ''));
+        if (input) {
+            input.focus();
+        }
+    };
     const setFieldValue = (name: string, value: any) => {
         const field = fields?.find((f) => f.name === name);
         dataDispatchAction({
@@ -626,6 +640,7 @@ export const Form: React.FC<FormProps> = (props) => {
         validate,
         save,
         delete: delette,
+        focus,
         setFieldValue,
         handleSubmissionErrors,
     };
@@ -639,6 +654,7 @@ export const Form: React.FC<FormProps> = (props) => {
             apiRefProp.current.validate = validate;
             apiRefProp.current.save = save;
             apiRefProp.current.delete = delette;
+            apiRefProp.current.focus = focus;
             apiRefProp.current.setFieldValue = setFieldValue;
             apiRefProp.current.handleSubmissionErrors = handleSubmissionErrors;
         } else {
@@ -693,7 +709,7 @@ export const Form: React.FC<FormProps> = (props) => {
         : {};
     return (
         <ResourceApiFormContext.Provider value={context}>
-            <div style={divStyle} onKeyDown={handleFormEnterKeyPressed}>
+            <div style={divStyle} onKeyDown={handleFormEnterKeyPressed} ref={divRef}>
                 {isReady ? children : null}
             </div>
         </ResourceApiFormContext.Provider>
