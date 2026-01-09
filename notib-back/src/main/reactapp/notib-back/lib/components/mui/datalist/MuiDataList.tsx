@@ -258,6 +258,7 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         readOnly ?? false,
         formAdditionalData,
         toolbarCreateLink,
+        false,
         undefined,
         undefined,
         rowDetailLink,
