@@ -291,7 +291,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 					}
 				}
                 var estat = getEstatNotifica(datatDarrer.getResultado());
-                if (!datatData.equals(dataUltimDatat) || !estat.equals(enviament.getNotificaEstat())) {
+                if (datatData != null && !datatData.equals(dataUltimDatat) || estat != null && !estat.equals(enviament.getNotificaEstat())) {
                     enviament.setNotificaEstat(estat);
                     enviament.setNotificaEstatData(datatData);
 //                    comandaListener.enviarTasca(enviament);
@@ -434,8 +434,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 					+ (enviament.getTitular().getLlinatge1() != null ? " " + enviament.getTitular().getLlinatge1() : "")
 					+ (enviament.getTitular().getLlinatge2() != null ? " " + enviament.getTitular().getLlinatge2() : ""));
 			datat.setOrigen("electronico");
-//			datat.setResultado("expirada");
-			datat.setResultado("pendent");
+			datat.setResultado("expirada");
 			datats.getDatado().add(datat);
 			resultat.setDatados(datats);
 			var certificacio = new Certificacion();
