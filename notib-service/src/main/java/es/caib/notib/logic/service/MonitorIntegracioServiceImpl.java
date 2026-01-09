@@ -4,10 +4,8 @@
 package es.caib.notib.logic.service;
 
 import com.google.common.base.Strings;
-import com.sun.jersey.api.client.ClientResponse;
 import es.caib.notib.logic.comanda.ComandaListener;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
-import es.caib.notib.logic.helper.EmailNotificacioHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
@@ -31,7 +29,7 @@ import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.plugin.cie.CiePluginHelper;
-import es.caib.notib.logic.utils.DatesUtils;
+import es.caib.notib.logic.intf.util.DatesUtils;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.filtres.FiltreMonitorIntegracio;

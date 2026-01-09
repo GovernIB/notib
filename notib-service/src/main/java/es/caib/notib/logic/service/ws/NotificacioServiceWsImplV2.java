@@ -56,7 +56,7 @@ import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.intf.util.EidasValidator;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2;
-import es.caib.notib.logic.utils.DatesUtils;
+import es.caib.notib.logic.intf.util.DatesUtils;
 import es.caib.notib.persist.entity.AplicacioEntity;
 import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EntitatEntity;

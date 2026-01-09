@@ -43,7 +43,7 @@ public class SalutController {
         return AppInfo.builder()
                 .codi("NOT")
                 .nom("Notib")
-                .data(manifestInfo.getBuildDate())
+                .data(DatesUtils.toOffsetDateTime(manifestInfo.getBuildDate()))
                 .versio(manifestInfo.getVersion())
                 .revisio(manifestInfo.getBuildScmRevision())
                 .jdkVersion(manifestInfo.getBuildJDK())

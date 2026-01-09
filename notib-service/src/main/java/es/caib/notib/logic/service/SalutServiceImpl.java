@@ -38,6 +38,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -124,7 +125,7 @@ public class SalutServiceImpl implements SalutService {
         return SalutInfo.builder()
                 .codi("NOT")
                 .versio(versio)
-                .data(new Date())
+                .data(OffsetDateTime.now())
                 .estatGlobal(estatSalut)
                 .estatBaseDeDades(salutDatabase)
                 .integracions(integracions)

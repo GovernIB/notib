@@ -18,7 +18,7 @@ import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnvio;
 import es.caib.notib.logic.objectes.LoggingTipus;
-import es.caib.notib.logic.utils.DatesUtils;
+import es.caib.notib.logic.intf.util.DatesUtils;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.logic.plugin.cie.CiePluginJms;
 import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOE.RespuestaSincronizarEnvioOE;

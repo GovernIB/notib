@@ -16,6 +16,7 @@ import es.caib.notib.logic.intf.dto.AvisDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
+import es.caib.notib.logic.intf.util.DatesUtils;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.utils.NotibLogger;
@@ -91,8 +92,8 @@ public class ComandaListener {
                     .tipus(AvisTipus.INFO)
                     .nom(dto.getAssumpte())
                     .descripcio(dto.getMissatge())
-                    .dataInici(dto.getDataInici())
-                    .dataFi(dto.getDataFinal())
+                    .dataInici(DatesUtils.toOffsetDateTime(dto.getDataInici()))
+                    .dataFi(DatesUtils.toOffsetDateTime(dto.getDataFinal()))
                     .build();
             enviarAvisComanda(avis);
         } catch (Exception ex) {
@@ -128,8 +129,8 @@ public class ComandaListener {
                     .entornCodi(entornCodi)
                     .identificador(enviament.getNotificaReferencia())
                     .nom(notificacio.getConcepte())
-                    .dataInici(dataInici)
-                    .dataFi(dataFi)
+                    .dataInici(dataInici != null ? DatesUtils.toOffsetDateTime(dataInici) : null)
+                    .dataFi(dataFi != null ? DatesUtils.toOffsetDateTime(dataFi) : null)
                     .descripcio(desc)
                     .tipus(AvisTipus.INFO)
                     .responsable(notificacio.getUsuariCodi())
@@ -170,8 +171,6 @@ public class ComandaListener {
                 throw new Exception("La propietat es.caib.notib.plugin.comanda.url.base no pot ser null");
             }
             url = url.endsWith("/") ? url.substring(0,url.length()-1) : url;
-//            url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "api/v1/jms/avisos";
-//            info.addParam("url", url);
         } catch (Exception ex) {
             var msg = "Error al obtenir la url per enviar l'avis a Commanda";
             integracioHelper.addAccioError(info, msg, ex);
@@ -180,21 +179,11 @@ public class ComandaListener {
         }
 
         try {
-//            var httpHeaders = new HttpHeaders();
-//            httpHeaders.set("Content-Type", "application/json");
             var username = configHelper.getConfig("es.caib.notib.plugin.comanda.usuari");
             var password = configHelper.getConfig("es.caib.notib.plugin.comanda.password");
-//            String auth = username + ":" + password;
-//            byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
-//            String authHeader = "Basic " + new String(encodedAuth);
-//            httpHeaders.set("Authorization", authHeader);
-//            HttpEntity<String> requestEntity = new HttpEntity<>(avis, httpHeaders);
             NotibLogger.getInstance().info("[enviarAvisComanda] Enviant avis a Comanda url " + url, log, LoggingTipus.COMANDA);
-//            RestTemplate restTemplate = new RestTemplate();
-//            ResponseEntity<String> response = restTemplate.postForEntity(url, requestEntity, String.class);
             var comandaClient = new ComandaClient(url, username, password);
             var resposta = comandaClient.crearAvis(avis);
-//            NotibLogger.getInstance().info("[enviarAvisCommanda] Resposta: " + response.getBody(), log, LoggingTipus.COMANDA);
             NotibLogger.getInstance().info("[enviarAvisCommanda] Resposta: " + resposta, log, LoggingTipus.COMANDA);
             integracioHelper.addAccioOk(info);
         } catch (Exception ex) {
@@ -239,18 +228,9 @@ public class ComandaListener {
             return;
         }
         try {
-//            var httpHeaders = new HttpHeaders();
-//            httpHeaders.set("Content-Type", "application/json");
             var username = configHelper.getConfig("es.caib.notib.plugin.comanda.usuari");
             var password = configHelper.getConfig("es.caib.notib.plugin.comanda.password");
-//            String auth = username + ":" + password;
-//            byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
-//            String authHeader = "Basic " + new String(encodedAuth);
-//            httpHeaders.set("Authorization", authHeader);
-//            HttpEntity<String> requestEntity = new HttpEntity<>(tasca, httpHeaders);
             NotibLogger.getInstance().info("[enviarTascaCommanda] Enviant tasca a Comanda url " + url, log, LoggingTipus.COMANDA);
-//            var restTemplate = new RestTemplate();
-//             ResponseEntity<String> response = restTemplate.postForEntity(url, requestEntity, String.class);
             var comandaClient = new ComandaClient(url, username, password);
             var resposta = comandaClient.crearTasca(tasca);
             NotibLogger.getInstance().info("[enviarTascaCommanda] Resposta: " + resposta, log, LoggingTipus.COMANDA);
@@ -277,7 +257,7 @@ public class ComandaListener {
             var estatDesc = EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus()) ? "Estat SIR: " + enviament.getRegistreEstat().name()
                     : "Estat Notifica: " + enviament.getNotificaEstat().name();
             estatDesc += enviament.getEntregaPostal() != null ? ", Estat CIE: " + (enviament.getEntregaPostal().getCieEstat() != null ? enviament.getEntregaPostal().getCieEstat() : "Pendent d'enviar al centre CIE" ) : "";
-            var dataInici = notificacio.getCreatedDate().isPresent() ? Date.from(notificacio.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()) : null;
+            var dataInici = notificacio.getCreatedDate().isPresent() ? notificacio.getCreatedDate().get().atZone(ZoneId.systemDefault()).toOffsetDateTime() : null;
             var tasca =  Tasca.builder()
                     .appCodi(APP_CODI)
                     .entornCodi(entornCodi)
@@ -286,8 +266,8 @@ public class ComandaListener {
                     .nom(notificacio.getConcepte())
                     .descripcio(descripcio)
                     .dataInici(dataInici)
-                    .dataFi(notificacio.getEstatProcessatDate())
-                    .dataCaducitat(notificacio.getCaducitat())
+                    .dataFi(DatesUtils.toOffsetDateTime(notificacio.getEstatProcessatDate()))
+                    .dataCaducitat(DatesUtils.toOffsetDateTime(notificacio.getCaducitat()))
                     .estat(enviament.getEstatPerComanda())
                     .estatDescripcio(estatDesc)
                     .numeroExpedient(notificacio.getNumExpedient())
@@ -302,7 +282,6 @@ public class ComandaListener {
             log.error("[ComandaListener] Error generant la tasca", ex );
         }
     }
-
 
     public boolean diagnosticar() throws Exception {
 
@@ -324,3 +303,4 @@ public class ComandaListener {
         return HttpStatus.ACCEPTED.equals(response.getStatusCode());
     }
 }
+

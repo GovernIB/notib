@@ -1,5 +1,8 @@
 package es.caib.notib.logic.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.pool.PooledConnectionFactory;
@@ -38,7 +41,12 @@ public class SmJmsConfig {
 
     @Bean
     public MessageConverter jacksonJmsMessageConverter() {
+
         MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
+        var mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS); // use ISO-8601 strings
+        converter.setObjectMapper(mapper);
         converter.setTargetType(MessageType.TEXT);
         converter.setTypeIdPropertyName("_type");
         return converter;
