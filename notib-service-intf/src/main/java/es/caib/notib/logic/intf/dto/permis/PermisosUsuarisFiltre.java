@@ -1,11 +1,11 @@
 package es.caib.notib.logic.intf.dto.permis;
 
+import com.google.common.base.Strings;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.bouncycastle.util.Strings;
 
 @Getter
 @Setter
