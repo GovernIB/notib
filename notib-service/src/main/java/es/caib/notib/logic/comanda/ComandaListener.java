@@ -169,7 +169,7 @@ public class ComandaListener {
             if (url == null) {
                 throw new Exception("La propietat es.caib.notib.plugin.comanda.url.base no pot ser null");
             }
-            url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "api/jms/avisos";
+            url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "api/v1/jms/avisos";
             info.addParam("url", url);
         } catch (Exception ex) {
             var msg = "Error al obtenir la url per enviar l'avis a Commanda";
