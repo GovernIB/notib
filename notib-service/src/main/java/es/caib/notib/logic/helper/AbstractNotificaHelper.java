@@ -187,7 +187,7 @@ public abstract class AbstractNotificaHelper {
 
 		if (estatsEnviamentsNotificaFinals && !NotificacioEstatEnumDto.PROCESSADA.equals(notificacioEstat)) {
 			NotificacioEstatEnumDto nouEstat = NotificacioEstatEnumDto.FINALITZADA;
-			if (!estatsEnviamentsFinals) {
+			if (!estatsEnviamentsFinals || EnviamentEstat.ERROR_ENTREGA.equals(enviament.getNotificaEstat())) {
 				nouEstat = NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS;
 			}
 			notificacio.updateEstat(nouEstat);
