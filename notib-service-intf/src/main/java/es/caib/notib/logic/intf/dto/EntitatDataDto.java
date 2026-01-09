@@ -27,11 +27,13 @@ public class EntitatDataDto extends AuditoriaDto {
 	private String descripcio;
 
 //	private boolean activa;
-	private String logoCap;
-	private String logoPeu;
+//	private String logoCap;
+//	private String logoPeu;
 	private byte[] logoCapBytes;
+	private String logoCapNom;
 	private boolean eliminarLogoCap;
 	private byte[] logoPeuBytes;
+	private String logoPeuNom;
 	private boolean eliminarLogoPeu;
 	private String colorFons;
 	private String colorLletra;

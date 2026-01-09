@@ -59,16 +59,16 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	private String descripcio;
 	@Column(name = "activa", nullable = false)
 	private boolean activa;
-////	@Lob
-//	@Column(name = "logo_cap")
-//	private byte[] logoCapBytes;
-////	@Lob
-//	@Column(name = "logo_peu")
-//	private byte[] logoPeuBytes;
-//	@Column(name = "color_fons", length = 1024)
-//	private String colorFons;
-//	@Column(name = "color_lletra", length = 1024)
-//	private String colorLletra;
+	@Lob
+	@Column(name = "logo_cap")
+	private byte[] logoCapBytes;
+	@Lob
+	@Column(name = "logo_peu")
+	private byte[] logoPeuBytes;
+	@Column(name = "color_fons", length = 1024)
+	private String colorFons;
+	@Column(name = "color_lletra", length = 1024)
+	private String colorLletra;
 	@Column(name = "tipus_doc_default")
 	private TipusDocumentEnumDto tipusDocDefault;
 	@Column(name = "nom_oficina_virtual", length = 255)
@@ -104,8 +104,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			boolean ambEntregaDeh,
 			EntregaCieEntity entregaCie,
 			String descripcio,
-//			byte[] logoCapBytes,
-//			byte[] logoPeuBytes,
+			byte[] logoCapBytes,
+			byte[] logoPeuBytes,
 //			String colorFons,
 //			String colorLletra,
 			TipusDocumentEnumDto tipusDocDefault,
@@ -124,8 +124,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 		this.apiKey = apiKey;
 		this.ambEntregaDeh = ambEntregaDeh;
 		this.entregaCie = entregaCie;
-//		this.logoCapBytes = logoCapBytes;
-//		this.logoPeuBytes = logoPeuBytes;
+		this.logoCapBytes = logoCapBytes;
+		this.logoPeuBytes = logoPeuBytes;
 //		this.colorFons = colorFons;
 //		this.colorLletra = colorLletra;
 		this.tipusDocDefault = tipusDocDefault;
@@ -149,8 +149,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			String dir3CodiReg,
 			String apiKey,
 			boolean ambEntregaDeh,
-//			byte[] logoCapBytes,
-//			byte[] logoPeuBytes,
+			byte[] logoCapBytes,
+			byte[] logoPeuBytes,
 //			String colorFons,
 //			String colorLletra,
 			TipusDocumentEnumDto tipusDocDefault,
@@ -168,8 +168,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 				.dir3CodiReg(dir3CodiReg)
 				.apiKey(apiKey)
 				.ambEntregaDeh(ambEntregaDeh)
-//				.logoCapBytes(logoCapBytes)
-//				.logoPeuBytes(logoPeuBytes)
+				.logoCapBytes(logoCapBytes)
+				.logoPeuBytes(logoPeuBytes)
 //				.colorFons(colorFons)
 //				.colorLletra(colorLletra)
 				.tipusDocDefault(tipusDocDefault)

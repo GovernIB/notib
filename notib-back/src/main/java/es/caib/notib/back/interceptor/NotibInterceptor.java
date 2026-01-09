@@ -125,8 +125,8 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
         var capColor = "";
         if (entitat != null) {
             var codi = entitat.getCodi();
-            capLogo = aplicacioService.propertyGet("es.caib.notib." + codi + ".capsalera.logo");
-            peuLogo = aplicacioService.propertyGet("es.caib.notib." + codi + ".peu.logo");
+            capLogo = entitat.getLogoCapBytes() != null ? "logoCap" : aplicacioService.propertyGet("es.caib.notib." + codi + ".capsalera.logo");
+            peuLogo = entitat.getLogoPeuBytes() != null ? "logoPeu" : aplicacioService.propertyGet("es.caib.notib." + codi + ".peu.logo");
             capBackColorLogo = aplicacioService.propertyGet("es.caib.notib." + codi + ".capsalera.color.fons");
             capColor = aplicacioService.propertyGet("es.caib.notib." + codi + ".capsalera.color.lletra");
         }

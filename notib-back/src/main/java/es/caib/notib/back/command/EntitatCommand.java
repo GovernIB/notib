@@ -30,7 +30,8 @@ import java.util.List;
 @Slf4j
 @Getter @Setter
 @EntitatValorsNoRepetits
-public class EntitatCommand {
+public class
+EntitatCommand {
 
 	private Long id;
 	@NotEmpty
@@ -48,12 +49,12 @@ public class EntitatCommand {
 	private String apiKey;
 	private boolean ambEntregaDeh;
 	private String descripcio;
-//	private MultipartFile logoCap;
-	private String logoCap;
+	private MultipartFile logoCap;
+//	private String logoCap;
 	private String logoCapNom;
 	private boolean eliminarLogoCap;
-//	private MultipartFile logoPeu;
-	private String logoPeu;
+	private MultipartFile logoPeu;
+//	private String logoPeu;
 	private String logoPeuNom;
 	private boolean eliminarLogoPeu;
 	private String colorFons;
@@ -108,30 +109,30 @@ public class EntitatCommand {
 		}
 
 		if (dto.getLogoCapBytes() != null) {
-			var base64 = Base64.getEncoder().encodeToString(dto.getLogoCapBytes());
-			try {
-				var nom = "logo_cap";
-				var mime = MimeUtils.getMimeTypeFromBase64(base64, nom);
-				var multipartFile = new MockMultipartFile(nom, nom, mime, dto.getLogoCapBytes());
-//                entitat.setLogoCap(multipartFile);
-				entitat.setLogoCap(dto.getLogoCap());
-				entitat.setLogoCapNom(nom);
-			} catch (Exception ex) {
-				log.error("Error obtenint el mime type per el logo_cap");
-			}
+//            var base64 = Base64.getEncoder().encodeToString(dto.getLogoCapBytes());
+//            try {
+			var nom = "logo_cap";
+//                var mime = MimeUtils.getMimeTypeFromBase64(base64, nom);
+//                var multipartFile = new MockMultipartFile(nom, nom, mime, dto.getLogoCapBytes());
+////                entitat.setLogoCap(multipartFile);
+//                entitat.setLogoCap(dto.getLogoCap());
+			entitat.setLogoCapNom(nom);
+//            } catch (Exception ex) {
+//                log.error("Error obtenint el mime type per el logo_cap");
+//            }
 		}
 		if (dto.getLogoPeuBytes() != null) {
-			var base64 = Base64.getEncoder().encodeToString(dto.getLogoPeuBytes());
-			try {
-				var nom = "logo_peu";
-				var mime = MimeUtils.getMimeTypeFromBase64(base64, nom);
-				var multipartFile = new MockMultipartFile(nom, nom, mime, dto.getLogoPeuBytes());
-//                entitat.setLogoPeu(multipartFile);
-				entitat.setLogoPeu(dto.getLogoPeu());
-				entitat.setLogoPeuNom(nom);
-			} catch (Exception ex) {
-				log.error("Error obtenint el mime type per el logo_cap");
-			}
+//            var base64 = Base64.getEncoder().encodeToString(dto.getLogoPeuBytes());
+//            try {
+			var nom = "logo_peu";
+//                var mime = MimeUtils.getMimeTypeFromBase64(base64, nom);
+//                var multipartFile = new MockMultipartFile(nom, nom, mime, dto.getLogoPeuBytes());
+////                entitat.setLogoPeu(multipartFile);
+//                entitat.setLogoPeu(dto.getLogoPeu());
+			entitat.setLogoPeuNom(nom);
+//            } catch (Exception ex) {
+//                log.error("Error obtenint el mime type per el logo_cap");
+//            }
 		}
 		return entitat;
 	}

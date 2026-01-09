@@ -332,8 +332,10 @@ function updateLlibre(dir3codi) {
 				</div>
 <%--				<not:inputFile name="logoCap" fileName="${entitatCommand.logoCapNom}" textKey="entitat.form.camp.conf.logocap" fileEntitat="${not empty entitatCommand.logoCapNom}" logoMenu="true" inputSize="6"/>--%>
 <%--				<not:inputFile name="logoPeu" fileName="${entitatCommand.logoPeuNom}" textKey="entitat.form.camp.conf.logopeu" fileEntitat="${not empty entitatCommand.logoPeuNom}" logoMenu="false" inputSize="6"/>--%>
-				<not:inputText name="logoCap" textKey="entitat.form.camp.conf.logocap"/>
-				<not:inputText name="logoPeu" textKey="entitat.form.camp.conf.logopeu"/>
+				<not:inputFile name="logoCap" fileName="${entitatCommand.logoCapNom}" textKey="entitat.form.camp.conf.logocap" fileEntitat="${not empty entitatCommand.logoCapNom}" logoMenu="true" inputSize="6"/>
+				<not:inputFile name="logoPeu" fileName="${entitatCommand.logoPeuNom}" textKey="entitat.form.camp.conf.logopeu" fileEntitat="${not empty entitatCommand.logoPeuNom}" logoMenu="false" inputSize="6"/>
+<%--				<not:inputText name="logoCap" textKey="entitat.form.camp.conf.logocap"/>--%>
+<%--				<not:inputText name="logoPeu" textKey="entitat.form.camp.conf.logopeu"/>--%>
 				<not:inputText name="colorFons" textKey="entitat.form.camp.conf.fons" picker="true"/>
 				<not:inputText name="colorLletra" textKey="entitat.form.camp.conf.lletra" picker="true"/>
 				<div class="title">
