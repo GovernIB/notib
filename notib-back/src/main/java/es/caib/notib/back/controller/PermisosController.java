@@ -156,8 +156,4 @@ public class PermisosController extends BaseUserController {
         return filtreCommand;
     }
 
-    @Override
-    protected List<Long> getIdsElementsFiltrats(HttpServletRequest request) throws ParseException {
-        return List.of();
-    }
 }
