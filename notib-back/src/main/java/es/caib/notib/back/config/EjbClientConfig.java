@@ -7,7 +7,6 @@ import es.caib.notib.logic.intf.base.service.PermissionEvaluatorService;
 import es.caib.notib.logic.intf.base.service.ResourceApiService;
 import es.caib.notib.logic.intf.resourceservice.EnviamentResourceService;
 import es.caib.notib.logic.intf.service.*;
-import liquibase.logging.LogService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWarDeployment;
 import org.springframework.context.annotation.Bean;
