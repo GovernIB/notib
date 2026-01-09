@@ -122,6 +122,7 @@
                                 <li><a id="enviarCallbacks" style="cursor: pointer;"><spring:message code="callback.boto.enviar"/></a></li>
                                 <li><a id="pausarCallbacks" style="cursor: pointer;"><spring:message code="callback.boto.pausar"/></a></li>
                                 <li><a id="activarCallbacks" style="cursor: pointer;"><spring:message code="callback.boto.activar"/></a></li>
+                                <li><a id="esborrarCallbacks" style="cursor: pointer;"><spring:message code="callback.boto.esborrar"/></a></li>
                             </ul>
                         </div>
                 </div>

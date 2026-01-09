@@ -247,6 +247,19 @@ function initEvents($table, url_prefix, eventMessages) {
             return false;
         });
 
+        $('#esborrarCallbacks').on('click', function() {
+
+            let count = Number($(".seleccioCount").html());
+            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+                return;
+            }
+            if(confirm(eventMessages['confirm-accio-massiva-activar'])){
+                location.href =  url_prefix + "/esborrar";
+                // setTimeout(() => $table.DataTable().rows().deselect(), 100);
+            }
+            return false;
+        });
+
         $("#exportarODS").on("click", (e) => {
 
             let count = Number($(".seleccioCount").html());
