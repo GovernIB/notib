@@ -76,9 +76,11 @@ const EntitatFormTabPermisos: React.FC = () => {
         formAdditionalData={{ resourceName: 'entitatResource', resourceId: id }}
         paginationActive
         toolbarHideQuickFilter
-        popupEditActive
+        inlineEditActive
+        //popupEditActive
         popupEditFormDialogResourceTitle={t('page.entitats.form.resourceNames.permis')}
-        popupEditFormContent={<EntitatFormTabPermisosFormContent />} />;
+        popupEditFormContent={<EntitatFormTabPermisosFormContent />}
+        density="standard" />;
 }
 
 export default EntitatFormTabPermisos;

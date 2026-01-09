@@ -11,6 +11,7 @@ export type FormApi = {
     validate: () => void;
     save: () => Promise<any>;
     delete: () => void;
+    focus: (name?: string) => void;
     setFieldValue: (name: string, value: any) => void;
     handleSubmissionErrors: (error: ResourceApiError, temporalMessageTitle?: string) => void;
 };

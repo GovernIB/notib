@@ -50,8 +50,8 @@ export type DataCommonExportFn = (
     fileType?: ExportFileType,
     forceUnpaged?: boolean
 ) => void;
-export type DataCommonShowCreateDialogFn = (row?: any) => void;
-export type DataCommonShowUpdateDialogFn = (id: any, row?: any) => void;
+export type DataCommonTriggerCreateFn = (row?: any) => void;
+export type DataCommonTriggerUpdateFn = (id: any, row?: any) => void;
 export type DataCommonTriggerDeleteFn = (id: any) => void;
 
 export const useApiDataCommon = (
@@ -213,6 +213,8 @@ export const useDataCommonEditable = (
     readOnly: boolean,
     formAdditionalData: ((row?: any) => any) | any,
     toolbarCreateLink: string | undefined,
+    inlineCreate: (() => void) | undefined,
+    inlineUpdate: ((id: any, row?: any, additionalData?: any) => void) | undefined,
     rowDetailLink: string | undefined,
     rowUpdateLink: string | undefined,
     rowDisableUpdateButton: boolean | ((row: any) => boolean) | undefined,
@@ -221,6 +223,9 @@ export const useDataCommonEditable = (
     rowHideUpdateButton: boolean | ((row: any) => boolean) | undefined,
     rowHideDeleteButton: boolean | ((row: any) => boolean) | undefined,
     rowHideDetailsButton: boolean | ((row: any) => boolean) | undefined,
+    inlineEditActive: boolean | undefined,
+    inlineCreateEditActive: boolean | undefined,
+    inlineUpdateEditActive: boolean | undefined,
     popupEditActive: boolean | undefined,
     popupEditCreateActive: boolean | undefined,
     popupEditUpdateActive: boolean | undefined,
@@ -240,9 +245,11 @@ export const useDataCommonEditable = (
     const dataDialogPopupApiRef = React.useRef<DataFormDialogApi>(undefined);
     const confirmDialogButtons = useConfirmDialogButtons();
     const confirmDialogComponentProps = { maxWidth: 'sm', fullWidth: true };
+    const isInlineEditCreate = inlineEditActive || inlineCreateEditActive;
+    const isInlineEditUpdate = inlineEditActive || inlineUpdateEditActive;
     const isPopupEditCreate = popupEditActive || popupEditCreateActive;
     const isPopupEditUpdate = popupEditActive || popupEditUpdateActive;
-    const showCreateDialog: DataCommonShowCreateDialogFn = (row?: any, additionalData?: any) => {
+    const triggerCreate: DataCommonTriggerCreateFn = (row?: any, additionalData?: any) => {
         const processedAdditionalData = {
             ...(typeof formAdditionalData === 'function'
                 ? formAdditionalData(row, 'create')
@@ -258,25 +265,29 @@ export const useDataCommonEditable = (
                 // Feim un catch buit perquè no aparegui a la consola el missatge: Uncaught (in promise)
             });
     };
-    const showUpdateDialog: DataCommonShowUpdateDialogFn = (
+    const triggerUpdate: DataCommonTriggerUpdateFn = (
         id: any,
         row?: any,
         additionalData?: any
     ) => {
-        const processedAdditionalData = {
-            ...(typeof formAdditionalData === 'function'
-                ? formAdditionalData(row, 'update')
-                : formAdditionalData),
-            ...additionalData,
-        };
-        dataDialogPopupApiRef.current
-            ?.show(id, processedAdditionalData)
-            .then(() => {
-                refresh?.();
-            })
-            .catch(() => {
-                // Feim un catch buit perquè no aparegui a la consola el missatge: Uncaught (in promise)
-            });
+        if (!inlineUpdate) {
+            const processedAdditionalData = {
+                ...(typeof formAdditionalData === 'function'
+                    ? formAdditionalData(row, 'update')
+                    : formAdditionalData),
+                ...additionalData,
+            };
+            dataDialogPopupApiRef.current
+                ?.show(id, processedAdditionalData)
+                .then(() => {
+                    refresh?.();
+                })
+                .catch(() => {
+                    // Feim un catch buit perquè no aparegui a la consola el missatge: Uncaught (in promise)
+                });
+        } else {
+            inlineUpdate(id, row);
+        }
     };
     const triggerDelete = (id: any) => {
         messageDialogShow(
@@ -310,7 +321,7 @@ export const useDataCommonEditable = (
             });
     };
     const isCreateLinkPresent = apiCurrentActions?.['create'] != null;
-    const createLinkConfigError = !readOnly && !isPopupEditCreate && toolbarCreateLink == null;
+    const createLinkConfigError = !readOnly && !isPopupEditCreate && !isInlineEditCreate && toolbarCreateLink == null;
     const toolbarAddElement =
         isCreateLinkPresent && !readOnly
             ? toToolbarIcon('add', {
@@ -319,12 +330,12 @@ export const useDataCommonEditable = (
                   linkState: formAdditionalData
                       ? { additionalData: formAdditionalData }
                       : undefined,
-                  onClick: !toolbarCreateLink ? showCreateDialog : undefined,
+                  onClick: !toolbarCreateLink ? (isInlineEditCreate ? inlineCreate : triggerCreate) : undefined,
                   disabled: createLinkConfigError,
               })
             : undefined;
     const rowEditActions: DataCommonAdditionalAction[] = [];
-    const updateLinkConfigError = !readOnly && !isPopupEditUpdate && rowUpdateLink == null;
+    const updateLinkConfigError = !readOnly && !isPopupEditUpdate && !isInlineEditUpdate && rowUpdateLink == null;
     !readOnly &&
         rowEditActions.push({
             label: t('datacommon.update.label'),
@@ -392,8 +403,8 @@ export const useDataCommonEditable = (
         toolbarAddElement,
         rowEditActions,
         formDialogComponent,
-        showCreateDialog,
-        showUpdateDialog,
+        triggerCreate,
+        triggerUpdate,
         triggerDelete,
     };
 };

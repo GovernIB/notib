@@ -54,6 +54,10 @@ const componentsEs = {
             one: '1 fila seleccionada',
             multiple: '{{count}} filas seleccionadas',
         },
+        edit: {
+            save: 'Guardar',
+            cancel: 'Cancelar'
+        },
         pageInfo: '{{from}} a {{to}} de {{count}}',
         sizeAuto: 'Automático',
         requestPending: 'Pendiente de consultar',

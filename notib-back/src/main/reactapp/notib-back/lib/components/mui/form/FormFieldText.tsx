@@ -18,11 +18,10 @@ export const useFormFieldCommon = (
     componentProps: any,
     startAdornmentIcons?: React.ReactElement[]
 ) => {
-    const helperText = inline ? field?.helperText : (fieldError?.message ?? field?.helperText);
-    const title = field?.title ?? (inline ? helperText : undefined);
+    const title = inline ? (fieldError?.message ?? field?.title) : field?.title;
     const inlineErrorIconElement =
         fieldError && inline ? (
-            <Icon fontSize="small" color="error" title={fieldError.message} sx={{ mr: 1 }}>
+            <Icon fontSize="small" color="error" title={title} sx={{ mr: 1 }}>
                 warning
             </Icon>
         ) : null;
@@ -36,6 +35,7 @@ export const useFormFieldCommon = (
         ) : (
             componentProps?.slotProps?.input?.startAdornment
         );
+    const helperText = inline ? field?.helperText : (fieldError?.message ?? field?.helperText);
     return {
         helperText,
         title,

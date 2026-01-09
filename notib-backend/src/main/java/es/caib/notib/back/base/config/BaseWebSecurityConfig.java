@@ -6,6 +6,7 @@ import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.convert.converter.Converter;
@@ -44,6 +45,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.util.*;
@@ -63,6 +65,9 @@ public abstract class BaseWebSecurityConfig {
 	private String principalClaim;
 	@Value("${spring.security.oauth2.client.provider.keycloak.user-name-attribute:#{null}}")
 	private String clientProviderKeycloakUserNameAttribute;
+
+	@Autowired
+	private ServletContext servletContext;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -84,7 +89,7 @@ public abstract class BaseWebSecurityConfig {
 					userInfoEndpoint(userInfo -> userInfo.userService(oauth2UserService())).
 					failureHandler((request, response, exception) -> {
 						request.getSession().invalidate();
-						response.sendRedirect("/");
+						response.sendRedirect(servletContext.getContextPath());
 					}));
 		}
 		if (isOidcClientActive()) {
@@ -93,7 +98,7 @@ public abstract class BaseWebSecurityConfig {
 					userInfoEndpoint(userInfo -> userInfo.oidcUserService(oidcUserService())).
 					failureHandler((request, response, exception) -> {
 						request.getSession().invalidate();
-						response.sendRedirect("/");
+						response.sendRedirect(servletContext.getContextPath());
 					}));
 		}
 		var auth = http.authorizeHttpRequests().requestMatchers(internalPublicRequestMatchers()).permitAll();

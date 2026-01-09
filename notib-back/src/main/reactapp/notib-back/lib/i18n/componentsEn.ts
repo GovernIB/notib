@@ -53,6 +53,10 @@ const componentsEn = {
             one: '1 selected row ',
             multiple: '{{count}} selected rows',
         },
+        edit: {
+            save: 'Save',
+            cancel: 'Cancel'
+        },
         pageInfo: '{{from}} to {{to}} of {{count}}',
         sizeAuto: 'Automatic',
         requestPending: 'Searching...',
