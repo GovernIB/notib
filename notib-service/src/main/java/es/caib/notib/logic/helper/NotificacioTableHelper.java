@@ -32,7 +32,8 @@ public class NotificacioTableHelper {
     private NotificacioTableViewRepository notificacioTableViewRepository;
     @Autowired
     private NotificacioMassivaRepository notificacioMassivaRepository;
-
+    @Autowired
+    private EnviamentTableHelper enviamentTableHelper;
 
     @Transactional(propagation = Propagation.MANDATORY)
     public void crearRegistre(NotificacioEntity notificacio){
@@ -140,6 +141,7 @@ public class NotificacioTableHelper {
                         if ((estatMask & eventEstat.getMask()) == 0) {
                             estatMask += eventEstat.getMask();
                         }
+                        enviamentTableHelper.actualitzarEstat(enviament.getId(), not.getEstat());
                     }
                     item.setEstatMask(estatMask);
                 }

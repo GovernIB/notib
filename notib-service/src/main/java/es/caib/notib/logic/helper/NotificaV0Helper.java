@@ -291,7 +291,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 					}
 				}
                 var estat = getEstatNotifica(datatDarrer.getResultado());
-				if (!datatData.equals(dataUltimDatat) || !estat.equals(enviament.getNotificaEstat())) {
+				if (datatData != null && !datatData.equals(dataUltimDatat) || estat != null && !estat.equals(enviament.getNotificaEstat())) {
 					enviament.setNotificaEstat(estat);
 					enviament.setNotificaEstatData(datatData);
 //                    comandaListener.enviarTasca(enviament);

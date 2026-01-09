@@ -1,6 +1,7 @@
 package es.caib.notib.logic.helper;
 
 import es.caib.notib.client.domini.CieEstat;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EnviamentTableEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -8,11 +9,13 @@ import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.PersonaEntity;
 import es.caib.notib.persist.repository.EnviamentTableRepository;
 import joptsimple.internal.Strings;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Component
 public class EnviamentTableHelper {
 
@@ -20,6 +23,19 @@ public class EnviamentTableHelper {
     private EnviamentTableRepository enviamentTableRepository;
     @Autowired
     private NotificacioTableHelper notificacioTableHelper;
+
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void actualitzarEstat(Long enviamentId, NotificacioEstatEnumDto estat) {
+
+        try {
+            var tableViewItem = enviamentTableRepository.findById(enviamentId).orElseThrow();
+            tableViewItem.setEstat(estat);
+            enviamentTableRepository.save(tableViewItem);
+        } catch (Exception ex) {
+            log.error("[EnviamentTableHelper.actualitzarEstat] Error actualitzant l'estat per l'enviament amb id " + enviamentId + " estat " + estat);
+        }
+    }
+
 
     @Transactional(propagation = Propagation.MANDATORY)
     public void crearRegistre(NotificacioEnviamentEntity enviament) {
