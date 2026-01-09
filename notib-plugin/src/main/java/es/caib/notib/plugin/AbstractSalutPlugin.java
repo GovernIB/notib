@@ -1,11 +1,10 @@
 package es.caib.notib.plugin;
 
 import com.google.common.base.Strings;
+import es.caib.comanda.model.v1.salut.EstatSalut;
+import es.caib.comanda.model.v1.salut.EstatSalutEnum;
+import es.caib.comanda.model.v1.salut.IntegracioPeticions;
 import es.caib.comanda.ms.salut.helper.EstatHelper;
-import es.caib.comanda.ms.salut.model.EstatByPercent;
-import es.caib.comanda.ms.salut.model.EstatSalut;
-import es.caib.comanda.ms.salut.model.EstatSalutEnum;
-import es.caib.comanda.ms.salut.model.IntegracioPeticions;
 import es.caib.notib.plugin.utils.CuaFifoBool;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;

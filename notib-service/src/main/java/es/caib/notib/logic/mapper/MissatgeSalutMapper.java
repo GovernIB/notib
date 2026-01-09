@@ -1,7 +1,7 @@
 package es.caib.notib.logic.mapper;
 
-import es.caib.comanda.ms.salut.model.MissatgeSalut;
-import es.caib.comanda.ms.salut.model.SalutNivell;
+import es.caib.comanda.model.v1.salut.MissatgeSalut;
+import es.caib.comanda.model.v1.salut.SalutNivell;
 import es.caib.notib.logic.intf.dto.AvisNivellEnumDto;
 import es.caib.notib.persist.entity.AvisEntity;
 import org.mapstruct.BeanMapping;

@@ -1,21 +1,25 @@
 package es.caib.notib.logic.service;
 
-import es.caib.comanda.ms.salut.model.*;
+import es.caib.comanda.model.v1.salut.ContextInfo;
+import es.caib.comanda.model.v1.salut.EstatSalut;
+import es.caib.comanda.model.v1.salut.EstatSalutEnum;
+import es.caib.comanda.model.v1.salut.IntegracioSalut;
+import es.caib.comanda.model.v1.salut.IntegracioInfo;
+import es.caib.comanda.model.v1.salut.Manual;
+import es.caib.comanda.model.v1.salut.MissatgeSalut;
+import es.caib.comanda.model.v1.salut.SalutInfo;
+import es.caib.comanda.model.v1.salut.SubsistemaInfo;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.helper.SubsistemesHelper;
 import es.caib.notib.logic.helper.plugin.AbstractPluginHelper;
 import es.caib.notib.logic.intf.service.SalutService;
 import es.caib.notib.logic.mapper.MissatgeSalutMapper;
 import es.caib.notib.logic.utils.CustomHealthIndicator;
-import es.caib.notib.logic.utils.MonitorHelper;
 import es.caib.notib.logic.utils.NotibBenchmark;
 import es.caib.notib.persist.repository.AvisRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
-import org.hyperic.sigar.CpuPerc;
-import org.hyperic.sigar.Mem;
-import org.hyperic.sigar.Sigar;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
@@ -120,8 +124,8 @@ public class SalutServiceImpl implements SalutService {
                 .codi("NOT")
                 .versio(versio)
                 .data(new Date())
-                .estat(estatSalut)
-                .bd(salutDatabase)
+                .estatGlobal(estatSalut)
+                .estatBaseDeDades(salutDatabase)
                 .integracions(integracions)
                 .subsistemes(subsistemes)
                 .missatges(missatges)

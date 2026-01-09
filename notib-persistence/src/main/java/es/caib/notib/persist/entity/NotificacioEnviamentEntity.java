@@ -1,6 +1,6 @@
 package es.caib.notib.persist.entity;
 
-import es.caib.comanda.ms.broker.model.TascaEstat;
+import es.caib.comanda.model.v1.tasca.TascaEstat;
 import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentTipus;

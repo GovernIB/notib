@@ -2,9 +2,10 @@ package es.caib.notib.logic.comanda;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import es.caib.comanda.ms.broker.model.Avis;
-import es.caib.comanda.ms.broker.model.AvisTipus;
-import es.caib.comanda.ms.broker.model.Tasca;
+import es.caib.comanda.api.client.v1.ComandaClient;
+import es.caib.comanda.model.v1.avis.Avis;
+import es.caib.comanda.model.v1.avis.AvisTipus;
+import es.caib.comanda.model.v1.tasca.Tasca;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
@@ -41,7 +42,6 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Base64;
 import java.util.Date;
@@ -148,9 +148,9 @@ public class ComandaListener {
 
         var mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
-        var requestBody = mapper.writeValueAsString(avis);
+//        var requestBody = mapper.writeValueAsString(avis);
         NotibLogger.getInstance().info("[ComandaListener] Enviant avis a la cua de tasques de Comanda " + avis, log, LoggingTipus.COMANDA);
-        jmsTemplate.convertAndSend(SmConstants.CUA_COMANDA_AVISOS, requestBody,
+        jmsTemplate.convertAndSend(SmConstants.CUA_COMANDA_AVISOS, avis,
                 m -> {
                     m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 0);
                     return m;
@@ -159,18 +159,19 @@ public class ComandaListener {
 
     @Transactional
     @JmsListener(destination = SmConstants.CUA_COMANDA_AVISOS, containerFactory = SmConstants.JMS_FACTORY_ACK)
-    public void enviarAvisComanda(@Payload String avis, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
+    public void enviarAvisComanda(@Payload Avis avis, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
 
         message.acknowledge();
         var info = new IntegracioInfo(IntegracioCodi.COMANDA, "Enviament d'avis a comanda", IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Avis", avis.toString()));
         String url;
         try {
             url = configHelper.getConfig("es.caib.notib.plugin.comanda.url");
-            if (url == null) {
+            if (Strings.isNullOrEmpty(url )) {
                 throw new Exception("La propietat es.caib.notib.plugin.comanda.url.base no pot ser null");
             }
-            url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "api/v1/jms/avisos";
-            info.addParam("url", url);
+            url = url.endsWith("/") ? url.substring(0,url.length()-1) : url;
+//            url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "api/v1/jms/avisos";
+//            info.addParam("url", url);
         } catch (Exception ex) {
             var msg = "Error al obtenir la url per enviar l'avis a Commanda";
             integracioHelper.addAccioError(info, msg, ex);
@@ -179,19 +180,22 @@ public class ComandaListener {
         }
 
         try {
-            var httpHeaders = new HttpHeaders();
-            httpHeaders.set("Content-Type", "application/json");
+//            var httpHeaders = new HttpHeaders();
+//            httpHeaders.set("Content-Type", "application/json");
             var username = configHelper.getConfig("es.caib.notib.plugin.comanda.usuari");
             var password = configHelper.getConfig("es.caib.notib.plugin.comanda.password");
-            String auth = username + ":" + password;
-            byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
-            String authHeader = "Basic " + new String(encodedAuth);
-            httpHeaders.set("Authorization", authHeader);
-            HttpEntity<String> requestEntity = new HttpEntity<>(avis, httpHeaders);
+//            String auth = username + ":" + password;
+//            byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
+//            String authHeader = "Basic " + new String(encodedAuth);
+//            httpHeaders.set("Authorization", authHeader);
+//            HttpEntity<String> requestEntity = new HttpEntity<>(avis, httpHeaders);
             NotibLogger.getInstance().info("[enviarAvisComanda] Enviant avis a Comanda url " + url, log, LoggingTipus.COMANDA);
-            RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<String> response = restTemplate.postForEntity(url, requestEntity, String.class);
-            NotibLogger.getInstance().info("[enviarAvisCommanda] Resposta: " + response.getBody(), log, LoggingTipus.COMANDA);
+//            RestTemplate restTemplate = new RestTemplate();
+//            ResponseEntity<String> response = restTemplate.postForEntity(url, requestEntity, String.class);
+            var comandaClient = new ComandaClient(url, username, password);
+            var resposta = comandaClient.crearAvis(avis);
+//            NotibLogger.getInstance().info("[enviarAvisCommanda] Resposta: " + response.getBody(), log, LoggingTipus.COMANDA);
+            NotibLogger.getInstance().info("[enviarAvisCommanda] Resposta: " + resposta, log, LoggingTipus.COMANDA);
             integracioHelper.addAccioOk(info);
         } catch (Exception ex) {
             var msg = "Error al enviar l'avis a Commanda";
@@ -204,9 +208,9 @@ public class ComandaListener {
 
         var mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
-        var requestBody = mapper.writeValueAsString(tasca);
+//        var requestBody = mapper.writeValueAsString(tasca);
         NotibLogger.getInstance().info("[ComandaListener] Enviant tasca a la cua de tasques de Comanda " + tasca, log, LoggingTipus.COMANDA);
-        jmsTemplate.convertAndSend(SmConstants.CUA_COMANDA_TASQUES, requestBody,
+        jmsTemplate.convertAndSend(SmConstants.CUA_COMANDA_TASQUES, tasca,
                 m -> {
                     m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 0);
                     return m;
@@ -216,17 +220,17 @@ public class ComandaListener {
 
     @Transactional
     @JmsListener(destination = SmConstants.CUA_COMANDA_TASQUES, containerFactory = SmConstants.JMS_FACTORY_ACK)
-    public void enviarTascaComanda(@Payload String tasca, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
+    public void enviarTascaComanda(@Payload Tasca tasca, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
 
         message.acknowledge();
-        var info = new IntegracioInfo(IntegracioCodi.COMANDA, "Enviament de tasca a comanda", IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Tasca", tasca));
+        var info = new IntegracioInfo(IntegracioCodi.COMANDA, "Enviament de tasca a comanda", IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Tasca", tasca.toString()));
         String url;
         try {
             url = configHelper.getConfig("es.caib.notib.plugin.comanda.url");
             if (url == null) {
                 throw new Exception("La propietat es.caib.notib.plugin.comanda.url.base no pot ser null");
             }
-            url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "api/jms/tasques";
+            url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "api/v1/jms/tasques";
             info.addParam("url", url);
         } catch (Exception ex) {
             var msg = "Error al obtenir la url per enviar la tasca a Commanda";
@@ -235,19 +239,21 @@ public class ComandaListener {
             return;
         }
         try {
-            var httpHeaders = new HttpHeaders();
-            httpHeaders.set("Content-Type", "application/json");
+//            var httpHeaders = new HttpHeaders();
+//            httpHeaders.set("Content-Type", "application/json");
             var username = configHelper.getConfig("es.caib.notib.plugin.comanda.usuari");
             var password = configHelper.getConfig("es.caib.notib.plugin.comanda.password");
-            String auth = username + ":" + password;
-            byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
-            String authHeader = "Basic " + new String(encodedAuth);
-            httpHeaders.set("Authorization", authHeader);
-            HttpEntity<String> requestEntity = new HttpEntity<>(tasca, httpHeaders);
+//            String auth = username + ":" + password;
+//            byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
+//            String authHeader = "Basic " + new String(encodedAuth);
+//            httpHeaders.set("Authorization", authHeader);
+//            HttpEntity<String> requestEntity = new HttpEntity<>(tasca, httpHeaders);
             NotibLogger.getInstance().info("[enviarTascaCommanda] Enviant tasca a Comanda url " + url, log, LoggingTipus.COMANDA);
-            var restTemplate = new RestTemplate();
-            ResponseEntity<String> response = restTemplate.postForEntity(url, requestEntity, String.class);
-            NotibLogger.getInstance().info("[enviarTascaCommanda] Resposta: " + response.getBody(), log, LoggingTipus.COMANDA);
+//            var restTemplate = new RestTemplate();
+//             ResponseEntity<String> response = restTemplate.postForEntity(url, requestEntity, String.class);
+            var comandaClient = new ComandaClient(url, username, password);
+            var resposta = comandaClient.crearTasca(tasca);
+            NotibLogger.getInstance().info("[enviarTascaCommanda] Resposta: " + resposta, log, LoggingTipus.COMANDA);
             integracioHelper.addAccioOk(info);
         } catch (Exception ex) {
             var msg = "Error al enviar la tasca a Commanda";

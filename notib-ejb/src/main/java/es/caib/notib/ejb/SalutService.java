@@ -1,6 +1,9 @@
 package es.caib.notib.ejb;
 
-import es.caib.comanda.ms.salut.model.*;
+import es.caib.comanda.model.v1.salut.ContextInfo;
+import es.caib.comanda.model.v1.salut.IntegracioInfo;
+import es.caib.comanda.model.v1.salut.SalutInfo;
+import es.caib.comanda.model.v1.salut.SubsistemaInfo;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.context.annotation.Primary;
 

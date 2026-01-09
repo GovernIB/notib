@@ -1,7 +1,7 @@
 package es.caib.notib.api.interna.controller;
 
-import es.caib.comanda.ms.salut.model.AppInfo;
-import es.caib.comanda.ms.salut.model.SalutInfo;
+import es.caib.comanda.model.v1.salut.AppInfo;
+import es.caib.comanda.model.v1.salut.SalutInfo;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.SalutService;
 import lombok.Builder;
