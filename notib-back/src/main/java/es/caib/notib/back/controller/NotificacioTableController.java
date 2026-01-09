@@ -301,6 +301,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         return procediments.stream().filter(p -> p.isActiu()).collect(Collectors.toList());
     }
 
+
     @GetMapping(value = "/serveisOrgan")
     @ResponseBody
     public List<CodiValorOrganGestorComuDto> getServeis(HttpServletRequest request, Model model) {
@@ -326,17 +327,18 @@ public class NotificacioTableController extends TableAccionsMassivesController {
      */
     @GetMapping(value = "/procedimentsOrgan/{organGestor}")
     @ResponseBody
-    public List<CodiValorOrganGestorComuDto> getProcediments(HttpServletRequest request, Model model) {
+    public List<CodiValorOrganGestorComuDto> getProcedimentByOrganGestor(HttpServletRequest request, @PathVariable Long organGestor, Model model) {
 
         var entitatId = sessionScopedContext.getEntitatActualId();
         String organCodi = null;
         var permis = PermisEnum.CONSULTA;
-        var organGestor = getOrganGestorActual(request);
-        if (organGestor != null) {
-            organCodi = organGestor.getCodi();
+        var organActual = getOrganGestorActual(request);
+        if (organActual != null) {
+            organCodi = organActual.getCodi();
         }
         var rol = RolEnumDto.valueOf(sessionScopedContext.getRolActual());
-        var procediments = procedimentService.getProcedimentsOrgan(entitatId, organCodi, null, rol, permis);
+        var organ = organGestorService.findById(entitatId, organGestor);
+        var procediments = procedimentService.getProcedimentsOrgan(entitatId, organ.getCodi(), organGestor, rol, permis);
         return procediments.stream().filter(p -> p.isActiu()).collect(Collectors.toList());
     }
 
