@@ -173,7 +173,7 @@
 			<div class="navbar-brand">
 				<div id="govern-logo" class="pull-left">
 					<c:choose>
-						<c:when test="${sessionScopedContext.capLogo!=null  && not empty sessionScopedContext.capLogo || sessionScope['EntitatHelper.entitatActual'].logoCapBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].logoCapBytes)!=0}">
+						<c:when test="${not isRolActualAdministrador && sessionScopedContext.capLogo!=null  && not empty sessionScopedContext.capLogo || sessionScope['EntitatHelper.entitatActual'].logoCapBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].logoCapBytes)!=0}">
 							<img src="<c:url value="/entitat/getEntitatLogoCap"/>"  height="65" alt="Govern de les Illes Balears" />
 						</c:when>
 						<c:otherwise>
@@ -491,7 +491,7 @@
 	<div class="pull-right govern-footer">
 		<p>
 			<c:choose>
-				<c:when test="${sessionScopedContext.peuLogo!=null  && not empty sessionScopedContext.peuLogo || sessionScope['EntitatHelper.entitatActual'].logoPeuBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].logoPeuBytes)!=0}">
+				<c:when test="${not isRolActualAdministrador && sessionScopedContext.peuLogo!=null  && not empty sessionScopedContext.peuLogo || sessionScope['EntitatHelper.entitatActual'].logoPeuBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].logoPeuBytes)!=0}">
 					<img src="<c:url value="/entitat/getEntitatLogoPeu"/>"  height="65" alt="Govern de les Illes Balears" />
 				</c:when>
 				<c:otherwise>
