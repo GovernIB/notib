@@ -22,13 +22,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
-//@RequestMapping("/consulta/v3")
+@RequestMapping("/v1/estadistiques")
 public class EstadistiquesController {
 
     private final EstadisticaService estadisticaService;
 
 
-    @GetMapping("/estadistiquesInfo")
+    @GetMapping("/info")
     public EstadistiquesInfo statsInfo() throws IOException {
 
         List<DimensioDesc> dimensions = estadisticaService.getDimensions();
@@ -36,13 +36,13 @@ public class EstadistiquesController {
         return EstadistiquesInfo.builder().codi("NOT").dimensions(dimensions).indicadors(indicadors).build();
     }
 
-    @GetMapping("/estadistiques")
+    @GetMapping
     public RegistresEstadistics estadistiques(HttpServletRequest request) throws IOException {
 
         return estadisticaService.consultaUltimesEstadistiques();
     }
 
-    @GetMapping("/estadistiques/{dies}")
+    @GetMapping("/{dies}")
     public List<RegistresEstadistics> estadistiques(HttpServletRequest request, @PathVariable Integer dies) throws IOException {
 
         List<RegistresEstadistics> result = new ArrayList<>();
@@ -54,14 +54,14 @@ public class EstadistiquesController {
         return result;
     }
 
-    @GetMapping("/estadistiques/of/{data}")
+    @GetMapping("/of/{data}")
     public RegistresEstadistics estadistiques(HttpServletRequest request, @PathVariable String data) throws Exception {
 
         LocalDate date = LocalDate.parse(data, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         return estadisticaService.consultaEstadistiques(date);
     }
 
-    @GetMapping("/estadistiques/from/{dataInici}/to/{dataFi}")
+    @GetMapping("/from/{dataInici}/to/{dataFi}")
     public List<RegistresEstadistics> estadistiques(HttpServletRequest request, @PathVariable String dataInici, @PathVariable String dataFi) throws Exception {
 
         List<RegistresEstadistics> result = new ArrayList<>();

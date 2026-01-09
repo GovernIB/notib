@@ -20,23 +20,23 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/logs")
+@RequestMapping("/v1/logs")
 public class LogController {
 
     @Autowired
     private LogService logService;
 
-    @GetMapping("/llistar/fitxers")
+    @GetMapping
     public List<FitxerInfo> llistarFitxers() {
         return logService.llistarFitxers();
     }
 
-    @GetMapping("/fitxer/{nom}")
+    @GetMapping("/{nom}")
     public FitxerContingut getFitxerByNom(@PathVariable("nom") String nom) {
         return logService.getFitxerByNom(nom);
     }
 
-    @GetMapping("/llegir/ultimes/{nLinies}/linies/fitxer/{nomFitxer}")
+    @GetMapping("/{nomFitxer}/linies/{nLinies}")
     public List<String> llegitUltimesLinies(@PathVariable("nLinies") Long nLinies, @PathVariable("nomFitxer") String nomFitxer) {
         return logService.readLastNLines(nomFitxer, nLinies);
     }
