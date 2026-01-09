@@ -44,7 +44,6 @@ public class ConfigController extends BaseUserController{
 
     private static final String PROPIETATS_CONFIGURABLES_FILTRE = "propietats_configurables_filtre";
 
-
     @GetMapping
     public String get(HttpServletRequest request, Model model) {
 
@@ -140,11 +139,11 @@ public class ConfigController extends BaseUserController{
         }
     }
 
-    private void fillFormsModel(ConfigGroupDto cGroup, Model model, List<EntitatDto> entitats){
+    private void fillFormsModel(ConfigGroupDto cGroup, Model model, List<EntitatDto> entitats, boolean isFIltre){
 
         List<ConfigDto> confs = new ArrayList<>();
         for (var config: cGroup.getConfigs()) {
-            if (!StringUtils.isEmpty(config.getEntitatCodi())) {
+            if (!Strings.isNullOrEmpty(config.getEntitatCodi()) && !isFIltre) {
                 continue;
             }
             model.addAttribute("config_" + config.getKey().replace('.', '_'), ConfigCommand.builder().key(config.getKey()).value(config.getValue()).build());
@@ -158,8 +157,19 @@ public class ConfigController extends BaseUserController{
             return;
         }
         for (var child : cGroup.getInnerConfigs()){
-            fillFormsModel(child, model, entitats);
+            fillFormsModel(child, model, entitats, isFIltre);
         }
+    }
+
+    private PropietatsConfigurablesCommand getFiltreCommand(HttpServletRequest request) {
+
+        var command = (PropietatsConfigurablesCommand) RequestSessionHelper.obtenirObjecteSessio(request, PROPIETATS_CONFIGURABLES_FILTRE);
+        if (command != null) {
+            return command;
+        }
+        command = new PropietatsConfigurablesCommand();
+        RequestSessionHelper.actualitzarObjecteSessio(request, PROPIETATS_CONFIGURABLES_FILTRE, command);
+        return command;
     }
 
     @Builder @Getter
