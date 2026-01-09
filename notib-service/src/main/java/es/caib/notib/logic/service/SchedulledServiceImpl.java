@@ -141,7 +141,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 	public void enviamentRefrescarEstatDEH() {
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			if (!notificaHelper.isAdviserActiu() && isTasquesActivesProperty() && isEnviamentActualitzacioCertificacioActiva() && notificaHelper.isConnexioNotificaDisponible()) {
+			if (!notificaHelper.isAdviserActiu() && isEnviamentActualitzacioCertificacioActiva() && notificaHelper.isConnexioNotificaDisponible()) {
 				log.info("[DEH] Cercant enviaments DEH finalitzats sense certificació...");
 				List<Long> pendents = notificacioService.getNotificacionsDEHPendentsRefrescarCert();
 				if (pendents != null && !pendents.isEmpty()) {
