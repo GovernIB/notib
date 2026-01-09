@@ -66,7 +66,8 @@ public class GestioDocumentalPluginFilesystem extends AbstractSalutPlugin implem
 	public String create(String agrupacio, InputStream contingut) throws SistemaExternException {
 
 		try (contingut) {
-            long startTime = System.currentTimeMillis();
+			logger.info("[GestioDocumentalPluginFilesystem.create] agrupacio: " + agrupacio);
+			long startTime = System.currentTimeMillis();
 			agrupacio = checkAgrupacio(agrupacio);
 			var basedir = getBaseDir(agrupacio);
 			var subfolderId = getValidSubfolder(agrupacio);
@@ -201,6 +202,7 @@ public class GestioDocumentalPluginFilesystem extends AbstractSalutPlugin implem
 	public Path ultimDirectoryModificat(String baseDir) {
 
 		try {
+			logger.info("[GestioDocumentalPluginFilesystem.ultimDirectoryModificat] baseDir: " + baseDir);
 			var dir = Paths.get(baseDir);
 			try (var list = Files.list(dir)) {
 				if (list.count() > MAX_FILES_IN_FOLDER) {
