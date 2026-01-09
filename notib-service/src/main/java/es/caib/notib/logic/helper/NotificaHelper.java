@@ -13,6 +13,7 @@ import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.dto.anular.Anulacio;
 import es.caib.notib.logic.intf.dto.anular.RespostaAnular;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.intf.ws.adviser.nexea.NexeaAdviserWs;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnvio;
@@ -105,11 +106,21 @@ public class NotificaHelper {
 			}
 			enviament.setAnulat(true);
 			enviament.setMotiuAnulacio(anulacio.getMotiu());
+			enviament.getNotificacio().setEstat(isTotsEnviamentsAnulats(enviament.getNotificacio()) ? NotificacioEstatEnumDto.ANULADA : NotificacioEstatEnumDto.PARCIALMENT_ANULADA);
+			enviament.setNotificaEstat(EnviamentEstat.ANULADA);
 			enviamentTableHelper.actualitzarRegistre(enviament);
 		}
 		return respostaAnular;
 	}
 
+	private boolean isTotsEnviamentsAnulats(NotificacioEntity notificacio) {
+
+		var totsEnviamentsAnulats = true;
+		for (var enviament : notificacio.getEnviaments()) {
+			totsEnviamentsAnulats = totsEnviamentsAnulats && enviament.isAnulat();
+		}
+		return  totsEnviamentsAnulats;
+	}
 
 	@Transactional
 	@JmsListener(destination = CUA_SINCRONIZAR_ENVIO_OE, containerFactory = JMS_FACTORY_ACK)
