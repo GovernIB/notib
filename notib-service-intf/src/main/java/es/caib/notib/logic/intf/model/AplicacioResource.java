@@ -40,7 +40,7 @@ public class AplicacioResource extends BaseResource<Long> {
 	@NotNull
 	@Size(max = 256)
 	private String callbackUrl;
-	private Boolean activa;
+	private Boolean activa = true;
 	private Boolean headerCsrf;
 	@NotNull
 	private LocalTime horariLaboralInici;

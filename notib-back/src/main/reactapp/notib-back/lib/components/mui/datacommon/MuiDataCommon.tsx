@@ -240,7 +240,10 @@ export const useDataCommonEditable = (
     popupEditFormI18nKeys: FormI18nKeys | undefined,
     apiCurrentActions: any,
     apiDelete: (id: any) => Promise<any>,
-    refresh: () => void
+    refresh: () => void,
+    onCreate: ((row: any) => void) | undefined,
+    onUpdate: ((row: any) => void) | undefined,
+    onDelete: ((id: any) => void) | undefined,
 ) => {
     const { t, temporalMessageShow, messageDialogShow } = useBaseAppContext();
     const dataDialogPopupApiRef = React.useRef<DataFormDialogApi>(undefined);
@@ -259,7 +262,8 @@ export const useDataCommonEditable = (
         };
         dataDialogPopupApiRef.current
             ?.show(undefined, processedAdditionalData)
-            .then(() => {
+            .then((data) => {
+                onCreate?.(data);
                 refresh?.();
             })
             .catch(() => {
@@ -280,7 +284,8 @@ export const useDataCommonEditable = (
             };
             dataDialogPopupApiRef.current
                 ?.show(id, processedAdditionalData)
-                .then(() => {
+                .then((data) => {
+                    onUpdate?.(data);
                     refresh?.();
                 })
                 .catch(() => {
@@ -301,6 +306,7 @@ export const useDataCommonEditable = (
                 if (value) {
                     apiDelete(id)
                         .then(() => {
+                            onDelete?.(id);
                             refresh?.();
                             temporalMessageShow(
                                 null,

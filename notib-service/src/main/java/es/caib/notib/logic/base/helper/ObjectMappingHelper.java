@@ -85,10 +85,26 @@ public class ObjectMappingHelper {
 					ReflectionUtils.makeAccessible(sourceField);
 					Field targetField = ReflectionUtils.findField(target.getClass(), sourceField.getName());
 					if (targetField != null) {
-						if (isSimpleType(sourceField.getType())) {
+						if (targetField.getType().isPrimitive() && sourceField.get(source) == null) {
+							if (targetField.getType() == boolean.class) {
+								targetField.setBoolean(target, false);
+							} else if (targetField.getType() == int.class) {
+								targetField.setInt(target, 0);
+							} else if (targetField.getType() == long.class) {
+								targetField.setLong(target, 0L);
+							} else if (targetField.getType() == double.class) {
+								targetField.setDouble(target, 0.0);
+							} else if (targetField.getType() == float.class) {
+								targetField.setFloat(target, 0f);
+							} else if (targetField.getType() == short.class) {
+								targetField.setShort(target, (short)0);
+							} else if (targetField.getType() == byte.class) {
+								targetField.setByte(target, (byte)0);
+							}
+						} else if (isSimpleType(sourceField.getType())) {
 							boolean isFileReferenceMapping =
 									(sourceField.getType().equals(byte[].class) && targetField.getType().equals(FileReference.class)) ||
-									(targetField.getType().equals(byte[].class) && sourceField.getType().equals(FileReference.class));
+											(targetField.getType().equals(byte[].class) && sourceField.getType().equals(FileReference.class));
 							if (!isFileReferenceMapping) {
 								setFieldValue(
 										target,

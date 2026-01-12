@@ -18,7 +18,7 @@ import {
 
 const EntitatFormTabTipusDocs: React.FC = () => {
     const { t } = useTranslation();
-    const { id, fields } = useFormContext();
+    const { id, fields, apiRef: formApiRef } = useFormContext();
     const {
         isReady: apiIsReady,
         find: apiFind,
@@ -68,6 +68,7 @@ const EntitatFormTabTipusDocs: React.FC = () => {
                 apiCreate({ data }).
                     then(() => {
                         refreshRows();
+                        formApiRef.current?.refresh();
                         temporalMessageShow(null, t('page.entitats.form.tipusDocuments.enable.success'), 'success');
                     }).
                     catch(error => {
@@ -79,6 +80,7 @@ const EntitatFormTabTipusDocs: React.FC = () => {
                 apiDelete(found.id).
                     then(() => {
                         refreshRows();
+                        formApiRef.current?.refresh();
                         temporalMessageShow(null, t('page.entitats.form.tipusDocuments.disable.success'), 'success');
                     }).
                     catch(error => {
@@ -88,6 +90,9 @@ const EntitatFormTabTipusDocs: React.FC = () => {
         }
     }
     return <>
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+            <Grid size={4}><FormField name="tipusDocDefault" hiddenEnumValues={hiddenEnumValues}/></Grid>
+        </Grid>
         {tipusDocumentOptions && entitatTipusDocumentRows && <TableContainer component={Paper} variant="outlined">
             <Table sx={{ minWidth: 650 }} aria-label="simple table">
                 <TableHead>
@@ -114,9 +119,6 @@ const EntitatFormTabTipusDocs: React.FC = () => {
                 </TableBody>
             </Table>
         </TableContainer>}
-        <Grid container spacing={2} sx={{ mt: 3 }}>
-            <Grid size={12}><FormField name="tipusDocDefault" hiddenEnumValues={hiddenEnumValues}/></Grid>
-        </Grid>
     </>;
 }
 

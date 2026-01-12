@@ -24,7 +24,7 @@ const EntitatFormTabAplicacionsFormContent: React.FC = () => {
 
 const EntitatFormTabAplicacions: React.FC = () => {
     const { t } = useTranslation();
-    const { id } = useFormContext();
+    const { id, apiRef: formApiRef } = useFormContext();
     const columns = React.useMemo(() => [{
         field: 'usuariCodi',
         sortable: false,
@@ -38,6 +38,9 @@ const EntitatFormTabAplicacions: React.FC = () => {
         sortable: false,
         flex: 1
     }], []);
+    const handleDataGridRowChanges = () => {
+        formApiRef.current?.refresh();
+    }
     return <MuiDataGrid
         title=""
         resourceName="aplicacioResource"
@@ -48,7 +51,9 @@ const EntitatFormTabAplicacions: React.FC = () => {
         toolbarHideQuickFilter
         popupEditActive
         popupEditFormDialogResourceTitle={t('page.entitats.form.resourceNames.aplicacio')}
-        popupEditFormContent={<EntitatFormTabAplicacionsFormContent />} />;
+        popupEditFormContent={<EntitatFormTabAplicacionsFormContent />}
+        onRowCreate={handleDataGridRowChanges}
+        onRowDelete={handleDataGridRowChanges} />;
 }
 
 export default EntitatFormTabAplicacions;
