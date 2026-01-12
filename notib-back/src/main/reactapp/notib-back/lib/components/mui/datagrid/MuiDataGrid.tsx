@@ -3,6 +3,7 @@ import {
     DataGridProProps as DataGridProps,
     GridRowsProp,
     GridRowParams,
+    GridRenderCellParams,
     GridRowClassNameParams,
     GridColDef,
     GridFilterModel,
@@ -16,6 +17,8 @@ import {
     GridEventListener,
     GridCallbackDetails,
     GridInitialState,
+    GridActionsCell,
+    GridActionsCellItem,
     MuiEvent,
     useGridApiRef as useMuiDatagridApiRef,
     useGridApiContext,
@@ -23,6 +26,7 @@ import {
     gridEditRowsStateSelector,
 } from '@mui/x-data-grid-pro';
 import Box from '@mui/material/Box';
+import Icon from '@mui/material/Icon';
 import { capitalize } from '../../../util/text';
 import useLogConsole from '../../../util/useLogConsole';
 import { formattedFieldValue, isFieldNumericType } from '../../../util/fields';
@@ -37,14 +41,10 @@ import { useBaseAppContext, DialogButton } from '../../BaseAppContext';
 import { useMuiBaseAppContext } from '../MuiBaseAppContext';
 import { useResourceApiService } from '../../ResourceApiProvider';
 import { useResourceApiContext, ResourceType, ExportFileType } from '../../ResourceApiContext';
-import { toDataGridActionItem, DataGridActionItemOnClickFn } from './DataGridActionItem';
 import {
     useApiDataCommon,
     useDataCommonEditable,
     DataCommonAdditionalAction,
-    DataCommonTriggerCreateFn,
-    DataCommonTriggerUpdateFn,
-    DataCommonTriggerDeleteFn,
 } from '../datacommon/MuiDataCommon';
 import { useDataToolbar, DataToolbarType } from '../datacommon/DataToolbar';
 import DataGridRow from './DataGridRow';
@@ -303,84 +303,100 @@ const rowArtifactShowCheck = (
         return true;
     }
 };
-const getRowActionOnClick = (
-    rowAction: DataCommonAdditionalAction,
-    triggerCreate: DataCommonTriggerCreateFn,
-    triggerUpdate: DataCommonTriggerUpdateFn,
-    triggerDelete: DataCommonTriggerDeleteFn
-): DataGridActionItemOnClickFn | undefined => {
-    if (rowAction.clickShowCreateDialog) {
-        return (_id, row) => triggerCreate(row);
-    } else if (rowAction.clickShowUpdateDialog) {
-        return (id, row) => triggerUpdate(id, row);
-    } else if (rowAction.clickTriggerDelete) {
-        return (id) => triggerDelete(id);
-    } else {
-        return rowAction.onClick;
-    }
-};
+
+const rowActionsToGridActionsCellItem = (
+    label: string,
+    titleProp?: string,
+    icon?: string,
+    linkTo?: string,
+    linkState?: any,
+    linkTarget?: string,
+    onClick?: (event: any) => void,
+    showInMenu?: boolean,
+    disabled?: boolean) => {
+    const { getLinkComponent } = useBaseAppContext();
+    const additionalProps: any = showInMenu ? { showInMenu: true } : {};
+    linkTo && (additionalProps['component'] = getLinkComponent());
+    linkTo && (additionalProps['to'] = linkTo);
+    linkState && (additionalProps['state'] = linkState);
+    linkTarget && (additionalProps['target'] = linkTarget);
+    const title = !showInMenu ? label : titleProp;
+    const actionCellItem = (
+        <GridActionsCellItem
+            label={label}
+            title={title}
+            icon={icon ? <Icon>{icon}</Icon> : undefined}
+            onClick={onClick}
+            disabled={disabled}
+            {...additionalProps}
+        />
+    );
+    return actionCellItem;
+}
 
 const rowActionsToGridActionsCellItems = (
     rowActions: DataCommonAdditionalAction[],
-    params: GridRowParams,
-    triggerCreate: DataCommonTriggerCreateFn,
-    triggerUpdate: DataCommonTriggerUpdateFn,
-    triggerDelete: DataCommonTriggerDeleteFn,
+    id: any,
+    row: any,
     artifacts: any[] | undefined,
     forceDisabled?: boolean
 ): React.ReactElement[] => {
+    const { apiRef: dataGridApiRef } = useDataGridContext();
     const actions: React.ReactElement[] = [];
     rowActions.forEach((rowAction: DataCommonAdditionalAction) => {
-        const rowLink = rowLinkFind(rowAction.rowLink, params.row['_actions']);
-        const rowLinkShow = rowLinkShowCheck(rowAction.rowLink, params.row['_actions']);
+        const rowLink = rowLinkFind(rowAction.rowLink, row['_actions']);
+        const rowLinkShow = rowLinkShowCheck(rowAction.rowLink, row['_actions']);
         const rowArtifactShow = rowArtifactShowCheck(rowAction.action, rowAction.report, artifacts);
         const rowActionLinkTo =
             typeof rowAction.linkTo === 'function'
-                ? rowAction.linkTo?.(params.row)
-                : rowAction.linkTo?.replace('{{id}}', '' + params.id);
+                ? rowAction.linkTo?.(row)
+                : rowAction.linkTo?.replace('{{id}}', '' + id);
         const rowActionLinkState =
             typeof rowAction.linkState === 'function'
-                ? rowAction.linkState?.(params.row)
+                ? rowAction.linkState?.(row)
                 : rowAction.linkState;
         const rowActionLinkTarget =
             typeof rowAction.linkTarget === 'function'
-                ? rowAction.linkTarget?.(params.row)
+                ? rowAction.linkTarget?.(row)
                 : rowAction.linkTarget;
-        const rowActionOnClick = getRowActionOnClick(
-            rowAction,
-            triggerCreate,
-            triggerUpdate,
-            triggerDelete
-        );
+        const rowActionOnClick = (event: any) => {
+            if (rowAction.clickShowCreateDialog) {
+                dataGridApiRef.current?.triggerCreate?.(row);
+            } else if (rowAction.clickShowUpdateDialog) {
+                 dataGridApiRef.current?.triggerUpdate?.(id, row);
+            } else if (rowAction.clickTriggerDelete) {
+                dataGridApiRef.current?.triggerDelete?.(id);
+            } else {
+                rowAction.onClick?.(id, row, event);
+            }
+        }
         const label =
-            typeof rowAction.label === 'function' ? rowAction.label(params.row) : rowAction.label;
+            typeof rowAction.label === 'function' ? rowAction.label(row) : rowAction.label;
         const title =
-            typeof rowAction.title === 'function' ? rowAction.title(params.row) : rowAction.title;
+            typeof rowAction.title === 'function' ? rowAction.title(row) : rowAction.title;
         const icon =
-            typeof rowAction.icon === 'function' ? rowAction.icon(params.row) : rowAction.icon;
+            typeof rowAction.icon === 'function' ? rowAction.icon(row) : rowAction.icon;
         const showInMenu =
             typeof rowAction.showInMenu === 'function'
-                ? rowAction.showInMenu(params.row)
+                ? rowAction.showInMenu(row)
                 : rowAction.showInMenu;
         const disabled =
             forceDisabled ||
             (typeof rowAction.disabled === 'function'
-                ? rowAction.disabled(params.row)
+                ? rowAction.disabled(row)
                 : rowAction.disabled);
         const hidden =
             typeof rowAction.hidden === 'function'
-                ? rowAction.hidden(params.row)
+                ? rowAction.hidden(row)
                 : rowAction.hidden;
         rowLinkShow &&
             rowArtifactShow &&
             !hidden &&
             actions.push(
-                toDataGridActionItem(
-                    params.id,
+                rowActionsToGridActionsCellItem(
                     label ?? (rowLink != null ? rowLink?.title : rowAction),
                     title,
                     icon,
-                    params.row,
                     rowActionLinkTo,
                     rowActionLinkState,
                     rowActionLinkTarget,
@@ -400,9 +416,6 @@ const useGridColumns = (
     rowActions: DataCommonAdditionalAction[],
     rowInlineEditActive: boolean,
     fields: any[] | undefined,
-    triggerCreate: DataCommonTriggerCreateFn,
-    triggerUpdate: DataCommonTriggerUpdateFn,
-    triggerDelete: DataCommonTriggerDeleteFn,
     inlineStopRowEditMode: (id: any, ignoreModifications?: boolean) => void,
     artifacts: any[] | undefined
 ) => {
@@ -459,9 +472,9 @@ const useGridColumns = (
             const actionsColumn = {
                 field: ' ',
                 type: 'actions',
-                getActions: (params: GridRowParams) => {
-                    const apiRef = useGridApiContext();
-                    const rowModesModel = useGridSelector(apiRef, gridEditRowsStateSelector);
+                renderCell: (params: GridRenderCellParams) => {
+                    const gridApiRef = useGridApiContext();
+                    const rowModesModel = useGridSelector(gridApiRef, gridEditRowsStateSelector);
                     const anyRowInEditMode = Object.keys(rowModesModel).length > 0;
                     const currentRowInEditMode = typeof rowModesModel[params.id] !== 'undefined';
                     const rowEditActions = [
@@ -476,15 +489,16 @@ const useGridColumns = (
                             onClick: () => inlineStopRowEditMode(params.id, true),
                         },
                     ];
-                    return rowActionsToGridActionsCellItems(
+                    const actionsCellItems = rowActionsToGridActionsCellItems(
                         currentRowInEditMode ? rowEditActions : rowActions,
-                        params,
-                        triggerCreate,
-                        triggerUpdate,
-                        triggerDelete,
+                        params.id,
+                        params.row,
                         artifacts,
                         anyRowInEditMode && !currentRowInEditMode
                     );
+                    return <GridActionsCell {...params}>
+                        {actionsCellItems}
+                    </GridActionsCell>;
                 },
                 ...rowActionsColumnProps,
             };
@@ -860,19 +874,27 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         [...rowAdditionalActions, ...rowEditActions],
         (inlineEditActive ?? false) || (inlineEditUpdateActive ?? false),
         fields,
-        triggerCreate,
-        triggerUpdate,
-        triggerDelete,
         inlineStopRowEditMode,
         artifacts,
     );
     const apiRef = React.useRef<MuiDataGridApi>({
-        refresh,
-        export: gridExport,
-        triggerCreate,
-        triggerUpdate,
-        setFilter: (filter) => setInternalFilter(filter ?? undefined),
-    });
+            refresh,
+            export: gridExport,
+            triggerCreate,
+            triggerUpdate,
+            triggerDelete,
+            setFilter: (filter) => setInternalFilter(filter ?? undefined),
+        });
+    React.useEffect(() => {
+        apiRef.current = {
+            refresh,
+            export: gridExport,
+            triggerCreate,
+            triggerUpdate,
+            triggerDelete,
+            setFilter: (filter) => setInternalFilter(filter ?? undefined),
+        };
+    }, [refresh, gridExport, triggerCreate, triggerUpdate, triggerDelete, setInternalFilter]);
     if (apiRefProp) {
         if (apiRefProp.current) {
             apiRefProp.current.refresh = refresh;

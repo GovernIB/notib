@@ -362,11 +362,11 @@ export const useDataCommonEditable = (
         rowEditActions.push({
             label: t('datacommon.delete.label'),
             icon: 'delete',
-            onClick: triggerDelete,
             disabled: rowDisableDeleteButton,
             hidden: rowHideDeleteButton,
             showInMenu: true,
             rowLink: 'delete',
+            clickTriggerDelete: true
         });
     rowDetailLink &&
         rowEditActions.push({

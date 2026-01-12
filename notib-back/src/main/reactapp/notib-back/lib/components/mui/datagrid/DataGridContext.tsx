@@ -6,6 +6,7 @@ export type MuiDataGridApi = {
     export: () => void;
     triggerCreate: (row?: any, additionalData?: any) => void;
     triggerUpdate: (id: any, row?: any, additionalData?: any) => void;
+    triggerDelete: (id: any) => void;
     setFilter: (filter: string | undefined) => void;
 };
 
