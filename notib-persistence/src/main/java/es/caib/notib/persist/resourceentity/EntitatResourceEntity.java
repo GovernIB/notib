@@ -86,6 +86,8 @@ public class EntitatResourceEntity extends BaseAuditableResourceEntity<EntitatRe
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "entitat_entrega_cie_fk"))
 	private EntregaCieEntity entregaCie;
 
+	@Formula("(select count(*) from " + BaseConfig.DB_PREFIX + "entitat_tipus_doc tdc where tdc.entitat_id = id)")
+	private Integer tipusDocCount;
 	@Formula("(select count(*) from " + BaseConfig.DB_PREFIX + "aplicacio apl where apl.entitat_id = id)")
 	private Integer aplicacioCount;
 

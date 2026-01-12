@@ -34,7 +34,7 @@ const EntitatFormTabPermisosFormContent: React.FC = () => {
 
 const EntitatFormTabPermisos: React.FC = () => {
     const { t } = useTranslation();
-    const { id } = useFormContext();
+    const { id, apiRef: formApiRef } = useFormContext();
     const sidGrantedAuthorityEnumOptions = [{
         value: false,
         description: t('page.entitats.form.permisos.grantedAuthority.user')
@@ -78,6 +78,9 @@ const EntitatFormTabPermisos: React.FC = () => {
         sortable: false,
         flex: 1
     }], [t]);
+    const handleDataGridRowChanges = () => {
+        formApiRef.current?.refresh();
+    }
     return <MuiDataGrid
         title=""
         resourceName="aclEntryResource"
@@ -85,12 +88,14 @@ const EntitatFormTabPermisos: React.FC = () => {
         staticFilter={"resourceName:'entitatResource' and resourceId:" + id}
         formAdditionalData={{ sidGrantedAuthority: false, resourceName: 'entitatResource', resourceId: id }}
         paginationActive
+        //density="standard"
         toolbarHideQuickFilter
         inlineEditActive
         //popupEditActive
         popupEditFormDialogResourceTitle={t('page.entitats.form.resourceNames.permis')}
         popupEditFormContent={<EntitatFormTabPermisosFormContent />}
-        density="standard" />;
+        onRowCreate={handleDataGridRowChanges}
+        onRowDelete={handleDataGridRowChanges} />;
 }
 
 export default EntitatFormTabPermisos;

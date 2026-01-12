@@ -285,7 +285,10 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         popupEditFormI18nKeys,
         apiCurrentActions,
         apiDelete,
-        refresh
+        refresh,
+        undefined,
+        undefined,
+        undefined
     );
     const toolbarNodesPosition = 2;
     const toolbarListElementsWithPositions: ReactElementWithPosition[] = [];

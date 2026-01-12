@@ -86,7 +86,7 @@ const EntitatFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> 
     React.useEffect(() => {
         setSubtitle(data?.codi + ', ' + data?.nom);
     }, [data]);
-    const tipusDocsTabLabel = <Badge badgeContent={data.aplicacioCount} color="primary">
+    const tipusDocsTabLabel = <Badge badgeContent={data.tipusDocCount} color="primary">
         {t('page.entitats.form.tabs.tipusDocs')}
     </Badge>
     const aplicacionsTabLabel = <Badge badgeContent={data.aplicacioCount} color="primary">
@@ -154,7 +154,7 @@ export const EntitatForm: React.FC = () => {
             resourceName="entitatResource"
             id={id != null ? parseInt(id) : id}
             title={id != null ? t('page.entitats.form.titleUpdate') : t('page.entitats.form.titleCreate')}
-            toolbarSubtitle={subtitle}
+            toolbarSubtitle={id != null ? subtitle : undefined}
             componentProps={{ style: { height: '100%' } }}
             commonFieldComponentProps={{ size: 'small' }}>
             <EntitatFormContent setSubtitle={setSubtitle} />

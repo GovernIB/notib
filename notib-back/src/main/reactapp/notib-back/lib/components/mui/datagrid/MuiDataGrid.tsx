@@ -232,6 +232,12 @@ export type MuiDataGridProps = {
         rowSelectionModel: GridRowSelectionModel,
         details: GridCallbackDetails
     ) => void;
+    /** Event que es llença quan es crea una nova fila */
+    onRowCreate?: (row: any) => void;
+    /** Event que es llença quan es modifica una fila */
+    onRowUpdate?: (row: any) => void;
+    /** Event que es llença quan s'elimina una fila */
+    onRowDelete?: (id: any) => void;
     /** Referència a l'api del component */
     apiRef?: MuiDataGridApiRef;
     /** Referència a l'api interna del component DataGrid de MUI */
@@ -590,6 +596,9 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         onRowsChange,
         onRowOrderChange,
         onRowSelectionModelChange,
+        onRowCreate,
+        onRowUpdate,
+        onRowDelete,
         apiRef: apiRefProp,
         datagridApiRef: datagridApiRefProp,
         height,
@@ -797,7 +806,10 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         popupEditFormI18nKeys,
         apiCurrentActions,
         apiDelete,
-        refresh
+        refresh,
+        onRowCreate,
+        onRowUpdate,
+        onRowDelete
     );
     const toolbarNodesPosition = 2;
     const toolbarGridElementsWithPositions: ReactElementWithPosition[] = [];
@@ -938,6 +950,11 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                                 ? { ...saved, id: CREATE_ROW_ID }
                                 : saved
                         );
+                        if (newRow.id === CREATE_ROW_ID) {
+                            onRowCreate?.(newRow);
+                        } else {
+                            onRowUpdate?.(newRow);
+                        }
                         refresh();
                     })
                     .catch(reject);

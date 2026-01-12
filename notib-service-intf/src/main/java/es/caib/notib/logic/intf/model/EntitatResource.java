@@ -85,6 +85,7 @@ public class EntitatResource extends BaseResource<Long> {
 	private Long operadorPostalId;
 	private Long cieId;
 
+	private Integer tipusDocCount;
 	private Integer aplicacioCount;
 	private Integer aclEntryCount;
 
