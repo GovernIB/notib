@@ -1,5 +1,6 @@
 package es.caib.notib.plugin.registre;
 
+import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 
