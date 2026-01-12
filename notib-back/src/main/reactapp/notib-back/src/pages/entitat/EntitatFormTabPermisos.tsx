@@ -35,6 +35,13 @@ const EntitatFormTabPermisosFormContent: React.FC = () => {
 const EntitatFormTabPermisos: React.FC = () => {
     const { t } = useTranslation();
     const { id } = useFormContext();
+    const sidGrantedAuthorityEnumOptions = [{
+        value: false,
+        description: t('page.entitats.form.permisos.grantedAuthority.user')
+    }, {
+        value: true,
+        description: t('page.entitats.form.permisos.grantedAuthority.role')
+    }];
     const columns = React.useMemo(() => [{
         headerName: t('page.entitats.form.permisos.tipus'),
         field: 'sidGrantedAuthority',
@@ -43,6 +50,9 @@ const EntitatFormTabPermisos: React.FC = () => {
         valueFormatter: (value: any) => value ?
             t('page.entitats.form.permisos.grantedAuthority.role') :
             t('page.entitats.form.permisos.grantedAuthority.user'),
+        renderEditCell: (params: any) => {
+            return <FormField name={params.field} label="" type="enum" options={sidGrantedAuthorityEnumOptions} required inline />;
+        },
     }, {
         field: 'sidName',
         sortable: false,
@@ -73,7 +83,7 @@ const EntitatFormTabPermisos: React.FC = () => {
         resourceName="aclEntryResource"
         columns={columns}
         staticFilter={"resourceName:'entitatResource' and resourceId:" + id}
-        formAdditionalData={{ resourceName: 'entitatResource', resourceId: id }}
+        formAdditionalData={{ sidGrantedAuthority: false, resourceName: 'entitatResource', resourceId: id }}
         paginationActive
         toolbarHideQuickFilter
         inlineEditActive

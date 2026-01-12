@@ -213,6 +213,7 @@ export const useDataCommonEditable = (
     readOnly: boolean,
     formAdditionalData: ((row?: any) => any) | any,
     toolbarCreateLink: string | undefined,
+    toolbarDisableCreateLink: boolean | (() => boolean) | undefined,
     inlineCreate: (() => void) | undefined,
     inlineUpdate: ((id: any, row?: any, additionalData?: any) => void) | undefined,
     rowDetailLink: string | undefined,
@@ -322,6 +323,7 @@ export const useDataCommonEditable = (
     };
     const isCreateLinkPresent = apiCurrentActions?.['create'] != null;
     const createLinkConfigError = !readOnly && !isPopupEditCreate && !isInlineEditCreate && toolbarCreateLink == null;
+    const toolbarDisableCreateLinkValue = typeof toolbarDisableCreateLink === 'function' ? toolbarDisableCreateLink() : toolbarDisableCreateLink;
     const toolbarAddElement =
         isCreateLinkPresent && !readOnly
             ? toToolbarIcon('add', {
@@ -331,7 +333,7 @@ export const useDataCommonEditable = (
                       ? { additionalData: formAdditionalData }
                       : undefined,
                   onClick: !toolbarCreateLink ? (isInlineEditCreate ? inlineCreate : triggerCreate) : undefined,
-                  disabled: createLinkConfigError,
+                  disabled: toolbarDisableCreateLinkValue || createLinkConfigError,
               })
             : undefined;
     const rowEditActions: DataCommonAdditionalAction[] = [];

@@ -10,6 +10,7 @@ import {
     GridSortDirection,
     GridPaginationModel,
     GridRowSelectionModel,
+    GridRowModesModel,
     GridSlots,
     GridApiPro,
     GridEventListener,
@@ -625,6 +626,8 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         !treeDataAdditionalRowsIsFunction ? [] : (treeDataAdditionalRows as any[])
     );
     const [initialState, setInitialState] = React.useState<GridInitialState | null>();
+    const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
+    const anyRowInEditMode = Object.keys(rowModesModel).length > 0;
     const {
         currentActions: apiCurrentActions,
         currentError: apiCurrentError,
@@ -767,6 +770,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         readOnly ?? false,
         formAdditionalData,
         toolbarCreateLink,
+        anyRowInEditMode,
         (inlineEditActive || inlineEditCreateActive) ? inlineCreate : undefined,
         (inlineEditActive || inlineEditUpdateActive) ? inlineUpdate : undefined,
         rowDetailLink,
@@ -908,6 +912,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
           };
     const inlineEditingProps: any = inlineEditActive || inlineEditCreateActive ? {
         editMode: 'row',
+        onRowModesModelChange: setRowModesModel,
         onRowEditStart: (params: any) => {
             formApiRef.current.reset(params.row, params.id);
             setTimeout(() => formApiRef.current.focus(params.field));
@@ -923,9 +928,20 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                 }
             }
         },
-        processRowUpdate: () => {
-            return formApiRef.current?.save();
-        },
+        processRowUpdate: (newRow: any) =>
+            new Promise((resolve, reject) => {
+                formApiRef.current
+                    ?.save()
+                    .then((saved) => {
+                        resolve(
+                            newRow.id === CREATE_ROW_ID
+                                ? { ...saved, id: CREATE_ROW_ID }
+                                : saved
+                        );
+                        refresh();
+                    })
+                    .catch(reject);
+            }),
         onProcessRowUpdateError: (error: any) => {
             if (!error.modificationCanceledError && error.status === 422) {
                 const errors = error.errors ?? error.validationErrors;
