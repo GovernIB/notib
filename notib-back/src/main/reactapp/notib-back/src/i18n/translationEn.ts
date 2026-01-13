@@ -3,6 +3,7 @@ const translationEn = {
         home: "Home",
         config: "Settings",
         entitats: "Entities",
+        avisos: "Advices",
         enviaments: "Deliveries",
     },
     page: {
@@ -48,6 +49,15 @@ const translationEn = {
                     admLecturaAllowed: "Adm. read",
                     aplicacioAllowed: "Application",
                 }
+            },
+        },
+        avisos: {
+            grid: {
+                title: "Advices",
+            },
+            form: {
+                titleCreate: "Create advice",
+                titleUpdate: "Update advice",
             },
         },
         notFound: {
