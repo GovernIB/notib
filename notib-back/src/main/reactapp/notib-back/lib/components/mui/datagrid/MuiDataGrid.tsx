@@ -51,6 +51,7 @@ import DataGridRow from './DataGridRow';
 import DataGridFooter from './DataGridFooter';
 import DataGridNoRowsOverlay from './DataGridNoRowsOverlay';
 import DataGridCustomStyle from './DataGridCustomStyle';
+import DataGridBulkDelete from './DataGridBulkDelete';
 import DataGridContext, {
     MuiDataGridApi,
     MuiDataGridApiRef,
@@ -153,6 +154,8 @@ export type MuiDataGridProps = {
     toolbarHide?: true;
     /** Indica si el toolbar ha de mostrar un botó per a tornar enrere */
     toolbarBackButton?: true;
+    /** Indica si el toolbar ha de mostrar un botó per a l'esborrat massiu de files */
+    toolbarBulkDelete?: true;
     /** Oculta el botó d'exportació de la barra d'eines */
     toolbarHideExport?: false;
     /** Oculta el botó de creació de la barra d'eines */
@@ -237,7 +240,7 @@ export type MuiDataGridProps = {
     /** Event que es llença quan es modifica una fila */
     onRowUpdate?: (row: any) => void;
     /** Event que es llença quan s'elimina una fila */
-    onRowDelete?: (id: any) => void;
+    onRowDelete?: (id: any | any[]) => void;
     /** Referència a l'api del component */
     apiRef?: MuiDataGridApiRef;
     /** Referència a l'api interna del component DataGrid de MUI */
@@ -572,6 +575,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         toolbarType = 'default',
         toolbarHide,
         toolbarBackButton,
+        toolbarBulkDelete,
         toolbarHideExport = true,
         toolbarHideCreate,
         toolbarHideRefresh,
@@ -612,7 +616,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         onRowSelectionModelChange,
         onRowCreate,
         onRowUpdate,
-        onRowDelete,
+        onRowDelete: onRowDeleteProp,
         apiRef: apiRefProp,
         datagridApiRef: datagridApiRefProp,
         height,
@@ -655,6 +659,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         currentActions: apiCurrentActions,
         currentError: apiCurrentError,
         delete: apiDelete,
+        bulkDelete: apiBulkDelete,
     } = useResourceApiService(resourceName);
     const findArgs = React.useMemo(() => {
         const filter = staticFilter
@@ -718,6 +723,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     );
     const isUpperToolbarType = toolbarType === 'upper';
     const gridMargins = isUpperToolbarType ? { m: 2 } : null;
+    const canDeleteAnyRow = rows.some(r => r['_actions']?.['delete'] != null);
     React.useEffect(() => {
         onRowsChange?.(rows, pageInfo);
         if (treeDataAdditionalRowsIsFunction) {
@@ -781,6 +787,17 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
             datagridApiRef.current?.stopRowEditMode({ id });
         }
     }
+    const onRowDelete = (id: any | any[]) => {
+        const ids = Array.isArray(id) ? id : (id != null ? [id] : null);
+        if (ids != null) {
+            setRowSelectionModel((prev) => {
+                const newIds = new Set(
+                    [...prev.ids].filter((id) => !ids.includes(id)));
+                return { ...prev, ids: newIds };
+            });
+        }
+        onRowDeleteProp?.(id);
+    }
     const {
         toolbarAddElement,
         rowEditActions,
@@ -820,6 +837,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         popupEditFormI18nKeys,
         apiCurrentActions,
         apiDelete,
+        apiBulkDelete,
         refresh,
         onRowCreate,
         onRowUpdate,
@@ -831,6 +849,14 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         toolbarGridElementsWithPositions.push({
             position: toolbarNodesPosition,
             element: !toolbarHideCreate ? toolbarAddElement : <span />,
+        });
+    toolbarBulkDelete &&
+        toolbarGridElementsWithPositions.push({
+            position: toolbarNodesPosition,
+            element: <DataGridBulkDelete
+                rowSelectionModel={rowSelectionModel}
+                disabled={!canDeleteAnyRow}
+                onClick={triggerDelete} />,
         });
     const toolbarNumElements =
         toolbarNodesPosition +
@@ -926,7 +952,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
               rowCount: pageInfo?.totalElements ?? 0,
           }
         : null;
-    const selectionProps: any = selectionActive
+    const selectionProps: any = selectionActive || toolbarBulkDelete
         ? {
               checkboxSelection: true,
               disableRowSelectionOnClick: true,

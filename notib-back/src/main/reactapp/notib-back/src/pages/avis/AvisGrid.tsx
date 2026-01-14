@@ -1,6 +1,5 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Chip from '@mui/material/Chip';
 import {
     GridPage,
     MuiDataGrid,
@@ -10,6 +9,9 @@ import {
 export const AvisGrid = () => {
     const { t } = useTranslation();
     const columns: MuiDataGridColDef[] =  React.useMemo(() => [{
+        field: 'entitat',
+        flex: 2,
+    }, {
         field: 'assumpte',
         flex: 4,
     }, {
@@ -33,8 +35,9 @@ export const AvisGrid = () => {
             resourceName="avisResource"
             columns={columns}
             paginationActive
+            toolbarBulkDelete
             toolbarCreateLink="form"
-            rowLink="form/{{id}}"
+            //rowLink="form/{{id}}"
             rowUpdateLink="form/{{id}}" />
     </GridPage>;
 };

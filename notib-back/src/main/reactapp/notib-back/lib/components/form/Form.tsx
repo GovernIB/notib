@@ -439,6 +439,32 @@ export const Form: React.FC<FormProps> = (props) => {
                 reject('Form validation only available in form artifacts');
             }
         });
+    const navigateToSaveLink = (
+        link: string | undefined,
+        id: any,
+        replace?: boolean) => {
+        const linkIdReplaced = link?.replace('{{id}}', '' + id);
+        if (linkIdReplaced?.startsWith('.')) {
+            linkIdReplaced &&
+                navigate(locationPath + '/' + linkIdReplaced, { replace });
+        } else if (linkIdReplaced?.startsWith('/')) {
+            linkIdReplaced &&
+                navigate(linkIdReplaced.substring(1), {
+                    replace: true,
+                });
+        } else {
+            const sli = locationPath?.lastIndexOf('/');
+            if (sli != -1) {
+                linkIdReplaced &&
+                    navigate(
+                        locationPath.substring(0, sli + 1) + linkIdReplaced,
+                        { replace }
+                    );
+            } else {
+                linkIdReplaced && navigate(linkIdReplaced, { replace });
+            }
+        }
+    }
     const save = () =>
         new Promise<any>((resolve, reject) => {
             if (resourceType == null) {
@@ -466,49 +492,14 @@ export const Form: React.FC<FormProps> = (props) => {
                                     ? onUpdateSuccess(savedData)
                                     : onSaveSuccess?.(data);
                                 if (updateLink != null || saveLink != null) {
-                                    const link = (updateLink ?? saveLink)?.replace(
-                                        '{{id}}',
-                                        '' + savedData.id
-                                    );
-                                    link &&
-                                        navigate(link, {
-                                            replace: true,
-                                            relative: 'route',
-                                        });
+                                    navigateToSaveLink((updateLink ?? saveLink), savedData.id);
                                 }
                             } else {
                                 onCreateSuccess != null
                                     ? onCreateSuccess(savedData)
                                     : onSaveSuccess?.(data);
                                 if (createLink || saveLink) {
-                                    const link = (createLink ?? saveLink)?.replace(
-                                        '{{id}}',
-                                        '' + savedData.id
-                                    );
-                                    if (link?.startsWith('.')) {
-                                        link &&
-                                            navigate(locationPath + '/' + link, {
-                                                replace: true,
-                                            });
-                                    } else if (link?.startsWith('/')) {
-                                        link &&
-                                            navigate(link.substring(1), {
-                                                replace: true,
-                                            });
-                                    } else {
-                                        const sli = locationPath?.lastIndexOf('/');
-                                        if (sli != -1) {
-                                            link &&
-                                                navigate(
-                                                    locationPath.substring(0, sli + 1) + link,
-                                                    {
-                                                        replace: true,
-                                                    }
-                                                );
-                                        } else {
-                                            link && navigate(link, { replace: true });
-                                        }
-                                    }
+                                    navigateToSaveLink((createLink ?? saveLink), savedData.id, true);
                                 }
                             }
                             resolve(savedData);

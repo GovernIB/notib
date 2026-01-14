@@ -25,13 +25,13 @@ export const App = () => {
         to: '/avisos',
         icon: 'notifications',
         resourceName: 'avisResource',
-    }, {
+    }/*, {
         id: 'enviaments',
         title: t('menu.enviaments'),
         to: '/enviaments',
         icon: 'mail_outline',
         resourceName: 'enviamentResource',
-    }]
+    }*/]
     const menuEntries = [{
         id: 'home',
         title: t('menu.home'),

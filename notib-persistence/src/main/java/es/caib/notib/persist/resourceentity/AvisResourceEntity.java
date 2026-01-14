@@ -31,7 +31,7 @@ public class AvisResourceEntity extends BaseAuditableResourceEntity<AvisResource
 	@Column(name = "data_inici", nullable = false)
 	private Date dataInici;
 	@Temporal(TemporalType.DATE)
-	@Column(name = "data_final", nullable = false)
+	@Column(name = "data_final")
 	private Date dataFinal;
 	@Column(name = "actiu", nullable = false)
 	private Boolean actiu;

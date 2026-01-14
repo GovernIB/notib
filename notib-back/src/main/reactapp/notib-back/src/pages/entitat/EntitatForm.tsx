@@ -155,6 +155,8 @@ export const EntitatForm: React.FC = () => {
             id={id != null ? parseInt(id) : id}
             title={id != null ? t('page.entitats.form.titleUpdate') : t('page.entitats.form.titleCreate')}
             toolbarSubtitle={id != null ? subtitle : undefined}
+            createLink="../"
+            updateLink="../../"
             componentProps={{ style: { height: '100%' } }}
             commonFieldComponentProps={{ size: 'small' }}>
             <EntitatFormContent setSubtitle={setSubtitle} />

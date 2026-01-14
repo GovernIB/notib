@@ -10,6 +10,7 @@ import {
 
 const AvisFormContent: React.FC = () => {
     return <Grid container spacing={2}>
+        <Grid size={12}><FormField name="entitat" /></Grid>
         <Grid size={12}><FormField name="assumpte" /></Grid>
         <Grid size={12}><FormField name="missatge" type="textarea" /></Grid>
         <Grid size={6}><FormField name="dataInici" type="date" /></Grid>
@@ -27,6 +28,9 @@ export const AvisForm: React.FC = () => {
             resourceName="avisResource"
             id={id != null ? parseInt(id) : id}
             title={id != null ? t('page.avisos.form.titleUpdate') : t('page.avisos.form.titleCreate')}
+            //createLink="./{{id}}"
+            createLink="../"
+            updateLink="../../"
             componentProps={{ style: { height: '100%' } }}
             commonFieldComponentProps={{ size: 'small' }}>
             <AvisFormContent />

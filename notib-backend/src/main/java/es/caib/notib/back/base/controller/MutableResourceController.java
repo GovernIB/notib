@@ -3,9 +3,7 @@ package es.caib.notib.back.base.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import es.caib.notib.logic.intf.base.exception.ArtifactNotFoundException;
-import es.caib.notib.logic.intf.base.model.FieldOption;
-import es.caib.notib.logic.intf.base.model.OnChangeEvent;
-import es.caib.notib.logic.intf.base.model.Resource;
+import es.caib.notib.logic.intf.base.model.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -13,7 +11,9 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.validation.Valid;
 import java.io.Serializable;
 
 /**
@@ -103,6 +103,18 @@ public interface MutableResourceController<R extends Resource<? extends Serializ
 	 */
 	ResponseEntity<String> onChange(
 			final OnChangeEvent<ID> onChangeEvent) throws JsonProcessingException;
+
+	/**
+	 * Executa accions sobre múltiples recursos (PATCH, ACTION, DELETE).
+	 *
+	 * @param bulkRequest
+	 *            paràmetres de l'execució múltiple.
+	 * @return el resultat de l'execució (conté informació de l'execució sobre cada recurs).
+	 */
+	ResponseEntity<BulkResponse<ID>> bulk(
+			@Valid
+			@RequestBody
+			final BulkRequest<ID> bulkRequest);
 
 	/**
 	 * Consulta paginada de les opcions disponibles per a emplenar un camp de tipus ResourceReference.

@@ -44,11 +44,10 @@ public class AvisResource extends BaseResource<Long> {
 	private String missatge;
 	@NotNull
 	private Date dataInici;
-	@NotNull
 	private Date dataFinal;
 	@NotNull
-	private AvisNivellEnumDto avisNivell;
-	private boolean actiu;
+	private AvisNivellEnumDto avisNivell = AvisNivellEnumDto.INFO;
+	private boolean actiu = true;
 	private boolean avisAdministrador;
 
 	@NotNull

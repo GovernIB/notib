@@ -36,6 +36,13 @@ const componentsEs = {
                 success: 'Elemento borrado',
                 error: 'Error borrando elemento',
             },
+            multiple: {
+                label: 'Confirmación',
+                confirm:
+                    '¿Está seguro de que desea borrar los {{count}} elementos seleccionados (esta acción no se puede deshacer)?',
+                success: '{{count}} elementos borrados',
+                error: 'No se han podido borrar {{count}} elementos',
+            },
         },
         export: {
             label: 'Exportar',

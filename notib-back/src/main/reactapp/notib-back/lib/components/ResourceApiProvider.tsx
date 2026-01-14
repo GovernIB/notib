@@ -40,6 +40,9 @@ type ResourceApiMethods = {
     fieldOptionsFields: (args: ResourceApiFieldArgs) => Promise<any[]>;
     fieldOptionsFind: (args: ResourceApiFieldOptionsFindArgs) => Promise<ResourceApiFindResponse>;
     fieldDownload: (id: any, args: ResourceApiFieldArgs) => Promise<ResourceApiBlobResponse>;
+    bulkPatch: (ids: any[], args: ResourceApiRequestArgs) => Promise<ResourceApiBulkResponse>;
+    bulkAction: (ids: any[], args: ResourceApiActionArgs) => Promise<ResourceApiBulkResponse>;
+    bulkDelete: (ids: any[], args?: ResourceApiRequestArgs) => Promise<ResourceApiBulkResponse>;
 };
 
 export type ResourceApiService = {
@@ -114,6 +117,17 @@ export type ResourceApiExportArgs = ResourceApiFindCommonArgs & {
 export type ResourceApiBlobResponse = {
     blob: Blob;
     fileName: string;
+};
+
+export type ResourceApiBulkResponse = {
+    successCount: number;
+    errorCount: number;
+    items: {
+        id: any;
+        actionResult?: any;
+        error?: boolean;
+        errorMessage?: string;
+    }[];
 };
 
 export type ResourceApiArtifact = {
@@ -997,6 +1011,72 @@ const generateResourceApiMethods = (
         },
         [request]
     );
+    const bulkPatch = React.useCallback(
+        (ids: any[], args: ResourceApiRequestArgs): Promise<ResourceApiBulkResponse> => {
+            const requestArgs = {
+                ...args,
+                data: {
+                    ids,
+                    type: 'PATCH',
+                    params: args.data
+                },
+            };
+            return new Promise((resolve, reject) => {
+                request('bulk', null, requestArgs)
+                    .then((state: State) => {
+                        resolve(state.data);
+                    })
+                    .catch((problem: Problem) => {
+                        reject(toResourceApiError(problem));
+                    });
+            });
+        },
+        [request]
+    );
+    const bulkAction = React.useCallback(
+        (ids: any[], args: ResourceApiActionArgs): Promise<ResourceApiBulkResponse> => {
+            const requestArgs = {
+                ...args,
+                data: {
+                    ids,
+                    type: 'ACTION',
+                    actionCode: args.code,
+                    params: args.data
+                },
+            };
+            return new Promise((resolve, reject) => {
+                request('bulk', null, requestArgs)
+                    .then((state: State) => {
+                        resolve(state.data);
+                    })
+                    .catch((problem: Problem) => {
+                        reject(toResourceApiError(problem));
+                    });
+            });
+        },
+        [request]
+    );
+    const bulkDelete = React.useCallback(
+        (ids: any[], args?: ResourceApiRequestArgs): Promise<ResourceApiBulkResponse> => {
+            const requestArgs = {
+                ...args,
+                data: {
+                    ids,
+                    type: 'DELETE',
+                },
+            };
+            return new Promise((resolve, reject) => {
+                request('bulk', null, requestArgs)
+                    .then((state: State) => {
+                        resolve(state.data);
+                    })
+                    .catch((problem: Problem) => {
+                        reject(toResourceApiError(problem));
+                    });
+            });
+        },
+        [request]
+    );
     return {
         getOne,
         find,
@@ -1016,6 +1096,9 @@ const generateResourceApiMethods = (
         fieldOptionsFields,
         fieldOptionsFind,
         fieldDownload,
+        bulkPatch,
+        bulkAction,
+        bulkDelete,
     };
 };
 
