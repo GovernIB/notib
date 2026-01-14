@@ -20,12 +20,18 @@ export const App = () => {
         icon: 'layers',
         resourceName: 'entitatResource',
     }, {
+        id: 'avisos',
+        title: t('menu.avisos'),
+        to: '/avisos',
+        icon: 'notifications',
+        resourceName: 'avisResource',
+    }/*, {
         id: 'enviaments',
         title: t('menu.enviaments'),
         to: '/enviaments',
         icon: 'mail_outline',
         resourceName: 'enviamentResource',
-    }]
+    }*/]
     const menuEntries = [{
         id: 'home',
         title: t('menu.home'),

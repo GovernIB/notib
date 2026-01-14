@@ -35,6 +35,13 @@ const componentsEn = {
                 success: 'Deleted items',
                 error: 'Error deleting items',
             },
+            multiple: {
+                label: 'Confirmation',
+                confirm:
+                    "Are you sure you want to delete {{count}} selected items (this action can't be undone)?",
+                success: '{{count}} items deleted',
+                error: "{{count}} items couldn't be deleted",
+            },
         },
         export: {
             label: 'Export',

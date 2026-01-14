@@ -3,6 +3,7 @@ const translationCa = {
         home: "Inici",
         config: "Configuració",
         entitats: "Entitats",
+        avisos: "Avisos",
         enviaments: "Enviaments",
     },
     page: {
@@ -48,6 +49,15 @@ const translationCa = {
                     admLecturaAllowed: "Adm. lectura",
                     aplicacioAllowed: "Aplicació",
                 }
+            },
+        },
+        avisos: {
+            grid: {
+                title: "Avisos",
+            },
+            form: {
+                titleCreate: "Crear avís",
+                titleUpdate: "Modificar avís",
             },
         },
         notFound: {

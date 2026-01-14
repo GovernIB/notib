@@ -162,6 +162,12 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			E entity = null;
 			if (id != null) {
 				entity = getEntity(id);
+			} else if (artifactRequiresId(ResourceArtifactType.ACTION, code)) {
+				throw new ActionExecutionException(
+						getResourceClass(),
+						null,
+						code,
+						"This action requires id");
 			}
 			try {
 				return executor.exec(code, entity, params);

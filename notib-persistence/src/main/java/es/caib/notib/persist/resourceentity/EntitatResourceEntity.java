@@ -91,6 +91,9 @@ public class EntitatResourceEntity extends BaseAuditableResourceEntity<EntitatRe
 	@Formula("(select count(*) from " + BaseConfig.DB_PREFIX + "aplicacio apl where apl.entitat_id = id)")
 	private Integer aplicacioCount;
 
+	@Version
+	private long version = 0;
+
 	@Builder
 	public EntitatResourceEntity(
 			EntitatResource resource,

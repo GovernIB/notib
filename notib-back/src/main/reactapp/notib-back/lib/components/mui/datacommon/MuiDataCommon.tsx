@@ -240,10 +240,11 @@ export const useDataCommonEditable = (
     popupEditFormI18nKeys: FormI18nKeys | undefined,
     apiCurrentActions: any,
     apiDelete: (id: any) => Promise<any>,
+    apiBulkDelete: (id: any[]) => Promise<any>,
     refresh: () => void,
     onCreate: ((row: any) => void) | undefined,
     onUpdate: ((row: any) => void) | undefined,
-    onDelete: ((id: any) => void) | undefined,
+    onDelete: ((id: any | any[]) => void) | undefined,
 ) => {
     const { t, temporalMessageShow, messageDialogShow } = useBaseAppContext();
     const dataDialogPopupApiRef = React.useRef<DataFormDialogApi>(undefined);
@@ -296,36 +297,79 @@ export const useDataCommonEditable = (
         }
     };
     const triggerDelete = (id: any) => {
-        messageDialogShow(
-            t('datacommon.delete.single.label'),
-            t('datacommon.delete.single.confirm'),
-            confirmDialogButtons,
-            confirmDialogComponentProps
-        )
-            .then((value: any) => {
-                if (value) {
-                    apiDelete(id)
-                        .then(() => {
-                            onDelete?.(id);
-                            refresh?.();
-                            temporalMessageShow(
-                                null,
-                                t('datacommon.delete.single.success'),
-                                'success'
-                            );
+        const multiple = Array.isArray(id) && id.length > 1;
+        if (!multiple) {
+            const singleId = Array.isArray(id) ? id[0] : id;
+            messageDialogShow(
+                t('datacommon.delete.single.label'),
+                t('datacommon.delete.single.confirm'),
+                confirmDialogButtons,
+                confirmDialogComponentProps
+            )
+                .then((value: any) => {
+                    if (value) {
+                        apiDelete(singleId)
+                            .then(() => {
+                                onDelete?.(singleId);
+                                refresh?.();
+                                temporalMessageShow(
+                                    null,
+                                    t('datacommon.delete.single.success'),
+                                    'success'
+                                );
+                            })
+                            .catch((error) => {
+                                temporalMessageShow(
+                                    t('datacommon.delete.single.error'),
+                                    error.description ?? error.message,
+                                    'error'
+                                );
+                            });
+                    }
+                })
+                .catch(() => {
+                    // Feim un catch buit perquè no aparegui a la consola el missatge: Uncaught (in promise)
+                });
+        } else {
+            messageDialogShow(
+                t('datacommon.delete.multiple.label'),
+                t('datacommon.delete.multiple.confirm', { count: id.length }),
+                confirmDialogButtons,
+                confirmDialogComponentProps
+            )
+                .then((value: any) => {
+                    if (value) {
+                        apiBulkDelete(id).then(response => {
+                            if (response.errorCount === 0) {
+                                const deletedIds = response.items?.filter((i: any) => !(i.error)).map((i: any) => i.id);
+                                onDelete?.(deletedIds);
+                                refresh?.();
+                                temporalMessageShow(
+                                    null,
+                                    t('datacommon.delete.multiple.success', {count: response.successCount }),
+                                    'success'
+                                );
+                            } else {
+                                temporalMessageShow(
+                                    null,
+                                    t('datacommon.delete.multiple.error', {count: response.errorCount }),
+                                    'warning'
+                                );
+                            }
                         })
                         .catch((error) => {
                             temporalMessageShow(
-                                t('datacommon.delete.single.error'),
+                                t('datacommon.delete.multiple.error', {count: id.length }),
                                 error.description ?? error.message,
                                 'error'
                             );
                         });
-                }
-            })
-            .catch(() => {
-                // Feim un catch buit perquè no aparegui a la consola el missatge: Uncaught (in promise)
-            });
+                    }
+                })
+                .catch(() => {
+                    // Feim un catch buit perquè no aparegui a la consola el missatge: Uncaught (in promise)
+                });
+        }
     };
     const isCreateLinkPresent = apiCurrentActions?.['create'] != null;
     const createLinkConfigError = !readOnly && !isPopupEditCreate && !isInlineEditCreate && toolbarCreateLink == null;

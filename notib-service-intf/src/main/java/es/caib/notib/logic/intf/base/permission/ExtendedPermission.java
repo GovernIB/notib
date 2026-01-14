@@ -74,6 +74,7 @@ public class ExtendedPermission extends BasePermission {
 		case PERM7: return PERM7;
 		case PERM8: return PERM8;
 		case PERM9: return PERM9;
+		case PERMX: return PERMX;
 		default:
 			return null;
 		}

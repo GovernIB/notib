@@ -36,6 +36,13 @@ const componentsCa = {
                 success: 'Element esborrat',
                 error: 'Error esborrant element',
             },
+            multiple: {
+                label: 'Confirmació',
+                confirm:
+                    'Estau segur que voleu esborrar els {{count}} elements seleccionats (aquesta acció no es pot desfer)?',
+                success: '{{count}} elements esborrats',
+                error: 'No s\'han pogut esborrar {{count}} elements',
+            },
         },
         export: {
             label: 'Exportar',

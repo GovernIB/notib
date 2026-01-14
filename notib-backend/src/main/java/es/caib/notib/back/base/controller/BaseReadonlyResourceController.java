@@ -1120,6 +1120,32 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		}
 	}
 
+	protected <T> void validateResource(
+			T resource,
+			int paramIndex,
+			BindingResult bindingResult,
+			Object... validationHints) throws MethodArgumentNotValidException {
+		BindingResult resourceBindingResult = new BeanPropertyBindingResult(
+				resource,
+				bindingResult != null ? bindingResult.getObjectName() : "resource");
+		Object[] finalValidationHints = validationHints;
+		if (validationHints == null || validationHints.length == 0) {
+			finalValidationHints = new Object[] { Default.class };
+		}
+		validator.validate(
+				resource,
+				resourceBindingResult,
+				finalValidationHints);
+		if (resourceBindingResult.hasErrors() && bindingResult != null) {
+			bindingResult.addAllErrors(resourceBindingResult);
+			throw new MethodArgumentNotValidException(
+					new MethodParameter(
+							new Object() {}.getClass().getEnclosingMethod(),
+							paramIndex),
+					bindingResult);
+		}
+	}
+
 	protected static final String SELF_RESOURCE_ID_TOKEN = "#resourceId#";
 	protected List<Link> buildSingleResourceLinks(
 			Serializable id,
@@ -1602,32 +1628,6 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			}
 		} else {
 			return null;
-		}
-	}
-
-	private <T> void validateResource(
-			T resource,
-			int paramIndex,
-			BindingResult bindingResult,
-			Object... validationHints) throws MethodArgumentNotValidException {
-		BindingResult resourceBindingResult = new BeanPropertyBindingResult(resource, bindingResult.getObjectName());
-		Object[] finalValidationHints;
-		if (validationHints == null || validationHints.length == 0) {
-			finalValidationHints = new Object[] { Default.class };
-		} else {
-			finalValidationHints = validationHints;
-		}
-		validator.validate(
-				resource,
-				resourceBindingResult,
-				finalValidationHints);
-		if (resourceBindingResult.hasErrors()) {
-			bindingResult.addAllErrors(resourceBindingResult);
-			throw new MethodArgumentNotValidException(
-					new MethodParameter(
-							new Object() {}.getClass().getEnclosingMethod(),
-							paramIndex),
-					bindingResult);
 		}
 	}
 
