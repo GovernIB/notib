@@ -1,7 +1,7 @@
 databaseChangeLog:
 - changeSet:
-    id: 1765358456691-1
-    author: limit (generated)
+    id: init_table-1
+    author: limit
     changes:
     - createTable:
         columns:
@@ -9,7 +9,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: SYS_C007112
+              primaryKeyName: ${db_prefix}NOTIFICACIO_PK
             name: ID
             type: BIGINT
         - column:
@@ -186,10 +186,10 @@ databaseChangeLog:
         - column:
             name: ORIGEN
             type: VARCHAR(8 ${varcharUnit})
-        tableName: ${db_prefix}NOTIFICACIO   
+        tableName: ${db_prefix}NOTIFICACIO
 - changeSet:
-    id: 1765358456691-2
-    author: limit (generated)
+    id: init_table-2
+    author: limit
     changes:
     - createTable:
         columns:
@@ -197,7 +197,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: SYS_C007107
+              primaryKeyName: ${db_prefix}NOTIFICACIO_ENV_PK
             name: ID
             type: BIGINT
         - column:
@@ -445,10 +445,10 @@ databaseChangeLog:
         - column:
             name: MOTIU_ANULACIO
             type: VARCHAR(250 ${varcharUnit})
-        tableName: ${db_prefix}NOTIFICACIO_ENV  
+        tableName: ${db_prefix}NOTIFICACIO_ENV
 - changeSet:
-    id: 1765358456691-3
-    author: limit (generated)
+    id: init_table-3
+    author: limit
     changes:
     - createTable:
         columns:
@@ -642,8 +642,8 @@ databaseChangeLog:
             type: date
         tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
 - changeSet:
-    id: 1765358456691-4
-    author: limit (generated)
+    id: init_table-4
+    author: limit
     changes:
     - createTable:
         columns:
@@ -651,7 +651,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_ORGAN_GESTOR_PK
+              primaryKeyName: ${db_prefix}ORGAN_GESTOR_PK
             name: ID
             type: BIGINT
         - column:
@@ -718,8 +718,8 @@ databaseChangeLog:
             type: boolean
         tableName: ${db_prefix}ORGAN_GESTOR
 - changeSet:
-    id: 1765358456691-5
-    author: limit (generated)
+    id: init_table-5
+    author: limit
     changes:
     - createTable:
         columns:
@@ -727,7 +727,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_NOTIFICACIO_TABLE_PK
+              primaryKeyName: ${db_prefix}NOTIFICACIO_TABLE_PK
             name: ID
             type: BIGINT
         - column:
@@ -917,302 +917,8 @@ databaseChangeLog:
             type: boolean
         tableName: ${db_prefix}NOTIFICACIO_TABLE
 - changeSet:
-    id: 1765358456691-6
-    author: limit (generated)
-    changes:
-    - createTable:
-        columns:
-        - column:
-            constraints:
-              nullable: false
-            name: ID
-            type: BIGINT
-        - column:
-            constraints:
-              nullable: false
-            name: PRINCIPAL
-            type: boolean
-        - column:
-            constraints:
-              nullable: false
-            name: SID
-            type: VARCHAR(100 ${varcharUnit})
-        tableName: ${db_prefix}ACL_SID        
-- changeSet:
-    id: 1765358456691-8
-    author: limit (generated)
-    changes:
-    - createTable:
-        columns:
-        - column:
-            constraints:
-              nullable: false
-            name: ID
-            type: BIGINT
-        - column:
-            constraints:
-              nullable: false
-            name: OBJECT_ID_CLASS
-            type: BIGINT
-        - column:
-            constraints:
-              nullable: false
-            name: OBJECT_ID_IDENTITY
-            type: BIGINT
-        - column:
-            name: PARENT_OBJECT
-            type: BIGINT
-        - column:
-            constraints:
-              nullable: false
-            name: OWNER_SID
-            type: BIGINT
-        - column:
-            constraints:
-              nullable: false
-            name: ENTRIES_INHERITING
-            type: boolean
-        tableName: ${db_prefix}ACL_OBJECT_IDENTITY      
-- changeSet:
-    id: 1765358456691-10
-    author: limit (generated)
-    changes:
-    - createTable:
-        columns:
-        - column:
-            constraints:
-              nullable: false
-            name: ID
-            type: BIGINT
-        - column:
-            constraints:
-              nullable: false
-            name: ACL_OBJECT_IDENTITY
-            type: BIGINT
-        - column:
-            constraints:
-              nullable: false
-            name: ACE_ORDER
-            type: BIGINT
-        - column:
-            constraints:
-              nullable: false
-            name: SID
-            type: BIGINT
-        - column:
-            constraints:
-              nullable: false
-            name: MASK
-            type: BIGINT
-        - column:
-            constraints:
-              nullable: false
-            name: GRANTING
-            type: boolean
-        - column:
-            constraints:
-              nullable: false
-            name: AUDIT_SUCCESS
-            type: boolean
-        - column:
-            constraints:
-              nullable: false
-            name: AUDIT_FAILURE
-            type: boolean
-        tableName: ${db_prefix}ACL_ENTRY   
-- changeSet:
-    id: 1765358456691-12
-    author: limit (generated)
-    changes:
-    - createTable:
-        columns:
-        - column:
-            constraints:
-              nullable: false
-            name: ID
-            type: BIGINT
-        - column:
-            constraints:
-              nullable: false
-            name: CLASS
-            type: VARCHAR(100 ${varcharUnit})
-        tableName: ${db_prefix}ACL_CLASS   
-- changeSet:
-    id: 1765358456691-14
-    author: limit (generated)
-    changes:
-    - createView:
-        fullDefinition: true
-        selectQuery: |-
-          CREATE OR REPLACE FORCE VIEW "NOT_SIR_VIEW" ("ENTITAT_ID", "PROCEDIMENT_ID", "ORGAN_CODI", "USUARI_CODI", "ENV_TIPUS", "ORIGEN", "TIPUS", "DIA", "TOTAL") AS WITH notificacions AS (
-              SELECT
-                  n.entitat_id,
-                  n.procediment_id,
-                  o.codi as organ_codi,
-                  n.usuari_codi,
-                  n.env_tipus,
-                  n.origen,
-                  e.SIR_ESTAT as estat,
-                  e.SIR_DIA
-              FROM NOT_NOTIFICACIO_ENV e
-                  JOIN NOT_NOTIFICACIO_ENV_TABLE et on et.id = e.id
-                  JOIN NOT_NOTIFICACIO n ON e.notificacio_id = n.id
-                  JOIN NOT_ORGAN_GESTOR o ON n.organ_gestor = o.id
-              WHERE e.SIR_DIA IS NOT NULL AND e.registre_estat_final = 1
-          )
-          SELECT entitat_id,
-                 procediment_id,
-                 organ_codi,
-                 usuari_codi,
-                 env_tipus,
-                 origen,
-                 estat AS tipus,
-                 SIR_DIA AS dia,
-                 COUNT(*) AS total
-          FROM notificacions
-          WHERE SIR_DIA IS NOT NULL
-          GROUP BY entitat_id, procediment_id, organ_codi, usuari_codi, env_tipus, origen, estat, SIR_DIA
-        viewName: NOT_SIR_VIEW
-- changeSet:
-    id: 1765358456691-15
-    author: limit (generated)
-    changes:
-    - createView:
-        fullDefinition: true
-        selectQuery: |-
-          CREATE OR REPLACE FORCE VIEW "NOT_REGISTRADES_VIEW" ("ENTITAT_ID", "PROCEDIMENT_ID", "ORGAN_CODI", "USUARI_CODI", "ENV_TIPUS", "ORIGEN", "TIPUS", "DIA", "TOTAL") AS WITH notificacions AS (
-              SELECT
-                  et.entitat_id,
-                  n.procediment_id,
-                  o.codi as organ_codi,
-                  et.usuari_codi,
-                  et.tipus_enviament as env_tipus,
-                  n.origen,
-                  et.REGISTRE_DIA
-              FROM NOT_NOTIFICACIO_ENV_TABLE et
-              JOIN NOT_NOTIFICACIO n ON et.notificacio_id = n.id
-              JOIN NOT_ORGAN_GESTOR o ON n.organ_gestor = o.id
-              WHERE et.REGISTRE_DIA IS NOT NULL
-          )
-          SELECT entitat_id,
-                 procediment_id,
-                 organ_codi,
-                 usuari_codi,
-                 env_tipus,
-                 origen,
-                 'REGISTRADA' AS tipus,
-                 REGISTRE_DIA AS dia,
-                 COUNT(*) AS total
-          FROM notificacions
-          WHERE REGISTRE_DIA IS NOT NULL
-          GROUP BY entitat_id, procediment_id, organ_codi, usuari_codi, env_tipus, origen, REGISTRE_DIA
-        viewName: NOT_REGISTRADES_VIEW
-- changeSet:
-    id: 1765358456691-16
-    author: limit (generated)
-    changes:
-    - createView:
-        fullDefinition: true
-        selectQuery: |-
-          CREATE OR REPLACE FORCE VIEW "NOT_ESTAT_VIEW" ("ENTITAT_ID", "PROCEDIMENT_ID", "ORGAN_CODI", "USUARI_CODI", "ENV_TIPUS", "ORIGEN", "TIPUS", "DIA", "TOTAL") AS WITH notificacions AS (
-              SELECT
-                  n.entitat_id,
-                  n.procediment_id,
-                  o.codi as organ_codi,
-                  n.usuari_codi,
-                  n.env_tipus,
-                  n.origen,
-                  e.ESTAT_NOM as estat,
-                  nt.error_last_event as error,
-                  e.ESTAT_DIA
-              FROM NOT_NOTIFICACIO_ENV e
-                  JOIN NOT_NOTIFICACIO n ON e.notificacio_id = n.id
-                  JOIN NOT_NOTIFICACIO_TABLE nt ON nt.id = n.id
-                  JOIN NOT_ORGAN_GESTOR o ON n.organ_gestor = o.id
-              WHERE e.ESTAT_DIA IS NOT NULL
-          )
-          SELECT entitat_id,
-                 procediment_id,
-                 organ_codi,
-                 usuari_codi,
-                 env_tipus,
-                 origen,
-                 CASE
-                     WHEN error = 1 AND estat = 'PENDENT' THEN 'REG_ERR'
-                     WHEN error = 1 AND estat = 'PEND_ENV' THEN 'ENV_ERR'
-                     ELSE estat
-                 END AS tipus,
-                 ESTAT_DIA AS dia,
-                 COUNT(*) AS total
-          FROM notificacions
-          WHERE ESTAT_DIA IS NOT NULL
-          GROUP BY entitat_id, procediment_id, organ_codi, usuari_codi, env_tipus, origen, estat, error, ESTAT_DIA
-        viewName: NOT_ESTAT_VIEW
-- changeSet:
-    id: 1765358456691-17
-    author: limit (generated)
-    changes:
-    - createView:
-        fullDefinition: true
-        selectQuery: |-
-          CREATE OR REPLACE FORCE VIEW "NOT_CREADES_ENVIADES_VIEW" ("ENTITAT_ID", "PROCEDIMENT_ID", "ORGAN_CODI", "USUARI_CODI", "ENV_TIPUS", "ORIGEN", "TIPUS", "DIA", "TOTAL") AS WITH notificacions AS (
-              SELECT
-                  nt.entitat_id,
-                  n.procediment_id,
-                  o.codi as organ_codi,
-                  nt.usuari_codi,
-                  nt.env_tipus,
-                  n.origen,
-                  nt.CREATED_DIA,
-                  nt.ENVIADA_DIA
-              FROM NOT_NOTIFICACIO_TABLE nt
-              JOIN NOT_NOTIFICACIO n ON nt.id = n.id
-              JOIN NOT_ORGAN_GESTOR o ON n.organ_gestor = o.id
-              WHERE nt.CREATED_DIA IS NOT NULL OR nt.ENVIADA_DIA IS NOT NULL
-          )
-          SELECT entitat_id,
-                 procediment_id,
-                 organ_codi,
-                 usuari_codi,
-                 env_tipus,
-                 origen,
-                 'CREADA' AS tipus,
-                 CREATED_DIA AS dia,
-                 COUNT(*) AS total
-          FROM notificacions
-          WHERE CREATED_DIA IS NOT NULL
-          GROUP BY entitat_id, procediment_id, organ_codi, usuari_codi, env_tipus, origen, CREATED_DIA
-        viewName: NOT_CREADES_ENVIADES_VIEW
-- changeSet:
-    id: 1765358456691-18
-    author: limit (generated)
-    changes:
-    - createView:
-        fullDefinition: true
-        selectQuery: "CREATE OR REPLACE FORCE VIEW \"NOT_STATS_VIEW\" (\"ID\", \"\
-          ENTITAT_ID\", \"PROCEDIMENT_ID\", \"ORGAN_CODI\", \"USUARI_CODI\", \"ENV_TIPUS\"\
-          , \"ORIGEN\", \"TIPUS\", \"DIA\", \"TOTAL\") AS SELECT\n    ROW_NUMBER()\
-          \ OVER (ORDER BY entitat_id, dia) AS id,\n    entitat_id,\n    procediment_id,\n\
-          \    organ_codi,\n    usuari_codi,\n    env_tipus,\n    origen,\n    tipus,\n\
-          \    dia,\n    total\nFROM (SELECT entitat_id,\n             procediment_id,\n\
-          \             organ_codi,\n             usuari_codi,\n             env_tipus,\n\
-          \             origen,\n             tipus,\n             dia,\n        \
-          \     total\n      FROM NOT_CREADES_ENVIADES_VIEW\n \n      UNION ALL\n\
-          \ \n      SELECT entitat_id,\n             procediment_id,\n           \
-          \  organ_codi,\n             usuari_codi,\n             env_tipus,\n   \
-          \          origen,\n             tipus,\n             dia,\n           \
-          \  total\n      FROM NOT_REGISTRADES_VIEW\n \n      UNION ALL\n \n     \
-          \ SELECT entitat_id,\n             procediment_id,\n             organ_codi,\n\
-          \             usuari_codi,\n             env_tipus,\n             origen,\n\
-          \             tipus,\n             dia,\n             total\n      FROM\
-          \ NOT_ESTAT_VIEW\n \n      UNION ALL\n \n      SELECT entitat_id,\n    \
-          \         procediment_id,\n             organ_codi,\n             usuari_codi,\n\
-          \             env_tipus,\n             origen,\n             tipus,\n  \
-          \           dia,\n             total\n      FROM NOT_SIR_VIEW\n)"
-        viewName: NOT_STATS_VIEW
-- changeSet:
-    id: 1765358456691-21
-    author: limit (generated)
+    id: init_table-6
+    author: limit
     changes:
     - createTable:
         columns:
@@ -1220,7 +926,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_ACC_MASS_PK
+              primaryKeyName: ${db_prefix}ACCIO_MASSIVA_PK
             name: ID
             type: BIGINT
         - column:
@@ -1259,10 +965,10 @@ databaseChangeLog:
         - column:
             name: EXCEPCIO_STACKTRACE
             type: VARCHAR(2048 ${varcharUnit})
-        tableName: ${db_prefix}ACCIO_MASSIVA   
+        tableName: ${db_prefix}ACCIO_MASSIVA
 - changeSet:
-    id: 1765358456691-22
-    author: limit (generated)
+    id: init_table-7
+    author: limit
     changes:
     - createTable:
         columns:
@@ -1270,7 +976,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_ACC_MASS_ELEM_PK
+              primaryKeyName: ${db_prefix}ACCIO_MASSIVA_ELEMENT_PK
             name: ID
             type: BIGINT
         - column:
@@ -1291,10 +997,10 @@ databaseChangeLog:
         - column:
             name: EXCEPCIO_STACKTRACE
             type: VARCHAR(2048 ${varcharUnit})
-        tableName: ${db_prefix}ACCIO_MASSIVA_ELEMENT   
+        tableName: ${db_prefix}ACCIO_MASSIVA_ELEMENT
 - changeSet:
-    id: 1765358456691-23
-    author: limit (generated)
+    id: init_table-8
+    author: limit
     changes:
     - createTable:
         columns:
@@ -1302,7 +1008,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: SYS_C007133
+              primaryKeyName: ${db_prefix}APLICACIO_PK
             name: ID
             type: BIGINT
         - column:
@@ -1374,10 +1080,10 @@ databaseChangeLog:
             defaultValueComputed: TO_DATE('16:00:00', 'HH24:MI:SS')
             name: HORARI_LABORAL_FI
             type: date
-        tableName: ${db_prefix}APLICACIO    
+        tableName: ${db_prefix}APLICACIO
 - changeSet:
-    id: 1765358456691-24
-    author: limit (generated)
+    id: init_table-9
+    author: limit
     changes:
     - createTable:
         columns:
@@ -1385,7 +1091,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_APLICACIO_AUDIT_PK
+              primaryKeyName: ${db_prefix}APLICACIO_AUDIT_PK
             name: ID
             type: BIGINT
         - column:
@@ -1427,10 +1133,10 @@ databaseChangeLog:
         - column:
             name: ACTIVA
             type: boolean
-        tableName: ${db_prefix}APLICACIO_AUDIT   
+        tableName: ${db_prefix}APLICACIO_AUDIT
 - changeSet:
-    id: 1765358456691-25
-    author: limit (generated)
+    id: init_table-10
+    author: limit
     changes:
     - createTable:
         columns:
@@ -1438,7 +1144,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_AVIS_PK
+              primaryKeyName: ${db_prefix}AVIS_PK
             name: ID
             type: BIGINT
         - column:
@@ -1488,10 +1194,10 @@ databaseChangeLog:
         - column:
             name: ENTITAT_ID
             type: NUMERIC(38, 0)
-        tableName: ${db_prefix}AVIS   
+        tableName: ${db_prefix}AVIS
 - changeSet:
-    id: 1765358456691-26
-    author: limit (generated)
+    id: init_table-11
+    author: limit
     changes:
     - createTable:
         columns:
@@ -1499,7 +1205,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_CALLBACK_PK
+              primaryKeyName: ${db_prefix}CALLBACK_PK
             name: ID
             type: BIGINT
         - column:
@@ -1548,10 +1254,10 @@ databaseChangeLog:
         - column:
             name: ULTIM_INTENT
             type: TIMESTAMP(6)
-        tableName: ${db_prefix}CALLBACK    
+        tableName: ${db_prefix}CALLBACK
 - changeSet:
-    id: 1765358456691-27
-    author: limit (generated)
+    id: init_table-12
+    author: limit
     changes:
     - createTable:
         columns:
@@ -1559,7 +1265,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: SYS_C006987
+              primaryKeyName: ${db_prefix}COLUMNES_PK
             name: ID
             type: BIGINT
         - column:
@@ -1682,10 +1388,10 @@ databaseChangeLog:
             defaultValueNumeric: 1
             name: ENTREGA_POSTAL
             type: boolean
-        tableName: ${db_prefix}COLUMNES   
+        tableName: ${db_prefix}COLUMNES
 - changeSet:
-    id: 1765358456691-28
-    author: limit (generated)
+    id: init_table-13
+    author: limit
     changes:
     - createTable:
         columns:
@@ -1693,7 +1399,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_CONFIG_PK
+              primaryKeyName: ${db_prefix}CONFIG_PK
             name: KEY
             type: VARCHAR(256 ${varcharUnit})
         - column:
@@ -1738,8 +1444,8 @@ databaseChangeLog:
             type: boolean
         tableName: ${db_prefix}CONFIG
 - changeSet:
-    id: 1765358456691-29
-    author: limit (generated)
+    id: init_table-14
+    author: limit
     changes:
     - createTable:
         columns:
@@ -1747,7 +1453,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_CONFIG_GROUP_PK
+              primaryKeyName: ${db_prefix}CONFIG_GROUP_PK
             name: CODE
             type: VARCHAR(128 ${varcharUnit})
         - column:
@@ -1764,10 +1470,10 @@ databaseChangeLog:
               nullable: false
             name: DESCRIPTION
             type: VARCHAR(512 ${varcharUnit})
-        tableName: ${db_prefix}CONFIG_GROUP      
+        tableName: ${db_prefix}CONFIG_GROUP
 - changeSet:
-    id: 1765358456691-30
-    author: limit (generated)
+    id: init_table-15
+    author: limit
     changes:
     - createTable:
         columns:
@@ -1775,16 +1481,16 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_CONFIG_TYPE_PK
+              primaryKeyName: ${db_prefix}CONFIG_TYPE_PK
             name: CODE
             type: VARCHAR(128 ${varcharUnit})
         - column:
             name: VALUE
             type: VARCHAR(2048 ${varcharUnit})
-        tableName: ${db_prefix}CONFIG_TYPE      
+        tableName: ${db_prefix}CONFIG_TYPE
 - changeSet:
-    id: 1765358456691-31
-    author: limit (generated)
+    id: init_table-16
+    author: limit
     changes:
     - createTable:
         columns:
@@ -1792,7 +1498,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: SYS_C007186
+              primaryKeyName: ${db_prefix}DOCUMENT_PK
             name: ID
             type: BIGINT
         - column:
@@ -1846,10 +1552,10 @@ databaseChangeLog:
         - column:
             name: FIRMAT
             type: boolean
-        tableName: ${db_prefix}DOCUMENT     
+        tableName: ${db_prefix}DOCUMENT
 - changeSet:
-    id: 1765358456691-32
-    author: limit (generated)
+    id: init_table-17
+    author: limit
     changes:
     - createTable:
         columns:
@@ -1857,7 +1563,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: SYS_C007189
+              primaryKeyName: ${db_prefix}ENTITAT_PK
             name: ID
             type: BIGINT
         - column:
@@ -1961,10 +1667,10 @@ databaseChangeLog:
         - column:
             name: LOGO_PEU
             type: BLOB
-        tableName: ${db_prefix}ENTITAT    
+        tableName: ${db_prefix}ENTITAT
 - changeSet:
-    id: 1765358456691-33
-    author: limit (generated)
+    id: init_table-18
+    author: limit
     changes:
     - createTable:
         columns:
@@ -1972,7 +1678,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_ENTITAT_AUDIT_PK
+              primaryKeyName: ${db_prefix}ENTITAT_AUDIT_PK
             name: ID
             type: BIGINT
         - column:
@@ -2048,10 +1754,10 @@ databaseChangeLog:
         - column:
             name: LLIBRE_NOM
             type: VARCHAR(255 ${varcharUnit})
-        tableName: ${db_prefix}ENTITAT_AUDIT   
+        tableName: ${db_prefix}ENTITAT_AUDIT
 - changeSet:
-    id: 1765358456691-34
-    author: limit (generated)
+    id: init_table-19
+    author: limit
     changes:
     - createTable:
         columns:
@@ -2059,7 +1765,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: SYS_C007237
+              primaryKeyName: ${db_prefix}ENTITAT_TIPUS_DOC_PK
             name: ID
             type: BIGINT
         - column:
@@ -2080,10 +1786,10 @@ databaseChangeLog:
         - column:
             name: ENTITAT_ID
             type: BIGINT
-        tableName: ${db_prefix}ENTITAT_TIPUS_DOC    
+        tableName: ${db_prefix}ENTITAT_TIPUS_DOC
 - changeSet:
-    id: 1765358456691-35
-    author: limit (generated)
+    id: init_table-20
+    author: limit
     changes:
     - createTable:
         columns:
@@ -2091,7 +1797,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_ENTREGA_CIE_PK
+              primaryKeyName: ${db_prefix}ENTREGA_CIE_PK
             name: ID
             type: BIGINT
         - column:
@@ -2116,10 +1822,10 @@ databaseChangeLog:
         - column:
             name: LASTMODIFIEDDATE
             type: TIMESTAMP(6)
-        tableName: ${db_prefix}ENTREGA_CIE 
+        tableName: ${db_prefix}ENTREGA_CIE
 - changeSet:
-    id: 1765358456691-36
-    author: limit (generated)
+    id: init_table-21
+    author: limit
     changes:
     - createTable:
         columns:
@@ -2127,7 +1833,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_ENTREGA_POSTAL_PK
+              primaryKeyName: ${db_prefix}ENTREGA_POSTAL_PK
             name: ID
             type: BIGINT
         - column:
@@ -2296,10 +2002,10 @@ databaseChangeLog:
         - column:
             name: CIE_ESTAT_DATAACT
             type: TIMESTAMP(6)
-        tableName: ${db_prefix}ENTREGA_POSTAL  
+        tableName: ${db_prefix}ENTREGA_POSTAL
 - changeSet:
-    id: 1765358456691-37
-    author: limit (generated)
+    id: init_table-22
+    author: limit
     changes:
     - createTable:
         columns:
@@ -2307,7 +2013,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: PK_NOT_EXPLOT_DIM
+              primaryKeyName: ${db_prefix}EXPLOT_DIM_PK
             name: ID
             type: NUMERIC(38, 0)
         - column:
@@ -2340,10 +2046,10 @@ databaseChangeLog:
         - column:
             name: PROCEDIMENT_CODI
             type: VARCHAR(64 ${varcharUnit})
-        tableName: ${db_prefix}EXPLOT_DIM  
+        tableName: ${db_prefix}EXPLOT_DIM
 - changeSet:
-    id: 1765358456691-38
-    author: limit (generated)
+    id: init_table-23
+    author: limit
     changes:
     - createTable:
         columns:
@@ -2351,7 +2057,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: PK_NOT_EXPLOT_ENV_INFO
+              primaryKeyName: ${db_prefix}EXPLOT_ENV_INFO_PK
             name: ID
             type: NUMERIC(38, 0)
         - column:
@@ -2474,10 +2180,10 @@ databaseChangeLog:
               nullable: false
             name: ENVIAMENT_ID
             type: NUMERIC(38, 0)
-        tableName: ${db_prefix}EXPLOT_ENV_INFO 
+        tableName: ${db_prefix}EXPLOT_ENV_INFO
 - changeSet:
-    id: 1765358456691-39
-    author: limit (generated)
+    id: init_table-24
+    author: limit
     changes:
     - createTable:
         columns:
@@ -2485,7 +2191,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: PK_NOT_EXPLOT_FET
+              primaryKeyName: ${db_prefix}EXPLOT_FET_PK
             name: ID
             type: NUMERIC(38, 0)
         - column:
@@ -2684,10 +2390,10 @@ databaseChangeLog:
         - column:
             name: INT_EML
             type: NUMERIC(38, 0)
-        tableName: ${db_prefix}EXPLOT_FET        
+        tableName: ${db_prefix}EXPLOT_FET
 - changeSet:
-    id: 1765358456691-40
-    author: limit (generated)
+    id: init_table-25
+    author: limit
     changes:
     - createTable:
         columns:
@@ -2695,7 +2401,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: PK_NOT_EXPLOT_TEMPS
+              primaryKeyName: ${db_prefix}EXPLOT_TEMPS_PK
             name: ID
             type: NUMERIC(38, 0)
         - column:
@@ -2733,8 +2439,8 @@ databaseChangeLog:
             type: VARCHAR(2 ${varcharUnit})
         tableName: ${db_prefix}EXPLOT_TEMPS
 - changeSet:
-    id: 1765358456691-41
-    author: limit (generated)
+    id: init_table-26
+    author: limit
     changes:
     - createTable:
         columns:
@@ -2742,7 +2448,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: SYS_C007272
+              primaryKeyName: ${db_prefix}FORMATS_FULLA_PK
             name: ID
             type: BIGINT
         - column:
@@ -2763,10 +2469,10 @@ databaseChangeLog:
         - column:
             name: PAGADOR_CIE_ID
             type: BIGINT
-        tableName: ${db_prefix}FORMATS_FULLA  
+        tableName: ${db_prefix}FORMATS_FULLA
 - changeSet:
-    id: 1765358456691-42
-    author: limit (generated)
+    id: init_table-27
+    author: limit
     changes:
     - createTable:
         columns:
@@ -2774,7 +2480,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: SYS_C007278
+              primaryKeyName: ${db_prefix}FORMATS_SOBRE_PK
             name: ID
             type: BIGINT
         - column:
@@ -2797,8 +2503,8 @@ databaseChangeLog:
             type: BIGINT
         tableName: ${db_prefix}FORMATS_SOBRE
 - changeSet:
-    id: 1765358456691-43
-    author: limit (generated)
+    id: init_table-28
+    author: limit
     changes:
     - createTable:
         columns:
@@ -2806,7 +2512,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: SYS_C007129
+              primaryKeyName: ${db_prefix}GRUP_PK
             name: ID
             type: BIGINT
         - column:
@@ -2835,10 +2541,10 @@ databaseChangeLog:
         - column:
             name: ORGAN_GESTOR
             type: BIGINT
-        tableName: ${db_prefix}GRUP   
+        tableName: ${db_prefix}GRUP
 - changeSet:
-    id: 1765358456691-44
-    author: limit (generated)
+    id: init_table-29
+    author: limit
     changes:
     - createTable:
         columns:
@@ -2846,7 +2552,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_GRUP_AUDIT_PK
+              primaryKeyName: ${db_prefix}GRUP_AUDIT_PK
             name: ID
             type: BIGINT
         - column:
@@ -2888,10 +2594,10 @@ databaseChangeLog:
         - column:
             name: ORGAN
             type: VARCHAR(64 ${varcharUnit})
-        tableName: ${db_prefix}GRUP_AUDIT  
+        tableName: ${db_prefix}GRUP_AUDIT
 - changeSet:
-    id: 1765358456691-45
-    author: limit (generated)
+    id: init_table-30
+    author: limit
     changes:
     - createTable:
         columns:
@@ -2899,7 +2605,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_HIST_ENVI_OID_PK
+              primaryKeyName: ${db_prefix}HIST_ENVIAMENTS_PK
             name: ID
             type: BIGINT
         - column:
@@ -3003,8 +2709,8 @@ databaseChangeLog:
             type: BIGINT
         tableName: ${db_prefix}HIST_ENVIAMENTS
 - changeSet:
-    id: 1765358456691-46
-    author: limit (generated)
+    id: init_table-31
+    author: limit
     changes:
     - createTable:
         columns:
@@ -3012,7 +2718,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_HIST_NOTIF_OID_PK
+              primaryKeyName: ${db_prefix}HIST_NOTIF_PK
             name: ID
             type: BIGINT
         - column:
@@ -3139,10 +2845,10 @@ databaseChangeLog:
               nullable: false
             name: VERSION
             type: BIGINT
-        tableName: ${db_prefix}HIST_NOTIF 
+        tableName: ${db_prefix}HIST_NOTIF
 - changeSet:
-    id: 1765358456691-47
-    author: limit (generated)
+    id: init_table-32
+    author: limit
     changes:
     - createTable:
         columns:
@@ -3150,7 +2856,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_HIST_ORGAN_OID_PK
+              primaryKeyName: ${db_prefix}HIST_ORGAN_PK
             name: ID
             type: BIGINT
         - column:
@@ -3235,8 +2941,8 @@ databaseChangeLog:
             type: BIGINT
         tableName: ${db_prefix}HIST_ORGAN
 - changeSet:
-    id: 1765358456691-48
-    author: limit (generated)
+    id: init_table-33
+    author: limit
     changes:
     - createTable:
         columns:
@@ -3244,7 +2950,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_HIST_PROC_OID_PK
+              primaryKeyName: ${db_prefix}HIST_PROCEDIMENT_PK
             name: ID
             type: BIGINT
         - column:
@@ -3329,8 +3035,8 @@ databaseChangeLog:
             type: BIGINT
         tableName: ${db_prefix}HIST_PROCEDIMENT
 - changeSet:
-    id: 1765358456691-49
-    author: limit (generated)
+    id: init_table-34
+    author: limit
     changes:
     - createTable:
         columns:
@@ -3338,7 +3044,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_MON_INT_PK
+              primaryKeyName: ${db_prefix}MON_INT_PK
             name: ID
             type: BIGINT
         - column:
@@ -3385,10 +3091,10 @@ databaseChangeLog:
         - column:
             name: NOTIFICACIO_ID
             type: BIGINT
-        tableName: ${db_prefix}MON_INT 
+        tableName: ${db_prefix}MON_INT
 - changeSet:
-    id: 1765358456691-50
-    author: limit (generated)
+    id: init_table-35
+    author: limit
     changes:
     - createTable:
         columns:
@@ -3396,7 +3102,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_MON_INT_PARAM_PK
+              primaryKeyName: ${db_prefix}MON_INT_PARAM_PK
             name: ID
             type: BIGINT
         - column:
@@ -3415,10 +3121,10 @@ databaseChangeLog:
         - column:
             name: NOTIFICACIO_ID
             type: BIGINT
-        tableName: ${db_prefix}MON_INT_PARAM   
+        tableName: ${db_prefix}MON_INT_PARAM
 - changeSet:
-    id: 1765358456691-51
-    author: limit (generated)
+    id: init_table-36
+    author: limit
     changes:
     - createTable:
         columns:
@@ -3426,7 +3132,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_NOTIFICACIO_AUDIT_PK
+              primaryKeyName: ${db_prefix}NOTIFICACIO_AUDIT_PK
             name: ID
             type: BIGINT
         - column:
@@ -3552,10 +3258,10 @@ databaseChangeLog:
         - column:
             name: REFERENCIA
             type: VARCHAR(36 ${varcharUnit})
-        tableName: ${db_prefix}NOTIFICACIO_AUDIT  
+        tableName: ${db_prefix}NOTIFICACIO_AUDIT
 - changeSet:
-    id: 1765358456691-52
-    author: limit (generated)
+    id: init_table-37
+    author: limit
     changes:
     - createTable:
         columns:
@@ -3563,7 +3269,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_NOTIFICACIO_ENV_AUDIT_PK
+              primaryKeyName: ${db_prefix}NOTIFICACIO_ENV_AUDIT_PK
             name: ID
             type: BIGINT
         - column:
@@ -3713,10 +3419,10 @@ databaseChangeLog:
         - column:
             name: NOTIFICA_DATAT_ERRDES
             type: VARCHAR(255 ${varcharUnit})
-        tableName: ${db_prefix}NOTIFICACIO_ENV_AUDIT    
+        tableName: ${db_prefix}NOTIFICACIO_ENV_AUDIT
 - changeSet:
-    id: 1765358456691-53
-    author: limit (generated)
+    id: init_table-38
+    author: limit
     changes:
     - createTable:
         columns:
@@ -3724,7 +3430,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: SYS_C007264
+              primaryKeyName: ${db_prefix}NOTIFICACIO_EVENT_PK
             name: ID
             type: BIGINT
         - column:
@@ -3793,8 +3499,8 @@ databaseChangeLog:
             type: INTEGER
         tableName: ${db_prefix}NOTIFICACIO_EVENT
 - changeSet:
-    id: 1765358456691-54
-    author: limit (generated)
+    id: init_table-39
+    author: limit
     changes:
     - createTable:
         columns:
@@ -3802,7 +3508,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_NOTIFICACIO_MASSIVA_PK
+              primaryKeyName: ${db_prefix}NOTIFICACIO_MASSIVA_PK
             name: ID
             type: BIGINT
         - column:
@@ -3883,10 +3589,10 @@ databaseChangeLog:
             defaultValueNumeric: 0
             name: NUM_CANCELADES
             type: NUMERIC(38, 0)
-        tableName: ${db_prefix}NOTIFICACIO_MASSIVA    
+        tableName: ${db_prefix}NOTIFICACIO_MASSIVA
 - changeSet:
-    id: 1765358456691-55
-    author: limit (generated)
+    id: init_table-40
+    author: limit
     changes:
     - createTable:
         columns:
@@ -3894,7 +3600,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_OFI_PK
+              primaryKeyName: ${db_prefix}OFICINA_PK
             name: CODI
             type: VARCHAR(64 ${varcharUnit})
         - column:
@@ -3916,10 +3622,10 @@ databaseChangeLog:
         - column:
             name: ORGAN_GESTOR
             type: BIGINT
-        tableName: ${db_prefix}OFICINA 
+        tableName: ${db_prefix}OFICINA
 - changeSet:
-    id: 1765358456691-56
-    author: limit (generated)
+    id: init_table-41
+    author: limit
     changes:
     - createTable:
         columns:
@@ -3933,10 +3639,10 @@ databaseChangeLog:
               nullable: false
             name: NOU_OG
             type: NUMERIC(38, 0)
-        tableName: ${db_prefix}OG_SINC_REL    
+        tableName: ${db_prefix}OG_SINC_REL
 - changeSet:
-    id: 1765358456691-57
-    author: limit (generated)
+    id: init_table-42
+    author: limit
     changes:
     - createTable:
         columns:
@@ -3944,7 +3650,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: SYS_C007123
+              primaryKeyName: ${db_prefix}PAGADOR_CIE_PK
             name: ID
             type: BIGINT
         - column:
@@ -3993,8 +3699,8 @@ databaseChangeLog:
             type: BIGINT
         tableName: ${db_prefix}PAGADOR_CIE
 - changeSet:
-    id: 1765358456691-58
-    author: limit (generated)
+    id: init_table-43
+    author: limit
     changes:
     - createTable:
         columns:
@@ -4002,7 +3708,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: SYS_C007048
+              primaryKeyName: ${db_prefix}PAGADOR_POSTAL_PK
             name: ID
             type: BIGINT
         - column:
@@ -4042,8 +3748,8 @@ databaseChangeLog:
             type: VARCHAR(256 ${varcharUnit})
         tableName: ${db_prefix}PAGADOR_POSTAL
 - changeSet:
-    id: 1765358456691-59
-    author: limit (generated)
+    id: init_table-44
+    author: limit
     changes:
     - createTable:
         columns:
@@ -4051,7 +3757,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: SYS_C007037
+              primaryKeyName: ${db_prefix}PERSONA_PK
             name: ID
             type: BIGINT
         - column:
@@ -4109,8 +3815,8 @@ databaseChangeLog:
             type: VARCHAR(100 ${varcharUnit})
         tableName: ${db_prefix}PERSONA
 - changeSet:
-    id: 1765358456691-60
-    author: limit (generated)
+    id: init_table-45
+    author: limit
     changes:
     - createTable:
         columns:
@@ -4118,7 +3824,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: SYS_C007023
+              primaryKeyName: ${db_prefix}PROCEDIMENT_PK
             name: ID
             type: BIGINT
         - column:
@@ -4213,10 +3919,10 @@ databaseChangeLog:
         - column:
             name: ORGAN_GESTOR_AUX_FOO
             type: VARCHAR(64 ${varcharUnit})
-        tableName: ${db_prefix}PROCEDIMENT    
+        tableName: ${db_prefix}PROCEDIMENT
 - changeSet:
-    id: 1765358456691-61
-    author: limit (generated)
+    id: init_table-46
+    author: limit
     changes:
     - createTable:
         columns:
@@ -4224,7 +3930,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_PROCEDIMENT_AUDIT_PK
+              primaryKeyName: ${db_prefix}PROCEDIMENT_AUDIT_PK
             name: ID
             type: BIGINT
         - column:
@@ -4286,11 +3992,18 @@ databaseChangeLog:
             type: BIGINT
         tableName: ${db_prefix}PROCEDIMENT_AUDIT
 - changeSet:
-    id: 1765358456691-62
-    author: limit (generated)
+    id: init_table-47
+    author: limit
     changes:
     - createTable:
         columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${db_prefix}PROCESSOS_INICIALS_PK
+            name: ID
+            type: BIGINT
         - column:
             constraints:
               nullable: false
@@ -4302,17 +4015,10 @@ databaseChangeLog:
             defaultValue: 0
             name: INIT
             type: boolean
-        - column:
-            constraints:
-              nullable: false
-              primaryKey: true
-              primaryKeyName: NOT_PROCESSOS_INICIALS_PK
-            name: ID
-            type: BIGINT
         tableName: ${db_prefix}PROCESSOS_INICIALS
 - changeSet:
-    id: 1765358456691-63
-    author: limit (generated)
+    id: init_table-48
+    author: limit
     changes:
     - createTable:
         columns:
@@ -4320,7 +4026,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: SYS_C007028
+              primaryKeyName: ${db_prefix}PRO_GRUP_PK
             name: ID
             type: BIGINT
         - column:
@@ -4341,10 +4047,10 @@ databaseChangeLog:
         - column:
             name: PROCEDIMENT
             type: BIGINT
-        tableName: ${db_prefix}PRO_GRUP    
+        tableName: ${db_prefix}PRO_GRUP
 - changeSet:
-    id: 1765358456691-64
-    author: limit (generated)
+    id: init_table-49
+    author: limit
     changes:
     - createTable:
         columns:
@@ -4352,7 +4058,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_PRO_GRUP_AUDIT_PK
+              primaryKeyName: ${db_prefix}PRO_GRUP_AUDIT_PK
             name: ID
             type: BIGINT
         - column:
@@ -4392,8 +4098,8 @@ databaseChangeLog:
             type: VARCHAR(64 ${varcharUnit})
         tableName: ${db_prefix}PRO_GRUP_AUDIT
 - changeSet:
-    id: 1765358456691-65
-    author: limit (generated)
+    id: init_table-50
+    author: limit
     changes:
     - createTable:
         columns:
@@ -4401,7 +4107,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: NOT_PRO_ORGAN_PK
+              primaryKeyName: ${db_prefix}PRO_ORGAN_PK
             name: ID
             type: BIGINT
         - column:
@@ -4422,10 +4128,10 @@ databaseChangeLog:
         - column:
             name: LASTMODIFIEDBY_CODI
             type: VARCHAR(64 ${varcharUnit})
-        tableName: ${db_prefix}PRO_ORGAN 
+        tableName: ${db_prefix}PRO_ORGAN
 - changeSet:
-    id: 1765358456691-66
-    author: limit (generated)
+    id: init_table-51
+    author: limit
     changes:
     - createTable:
         columns:
@@ -4433,7 +4139,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: SYS_C007031
+              primaryKeyName: ${db_prefix}USUARI_PK
             name: CODI
             type: VARCHAR(64 ${varcharUnit})
         - column:
@@ -4490,10 +4196,10 @@ databaseChangeLog:
         - column:
             name: PROCEDIMENT_DEFECTE
             type: NUMBER
-        tableName: ${db_prefix}USUARI   
+        tableName: ${db_prefix}USUARI
 - changeSet:
-    id: 1765358456691-67
-    author: limit (generated)
+    id: init_table-52
+    author: limit
     changes:
     - createTable:
         columns:
@@ -4501,7 +4207,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: SYS_C007079
+              primaryKeyName: ${db_prefix}STATE_MACHINE_PK
             name: MACHINE_ID
             type: VARCHAR(255 ${varcharUnit})
         - column:
@@ -4510,4 +4216,4 @@ databaseChangeLog:
         - column:
             name: STATE_MACHINE_CONTEXT
             type: BLOB
-        tableName: STATE_MACHINE   
+        tableName: STATE_MACHINE
