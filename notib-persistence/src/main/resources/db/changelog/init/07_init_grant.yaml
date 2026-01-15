@@ -1,7 +1,7 @@
 databaseChangeLog:
 - changeSet:
     id: init-grant-1
-    author: limit (generated)
+    author: limit
     context: caib
     changes:
     - sql:

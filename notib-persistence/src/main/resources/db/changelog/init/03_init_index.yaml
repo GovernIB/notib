@@ -1,769 +1,813 @@
 databaseChangeLog:
-- changeSet:
-    id: init_index-1
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: ENTITAT_ID
-        - column:
-            name: PROCEDIMENT_ID
-        - column:
-            name: ORGAN_CODI
-        - column:
-            name: USUARI_CODI
-        - column:
-            name: TIPUS
-        - column:
-            name: ORIGEN
-        indexName: ${db_prefix}EXPLOT_DIM_UK_I
-        tableName: ${db_prefix}EXPLOT_DIM
-        unique: true
-- changeSet:
-    id: init_index-2
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: ENVIAMENT_ID
-        indexName: ${db_prefix}EXPENVINF_ENV_I
-        tableName: ${db_prefix}EXPLOT_ENV_INFO
-        unique: true
-- changeSet:
-    id: init_index-3
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: REFERENCIA
-        indexName: ${db_prefix}NOTTAB_REF_I
-        tableName: ${db_prefix}NOTIFICACIO_TABLE
-        unique: true
-- changeSet:
-    id: init_index-4
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: REFERENCIA
-        indexName: ${db_prefix}NOT_REF_I
-        tableName: ${db_prefix}NOTIFICACIO
-        unique: true
-- changeSet:
-    id: init_index-5
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: CODI
-        - column:
-            name: ENTITAT
-        indexName: ${db_prefix}ORGGES_ENTITAT_I
-        tableName: ${db_prefix}ORGAN_GESTOR
-        unique: true
-- changeSet:
-    id: init_index-6
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: ANTIC_OG
-        - column:
-            name: NOU_OG
-        indexName: ${db_prefix}OGSINCREL_UK_I
-        tableName: ${db_prefix}OG_SINC_REL
-        unique: true
-- changeSet:
-    id: init_index-7
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: CODI
-        indexName: ${db_prefix}ENTITAT_CODI_I
-        tableName: ${db_prefix}ENTITAT
-        unique: true
-- changeSet:
-    id: init_index-8
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: ENVIAMENT_ID
-        indexName: ${db_prefix}CALLBACK_ENV_I
-        tableName: ${db_prefix}CALLBACK
-        unique: true
-- changeSet:
-    id: init_index-9
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: TIPUS
-        - column:
-            name: NOTIFICACIO_ENV_ID
-        indexName: ${db_prefix}NOT_EVENT_NOTIF_ENV_I
-        tableName: ${db_prefix}NOTIFICACIO_EVENT
-- changeSet:
-    id: init_index-10
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: NIF
-        indexName: ${db_prefix}PERSONA_NIF_I
-        tableName: ${db_prefix}PERSONA
-- changeSet:
-    id: init_index-11
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: APLICACIO_ID
-        indexName: ${db_prefix}APLICACIO_AUDIT_APL_I
-        tableName: ${db_prefix}APLICACIO_AUDIT
-- changeSet:
-    id: init_index-12
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: DATA_FINAL
-        indexName: ${db_prefix}AVIS_DATA_FINAL_I
-        tableName: ${db_prefix}AVIS
-- changeSet:
-    id: init_index-13
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: DATA_INICI
-        indexName: ${db_prefix}AVIS_DATA_INICI_I
-        tableName: ${db_prefix}AVIS
-- changeSet:
-    id: init_index-14
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            computed: true
-            name: CREATEDDATE
-        indexName: ${db_prefix}CREATED_DIA_I
-        tableName: ${db_prefix}NOTIFICACIO_TABLE
-- changeSet:
-    id: init_index-15
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: ENTITAT_ID
-        indexName: ${db_prefix}ENTITAT_AUDIT_ENT_I
-        tableName: ${db_prefix}ENTITAT_AUDIT
-- changeSet:
-    id: init_index-16
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: ENTITAT_ID
-        indexName: ${db_prefix}NOT_MASS_ENTITAT_I
-        tableName: ${db_prefix}NOTIFICACIO_MASSIVA
-- changeSet:
-    id: init_index-17
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: ENTREGA_CIE_ID
-        indexName: ${db_prefix}ENTITAT_ENTREGA_CIE_I
-        tableName: ${db_prefix}ENTITAT
-- changeSet:
-    id: init_index-18
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: CIE_ID
-        indexName: ${db_prefix}ENTREGA_CIE_CIE_I
-        tableName: ${db_prefix}ENTREGA_CIE
-- changeSet:
-    id: init_index-19
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: OPERADOR_POSTAL_ID
-        indexName: ${db_prefix}ENTREGA_CIE_OPERADOR_I
-        tableName: ${db_prefix}ENTREGA_CIE
-- changeSet:
-    id: init_index-20
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            computed: true
-            name: ENVIADA_DATE
-        indexName: ${db_prefix}NOT_TABLE_ENVIADA_DATE_I
-        tableName: ${db_prefix}NOTIFICACIO_TABLE
-- changeSet:
-    id: init_index-21
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: ENTITAT_ID
-        indexName: ${db_prefix}NOT_ENV_TBL_ENTITAT_I
-        tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
-- changeSet:
-    id: init_index-22
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: ENTREGA_POSTAL_ID
-        indexName: ${db_prefix}NOT_ENV_ENTREGA_POSTAL_I
-        tableName: ${db_prefix}NOTIFICACIO_ENV
-- changeSet:
-    id: init_index-23
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: CREATEDDATE
-        indexName: ${db_prefix}NOT_ENV_TABLE_CREATEDDATE_I
-        tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
-- changeSet:
-    id: init_index-24
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: NOT_ORGAN_CODI
-        indexName: ${db_prefix}NOT_ENV_TABLE_ORGAN_CODI_IDX
-        tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
-- changeSet:
-    id: init_index-25
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            computed: true
-            name: NOTIFICA_ESTAT_DATAACT
-        indexName: ${db_prefix}NOT_ENV_NOTIF_ESTAT_DA_I
-        tableName: ${db_prefix}NOTIFICACIO_ENV
-- changeSet:
-    id: init_index-26
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            computed: true
-            name: DATA_CIE_CANCELADA
-        indexName: ${db_prefix}EXP_ENVINF_DCIE_CAN_I
-        tableName: ${db_prefix}EXPLOT_ENV_INFO
-- changeSet:
-    id: init_index-27
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            computed: true
-            name: DATA_CIE_ENVIADA
-        indexName: ${db_prefix}EXP_ENVINF_DCIE_ENV_I
-        tableName: ${db_prefix}EXPLOT_ENV_INFO
-- changeSet:
-    id: init_index-28
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            computed: true
-            name: DATA_CIE_ENVIAMENT_ERROR
-        indexName: ${db_prefix}EXP_ENVINF_DCIE_ENVERR_I
-        tableName: ${db_prefix}EXPLOT_ENV_INFO
-- changeSet:
-    id: init_index-29
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            computed: true
-            name: DATA_CIE_ERROR
-        indexName: ${db_prefix}EXP_ENVINF_DCIE_ERR_I
-        tableName: ${db_prefix}EXPLOT_ENV_INFO
-- changeSet:
-    id: init_index-30
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            computed: true
-            name: DATA_CIE_NOTIFICADA
-        indexName: ${db_prefix}EXP_ENVINF_DCIE_NOTIF_I
-        tableName: ${db_prefix}EXPLOT_ENV_INFO
-- changeSet:
-    id: init_index-31
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            computed: true
-            name: DATA_CIE_REBUTJADA
-        indexName: ${db_prefix}EXP_ENVINF_DCIE_REBUTJ_I
-        tableName: ${db_prefix}EXPLOT_ENV_INFO
-- changeSet:
-    id: init_index-32
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            computed: true
-            name: DATA_CREACIO
-        indexName: ${db_prefix}EXP_ENVINF_DCRE_I
-        tableName: ${db_prefix}EXPLOT_ENV_INFO
-- changeSet:
-    id: init_index-33
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            computed: true
-            name: DATA_EMAIL_ENVIADA
-        indexName: ${db_prefix}EXP_ENVINF_DMAI_ENV_I
-        tableName: ${db_prefix}EXPLOT_ENV_INFO
-- changeSet:
-    id: init_index-34
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            computed: true
-            name: DATA_EMAIL_ENVIAMENT_ERROR
-        indexName: ${db_prefix}EXP_ENVINF_DMAI_ENVERR_I
-        tableName: ${db_prefix}EXPLOT_ENV_INFO
-- changeSet:
-    id: init_index-35
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            computed: true
-            name: DATA_NOT_ENVIADA
-        indexName: ${db_prefix}EXP_ENVINF_DNOT_ENV_I
-        tableName: ${db_prefix}EXPLOT_ENV_INFO
-- changeSet:
-    id: init_index-36
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            computed: true
-            name: DATA_NOT_ENVIAMENT_ERROR
-        indexName: ${db_prefix}EXP_ENVINF_DNOT_ENVERR_I
-        tableName: ${db_prefix}EXPLOT_ENV_INFO
-- changeSet:
-    id: init_index-37
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            computed: true
-            name: DATA_NOT_ERROR
-        indexName: ${db_prefix}EXP_ENVINF_DNOT_ERR_I
-        tableName: ${db_prefix}EXPLOT_ENV_INFO
-- changeSet:
-    id: init_index-38
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            computed: true
-            name: DATA_NOT_EXPIRADA
-        indexName: ${db_prefix}EXP_ENVINF_DNOT_EXP_I
-        tableName: ${db_prefix}EXPLOT_ENV_INFO
-- changeSet:
-    id: init_index-39
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            computed: true
-            name: DATA_NOT_NOTIFICADA
-        indexName: ${db_prefix}EXP_ENVINF_DNOT_NOTIF_I
-        tableName: ${db_prefix}EXPLOT_ENV_INFO
-- changeSet:
-    id: init_index-40
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            computed: true
-            name: DATA_NOT_REBUTJADA
-        indexName: ${db_prefix}EXP_ENVINF_DNOT_REBUTJ_I
-        tableName: ${db_prefix}EXPLOT_ENV_INFO
-- changeSet:
-    id: init_index-41
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            computed: true
-            name: DATA_REGISTRADA
-        indexName: ${db_prefix}EXP_ENVINF_DREG_I
-        tableName: ${db_prefix}EXPLOT_ENV_INFO
-- changeSet:
-    id: init_index-42
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            computed: true
-            name: DATA_REG_ACCEPTADA
-        indexName: ${db_prefix}EXP_ENVINF_DREG_ACCEP_I
-        tableName: ${db_prefix}EXPLOT_ENV_INFO
-- changeSet:
-    id: init_index-43
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            computed: true
-            name: DATA_REG_ENV_ERROR
-        indexName: ${db_prefix}EXP_ENVINF_DREG_ENVERR_I
-        tableName: ${db_prefix}EXPLOT_ENV_INFO
-- changeSet:
-    id: init_index-44
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            computed: true
-            name: DATA_REG_REBUTJADA
-        indexName: ${db_prefix}EXP_ENVINF_DREG_REBUTJ_I
-        tableName: ${db_prefix}EXPLOT_ENV_INFO
-- changeSet:
-    id: init_index-45
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: GRUP_ID
-        indexName: ${db_prefix}GRUP_AUDIT_GRUP_I
-        tableName: ${db_prefix}GRUP_AUDIT
-- changeSet:
-    id: init_index-46
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: CODI
-        indexName: ${db_prefix}MONINT_CODI_I
-        tableName: ${db_prefix}MON_INT
-- changeSet:
-    id: init_index-47
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: DATA
-        indexName: ${db_prefix}MONINT_DATA_I
-        tableName: ${db_prefix}MON_INT
-- changeSet:
-    id: init_index-48
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: NOTIFICACIO_ID
-        indexName: ${db_prefix}NOT_AUDIT_NOT_I
-        tableName: ${db_prefix}NOTIFICACIO_AUDIT
-- changeSet:
-    id: init_index-49
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: ENVIAMENT_ID
-        indexName: ${db_prefix}NOT_ENV_AUDIT_ENV_I
-        tableName: ${db_prefix}NOTIFICACIO_ENV_AUDIT
-- changeSet:
-    id: init_index-50
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: NOTIFICACIO_ID
-        indexName: ${db_prefix}NOT_EVENT_NOT_I
-        tableName: ${db_prefix}NOTIFICACIO_EVENT
-- changeSet:
-    id: init_index-51
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: ESTAT
-        indexName: ${db_prefix}NOTIF_ESTAT_I
-        tableName: ${db_prefix}NOTIFICACIO
-- changeSet:
-    id: init_index-52
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: PROCEDIMENT_ID
-        indexName: ${db_prefix}NOTIF_PROCEDIMENT_I
-        tableName: ${db_prefix}NOTIFICACIO
-- changeSet:
-    id: init_index-53
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: PROC_CODI_NOTIB
-        indexName: ${db_prefix}NOTIF_PROCODNOT_I
-        tableName: ${db_prefix}NOTIFICACIO
-- changeSet:
-    id: init_index-54
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: PROCEDIMENT_ORGAN_ID
-        indexName: ${db_prefix}NOTIF_PROORGAN_I
-        tableName: ${db_prefix}NOTIFICACIO
-- changeSet:
-    id: init_index-55
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: USUARI_CODI
-        indexName: ${db_prefix}NOTIF_USUCOD_I
-        tableName: ${db_prefix}NOTIFICACIO
-- changeSet:
-    id: init_index-56
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: USUARI_CODI
-        indexName: ${db_prefix}NOT_ENVTAB_USUCOD_I
-        tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
-- changeSet:
-    id: init_index-57
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: NOTIFICACIO_MASSIVA_ID
-        indexName: ${db_prefix}NOTTAB_NOTMASS_I
-        tableName: ${db_prefix}NOTIFICACIO_TABLE
-- changeSet:
-    id: init_index-58
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: ORGAN_CODI
-        indexName: ${db_prefix}NOTTAB_ORGCOD_I
-        tableName: ${db_prefix}NOTIFICACIO_TABLE
-- changeSet:
-    id: init_index-59
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: PROCEDIMENT_ORGAN_ID
-        indexName: ${db_prefix}NOTTAB_PROORG_I
-        tableName: ${db_prefix}NOTIFICACIO_TABLE
-- changeSet:
-    id: init_index-60
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: USUARI_CODI
-        indexName: ${db_prefix}NOTTAB_USUCOD_I
-        tableName: ${db_prefix}NOTIFICACIO_TABLE
-- changeSet:
-    id: init_index-61
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: ORGANGESTOR_ID
-        indexName: ${db_prefix}PROORG_ORGGES_I
-        tableName: ${db_prefix}PRO_ORGAN
-- changeSet:
-    id: init_index-62
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: ENTITAT
-        indexName: ${db_prefix}ORGGES_ENTITAT_I
-        tableName: ${db_prefix}ORGAN_GESTOR
-- changeSet:
-    id: init_index-63
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: ENTREGA_CIE_ID
-        indexName: ${db_prefix}ORGGES_ENTCIE_I
-        tableName: ${db_prefix}ORGAN_GESTOR
-- changeSet:
-    id: init_index-64
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: PAGADOR_POSTAL_ID
-        indexName: ${db_prefix}NOTMASS_PAGPOS_I
-        tableName: ${db_prefix}NOTIFICACIO_MASSIVA
-- changeSet:
-    id: init_index-65
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: PROCEDIMENT_ID
-        indexName: ${db_prefix}PROCAUD_PROCED_I
-        tableName: ${db_prefix}PROCEDIMENT_AUDIT
-- changeSet:
-    id: init_index-66
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: PROCEDIMENT_ID
-        indexName: ${db_prefix}PROORG_PROCED_I
-        tableName: ${db_prefix}PRO_ORGAN
-- changeSet:
-    id: init_index-67
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: ENTREGA_CIE_ID
-        indexName: ${db_prefix}PROCED_ENTCIE_I
-        tableName: ${db_prefix}PROCEDIMENT
-- changeSet:
-    id: init_index-68
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: PROGRUP_ID
-        indexName: ${db_prefix}PROGRUPAUD_PROGRUP_I
-        tableName: ${db_prefix}PRO_GRUP_AUDIT
-- changeSet:
-    id: init_index-69
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            computed: true
-            name: REGISTRE_DATA
-        indexName: ${db_prefix}NOTENVTAB_REGDATA_I
-        tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
-- changeSet:
-    id: init_index-70
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            computed: true
-            name: SIR_REC_DATA
-        indexName: ${db_prefix}NOTENV_SIRRECDAT_I
-        tableName: ${db_prefix}NOTIFICACIO_ENV
-- changeSet:
-    id: init_index-71
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: ENTITAT_ID
-        indexName: ${db_prefix}NOTTAB_ENTITAT_I
-        tableName: ${db_prefix}NOTIFICACIO_TABLE
-- changeSet:
-    id: init_index-72
-    author: limit
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: NOTIFICACIO_ID
-        indexName: ${db_prefix}NOTENV_NOT_I
-        tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
+  - changeSet:
+      id: init_index-1
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: ENTITAT_ID
+              - column:
+                  name: PROCEDIMENT_ID
+              - column:
+                  name: ORGAN_CODI
+              - column:
+                  name: USUARI_CODI
+              - column:
+                  name: TIPUS
+              - column:
+                  name: ORIGEN
+            indexName: ${db_prefix}EXPLOT_DIM_UK_I
+            tableName: ${db_prefix}EXPLOT_DIM
+            unique: true
+  - changeSet:
+      id: init_index-2
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: ENVIAMENT_ID
+            indexName: ${db_prefix}EXPENVINF_ENV_I
+            tableName: ${db_prefix}EXPLOT_ENV_INFO
+            unique: true
+  - changeSet:
+      id: init_index-3
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: REFERENCIA
+            indexName: ${db_prefix}NOTTAB_REF_I
+            tableName: ${db_prefix}NOTIFICACIO_TABLE
+            unique: true
+  - changeSet:
+      id: init_index-4
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: REFERENCIA
+            indexName: ${db_prefix}NOT_REF_I
+            tableName: ${db_prefix}NOTIFICACIO
+            unique: true
+  - changeSet:
+      id: init_index-5
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: CODI
+              - column:
+                  name: ENTITAT
+            indexName: ${db_prefix}ORGGES_MULT_I
+            tableName: ${db_prefix}ORGAN_GESTOR
+            unique: true
+  - changeSet:
+      id: init_index-6
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: ANTIC_OG
+              - column:
+                  name: NOU_OG
+            indexName: ${db_prefix}OGSINCREL_MULT_I
+            tableName: ${db_prefix}OG_SINC_REL
+            unique: true
+  - changeSet:
+      id: init_index-7
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: CODI
+            indexName: ${db_prefix}ENTITAT_CODI_I
+            tableName: ${db_prefix}ENTITAT
+            unique: true
+  - changeSet:
+      id: init_index-8
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: ENVIAMENT_ID
+            indexName: ${db_prefix}CALLBACK_ENV_I
+            tableName: ${db_prefix}CALLBACK
+            unique: true
+  - changeSet:
+      id: init_index-9
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: TIPUS
+              - column:
+                  name: NOTIFICACIO_ENV_ID
+            indexName: ${db_prefix}NOT_EVENT_NOTIF_ENV_I
+            tableName: ${db_prefix}NOTIFICACIO_EVENT
+  - changeSet:
+      id: init_index-10
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: NIF
+            indexName: ${db_prefix}PERSONA_NIF_I
+            tableName: ${db_prefix}PERSONA
+  - changeSet:
+      id: init_index-11
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: APLICACIO_ID
+            indexName: ${db_prefix}APLICACIO_AUDIT_APL_I
+            tableName: ${db_prefix}APLICACIO_AUDIT
+  - changeSet:
+      id: init_index-12
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: DATA_FINAL
+            indexName: ${db_prefix}AVIS_DATA_FINAL_I
+            tableName: ${db_prefix}AVIS
+  - changeSet:
+      id: init_index-13
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: DATA_INICI
+            indexName: ${db_prefix}AVIS_DATA_INICI_I
+            tableName: ${db_prefix}AVIS
+  - changeSet:
+      id: init_index-14
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  computed: true
+                  name: CREATEDDATE
+            indexName: ${db_prefix}CREATED_DIA_I
+            tableName: ${db_prefix}NOTIFICACIO_TABLE
+  - changeSet:
+      id: init_index-15
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: ENTITAT_ID
+            indexName: ${db_prefix}ENTITAT_AUDIT_ENT_I
+            tableName: ${db_prefix}ENTITAT_AUDIT
+  - changeSet:
+      id: init_index-16
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: ENTITAT_ID
+            indexName: ${db_prefix}NOT_MASS_ENTITAT_I
+            tableName: ${db_prefix}NOTIFICACIO_MASSIVA
+  - changeSet:
+      id: init_index-17
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: ENTREGA_CIE_ID
+            indexName: ${db_prefix}ENTITAT_ENTREGA_CIE_I
+            tableName: ${db_prefix}ENTITAT
+  - changeSet:
+      id: init_index-18
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: CIE_ID
+            indexName: ${db_prefix}ENTREGA_CIE_CIE_I
+            tableName: ${db_prefix}ENTREGA_CIE
+  - changeSet:
+      id: init_index-19
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: OPERADOR_POSTAL_ID
+            indexName: ${db_prefix}ENTREGA_CIE_OPERADOR_I
+            tableName: ${db_prefix}ENTREGA_CIE
+  - changeSet:
+      id: init_index-20
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  computed: true
+                  name: ENVIADA_DATE
+            indexName: ${db_prefix}NOT_TABLE_ENVIADA_DATE_I
+            tableName: ${db_prefix}NOTIFICACIO_TABLE
+  - changeSet:
+      id: init_index-21
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: ENTITAT_ID
+            indexName: ${db_prefix}NOT_ENV_TBL_ENTITAT_I
+            tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
+  - changeSet:
+      id: init_index-22
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: ENTREGA_POSTAL_ID
+            indexName: ${db_prefix}NOT_ENV_ENTREGA_POSTAL_I
+            tableName: ${db_prefix}NOTIFICACIO_ENV
+  - changeSet:
+      id: init_index-23
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: CREATEDDATE
+            indexName: ${db_prefix}NOT_ENV_TABLE_CREATEDDATE_I
+            tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
+  - changeSet:
+      id: init_index-24
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: NOT_ORGAN_CODI
+            indexName: ${db_prefix}NOT_ENV_TABLE_ORGAN_CODI_IDX
+            tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
+  - changeSet:
+      id: init_index-25
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  computed: true
+                  name: NOTIFICA_ESTAT_DATAACT
+            indexName: ${db_prefix}NOT_ENV_NOTIF_ESTAT_DA_I
+            tableName: ${db_prefix}NOTIFICACIO_ENV
+  - changeSet:
+      id: init_index-26
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  computed: true
+                  name: DATA_CIE_CANCELADA
+            indexName: ${db_prefix}EXP_ENVINF_DCIE_CAN_I
+            tableName: ${db_prefix}EXPLOT_ENV_INFO
+  - changeSet:
+      id: init_index-27
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  computed: true
+                  name: DATA_CIE_ENVIADA
+            indexName: ${db_prefix}EXP_ENVINF_DCIE_ENV_I
+            tableName: ${db_prefix}EXPLOT_ENV_INFO
+  - changeSet:
+      id: init_index-28
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  computed: true
+                  name: DATA_CIE_ENVIAMENT_ERROR
+            indexName: ${db_prefix}EXP_ENVINF_DCIE_ENVERR_I
+            tableName: ${db_prefix}EXPLOT_ENV_INFO
+  - changeSet:
+      id: init_index-29
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  computed: true
+                  name: DATA_CIE_ERROR
+            indexName: ${db_prefix}EXP_ENVINF_DCIE_ERR_I
+            tableName: ${db_prefix}EXPLOT_ENV_INFO
+  - changeSet:
+      id: init_index-30
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  computed: true
+                  name: DATA_CIE_NOTIFICADA
+            indexName: ${db_prefix}EXP_ENVINF_DCIE_NOTIF_I
+            tableName: ${db_prefix}EXPLOT_ENV_INFO
+  - changeSet:
+      id: init_index-31
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  computed: true
+                  name: DATA_CIE_REBUTJADA
+            indexName: ${db_prefix}EXP_ENVINF_DCIE_REBUTJ_I
+            tableName: ${db_prefix}EXPLOT_ENV_INFO
+  - changeSet:
+      id: init_index-32
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  computed: true
+                  name: DATA_CREACIO
+            indexName: ${db_prefix}EXP_ENVINF_DCRE_I
+            tableName: ${db_prefix}EXPLOT_ENV_INFO
+  - changeSet:
+      id: init_index-33
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  computed: true
+                  name: DATA_EMAIL_ENVIADA
+            indexName: ${db_prefix}EXP_ENVINF_DMAI_ENV_I
+            tableName: ${db_prefix}EXPLOT_ENV_INFO
+  - changeSet:
+      id: init_index-34
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  computed: true
+                  name: DATA_EMAIL_ENVIAMENT_ERROR
+            indexName: ${db_prefix}EXP_ENVINF_DMAI_ENVERR_I
+            tableName: ${db_prefix}EXPLOT_ENV_INFO
+  - changeSet:
+      id: init_index-35
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  computed: true
+                  name: DATA_NOT_ENVIADA
+            indexName: ${db_prefix}EXP_ENVINF_DNOT_ENV_I
+            tableName: ${db_prefix}EXPLOT_ENV_INFO
+  - changeSet:
+      id: init_index-36
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  computed: true
+                  name: DATA_NOT_ENVIAMENT_ERROR
+            indexName: ${db_prefix}EXP_ENVINF_DNOT_ENVERR_I
+            tableName: ${db_prefix}EXPLOT_ENV_INFO
+  - changeSet:
+      id: init_index-37
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  computed: true
+                  name: DATA_NOT_ERROR
+            indexName: ${db_prefix}EXP_ENVINF_DNOT_ERR_I
+            tableName: ${db_prefix}EXPLOT_ENV_INFO
+  - changeSet:
+      id: init_index-38
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  computed: true
+                  name: DATA_NOT_EXPIRADA
+            indexName: ${db_prefix}EXP_ENVINF_DNOT_EXP_I
+            tableName: ${db_prefix}EXPLOT_ENV_INFO
+  - changeSet:
+      id: init_index-39
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  computed: true
+                  name: DATA_NOT_NOTIFICADA
+            indexName: ${db_prefix}EXP_ENVINF_DNOT_NOTIF_I
+            tableName: ${db_prefix}EXPLOT_ENV_INFO
+  - changeSet:
+      id: init_index-40
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  computed: true
+                  name: DATA_NOT_REBUTJADA
+            indexName: ${db_prefix}EXP_ENVINF_DNOT_REBUTJ_I
+            tableName: ${db_prefix}EXPLOT_ENV_INFO
+  - changeSet:
+      id: init_index-41
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  computed: true
+                  name: DATA_REGISTRADA
+            indexName: ${db_prefix}EXP_ENVINF_DREG_I
+            tableName: ${db_prefix}EXPLOT_ENV_INFO
+  - changeSet:
+      id: init_index-42
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  computed: true
+                  name: DATA_REG_ACCEPTADA
+            indexName: ${db_prefix}EXP_ENVINF_DREG_ACCEP_I
+            tableName: ${db_prefix}EXPLOT_ENV_INFO
+  - changeSet:
+      id: init_index-43
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  computed: true
+                  name: DATA_REG_ENV_ERROR
+            indexName: ${db_prefix}EXP_ENVINF_DREG_ENVERR_I
+            tableName: ${db_prefix}EXPLOT_ENV_INFO
+  - changeSet:
+      id: init_index-44
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  computed: true
+                  name: DATA_REG_REBUTJADA
+            indexName: ${db_prefix}EXP_ENVINF_DREG_REBUTJ_I
+            tableName: ${db_prefix}EXPLOT_ENV_INFO
+  - changeSet:
+      id: init_index-45
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: GRUP_ID
+            indexName: ${db_prefix}GRUP_AUDIT_GRUP_I
+            tableName: ${db_prefix}GRUP_AUDIT
+  - changeSet:
+      id: init_index-46
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: CODI
+            indexName: ${db_prefix}MONINT_CODI_I
+            tableName: ${db_prefix}MON_INT
+  - changeSet:
+      id: init_index-47
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: DATA
+            indexName: ${db_prefix}MONINT_DATA_I
+            tableName: ${db_prefix}MON_INT
+  - changeSet:
+      id: init_index-48
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: NOTIFICACIO_ID
+            indexName: ${db_prefix}NOT_AUDIT_NOT_I
+            tableName: ${db_prefix}NOTIFICACIO_AUDIT
+  - changeSet:
+      id: init_index-49
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: ENVIAMENT_ID
+            indexName: ${db_prefix}NOT_ENV_AUDIT_ENV_I
+            tableName: ${db_prefix}NOTIFICACIO_ENV_AUDIT
+  - changeSet:
+      id: init_index-50
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: NOTIFICACIO_ID
+            indexName: ${db_prefix}NOT_EVENT_NOT_I
+            tableName: ${db_prefix}NOTIFICACIO_EVENT
+  - changeSet:
+      id: init_index-51
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: ESTAT
+            indexName: ${db_prefix}NOTIF_ESTAT_I
+            tableName: ${db_prefix}NOTIFICACIO
+  - changeSet:
+      id: init_index-52
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: PROCEDIMENT_ID
+            indexName: ${db_prefix}NOTIF_PROCEDIMENT_I
+            tableName: ${db_prefix}NOTIFICACIO
+  - changeSet:
+      id: init_index-53
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: PROC_CODI_NOTIB
+            indexName: ${db_prefix}NOTIF_PROCODNOT_I
+            tableName: ${db_prefix}NOTIFICACIO
+  - changeSet:
+      id: init_index-54
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: PROCEDIMENT_ORGAN_ID
+            indexName: ${db_prefix}NOTIF_PROORGAN_I
+            tableName: ${db_prefix}NOTIFICACIO
+  - changeSet:
+      id: init_index-55
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: USUARI_CODI
+            indexName: ${db_prefix}NOTIF_USUCOD_I
+            tableName: ${db_prefix}NOTIFICACIO
+  - changeSet:
+      id: init_index-56
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: USUARI_CODI
+            indexName: ${db_prefix}NOT_ENVTAB_USUCOD_I
+            tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
+  - changeSet:
+      id: init_index-57
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: NOTIFICACIO_MASSIVA_ID
+            indexName: ${db_prefix}NOTTAB_NOTMASS_I
+            tableName: ${db_prefix}NOTIFICACIO_TABLE
+  - changeSet:
+      id: init_index-58
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: ORGAN_CODI
+            indexName: ${db_prefix}NOTTAB_ORGCOD_I
+            tableName: ${db_prefix}NOTIFICACIO_TABLE
+  - changeSet:
+      id: init_index-59
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: PROCEDIMENT_ORGAN_ID
+            indexName: ${db_prefix}NOTTAB_PROORG_I
+            tableName: ${db_prefix}NOTIFICACIO_TABLE
+  - changeSet:
+      id: init_index-60
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: USUARI_CODI
+            indexName: ${db_prefix}NOTTAB_USUCOD_I
+            tableName: ${db_prefix}NOTIFICACIO_TABLE
+  - changeSet:
+      id: init_index-61
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: ORGANGESTOR_ID
+            indexName: ${db_prefix}PROORG_ORGGES_I
+            tableName: ${db_prefix}PRO_ORGAN
+  - changeSet:
+      id: init_index-62
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: ENTITAT
+            indexName: ${db_prefix}ORGGES_ENTITAT_I
+            tableName: ${db_prefix}ORGAN_GESTOR
+  - changeSet:
+      id: init_index-63
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: ENTREGA_CIE_ID
+            indexName: ${db_prefix}ORGGES_ENTCIE_I
+            tableName: ${db_prefix}ORGAN_GESTOR
+  - changeSet:
+      id: init_index-64
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: PAGADOR_POSTAL_ID
+            indexName: ${db_prefix}NOTMASS_PAGPOS_I
+            tableName: ${db_prefix}NOTIFICACIO_MASSIVA
+  - changeSet:
+      id: init_index-65
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: PROCEDIMENT_ID
+            indexName: ${db_prefix}PROCAUD_PROCED_I
+            tableName: ${db_prefix}PROCEDIMENT_AUDIT
+  - changeSet:
+      id: init_index-66
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: PROCEDIMENT_ID
+            indexName: ${db_prefix}PROORG_PROCED_I
+            tableName: ${db_prefix}PRO_ORGAN
+  - changeSet:
+      id: init_index-67
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: ENTREGA_CIE_ID
+            indexName: ${db_prefix}PROCED_ENTCIE_I
+            tableName: ${db_prefix}PROCEDIMENT
+  - changeSet:
+      id: init_index-68
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: PROGRUP_ID
+            indexName: ${db_prefix}PROGRUPAUD_PROGRUP_I
+            tableName: ${db_prefix}PRO_GRUP_AUDIT
+  - changeSet:
+      id: init_index-69
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  computed: true
+                  name: REGISTRE_DATA
+            indexName: ${db_prefix}NOTENVTAB_REGDATA_I
+            tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
+  - changeSet:
+      id: init_index-70
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  computed: true
+                  name: SIR_REC_DATA
+            indexName: ${db_prefix}NOTENV_SIRRECDAT_I
+            tableName: ${db_prefix}NOTIFICACIO_ENV
+  - changeSet:
+      id: init_index-71
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: ENTITAT_ID
+            indexName: ${db_prefix}NOTTAB_ENTITAT_I
+            tableName: ${db_prefix}NOTIFICACIO_TABLE
+  - changeSet:
+      id: init_index-72
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: NOTIFICACIO_ID
+            indexName: ${db_prefix}NOTENV_NOT_I
+            tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
+  - changeSet:
+      id: init_index-73
+      author: limit
+      changes:
+        - addUniqueConstraint:
+            columnNames: ENTITAT_ID, PROCEDIMENT_ID, ORGAN_CODI, USUARI_CODI, TIPUS, ORIGEN
+            constraintName: ${db_prefix}EXPLOT_DIM_UK
+            forIndexName: ${db_prefix}EXPLOT_DIM_UK_I
+            tableName: ${db_prefix}EXPLOT_DIM
+        - addUniqueConstraint:
+            columnNames: ENVIAMENT_ID
+            constraintName: ${db_prefix}EXPLOT_ENV_UK
+            forIndexName: ${db_prefix}EXPENVINF_ENV_I
+            tableName: ${db_prefix}EXPLOT_ENV_INFO
+        - addUniqueConstraint:
+            columnNames: REFERENCIA
+            constraintName: ${db_prefix}NOTIFICACIO_TABLE_UK
+            forIndexName: ${db_prefix}NOTTAB_REF_I
+            tableName: ${db_prefix}NOTIFICACIO_TABLE
+        - addUniqueConstraint:
+            columnNames: REFERENCIA
+            constraintName: ${db_prefix}NOTIFICACIO_UK
+            forIndexName: ${db_prefix}NOT_REF_I
+            tableName: ${db_prefix}NOTIFICACIO
+        - addUniqueConstraint:
+            columnNames: CODI, ENTITAT
+            constraintName: ${db_prefix}ORGGES_MULT_UK
+            forIndexName: ${db_prefix}ORGGES_MULT_I
+            tableName: ${db_prefix}ORGAN_GESTOR
+        - addUniqueConstraint:
+            columnNames: ANTIC_OG, NOU_OG
+            constraintName: ${db_prefix}OGSINCREL_MULT_UK
+            forIndexName: ${db_prefix}OGSINCREL_MULT_I
+            tableName: ${db_prefix}OG_SINC_REL
+        - addUniqueConstraint:
+            columnNames: CODI
+            constraintName: ENTITAT_CODI_UK
+            forIndexName: ${db_prefix}ENTITAT_CODI_I
+            tableName: ${db_prefix}ENTITAT
+        - addUniqueConstraint:
+            columnNames: ENVIAMENT_ID
+            constraintName: ${db_prefix}CALLBACK_ENV_UK
+            forIndexName: ${db_prefix}CALLBACK_ENV_I
+            tableName: ${db_prefix}CALLBACK
