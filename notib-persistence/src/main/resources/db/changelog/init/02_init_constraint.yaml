@@ -1,45 +1,5 @@
 databaseChangeLog:
-- changeSet:
-    id: init_constraint-1
-    author: limit
-    changes:
-    - addUniqueConstraint:
-        columnNames: ENTITAT_ID, PROCEDIMENT_ID, ORGAN_CODI, USUARI_CODI, TIPUS, ORIGEN
-        constraintName: NOT_EXPLOT_DIM_UK
-        forIndexName: NOT_EXPLOT_DIM_UK
-        tableName: NOT_EXPLOT_DIM
-    - addUniqueConstraint:
-        columnNames: ENVIAMENT_ID
-        constraintName: NOT_EXPLOT_ENV_UK
-        forIndexName: NOT_EXPLOT_ENV_UK
-        tableName: NOT_EXPLOT_ENV_INFO
-    - addUniqueConstraint:
-        columnNames: REFERENCIA
-        constraintName: NOT_NOTIFICACIO_TABLE_UN
-        forIndexName: NOT_NOTIFICACIO_TABLE_UN
-        tableName: NOT_NOTIFICACIO_TABLE
-    - addUniqueConstraint:
-        columnNames: REFERENCIA
-        constraintName: NOT_NOTIFICACIO_UN
-        forIndexName: NOT_NOTIFICACIO_UN
-        tableName: NOT_NOTIFICACIO
-    - addUniqueConstraint:
-        columnNames: CODI, ENTITAT
-        constraintName: NOT_ORGAN_ENTITAT_UNIQUE
-        forIndexName: NOT_ORGAN_ENTITAT_UNIQUE
-        tableName: NOT_ORGAN_GESTOR
-    - addUniqueConstraint:
-        columnNames: ANTIC_OG, NOU_OG
-        constraintName: NOT_UO_SINC_REL_MULT_UK
-        forIndexName: NOT_UO_SINC_REL_MULT_UK
-        tableName: NOT_OG_SINC_REL
-    - addUniqueConstraint:
-        columnNames: CODI
-        constraintName: SYS_C007188
-        forIndexName: NOT_ENTITAT_UK
-        tableName: NOT_ENTITAT
-    - addUniqueConstraint:
-        columnNames: ENVIAMENT_ID
-        constraintName: SYS_C007644
-        forIndexName: SYS_C007644
-        tableName: NOT_CALLBACK
+  - changeSet:
+      id: init_constraint-1
+      author: limit
+

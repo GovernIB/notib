@@ -1,4 +1,0 @@
-databaseChangeLog:
-- changeSet:
-    id: init_acl-1
-    author: limit

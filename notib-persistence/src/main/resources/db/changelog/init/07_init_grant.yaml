@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: init-grant-1
+      author: limit
+      context: caib
+      changes:
+        - sqlFile:
+            dbms: oracle
+            splitStatements: false
+            path: scripts/oracle_caib_grants.sql
+            relativeToChangelogFile: true
