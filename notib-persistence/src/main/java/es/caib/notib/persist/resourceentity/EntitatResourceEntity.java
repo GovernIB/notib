@@ -76,7 +76,7 @@ public class EntitatResourceEntity extends BaseAuditableResourceEntity<EntitatRe
 
 	@Lob
 	@Basic(fetch = FetchType.LAZY)
-	@Column(name = "logo_cap2")
+	@Column(name = "logo_cap")
 	private byte[] logoCapsalera;
 
 	@ManyToOne(fetch = FetchType.LAZY)

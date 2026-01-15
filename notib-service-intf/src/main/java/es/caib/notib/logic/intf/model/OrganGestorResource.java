@@ -1,0 +1,105 @@
+package es.caib.notib.logic.intf.model;
+
+import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
+import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
+import es.caib.notib.logic.intf.base.config.BaseConfig;
+import es.caib.notib.logic.intf.base.model.BaseResource;
+import es.caib.notib.logic.intf.base.permission.PermissionEnum;
+import es.caib.notib.logic.intf.dto.OficinaDto;
+import es.caib.notib.logic.intf.dto.PermisDto;
+import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
+import java.util.List;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@FieldNameConstants
+@ResourceConfig(
+        descriptionField = OrganGestorResource.Fields.codi,
+        quickFilterFields = {OrganGestorResource.Fields.codi, GrupResource.Fields.nom},
+        accessConstraints = @ResourceAccessConstraint(
+                type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+                roles = { BaseConfig.ROLE_ADMIN },
+                grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
+        )
+)
+public class OrganGestorResource extends BaseResource<Long> {
+
+        @NotEmpty
+        @Size(max=64)
+        private String codi;
+        @Size(max=64)
+        private String codiPare;
+        @NotEmpty @Size(max=1000)
+        private String nomPare;
+        @NotEmpty @Size(max=1000)
+        private String nom;
+        private String nomEs;
+        private Long entitatId;
+        private String entitatNom;
+        private String llibre;
+        private String llibreNom;
+        private String oficinaNom;
+        private List<PermisDto> permisos;
+        private OficinaDto oficina;
+        private OrganGestorEstatEnum estat = null;
+
+        private Boolean sir;
+        private String cif;
+        private boolean actiu;
+        private boolean permetreSir;
+
+        private String nomCodi;
+
+        private boolean entregaCieDesactivada;
+        private boolean entregaCieActiva;
+        private Long operadorPostalId;
+        private Long cieId;
+        private boolean sobrescriureCieOrganEmisor;
+
+        private String estatTraduccio;
+
+        public void setOrganGestorEstatEnum(OrganGestorEstatEnum estat) {
+                this.estat = estat;
+                actiu = estat != null && OrganGestorEstatEnum.V.equals(estat);
+        }
+
+        public String getNomCodi() {
+                return nom + " (" + codi + ")";
+        }
+
+        public String getCodiNom() {
+                return codi + " - " + nom;
+        }
+
+        public String getLlibreCodiNom() {
+                if (llibre != null)
+                        return llibre + " " + (llibreNom != null ? llibreNom : "");
+                return "";
+        }
+        public String getOficinaCodiNom() {
+                if (oficina != null)
+                        return oficina.getCodi() + " " + (oficina.getNom() != null ? oficina.getNom() : "");
+                return "";
+        }
+        public int getPermisosCount() {
+                if  (permisos == null)
+                        return 0;
+                else
+                        return permisos.size();
+        }
+
+        public String getOrganGestorDesc() {
+                if (nom != null && !nom.isEmpty())
+                        return codi + " - " + nom;
+                return codi;
+        }
+
+}
