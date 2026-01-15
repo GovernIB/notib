@@ -219,6 +219,7 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         currentActions: apiCurrentActions,
         currentError: apiCurrentError,
         delete: apiDelete,
+        bulkDelete: apiBulkDelete,
     } = useResourceApiService(resourceName);
     const findArgs = React.useMemo(
         () => ({
@@ -285,6 +286,7 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         popupEditFormI18nKeys,
         apiCurrentActions,
         apiDelete,
+        apiBulkDelete,
         refresh,
         undefined,
         undefined,
