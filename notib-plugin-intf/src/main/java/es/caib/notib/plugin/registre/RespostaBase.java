@@ -1,8 +1,8 @@
 package es.caib.notib.plugin.registre;
 
-import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Resposta base del plugin de registre
@@ -17,7 +17,7 @@ public class RespostaBase {
 	private String errorDescripcio;
 
 	public boolean isError() {
-		return !Strings.isNullOrEmpty(errorCodi);
+		return !StringUtils.isEmpty(errorCodi);
 	}
 
 }
