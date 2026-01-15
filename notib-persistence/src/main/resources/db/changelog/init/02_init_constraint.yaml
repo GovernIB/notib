@@ -1,7 +1,7 @@
 databaseChangeLog:
 - changeSet:
-    id: 1765358456691-69
-    author: salloza (generated)
+    id: init_constraint-1
+    author: limit
     changes:
     - addUniqueConstraint:
         columnNames: ENTITAT_ID, PROCEDIMENT_ID, ORGAN_CODI, USUARI_CODI, TIPUS, ORIGEN
