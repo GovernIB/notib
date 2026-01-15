@@ -1,49 +1,43 @@
 databaseChangeLog:
   - changeSet:
-      id: 1765358456691-7
-      author: limit (generated)
+      id: init_sequence-1
+      author: limit
       changes:
         - createSequence:
-            maxValue: 9999999999999999999999999999
-            sequenceName: NOT_ACL_SID_SEQ
+            sequenceName: ${db_prefix}ACL_SID_SQ
             startValue: 1
   - changeSet:
-      id: 1765358456691-9
-      author: limit (generated)
+      id: init_sequence-2
+      author: limit
       changes:
         - createSequence:
-            maxValue: 9999999999999999999999999999
-            sequenceName: NOT_ACL_OBJECT_IDENTITY_SEQ
+            sequenceName: ${db_prefix}ACL_OBJECT_IDENTITY_SQ
             startValue: 1
   - changeSet:
-      id: 1765358456691-11
-      author: limit (generated)
+      id: init_sequence-3
+      author: limit
       changes:
         - createSequence:
-            maxValue: 9999999999999999999999999999
-            sequenceName: NOT_ACL_ENTRY_SEQ
+            sequenceName: ${db_prefix}ACL_ENTRY_SQ
             startValue: 1
   - changeSet:
-      id: 1765358456691-13
-      author: limit (generated)
+      id: init_sequence-4
+      author: limit
       changes:
         - createSequence:
-            maxValue: 9999999999999999999999999999
-            sequenceName: NOT_ACL_CLASS_SEQ
+            sequenceName: ${db_prefix}ACL_CLASS_SQ
             startValue: 1
   - changeSet:
-      id: 1765358456691-19
-      author: limit (generated)
+      id: init_sequence-5
+      author: limit
       changes:
         - createSequence:
-            maxValue: 9999999999999999999999999999
+            sequenceName: ${db_prefix}HIBERNATE_SEQ
+            startValue: 1
+  - changeSet:
+      id: init_sequence-6
+      author: limit
+      changes:
+        - createSequence:
             sequenceName: HIBERNATE_SEQUENCE
-            startValue: 1
-  - changeSet:
-      id: 1765358456691-20
-      author: limit (generated)
-      changes:
-        - createSequence:
-            maxValue: 9999999999999999999999999999
-            sequenceName: NOT_HIBERNATE_SEQ
             startValue: 1
