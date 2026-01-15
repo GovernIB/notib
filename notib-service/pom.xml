@@ -392,7 +392,7 @@
 					<systemPropertyVariables>
 						<es.caib.notib.properties.path>src/test/resources/es/caib/notib/core/test.properties</es.caib.notib.properties.path>
 					</systemPropertyVariables>
-					<argLine>-XX:MaxPermSize=512m</argLine>
+<!--					<argLine>-XX:MaxPermSize=512m</argLine>-->
 				</configuration>
             </plugin>
 			<plugin>

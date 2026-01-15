@@ -10,6 +10,7 @@ import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.NotificacioEventEntity;
 import es.caib.notib.persist.entity.NotificacioMassivaEntity;
 import es.caib.notib.persist.entity.NotificacioTableEntity;
+import es.caib.notib.persist.repository.EnviamentTableRepository;
 import es.caib.notib.persist.repository.NotificacioEventRepository;
 import es.caib.notib.persist.repository.NotificacioMassivaRepository;
 import es.caib.notib.persist.repository.NotificacioTableViewRepository;
@@ -32,8 +33,10 @@ public class NotificacioTableHelper {
     private NotificacioTableViewRepository notificacioTableViewRepository;
     @Autowired
     private NotificacioMassivaRepository notificacioMassivaRepository;
+//    @Autowired
+//    private EnviamentTableHelper enviamentTableHelper;
     @Autowired
-    private EnviamentTableHelper enviamentTableHelper;
+    private EnviamentTableRepository enviamentTableRepository;
 
     @Transactional(propagation = Propagation.MANDATORY)
     public void crearRegistre(NotificacioEntity notificacio){
@@ -141,7 +144,7 @@ public class NotificacioTableHelper {
                         if ((estatMask & eventEstat.getMask()) == 0) {
                             estatMask += eventEstat.getMask();
                         }
-                        enviamentTableHelper.actualitzarEstat(enviament.getId(), not.getEstat());
+                        actualitzarEstat(enviament.getId(), not.getEstat());
                     }
                     item.setEstatMask(estatMask);
                 }
@@ -151,6 +154,18 @@ public class NotificacioTableHelper {
             notificacioTableViewRepository.saveAndFlush(item);
         } catch (Exception ex) {
             log.error("Error actualitzant la informació de la notificació " + not.getId(), ex);
+        }
+    }
+
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void actualitzarEstat(Long enviamentId, NotificacioEstatEnumDto estat) {
+
+        try {
+            var tableViewItem = enviamentTableRepository.findById(enviamentId).orElseThrow();
+            tableViewItem.setEstat(estat);
+            enviamentTableRepository.save(tableViewItem);
+        } catch (Exception ex) {
+            log.error("[EnviamentTableHelper.actualitzarEstat] Error actualitzant l'estat per l'enviament amb id " + enviamentId + " estat " + estat);
         }
     }
 

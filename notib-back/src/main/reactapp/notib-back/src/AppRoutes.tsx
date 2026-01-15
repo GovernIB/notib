@@ -1,6 +1,8 @@
 import { Routes, Route, Navigate} from 'react-router-dom';
 import EntitatGrid from './pages/entitat/EntitatGrid';
 import EntitatForm from './pages/entitat/EntitatForm';
+import ProcedimentGrid from './pages/procediment/ProcedimentGrid';
+import ProcedimentForm from "./pages/procediment/ProcedimentForm";
 import AvisGrid from './pages/avis/AvisGrid';
 import AvisForm from './pages/avis/AvisForm';
 import Enviaments from './pages/Enviaments';
@@ -22,6 +24,14 @@ const AppRoutes = () => {
                 <Route path="form">
                     <Route index element={<AvisForm />} />
                     <Route path=":id" element={<AvisForm />} />
+                </Route>
+            </Route>
+            <Route index element={<Navigate to="/procediments" replace />} />
+            <Route path="procediments">
+                <Route index element={<ProcedimentGrid />} />
+                <Route path="form">
+                    <Route index element={<ProcedimentForm />} />
+                    <Route path=":id" element={<ProcedimentForm />} />
                 </Route>
             </Route>
             <Route path="enviaments" element={<Enviaments />} />
