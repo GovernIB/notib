@@ -448,7 +448,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			Holder<String> codigoRespuesta = new Holder<>();
 			Holder<String> descripcionRespuesta = new Holder<>();
 			Holder<es.caib.notib.logic.wsdl.notificaV2.common.Opciones> opcionesRespuestaSincronizarOE = new Holder<>();
-
+			var msg = "organEmissor: " + organEmisor + " id: " + id + " tipoEntrega: " + tipoEntrega + " modoNotificacion: " + modoNotificacion + " estat: " + estat
+					+ " receptor: " + receptor.getNifReceptor() + " " + receptor.getNombreReceptor() + " acuse: " + acusePdf.getReferenciaPdfAcuse()
+					+ " acuseXml: " + acuseXml.getReferenciaPdfAcuse() + " opcionesSize: " + opciones.getOpcion().size();
+			NotibLogger.getInstance().info(msg, log, LoggingTipus.NOTIFICA);
 			getSincronizarEnvioWs(apiKey).sincronizarEnvioOE(organEmisor, id, tipoEntrega, modoNotificacion, estat, dataHolder,
 					null, receptor, acusePdf, acuseXml, opciones, codigoRespuesta, descripcionRespuesta, opcionesRespuestaSincronizarOE);
 
