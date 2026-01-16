@@ -1,5 +1,662 @@
 databaseChangeLog:
-  - changeSet:
-      id: init_constraint-1
-      author: limit
+- changeSet:
+    id: init_constraint-1
+    author: limit
+    changes:
+    - addUniqueConstraint:
+        columnNames: ENTITAT_ID, PROCEDIMENT_ID, ORGAN_CODI, USUARI_CODI, TIPUS, ORIGEN
+        constraintName: NOT_EXPLOT_DIM_UK
+        forIndexName: NOT_EXPLOT_DIM_UK
+        tableName: NOT_EXPLOT_DIM
+    - addUniqueConstraint:
+        columnNames: ENVIAMENT_ID
+        constraintName: NOT_EXPLOT_ENV_UK
+        forIndexName: NOT_EXPLOT_ENV_UK
+        tableName: NOT_EXPLOT_ENV_INFO
+    - addUniqueConstraint:
+        columnNames: REFERENCIA
+        constraintName: NOT_NOTIFICACIO_TABLE_UN
+        forIndexName: NOT_NOTIFICACIO_TABLE_UN
+        tableName: NOT_NOTIFICACIO_TABLE
+    - addUniqueConstraint:
+        columnNames: REFERENCIA
+        constraintName: NOT_NOTIFICACIO_UN
+        forIndexName: NOT_NOTIFICACIO_UN
+        tableName: NOT_NOTIFICACIO
+    - addUniqueConstraint:
+        columnNames: CODI, ENTITAT
+        constraintName: NOT_ORGAN_ENTITAT_UNIQUE
+        forIndexName: NOT_ORGAN_ENTITAT_UNIQUE
+        tableName: NOT_ORGAN_GESTOR
+    - addUniqueConstraint:
+        columnNames: ANTIC_OG, NOU_OG
+        constraintName: NOT_UO_SINC_REL_MULT_UK
+        forIndexName: NOT_UO_SINC_REL_MULT_UK
+        tableName: NOT_OG_SINC_REL
+    - addUniqueConstraint:
+        columnNames: CODI
+        constraintName: SYS_C007188
+        forIndexName: NOT_ENTITAT_UK
+        tableName: NOT_ENTITAT
+    - addUniqueConstraint:
+        columnNames: ENVIAMENT_ID
+        constraintName: SYS_C007644
+        forIndexName: SYS_C007644
+        tableName: NOT_CALLBACK
 
+    - addForeignKeyConstraint:
+        baseTableName: NOT_ACCIO_MASSIVA
+        baseColumnNames: ENTITAT_ID
+        referencedTableName: NOT_ENTITAT
+        referencedColumnNames: ID
+        constraintName: NOT_ACC_MASS_ENTITAT_FK
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_ACCIO_MASSIVA_ELEMENT
+          baseColumnNames: ACCIO_MASSIVA_ID
+          referencedTableName: NOT_ACCIO_MASSIVA
+          referencedColumnNames: ID
+          constraintName: FK_ACCIOMASSIVA_ELEMENT
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_ACCIO_MASSIVA_ELEMENT
+        baseColumnNames: ELEMENT_ID
+        referencedTableName: NOT_NOTIFICACIO_ENV
+        referencedColumnNames: ID
+        constraintName: NOT_ACC_MASS_EL_ENV_ID_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_APLICACIO
+        baseColumnNames: USUARI_CODI
+        referencedTableName: NOT_USUARI
+        referencedColumnNames: CODI
+        constraintName: NOT_APL_USR_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_APLICACIO
+        baseColumnNames: ENTITAT_ID
+        referencedTableName: NOT_ENTITAT
+        referencedColumnNames: ID
+        constraintName: NOT_APLICACIO_ENTITAT_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_APLICACIO_AUDIT
+        baseColumnNames: ENTITAT_ID
+        referencedTableName: NOT_ENTITAT
+        referencedColumnNames: ID
+        constraintName: NOT_APL_AU_ENTITAT_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_APLICACIO_AUDIT
+        baseColumnNames: APLICACIO_ID
+        referencedTableName: NOT_APLICACIO
+        referencedColumnNames: ID
+        constraintName: NOT_APL_AU_APL_FK
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_AVIS
+          baseColumnNames: ENTITAT_ID
+          referencedTableName: NOT_ENTITAT
+          referencedColumnNames: ID
+          constraintName: NOT_AVIS_ENTITAT_FK
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_CALLBACK
+          baseColumnNames: USUARI_CODI
+          referencedTableName: NOT_USUARI
+          referencedColumnNames: CODI
+          constraintName: NOT_CALLBACK_USR_FK
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_CALLBACK
+          baseColumnNames: NOTIFICACIO_ID
+          referencedTableName: NOT_NOTIFICACIO
+          referencedColumnNames: ID
+          constraintName: NOT_CALLBACK_NOT_FK
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_CALLBACK
+          baseColumnNames: ENVIAMENT_ID
+          referencedTableName: NOT_NOTIFICACIO_ENV
+          referencedColumnNames: ID
+          constraintName: NOT_CALLBACK_ENV_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_ENTITAT
+        baseColumnNames: ENTREGA_CIE_ID
+        referencedTableName: NOT_ENTREGA_CIE
+        referencedColumnNames: ID
+        constraintName: NOT_ENTITAT_ENTREGA_CIE_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_ENTITAT_AUDIT
+        baseColumnNames: ENTITAT_ID
+        referencedTableName: NOT_ENTITAT
+        referencedColumnNames: ID
+        constraintName: NOT_ENTITAT_AUDIT_ENTITAT_FK
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_ENTITAT_TIPUS_DOC
+          baseColumnNames: ENTITAT_ID
+          referencedTableName: NOT_ENTITAT
+          referencedColumnNames: ID
+          constraintName: NOT_ENT_TIPUS_DOC_ENTITAT_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_ENTREGA_CIE
+        baseColumnNames: OPERADOR_POSTAL_ID
+        referencedTableName: NOT_PAGADOR_POSTAL
+        referencedColumnNames: ID
+        constraintName: NOT_ENTREGA_CIE_OPERADOR_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_ENTREGA_CIE
+        baseColumnNames: CIE_ID
+        referencedTableName: NOT_PAGADOR_CIE
+        referencedColumnNames: ID
+        constraintName: NOT_ENTREGA_CIE_PAGCIE_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_ENTREGA_POSTAL
+        baseColumnNames: CIE_ID
+        referencedTableName: NOT_ENTREGA_CIE
+        referencedColumnNames: ID
+        constraintName: NOT_ENT_POSTAL_CIE_FK
+
+  # NOT_EXPLOT_DIM
+  # NOT_EXPLOT_FET
+  # NOT_EXPLOT_TEMPS
+  # NOT_EXPLOT_TEMPS
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_FORMATS_FULLA
+        baseColumnNames: PAGADOR_CIE_ID
+        referencedTableName: NOT_PAGADOR_CIE
+        referencedColumnNames: ID
+        constraintName: NOT_FORMATS_FULLA_FK
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_FORMATS_SOBRE
+          baseColumnNames: PAGADOR_CIE_ID
+          referencedTableName: NOT_PAGADOR_CIE
+          referencedColumnNames: ID
+          constraintName: NOT_FORMATS_SOBRE_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_GRUP
+        baseColumnNames: ENTITAT
+        referencedTableName: NOT_ENTITAT
+        referencedColumnNames: ID
+        constraintName: NOT_ENTITAT_GRUP_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_GRUP
+        baseColumnNames: ORGAN_GESTOR
+        referencedTableName: NOT_ORGAN_GESTOR
+        referencedColumnNames: ID
+        constraintName: NOT_GRUP_ORGAN_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_GRUP_AUDIT
+        baseColumnNames: GRUP_ID
+        referencedTableName: NOT_ORGAN_GESTOR
+        referencedColumnNames: ID
+        constraintName: NOT_GRUP_AUDIT_GRUP_ID_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_GRUP
+        baseColumnNames: ENTITAT_ID
+        referencedTableName: NOT_ENTITAT
+        referencedColumnNames: ID
+        constraintName: NOT_GRUP_AUDIT_ENTITAT_FK
+
+# NOT_HIST_ENVIAMENTS
+# NOT_HIST_NOTIF
+# NOT_HIST_ORGAN
+# NOT_HIST_PROCEDIMENT
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_MON_INT
+          baseColumnNames: CODI_USUARI
+          referencedTableName: NOT_USUARI
+          referencedColumnNames: CODI
+          constraintName: NOT_MON_INT_USR_CODI_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_MON_INT
+        baseColumnNames: CODI_ENTITAT
+        referencedTableName: NOT_ENTITAT
+        referencedColumnNames: CODI
+        constraintName: NOT_MON_INT_ENTITAT_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_MON_INT
+        baseColumnNames: NOTIFICACIO_ID
+        referencedTableName: NOT_NOTIFICACIO
+        referencedColumnNames: ID
+        constraintName: NOT_MON_INT_NOT_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_MON_INT_PARAM
+        baseColumnNames: MON_INT_ID
+        referencedTableName: NOT_MON_INT
+        referencedColumnNames: ID
+        constraintName: NOT_MONINTPARAM_MONINT_FK
+
+#    - addForeignKeyConstraint:
+#        baseTableName: NOT_MON_INT_PARAM
+#        baseColumnNames: NOTIFICACIO_ID
+#        referencedTableName: NOT_NOTIFICACIO
+#        referencedColumnNames: ID
+#        constraintName: NOT_MONINTPARAM_NOT_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_NOTIFICACIO
+        baseColumnNames: USUAR_CODI
+        referencedTableName: NOT_USUARI
+        referencedColumnNames: CODI
+        constraintName: NOT_NOTIFICACIO_USUARI_FK
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_NOTIFICACIO
+          baseColumnNames: ENTITAT_ID
+          referencedTableName: NOT_ENTITAT
+          referencedColumnNames: ID
+          constraintName: NOT_ENTITAT_NOTIFICACIO_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_NOTIFICACIO
+        baseColumnNames: PROCEDIMENT_ID
+        referencedTableName: NOT_PROCEDIMENT
+        referencedColumnNames: ID
+        constraintName: NOT_PROCEDIMENT_NOT_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_NOTIFICACIO
+        baseColumnNames: PROCEDIMENT_ORGAN_ID
+        referencedTableName: NOT_PROCEDIMENT
+        referencedColumnNames: ID
+        constraintName: NOT_PROCORGAN_NOT_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_NOTIFICACIO
+        baseColumnNames: DOCUMENT_ID
+        referencedTableName: NOT_DOCUMENT
+        referencedColumnNames: ID
+        constraintName: NOT_NOTIF_DOCUMENT_ID_FK
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_NOTIFICACIO
+          baseColumnNames: DOCUMENT2_ID
+          referencedTableName: NOT_DOCUMENT
+          referencedColumnNames: ID
+          constraintName: NOT_DOCUMENT2_NOTIFICACIO_FK
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_NOTIFICACIO
+          baseColumnNames: DOCUMENT3_ID
+          referencedTableName: NOT_DOCUMENT
+          referencedColumnNames: ID
+          constraintName: NOT_DOCUMENT3_NOTIFICACIO_FK
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_NOTIFICACIO
+          baseColumnNames: DOCUMENT3_ID
+          referencedTableName: NOT_DOCUMENT
+          referencedColumnNames: ID
+          constraintName: NOT_DOCUMENT3_NOTIFICACIO_FK
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_NOTIFICACIO
+          baseColumnNames: DOCUMENT4_ID
+          referencedTableName: NOT_DOCUMENT
+          referencedColumnNames: ID
+          constraintName: NOT_DOCUMENT4_NOTIFICACIO_FK
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_NOTIFICACIO
+          baseColumnNames: DOCUMENT5_ID
+          referencedTableName: NOT_DOCUMENT
+          referencedColumnNames: ID
+          constraintName: NOT_DOCUMENT5_NOTIFICACIO_FK
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_NOTIFICACIO
+          baseColumnNames: ORGAN_GESTOR
+          referencedTableName: NOT_ORGAN_GESTOR
+          referencedColumnNames: ID
+          constraintName: NOT_ORGAN_GESTOR_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_NOTIFICACIO
+        baseColumnNames: NOTIFICACIO_MASSIVA_ID
+        referencedTableName: NOT_NOTIFICACIO_MASSIVA
+        referencedColumnNames: ID
+        constraintName: NOT_NOTIF_NOTIF_MASSIVA_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_NOTIFICACIO_AUDIT
+        baseColumnNames: NOTIFICACIO_ID
+        referencedTableName: NOT_NOTIFICACIO
+        referencedColumnNames: ID
+        constraintName: NOT_NOT_AUDIT_NOT_ID_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_NOTIFICACIO_AUDIT
+        baseColumnNames: ENTITAT_ID
+        referencedTableName: NOT_ENTITAT
+        referencedColumnNames: ID
+        constraintName: NOT_NOT_AUDIT_ENTITAT_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_NOTIFICACIO_AUDIT
+        baseColumnNames: DOCUMENT_ID
+        referencedTableName: NOT_DOCUMENT
+        referencedColumnNames: ID
+        constraintName: NOT_NOT_AUDIT_DOC_ID_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_NOTIFICACIO_AUDIT
+        baseColumnNames: USUARI_CODI
+        referencedTableName: NOT_USUARI
+        referencedColumnNames: CODI
+        constraintName: NOT_NOT_AUDIT_USR_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_NOTIFICACIO_ENV
+        baseColumnNames: NOTIFICACIO_ID
+        referencedTableName: NOT_NOTIFICACIO
+        referencedColumnNames: ID
+        constraintName: NOT_NOTIFICACIO_NOTENV_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_NOTIFICACIO_ENV
+        baseColumnNames: NOT_PERSONA
+        referencedTableName: TITULAR_ID
+        referencedColumnNames: ID
+        constraintName: NOT_PERSONA_NOTIFICACIO_ENV_FK
+
+#   NotificacioEnviamentEntity.destinataris
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_NOTIFICACIO_ENV
+        baseColumnNames: ENTREGA_POSTAL_ID
+        referencedTableName: NOT_ENTREGA_POSTAL
+        referencedColumnNames: ID
+        constraintName: NOT_NOTIFICACIO_ENV_DOM_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_NOTIFICACIO_ENV
+        baseColumnNames: ULTIM_EVENT
+        referencedTableName: NOT_NOTIFICACIO_EVENT
+        referencedColumnNames: ID
+        constraintName: NOT_NOTEVENT_ULTIM_EVENT_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_NOTIFICACIO_ENV_AUDIT
+        baseColumnNames: ENVIAMENT_ID
+        referencedTableName: NOT_NOTIFICACIO_ENV
+        referencedColumnNames: ID
+        constraintName: NOT_NOTENVAUDIT_ENV_ID_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_NOTIFICACIO_ENV_AUDIT
+        baseColumnNames: NOTIFICACIO_ID
+        referencedTableName: NOT_NOTIFICACIO
+        referencedColumnNames: ID
+        constraintName: NOT_NOTENVAUDIT_NOT_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_NOTIFICACIO_ENV_AUDIT
+        baseColumnNames: TITULAR_ID
+        referencedTableName: NOT_PERSONA
+        referencedColumnNames: ID
+        constraintName: NOT_NOTENVAUDIT_TITULAR_FK
+
+    # DESTINATARIS
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_NOTIFICACIO_ENV_TABLE
+        baseColumnNames: NOTIFICACIO_ID
+        referencedTableName: NOT_NOTIFICACIO
+        referencedColumnNames: ID
+        constraintName: NOT_ENV_TABLE_NOT_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_NOTIFICACIO_ENV_TABLE
+        baseColumnNames: ENTITAT_ID
+        referencedTableName: NOT_ENTITAT
+        referencedColumnNames: ID
+        constraintName: NOT_ENV_TABLE_ENTITAT_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_NOTIFICACIO_ENV_TABLE
+        baseColumnNames: USUARI_CODI
+        referencedTableName: NOT_USUARI
+        referencedColumnNames: CODI
+        constraintName: NOT_ENV_TABLE_USUARI_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_NOTIFICACIO_EVENT
+        baseColumnNames: NOTIFICACIO_ID
+        referencedTableName: NOT_NOTIFICACIO
+        referencedColumnNames: ID
+        constraintName: NOT_NOTIFICACIO_NOTEVENT_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_NOTIFICACIO_EVENT
+        baseColumnNames: NOTIFICACIO_ENV_ID
+        referencedTableName: NOT_NOTIFICACIO_ENV
+        referencedColumnNames: ID
+        constraintName: NOT_NOTENV_NOTEVE_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_NOTIFICACIO_MASSIVA
+        baseColumnNames: ENTITAT_ID
+        referencedTableName: NOT_ENTITAT
+        referencedColumnNames: ID
+        constraintName: NOT_MASSIVA_ENTITAT_FK
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_NOTIFICACIO_MASSIVA
+          baseColumnNames: PAGADOR_POSTAL_ID
+          referencedTableName: NOT_PAGADOR_POSTAL
+          referencedColumnNames: ID
+          constraintName: NOT_MASSIVA_PAGADOR_POSTAL_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_NOTIFICACIO_TABLE
+        baseColumnNames: ENTITAT_ID
+        referencedTableName: NOT_ENTITAT
+        referencedColumnNames: ID
+        constraintName: NOT_NOT_TABLE_ENTITAT_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_NOTIFICACIO_TABLE
+        baseColumnNames: USUARI_CODI
+        referencedTableName: NOT_USUARI
+        referencedColumnNames: CODI
+        constraintName: NOT_NOT_TABLE_USUARI_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_NOTIFICACIO_TABLE
+        baseColumnNames: PROCEDIMENT_CODI
+        referencedTableName: NOT_PROCEDIMENT
+        referencedColumnNames: CODI
+        constraintName: NOT_NOT_TABLE_PROC_FK
+
+#    - addForeignKeyConstraint:
+#          baseTableName: NOT_NOTIFICACIO_TABLE
+#          baseColumnNames: ORGAN_CODI
+#          referencedTableName: NOT_ORGAN_GESTOR
+#          referencedColumnNames: CODI
+#          constraintName: NOT_NOT_TABLE_ORGAN_FK
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_NOTIFICACIO_TABLE
+          baseColumnNames: NOTIFICACIO_MASSIVA_ID
+          referencedTableName: NOT_NOTIFICACIO_MASSIVA
+          referencedColumnNames: ID
+          constraintName: NOT_NOT_TABLE_MASSIVA_FK
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_OFICINA
+          baseColumnNames: ENTITAT_ID
+          referencedTableName: NOT_ENTITAT
+          referencedColumnNames: ID
+          constraintName: NOT_OFICINA_ENTITAT_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_OFICINA
+        baseColumnNames: ORGAN_GESTOR
+        referencedTableName: NOT_ORGAN_GESTOR
+        referencedColumnNames: ID
+        constraintName: NOT_OFI_ORGAN_GESTOR_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_OFICINA
+        baseColumnNames: ENTITAT
+        referencedTableName: NOT_ENTITAT
+        referencedColumnNames: ID
+        constraintName: NOT_ORGAN_ENTITAT_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_OFICINA
+        baseColumnNames: ENTREGA_CIE_ID
+        referencedTableName: NOT_ENTREGA_CIE
+        referencedColumnNames: ID
+        constraintName: NOT_ORGAN_ENTREGA_CIE_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_PAGADOR_CIE
+        baseColumnNames: ENTITAT
+        referencedTableName: NOT_ENTITAT
+        referencedColumnNames: ID
+        constraintName: NOT_PAGADOR_CIE_ENTITAT_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_PAGADOR_CIE
+        baseColumnNames: ORGAN_EMISOR
+        referencedTableName: NOT_ORGAN_GESTOR
+        referencedColumnNames: ID
+        constraintName: NOT_EMISORCIE_ORGAN_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_PAGADOR_POSTAL
+        baseColumnNames: ENTITAT
+        referencedTableName: NOT_ENTITAT
+        referencedColumnNames: ID
+        constraintName: NOT_PAGADOR_POSTAL_ENTITAT_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_PAGADOR_POSTAL
+        baseColumnNames: ORGAN_GESTOR
+        referencedTableName: NOT_ORGAN_GESTOR
+        referencedColumnNames: ID
+        constraintName: NOT_PAGPOSTAL_ORGAN_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_PERSONA
+        baseColumnNames: NOTIFICACIO_ENV_ID
+        referencedTableName: NOT_NOTIFICACIO_ENV
+        referencedColumnNames: ID
+        constraintName: NOT_PERSONA_NOT_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_PROCEDIMENT
+        baseColumnNames: ENTITAT
+        referencedTableName: NOT_ENTITAT
+        referencedColumnNames: ID
+        constraintName: NOT_PROCSER_ENTITAT_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_PROCEDIMENT
+        baseColumnNames: ENTREGA_CIE_ID
+        referencedTableName: NOT_ENTREGA_CIE
+        referencedColumnNames: ID
+        constraintName: NOT_PROCEDIMENT_ENTREGA_CIE_FK
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_PROCEDIMENT
+          baseColumnNames: ORGAN_GESTOR
+          referencedTableName: NOT_ORGAN_GESTOR
+          referencedColumnNames: ID
+          constraintName: NOT_PROCSER_ORGAN_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_PROCEDIMENT_AUDIT
+        baseColumnNames: ENTITAT_ID
+        referencedTableName: NOT_ENTITAT_ID
+        referencedColumnNames: ID
+        constraintName: NOT_PROC_AUDIT_ENTITAT_FK
+
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_PROCEDIMENT_AUDIT
+        baseColumnNames: PROCEDIMENT_ID
+        referencedTableName: NOT_PROCEDIMENT
+        referencedColumnNames: ID
+        constraintName: NOT_PROC_AUDIT_PROC_FK
+
+#    - addForeignKeyConstraint:
+#        baseTableName: NOT_PROCEDIMENT_AUDIT
+#        baseColumnNames: ORGAN
+#        referencedTableName: NOT_ORGAN_GESTOR
+#        referencedColumnNames: CODI
+#        constraintName: NOT_PROC_AUDIT_ORGAN_FK
+
+    - addForeignKeyConstraint:
+        baseTableName: NOT_PROCEDIMENT_AUDIT
+        baseColumnNames: PAGADORPOSTAL_ID
+        referencedTableName: NOT_PAGADOR_POSTAL
+        referencedColumnNames: ID
+        constraintName: NOT_PROC_AUDIT_PAGPOSTAL_FK
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_PROCEDIMENT_AUDIT
+          baseColumnNames: PAGADORCIE_ID
+          referencedTableName: NOT_PAGADOR_CIE
+          referencedColumnNames: ID
+          constraintName: NOT_PROC_AUDIT_PAGCIE_FK
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_PRO_GRUP
+          baseColumnNames: PROCEDIMENT
+          referencedTableName: NOT_PROCEDIMENT
+          referencedColumnNames: ID
+          constraintName: NOT_PRO_GRUP_FK
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_PRO_GRUP
+          baseColumnNames: GRUP
+          referencedTableName: NOT_GRUP
+          referencedColumnNames: ID
+          constraintName: NOT_GRUP_PRO_FK
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_PRO_GRUP_AUDIT
+          baseColumnNames: GRUP_ID
+          referencedTableName: NOT_GRUP
+          referencedColumnNames: ID
+          constraintName: NOT_PRO_GRUP_GRUP_FK
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_PRO_GRUP_AUDIT
+          baseColumnNames: ENTITAT_ID
+          referencedTableName: NOT_ENTITAT
+          referencedColumnNames: ID
+          constraintName: NOT_PRO_GRUP_ENTITAT_FK
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_PRO_ORGAN
+          baseColumnNames: PROCEDIMENT_ID
+          referencedTableName: NOT_PROCEDIMENT
+          referencedColumnNames: ID
+          constraintName: NOT_ORGAN_PRO_FK
+
+    - addForeignKeyConstraint:
+          baseTableName: NOT_PRO_ORGAN
+          baseColumnNames: ORGANGESTOR_ID
+          referencedTableName: NOT_ORGAN_GESTOR
+          referencedColumnNames: ID
+          constraintName: NOT_PRO_ORGAN_FK
