@@ -15,3 +15,4 @@ DELETE FROM not_config WHERE key = 'es.caib.notib.tasques.actives';
 UPDATE NOT_CONFIG SET JBOSS_PROPERTY = 1 WHERE key = 'es.caib.notib.plugin.gesdoc.filesystem.base.dir';
 INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.log.tipus.plugin.GESDOC', 'false', 'Mostrar logs del plugin del gestor documental', 'LOGS', 11, 0, 'BOOL', 0);
 UPDATE not_notificacio_env_table t SET t.NOT_ESTAT = (SELECT n.estat FROM not_notificacio n WHERE t.NOT_ID  = n.id) WHERE t.not_id IS NOT null;
+UPDATE NOT_NOtIFICACIO_TABLE t SET ORGAN_ID = (SELECT o.id FROM not_organ_gestor o WHERE o.entitat = t.entitat_id AND o.codi = t.organ_codi);
