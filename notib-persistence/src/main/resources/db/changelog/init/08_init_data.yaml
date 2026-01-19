@@ -5,6 +5,7 @@ databaseChangeLog:
       changes:
         - sqlFile:
             dbms: oracle
-            splitStatements: false
-            path: scripts/init_data.sql
+            splitStatements: true
+            endDelimiter: /
+            path: ../scripts/init/init_data.sql
             relativeToChangelogFile: true
