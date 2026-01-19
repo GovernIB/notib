@@ -58,7 +58,7 @@ public class EntitatResource extends BaseResource<Long> {
 	private boolean ambEntregaDeh;
 	@Size(max = 1024)
 	private String descripcio;
-	private boolean activa;
+	private boolean activa = true;
 	@Size(max = 1024)
 	private String colorFons;
 	@Size(max = 1024)
