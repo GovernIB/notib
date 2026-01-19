@@ -228,6 +228,7 @@ databaseChangeLog:
       changes:
         - sqlFile:
             dbms: oracle
-            splitStatements: false
-            path: scripts/oracle_current_value_fn.sql
+            splitStatements: true
+            endDelimiter: /
+            path: ../scripts/init/oracle_acl_triggers.sql
             relativeToChangelogFile: true

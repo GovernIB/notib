@@ -2,10 +2,11 @@ databaseChangeLog:
   - changeSet:
       id: init-grant-1
       author: limit
-      context: caib
+      labels: grants
       changes:
         - sqlFile:
             dbms: oracle
-            splitStatements: false
-            path: scripts/oracle_caib_grants.sql
+            splitStatements: true
+            endDelimiter: ;
+            path: ../scripts/init/oracle_caib_grants.sql
             relativeToChangelogFile: true
