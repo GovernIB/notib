@@ -208,6 +208,7 @@ export const Form: React.FC<FormProps> = (props) => {
     const [revertData, setRevertData] = React.useState<any>(undefined);
     const [isDataInitialized, setIsDataInitialized] = React.useState<boolean>(false);
     const [apiActions, setApiActions] = React.useState<any>(undefined);
+    const [createId, setCreateId] = React.useState<any>(undefined);
     const apiRef = React.useRef<FormApi>(undefined);
     const idFromExternalResetRef = React.useRef<any>(undefined);
     const isSaveActionPresent =
@@ -215,7 +216,7 @@ export const Form: React.FC<FormProps> = (props) => {
     const isDeleteActionPresent = id && apiActions?.['delete'] != null;
     const location = useLocation();
     const additionalData = additionalDataProp ?? location.state?.additionalData;
-    const calculatedId = (id?: any) => idFromExternalResetRef.current ?? id;
+    const calculatedId = (id?: any) => idFromExternalResetRef.current ?? createId ?? id;
     const isReady = !isLoading;
     const sendOnChangeRequest = React.useCallback(
         (id: any, args: ResourceApiOnChangeArgs): Promise<any> => {
@@ -362,12 +363,13 @@ export const Form: React.FC<FormProps> = (props) => {
             if (initialDataProp != null) {
                 reset(initialDataProp);
             } else {
-                getInitialData(id, fields, additionalData, initOnChangeRequest).then(
+                const calcId = calculatedId(id);
+                getInitialData(calcId, fields, additionalData, initOnChangeRequest).then(
                     (initialData: any) => {
                         debug && logConsole.debug('Initial data loaded', initialData);
                         const { _actions: initialDataActions, ...initialDataWithoutLinks } =
                             initialData;
-                        id != null && setApiActions(initialDataActions);
+                        calcId != null && setApiActions(initialDataActions);
                         reset(initialDataWithoutLinks);
                     }
                 );
@@ -495,6 +497,7 @@ export const Form: React.FC<FormProps> = (props) => {
                                     navigateToSaveLink((updateLink ?? saveLink), savedData.id);
                                 }
                             } else {
+                                setCreateId(savedData.id);
                                 onCreateSuccess != null
                                     ? onCreateSuccess(savedData)
                                     : onSaveSuccess?.(data);
@@ -609,9 +612,9 @@ export const Form: React.FC<FormProps> = (props) => {
     React.useEffect(() => {
         // Obté les dades inicials pel formulari
         if (fields != null) {
-            refresh();
+            refresh(createId != null);
         }
-    }, [id, fields]);
+    }, [id, createId, fields]);
     React.useEffect(() => {
         // Controla l'estat de formulari amb modificacions
         if (isReady) {
