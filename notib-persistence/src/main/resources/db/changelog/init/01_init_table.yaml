@@ -1934,7 +1934,7 @@ databaseChangeLog:
                   type: TIMESTAMP(6)
               - column:
                   name: CIE_ID
-                  type: VARCHAR(100 ${varcharUnit})
+                  type: BIGINT
               - column:
                   defaultValueNumeric: 0
                   name: CIE_CANCELAT
