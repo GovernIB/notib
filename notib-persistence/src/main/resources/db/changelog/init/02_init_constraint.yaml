@@ -239,16 +239,16 @@ databaseChangeLog:
             referencedTableName: ${db_prefix}USUARI
             referencedColumnNames: CODI
             constraintName: ${db_prefix}MON_INT_USR_CODI_FK
-  - changeSet:
-      id: init_constraint-25
-      author: limit
-      changes:
-        - addForeignKeyConstraint:
-            baseTableName: ${db_prefix}MON_INT
-            baseColumnNames: CODI_ENTITAT
-            referencedTableName: ${db_prefix}ENTITAT
-            referencedColumnNames: CODI
-            constraintName: ${db_prefix}MON_INT_ENTITAT_FK
+  #  - changeSet:
+  #      id: init_constraint-25
+  #      author: limit
+  #      changes:
+  #        - addForeignKeyConstraint:
+  #            baseTableName: ${db_prefix}MON_INT
+  #            baseColumnNames: CODI_ENTITAT
+  #            referencedTableName: ${db_prefix}ENTITAT
+  #            referencedColumnNames: CODI
+  #            constraintName: ${db_prefix}MON_INT_ENTITAT_FK
   - changeSet:
       id: init_constraint-26
       author: limit
@@ -269,16 +269,16 @@ databaseChangeLog:
             referencedTableName: ${db_prefix}MON_INT
             referencedColumnNames: ID
             constraintName: ${db_prefix}MONINTPARAM_MONINT_FK
-  - changeSet:
-      id: init_constraint-28
-      author: limit
-      changes:
-        - addForeignKeyConstraint:
-            baseTableName: ${db_prefix}NOTIFICACIO
-            baseColumnNames: USUAR_CODI
-            referencedTableName: ${db_prefix}USUARI
-            referencedColumnNames: CODI
-            constraintName: ${db_prefix}NOTIFICACIO_USUARI_FK
+  #  - changeSet:
+  #      id: init_constraint-28
+  #      author: limit
+  #      changes:
+  #        - addForeignKeyConstraint:
+  #            baseTableName: ${db_prefix}NOTIFICACIO
+  #            baseColumnNames: USUAR_CODI
+  #            referencedTableName: ${db_prefix}USUARI
+  #            referencedColumnNames: CODI
+  #            constraintName: ${db_prefix}NOTIFICACIO_USUARI_FK
   - changeSet:
       id: init_constraint-29
       author: limit
@@ -339,16 +339,16 @@ databaseChangeLog:
             referencedTableName: ${db_prefix}DOCUMENT
             referencedColumnNames: ID
             constraintName: ${db_prefix}DOCUMENT3_NOTIFICACIO_FK
-  - changeSet:
-      id: init_constraint-35
-      author: limit
-      changes:
-        - addForeignKeyConstraint:
-            baseTableName: ${db_prefix}NOTIFICACIO
-            baseColumnNames: DOCUMENT3_ID
-            referencedTableName: ${db_prefix}DOCUMENT
-            referencedColumnNames: ID
-            constraintName: ${db_prefix}DOCUMENT3_NOTIFICACIO_FK
+  #  - changeSet:
+  #      id: init_constraint-35
+  #      author: limit
+  #      changes:
+  #        - addForeignKeyConstraint:
+  #            baseTableName: ${db_prefix}NOTIFICACIO
+  #            baseColumnNames: DOCUMENT3_ID
+  #            referencedTableName: ${db_prefix}DOCUMENT
+  #            referencedColumnNames: ID
+  #            constraintName: ${db_prefix}DOCUMENT3_NOTIFICACIO_FK
   - changeSet:
       id: init_constraint-36
       author: limit
@@ -419,16 +419,16 @@ databaseChangeLog:
             referencedTableName: ${db_prefix}DOCUMENT
             referencedColumnNames: ID
             constraintName: ${db_prefix}NOT_AUDIT_DOC_ID_FK
-  - changeSet:
-      id: init_constraint-43
-      author: limit
-      changes:
-        - addForeignKeyConstraint:
-            baseTableName: ${db_prefix}NOTIFICACIO_AUDIT
-            baseColumnNames: USUARI_CODI
-            referencedTableName: ${db_prefix}USUARI
-            referencedColumnNames: CODI
-            constraintName: ${db_prefix}NOT_AUDIT_USR_FK
+  #  - changeSet:
+  #      id: init_constraint-43
+  #      author: limit
+  #      changes:
+  #        - addForeignKeyConstraint:
+  #            baseTableName: ${db_prefix}NOTIFICACIO_AUDIT
+  #            baseColumnNames: USUARI_CODI
+  #            referencedTableName: ${db_prefix}USUARI
+  #            referencedColumnNames: CODI
+  #            constraintName: ${db_prefix}NOT_AUDIT_USR_FK
   - changeSet:
       id: init_constraint-44
       author: limit
@@ -439,16 +439,16 @@ databaseChangeLog:
             referencedTableName: ${db_prefix}NOTIFICACIO
             referencedColumnNames: ID
             constraintName: ${db_prefix}NOTIFICACIO_NOTENV_FK
-  - changeSet:
-      id: init_constraint-45
-      author: limit
-      changes:
-        - addForeignKeyConstraint:
-            baseTableName: ${db_prefix}NOTIFICACIO_ENV
-            baseColumnNames: NOT_PERSONA
-            referencedTableName: TITULAR_ID
-            referencedColumnNames: ID
-            constraintName: ${db_prefix}PERSONA_NOTIFICACIO_ENV_FK
+  #  - changeSet:
+  #      id: init_constraint-45
+  #      author: limit
+  #      changes:
+  #        - addForeignKeyConstraint:
+  #            baseTableName: ${db_prefix}NOTIFICACIO_ENV
+  #            baseColumnNames: NOT_PERSONA
+  #            referencedTableName: TITULAR_ID
+  #            referencedColumnNames: ID
+  #            constraintName: ${db_prefix}PERSONA_NOTIFICACIO_ENV_FK
   - changeSet:
       id: init_constraint-46
       author: limit
@@ -589,16 +589,16 @@ databaseChangeLog:
             referencedTableName: ${db_prefix}USUARI
             referencedColumnNames: CODI
             constraintName: ${db_prefix}NOT_TABLE_USUARI_FK
-  - changeSet:
-      id: init_constraint-60
-      author: limit
-      changes:
-        - addForeignKeyConstraint:
-            baseTableName: ${db_prefix}NOTIFICACIO_TABLE
-            baseColumnNames: PROCEDIMENT_CODI
-            referencedTableName: ${db_prefix}PROCEDIMENT
-            referencedColumnNames: CODI
-            constraintName: ${db_prefix}NOT_TABLE_PROC_FK
+  #  - changeSet:
+  #      id: init_constraint-60
+  #      author: limit
+  #      changes:
+  #        - addForeignKeyConstraint:
+  #            baseTableName: ${db_prefix}NOTIFICACIO_TABLE
+  #            baseColumnNames: PROCEDIMENT_CODI
+  #            referencedTableName: ${db_prefix}PROCEDIMENT
+  #            referencedColumnNames: CODI
+  #            constraintName: ${db_prefix}NOT_TABLE_PROC_FK
   - changeSet:
       id: init_constraint-61
       author: limit
@@ -629,26 +629,26 @@ databaseChangeLog:
             referencedTableName: ${db_prefix}ORGAN_GESTOR
             referencedColumnNames: ID
             constraintName: ${db_prefix}OFI_ORGAN_GESTOR_FK
-  - changeSet:
-      id: init_constraint-64
-      author: limit
-      changes:
-        - addForeignKeyConstraint:
-            baseTableName: ${db_prefix}OFICINA
-            baseColumnNames: ENTITAT
-            referencedTableName: ${db_prefix}ENTITAT
-            referencedColumnNames: ID
-            constraintName: ${db_prefix}ORGAN_ENTITAT_FK
-  - changeSet:
-      id: init_constraint-65
-      author: limit
-      changes:
-        - addForeignKeyConstraint:
-            baseTableName: ${db_prefix}OFICINA
-            baseColumnNames: ENTREGA_CIE_ID
-            referencedTableName: ${db_prefix}ENTREGA_CIE
-            referencedColumnNames: ID
-            constraintName: ${db_prefix}ORGAN_ENTREGA_CIE_FK
+  #  - changeSet:
+  #      id: init_constraint-64
+  #      author: limit
+  #      changes:
+  #        - addForeignKeyConstraint:
+  #            baseTableName: ${db_prefix}OFICINA
+  #            baseColumnNames: ENTITAT
+  #            referencedTableName: ${db_prefix}ENTITAT
+  #            referencedColumnNames: ID
+  #            constraintName: ${db_prefix}ORGAN_ENTITAT_FK
+  #  - changeSet:
+  #      id: init_constraint-65
+  #      author: limit
+  #      changes:
+  #        - addForeignKeyConstraint:
+  #            baseTableName: ${db_prefix}OFICINA
+  #            baseColumnNames: ENTREGA_CIE_ID
+  #            referencedTableName: ${db_prefix}ENTREGA_CIE
+  #            referencedColumnNames: ID
+  #            constraintName: ${db_prefix}ORGAN_ENTREGA_CIE_FK
   - changeSet:
       id: init_constraint-66
       author: limit
@@ -736,7 +736,7 @@ databaseChangeLog:
         - addForeignKeyConstraint:
             baseTableName: ${db_prefix}PROCEDIMENT_AUDIT
             baseColumnNames: ENTITAT_ID
-            referencedTableName: ${db_prefix}ENTITAT_ID
+            referencedTableName: ${db_prefix}ENTITAT
             referencedColumnNames: ID
             constraintName: ${db_prefix}PROC_AUDIT_ENTITAT_FK
   - changeSet:
@@ -789,26 +789,26 @@ databaseChangeLog:
             referencedTableName: ${db_prefix}GRUP
             referencedColumnNames: ID
             constraintName: ${db_prefix}GRUP_PRO_FK
-  - changeSet:
-      id: init_constraint-80
-      author: limit
-      changes:
-        - addForeignKeyConstraint:
-            baseTableName: ${db_prefix}PRO_GRUP_AUDIT
-            baseColumnNames: GRUP_ID
-            referencedTableName: ${db_prefix}GRUP
-            referencedColumnNames: ID
-            constraintName: ${db_prefix}PRO_GRUP_GRUP_FK
-  - changeSet:
-      id: init_constraint-81
-      author: limit
-      changes:
-        - addForeignKeyConstraint:
-            baseTableName: ${db_prefix}PRO_GRUP_AUDIT
-            baseColumnNames: ENTITAT_ID
-            referencedTableName: ${db_prefix}ENTITAT
-            referencedColumnNames: ID
-            constraintName: ${db_prefix}PRO_GRUP_ENTITAT_FK
+  #  - changeSet:
+  #      id: init_constraint-80
+  #      author: limit
+  #      changes:
+  #        - addForeignKeyConstraint:
+  #            baseTableName: ${db_prefix}PRO_GRUP_AUDIT
+  #            baseColumnNames: GRUP_ID
+  #            referencedTableName: ${db_prefix}GRUP
+  #            referencedColumnNames: ID
+  #            constraintName: ${db_prefix}PRO_GRUP_GRUP_FK
+  #  - changeSet:
+  #      id: init_constraint-81
+  #      author: limit
+  #      changes:
+  #        - addForeignKeyConstraint:
+  #            baseTableName: ${db_prefix}PRO_GRUP_AUDIT
+  #            baseColumnNames: ENTITAT_ID
+  #            referencedTableName: ${db_prefix}ENTITAT
+  #            referencedColumnNames: ID
+  #            constraintName: ${db_prefix}PRO_GRUP_ENTITAT_FK
   - changeSet:
       id: init_constraint-82
       author: limit
@@ -829,75 +829,3 @@ databaseChangeLog:
             referencedTableName: ${db_prefix}ORGAN_GESTOR
             referencedColumnNames: ID
             constraintName: ${db_prefix}PRO_ORGAN_FK
-  - changeSet:
-      id: init_constraint-84
-      author: limit
-      changes:
-        - addUniqueConstraint:
-            columnNames: ENTITAT_ID, PROCEDIMENT_ID, ORGAN_CODI, USUARI_CODI, TIPUS, ORIGEN
-            constraintName: ${db_prefix}EXPLOT_DIM_UK
-            forIndexName: NOT_EXPLOT_DIM_UK
-            tableName: ${db_prefix}EXPLOT_DIM
-  - changeSet:
-      id: init_constraint-85
-      author: limit
-      changes:
-        - addUniqueConstraint:
-            columnNames: ENVIAMENT_ID
-            constraintName: ${db_prefix}EXPLOT_ENV_UK
-            forIndexName: NOT_EXPLOT_ENV_UK
-            tableName: ${db_prefix}EXPLOT_ENV_INFO
-  - changeSet:
-      id: init_constraint-86
-      author: limit
-      changes:
-        - addUniqueConstraint:
-            columnNames: REFERENCIA
-            constraintName: ${db_prefix}NOTIFICACIO_TABLE_UN
-            forIndexName: NOT_NOTIFICACIO_TABLE_UN
-            tableName: ${db_prefix}NOTIFICACIO_TABLE
-  - changeSet:
-      id: init_constraint-87
-      author: limit
-      changes:
-        - addUniqueConstraint:
-            columnNames: REFERENCIA
-            constraintName: ${db_prefix}NOTIFICACIO_UN
-            forIndexName: NOT_NOTIFICACIO_UN
-            tableName: ${db_prefix}NOTIFICACIO
-  - changeSet:
-      id: init_constraint-88
-      author: limit
-      changes:
-        - addUniqueConstraint:
-            columnNames: CODI, ENTITAT
-            constraintName: ${db_prefix}ORGAN_ENTITAT_UNIQUE
-            forIndexName: NOT_ORGAN_ENTITAT_UNIQUE
-            tableName: ${db_prefix}ORGAN_GESTOR
-  - changeSet:
-      id: init_constraint-89
-      author: limit
-      changes:
-        - addUniqueConstraint:
-            columnNames: ANTIC_OG, NOU_OG
-            constraintName: ${db_prefix}UO_SINC_REL_MULT_UK
-            forIndexName: NOT_UO_SINC_REL_MULT_UK
-            tableName: ${db_prefix}OG_SINC_REL
-  - changeSet:
-      id: init_constraint-90
-      author: limit
-      changes:
-        - addUniqueConstraint:
-            columnNames: CODI
-            constraintName: SYS_C007188
-            forIndexName: NOT_ENTITAT_UK
-            tableName: ${db_prefix}ENTITAT
-  - changeSet:
-      id: init_constraint-91
-      author: limit
-      changes:
-        - addUniqueConstraint:
-            columnNames: ENVIAMENT_ID
-            constraintName: SYS_C007644
-            forIndexName: SYS_C007644
-            tableName: ${db_prefix}CALLBACK
