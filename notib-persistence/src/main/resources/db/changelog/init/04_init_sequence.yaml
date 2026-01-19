@@ -34,10 +34,3 @@ databaseChangeLog:
         - createSequence:
             sequenceName: ${db_prefix}HIBERNATE_SEQ
             startValue: 1
-  - changeSet:
-      id: init_sequence-6
-      author: limit
-      changes:
-        - createSequence:
-            sequenceName: HIBERNATE_SEQUENCE
-            startValue: 1
