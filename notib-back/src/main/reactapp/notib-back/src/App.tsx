@@ -25,6 +25,12 @@ export const App = () => {
         to: '/avisos',
         icon: 'notifications',
         resourceName: 'avisResource',
+    },{
+        id: 'grups',
+        title: t('menu.grups'),
+        to: '/grups',
+        icon: 'notifications',
+        resourceName: 'grupResource',
     }/*, {
         id: 'enviaments',
         title: t('menu.enviaments'),

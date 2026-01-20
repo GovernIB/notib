@@ -11,8 +11,8 @@ import {
     MuiFormTabContent,
     useFormContext,
 } from 'reactlib';
-import ProcedimentFormTabGrups from './ProcedimentFormTabGrups.tsx';
-import ProcedimentFormTabPermisos from './ProcedimentFormTabPermisos';
+// import ProcedimentFormTabGrups from './ProcedimentFormTabGrups.tsx';
+// import ProcedimentFormTabPermisos from './ProcedimentFormTabPermisos';
 
 const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
     const { setSubtitle } = props;
@@ -48,12 +48,12 @@ const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void
                         <Grid size={12}><FormField name="descripcio" type="textarea" /></Grid>
                     </Grid>
                 </MuiFormTabContent>
-                <MuiFormTabContent index={2}>
-                    <ProcedimentFormTabGrups />
-                </MuiFormTabContent>
-                <MuiFormTabContent index={3}>
-                    <ProcedimentFormTabPermisos />
-                </MuiFormTabContent>
+                {/*<MuiFormTabContent index={2}>*/}
+                {/*    <ProcedimentFormTabGrups />*/}
+                {/*</MuiFormTabContent>*/}
+                {/*<MuiFormTabContent index={3}>*/}
+                {/*    <ProcedimentFormTabPermisos />*/}
+                {/*</MuiFormTabContent>*/}
             </MuiFormTabs>;
 }
 

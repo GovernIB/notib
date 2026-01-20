@@ -50,9 +50,8 @@ public class AvisResourceEntity extends BaseAuditableResourceEntity<AvisResource
 	private EntitatResourceEntity entitat;
 
 	@Builder
-	public AvisResourceEntity(
-			AvisResource resource,
-			EntitatResourceEntity entitat) {
+	public AvisResourceEntity(AvisResource resource, EntitatResourceEntity entitat) {
+
 		this.assumpte = resource.getAssumpte();
 		this.missatge = resource.getMissatge();
 		this.dataInici = resource.getDataInici();

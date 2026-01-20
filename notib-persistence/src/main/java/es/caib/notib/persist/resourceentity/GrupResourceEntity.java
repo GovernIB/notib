@@ -1,7 +1,9 @@
 package es.caib.notib.persist.resourceentity;
 
 import es.caib.notib.logic.intf.base.config.BaseConfig;
+import es.caib.notib.logic.intf.model.AvisResource;
 import es.caib.notib.logic.intf.model.GrupResource;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,4 +45,13 @@ public class GrupResourceEntity extends BaseAuditableResourceEntity<GrupResource
             foreignKey = @javax.persistence.ForeignKey(name = BaseConfig.DB_PREFIX + "grup_organ_fk"),
             nullable = false)
     protected OrganGestorResourceEntity organGestor;
+
+
+    @Builder
+    public GrupResourceEntity(GrupResource resource, EntitatResourceEntity entitat) {
+
+        this.codi = resource.getCodi();
+        this.nom = resource.getNom();
+        this.entitat = entitat;
+    }
 }

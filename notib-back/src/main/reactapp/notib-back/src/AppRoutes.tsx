@@ -5,6 +5,8 @@ import ProcedimentGrid from './pages/procediment/ProcedimentGrid';
 import ProcedimentForm from "./pages/procediment/ProcedimentForm";
 import AvisGrid from './pages/avis/AvisGrid';
 import AvisForm from './pages/avis/AvisForm';
+import GrupGrid from './pages/grup/GrupGrid';
+import GrupForm from './pages/grup/GrupForm';
 import Enviaments from './pages/Enviaments';
 import NotFoundPage from './pages/NotFound';
 
@@ -32,6 +34,14 @@ const AppRoutes = () => {
                 <Route path="form">
                     <Route index element={<ProcedimentForm />} />
                     <Route path=":id" element={<ProcedimentForm />} />
+                </Route>
+            </Route>
+            <Route index element={<Navigate to="/grups" replace />} />
+            <Route path="grups">
+                <Route index element={<GrupGrid />} />
+                <Route path="form">
+                    <Route index element={<GrupForm />} />
+                    <Route path=":id" element={<GrupForm />} />
                 </Route>
             </Route>
             <Route path="enviaments" element={<Enviaments />} />

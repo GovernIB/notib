@@ -5,6 +5,7 @@ const translationEn = {
         entitats: "Entities",
         avisos: "Advices",
         enviaments: "Deliveries",
+        grups: "Groups",
     },
     page: {
         entitats: {
@@ -58,6 +59,15 @@ const translationEn = {
             form: {
                 titleCreate: "Create advice",
                 titleUpdate: "Update advice",
+            },
+        },
+        grups: {
+            grid: {
+                title: "Group",
+            },
+            form: {
+                titleCreate: "Create group",
+                titleUpdate: "Update group",
             },
         },
         notFound: {

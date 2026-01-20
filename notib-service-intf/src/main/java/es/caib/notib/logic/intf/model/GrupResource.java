@@ -23,7 +23,7 @@ import javax.validation.constraints.Size;
         quickFilterFields = {GrupResource.Fields.codi, GrupResource.Fields.nom},
         accessConstraints = @ResourceAccessConstraint(
                 type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-                roles = { BaseConfig.ROLE_ADMIN },
+                roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_SUPER },
                 grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
         )
 )
