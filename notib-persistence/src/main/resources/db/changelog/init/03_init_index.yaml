@@ -79,17 +79,17 @@ databaseChangeLog:
             indexName: ${db_prefix}OGSINCREL_MULT_I
             tableName: ${db_prefix}OG_SINC_REL
             unique: true
-  - changeSet:
-      id: init_index-7
-      author: limit
-      changes:
-        - createIndex:
-            columns:
-              - column:
-                  name: CODI
-            indexName: ${db_prefix}ENTITAT_CODI_I
-            tableName: ${db_prefix}ENTITAT
-            unique: true
+#  - changeSet:
+#      id: init_index-7
+#      author: limit
+#      changes:
+#        - createIndex:
+#            columns:
+#              - column:
+#                  name: CODI
+#            indexName: ${db_prefix}ENTITAT_CODI_I
+#            tableName: ${db_prefix}ENTITAT
+#            unique: true
   - changeSet:
       id: init_index-8
       author: limit
@@ -182,7 +182,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: ENTITAT_ID
-            indexName: ${db_prefix}NOT_MASS_ENTITAT_I
+            indexName: ${db_prefix}MASS_ENTITAT_I
             tableName: ${db_prefix}NOTIFICACIO_MASSIVA
   - changeSet:
       id: init_index-17
@@ -233,7 +233,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: ENTITAT_ID
-            indexName: ${db_prefix}NOT_ENV_TBL_ENTITAT_I
+            indexName: ${db_prefix}ENV_TBL_ENTITAT_I
             tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
   - changeSet:
       id: init_index-22
@@ -243,7 +243,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: ENTREGA_POSTAL_ID
-            indexName: ${db_prefix}NOT_ENV_ENTREGA_POSTAL_I
+            indexName: ${db_prefix}ENV_ENTREGA_POSTAL_I
             tableName: ${db_prefix}NOTIFICACIO_ENV
   - changeSet:
       id: init_index-23
@@ -253,7 +253,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: CREATEDDATE
-            indexName: ${db_prefix}NOT_ENV_TABLE_CREATEDDATE_I
+            indexName: ${db_prefix}ENV_TABLE_CREATEDDATE_I
             tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
   - changeSet:
       id: init_index-24
@@ -263,7 +263,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: NOT_ORGAN_CODI
-            indexName: ${db_prefix}NOT_ENV_TABLE_ORGAN_CODI_IDX
+            indexName: ${db_prefix}ENV_TABLE_ORGAN_CODI_IDX
             tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
   - changeSet:
       id: init_index-25
@@ -274,7 +274,7 @@ databaseChangeLog:
               - column:
                   computed: true
                   name: NOTIFICA_ESTAT_DATAACT
-            indexName: ${db_prefix}NOT_ENV_NOTIF_ESTAT_DA_I
+            indexName: ${db_prefix}ENV_NOTIF_ESTAT_DA_I
             tableName: ${db_prefix}NOTIFICACIO_ENV
   - changeSet:
       id: init_index-26
@@ -523,7 +523,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: NOTIFICACIO_ID
-            indexName: ${db_prefix}NOT_AUDIT_NOT_I
+            indexName: ${db_prefix}AUDIT_NOT_I
             tableName: ${db_prefix}NOTIFICACIO_AUDIT
   - changeSet:
       id: init_index-49
@@ -533,7 +533,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: ENVIAMENT_ID
-            indexName: ${db_prefix}NOT_ENV_AUDIT_ENV_I
+            indexName: ${db_prefix}ENV_AUDIT_ENV_I
             tableName: ${db_prefix}NOTIFICACIO_ENV_AUDIT
   - changeSet:
       id: init_index-50
@@ -543,7 +543,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: NOTIFICACIO_ID
-            indexName: ${db_prefix}NOT_EVENT_NOT_I
+            indexName: ${db_prefix}EVENT_NOT_I
             tableName: ${db_prefix}NOTIFICACIO_EVENT
   - changeSet:
       id: init_index-51
@@ -603,7 +603,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: USUARI_CODI
-            indexName: ${db_prefix}NOT_ENVTAB_USUCOD_I
+            indexName: ${db_prefix}ENVTAB_USUCOD_I
             tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
   - changeSet:
       id: init_index-57
@@ -801,11 +801,11 @@ databaseChangeLog:
             constraintName: ${db_prefix}OGSINCREL_MULT_UK
             forIndexName: ${db_prefix}OGSINCREL_MULT_I
             tableName: ${db_prefix}OG_SINC_REL
-        - addUniqueConstraint:
-            columnNames: CODI
-            constraintName: ENTITAT_CODI_UK
-            forIndexName: ${db_prefix}ENTITAT_CODI_I
-            tableName: ${db_prefix}ENTITAT
+#        - addUniqueConstraint:
+#            columnNames: CODI
+#            constraintName: ENTITAT_CODI_UK
+#            forIndexName: ${db_prefix}ENTITAT_CODI_I
+#            tableName: ${db_prefix}ENTITAT
         - addUniqueConstraint:
             columnNames: ENVIAMENT_ID
             constraintName: ${db_prefix}CALLBACK_ENV_UK
