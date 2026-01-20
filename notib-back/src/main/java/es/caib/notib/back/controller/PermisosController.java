@@ -1,7 +1,6 @@
 package es.caib.notib.back.controller;
 
 
-import com.google.common.base.Strings;
 import es.caib.notib.back.command.PermisosUsuarisFiltreCommand;
 import es.caib.notib.back.helper.DatatablesHelper;
 import es.caib.notib.back.helper.EnumHelper;
@@ -17,6 +16,8 @@ import es.caib.notib.logic.intf.dto.permis.PermisosUsuari;
 import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.logic.intf.service.UsuariService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -104,7 +105,7 @@ public class PermisosController extends BaseUserController {
 //            filtre.setDeleted(false);
             var filtre = getFiltreCommand(request).asDto();
             var organGestorCodi = filtre.getOrganGestor();
-            if (isAdminOrgan && entitatActual != null && Strings.isNullOrEmpty(organGestorCodi)) {
+            if (isAdminOrgan && entitatActual != null && StringUtils.isEmpty(organGestorCodi)) {
                 var organGestorActual = getOrganGestorActual(request);
                 organGestorCodi = organGestorActual.getCodi();
             }

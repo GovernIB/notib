@@ -1,6 +1,5 @@
 package es.caib.notib.back.controller;
 
-import com.google.common.base.Strings;
 import es.caib.notib.back.command.ConfigCommand;
 import es.caib.notib.back.command.PropietatsConfigurablesCommand;
 import es.caib.notib.back.helper.RequestSessionHelper;
@@ -83,7 +82,7 @@ public class ConfigController extends BaseUserController{
         model.addAttribute(getFiltreCommand(request));
         model.addAttribute("config_groups", configGroups);
         for (var cGroup: configGroups) {
-            fillFormsModel(cGroup, model, entitats, !Strings.isNullOrEmpty(command.getPropietat()));
+            fillFormsModel(cGroup, model, entitats, !StringUtils.isEmpty(command.getPropietat()));
         }
         return "config";
     }
@@ -143,7 +142,7 @@ public class ConfigController extends BaseUserController{
 
         List<ConfigDto> confs = new ArrayList<>();
         for (var config: cGroup.getConfigs()) {
-            if (!Strings.isNullOrEmpty(config.getEntitatCodi()) && !isFIltre) {
+            if (!StringUtils.isEmpty(config.getEntitatCodi()) && !isFIltre) {
                 continue;
             }
             model.addAttribute("config_" + config.getKey().replace('.', '_'), ConfigCommand.builder().key(config.getKey()).value(config.getValue()).build());
