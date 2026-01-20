@@ -12,7 +12,7 @@ export const GrupGrid = () => {
         field: 'nom',
         flex: 4,
     }, {
-        field: 'rol',
+        field: 'codi',
         flex: 4,
     }], []);
     return <GridPage disableMargins={false}>
