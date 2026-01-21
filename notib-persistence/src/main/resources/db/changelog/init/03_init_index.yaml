@@ -79,17 +79,6 @@ databaseChangeLog:
             indexName: ${db_prefix}OGSINCREL_MULT_I
             tableName: ${db_prefix}OG_SINC_REL
             unique: true
-#  - changeSet:
-#      id: init_index-7
-#      author: limit
-#      changes:
-#        - createIndex:
-#            columns:
-#              - column:
-#                  name: CODI
-#            indexName: ${db_prefix}ENTITAT_CODI_I
-#            tableName: ${db_prefix}ENTITAT
-#            unique: true
   - changeSet:
       id: init_index-8
       author: limit
@@ -801,11 +790,6 @@ databaseChangeLog:
             constraintName: ${db_prefix}OGSINCREL_MULT_UK
             forIndexName: ${db_prefix}OGSINCREL_MULT_I
             tableName: ${db_prefix}OG_SINC_REL
-#        - addUniqueConstraint:
-#            columnNames: CODI
-#            constraintName: ENTITAT_CODI_UK
-#            forIndexName: ${db_prefix}ENTITAT_CODI_I
-#            tableName: ${db_prefix}ENTITAT
         - addUniqueConstraint:
             columnNames: ENVIAMENT_ID
             constraintName: ${db_prefix}CALLBACK_ENV_UK

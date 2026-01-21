@@ -217,26 +217,6 @@ databaseChangeLog:
             referencedTableName: ${db_prefix}ORGAN_GESTOR
             referencedColumnNames: ID
             constraintName: ${db_prefix}GRUP_ORGAN_FK
-#  - changeSet:
-#      id: init_constraint-22
-#      author: limit
-#      changes:
-#        - addForeignKeyConstraint:
-#            baseTableName: ${db_prefix}GRUP_AUDIT
-#            baseColumnNames: GRUP_ID
-#            referencedTableName: ${db_prefix}ORGAN_GESTOR
-#            referencedColumnNames: ID
-#            constraintName: ${db_prefix}GRUP_AUDIT_GRUP_ID_FK
-#  - changeSet:
-#      id: init_constraint-23
-#      author: limit
-#      changes:
-#        - addForeignKeyConstraint:
-#            baseTableName: ${db_prefix}GRUP_AUDIT
-#            baseColumnNames: ENTITAT_ID
-#            referencedTableName: ${db_prefix}ENTITAT
-#            referencedColumnNames: ID
-#            constraintName: ${db_prefix}GRUP_AUDIT_ENTITAT_FK
   - changeSet:
       id: init_constraint-24
       author: limit
@@ -387,36 +367,6 @@ databaseChangeLog:
             referencedTableName: ${db_prefix}NOTIFICACIO_MASSIVA
             referencedColumnNames: ID
             constraintName: ${db_prefix}NOTIF_NOTIF_MASSIVA_FK
-#  - changeSet:
-#      id: init_constraint-40
-#      author: limit
-#      changes:
-#        - addForeignKeyConstraint:
-#            baseTableName: ${db_prefix}NOTIFICACIO_AUDIT
-#            baseColumnNames: NOTIFICACIO_ID
-#            referencedTableName: ${db_prefix}NOTIFICACIO
-#            referencedColumnNames: ID
-#            constraintName: ${db_prefix}NOT_AUDIT_NOT_ID_FK
-#  - changeSet:
-#      id: init_constraint-41
-#      author: limit
-#      changes:
-#        - addForeignKeyConstraint:
-#            baseTableName: ${db_prefix}NOTIFICACIO_AUDIT
-#            baseColumnNames: ENTITAT_ID
-#            referencedTableName: ${db_prefix}ENTITAT
-#            referencedColumnNames: ID
-#            constraintName: ${db_prefix}NOT_AUDIT_ENTITAT_FK
-#  - changeSet:
-#      id: init_constraint-42
-#      author: limit
-#      changes:
-#        - addForeignKeyConstraint:
-#            baseTableName: ${db_prefix}NOTIFICACIO_AUDIT
-#            baseColumnNames: DOCUMENT_ID
-#            referencedTableName: ${db_prefix}DOCUMENT
-#            referencedColumnNames: ID
-#            constraintName: ${db_prefix}NOT_AUDIT_DOC_ID_FK
   - changeSet:
       id: init_constraint-44
       author: limit
@@ -457,36 +407,6 @@ databaseChangeLog:
             referencedTableName: ${db_prefix}NOTIFICACIO_EVENT
             referencedColumnNames: ID
             constraintName: ${db_prefix}NOTEVENT_ULTIM_EVENT_FK
-#  - changeSet:
-#      id: init_constraint-48
-#      author: limit
-#      changes:
-#        - addForeignKeyConstraint:
-#            baseTableName: ${db_prefix}NOTIFICACIO_ENV_AUDIT
-#            baseColumnNames: ENVIAMENT_ID
-#            referencedTableName: ${db_prefix}NOTIFICACIO_ENV
-#            referencedColumnNames: ID
-#            constraintName: ${db_prefix}NOTENVAUDIT_ENV_ID_FK
-#  - changeSet:
-#      id: init_constraint-49
-#      author: limit
-#      changes:
-#        - addForeignKeyConstraint:
-#            baseTableName: ${db_prefix}NOTIFICACIO_ENV_AUDIT
-#            baseColumnNames: NOTIFICACIO_ID
-#            referencedTableName: ${db_prefix}NOTIFICACIO
-#            referencedColumnNames: ID
-#            constraintName: ${db_prefix}NOTENVAUDIT_NOT_FK
-#  - changeSet:
-#      id: init_constraint-50
-#      author: limit
-#      changes:
-#        - addForeignKeyConstraint:
-#            baseTableName: ${db_prefix}NOTIFICACIO_ENV_AUDIT
-#            baseColumnNames: TITULAR_ID
-#            referencedTableName: ${db_prefix}PERSONA
-#            referencedColumnNames: ID
-#            constraintName: ${db_prefix}NOTENVAUDIT_TITULAR_FK
   - changeSet:
       id: init_constraint-51
       author: limit
@@ -577,16 +497,6 @@ databaseChangeLog:
             referencedTableName: ${db_prefix}USUARI
             referencedColumnNames: CODI
             constraintName: ${db_prefix}TABLE_USUARI_FK
-#  - changeSet:
-#      id: init_constraint-60
-#      author: limit
-#      changes:
-#        - addForeignKeyConstraint:
-#            baseTableName: ${db_prefix}NOTIFICACIO_TABLE
-#            baseColumnNames: PROCEDIMENT_CODI
-#            referencedTableName: ${db_prefix}PROCEDIMENT
-#            referencedColumnNames: CODI
-#            constraintName: ${db_prefix}NOT_TABLE_PROC_FK
   - changeSet:
       id: init_constraint-61
       author: limit
@@ -707,46 +617,6 @@ databaseChangeLog:
             referencedTableName: ${db_prefix}ORGAN_GESTOR
             referencedColumnNames: ID
             constraintName: ${db_prefix}PROCSER_ORGAN_FK
-#  - changeSet:
-#      id: init_constraint-74
-#      author: limit
-#      changes:
-#        - addForeignKeyConstraint:
-#            baseTableName: ${db_prefix}PROCEDIMENT_AUDIT
-#            baseColumnNames: ENTITAT_ID
-#            referencedTableName: ${db_prefix}ENTITAT
-#            referencedColumnNames: ID
-#            constraintName: ${db_prefix}PROC_AUDIT_ENTITAT_FK
-#  - changeSet:
-#      id: init_constraint-75
-#      author: limit
-#      changes:
-#        - addForeignKeyConstraint:
-#            baseTableName: ${db_prefix}PROCEDIMENT_AUDIT
-#            baseColumnNames: PROCEDIMENT_ID
-#            referencedTableName: ${db_prefix}PROCEDIMENT
-#            referencedColumnNames: ID
-#            constraintName: ${db_prefix}PROC_AUDIT_PROC_FK
-#  - changeSet:
-#      id: init_constraint-76
-#      author: limit
-#      changes:
-#        - addForeignKeyConstraint:
-#            baseTableName: ${db_prefix}PROCEDIMENT_AUDIT
-#            baseColumnNames: PAGADORPOSTAL_ID
-#            referencedTableName: ${db_prefix}PAGADOR_POSTAL
-#            referencedColumnNames: ID
-#            constraintName: ${db_prefix}PROC_AUDIT_PAGPOSTAL_FK
-#  - changeSet:
-#      id: init_constraint-77
-#      author: limit
-#      changes:
-#        - addForeignKeyConstraint:
-#            baseTableName: ${db_prefix}PROCEDIMENT_AUDIT
-#            baseColumnNames: PAGADORCIE_ID
-#            referencedTableName: ${db_prefix}PAGADOR_CIE
-#            referencedColumnNames: ID
-#            constraintName: ${db_prefix}PROC_AUDIT_PAGCIE_FK
   - changeSet:
       id: init_constraint-78
       author: limit
@@ -767,26 +637,6 @@ databaseChangeLog:
             referencedTableName: ${db_prefix}GRUP
             referencedColumnNames: ID
             constraintName: ${db_prefix}GRUP_PRO_FK
-  #  - changeSet:
-  #      id: init_constraint-80
-  #      author: limit
-  #      changes:
-  #        - addForeignKeyConstraint:
-  #            baseTableName: ${db_prefix}PRO_GRUP_AUDIT
-  #            baseColumnNames: GRUP_ID
-  #            referencedTableName: ${db_prefix}GRUP
-  #            referencedColumnNames: ID
-  #            constraintName: ${db_prefix}PRO_GRUP_GRUP_FK
-  #  - changeSet:
-  #      id: init_constraint-81
-  #      author: limit
-  #      changes:
-  #        - addForeignKeyConstraint:
-  #            baseTableName: ${db_prefix}PRO_GRUP_AUDIT
-  #            baseColumnNames: ENTITAT_ID
-  #            referencedTableName: ${db_prefix}ENTITAT
-  #            referencedColumnNames: ID
-  #            constraintName: ${db_prefix}PRO_GRUP_ENTITAT_FK
   - changeSet:
       id: init_constraint-82
       author: limit
