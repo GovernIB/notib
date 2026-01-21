@@ -193,6 +193,10 @@ databaseChangeLog:
       id: init_constraint-20
       author: limit
       changes:
+        - addUniqueConstraint:
+            columnNames: CODI
+            constraintName: NOT_ENTITAT_UK
+            tableName: NOT_ENTITAT
         - addForeignKeyConstraint:
             baseTableName: ${db_prefix}MON_INT
             baseColumnNames: CODI_ENTITAT
@@ -619,11 +623,3 @@ databaseChangeLog:
             referencedTableName: ${db_prefix}ORGAN_GESTOR
             referencedColumnNames: ID
             constraintName: ${db_prefix}PRO_ORGAN_FK
-  - changeSet:
-      id: init_constraint-63
-      author: limit
-      changes:
-        - addUniqueConstraint:
-            columnNames: CODI
-            constraintName: NOT_ENTITAT_UK
-            tableName: NOT_ENTITAT
