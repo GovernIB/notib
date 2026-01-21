@@ -25,6 +25,7 @@ ALTER TABLE not_notificacio_env ADD anulat NUMBER(1) DEFAULT '0';
 ALTER TABLE not_notificacio_env ADD motiu_anulacio VARCHAR2(250 CHAR);
 ALTER TABLE not_notificacio_env_table ADD anulat NUMBER(1) DEFAULT '0';
 ALTER TABLE not_notificacio_env_table ADD motiu_anulacio VARCHAR2(250 CHAR);
+ALTER TABLE not_notificacio_table ADD organ_id NUMBER;
 
 UPDATE not_notificacio_table SET per_actualitzar = 1;
 UPDATE not_notificacio_table t SET t.LAST_EVENT_FI_REINTENTS = 1 WHERE t.id IN (SELECT DISTINCT e.NOTIFICACIO_ID  FROM not_notificacio_event e WHERE e.FI_REINTENTS = 1 AND e.tipus IN (0, 3));
@@ -39,5 +40,6 @@ INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PRO
 INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugin.digitalitzacio.endpointName', null,'Nom del endpoint del plugin de digitalitzacio','DIGITALITZACIO', 4, 0, 'TEXT', 0);
 INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugin.digitalitzacio.scanner.mock', 0,'Resultat de l''escanneig fictici','DIGITALITZACIO', 5, 0, 'BOOL', 0);
 INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugin.fitxer.logs.path', null,'Ruta on es guarden el fitxers de logs del servidor','LOGS', 0, 1, 'TEXT', 0);
+UPDATE NOT_NOtIFICACIO_TABLE t SET ORGAN_ID = (SELECT o.id FROM not_organ_gestor o WHERE o.entitat = t.entitat_id AND o.codi = t.organ_codi);
 
 DELETE FROM not_config WHERE key = 'es.caib.notib.tasques.actives';

@@ -134,6 +134,8 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 	@Column(name = "PROCEDIMENT_TIPUS")
 	@Enumerated(EnumType.STRING)
 	private ProcSerTipusEnum procedimentTipus;
+	@Column(name = "ORGAN_ID")
+	private String organId;
 	@Column(name = "ORGAN_CODI")
 	private String organCodi;
 	@Column(name = "ORGAN_NOM")

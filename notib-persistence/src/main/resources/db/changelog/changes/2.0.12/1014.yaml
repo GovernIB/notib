@@ -15,3 +15,10 @@ databaseChangeLog:
               - column:
                   name: procediment_defecte
                   type: number
+        - addColumn:
+            tableName: not_notificacio_table
+            columns:
+              - column:
+                  name: organ_id
+                  type: number
+        - sql: "UPDATE NOT_NOtIFICACIO_TABLE t SET ORGAN_ID = (SELECT o.id FROM not_organ_gestor o WHERE o.entitat = t.entitat_id AND o.codi = t.organ_codi);"

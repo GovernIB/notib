@@ -523,7 +523,8 @@ public class NotificacioFormController extends BaseUserController {
         OrganGestorDto organDto = null;
         if (procedimentActual.isComu()) {
             try {
-                organDto = organGestorService.findByCodi(entitatActual.getId(), procedimentActual.getOrganGestor());
+                organDto = !Strings.isNullOrEmpty(organId) ? organGestorService.findById(entitatActual.getId(), Long.valueOf(organId))
+                        : organGestorService.findByCodi(entitatActual.getId(), procedimentActual.getOrganGestor());
             } catch (Exception ex) {
                 log.error("Error obtinguent el codi de l'organ", ex);
             }

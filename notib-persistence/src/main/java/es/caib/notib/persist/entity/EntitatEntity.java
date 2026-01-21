@@ -106,8 +106,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			String descripcio,
 			byte[] logoCapBytes,
 			byte[] logoPeuBytes,
-//			String colorFons,
-//			String colorLletra,
+			String colorFons,
+			String colorLletra,
 			TipusDocumentEnumDto tipusDocDefault,
 			String oficina,
 			String nomOficinaVirtual,
@@ -126,8 +126,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 		this.entregaCie = entregaCie;
 		this.logoCapBytes = logoCapBytes;
 		this.logoPeuBytes = logoPeuBytes;
-//		this.colorFons = colorFons;
-//		this.colorLletra = colorLletra;
+		this.colorFons = colorFons;
+		this.colorLletra = colorLletra;
 		this.tipusDocDefault = tipusDocDefault;
 		this.oficina = oficina;
 		this.nomOficinaVirtual = nomOficinaVirtual;
@@ -151,8 +151,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			boolean ambEntregaDeh,
 			byte[] logoCapBytes,
 			byte[] logoPeuBytes,
-//			String colorFons,
-//			String colorLletra,
+			String colorFons,
+			String colorLletra,
 			TipusDocumentEnumDto tipusDocDefault,
 			String oficina,
 			String nomOficinaVirtual,
@@ -170,8 +170,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 				.ambEntregaDeh(ambEntregaDeh)
 				.logoCapBytes(logoCapBytes)
 				.logoPeuBytes(logoPeuBytes)
-//				.colorFons(colorFons)
-//				.colorLletra(colorLletra)
+				.colorFons(colorFons)
+				.colorLletra(colorLletra)
 				.tipusDocDefault(tipusDocDefault)
 				.oficina(oficina)
 				.nomOficinaVirtual(nomOficinaVirtual)
