@@ -2596,7 +2596,7 @@ databaseChangeLog:
                   type: VARCHAR(64 ${varcharUnit})
             tableName: ${db_prefix}GRUP_AUDIT
   - changeSet:
-      id: init_table-34
+      id: init_table-30
       author: limit
       changes:
         - createTable:
@@ -2654,7 +2654,7 @@ databaseChangeLog:
                   type: BIGINT
             tableName: ${db_prefix}MON_INT
   - changeSet:
-      id: init_table-35
+      id: init_table-31
       author: limit
       changes:
         - createTable:
@@ -2684,7 +2684,7 @@ databaseChangeLog:
                   type: BIGINT
             tableName: ${db_prefix}MON_INT_PARAM
   - changeSet:
-      id: init_table-36
+      id: init_table-32
       author: limit
       changes:
         - createTable:
@@ -2821,7 +2821,7 @@ databaseChangeLog:
                   type: VARCHAR(36 ${varcharUnit})
             tableName: ${db_prefix}NOTIFICACIO_AUDIT
   - changeSet:
-      id: init_table-37
+      id: init_table-33
       author: limit
       changes:
         - createTable:
@@ -2982,7 +2982,7 @@ databaseChangeLog:
                   type: VARCHAR(255 ${varcharUnit})
             tableName: ${db_prefix}NOTIFICACIO_ENV_AUDIT
   - changeSet:
-      id: init_table-38
+      id: init_table-34
       author: limit
       changes:
         - createTable:
@@ -3060,7 +3060,7 @@ databaseChangeLog:
                   type: INTEGER
             tableName: ${db_prefix}NOTIFICACIO_EVENT
   - changeSet:
-      id: init_table-39
+      id: init_table-35
       author: limit
       changes:
         - createTable:
@@ -3152,7 +3152,7 @@ databaseChangeLog:
                   type: NUMERIC(38, 0)
             tableName: ${db_prefix}NOTIFICACIO_MASSIVA
   - changeSet:
-      id: init_table-40
+      id: init_table-36
       author: limit
       changes:
         - createTable:
@@ -3185,7 +3185,7 @@ databaseChangeLog:
                   type: BIGINT
             tableName: ${db_prefix}OFICINA
   - changeSet:
-      id: init_table-41
+      id: init_table-37
       author: limit
       changes:
         - createTable:
@@ -3202,7 +3202,7 @@ databaseChangeLog:
                   type: NUMERIC(38, 0)
             tableName: ${db_prefix}OG_SINC_REL
   - changeSet:
-      id: init_table-42
+      id: init_table-38
       author: limit
       changes:
         - createTable:
@@ -3260,7 +3260,7 @@ databaseChangeLog:
                   type: BIGINT
             tableName: ${db_prefix}PAGADOR_CIE
   - changeSet:
-      id: init_table-43
+      id: init_table-39
       author: limit
       changes:
         - createTable:
@@ -3309,7 +3309,7 @@ databaseChangeLog:
                   type: VARCHAR(256 ${varcharUnit})
             tableName: ${db_prefix}PAGADOR_POSTAL
   - changeSet:
-      id: init_table-44
+      id: init_table-40
       author: limit
       changes:
         - createTable:
@@ -3376,7 +3376,7 @@ databaseChangeLog:
                   type: VARCHAR(100 ${varcharUnit})
             tableName: ${db_prefix}PERSONA
   - changeSet:
-      id: init_table-45
+      id: init_table-41
       author: limit
       changes:
         - createTable:
@@ -3482,7 +3482,7 @@ databaseChangeLog:
                   type: VARCHAR(64 ${varcharUnit})
             tableName: ${db_prefix}PROCEDIMENT
   - changeSet:
-      id: init_table-46
+      id: init_table-42
       author: limit
       changes:
         - createTable:
@@ -3553,7 +3553,7 @@ databaseChangeLog:
                   type: BIGINT
             tableName: ${db_prefix}PROCEDIMENT_AUDIT
   - changeSet:
-      id: init_table-47
+      id: init_table-43
       author: limit
       changes:
         - createTable:
@@ -3578,7 +3578,7 @@ databaseChangeLog:
                   type: boolean
             tableName: ${db_prefix}PROCESSOS_INICIALS
   - changeSet:
-      id: init_table-48
+      id: init_table-44
       author: limit
       changes:
         - createTable:
@@ -3610,7 +3610,7 @@ databaseChangeLog:
                   type: BIGINT
             tableName: ${db_prefix}PRO_GRUP
   - changeSet:
-      id: init_table-49
+      id: init_table-45
       author: limit
       changes:
         - createTable:
@@ -3659,7 +3659,7 @@ databaseChangeLog:
                   type: VARCHAR(64 ${varcharUnit})
             tableName: ${db_prefix}PRO_GRUP_AUDIT
   - changeSet:
-      id: init_table-50
+      id: init_table-46
       author: limit
       changes:
         - createTable:
@@ -3691,7 +3691,7 @@ databaseChangeLog:
                   type: VARCHAR(64 ${varcharUnit})
             tableName: ${db_prefix}PRO_ORGAN
   - changeSet:
-      id: init_table-51
+      id: init_table-47
       author: limit
       changes:
         - createTable:
@@ -3759,7 +3759,7 @@ databaseChangeLog:
                   type: NUMBER
             tableName: ${db_prefix}USUARI
   - changeSet:
-      id: init_table-52
+      id: init_table-48
       author: limit
       changes:
         - createTable:

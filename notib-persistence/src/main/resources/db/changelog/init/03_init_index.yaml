@@ -80,7 +80,7 @@ databaseChangeLog:
             tableName: ${db_prefix}OG_SINC_REL
             unique: true
   - changeSet:
-      id: init_index-8
+      id: init_index-7
       author: limit
       changes:
         - createIndex:
@@ -91,7 +91,7 @@ databaseChangeLog:
             tableName: ${db_prefix}CALLBACK
             unique: true
   - changeSet:
-      id: init_index-9
+      id: init_index-8
       author: limit
       changes:
         - createIndex:
@@ -103,7 +103,7 @@ databaseChangeLog:
             indexName: ${db_prefix}NOT_EVENT_NOTIF_ENV_I
             tableName: ${db_prefix}NOTIFICACIO_EVENT
   - changeSet:
-      id: init_index-10
+      id: init_index-9
       author: limit
       changes:
         - createIndex:
@@ -113,7 +113,7 @@ databaseChangeLog:
             indexName: ${db_prefix}PERSONA_NIF_I
             tableName: ${db_prefix}PERSONA
   - changeSet:
-      id: init_index-11
+      id: init_index-10
       author: limit
       changes:
         - createIndex:
@@ -123,7 +123,7 @@ databaseChangeLog:
             indexName: ${db_prefix}APLICACIO_AUDIT_APL_I
             tableName: ${db_prefix}APLICACIO_AUDIT
   - changeSet:
-      id: init_index-12
+      id: init_index-11
       author: limit
       changes:
         - createIndex:
@@ -133,7 +133,7 @@ databaseChangeLog:
             indexName: ${db_prefix}AVIS_DATA_FINAL_I
             tableName: ${db_prefix}AVIS
   - changeSet:
-      id: init_index-13
+      id: init_index-12
       author: limit
       changes:
         - createIndex:
@@ -143,7 +143,7 @@ databaseChangeLog:
             indexName: ${db_prefix}AVIS_DATA_INICI_I
             tableName: ${db_prefix}AVIS
   - changeSet:
-      id: init_index-14
+      id: init_index-13
       author: limit
       changes:
         - createIndex:
@@ -154,7 +154,7 @@ databaseChangeLog:
             indexName: ${db_prefix}CREATED_DIA_I
             tableName: ${db_prefix}NOTIFICACIO_TABLE
   - changeSet:
-      id: init_index-15
+      id: init_index-14
       author: limit
       changes:
         - createIndex:
@@ -164,7 +164,7 @@ databaseChangeLog:
             indexName: ${db_prefix}ENTITAT_AUDIT_ENT_I
             tableName: ${db_prefix}ENTITAT_AUDIT
   - changeSet:
-      id: init_index-16
+      id: init_index-15
       author: limit
       changes:
         - createIndex:
@@ -174,7 +174,7 @@ databaseChangeLog:
             indexName: ${db_prefix}MASS_ENTITAT_I
             tableName: ${db_prefix}NOTIFICACIO_MASSIVA
   - changeSet:
-      id: init_index-17
+      id: init_index-16
       author: limit
       changes:
         - createIndex:
@@ -184,7 +184,7 @@ databaseChangeLog:
             indexName: ${db_prefix}ENTITAT_ENTREGA_CIE_I
             tableName: ${db_prefix}ENTITAT
   - changeSet:
-      id: init_index-18
+      id: init_index-17
       author: limit
       changes:
         - createIndex:
@@ -194,7 +194,7 @@ databaseChangeLog:
             indexName: ${db_prefix}ENTREGA_CIE_CIE_I
             tableName: ${db_prefix}ENTREGA_CIE
   - changeSet:
-      id: init_index-19
+      id: init_index-18
       author: limit
       changes:
         - createIndex:
@@ -204,7 +204,7 @@ databaseChangeLog:
             indexName: ${db_prefix}ENTREGA_CIE_OPERADOR_I
             tableName: ${db_prefix}ENTREGA_CIE
   - changeSet:
-      id: init_index-20
+      id: init_index-19
       author: limit
       changes:
         - createIndex:
@@ -215,7 +215,7 @@ databaseChangeLog:
             indexName: ${db_prefix}NOT_TABLE_ENVIADA_DATE_I
             tableName: ${db_prefix}NOTIFICACIO_TABLE
   - changeSet:
-      id: init_index-21
+      id: init_index-20
       author: limit
       changes:
         - createIndex:
@@ -225,7 +225,7 @@ databaseChangeLog:
             indexName: ${db_prefix}ENV_TBL_ENTITAT_I
             tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
   - changeSet:
-      id: init_index-22
+      id: init_index-21
       author: limit
       changes:
         - createIndex:
@@ -235,7 +235,7 @@ databaseChangeLog:
             indexName: ${db_prefix}ENV_ENTREGA_POSTAL_I
             tableName: ${db_prefix}NOTIFICACIO_ENV
   - changeSet:
-      id: init_index-23
+      id: init_index-22
       author: limit
       changes:
         - createIndex:
@@ -245,7 +245,7 @@ databaseChangeLog:
             indexName: ${db_prefix}ENV_TABLE_CREATEDDATE_I
             tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
   - changeSet:
-      id: init_index-24
+      id: init_index-23
       author: limit
       changes:
         - createIndex:
@@ -255,7 +255,7 @@ databaseChangeLog:
             indexName: ${db_prefix}ENV_TABLE_ORGAN_CODI_IDX
             tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
   - changeSet:
-      id: init_index-25
+      id: init_index-24
       author: limit
       changes:
         - createIndex:
@@ -266,7 +266,7 @@ databaseChangeLog:
             indexName: ${db_prefix}ENV_NOTIF_ESTAT_DA_I
             tableName: ${db_prefix}NOTIFICACIO_ENV
   - changeSet:
-      id: init_index-26
+      id: init_index-25
       author: limit
       changes:
         - createIndex:
@@ -277,7 +277,7 @@ databaseChangeLog:
             indexName: ${db_prefix}EXP_ENVINF_DCIE_CAN_I
             tableName: ${db_prefix}EXPLOT_ENV_INFO
   - changeSet:
-      id: init_index-27
+      id: init_index-26
       author: limit
       changes:
         - createIndex:
@@ -288,7 +288,7 @@ databaseChangeLog:
             indexName: ${db_prefix}EXP_ENVINF_DCIE_ENV_I
             tableName: ${db_prefix}EXPLOT_ENV_INFO
   - changeSet:
-      id: init_index-28
+      id: init_index-27
       author: limit
       changes:
         - createIndex:
@@ -299,7 +299,7 @@ databaseChangeLog:
             indexName: ${db_prefix}EXP_ENVINF_DCIE_ENVERR_I
             tableName: ${db_prefix}EXPLOT_ENV_INFO
   - changeSet:
-      id: init_index-29
+      id: init_index-28
       author: limit
       changes:
         - createIndex:
@@ -310,7 +310,7 @@ databaseChangeLog:
             indexName: ${db_prefix}EXP_ENVINF_DCIE_ERR_I
             tableName: ${db_prefix}EXPLOT_ENV_INFO
   - changeSet:
-      id: init_index-30
+      id: init_index-29
       author: limit
       changes:
         - createIndex:
@@ -321,7 +321,7 @@ databaseChangeLog:
             indexName: ${db_prefix}EXP_ENVINF_DCIE_NOTIF_I
             tableName: ${db_prefix}EXPLOT_ENV_INFO
   - changeSet:
-      id: init_index-31
+      id: init_index-30
       author: limit
       changes:
         - createIndex:
@@ -332,7 +332,7 @@ databaseChangeLog:
             indexName: ${db_prefix}EXP_ENVINF_DCIE_REBUTJ_I
             tableName: ${db_prefix}EXPLOT_ENV_INFO
   - changeSet:
-      id: init_index-32
+      id: init_index-31
       author: limit
       changes:
         - createIndex:
@@ -343,7 +343,7 @@ databaseChangeLog:
             indexName: ${db_prefix}EXP_ENVINF_DCRE_I
             tableName: ${db_prefix}EXPLOT_ENV_INFO
   - changeSet:
-      id: init_index-33
+      id: init_index-32
       author: limit
       changes:
         - createIndex:
@@ -354,7 +354,7 @@ databaseChangeLog:
             indexName: ${db_prefix}EXP_ENVINF_DMAI_ENV_I
             tableName: ${db_prefix}EXPLOT_ENV_INFO
   - changeSet:
-      id: init_index-34
+      id: init_index-33
       author: limit
       changes:
         - createIndex:
@@ -365,7 +365,7 @@ databaseChangeLog:
             indexName: ${db_prefix}EXP_ENVINF_DMAI_ENVERR_I
             tableName: ${db_prefix}EXPLOT_ENV_INFO
   - changeSet:
-      id: init_index-35
+      id: init_index-34
       author: limit
       changes:
         - createIndex:
@@ -376,7 +376,7 @@ databaseChangeLog:
             indexName: ${db_prefix}EXP_ENVINF_DNOT_ENV_I
             tableName: ${db_prefix}EXPLOT_ENV_INFO
   - changeSet:
-      id: init_index-36
+      id: init_index-35
       author: limit
       changes:
         - createIndex:
@@ -387,7 +387,7 @@ databaseChangeLog:
             indexName: ${db_prefix}EXP_ENVINF_DNOT_ENVERR_I
             tableName: ${db_prefix}EXPLOT_ENV_INFO
   - changeSet:
-      id: init_index-37
+      id: init_index-36
       author: limit
       changes:
         - createIndex:
@@ -398,7 +398,7 @@ databaseChangeLog:
             indexName: ${db_prefix}EXP_ENVINF_DNOT_ERR_I
             tableName: ${db_prefix}EXPLOT_ENV_INFO
   - changeSet:
-      id: init_index-38
+      id: init_index-37
       author: limit
       changes:
         - createIndex:
@@ -409,7 +409,7 @@ databaseChangeLog:
             indexName: ${db_prefix}EXP_ENVINF_DNOT_EXP_I
             tableName: ${db_prefix}EXPLOT_ENV_INFO
   - changeSet:
-      id: init_index-39
+      id: init_index-38
       author: limit
       changes:
         - createIndex:
@@ -420,7 +420,7 @@ databaseChangeLog:
             indexName: ${db_prefix}EXP_ENVINF_DNOT_NOTIF_I
             tableName: ${db_prefix}EXPLOT_ENV_INFO
   - changeSet:
-      id: init_index-40
+      id: init_index-39
       author: limit
       changes:
         - createIndex:
@@ -431,7 +431,7 @@ databaseChangeLog:
             indexName: ${db_prefix}EXP_ENVINF_DNOT_REBUTJ_I
             tableName: ${db_prefix}EXPLOT_ENV_INFO
   - changeSet:
-      id: init_index-41
+      id: init_index-40
       author: limit
       changes:
         - createIndex:
@@ -442,7 +442,7 @@ databaseChangeLog:
             indexName: ${db_prefix}EXP_ENVINF_DREG_I
             tableName: ${db_prefix}EXPLOT_ENV_INFO
   - changeSet:
-      id: init_index-42
+      id: init_index-41
       author: limit
       changes:
         - createIndex:
@@ -453,7 +453,7 @@ databaseChangeLog:
             indexName: ${db_prefix}EXP_ENVINF_DREG_ACCEP_I
             tableName: ${db_prefix}EXPLOT_ENV_INFO
   - changeSet:
-      id: init_index-43
+      id: init_index-42
       author: limit
       changes:
         - createIndex:
@@ -464,7 +464,7 @@ databaseChangeLog:
             indexName: ${db_prefix}EXP_ENVINF_DREG_ENVERR_I
             tableName: ${db_prefix}EXPLOT_ENV_INFO
   - changeSet:
-      id: init_index-44
+      id: init_index-43
       author: limit
       changes:
         - createIndex:
@@ -475,7 +475,7 @@ databaseChangeLog:
             indexName: ${db_prefix}EXP_ENVINF_DREG_REBUTJ_I
             tableName: ${db_prefix}EXPLOT_ENV_INFO
   - changeSet:
-      id: init_index-45
+      id: init_index-44
       author: limit
       changes:
         - createIndex:
@@ -485,7 +485,7 @@ databaseChangeLog:
             indexName: ${db_prefix}GRUP_AUDIT_GRUP_I
             tableName: ${db_prefix}GRUP_AUDIT
   - changeSet:
-      id: init_index-46
+      id: init_index-45
       author: limit
       changes:
         - createIndex:
@@ -495,7 +495,7 @@ databaseChangeLog:
             indexName: ${db_prefix}MONINT_CODI_I
             tableName: ${db_prefix}MON_INT
   - changeSet:
-      id: init_index-47
+      id: init_index-46
       author: limit
       changes:
         - createIndex:
@@ -505,7 +505,7 @@ databaseChangeLog:
             indexName: ${db_prefix}MONINT_DATA_I
             tableName: ${db_prefix}MON_INT
   - changeSet:
-      id: init_index-48
+      id: init_index-47
       author: limit
       changes:
         - createIndex:
@@ -515,7 +515,7 @@ databaseChangeLog:
             indexName: ${db_prefix}AUDIT_NOT_I
             tableName: ${db_prefix}NOTIFICACIO_AUDIT
   - changeSet:
-      id: init_index-49
+      id: init_index-48
       author: limit
       changes:
         - createIndex:
@@ -525,7 +525,7 @@ databaseChangeLog:
             indexName: ${db_prefix}ENV_AUDIT_ENV_I
             tableName: ${db_prefix}NOTIFICACIO_ENV_AUDIT
   - changeSet:
-      id: init_index-50
+      id: init_index-49
       author: limit
       changes:
         - createIndex:
@@ -535,7 +535,7 @@ databaseChangeLog:
             indexName: ${db_prefix}EVENT_NOT_I
             tableName: ${db_prefix}NOTIFICACIO_EVENT
   - changeSet:
-      id: init_index-51
+      id: init_index-50
       author: limit
       changes:
         - createIndex:
@@ -545,7 +545,7 @@ databaseChangeLog:
             indexName: ${db_prefix}NOTIF_ESTAT_I
             tableName: ${db_prefix}NOTIFICACIO
   - changeSet:
-      id: init_index-52
+      id: init_index-51
       author: limit
       changes:
         - createIndex:
@@ -555,7 +555,7 @@ databaseChangeLog:
             indexName: ${db_prefix}NOTIF_PROCEDIMENT_I
             tableName: ${db_prefix}NOTIFICACIO
   - changeSet:
-      id: init_index-53
+      id: init_index-52
       author: limit
       changes:
         - createIndex:
@@ -565,7 +565,7 @@ databaseChangeLog:
             indexName: ${db_prefix}NOTIF_PROCODNOT_I
             tableName: ${db_prefix}NOTIFICACIO
   - changeSet:
-      id: init_index-54
+      id: init_index-53
       author: limit
       changes:
         - createIndex:
@@ -575,7 +575,7 @@ databaseChangeLog:
             indexName: ${db_prefix}NOTIF_PROORGAN_I
             tableName: ${db_prefix}NOTIFICACIO
   - changeSet:
-      id: init_index-55
+      id: init_index-54
       author: limit
       changes:
         - createIndex:
@@ -585,7 +585,7 @@ databaseChangeLog:
             indexName: ${db_prefix}NOTIF_USUCOD_I
             tableName: ${db_prefix}NOTIFICACIO
   - changeSet:
-      id: init_index-56
+      id: init_index-55
       author: limit
       changes:
         - createIndex:
@@ -595,7 +595,7 @@ databaseChangeLog:
             indexName: ${db_prefix}ENVTAB_USUCOD_I
             tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
   - changeSet:
-      id: init_index-57
+      id: init_index-56
       author: limit
       changes:
         - createIndex:
@@ -605,7 +605,7 @@ databaseChangeLog:
             indexName: ${db_prefix}NOTTAB_NOTMASS_I
             tableName: ${db_prefix}NOTIFICACIO_TABLE
   - changeSet:
-      id: init_index-58
+      id: init_index-57
       author: limit
       changes:
         - createIndex:
@@ -615,7 +615,7 @@ databaseChangeLog:
             indexName: ${db_prefix}NOTTAB_ORGCOD_I
             tableName: ${db_prefix}NOTIFICACIO_TABLE
   - changeSet:
-      id: init_index-59
+      id: init_index-58
       author: limit
       changes:
         - createIndex:
@@ -625,7 +625,7 @@ databaseChangeLog:
             indexName: ${db_prefix}NOTTAB_PROORG_I
             tableName: ${db_prefix}NOTIFICACIO_TABLE
   - changeSet:
-      id: init_index-60
+      id: init_index-59
       author: limit
       changes:
         - createIndex:
@@ -635,7 +635,7 @@ databaseChangeLog:
             indexName: ${db_prefix}NOTTAB_USUCOD_I
             tableName: ${db_prefix}NOTIFICACIO_TABLE
   - changeSet:
-      id: init_index-61
+      id: init_index-60
       author: limit
       changes:
         - createIndex:
@@ -645,7 +645,7 @@ databaseChangeLog:
             indexName: ${db_prefix}PROORG_ORGGES_I
             tableName: ${db_prefix}PRO_ORGAN
   - changeSet:
-      id: init_index-62
+      id: init_index-61
       author: limit
       changes:
         - createIndex:
@@ -655,7 +655,7 @@ databaseChangeLog:
             indexName: ${db_prefix}ORGGES_ENTITAT_I
             tableName: ${db_prefix}ORGAN_GESTOR
   - changeSet:
-      id: init_index-63
+      id: init_index-62
       author: limit
       changes:
         - createIndex:
@@ -665,7 +665,7 @@ databaseChangeLog:
             indexName: ${db_prefix}ORGGES_ENTCIE_I
             tableName: ${db_prefix}ORGAN_GESTOR
   - changeSet:
-      id: init_index-64
+      id: init_index-63
       author: limit
       changes:
         - createIndex:
@@ -675,7 +675,7 @@ databaseChangeLog:
             indexName: ${db_prefix}NOTMASS_PAGPOS_I
             tableName: ${db_prefix}NOTIFICACIO_MASSIVA
   - changeSet:
-      id: init_index-65
+      id: init_index-64
       author: limit
       changes:
         - createIndex:
@@ -685,7 +685,7 @@ databaseChangeLog:
             indexName: ${db_prefix}PROCAUD_PROCED_I
             tableName: ${db_prefix}PROCEDIMENT_AUDIT
   - changeSet:
-      id: init_index-66
+      id: init_index-65
       author: limit
       changes:
         - createIndex:
@@ -695,7 +695,7 @@ databaseChangeLog:
             indexName: ${db_prefix}PROORG_PROCED_I
             tableName: ${db_prefix}PRO_ORGAN
   - changeSet:
-      id: init_index-67
+      id: init_index-66
       author: limit
       changes:
         - createIndex:
@@ -705,7 +705,7 @@ databaseChangeLog:
             indexName: ${db_prefix}PROCED_ENTCIE_I
             tableName: ${db_prefix}PROCEDIMENT
   - changeSet:
-      id: init_index-68
+      id: init_index-67
       author: limit
       changes:
         - createIndex:
@@ -715,7 +715,7 @@ databaseChangeLog:
             indexName: ${db_prefix}PROGRUPAUD_PROGRUP_I
             tableName: ${db_prefix}PRO_GRUP_AUDIT
   - changeSet:
-      id: init_index-69
+      id: init_index-68
       author: limit
       changes:
         - createIndex:
@@ -726,7 +726,7 @@ databaseChangeLog:
             indexName: ${db_prefix}NOTENVTAB_REGDATA_I
             tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
   - changeSet:
-      id: init_index-70
+      id: init_index-69
       author: limit
       changes:
         - createIndex:
@@ -737,7 +737,7 @@ databaseChangeLog:
             indexName: ${db_prefix}NOTENV_SIRRECDAT_I
             tableName: ${db_prefix}NOTIFICACIO_ENV
   - changeSet:
-      id: init_index-71
+      id: init_index-70
       author: limit
       changes:
         - createIndex:
@@ -747,7 +747,7 @@ databaseChangeLog:
             indexName: ${db_prefix}NOTTAB_ENTITAT_I
             tableName: ${db_prefix}NOTIFICACIO_TABLE
   - changeSet:
-      id: init_index-72
+      id: init_index-71
       author: limit
       changes:
         - createIndex:
@@ -757,7 +757,7 @@ databaseChangeLog:
             indexName: ${db_prefix}NOTENV_NOT_I
             tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
   - changeSet:
-      id: init_index-73
+      id: init_index-72
       author: limit
       changes:
         - addUniqueConstraint:
