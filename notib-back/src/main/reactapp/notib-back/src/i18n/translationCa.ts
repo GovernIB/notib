@@ -6,6 +6,7 @@ const translationCa = {
         avisos: "Avisos",
         enviaments: "Enviaments",
         grups: "Grups",
+        organs: "Òrgans",
     },
     page: {
         entitats: {
@@ -69,6 +70,37 @@ const translationCa = {
                 titleCreate: "Crear grup",
                 titleUpdate: "Modificar grup",
             },
+        },
+        organs: {
+            grid: {
+                title: "Òrgans gestors"
+            },
+            form: {
+                titleUpdate: "Modificar òrgan gestor",
+                tabs: {
+                    dades: "Dades",
+                    permisos: "Permisos",
+                },
+                resourceNames: {
+                    permis: "permís",
+                },
+                permisos: {
+                    tipus: "Tipus",
+                    grantedAuthority: {
+                        user: "Usuari",
+                        role: "Rol",
+                    },
+                    administrador: "Administrador",
+                    consulta: "Consulta",
+                    processar: "Processar",
+                    gestio: "Gestió",
+                    comuns: "ProcSer comuns",
+                    notificacions: "Notificacions",
+                    comunicacions: "Comunicacions",
+                    sir: "Comunicacions SIR",
+                    comSenseProc: "Comunicacions sense procediment",
+                }
+            }
         },
         notFound: {
             title: "Pàgina no trobada",

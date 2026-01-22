@@ -7,6 +7,8 @@ import AvisGrid from './pages/avis/AvisGrid';
 import AvisForm from './pages/avis/AvisForm';
 import GrupGrid from './pages/grup/GrupGrid';
 import GrupForm from './pages/grup/GrupForm';
+import OrganGrid from './pages/organ/OrganGrid'
+import OrganForm from './pages/organ/OrganForm'
 import Enviaments from './pages/Enviaments';
 import NotFoundPage from './pages/NotFound';
 
@@ -42,6 +44,14 @@ const AppRoutes = () => {
                 <Route path="form">
                     <Route index element={<GrupForm />} />
                     <Route path=":id" element={<GrupForm />} />
+                </Route>
+            </Route>
+            <Route index element={<Navigate to="/organs" replace />} />
+            <Route path="organs">
+                <Route index element={<OrganGrid />} />
+                <Route path="form">
+                    <Route index element={<OrganForm />} />
+                    <Route path=":id" element={<OrganForm />} />
                 </Route>
             </Route>
             <Route path="enviaments" element={<Enviaments />} />

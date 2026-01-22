@@ -10,7 +10,6 @@ import es.caib.notib.persist.entity.cie.EntregaCieEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.ForeignKey;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -32,7 +31,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class OrganGestorResourceEntity extends BaseAuditableResourceEntity<OrganGestorResource> {
-
 
     @Column(name = "codi", length = 64, nullable = false)
     protected String codi;

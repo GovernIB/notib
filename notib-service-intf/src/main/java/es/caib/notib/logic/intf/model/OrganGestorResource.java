@@ -23,10 +23,10 @@ import java.util.List;
 @FieldNameConstants
 @ResourceConfig(
         descriptionField = OrganGestorResource.Fields.codi,
-        quickFilterFields = {OrganGestorResource.Fields.codi, GrupResource.Fields.nom},
+        quickFilterFields = {OrganGestorResource.Fields.codi, OrganGestorResource.Fields.nom},
         accessConstraints = @ResourceAccessConstraint(
                 type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-                roles = { BaseConfig.ROLE_ADMIN },
+                roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_SUPER   },
                 grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
         )
 )
@@ -46,9 +46,9 @@ public class OrganGestorResource extends BaseResource<Long> {
         private String entitatNom;
         private String llibre;
         private String llibreNom;
+        private String oficina;
         private String oficinaNom;
         private List<PermisDto> permisos;
-        private OficinaDto oficina;
         private OrganGestorEstatEnum estat = null;
 
         private Boolean sir;
@@ -84,11 +84,11 @@ public class OrganGestorResource extends BaseResource<Long> {
                         return llibre + " " + (llibreNom != null ? llibreNom : "");
                 return "";
         }
-        public String getOficinaCodiNom() {
-                if (oficina != null)
-                        return oficina.getCodi() + " " + (oficina.getNom() != null ? oficina.getNom() : "");
-                return "";
-        }
+//        public String getOficinaCodiNom() {
+//                if (oficina != null)
+//                        return oficina.getCodi() + " " + (oficina.getNom() != null ? oficina.getNom() : "");
+//                return "";
+//        }
         public int getPermisosCount() {
                 if  (permisos == null)
                         return 0;
