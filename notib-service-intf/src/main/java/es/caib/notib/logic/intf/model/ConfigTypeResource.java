@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
+import javax.persistence.Column;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,4 +26,7 @@ import lombok.experimental.FieldNameConstants;
         )
 )
 public class ConfigTypeResource extends BaseResource<Long> {
+
+    private String code;
+    private String value;
 }
