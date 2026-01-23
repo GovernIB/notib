@@ -23,7 +23,6 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
     } = useAuthContext();
     const {
         setHttpHeaders: apiSetHttpHeaders,
-        refreshApiIndex: apiRefreshIndex
     } = useResourceApiContext();
     const [currentUserRealmRoles, setCurrentUserRealmRoles] = React.useState<string[]>();
     const [currentRole, setCurrentRole] = React.useState<string>();

@@ -139,7 +139,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         headerAppbarStyle={appbarStyle}
         headerAppbarBackgroundColor={appbarBackgroundColor}
         headerAppbarBackgroundImg={appbarBackgroundImg}
-        headerAdditionalComponents={[<RoleSelector />]}
+        headerAdditionalComponents={[<RoleSelector key="roleselector" />]}
         headerAdditionalAuthComponents={[
             <Box key="sel_lang" sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 2 }}>
                 <HeaderLanguageSelector languages={availableLanguages} />
