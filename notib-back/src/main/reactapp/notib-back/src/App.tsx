@@ -4,7 +4,6 @@ import goibLogoLight from './assets/goib_logo_light.svg';
 import goibLogoDark from './assets/goib_logo_dark.svg';
 import notibLogoLight from './assets/notib_logo_light.png';
 import notibLogoDark from './assets/notib_logo_dark.png';
-import { NotibProvider } from './components/NotibProvider';
 import { BaseApp } from './components/BaseApp';
 import DrassanaFooter from './components/DrassanaFooter';
 import AppRoutes from './AppRoutes';
@@ -38,7 +37,14 @@ export const App = () => {
         to: '/organs',
         icon: 'account_tree',
         resourceName: 'organGestorResource',
-    },/*{
+    }, {
+        id: 'configuracio',
+        title: t('menu.propietatsConfiguracio'),
+        to: '/configs',
+        icon: 'settings',
+        resourceName: 'configGroupResource',
+    },
+/*{
         id: 'procediment',
         title: t('menu.procediments'),
         to: '/procediment',
@@ -51,7 +57,7 @@ export const App = () => {
         to: '/enviaments',
         icon: 'mail_outline',
         resourceName: 'enviamentResource',
-    }*/]
+    }*/];
     const menuEntries = [{
         id: 'home',
         title: t('menu.home'),

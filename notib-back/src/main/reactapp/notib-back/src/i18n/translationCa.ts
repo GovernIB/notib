@@ -6,7 +6,8 @@ const translationCa = {
         avisos: "Avisos",
         enviaments: "Enviaments",
         grups: "Grups",
-        organsGestors: "Òrgans gestors",
+        organs: "Òrgans",
+        propietatsConfiguracio: "Propietats configurables",
     },
     page: {
         entitats: {
@@ -76,7 +77,6 @@ const translationCa = {
                 title: "Òrgans gestors"
             },
             form: {
-                titleCreate: "Crear òrgan gestor",
                 titleUpdate: "Modificar òrgan gestor",
                 tabs: {
                     dades: "Dades",
@@ -128,12 +128,6 @@ const translationCa = {
             title: "Permisos",
             resourceTitle: "Permís",
         },
-        RoleSelector: {
-            role: {
-                NOT_SUPER: "Superadministrador",
-                NOT_ADMIN: "Administrador"
-            }
-        }
     },
 };
 
