@@ -1412,9 +1412,6 @@ databaseChangeLog:
                     nullable: false
                     primaryKey: true
                     primaryKeyName: ${db_prefix}CONFIG_PK
-                  name: ID
-                  type: BIGINT
-              - column:
                   name: KEY
                   type: VARCHAR(256 ${varcharUnit})
               - column:
@@ -1469,9 +1466,6 @@ databaseChangeLog:
                     nullable: false
                     primaryKey: true
                     primaryKeyName: ${db_prefix}CONFIG_GROUP_PK
-                  name: ID
-                  type: BIGINT
-              - column:
                   name: CODE
                   type: VARCHAR(128 ${varcharUnit})
               - column:
@@ -1500,9 +1494,6 @@ databaseChangeLog:
                     nullable: false
                     primaryKey: true
                     primaryKeyName: ${db_prefix}CONFIG_TYPE_PK
-                  name: ID
-                  type: BIGINT
-              - column:
                   name: CODE
                   type: VARCHAR(128 ${varcharUnit})
               - column:

@@ -1,0 +1,61 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2_1_1_000
+      author: limit
+      changes:
+        - dropPrimaryKey:
+            tableName: ${db_prefix}config_group
+            constraintName: ${db_prefix}CONFIG_GROUP_PK
+        - addColumn:
+            tableName: ${db_prefix}config_group
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+        - createSequence:
+            sequenceName: ${db_prefix}CONFIG_GROUP_SEQ
+            startValue: 1
+        - sql:
+            sql: "UPDATE ${db_prefix}CONFIG_GROUP SET id = ${db_prefix}CONFIG_GROUP_SEQ.nextval"
+        - addPrimaryKey:
+            tableName: ${db_prefix}config_group
+            columnNames: id
+            constraintName: ${db_prefix}CONFIG_GROUP_PK
+
+        - dropPrimaryKey:
+            tableName: ${db_prefix}config_type
+            constraintName: ${db_prefix}CONFIG_TYPE_PK
+        - addColumn:
+            tableName: ${db_prefix}config_type
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+        - createSequence:
+            sequenceName: ${db_prefix}CONFIG_TYPE_SEQ
+            startValue: 1
+        - sql:
+            sql: "UPDATE ${db_prefix}CONFIG_TYPE SET id = ${db_prefix}CONFIG_TYPE_SEQ.nextval"
+        - addPrimaryKey:
+            tableName: ${db_prefix}config_type
+            columnNames: id
+            constraintName: ${db_prefix}CONFIG_TYPE_PK
+
+        - dropPrimaryKey:
+            tableName: ${db_prefix}config
+            constraintName: ${db_prefix}CONFIG_PK
+        - addColumn:
+            tableName: ${db_prefix}config
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+        - createSequence:
+            sequenceName: ${db_prefix}CONFIG_SEQ
+            startValue: 1
+        - sql:
+            sql: "UPDATE ${db_prefix}CONFIG SET id = ${db_prefix}CONFIG_SEQ.nextval"
+        - addPrimaryKey:
+            tableName: ${db_prefix}config
+            columnNames: id
+            constraintName: ${db_prefix}CONFIG_PK

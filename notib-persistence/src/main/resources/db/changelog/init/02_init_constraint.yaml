@@ -8,7 +8,7 @@ databaseChangeLog:
             baseColumnNames: ENTITAT_ID
             referencedTableName: ${db_prefix}ENTITAT
             referencedColumnNames: ID
-            constraintName: ${db_prefix}ACC_MASS_ENTITAT_FK
+            constraintName: ${db_prefix}ACC_MASS_ENTITAT_FKq
   - changeSet:
       id: init_constraint-2
       author: limit
@@ -29,16 +29,16 @@ databaseChangeLog:
             referencedTableName: ${db_prefix}NOTIFICACIO_ENV
             referencedColumnNames: ID
             constraintName: ${db_prefix}ACC_MASS_EL_ENV_ID_FK
-  - changeSet:
-      id: init_constraint-4
-      author: limit
-      changes:
-        - addForeignKeyConstraint:
-            baseTableName: ${db_prefix}APLICACIO
-            baseColumnNames: USUARI_CODI
-            referencedTableName: ${db_prefix}USUARI
-            referencedColumnNames: CODI
-            constraintName: ${db_prefix}APL_USR_FK
+#  - changeSet:
+#      id: init_constraint-4
+#      author: limit
+#      changes:
+#        - addForeignKeyConstraint:
+#            baseTableName: ${db_prefix}APLICACIO
+#            baseColumnNames: USUARI_CODI
+#            referencedTableName: ${db_prefix}USUARI
+#            referencedColumnNames: CODI
+#            constraintName: ${db_prefix}APL_USR_FK
   - changeSet:
       id: init_constraint-5
       author: limit
@@ -59,16 +59,16 @@ databaseChangeLog:
             referencedTableName: ${db_prefix}ENTITAT
             referencedColumnNames: ID
             constraintName: ${db_prefix}AVIS_ENTITAT_FK
-  - changeSet:
-      id: init_constraint-7
-      author: limit
-      changes:
-        - addForeignKeyConstraint:
-            baseTableName: ${db_prefix}CALLBACK
-            baseColumnNames: USUARI_CODI
-            referencedTableName: ${db_prefix}USUARI
-            referencedColumnNames: CODI
-            constraintName: ${db_prefix}CALLBACK_USR_FK
+#  - changeSet:
+#      id: init_constraint-7
+#      author: limit
+#      changes:
+#        - addForeignKeyConstraint:
+#            baseTableName: ${db_prefix}CALLBACK
+#            baseColumnNames: USUARI_CODI
+#            referencedTableName: ${db_prefix}USUARI
+#            referencedColumnNames: CODI
+#            constraintName: ${db_prefix}CALLBACK_USR_FK
   - changeSet:
       id: init_constraint-8
       author: limit
@@ -179,16 +179,16 @@ databaseChangeLog:
             referencedTableName: ${db_prefix}ORGAN_GESTOR
             referencedColumnNames: ID
             constraintName: ${db_prefix}GRUP_ORGAN_FK
-  - changeSet:
-      id: init_constraint-19
-      author: limit
-      changes:
-        - addForeignKeyConstraint:
-            baseTableName: ${db_prefix}MON_INT
-            baseColumnNames: CODI_USUARI
-            referencedTableName: ${db_prefix}USUARI
-            referencedColumnNames: CODI
-            constraintName: ${db_prefix}MON_INT_USR_CODI_FK
+#  - changeSet:
+#      id: init_constraint-19
+#      author: limit
+#      changes:
+#        - addForeignKeyConstraint:
+#            baseTableName: ${db_prefix}MON_INT
+#            baseColumnNames: CODI_USUARI
+#            referencedTableName: ${db_prefix}USUARI
+#            referencedColumnNames: CODI
+#            constraintName: ${db_prefix}MON_INT_USR_CODI_FK
   - changeSet:
       id: init_constraint-20
       author: limit
@@ -223,16 +223,16 @@ databaseChangeLog:
             referencedTableName: ${db_prefix}MON_INT
             referencedColumnNames: ID
             constraintName: ${db_prefix}MONINTPARAM_MONINT_FK
-  - changeSet:
-      id: init_constraint-23
-      author: limit
-      changes:
-        - addForeignKeyConstraint:
-            baseTableName: ${db_prefix}NOTIFICACIO
-            baseColumnNames: USUARI_CODI
-            referencedTableName: ${db_prefix}USUARI
-            referencedColumnNames: CODI
-            constraintName: ${db_prefix}NOTIFICACIO_USUARI_FK
+#  - changeSet:
+#      id: init_constraint-23
+#      author: limit
+#      changes:
+#        - addForeignKeyConstraint:
+#            baseTableName: ${db_prefix}NOTIFICACIO
+#            baseColumnNames: USUARI_CODI
+#            referencedTableName: ${db_prefix}USUARI
+#            referencedColumnNames: CODI
+#            constraintName: ${db_prefix}NOTIFICACIO_USUARI_FK
   - changeSet:
       id: init_constraint-24
       author: limit
@@ -393,16 +393,16 @@ databaseChangeLog:
             referencedTableName: ${db_prefix}ENTITAT
             referencedColumnNames: ID
             constraintName: ${db_prefix}ENV_TABLE_ENTITAT_FK
-  - changeSet:
-      id: init_constraint-40
-      author: limit
-      changes:
-        - addForeignKeyConstraint:
-            baseTableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
-            baseColumnNames: USUARI_CODI
-            referencedTableName: ${db_prefix}USUARI
-            referencedColumnNames: CODI
-            constraintName: ${db_prefix}ENV_TABLE_USUARI_FK
+#  - changeSet:
+#      id: init_constraint-40
+#      author: limit
+#      changes:
+#        - addForeignKeyConstraint:
+#            baseTableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
+#            baseColumnNames: USUARI_CODI
+#            referencedTableName: ${db_prefix}USUARI
+#            referencedColumnNames: CODI
+#            constraintName: ${db_prefix}ENV_TABLE_USUARI_FK
   - changeSet:
       id: init_constraint-41
       author: limit
@@ -453,16 +453,16 @@ databaseChangeLog:
             referencedTableName: ${db_prefix}ENTITAT
             referencedColumnNames: ID
             constraintName: ${db_prefix}TABLE_ENTITAT_FK
-  - changeSet:
-      id: init_constraint-46
-      author: limit
-      changes:
-        - addForeignKeyConstraint:
-            baseTableName: ${db_prefix}NOTIFICACIO_TABLE
-            baseColumnNames: USUARI_CODI
-            referencedTableName: ${db_prefix}USUARI
-            referencedColumnNames: CODI
-            constraintName: ${db_prefix}TABLE_USUARI_FK
+#  - changeSet:
+#      id: init_constraint-46
+#      author: limit
+#      changes:
+#        - addForeignKeyConstraint:
+#            baseTableName: ${db_prefix}NOTIFICACIO_TABLE
+#            baseColumnNames: USUARI_CODI
+#            referencedTableName: ${db_prefix}USUARI
+#            referencedColumnNames: CODI
+#            constraintName: ${db_prefix}TABLE_USUARI_FK
   - changeSet:
       id: init_constraint-47
       author: limit
