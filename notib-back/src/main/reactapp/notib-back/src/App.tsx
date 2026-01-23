@@ -6,6 +6,7 @@ import notibLogoLight from './assets/notib_logo_light.png';
 import notibLogoDark from './assets/notib_logo_dark.png';
 import { BaseApp } from './components/BaseApp';
 import DrassanaFooter from './components/DrassanaFooter';
+import NotibProvider from './components/NotibProvider';
 import AppRoutes from './AppRoutes';
 
 const version = '0.0.0';

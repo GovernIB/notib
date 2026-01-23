@@ -6,7 +6,7 @@ const translationCa = {
         avisos: "Avisos",
         enviaments: "Enviaments",
         grups: "Grups",
-        organs: "Òrgans",
+        organsGestors: "Òrgans gestors",
         propietatsConfiguracio: "Propietats configurables",
     },
     page: {
@@ -128,6 +128,12 @@ const translationCa = {
             title: "Permisos",
             resourceTitle: "Permís",
         },
+        RoleSelector: {
+            role: {
+                NOT_SUPER: "Superadministrador",
+                NOT_ADMIN: "Administrador"
+            }
+        }
     },
 };
 
