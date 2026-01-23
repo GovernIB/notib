@@ -20,7 +20,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ConfigGroupResourceEntity extends BaseAuditableResourceEntity<ConfigGroupResource> {
+public class ConfigGroupResourceEntity extends BaseResourceEntity<ConfigGroupResource> {
 
     @Column(name = "CODE", length = 128, nullable = false)
     private String key;
@@ -30,9 +30,9 @@ public class ConfigGroupResourceEntity extends BaseAuditableResourceEntity<Confi
 
     @Column(name = "position")
     private int position;
-
-    @Column(name = "parentCode")
-    private String parentCode;
+//
+//    @Column(name = "parentCode")
+//    private String parentCode;
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_code")
