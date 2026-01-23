@@ -9,6 +9,7 @@ public class BaseConfig {
 
 	public static final String APP_NAME = "notib";
 	public static final String DB_PREFIX = "not_";
+	public static final String ROLE_PREFIX = "NOT_";
 	public static final String DEFAULT_LOCALE = "ca";
 
 	public static final String BASE_PACKAGE = "es.caib." + APP_NAME;
@@ -17,11 +18,14 @@ public class BaseConfig {
 	public static final String APP_PROPERTIES = BASE_PACKAGE + ".properties";
 	public static final String APP_SYSTEM_PROPERTIES = BASE_PACKAGE + ".system.properties";
 
-	public static final String ROLE_SUPER = "NOT_SUPER";
-	public static final String ROLE_ADMIN = "NOT_ADMIN";
-	public static final String ROLE_CARPETA = "NOT_CARPETA";
-	public static final String ROLE_APL = "NOT_APL";
-	public static final String ROLE_TOTHOM = "tothom";
+	public static final String ROLE_SUPER = ROLE_PREFIX + "SUPER";
+	public static final String ROLE_ADMIN = ROLE_PREFIX + "ADMIN";
+	public static final String ROLE_ADMIN_LECTURA = ROLE_PREFIX + "ADMIN_LECTURA";
+	public static final String ROLE_CARPETA = ROLE_PREFIX + "CARPETA";
+	public static final String ROLE_ORGAN = ROLE_PREFIX + "ORGAN";
+	public static final String ROLE_APL = ROLE_PREFIX + "APL";
+	public static final String ROLE_COM = ROLE_PREFIX + "COM";
+	public static final String ROLE_USER = "tothom";
 
 	public static final String API_PATH = "/apinew";
 	public static final String PING_PATH = "/ping";

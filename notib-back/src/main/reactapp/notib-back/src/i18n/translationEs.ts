@@ -4,8 +4,9 @@ const translationEs = {
         config: "Configuración",
         entitats: "Entidades",
         avisos: "Avisos",
-        enviaments: "Envíos",
+        enviaments: "Envios",
         grups: "Grupos",
+        organsGestors: "Órganos gestores",
     },
     page: {
         entitats: {
@@ -70,6 +71,38 @@ const translationEs = {
                 titleUpdate: "Modificar grupo",
             },
         },
+        organs: {
+            grid: {
+                title: "Órganos gestores"
+            },
+            form: {
+                titleCreate: "Crear órgano gestor",
+                titleUpdate: "Modificar órgano gestor",
+                tabs: {
+                    dades: "Datos",
+                    permisos: "Permisos",
+                },
+                resourceNames: {
+                    permis: "permiso",
+                },
+                permisos: {
+                    tipus: "Tipo",
+                    grantedAuthority: {
+                        user: "Usuario",
+                        role: "Rol",
+                    },
+                    administrador: "Administrador",
+                    consulta: "Consulta",
+                    processar: "Procesar",
+                    gestio: "Gestión",
+                    comuns: "ProcSer comunes",
+                    notificacions: "Notificaciones",
+                    comunicacions: "Comunicaciones",
+                    sir: "Comunicaciones SIR",
+                    comSenseProc: "Comunicaciones sin procedimiento",
+                }
+            }
+        },
         notFound: {
             title: "Página no encontrada",
             toHome: "Ir al inicio",
@@ -95,6 +128,12 @@ const translationEs = {
             title: "Permisos",
             resourceTitle: "Permiso",
         },
+        RoleSelector: {
+            role: {
+                NOT_SUPER: "Superadministrador",
+                NOT_ADMIN: "Administrador"
+            }
+        }
     },
 };
 

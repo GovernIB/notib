@@ -21,7 +21,6 @@ export const GrupGrid = () => {
             resourceName="grupResource"
             columns={columns}
             paginationActive
-            toolbarBulkDelete
             toolbarCreateLink="form"
             //rowLink="form/{{id}}"
             rowUpdateLink="form/{{id}}" />

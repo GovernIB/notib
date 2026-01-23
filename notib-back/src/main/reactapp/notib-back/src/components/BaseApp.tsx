@@ -21,6 +21,7 @@ import {
 import HeaderThemeModeSelector from './HeaderThemeModeSelector';
 import HeaderLanguageSelector from './HeaderLanguageSelector';
 import Offline from './Offline';
+import RoleSelector from './RoleSelector';
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
@@ -138,6 +139,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         headerAppbarStyle={appbarStyle}
         headerAppbarBackgroundColor={appbarBackgroundColor}
         headerAppbarBackgroundImg={appbarBackgroundImg}
+        headerAdditionalComponents={[<RoleSelector />]}
         headerAdditionalAuthComponents={[
             <Box key="sel_lang" sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 2 }}>
                 <HeaderLanguageSelector languages={availableLanguages} />

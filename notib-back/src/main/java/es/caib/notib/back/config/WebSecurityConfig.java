@@ -47,7 +47,7 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 			BaseConfig.ROLE_ADMIN + "," +
 			BaseConfig.ROLE_CARPETA + "," +
 			BaseConfig.ROLE_APL + "," +
-			BaseConfig.ROLE_TOTHOM + "}")
+			BaseConfig.ROLE_USER + "}")
 	protected String mappableRoles;
 	@Value("${" + BaseConfig.PROP_SECURITY_ROLE_HTTP_HEADER + ":X-App-Role}")
 	private String selectedRoleHttpHeader;

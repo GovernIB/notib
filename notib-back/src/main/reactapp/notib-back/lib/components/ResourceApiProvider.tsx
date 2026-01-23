@@ -1145,8 +1145,12 @@ export const useResourceApiService = (resourceName?: string): ResourceApiService
             }
         });
     const currentRefresh = (args?: ResourceApiRequestArgs) => {
-        indexState != null &&
-            resourceName != null &&
+        if (indexState != null && resourceName != null) {
+            setIsCurrentLoading(true);
+            setIsCurrentLoaded(false);
+            setCurrentState(undefined);
+            setCurrentFields(undefined);
+            setCurrentError(undefined);
             getPromiseFromStateLink(indexState, resourceName, args, true)
                 .then((state: State) => {
                     setCurrentState(state);
@@ -1162,18 +1166,13 @@ export const useResourceApiService = (resourceName?: string): ResourceApiService
                     setIsCurrentLoading(false);
                     !isCurrentLoaded && setIsCurrentLoaded(true);
                 });
+        }
     };
     React.useEffect(() => {
-        if (indexIsReady && indexState && !currentState) {
+        if (indexIsReady && indexState) {
             currentRefresh();
-        } else if (!indexIsReady && isCurrentLoaded) {
-            setIsCurrentLoading(true);
-            setIsCurrentLoaded(false);
-            setCurrentState(undefined);
-            setCurrentFields(undefined);
-            setCurrentError(undefined);
         }
-    }, [indexIsReady]);
+    }, [indexState]);
     React.useEffect(() => {
         if (currentError) {
             logConsole.error("Couldn't get API service '" + resourceName + "'", currentError);
@@ -1386,7 +1385,7 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
             refreshKettingClient(userSession, currentLanguage, httpHeaders);
             refreshApiIndex();
         }
-    }, [isAuthReady, currentLanguage, userSession]);
+    }, [isAuthReady, userSession, currentLanguage, httpHeaders]);
     React.useEffect(() => {
         if (indexState && debug) {
             debugAvailableServices && logConsole.debug('Resource API services from index:');
@@ -1411,7 +1410,6 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
             const changes: any = {};
             changedPairs.forEach((c) => (changes[c.attribute] = c.value));
             setUserSession((s: any) => ({ ...s, ...changes }));
-            refreshKettingClient({ ...userSession, ...changes }, currentLanguage, httpHeaders);
             return true;
         } else {
             return false;
@@ -1420,14 +1418,11 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
     const setUserSessionForContext = React.useCallback(
         (userSession: any) => {
             setUserSession(userSession);
-            refreshKettingClient(userSession, currentLanguage, httpHeaders);
         },
         [currentLanguage]
     );
     const clearUserSession = React.useCallback(() => {
         setUserSession({});
-        refreshKettingClient({}, currentLanguage, httpHeaders);
-        refreshApiIndex();
     }, [currentLanguage, httpHeaders]);
     const setOpenAnswerRequiredDialog = React.useCallback(
         (oarDialog: OpenAnswerRequiredDialogFn) => {
@@ -1440,11 +1435,9 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
     }, []);
     const setCurrentLanguageInternal = (currentLanguage?: string) => {
         setCurrentLanguage(currentLanguage);
-        refreshKettingClient(userSession, currentLanguage, httpHeaders);
     };
     const setHttpHeadersInternal = (currentHttpHeaders?: Record<string, string>[]) => {
         setHttpHeaders(currentHttpHeaders);
-        refreshKettingClient(userSession, currentLanguage, currentHttpHeaders);
     };
     const isReady = !isIndexLoading && !indexError && !offline;
     const context = {
