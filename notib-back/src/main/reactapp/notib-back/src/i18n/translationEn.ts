@@ -6,6 +6,7 @@ const translationEn = {
         avisos: "Advices",
         enviaments: "Deliveries",
         grups: "Groups",
+        propietatsConfiguracio: "Configurable properties",
     },
     page: {
         entitats: {
