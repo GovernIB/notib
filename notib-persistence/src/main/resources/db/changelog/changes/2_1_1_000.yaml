@@ -4,6 +4,32 @@ databaseChangeLog:
       author: limit
       changes:
         - dropPrimaryKey:
+            tableName: ${db_prefix}config
+            constraintName: ${db_prefix}CONFIG_PK
+        - addColumn:
+            tableName: ${db_prefix}config
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+        - createSequence:
+            sequenceName: ${db_prefix}CONFIG_SEQ
+            startValue: 1
+        - sql:
+            sql: "UPDATE ${db_prefix}CONFIG SET id = ${db_prefix}CONFIG_SEQ.nextval"
+        - addPrimaryKey:
+            tableName: ${db_prefix}config
+            columnNames: id
+            constraintName: ${db_prefix}CONFIG_PK
+        - addUniqueConstraint:
+            columnNames: key
+            constraintName: ${db_prefix}CONFIG_KEY_UK
+            tableName: ${db_prefix}config
+        - dropForeignKeyConstraint:
+            baseTableName: ${db_prefix}config
+            constraintName: ${db_prefix}CONFIG_GROUP_FK
+
+        - dropPrimaryKey:
             tableName: ${db_prefix}config_group
             constraintName: ${db_prefix}CONFIG_GROUP_PK
         - addColumn:
@@ -21,6 +47,11 @@ databaseChangeLog:
             tableName: ${db_prefix}config_group
             columnNames: id
             constraintName: ${db_prefix}CONFIG_GROUP_PK
+        - addUniqueConstraint:
+            columnNames: code
+            constraintName: ${db_prefix}CONFIG_GROUP_CODE_UK
+            tableName: ${db_prefix}config_group
+
 
         - dropPrimaryKey:
             tableName: ${db_prefix}config_type
@@ -40,22 +71,32 @@ databaseChangeLog:
             tableName: ${db_prefix}config_type
             columnNames: id
             constraintName: ${db_prefix}CONFIG_TYPE_PK
+        - addUniqueConstraint:
+            columnNames: code
+            constraintName: ${db_prefix}CONFIG_TYPE_CODE_UK
+            tableName: ${db_prefix}config_type
 
-        - dropPrimaryKey:
-            tableName: ${db_prefix}config
-            constraintName: ${db_prefix}CONFIG_PK
+        - addForeignKeyConstraint:
+            baseTableName: ${db_prefix}CONFIG
+            baseColumnNames: GROUP_CODE
+            referencedTableName: ${db_prefix}CONFIG_GROUP
+            referencedColumnNames: CODE
+            constraintName: ${db_prefix}CONFIG_GROUP_FK
+
+
+
         - addColumn:
-            tableName: ${db_prefix}config
+            tableName: ${db_prefix}ORGAN_GESTOR
             columns:
               - column:
-                  name: id
-                  type: bigint
-        - createSequence:
-            sequenceName: ${db_prefix}CONFIG_SEQ
-            startValue: 1
-        - sql:
-            sql: "UPDATE ${db_prefix}CONFIG SET id = ${db_prefix}CONFIG_SEQ.nextval"
-        - addPrimaryKey:
-            tableName: ${db_prefix}config
-            columnNames: id
-            constraintName: ${db_prefix}CONFIG_PK
+                  name: CREATEDDATE
+                  type: TIMESTAMP(6)
+              - column:
+                  name: CREATEDBY_CODI
+                  type: VARCHAR(64 ${varcharUnit})
+              - column:
+                  name: LASTMODIFIEDDATE
+                  type: TIMESTAMP(6)
+              - column:
+                  name: LASTMODIFIEDBY_CODI
+                  type: VARCHAR(64 ${varcharUnit})
