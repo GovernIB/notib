@@ -9,7 +9,8 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import Paper from '@mui/material/Paper';
 import Switch from '@mui/material/Switch';
-import { FormField, useBaseAppContext, useFormContext, useResourceApiService } from 'reactlib';
+import { useBaseAppContext, useFormContext, useResourceApiService } from 'reactlib';
+import GridFormField from '../../components/GridFormField';
 
 const EntitatFormTabTipusDocs: React.FC = () => {
     const { t } = useTranslation();
@@ -24,6 +25,7 @@ const EntitatFormTabTipusDocs: React.FC = () => {
     const [tipusDocumentOptions, setTipusDocumentOptions] = React.useState<any>();
     const [entitatTipusDocumentRows, setEntitatTipusDocumentRows] = React.useState<any[]>();
     const [hiddenEnumValues, setHiddenEnumValues] = React.useState<string[]>();
+
     const refreshRows = () => {
         const args = {
             filter: 'entitat.id:' + id,
@@ -33,17 +35,20 @@ const EntitatFormTabTipusDocs: React.FC = () => {
             setEntitatTipusDocumentRows(response.rows);
         });
     };
+
     React.useEffect(() => {
         if (fields?.length) {
             const tipusDocDefaultField = fields.find((f) => f.name === 'tipusDocDefault');
             tipusDocDefaultField && setTipusDocumentOptions(tipusDocDefaultField.options);
         }
     }, [fields]);
+
     React.useEffect(() => {
         if (apiIsReady) {
             refreshRows();
         }
     }, [apiIsReady]);
+
     React.useEffect(() => {
         if (tipusDocumentOptions) {
             const hiddenEnumValues = Object.keys(tipusDocumentOptions).filter((k) => {
@@ -52,6 +57,7 @@ const EntitatFormTabTipusDocs: React.FC = () => {
             setHiddenEnumValues(hiddenEnumValues);
         }
     }, [tipusDocumentOptions, entitatTipusDocumentRows]);
+
     const hanldleSwitchOnChange = (key: string, checked: boolean) => {
         const found = entitatTipusDocumentRows?.find((r) => r.tipusDocument === key);
         if (checked) {
@@ -103,9 +109,11 @@ const EntitatFormTabTipusDocs: React.FC = () => {
     return (
         <>
             <Grid container spacing={2} sx={{ mb: 2 }}>
-                <Grid size={4}>
-                    <FormField name="tipusDocDefault" hiddenEnumValues={hiddenEnumValues} />
-                </Grid>
+                <GridFormField
+                    size={4}
+                    name="tipusDocDefault"
+                    hiddenEnumValues={hiddenEnumValues}
+                />
             </Grid>
             {tipusDocumentOptions && entitatTipusDocumentRows && (
                 <TableContainer component={Paper} variant="outlined">

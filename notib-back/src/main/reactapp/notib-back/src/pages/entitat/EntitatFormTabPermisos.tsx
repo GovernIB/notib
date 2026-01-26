@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import { FormField, MuiDataGrid, useFormContext } from 'reactlib';
+import GridFormField from '../../components/GridFormField';
 
 const EntitatFormTabPermisosFormContent: React.FC = () => {
     const { t } = useTranslation();
@@ -17,42 +18,35 @@ const EntitatFormTabPermisosFormContent: React.FC = () => {
     ];
     return (
         <Grid container spacing={2}>
-            <Grid size={4}>
-                <FormField
-                    name="sidGrantedAuthority"
-                    label={t('page.entitats.form.permisos.tipus')}
-                    type="enum"
-                    options={enumOptions}
-                    required
-                />
-            </Grid>
-            <Grid size={8}>
-                <FormField name="sidName" />
-            </Grid>
-            <Grid size={12}>
-                <FormField
-                    name="perm0Allowed"
-                    label={t('page.entitats.form.permisos.usuariAllowed')}
-                />
-            </Grid>
-            <Grid size={12}>
-                <FormField
-                    name="perm2Allowed"
-                    label={t('page.entitats.form.permisos.admEntitatAllowed')}
-                />
-            </Grid>
-            <Grid size={12}>
-                <FormField
-                    name="permXAllowed"
-                    label={t('page.entitats.form.permisos.admLecturaAllowed')}
-                />
-            </Grid>
-            <Grid size={12}>
-                <FormField
-                    name="perm3Allowed"
-                    label={t('page.entitats.form.permisos.aplicacioAllowed')}
-                />
-            </Grid>
+            <GridFormField
+                size={4}
+                name="sidGrantedAuthority"
+                label={t('page.entitats.form.permisos.tipus')}
+                type="enum"
+                options={enumOptions}
+                required
+            />
+            <GridFormField size={8} name="sidName" />
+            <GridFormField
+                size={12}
+                name="perm0Allowed"
+                label={t('page.entitats.form.permisos.usuariAllowed')}
+            />
+            <GridFormField
+                size={12}
+                name="perm2Allowed"
+                label={t('page.entitats.form.permisos.admEntitatAllowed')}
+            />
+            <GridFormField
+                size={12}
+                name="permXAllowed"
+                label={t('page.entitats.form.permisos.admLecturaAllowed')}
+            />
+            <GridFormField
+                size={12}
+                name="perm3Allowed"
+                label={t('page.entitats.form.permisos.aplicacioAllowed')}
+            />
         </Grid>
     );
 };
