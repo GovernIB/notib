@@ -23,10 +23,12 @@ const Enviaments = () => {
                 columns={columns}
                 toolbarType="upper"
                 popupEditCreateActive
-                popupEditFormContent={<>
-                    <FormField name="entregaPostalActiva" />
-                    <FormField name="campProva" />
-                </>}
+                popupEditFormContent={
+                    <>
+                        <FormField name="entregaPostalActiva" />
+                        <FormField name="campProva" />
+                    </>
+                }
             />
         </GridPage>
     );

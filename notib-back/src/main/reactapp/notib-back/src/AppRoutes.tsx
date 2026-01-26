@@ -7,8 +7,8 @@ import AvisGrid from './pages/avis/AvisGrid';
 import AvisForm from './pages/avis/AvisForm';
 import GrupGrid from './pages/grup/GrupGrid';
 import GrupForm from './pages/grup/GrupForm';
-import OrganGrid from './pages/organ/OrganGrid'
-import OrganForm from './pages/organ/OrganForm'
+import OrganGrid from './pages/organ/OrganGrid';
+import OrganForm from './pages/organ/OrganForm';
 import Enviaments from './pages/Enviaments';
 import NotFoundPage from './pages/NotFound';
 import PropietatsConfigurables from './pages/propietatsConfigurables/PropietatsConfigurables';

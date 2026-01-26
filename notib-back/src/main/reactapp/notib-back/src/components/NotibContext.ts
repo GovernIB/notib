@@ -14,4 +14,4 @@ export const useNotibContext = () => {
         throw new Error('useNotibContext must be used within a ResourceApiProvider');
     }
     return context;
-}
+};

@@ -29,11 +29,23 @@ import javax.validation.constraints.Size;
 @ResourceConfig(
 		descriptionField = EntitatResource.Fields.nom,
 		quickFilterFields = { EntitatResource.Fields.codi, EntitatResource.Fields.nom },
-		accessConstraints = @ResourceAccessConstraint(
-				type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-				roles = { BaseConfig.ROLE_SUPER },
-				grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
-		)
+		accessConstraints = {
+				@ResourceAccessConstraint(
+						type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+						roles = { BaseConfig.ROLE_SUPER },
+						grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
+				),
+				@ResourceAccessConstraint(
+						type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+						roles = { BaseConfig.ROLE_ADMIN },
+						grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE }
+				),
+				@ResourceAccessConstraint(
+						type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+						roles = { BaseConfig.ROLE_USER },
+						grantedPermissions = { PermissionEnum.READ }
+				),
+		}
 )
 public class EntitatResource extends BaseResource<Long> {
 

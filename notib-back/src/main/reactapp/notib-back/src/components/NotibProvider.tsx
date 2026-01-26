@@ -14,16 +14,11 @@ const decodeJwt = (token: string) => {
     const payload = token.split('.')[1];
     const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
     return JSON.parse(atob(base64));
-}
+};
 
 export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
-    const {
-        isReady: authIsReady,
-        getToken: authGetToken
-    } = useAuthContext();
-    const {
-        setHttpHeaders: apiSetHttpHeaders,
-    } = useResourceApiContext();
+    const { isReady: authIsReady, getToken: authGetToken } = useAuthContext();
+    const { setHttpHeaders: apiSetHttpHeaders } = useResourceApiContext();
     const [currentUserRealmRoles, setCurrentUserRealmRoles] = React.useState<string[]>();
     const [currentRole, setCurrentRole] = React.useState<string>();
     React.useEffect(() => {
@@ -31,8 +26,10 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
             const token = authGetToken();
             if (token != null) {
                 const tokenDecoded = decodeJwt(token);
-                const realmRoles = tokenDecoded.realm_access?.roles?.filter((r: string) => r.startsWith(ROLE_PREFIX));
-                const filteredRoles = ALLOWED_ROLES.filter(a => realmRoles.includes(a));
+                const realmRoles = tokenDecoded.realm_access?.roles?.filter((r: string) =>
+                    r.startsWith(ROLE_PREFIX)
+                );
+                const filteredRoles = ALLOWED_ROLES.filter((a) => realmRoles.includes(a));
                 setCurrentUserRealmRoles(filteredRoles);
             }
         }
@@ -47,9 +44,7 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
         currentRole,
         setCurrentRole,
     };
-    return <NotibContext.Provider value={contextValue}>
-        {children}
-    </NotibContext.Provider>;
+    return <NotibContext.Provider value={contextValue}>{children}</NotibContext.Provider>;
 };
 
 export default NotibProvider;

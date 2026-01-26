@@ -12,12 +12,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/ca';
 import 'dayjs/locale/es';
-import {
-    MuiBaseApp,
-    type MenuEntry,
-    useBaseAppContext,
-    useResourceApiContext,
-} from 'reactlib';
+import { MuiBaseApp, type MenuEntry, useBaseAppContext, useResourceApiContext } from 'reactlib';
 import HeaderThemeModeSelector from './HeaderThemeModeSelector';
 import HeaderLanguageSelector from './HeaderLanguageSelector';
 import Offline from './Offline';
@@ -25,12 +20,12 @@ import RoleSelector from './RoleSelector';
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
-}
+};
 
 export type HeaderBackgroundModuleItem = {
     color?: string;
     image?: string;
-}
+};
 
 export type BaseAppProps = React.PropsWithChildren & {
     code: string;
@@ -48,7 +43,6 @@ export type BaseAppProps = React.PropsWithChildren & {
     footerHeight?: number;
 };
 
-
 export const Link = React.forwardRef<HTMLAnchorElement, RouterLinkProps>((itemProps, ref) => {
     return <RouterLink ref={ref} {...itemProps} role={undefined} />;
 });
@@ -59,9 +53,9 @@ const useBaseAppMenuEntries = (menuEntries?: MenuEntryWithResource[]) => {
         if (apiIsReady) {
             const apiLinks = apiIndex?.links.getAll();
             const resourceNames = apiLinks?.map((l: any) => l.rel);
-            return menuEntries?.
-                filter(e => e?.resourceName == null || resourceNames?.includes(e.resourceName)).
-                map(e => {
+            return menuEntries
+                ?.filter((e) => e?.resourceName == null || resourceNames?.includes(e.resourceName))
+                .map((e) => {
                     const { resourceName, ...otherProps } = e;
                     return otherProps;
                 });
@@ -69,12 +63,12 @@ const useBaseAppMenuEntries = (menuEntries?: MenuEntryWithResource[]) => {
             return [];
         }
     }, [apiIsReady, apiIndex]);
-}
+};
 
 const useLocationPath = () => {
     const location = useLocation();
     return location.pathname;
-}
+};
 
 const CustomLocalizationProvider = ({ children }: React.PropsWithChildren) => {
     const { currentLanguage } = useBaseAppContext();
@@ -90,10 +84,12 @@ const CustomLocalizationProvider = ({ children }: React.PropsWithChildren) => {
         }
     }, [currentLanguage]);
     const adapter = AdapterDayjs;
-    return <LocalizationProvider dateAdapter={adapter} adapterLocale={adapterLocale}>
-        {children}
-    </LocalizationProvider>;
-}
+    return (
+        <LocalizationProvider dateAdapter={adapter} adapterLocale={adapterLocale}>
+            {children}
+        </LocalizationProvider>
+    );
+};
 
 export const BaseApp: React.FC<BaseAppProps> = (props) => {
     const {
@@ -109,17 +105,17 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         appbarStyle,
         footer,
         footerHeight,
-        children
+        children,
     } = props;
     const navigate = useNavigate();
     const location = useLocation();
     const baseAppMenuEntries = useBaseAppMenuEntries(menuEntries);
     const i18nHandleLanguageChange = (language?: string) => {
         i18n.changeLanguage(language);
-    }
+    };
     const i18nAddResourceBundleCallback = (language: string, namespace: string, bundle: any) => {
         i18n.addResourceBundle(language, namespace, bundle);
-    }
+    };
     const anyHistoryEntryExist = () => location.key !== 'default';
     const goBack = (fallback?: string) => {
         if (anyHistoryEntryExist()) {
@@ -127,46 +123,50 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         } else if (fallback != null) {
             navigate(fallback);
         } else {
-            console.warn('[BACK] Couldn\'t go back, neither fallback specified nor previous entry exists in navigation history');
+            console.warn(
+                "[BACK] Couldn't go back, neither fallback specified nor previous entry exists in navigation history"
+            );
         }
-    }
-    return <MuiBaseApp
-        code={code}
-        headerTitle={title}
-        headerLogo={logo}
-        headerLogoStyle={logoStyle}
-        headerVersion={version}
-        headerAppbarStyle={appbarStyle}
-        headerAppbarBackgroundColor={appbarBackgroundColor}
-        headerAppbarBackgroundImg={appbarBackgroundImg}
-        headerAdditionalComponents={[<RoleSelector key="roleselector" />]}
-        headerAdditionalAuthComponents={[
-            <Box key="sel_lang" sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 2 }}>
-                <HeaderLanguageSelector languages={availableLanguages} />
-            </Box>,
-            <Box key="sel_theme_mode" sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                <HeaderThemeModeSelector />
-            </Box>
-        ]}
-        offline={<Offline />}
-        footer={footer}
-        footerHeight={footerHeight}
-        persistentSession
-        persistentLanguage
-        i18nUseTranslation={useTranslation}
-        i18nCurrentLanguage={i18n.language}
-        i18nHandleLanguageChange={i18nHandleLanguageChange}
-        i18nAddResourceBundleCallback={i18nAddResourceBundleCallback}
-        routerGoBack={goBack}
-        routerNavigate={navigate}
-        routerUseLocationPath={useLocationPath}
-        routerAnyHistoryEntryExist={anyHistoryEntryExist}
-        linkComponent={Link}
-        menuEntries={baseAppMenuEntries}>
-        <CustomLocalizationProvider>
-            {children}
-        </CustomLocalizationProvider>
-    </MuiBaseApp>;
-}
+    };
+    return (
+        <MuiBaseApp
+            code={code}
+            headerTitle={title}
+            headerLogo={logo}
+            headerLogoStyle={logoStyle}
+            headerVersion={version}
+            headerAppbarStyle={appbarStyle}
+            headerAppbarBackgroundColor={appbarBackgroundColor}
+            headerAppbarBackgroundImg={appbarBackgroundImg}
+            headerAdditionalComponents={[<RoleSelector key="roleselector" />]}
+            headerAdditionalAuthComponents={[
+                <Box
+                    key="sel_lang"
+                    sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 2 }}>
+                    <HeaderLanguageSelector languages={availableLanguages} />
+                </Box>,
+                <Box key="sel_theme_mode" sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                    <HeaderThemeModeSelector />
+                </Box>,
+            ]}
+            offline={<Offline />}
+            footer={footer}
+            footerHeight={footerHeight}
+            persistentSession
+            persistentLanguage
+            i18nUseTranslation={useTranslation}
+            i18nCurrentLanguage={i18n.language}
+            i18nHandleLanguageChange={i18nHandleLanguageChange}
+            i18nAddResourceBundleCallback={i18nAddResourceBundleCallback}
+            routerGoBack={goBack}
+            routerNavigate={navigate}
+            routerUseLocationPath={useLocationPath}
+            routerAnyHistoryEntryExist={anyHistoryEntryExist}
+            linkComponent={Link}
+            menuEntries={baseAppMenuEntries}>
+            <CustomLocalizationProvider>{children}</CustomLocalizationProvider>
+        </MuiBaseApp>
+    );
+};
 
 export default BaseApp;

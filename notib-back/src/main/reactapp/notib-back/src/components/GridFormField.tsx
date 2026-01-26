@@ -1,5 +1,5 @@
-import { Breakpoint, Grid, GridSize } from "@mui/material";
-import { FormField, FormFieldProps } from "reactlib";
+import { Breakpoint, Grid, GridSize } from '@mui/material';
+import { FormField, FormFieldProps } from 'reactlib';
 type ResponsiveStyleValue<T> = T | Array<T | null> | { [key in Breakpoint]?: T | null };
 
 type GridFormFieldProps = FormFieldProps & {
