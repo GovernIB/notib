@@ -20,6 +20,8 @@ import RoleSelector from './RoleSelector';
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
+    hidden?: boolean | (() => boolean);
+    children?: MenuEntryWithResource[];
 };
 
 export type HeaderBackgroundModuleItem = {
@@ -47,18 +49,37 @@ export const Link = React.forwardRef<HTMLAnchorElement, RouterLinkProps>((itemPr
     return <RouterLink ref={ref} {...itemProps} role={undefined} />;
 });
 
+const filterMenuEntries = (
+    menuEntries: MenuEntryWithResource[] | undefined,
+    resourceNames?: string[]
+): MenuEntry[] | undefined => {
+    return menuEntries
+        ?.map((e) => {
+            const filteredChildren = filterMenuEntries(e.children, resourceNames);
+            const passesResource =
+                e.resourceName == null || resourceNames?.includes(e.resourceName);
+            const passesHidden = e.hidden == null || !e.hidden;
+            if (!passesResource || !passesHidden) {
+                return filteredChildren && filteredChildren.length > 0
+                    ? { ...e, children: filteredChildren }
+                    : null;
+            }
+            const { resourceName, ...otherProps } = e;
+            return {
+                ...otherProps,
+                ...(filteredChildren ? { children: filteredChildren } : {}),
+            };
+        })
+        .filter((e): e is MenuEntry => e !== null);
+};
+
 const useBaseAppMenuEntries = (menuEntries?: MenuEntryWithResource[]) => {
     const { isReady: apiIsReady, indexState: apiIndex } = useResourceApiContext();
     return React.useMemo(() => {
         if (apiIsReady) {
             const apiLinks = apiIndex?.links.getAll();
             const resourceNames = apiLinks?.map((l: any) => l.rel);
-            return menuEntries
-                ?.filter((e) => e?.resourceName == null || resourceNames?.includes(e.resourceName))
-                .map((e) => {
-                    const { resourceName, ...otherProps } = e;
-                    return otherProps;
-                });
+            return filterMenuEntries(menuEntries, resourceNames);
         } else {
             return [];
         }

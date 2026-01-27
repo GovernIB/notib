@@ -53,13 +53,17 @@ public class EntitatResourceServiceImpl extends BaseMutableResourceService<Entit
 		boolean isRoleSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);
 		if (!isRoleSuper) {
 			Set<Serializable> allowedIds = aclHelper.findIdsWithAnyPermission(
-					EntitatResource.class,
-					List.of(ExtendedPermission.READ),
+					EntitatEntity.class,
+					List.of(ExtendedPermission.PERM0),
 					aclHelper.getCurrentUserSids().toArray(Sid[]::new));
 			String joinedIds = allowedIds.stream()
 					.map(String::valueOf)
 					.collect(Collectors.joining(","));
-			return "id in (" + joinedIds + ")";
+			if (!joinedIds.isEmpty()) {
+				return "id in (" + joinedIds + ")";
+			} else {
+				return "id is null";
+			}
 		} else {
 			return null;
 		}

@@ -1,5 +1,12 @@
 import { createContext, useContext } from 'react';
 
+export const ROLE_PREFIX = 'NOT_';
+export const ROLE_SUPER = ROLE_PREFIX + 'SUPER';
+export const ROLE_ADMIN = ROLE_PREFIX + 'ADMIN';
+export const ROLE_ADMIN_CONSULTA = ROLE_PREFIX + 'ADMIN_CONSULTA';
+export const ROLE_ORGAN = ROLE_PREFIX + 'ORGAN';
+export const ROLE_USER = 'tothom';
+
 export type NotibContextType = {
     currentUserRealmRoles?: string[];
     currentRole?: string;

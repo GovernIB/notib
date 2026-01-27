@@ -16,20 +16,13 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @FieldNameConstants
-@ResourceConfig(
-        descriptionField = ConfigResource.Fields.description,
-        quickFilterFields = {ConfigResource.Fields.key, ConfigResource.Fields.description},
-        accessConstraints = @ResourceAccessConstraint(
-                type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-                roles = {  BaseConfig.ROLE_SUPER   },
-                grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
-        )
-)
+@ResourceConfig(descriptionField = ConfigResource.Fields.description, quickFilterFields = {ConfigResource.Fields.key, ConfigResource.Fields.description}, accessConstraints = @ResourceAccessConstraint(type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE, roles = {BaseConfig.ROLE_SUPER}, grantedPermissions = {PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE}))
 public class ConfigGroupResource extends BaseResource<Long> {
 
-    private String key;
-    private String description;
-    private List<ConfigResource> configs;
-    private List<ConfigGroupResource> innerConfigs;
-    private String parentCode;
+	private String key;
+	private String description;
+	private List<ConfigResource> configs;
+	private List<ConfigGroupResource> innerConfigs;
+	private String parentCode;
+
 }

@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import Home from './pages/Home';
 import EntitatGrid from './pages/entitat/EntitatGrid';
 import EntitatForm from './pages/entitat/EntitatForm';
 import ProcedimentGrid from './pages/procediment/ProcedimentGrid';
@@ -16,7 +17,10 @@ import PropietatsConfigurables from './pages/propietatsConfigurables/PropietatsC
 const AppRoutes = () => {
     return (
         <Routes>
-            <Route index element={<Navigate to="/entitats" replace />} />
+            <Route index element={<Navigate to="/home" replace />} />
+            <Route path="home">
+                <Route index element={<Home />} />
+            </Route>
             <Route path="entitats">
                 <Route index element={<EntitatGrid />} />
                 <Route path="form">

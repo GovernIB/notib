@@ -7,13 +7,15 @@ import notibLogoDark from './assets/notib_logo_dark.png';
 import { BaseApp } from './components/BaseApp';
 import DrassanaFooter from './components/DrassanaFooter';
 import NotibProvider from './components/NotibProvider';
+import { useNotibContext, ROLE_SUPER, ROLE_ADMIN } from './components/NotibContext';
 import AppRoutes from './AppRoutes';
 
 const version = '0.0.0';
 
-export const App = () => {
+const InnerApp: React.FC = () => {
     const { t } = useTranslation();
     const { mode } = useColorScheme();
+    const { currentRole } = useNotibContext();
     const menuConfig = [
         {
             id: 'entitats',
@@ -21,6 +23,7 @@ export const App = () => {
             to: '/entitats',
             icon: 'layers',
             resourceName: 'entitatResource',
+            hidden: currentRole !== ROLE_SUPER,
         },
         {
             id: 'avisos',
@@ -28,6 +31,7 @@ export const App = () => {
             to: '/avisos',
             icon: 'notifications',
             resourceName: 'avisResource',
+            hidden: currentRole !== ROLE_SUPER,
         },
         {
             id: 'grups',
@@ -35,6 +39,7 @@ export const App = () => {
             to: '/grups',
             icon: 'group',
             resourceName: 'grupResource',
+            hidden: currentRole !== ROLE_ADMIN,
         },
         {
             id: 'organs',
@@ -42,6 +47,7 @@ export const App = () => {
             to: '/organs',
             icon: 'account_tree',
             resourceName: 'organGestorResource',
+            hidden: currentRole !== ROLE_ADMIN,
         },
         {
             id: 'configuracio',
@@ -49,6 +55,7 @@ export const App = () => {
             to: '/configs',
             icon: 'settings',
             resourceName: 'configGroupResource',
+            hidden: currentRole !== ROLE_ADMIN,
         },
         /*{
         id: 'procediment',
@@ -84,46 +91,52 @@ export const App = () => {
     const textColor = bgColor ? theme.palette.getContrastText(bgColor) : undefined;
     return (
         mode && (
-            <NotibProvider>
-                <BaseApp
-                    code="not"
-                    logo={mode === 'light' ? goibLogoLight : goibLogoDark}
-                    logoStyle={{
-                        '& img': { height: '49px' },
-                        pl: 1,
-                        pr: '29px',
-                        borderRight: '1px solid ' + theme.palette.divider,
-                    }}
-                    title={
-                        <img
-                            style={{
-                                marginLeft: '8px',
-                                height: '49px',
-                                verticalAlign: 'middle',
-                            }}
-                            src={mode === 'light' ? notibLogoLight : notibLogoDark}
-                            alt="Notib"
+            <BaseApp
+                code="not"
+                logo={mode === 'light' ? goibLogoLight : goibLogoDark}
+                logoStyle={{
+                    '& img': { height: '49px' },
+                    pl: 1,
+                    pr: '29px',
+                    borderRight: '1px solid ' + theme.palette.divider,
+                }}
+                title={
+                    <img
+                        style={{
+                            marginLeft: '8px',
+                            height: '49px',
+                            verticalAlign: 'middle',
+                        }}
+                        src={mode === 'light' ? notibLogoLight : notibLogoDark}
+                        alt="Notib"
+                    />
+                }
+                version={version}
+                availableLanguages={['ca', 'es']}
+                menuEntries={menuEntries}
+                appbarBackgroundColor={bgColor}
+                appbarStyle={{ color: textColor }}
+                footer={
+                    <div style={{ height: '36px' }}>
+                        <DrassanaFooter
+                            title="NOTIB"
+                            backgroundColor="#5F5D5D"
+                            style={{ position: 'fixed', width: '100%', bottom: 0 }}
                         />
-                    }
-                    version={version}
-                    availableLanguages={['ca', 'es']}
-                    menuEntries={menuEntries}
-                    appbarBackgroundColor={bgColor}
-                    appbarStyle={{ color: textColor }}
-                    footer={
-                        <div style={{ height: '36px' }}>
-                            <DrassanaFooter
-                                title="NOTIB"
-                                backgroundColor="#5F5D5D"
-                                style={{ position: 'fixed', width: '100%', bottom: 0 }}
-                            />
-                        </div>
-                    }
-                    footerHeight={36}>
-                    <AppRoutes />
-                </BaseApp>
-            </NotibProvider>
+                    </div>
+                }
+                footerHeight={36}>
+                <AppRoutes />
+            </BaseApp>
         )
+    );
+};
+
+export const App = () => {
+    return (
+        <NotibProvider>
+            <InnerApp />
+        </NotibProvider>
     );
 };
 

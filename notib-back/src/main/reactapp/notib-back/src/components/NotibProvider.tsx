@@ -1,14 +1,23 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthContext, useResourceApiContext } from 'reactlib';
-import { NotibContext } from './NotibContext';
+import {
+    NotibContext,
+    ROLE_PREFIX,
+    ROLE_SUPER,
+    ROLE_ADMIN,
+    ROLE_ADMIN_CONSULTA,
+    ROLE_ORGAN,
+    ROLE_USER,
+} from './NotibContext';
 
-export const ROLE_PREFIX = 'NOT_';
-export const ROLE_SUPER = ROLE_PREFIX + 'SUPER';
-export const ROLE_ADMIN = ROLE_PREFIX + 'ADMIN';
-export const ROLE_ADMIN_CONSULTA = ROLE_PREFIX + 'ADMIN_CONSULTA';
-export const ROLE_ORGAN = ROLE_PREFIX + 'ORGAN';
-export const ROLE_USER = 'tothom';
-const ALLOWED_ROLES = [ROLE_SUPER, ROLE_ADMIN, ROLE_ADMIN_CONSULTA, ROLE_ORGAN, ROLE_USER];
+const ALLOWED_ROLES = [
+    ROLE_SUPER,
+    ROLE_ADMIN,
+    ROLE_ADMIN_CONSULTA,
+    ROLE_ORGAN,
+    ROLE_USER,
+].reverse();
 
 const decodeJwt = (token: string) => {
     const payload = token.split('.')[1];
@@ -17,6 +26,7 @@ const decodeJwt = (token: string) => {
 };
 
 export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
+    const navigate = useNavigate();
     const { isReady: authIsReady, getToken: authGetToken } = useAuthContext();
     const { setHttpHeaders: apiSetHttpHeaders } = useResourceApiContext();
     const [currentUserRealmRoles, setCurrentUserRealmRoles] = React.useState<string[]>();
@@ -31,12 +41,16 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
                 );
                 const filteredRoles = ALLOWED_ROLES.filter((a) => realmRoles.includes(a));
                 setCurrentUserRealmRoles(filteredRoles);
+                if (filteredRoles.length > 0 && currentRole == null) {
+                    setCurrentRole(filteredRoles[0]);
+                }
             }
         }
     }, [authIsReady]);
     React.useEffect(() => {
         if (currentRole) {
             apiSetHttpHeaders([{ 'X-App-Role': currentRole }]);
+            navigate('/', { replace: true });
         }
     }, [currentRole]);
     const contextValue = {
