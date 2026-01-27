@@ -91,7 +91,7 @@ public abstract class NotificacioTableMapper {
 			var paramBuilder = NotificacioTableItemConversioParams.builder();
 
 			if (not.getProcedimentCodi() != null && NotificacioEstatEnumDto.FINALITZADA.equals(not.getEstat())) {
-				paramBuilder.permisProcessar(codis.contains(not.getProcedimentCodi()) || codis.contains(not.getOrganId()));
+				paramBuilder.permisProcessar(codis.contains(not.getProcedimentCodi()) || codis.contains(not.getId() + ""));
 			}
 			if (not.getOrganCodi() != null) {
 				var organ = organs.get(not.getOrganCodi());
