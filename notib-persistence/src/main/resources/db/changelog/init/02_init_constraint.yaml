@@ -623,3 +623,13 @@ databaseChangeLog:
             referencedTableName: ${db_prefix}ORGAN_GESTOR
             referencedColumnNames: ID
             constraintName: ${db_prefix}PRO_ORGAN_FK
+  - changeSet:
+        id: init_constraint-63
+        author: limit
+        changes:
+            - addForeignKeyConstraint:
+                  baseTableName: ${db_prefix}CONFIG
+                  baseColumnNames: GROUP_CODE
+                  referencedTableName: ${db_prefix}CONFIG_GROUP
+                  referencedColumnNames: CODE
+                  constraintName: ${db_prefix}CONFIG_GROUP_FK

@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: 2_1_1_000
+      id: 2_1_1_000-1
       author: limit
       changes:
         - dropPrimaryKey:
@@ -12,11 +12,8 @@ databaseChangeLog:
               - column:
                   name: id
                   type: bigint
-        - createSequence:
-            sequenceName: ${db_prefix}CONFIG_SEQ
-            startValue: 1
         - sql:
-            sql: "UPDATE ${db_prefix}CONFIG SET id = ${db_prefix}CONFIG_SEQ.nextval"
+            sql: "UPDATE ${db_prefix}CONFIG SET id = ${db_prefix}HIBERNATE_SEQ.nextval"
         - addPrimaryKey:
             tableName: ${db_prefix}config
             columnNames: id
@@ -29,6 +26,10 @@ databaseChangeLog:
             baseTableName: ${db_prefix}config
             constraintName: ${db_prefix}CONFIG_GROUP_FK
 
+  - changeSet:
+      id: 2_1_1_000-2
+      author: limit
+      changes:
         - dropPrimaryKey:
             tableName: ${db_prefix}config_group
             constraintName: ${db_prefix}CONFIG_GROUP_PK
@@ -38,11 +39,8 @@ databaseChangeLog:
               - column:
                   name: id
                   type: bigint
-        - createSequence:
-            sequenceName: ${db_prefix}CONFIG_GROUP_SEQ
-            startValue: 1
         - sql:
-            sql: "UPDATE ${db_prefix}CONFIG_GROUP SET id = ${db_prefix}CONFIG_GROUP_SEQ.nextval"
+            sql: "UPDATE ${db_prefix}CONFIG_GROUP SET id = ${db_prefix}HIBERNATE_SEQ.nextval"
         - addPrimaryKey:
             tableName: ${db_prefix}config_group
             columnNames: id
@@ -52,7 +50,10 @@ databaseChangeLog:
             constraintName: ${db_prefix}CONFIG_GROUP_CODE_UK
             tableName: ${db_prefix}config_group
 
-
+  - changeSet:
+      id: 2_1_1_000-3
+      author: limit
+      changes:
         - dropPrimaryKey:
             tableName: ${db_prefix}config_type
             constraintName: ${db_prefix}CONFIG_TYPE_PK
@@ -62,11 +63,8 @@ databaseChangeLog:
               - column:
                   name: id
                   type: bigint
-        - createSequence:
-            sequenceName: ${db_prefix}CONFIG_TYPE_SEQ
-            startValue: 1
         - sql:
-            sql: "UPDATE ${db_prefix}CONFIG_TYPE SET id = ${db_prefix}CONFIG_TYPE_SEQ.nextval"
+            sql: "UPDATE ${db_prefix}CONFIG_TYPE SET id = ${db_prefix}HIBERNATE_SEQ.nextval"
         - addPrimaryKey:
             tableName: ${db_prefix}config_type
             columnNames: id
@@ -75,7 +73,6 @@ databaseChangeLog:
             columnNames: code
             constraintName: ${db_prefix}CONFIG_TYPE_CODE_UK
             tableName: ${db_prefix}config_type
-
         - addForeignKeyConstraint:
             baseTableName: ${db_prefix}CONFIG
             baseColumnNames: GROUP_CODE
@@ -83,8 +80,10 @@ databaseChangeLog:
             referencedColumnNames: CODE
             constraintName: ${db_prefix}CONFIG_GROUP_FK
 
-
-
+  - changeSet:
+      id: 2_1_1_000-4
+      author: limit
+      changes:
         - addColumn:
             tableName: ${db_prefix}ORGAN_GESTOR
             columns:
