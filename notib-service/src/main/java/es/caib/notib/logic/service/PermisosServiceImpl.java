@@ -345,7 +345,7 @@ public class PermisosServiceImpl implements PermisosService {
         }
         return not.getProcediment().getCodi() != null
                 && (PermisEnum.PROCESSAR.equals(permis) ? NotificacioEstatEnumDto.FINALITZADA.equals(not.getEstat()) : true)
-                && (codis.contains(not.getProcediment().getCodi()) || codis.contains(not.getOrganGestor().getCodi()));
+                && (codis.contains(not.getProcediment().getCodi()) || codis.contains(not.getOrganGestor().getId() + ""));
     }
 
 
