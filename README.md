@@ -40,7 +40,7 @@ NOTIB ofereix una plataforma  per a realitzar i gestionar totes les comunicacion
 
 **Documentació**
 
->- [Manual d'usuari](https://github.com/GovernIB/notib/blob/v2.0.12.rc17/doc/pdf/NOTIB_usuari.pdf)
+>- [Manual d'usuari](https://github.com/GovernIB/notib/raw/v2.0.12.rc17/doc/pdf/NOTIB_usuari.pdf)
 >- [Manual d'instal·lació](https://github.com/GovernIB/notib/raw/notib-2.0/doc/pdf/NOTIB_instalacio.pdf)
 >- [Manual d'administració](https://github.com/GovernIB/notib/raw/notib-2.0/doc/pdf/NOTIB_administracio.pdf)
 >- [Manual d'integració](https://github.com/GovernIB/notib/raw/notib-2.0/doc/pdf/NOTIB_integracio.pdf)
