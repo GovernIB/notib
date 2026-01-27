@@ -109,6 +109,15 @@ const translationCa = {
                 },
             },
         },
+        propietatsConfiguracio: {
+            grid: {
+                title: "Propietats configurables",
+            },
+            form: {
+                titleCreate: "Crear propietat configurable",
+                titleUpdate: "Modificar propietat configurable",
+            },
+        },
         notFound: {
             title: 'Pàgina no trobada',
             toHome: "Anar a l'inici",

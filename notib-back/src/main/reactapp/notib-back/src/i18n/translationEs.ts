@@ -110,6 +110,15 @@ const translationEs = {
                 },
             },
         },
+        propietatsConfiguracio: {
+            grid: {
+                title: "Propiedades configurables",
+            },
+            form: {
+                titleCreate: "Crear propiedad configurable",
+                titleUpdate: "Modificar propiedad configurable",
+            },
+        },
         notFound: {
             title: 'Página no encontrada',
             toHome: 'Ir al inicio',
