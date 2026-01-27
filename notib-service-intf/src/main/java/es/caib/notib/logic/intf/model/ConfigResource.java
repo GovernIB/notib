@@ -4,6 +4,7 @@ import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
+import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import es.caib.notib.logic.intf.dto.config.EntitatConfig;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
+import javax.persistence.Column;
 import java.util.List;
 
 @Getter
@@ -32,12 +34,11 @@ public class ConfigResource extends BaseResource<Long> {
 	private String value;
 	private String description;
 	private boolean jbossProperty;
-	private List<EntitatConfig> entitatsConfig;
-	private String entitatCodi;
-	private String entitatValue;
 	private boolean configurable;
+	private int position;
 
-	private String typeCode;
-	private List<String> validValues;
+	private ResourceReference<ConfigGroupResource, Long> configGroup;
+	private ResourceReference<ConfigTypeResource, Long> configType;
+	private ResourceReference<EntitatResource, Long> entitat; // opcional
 
 }

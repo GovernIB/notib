@@ -2,17 +2,12 @@ package es.caib.notib.persist.resourceentity;
 
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.model.ConfigResource;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.ForeignKey;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = BaseConfig.DB_PREFIX + "config")
@@ -21,33 +16,52 @@ import javax.persistence.Table;
 @NoArgsConstructor
 public class ConfigResourceEntity extends BaseAuditableResourceEntity<ConfigResource> {
 
-    @Column(name = "key", length = 256, nullable = false)
-    private String key;
+	@Column(name = "key", length = 256, nullable = false)
+	private String key;
+	@Column(name = "value", length = 2048, nullable = true)
+	private String value;
+	@Column(name = "description", length = 2048, nullable = true)
+	private String description;
+	@Column(name = "jbossProperty", nullable = false)
+	private boolean jbossProperty;
+	@Column(name = "configurable", nullable = false)
+	private boolean configurable;
+	@Column(name = "position", nullable = false)
+	private int position;
 
-    @Column(name = "value", length = 2048, nullable = true)
-    private String value;
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(
+		name = "config_group_id",
+		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "CONFIG_GROUP_FK"))
+	private ConfigGroupResourceEntity configGroup;
 
-    @Column(name = "description", length = 2048, nullable = true)
-    private String description;
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(
+		name = "type_id",
+		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "CONFIG_TYPE_FK"))
+	private ConfigTypeResourceEntity configType;
 
-    @Column(name = "jbossProperty", nullable = false)
-    private boolean jbossProperty;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(
+		name = "entitat_id",
+		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "CONFIG_ENTITAT_FK"))
+	private EntitatResourceEntity entitat;
 
-    @Column(name = "groupCode", length = 2048, nullable = true)
-    private String groupCode;
+	@Builder
+	public ConfigResourceEntity(
+		ConfigResource resource,
+		ConfigGroupResourceEntity configGroup,
+		ConfigTypeResourceEntity configType,
+		EntitatResourceEntity entitat) {
+		this.key = resource.getKey();
+		this.value = resource.getValue();
+		this.description = resource.getDescription();
+		this.jbossProperty = resource.isJbossProperty();
+		this.configurable = resource.isConfigurable();
+		this.position = resource.getPosition();
+		this.configGroup = configGroup;
+		this.configType = configType;
+		this.entitat = entitat;
+	}
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-//    @JoinColumn(name = "TYPE_CODE", insertable = false, updatable = false)
-    @JoinColumn(name = "type_code", updatable = false)
-    @ForeignKey(name = "NOT_CONFIG_TYPE_FK")
-    private ConfigTypeResourceEntity type;
-
-    @Column(name = "entitat_codi", length = 64)
-    private String entitatCodi;
-
-    @Column(name = "configurable")
-    private boolean configurable;
-
-    @Column(name = "position")
-    private int position;
 }
