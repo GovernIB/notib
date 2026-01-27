@@ -81,25 +81,29 @@ public abstract class NotificacioTableMapper {
     @Mapping(target = "organEstat", source = "params.organEstat")
     public abstract NotificacioTableItemDto toNotificacioTableItemDto(NotificacioTableEntity not, NotificacioTableItemConversioParams params);
 
-    public abstract List<NotificacioTableItemDto> toNotificacionsTableItemDto(List<NotificacioTableEntity> nots, @Context List<String> codis, @Context Map<String, OrganismeDto> organs);
+    public List<NotificacioTableItemDto> toNotificacionsTableItemDto(List<NotificacioTableEntity> nots, @Context List<String> codis, @Context Map<String, OrganismeDto> organs) {
 
-    public NotificacioTableItemDto mapNotificacioTableItemDtoContext(NotificacioTableEntity not, @Context List<String> codis, @Context Map<String, OrganismeDto> organs) {
+//    public NotificacioTableItemDto mapNotificacioTableItemDtoContext(NotificacioTableEntity not, @Context List<String> codis, @Context Map<String, OrganismeDto> organs) {
+        List<NotificacioTableItemDto> notificacions = new ArrayList<>();
+        for (var not : nots)
+            {
+                if (not == null) {
+                    return null;
+                }
 
-        if (not == null) {
-            return null;
-        }
+                var paramBuilder = NotificacioTableItemConversioParams.builder();
 
-        var paramBuilder = NotificacioTableItemConversioParams.builder();
+                if (not.getProcedimentCodi() != null && NotificacioEstatEnumDto.FINALITZADA.equals(not.getEstat())) {
+                    paramBuilder.permisProcessar(codis.contains(not.getProcedimentCodi()) || codis.contains(not.getOrganId()));
+                }
+                if (not.getOrganCodi() != null) {
+                    var organ = organs.get(not.getOrganCodi());
+                    paramBuilder.organEstat(organ != null ? organ.getEstat() : null);
+                }
+                notificacions.add(toNotificacioTableItemDto(not, paramBuilder.build()));
 
-        if (not.getProcedimentCodi() != null && NotificacioEstatEnumDto.FINALITZADA.equals(not.getEstat())) {
-            paramBuilder.permisProcessar(codis.contains(not.getProcedimentCodi()) || codis.contains(not.getOrganCodi()));
-        }
-        if (not.getOrganCodi() != null) {
-            var organ = organs.get(not.getOrganCodi());
-            paramBuilder.organEstat(organ != null ? organ.getEstat() : null);
-        }
-
-        return toNotificacioTableItemDto(not, paramBuilder.build());
+            }
+        return notificacions;
     }
 
     @AfterMapping
