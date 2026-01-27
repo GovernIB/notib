@@ -141,6 +141,7 @@ public class CallbackHelper {
 				return null;
 			}
 			callback = CallbackEntity.builder().usuariCodi(codi).notificacioId(env.getNotificacio().getId()).enviamentId(env.getId()).build();
+			callbackRepository.saveAndFlush(callback);
 		}
 		callback.setData(new Date());
 		callback.setEstat(CallbackEstatEnumDto.PENDENT);
