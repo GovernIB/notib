@@ -43,13 +43,13 @@ import java.util.NoSuchElementException;
 /**
  * Classe per englobar la tasca de notificar l'estat o la certificació a l'aplicació
  * client a partir de la referència del destinatari de la notificació.
- * 
+ *
  * Recupera la informació de la notificació a partir de la referència i la informació
  * de l'aplicació client a partir del codi d'usuari que ha creat l'anotació.
  * Emplena la informació cap al client de la mateixa forma que el WS de consulta  NotificacioServiceWsImplV2.
- * 
+ *
  * @see es.caib.notib.logic.service.ws.NotificacioServiceWsImplV2
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -141,6 +141,7 @@ public class CallbackHelper {
 				return null;
 			}
 			callback = CallbackEntity.builder().usuariCodi(codi).notificacioId(env.getNotificacio().getId()).enviamentId(env.getId()).build();
+			callbackRepository.saveAndFlush(callback);
 		}
 		callback.setData(new Date());
 		callback.setEstat(CallbackEstatEnumDto.PENDENT);
