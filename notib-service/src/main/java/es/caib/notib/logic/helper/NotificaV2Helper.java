@@ -207,11 +207,12 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
                         comandaListener.enviarAvis(enviament, AvisDescripcio.ENVIAMENT_NOTIFICA);
                     }
 
+					var cieNotifica = isCieNotifica(notificacio);
                     for (NotificacioEnviamentEntity e : notificacio.getEnviaments()) {
 					    if (pluginHelper.enviarCarpeta()) {
 							pluginHelper.enviarNotificacioMobil(e);
 						}
-                        if (e.getEntregaPostal() == null) {
+                        if (e.getEntregaPostal() == null || cieNotifica) {
                             callbackHelper.crearCallback(notificacio, e, error, errorDescripcio);
                         }
 					}
@@ -951,9 +952,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				envio.setDestinatarios(destinatarios);
 			}
 
-			if (enviament.getEntregaPostal() != null
-					&&  (notificacio.getProcediment() != null && notificacio.getProcediment().getEntregaCieEfectiva() != null && !notificacio.getProcediment().getEntregaCieEfectiva().getCie().isCieExtern()
-						|| notificacio.getOrganGestor().getEntregaCie() != null && !notificacio.getOrganGestor().getEntregaCie().getCie().isCieExtern())) {
+			if (enviament.getEntregaPostal() != null && isCieNotifica(notificacio)) {
+//					&&  (notificacio.getProcediment() != null && notificacio.getProcediment().getEntregaCieEfectiva() != null && !notificacio.getProcediment().getEntregaCieEfectiva().getCie().isCieExtern()
+//						|| notificacio.getOrganGestor().getEntregaCie() != null && !notificacio.getOrganGestor().getEntregaCie().getCie().isCieExtern())) {
 
 				NotibLogger.getInstance().error("[NOTIFICA] Enviament " + enviament.getNotificaReferencia() + " amb entrega postal amb cie Notifica " , log, LoggingTipus.ENTREGA_CIE);
 				var entregaPostal = new EntregaPostal();
@@ -1057,6 +1058,12 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			envios.getEnvio().add(envio);
 		}
 		return envios;
+	}
+
+	private boolean isCieNotifica(NotificacioEntity notificacio) {
+
+		return notificacio.getProcediment() != null && notificacio.getProcediment().getEntregaCieEfectiva() != null && !notificacio.getProcediment().getEntregaCieEfectiva().getCie().isCieExtern()
+				|| notificacio.getOrganGestor().getEntregaCie() != null && !notificacio.getOrganGestor().getEntregaCie().getCie().isCieExtern();
 	}
 
 	private NotificaWsV2PortType getNotificaWs(String apiKey) throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
