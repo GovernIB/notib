@@ -13,10 +13,12 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/ca';
 import 'dayjs/locale/es';
 import { MuiBaseApp, type MenuEntry, useBaseAppContext, useResourceApiContext } from 'reactlib';
+import { useNotibContext, ROLE_SUPER } from './NotibContext';
 import HeaderThemeModeSelector from './HeaderThemeModeSelector';
 import HeaderLanguageSelector from './HeaderLanguageSelector';
 import Offline from './Offline';
 import RoleSelector from './RoleSelector';
+import EntitatSelector from './EntitatSelector';
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
@@ -130,6 +132,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
     } = props;
     const navigate = useNavigate();
     const location = useLocation();
+    const { currentRole } = useNotibContext();
     const baseAppMenuEntries = useBaseAppMenuEntries(menuEntries);
     const i18nHandleLanguageChange = (language?: string) => {
         i18n.changeLanguage(language);
@@ -159,7 +162,10 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             headerAppbarStyle={appbarStyle}
             headerAppbarBackgroundColor={appbarBackgroundColor}
             headerAppbarBackgroundImg={appbarBackgroundImg}
-            headerAdditionalComponents={[<RoleSelector key="roleselector" />]}
+            headerAdditionalComponents={[
+                <RoleSelector key="role_selector" />,
+                ...(currentRole !== ROLE_SUPER ? [<EntitatSelector key="entitat_selector" />] : []),
+            ]}
             headerAdditionalAuthComponents={[
                 <Box
                     key="sel_lang"

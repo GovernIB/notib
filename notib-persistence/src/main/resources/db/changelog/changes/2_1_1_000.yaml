@@ -79,23 +79,3 @@ databaseChangeLog:
             referencedTableName: ${db_prefix}CONFIG_GROUP
             referencedColumnNames: CODE
             constraintName: ${db_prefix}CONFIG_GROUP_FK
-
-  - changeSet:
-      id: 2_1_1_000-4
-      author: limit
-      changes:
-        - addColumn:
-            tableName: ${db_prefix}ORGAN_GESTOR
-            columns:
-              - column:
-                  name: CREATEDDATE
-                  type: TIMESTAMP(6)
-              - column:
-                  name: CREATEDBY_CODI
-                  type: VARCHAR(64 ${varcharUnit})
-              - column:
-                  name: LASTMODIFIEDDATE
-                  type: TIMESTAMP(6)
-              - column:
-                  name: LASTMODIFIEDBY_CODI
-                  type: VARCHAR(64 ${varcharUnit})

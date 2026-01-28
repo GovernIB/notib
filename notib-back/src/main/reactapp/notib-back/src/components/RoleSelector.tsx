@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemText from '@mui/material/ListItemText';
 import Icon from '@mui/material/Icon';
@@ -9,16 +10,16 @@ import { useNotibContext } from './NotibContext';
 
 const RoleSelector: React.FC = () => {
     const { t } = useTranslation();
-    const { currentUserRealmRoles, currentRole, setCurrentRole } = useNotibContext();
-    React.useEffect(() => {
-        if (currentUserRealmRoles?.length === 1) {
-            setCurrentRole(currentUserRealmRoles[0]);
-        }
-    }, [currentUserRealmRoles]);
-    return currentUserRealmRoles ? (
+    const navigate = useNavigate();
+    const { rolesAvailable, currentRole, setCurrentRole } = useNotibContext();
+    const handleRoleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setCurrentRole(event.target.value);
+        navigate('/', { replace: true });
+    };
+    return rolesAvailable ? (
         <TextField
             value={currentRole ?? ''}
-            onChange={(event) => setCurrentRole(event.target.value)}
+            onChange={handleRoleChange}
             size="small"
             select
             slotProps={{
@@ -31,7 +32,7 @@ const RoleSelector: React.FC = () => {
                 },
             }}
             sx={{ mr: 1 }}>
-            {currentUserRealmRoles.map((r) => (
+            {rolesAvailable.map((r) => (
                 <MenuItem key={r} value={r}>
                     <ListItemText>{t('component.RoleSelector.role.' + r)}</ListItemText>
                 </MenuItem>

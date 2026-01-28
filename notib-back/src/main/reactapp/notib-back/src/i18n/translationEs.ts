@@ -7,7 +7,7 @@ const translationEs = {
         enviaments: 'Envios',
         grups: 'Grupos',
         organsGestors: 'Órganos gestores',
-        propietatsConfiguracio: 'Propiedades configurables',
+        propietats: 'Propiedades',
     },
     page: {
         home: {
@@ -112,11 +112,11 @@ const translationEs = {
         },
         propietatsConfiguracio: {
             grid: {
-                title: "Propiedades configurables",
+                title: 'Propiedades configurables',
             },
             form: {
-                titleCreate: "Crear propiedad configurable",
-                titleUpdate: "Modificar propiedad configurable",
+                titleCreate: 'Crear propiedad configurable',
+                titleUpdate: 'Modificar propiedad configurable',
             },
         },
         notFound: {

@@ -50,12 +50,12 @@ const InnerApp: React.FC = () => {
             hidden: currentRole !== ROLE_ADMIN,
         },
         {
-            id: 'configuracio',
-            title: t('menu.propietatsConfiguracio'),
-            to: '/configs',
+            id: 'propietats',
+            title: t('menu.propietats'),
+            to: '/propietats',
             icon: 'settings',
             resourceName: 'configGroupResource',
-            hidden: currentRole !== ROLE_ADMIN,
+            hidden: currentRole !== ROLE_SUPER,
         },
         /*{
         id: 'procediment',
