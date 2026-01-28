@@ -12,7 +12,7 @@ import OrganGrid from './pages/organ/OrganGrid';
 import OrganForm from './pages/organ/OrganForm';
 import Enviaments from './pages/Enviaments';
 import NotFoundPage from './pages/NotFound';
-import PropietatsConfigurables from './pages/propietatsConfigurables/PropietatsConfigurables';
+import Propietats from './pages/Propietats';
 
 const AppRoutes = () => {
     return (
@@ -59,7 +59,7 @@ const AppRoutes = () => {
                     <Route path=":id" element={<OrganForm />} />
                 </Route>
             </Route>
-            <Route path="configs" element={<PropietatsConfigurables />} />
+            <Route path="propietats" element={<Propietats />} />
             <Route path="enviaments" element={<Enviaments />} />
             <Route path="*" element={<NotFoundPage />} />
         </Routes>
