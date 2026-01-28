@@ -32,13 +32,13 @@ public class ConfigResourceEntity extends BaseAuditableResourceEntity<ConfigReso
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(
 		name = "config_group_id",
-		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "CONFIG_GROUP_FK"))
+		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "CONFIG_GROUP_ID_FK"))
 	private ConfigGroupResourceEntity configGroup;
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(
-		name = "type_id",
-		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "CONFIG_TYPE_FK"))
+		name = "config_type_id",
+		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "CONFIG_TYPE_ID_FK"))
 	private ConfigTypeResourceEntity configType;
 
 	@ManyToOne(fetch = FetchType.LAZY)

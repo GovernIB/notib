@@ -12,8 +12,12 @@ databaseChangeLog:
               - column:
                   name: id
                   type: bigint
-        - sql:
-            sql: "UPDATE ${db_prefix}CONFIG SET id = ${db_prefix}HIBERNATE_SEQ.nextval"
+        - update:
+            tableName: ${db_prefix}CONFIG
+            columns:
+                - column:
+                    name: id
+                    valueNumeric: ${hibernateSeqNextVal}
         - addPrimaryKey:
             tableName: ${db_prefix}config
             columnNames: id
@@ -39,8 +43,12 @@ databaseChangeLog:
               - column:
                   name: id
                   type: bigint
-        - sql:
-            sql: "UPDATE ${db_prefix}CONFIG_GROUP SET id = ${db_prefix}HIBERNATE_SEQ.nextval"
+        - update:
+            tableName: ${db_prefix}CONFIG_GROUP
+            columns:
+                - column:
+                    name: id
+                    valueNumeric: ${hibernateSeqNextVal}
         - addPrimaryKey:
             tableName: ${db_prefix}config_group
             columnNames: id
@@ -63,8 +71,12 @@ databaseChangeLog:
               - column:
                   name: id
                   type: bigint
-        - sql:
-            sql: "UPDATE ${db_prefix}CONFIG_TYPE SET id = ${db_prefix}HIBERNATE_SEQ.nextval"
+        - update:
+            tableName: ${db_prefix}CONFIG_TYPE
+            columns:
+                - column:
+                    name: id
+                    valueNumeric: ${hibernateSeqNextVal}
         - addPrimaryKey:
             tableName: ${db_prefix}config_type
             columnNames: id
@@ -79,3 +91,66 @@ databaseChangeLog:
             referencedTableName: ${db_prefix}CONFIG_GROUP
             referencedColumnNames: CODE
             constraintName: ${db_prefix}CONFIG_GROUP_FK
+
+  - changeSet:
+      id: 2_1_1_000-4
+      author: limit
+      changes:
+        - addColumn:
+            tableName: ${db_prefix}CONFIG
+            columns:
+                - column:
+                    name: config_group_id
+                    type: bigint
+                - column:
+                    name: config_type_id
+                    type: bigint
+                - column:
+                    name: entitat_id
+                    type: bigint
+        - addForeignKeyConstraint:
+            baseTableName: ${db_prefix}CONFIG
+            baseColumnNames: config_group_id
+            referencedTableName: ${db_prefix}CONFIG_GROUP
+            referencedColumnNames: ID
+            constraintName: ${db_prefix}CONFIG_GROUP_ID_FK
+        - addForeignKeyConstraint:
+            baseTableName: ${db_prefix}CONFIG
+            baseColumnNames: config_type_id
+            referencedTableName: ${db_prefix}CONFIG_TYPE
+            referencedColumnNames: ID
+            constraintName: ${db_prefix}CONFIG_TYPE_ID_FK
+        - addForeignKeyConstraint:
+            baseTableName: ${db_prefix}CONFIG
+            baseColumnNames: entitat_id
+            referencedTableName: ${db_prefix}ENTITAT
+            referencedColumnNames: ID
+            constraintName: ${db_prefix}CONFIG_ENTITAT_FK
+        - sql:
+            sql: " UPDATE ${db_prefix}config a SET config_group_id = (SELECT b.id FROM ${db_prefix}config_group b WHERE a.GROUP_CODE = b.code) WHERE a.GROUP_CODE IS NOT NULL;
+            UPDATE ${db_prefix}config a SET config_type_id = (SELECT b.id FROM ${db_prefix}config_type b WHERE a.TYPE_CODE = b.code) WHERE a.TYPE_CODE IS NOT NULL;
+            UPDATE ${db_prefix}config a SET entitat_id = (SELECT b.id FROM ${db_prefix}entitat b WHERE a.ENTITAT_CODI = b.CODI) WHERE a.ENTITAT_CODI IS NOT NULL; "
+        - addNotNullConstraint:
+            tableName: ${db_prefix}CONFIG
+            columnName: config_group_id
+        - addNotNullConstraint:
+            tableName: ${db_prefix}CONFIG
+            columnName: config_type_id
+  - changeSet:
+        id: 2_1_1_000-5
+        author: limit
+        changes:
+            - addColumn:
+                tableName: ${db_prefix}CONFIG_GROUP
+                columns:
+                    - column:
+                        name: parent_id
+                        type: bigint
+            - addForeignKeyConstraint:
+                baseTableName: ${db_prefix}CONFIG_GROUP
+                baseColumnNames: parent_id
+                referencedTableName: ${db_prefix}CONFIG_GROUP
+                referencedColumnNames: ID
+                constraintName: ${db_prefix}CONFIG_GROUP_PARENT_FK
+            - sql:
+                sql: "UPDATE ${db_prefix}config_group a SET parent_id = (SELECT b.id FROM ${db_prefix}config_group b WHERE a.PARENT_CODE  = b.code) WHERE a.parent_code IS NOT NULL; "

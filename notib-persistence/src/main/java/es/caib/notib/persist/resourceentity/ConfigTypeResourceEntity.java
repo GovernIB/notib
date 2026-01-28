@@ -2,6 +2,8 @@ package es.caib.notib.persist.resourceentity;
 
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.model.ConfigTypeResource;
+import liquibase.pro.packaged.C;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,4 +24,11 @@ public class ConfigTypeResourceEntity extends BaseAuditableResourceEntity<Config
 
     @Column(name = "value", length = 2048)
     private String value;
+
+	@Builder
+	public ConfigTypeResourceEntity(ConfigTypeResource resource) {
+
+		this.code = resource.getCode();
+		this.value = resource.getValue();
+	}
 }

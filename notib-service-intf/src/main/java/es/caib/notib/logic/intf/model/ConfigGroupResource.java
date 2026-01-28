@@ -4,6 +4,7 @@ import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
+import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,9 +27,7 @@ import java.util.List;
 public class ConfigGroupResource extends BaseResource<Long> {
 
 	private String key;
+	private ResourceReference<ConfigGroupResource, Long> parent;
+	private int position;
 	private String description;
-	private List<ConfigResource> configs;
-	private List<ConfigGroupResource> innerConfigs;
-	private String parentCode;
-
 }

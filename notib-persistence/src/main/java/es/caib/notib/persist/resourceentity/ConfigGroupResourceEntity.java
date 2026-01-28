@@ -9,7 +9,9 @@ import lombok.Setter;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
@@ -25,22 +27,16 @@ public class ConfigGroupResourceEntity extends BaseResourceEntity<ConfigGroupRes
     @Column(name = "CODE", length = 128, nullable = false)
     private String key;
 
-    @Column(name = "description", length = 512, nullable = true)
-    private String description;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(
+		name = "parent_id",
+		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "CONFIG_GROUP_PARENT_FK"))
+    private ConfigGroupResourceEntity parent;
 
     @Column(name = "position")
     private int position;
-//
-//    @Column(name = "parentCode")
-//    private String parentCode;
+    @Column(name = "description", length = 512, nullable = true)
+    private String description;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_code")
-    @OrderBy("position ASC")
-    private Set<ConfigResourceEntity> configs;
-
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_code")
-    @OrderBy("position ASC")
-    private Set<ConfigGroupResourceEntity> innerConfigs;
 }
+
