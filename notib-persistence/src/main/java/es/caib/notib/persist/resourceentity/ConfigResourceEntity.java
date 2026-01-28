@@ -22,7 +22,7 @@ public class ConfigResourceEntity extends BaseAuditableResourceEntity<ConfigReso
 	private String value;
 	@Column(name = "description", length = 2048, nullable = true)
 	private String description;
-	@Column(name = "jbossProperty", nullable = false)
+	@Column(name = "jboss_property", nullable = false)
 	private boolean jbossProperty;
 	@Column(name = "configurable", nullable = false)
 	private boolean configurable;
