@@ -8,6 +8,7 @@ import es.caib.notib.back.interceptor.*;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.util.ThreadLocalUtil;
 import es.caib.notib.logic.intf.model.UserSession;
+import es.caib.notib.logic.intf.resourceservice.UsuariResourceService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,6 +60,8 @@ public class WebMvcConfig extends BaseWebMvcConfig implements WebMvcConfigurer {
 	private AccesUsuariInterceptor accesUsuariInterceptor;
 	@Autowired
 	private ObjectMapper objectMapper;
+	@Autowired
+	private UsuariResourceService usuariResourceService;
 
 	private static final long MAX_UPLOAD_SIZE = 52428800;
 
@@ -138,6 +141,17 @@ public class WebMvcConfig extends BaseWebMvcConfig implements WebMvcConfigurer {
 	}
 
 	@Bean
+	public HandlerInterceptor userInterceptor() {
+		return new AsyncHandlerInterceptor() {
+			@Override
+			public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+				usuariResourceService.refresh();
+				return true;
+			}
+		};
+	}
+
+	@Bean
 	public HandlerInterceptor userSessionInterceptor() {
 		return new AsyncHandlerInterceptor() {
 			@Override
@@ -198,6 +212,7 @@ public class WebMvcConfig extends BaseWebMvcConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(userInterceptor());
 		registry.addInterceptor(userSessionInterceptor());
 		registry.addInterceptor(localeChangeInterceptor());
 		registry.addInterceptor(notibInterceptor).excludePathPatterns(INTERCEPTOR_EXCLUSIONS).order(0);

@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
- * Implementació del servei d'enviaments.
+ * Implementació del servei de gestió d'enviaments.
  *
  * @author Límit Tecnologies
  */

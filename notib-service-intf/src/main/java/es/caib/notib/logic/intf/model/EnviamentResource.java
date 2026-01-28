@@ -12,6 +12,11 @@ import lombok.Setter;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
+/**
+ * Informació d'un enviament.
+ *
+ * @author Límit Tecnologies
+ */
 @Getter
 @Setter
 @NoArgsConstructor

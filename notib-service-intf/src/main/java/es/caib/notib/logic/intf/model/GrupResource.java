@@ -14,6 +14,11 @@ import lombok.experimental.FieldNameConstants;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+/**
+ * Informació d'un grup.
+ *
+ * @author Límit Tecnologies
+ */
 @Getter
 @Setter
 @NoArgsConstructor

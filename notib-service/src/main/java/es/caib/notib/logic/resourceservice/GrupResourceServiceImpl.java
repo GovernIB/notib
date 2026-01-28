@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
- * Implementació del servei de gestió d'avisos.
+ * Implementació del servei de gestió de grups.
  *
  * @author Límit Tecnologies
  */
