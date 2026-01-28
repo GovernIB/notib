@@ -12,8 +12,8 @@ export type NotibContextType = {
     entitatsAvailable?: any[];
     currentRole?: string;
     setCurrentRole: (currentRole: string | undefined) => void;
-    currentEntitat?: any;
-    setCurrentEntitat: (currentRole: any | undefined) => void;
+    currentEntitatId?: any;
+    setCurrentEntitatId: (currentRole: any | undefined) => void;
 };
 
 export const NotibContext = createContext<NotibContextType | undefined>(undefined);

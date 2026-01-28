@@ -7,13 +7,13 @@ import InputAdornment from '@mui/material/InputAdornment';
 import { useNotibContext } from './NotibContext';
 
 const EntitatSelector: React.FC = () => {
-    const { entitatsAvailable, currentEntitat, setCurrentEntitat } = useNotibContext();
+    const { entitatsAvailable, currentEntitatId, setCurrentEntitatId } = useNotibContext();
     const handleEntitatChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setCurrentEntitat(event.target.value);
+        setCurrentEntitatId(Number(event.target.value));
     };
     return entitatsAvailable ? (
         <TextField
-            value={currentEntitat ?? ''}
+            value={currentEntitatId != null ? '' + currentEntitatId : ''}
             onChange={handleEntitatChange}
             size="small"
             select
@@ -28,7 +28,7 @@ const EntitatSelector: React.FC = () => {
             }}
             sx={{ mr: 1 }}>
             {entitatsAvailable.map((e) => (
-                <MenuItem key={e} value={e}>
+                <MenuItem key={e.id} value={e.id}>
                     <ListItemText>{e.nom}</ListItemText>
                 </MenuItem>
             ))}
