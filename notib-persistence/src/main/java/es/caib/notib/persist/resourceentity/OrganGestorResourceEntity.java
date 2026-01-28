@@ -44,14 +44,6 @@ public class OrganGestorResourceEntity extends BaseAuditableResourceEntity<Organ
     @Column(name = "nom_es", length = 1000)
     protected String nomEs;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "entitat",
-            referencedColumnName = "id",
-            foreignKey = @javax.persistence.ForeignKey(name = BaseConfig.DB_PREFIX + "not_organ_entitat_fk"),
-            nullable = false)
-    protected EntitatEntity entitat;
-
     @Column(name = "llibre")
     protected String llibre;
 
@@ -102,6 +94,14 @@ public class OrganGestorResourceEntity extends BaseAuditableResourceEntity<Organ
 
     @Column(name = "sobrescriure_cie_organ_emisor")
     private boolean sobrescriureCieOrganEmisor;
+
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(
+		name = "entitat",
+		referencedColumnName = "id",
+		foreignKey = @javax.persistence.ForeignKey(name = BaseConfig.DB_PREFIX + "not_organ_entitat_fk"),
+		nullable = false)
+	protected EntitatEntity entitat;
 
 
 }

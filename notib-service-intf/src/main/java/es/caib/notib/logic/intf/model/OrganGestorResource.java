@@ -5,7 +5,6 @@ import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
-import es.caib.notib.logic.intf.dto.OficinaDto;
 import es.caib.notib.logic.intf.dto.PermisDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import lombok.Getter;
@@ -23,10 +22,10 @@ import java.util.List;
 @FieldNameConstants
 @ResourceConfig(
         descriptionField = OrganGestorResource.Fields.codi,
-        quickFilterFields = {OrganGestorResource.Fields.codi, OrganGestorResource.Fields.nom},
+        quickFilterFields = { OrganGestorResource.Fields.codi, OrganGestorResource.Fields.nom },
         accessConstraints = @ResourceAccessConstraint(
                 type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-                roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_SUPER   },
+                roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_SUPER },
                 grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
         )
 )

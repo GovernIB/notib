@@ -2,7 +2,7 @@ package es.caib.notib.logic.intf.base.config;
 
 /**
  * Propietats de l'aplicació.
- * 
+ *
  * @author Límit Tecnologies
  */
 public class BaseConfig {
@@ -38,5 +38,6 @@ public class BaseConfig {
 	public static final String PROP_SECURITY_MAPPABLE_ROLES = PROPERTY_PREFIX + "security.mappableRoles";
 	public static final String PROP_SECURITY_ROLE_HTTP_HEADER = PROPERTY_PREFIX + "security.selected.role.http.header";
 	public static final String PROP_SECURITY_NAME_ATTRIBUTE_KEY = PROPERTY_PREFIX + "security.nameAttributeKey";
+	public static final String PROP_USER_SESSION_HTTP_HEADER = PROPERTY_PREFIX + "user.session.http.header";
 
 }

@@ -1,16 +1,24 @@
 package es.caib.notib.back.config;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opensymphony.sitemesh.webapp.SiteMeshFilter;
 import es.caib.notib.back.base.config.BaseWebMvcConfig;
 import es.caib.notib.back.interceptor.*;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
+import es.caib.notib.logic.intf.base.util.ThreadLocalUtil;
+import es.caib.notib.logic.intf.model.UserSession;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.springframework.web.servlet.AsyncHandlerInterceptor;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
@@ -19,6 +27,7 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.resource.PathResourceResolver;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -26,17 +35,20 @@ import java.util.Locale;
 
 /**
  * Configuració de Spring web MVC.
- * 
+ *
  * @author Limit Tecnologies
  */
 @Configuration
 @Order
 public class WebMvcConfig extends BaseWebMvcConfig implements WebMvcConfigurer {
 
+	@Value("${" + BaseConfig.PROP_USER_SESSION_HTTP_HEADER + ":X-App-Session}")
+	private String userSessionHttpHeader;
+
 	@Autowired
 	private NotibInterceptor notibInterceptor;
-	@Autowired
-	private SessionInterceptor sessionInterceptor;
+	// @Autowired
+	// private SessionInterceptor sessionInterceptors;
 	@Autowired
 	private AccesPagadorsInterceptor accesPagadorsInterceptor;
 	@Autowired
@@ -45,6 +57,8 @@ public class WebMvcConfig extends BaseWebMvcConfig implements WebMvcConfigurer {
 	private AccesSuperInterceptor accesSuperInterceptor;
 	@Autowired
 	private AccesUsuariInterceptor accesUsuariInterceptor;
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	private static final long MAX_UPLOAD_SIZE = 52428800;
 
@@ -57,54 +71,43 @@ public class WebMvcConfig extends BaseWebMvcConfig implements WebMvcConfigurer {
 		return registrationBean;
 	}
 
-    @Override
-    protected boolean isJsAppResourceHandlerEnabled() {
-        return false;
-    }
+	@Override
+	protected boolean isJsAppResourceHandlerEnabled() {
+	    return false;
+	}
 
-    @Override
-    protected String getJsAppStaticFolder() {
-        return "/reactapp";
-    }
+	@Override
+	protected String getJsAppStaticFolder() {
+	    return "/reactapp";
+	}
 
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // ResourceHandler per a que totes les peticions desconegudes passin per l'index.html
-        registry.
-                addResourceHandler(getJsAppStaticFolder() + "/**").
-                addResourceLocations(getJsAppStaticFolder() + "/").
-                resourceChain(true).
-                addResolver(new PathResourceResolver() {
-                    @Override
-                    protected Resource getResource(String resourcePath, Resource location) throws IOException {
-                        Resource requestedResource = location.createRelative(resourcePath);
-                        if (requestedResource.exists() && requestedResource.isReadable()) {
-                            return requestedResource;
-                        } else {
-                            return location.createRelative("index.html");
-                        }
-                    }
-                });
-    }
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		// ResourceHandler per a que totes les peticions desconegudes passin per l'index.html
+		registry.
+			addResourceHandler(getJsAppStaticFolder() + "/**").
+			addResourceLocations(getJsAppStaticFolder() + "/").
+			resourceChain(true).
+			addResolver(new PathResourceResolver() {
+			    @Override
+			    protected Resource getResource(String resourcePath, Resource location) throws IOException {
+				Resource requestedResource = location.createRelative(resourcePath);
+				if (requestedResource.exists() && requestedResource.isReadable()) {
+					return requestedResource;
+				} else {
+					return location.createRelative("index.html");
+				}
+			    }
+			});
+	}
 
-
-    @Override
+	@Override
 	public void configureViewResolvers(ViewResolverRegistry registry) {
 		registry.jsp("/WEB-INF/jsp/", ".jsp");
 	}
 
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
-		/*registry.
-				addMapping("/**").
-				allowedOrigins("http://localhost:5173", "http://localhost:8080").
-				allowCredentials(true).
-				allowedHeaders("Accept", "Content-Type", "Origin", "Authorization", "X-Auth-Token").
-				exposedHeaders("X-Auth-Token", "Authorization").
-				allowedMethods("POST", "GET", "DELETE", "PUT", "OPTIONS");*/
-				/*allowedMethods("*").
-				allowedHeaders("*").
-				allowedMethods("POST", "GET", "DELETE", "PUT", "OPTIONS");*/
 		registry.
 				addMapping("/**").
 				allowedOrigins("http://localhost:5173", "http://localhost:8080").
@@ -127,20 +130,34 @@ public class WebMvcConfig extends BaseWebMvcConfig implements WebMvcConfigurer {
 		return localeResolver;
 	}
 
-	/*@Bean
-	public ViewResolver internalResourceViewResolver() {
-		var bean = new InternalResourceViewResolver();
-		bean.setViewClass(JstlView.class);
-		bean.setPrefix("/WEB-INF/jsp/");
-		bean.setSuffix(".jsp");
-		return bean;
-	}*/
-
 	@Bean
 	public LocaleChangeInterceptor localeChangeInterceptor() {
 		var lci = new LocaleChangeInterceptor();
 		lci.setParamName("lang");
 		return lci;
+	}
+
+	@Bean
+	public HandlerInterceptor userSessionInterceptor() {
+		return new AsyncHandlerInterceptor() {
+			@Override
+			public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws JsonProcessingException {
+				UserSession userSession = null;
+				String json = request.getHeader(userSessionHttpHeader);
+				if (json != null) {
+					var parsedJson = objectMapper.readValue(json, java.util.Map.class);
+					Integer entitatId = (Integer)parsedJson.get("e");
+					Integer organGestorId = (Integer)parsedJson.get("o");
+					userSession = new UserSession(
+						entitatId != null ? entitatId.longValue() : null,
+						organGestorId != null ? organGestorId.longValue() : null);
+				}
+				if (userSession != null) {
+					ThreadLocalUtil.setAttribute(ThreadLocalUtil.SESSION_KEY, userSession);
+				}
+				return true;
+			}
+		};
 	}
 
 	private static final String[] INTERCEPTOR_EXCLUSIONS = 	{
@@ -181,6 +198,7 @@ public class WebMvcConfig extends BaseWebMvcConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(userSessionInterceptor());
 		registry.addInterceptor(localeChangeInterceptor());
 		registry.addInterceptor(notibInterceptor).excludePathPatterns(INTERCEPTOR_EXCLUSIONS).order(0);
 //		registry.addInterceptor(sessionInterceptor).excludePathPatterns(ALL_EXCLUSIONS).order(1);
@@ -192,14 +210,14 @@ public class WebMvcConfig extends BaseWebMvcConfig implements WebMvcConfigurer {
 	}
 
 	public static class CustomLocaleResolver extends SessionLocaleResolver {
-		private AcceptHeaderLocaleResolver acceptHeaderLocaleResolver;
+		private final AcceptHeaderLocaleResolver acceptHeaderLocaleResolver;
 		public CustomLocaleResolver(List<Locale> supportedLocales) {
 			acceptHeaderLocaleResolver = new AcceptHeaderLocaleResolver();
 			acceptHeaderLocaleResolver.setSupportedLocales(supportedLocales);
 		}
 		@Override
-		protected Locale determineDefaultLocale(HttpServletRequest request) {
-
+		@NotNull
+		protected Locale determineDefaultLocale(@NotNull HttpServletRequest request) {
 			var acceptHeaderLocale = acceptHeaderLocaleResolver.resolveLocale(request);
 			if (acceptHeaderLocale != null) {
 				return acceptHeaderLocale;
