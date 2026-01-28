@@ -179,7 +179,6 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             offline={<Offline />}
             footer={footer}
             footerHeight={footerHeight}
-            persistentSession
             persistentLanguage
             i18nUseTranslation={useTranslation}
             i18nCurrentLanguage={i18n.language}

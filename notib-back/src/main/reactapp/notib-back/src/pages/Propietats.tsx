@@ -49,7 +49,7 @@ const PropietatsList: React.FC<{ group?: string }> = (props) => {
 				unpaged: true,
 			};
 			apiFind(args).then((response) => {
-				const configs = response.rows.filter((r) => true);
+				const configs = response.rows.filter(() => true);
 				console.log('>>> configs', configs);
 				setConfigs(configs);
 			});

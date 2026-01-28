@@ -8,7 +8,6 @@ import { useOptionalAuthContext } from './AuthContext';
 import ResourceApiContext, {
     useResourceApiContext,
     OpenAnswerRequiredDialogFn,
-    ResourceApiUserSessionValuePair,
     ResourceType,
     ExportFileType,
 } from './ResourceApiContext';
@@ -1018,7 +1017,7 @@ const generateResourceApiMethods = (
                 data: {
                     ids,
                     type: 'PATCH',
-                    params: args.data
+                    params: args.data,
                 },
             };
             return new Promise((resolve, reject) => {
@@ -1041,7 +1040,7 @@ const generateResourceApiMethods = (
                     ids,
                     type: 'ACTION',
                     actionCode: args.code,
-                    params: args.data
+                    params: args.data,
                 },
             };
             return new Promise((resolve, reject) => {
@@ -1259,8 +1258,6 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
         defaultLanguage,
         currentLanguage: currentLanguageProp,
         onCurrentLanguageChange,
-        userSessionActive,
-        defaultUserSession,
         offlineAutoCheck,
         debug,
         debugRequests,
@@ -1275,7 +1272,6 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
     const getToken = authContext?.getToken;
     const kettingClientRef = React.useRef<Client>(undefined);
     const openAnswerRequiredDialogRef = React.useRef<OpenAnswerRequiredDialogFn>(undefined);
-    const [userSession, setUserSession] = React.useState<any>(defaultUserSession);
     const [httpHeaders, setHttpHeaders] = React.useState<Record<string, string>[]>();
     const [currentLanguage, setCurrentLanguage] = useControlledUncontrolledState<
         string | undefined
@@ -1287,7 +1283,6 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
     const indexPath = new URL(apiUrl).pathname;
     const indexPathWithoutApi = indexPath.endsWith('/api') ? indexPath.slice(0, -4) : indexPath;
     const refreshKettingClient = (
-        currentUserSession: any,
         currentLanguage: string | undefined,
         currentHttpHeaders: Record<string, string>[] | undefined
     ) => {
@@ -1304,9 +1299,6 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
             }
             if (currentLanguage && currentLanguage.length) {
                 newRequest.headers.set('Accept-Language', currentLanguage);
-            }
-            if (currentUserSession && Object.keys(currentUserSession).length > 0) {
-                newRequest.headers.set('X-App-Session', JSON.stringify(currentUserSession));
             }
             if (currentHttpHeaders && Object.keys(currentHttpHeaders).length > 0) {
                 currentHttpHeaders.forEach((e) => {
@@ -1380,12 +1372,11 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
         }
     }, [isIndexLoading, indexState, indexError, offlineAutoCheck]);
     React.useEffect(() => {
-        const sessionInitialized = userSessionActive ? userSession != null : true;
-        if (sessionInitialized && (authContext == null || isAuthReady)) {
-            refreshKettingClient(userSession, currentLanguage, httpHeaders);
+        if (authContext == null || isAuthReady) {
+            refreshKettingClient(currentLanguage, httpHeaders);
             refreshApiIndex();
         }
-    }, [isAuthReady, userSession, currentLanguage, httpHeaders]);
+    }, [isAuthReady, currentLanguage, httpHeaders]);
     React.useEffect(() => {
         if (indexState && debug) {
             debugAvailableServices && logConsole.debug('Resource API services from index:');
@@ -1400,30 +1391,6 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
     const isDebugRequests = React.useCallback(() => {
         return (debug == null && debugRequests != null && debugRequests) || debug;
     }, []);
-    const setUserSessionAttributes = (
-        attributeValuePairs: ResourceApiUserSessionValuePair[]
-    ): boolean => {
-        const changedPairs = attributeValuePairs?.filter(
-            (p) => p.value !== userSession?.[p.attribute]
-        );
-        if (changedPairs?.length) {
-            const changes: any = {};
-            changedPairs.forEach((c) => (changes[c.attribute] = c.value));
-            setUserSession((s: any) => ({ ...s, ...changes }));
-            return true;
-        } else {
-            return false;
-        }
-    };
-    const setUserSessionForContext = React.useCallback(
-        (userSession: any) => {
-            setUserSession(userSession);
-        },
-        [currentLanguage]
-    );
-    const clearUserSession = React.useCallback(() => {
-        setUserSession({});
-    }, [currentLanguage, httpHeaders]);
     const setOpenAnswerRequiredDialog = React.useCallback(
         (oarDialog: OpenAnswerRequiredDialogFn) => {
             openAnswerRequiredDialogRef.current = oarDialog;
@@ -1447,15 +1414,11 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
         offline,
         indexState,
         indexError,
-        userSession,
         currentLanguage,
         refreshApiIndex,
         getKettingClient,
         requestHref,
         isDebugRequests,
-        setUserSession: setUserSessionForContext,
-        setUserSessionAttributes,
-        clearUserSession,
         setCurrentLanguage: setCurrentLanguageInternal,
         httpHeaders,
         setHttpHeaders: setHttpHeadersInternal,
