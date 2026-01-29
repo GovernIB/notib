@@ -238,9 +238,10 @@ public abstract class BaseWebSecurityConfig {
 
 	protected Converter<Jwt, AbstractAuthenticationToken> jwtAuthConverter() {
 		return jwt -> {
-			Collection<GrantedAuthority> grantedAuthorities = Stream.concat(
+			Set<GrantedAuthority> grantedAuthorities = Stream.concat(
 					new JwtGrantedAuthoritiesConverter().convert(jwt).stream(),
-					extractJwtGrantedAuthorities(jwt).stream()).collect(Collectors.toSet());
+					extractJwtGrantedAuthorities(jwt).stream()).
+					collect(Collectors.toCollection(HashSet::new));
 			filterAllowedGrantedAuthorities(grantedAuthorities);
 			return new JwtAuthenticationToken(
 					jwt,
@@ -342,7 +343,7 @@ public abstract class BaseWebSecurityConfig {
 				collect(Collectors.toSet());
 	}
 
-	protected void filterAllowedGrantedAuthorities(Collection<? extends GrantedAuthority> grantedAuthorities) {
+	protected void filterAllowedGrantedAuthorities(Set<GrantedAuthority> grantedAuthorities) {
 		Set<String> allowedRoles = getAllowedRoles();
 		if (allowedRoles != null) {
 			grantedAuthorities.removeIf(a -> !allowedRoles.contains(a.getAuthority()));

@@ -16,6 +16,7 @@ import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.authority.mapping.SimpleAttributes2GrantedAuthoritiesMapper;
 import org.springframework.security.core.authority.mapping.SimpleMappableAttributesRetriever;
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
@@ -33,7 +34,7 @@ import java.util.*;
 
 /**
  * Configuració de Spring Security per a executar l'aplicació amb Spring Boot.
- * 
+ *
  * @author Limit Tecnologies
  */
 @Slf4j
@@ -173,7 +174,7 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 					IDToken idToken = keycloakPrincipal.getKeycloakSecurityContext().getIdToken();
 					Collection<? extends GrantedAuthority> grantedAuthorities = j2eeUserRoles2GrantedAuthoritiesMapper.
 							getGrantedAuthorities(roles);
-					filterAllowedGrantedAuthorities(grantedAuthorities);
+					filterAllowedGrantedAuthorities(new HashSet<>(grantedAuthorities));
 					result = new PreauthWebAuthenticationDetails(
 							context,
 							j2eeUserRoles2GrantedAuthoritiesMapper.getGrantedAuthorities(roles),
@@ -188,7 +189,7 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 				} else {
 					Collection<? extends GrantedAuthority> grantedAuthorities = j2eeUserRoles2GrantedAuthoritiesMapper.
 							getGrantedAuthorities(j2eeUserRoles);
-					filterAllowedGrantedAuthorities(grantedAuthorities);
+					filterAllowedGrantedAuthorities(new HashSet<>(grantedAuthorities));
 					result = new PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails(
 							context,
 							grantedAuthorities);
@@ -206,6 +207,15 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 		attributes2GrantedAuthoritiesMapper.setAttributePrefix(MethodSecurityConfig.DEFAULT_ROLE_PREFIX);
 		authenticationDetailsSource.setUserRoles2GrantedAuthoritiesMapper(attributes2GrantedAuthoritiesMapper);
 		return authenticationDetailsSource;
+	}
+
+	@Override
+	protected void filterAllowedGrantedAuthorities(Set<GrantedAuthority> grantedAuthorities) {
+		super.filterAllowedGrantedAuthorities(grantedAuthorities);
+		GrantedAuthority userGrantedAuthority = new SimpleGrantedAuthority(BaseConfig.ROLE_USER);
+		if (!grantedAuthorities.contains(userGrantedAuthority)) {
+			grantedAuthorities.add(userGrantedAuthority);
+		}
 	}
 
 	@Getter

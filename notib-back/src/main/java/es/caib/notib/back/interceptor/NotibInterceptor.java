@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.support.RequestContextUtils;
@@ -53,34 +54,36 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
         request.setAttribute(REQUEST_ATTRIBUTE_MANIFEST_ATRIBUTES, MissatgesHelper.getManifestAtributsMap());
         request.setAttribute(REQUEST_ATTRIBUTE_LOCALE, RequestContextUtils.getLocale(request).getLanguage());
 
+
+        HttpServletRequest wrappedRequest = new SecurityContextHolderAwareRequestWrapper(request, "");
         // Tipus accés: Es comprova si s0estpa fent una petició noDeco, modal o ajax.
         // En aquest cas es canvia la url, es redirigeix a la nova url, i per tant NO ha de continuar executat l'interceptor
-        var continuarExecucio = ModalHelper.comprovarModalInterceptor(request, response) &&
-                NodecoHelper.comprovarNodecoInterceptor(request, response) &&
-                AjaxHelper.comprovarAjaxInterceptor(request, response);
+        var continuarExecucio = ModalHelper.comprovarModalInterceptor(wrappedRequest, response) &&
+                NodecoHelper.comprovarNodecoInterceptor(wrappedRequest, response) &&
+                AjaxHelper.comprovarAjaxInterceptor(wrappedRequest, response);
 
         if (!continuarExecucio)
             return false;
 
         // Es comprova que l'usuari s'hagi desat a la BBDD, i l'assigna com a usuari actual
         // També es calculen els permisos que té l'usuari en el conjunt d'entitats
-        processarUsuariActual(request, response);
+        processarUsuariActual(wrappedRequest, response);
         // Comprova si s'està canviant el rol.
         // En cas afirmatiu s'assignarà el nou rol, i es recalcularan les entitats disponibles per rol, i actual
-        processarCanviRol(request);
+        processarCanviRol(wrappedRequest);
         // Es carreguen les entitats disponibles i actual, així com els rols disponibles i actuals (si bo s'ha fet un canvi de rol)
-        processarEntitatsIRols(request);
+        processarEntitatsIRols(wrappedRequest);
         // Comprova is s'està canviant l'entitat. En cas afirmatiu:
         // En cas afirmatiu s'assigna la nova entitat
-        processarCanviEntitat(request);
+        processarCanviEntitat(wrappedRequest);
         // Assignam el codi d'entitat per al servei de propietats
         entitatService.setConfigEntitat(sessionScopedContext.getEntitatActualCodi());
         // Obtenim els permisos per a mostrar o ocultar els menus d'alta de notificacions, comunicacions i comunicacions SIR
         obtenirPermisosMenu();
         // Obtenim els òrgans gestors accessibles com a administrador per l'usuari, i comprovam si es fa un canvi d'òrgan
-        processarOrgansGestors(request);
+        processarOrgansGestors(wrappedRequest);
         // Carregar avisos
-        processarAvisos(request);
+        processarAvisos(wrappedRequest);
 
         request.setAttribute("sessionScopedContext", sessionScopedContext);
         return true;

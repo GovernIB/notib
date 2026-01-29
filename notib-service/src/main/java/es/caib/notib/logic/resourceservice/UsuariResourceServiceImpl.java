@@ -11,9 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -35,11 +37,13 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
 		if (usuariFromAuth != null) {
 			Optional<UsuariResourceEntity> usuariOptional = usuariResourceRepository.findById(authenticationHelper.getCurrentUserName());
 			if (usuariOptional.isPresent()) {
-				UsuariResourceEntity usuari = usuariOptional.get();
-				usuari.setNomSencer(usuariFromAuth.getNomSencer());
-				usuari.setNif(usuariFromAuth.getNif());
-				usuari.setEmail(usuariFromAuth.getEmail());
-				usuariResourceRepository.save(usuari);
+				UsuariResourceEntity usuariFromDb = usuariOptional.get();
+				if (hasToUpdateUsuari(usuariFromDb, usuariFromAuth)) {
+					usuariFromDb.setNomSencer(usuariFromAuth.getNomSencer());
+					usuariFromDb.setNif(usuariFromAuth.getNif());
+					usuariFromDb.setEmail(usuariFromAuth.getEmail());
+					usuariResourceRepository.save(usuariFromDb);
+				}
 			} else {
 				UsuariResourceEntity usuari = UsuariResourceEntity.builder().
 					resource(usuariFromAuth).
@@ -55,7 +59,7 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
 			if (authentication.getPrincipal() instanceof Jwt) {
 				// Authenticació provinent de Spring Boot
 				UsuariResource usuariResource = new UsuariResource();
-				Jwt jwt = (Jwt) authentication.getPrincipal();
+				Jwt jwt = (Jwt)authentication.getPrincipal();
 				usuariResource.setCodi(authentication.getName());
 				usuariResource.setNomSencer(jwt.getClaimAsString("name"));
 				usuariResource.setNif(jwt.getClaimAsString("nif"));
@@ -63,6 +67,7 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
 				return usuariResource;
 			} else if (authentication.getPrincipal() instanceof User) {
 				UsuariResource usuariResource = new UsuariResource();
+				UserDetails userDetails = (UserDetails)authentication.getPrincipal();
 				/*WebSecurityConfig.PreauthWebAuthenticationDetails authDetails = (WebSecurityConfig.PreauthWebAuthenticationDetails)authentication.getDetails();
 				usuari.setCodi(authDetails.getPreferredUsername());
 				usuari.setNom(authDetails.getName());
@@ -73,6 +78,12 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
 			}
 		}
 		return null;
+	}
+
+	private boolean hasToUpdateUsuari(UsuariResourceEntity usuariFromDb, UsuariResource usuariFromAuth) {
+		return !Objects.equals(usuariFromDb.getNomSencer(), usuariFromAuth.getNomSencer()) ||
+			!Objects.equals(usuariFromDb.getNif(), usuariFromAuth.getNif()) ||
+			!Objects.equals(usuariFromDb.getEmail(), usuariFromAuth.getEmail());
 	}
 
 }

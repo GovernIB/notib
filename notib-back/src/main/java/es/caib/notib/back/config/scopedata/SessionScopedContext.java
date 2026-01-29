@@ -15,7 +15,8 @@ import java.util.List;
 
 @Slf4j
 @Component
-@Getter @Setter
+@Getter
+@Setter
 @SessionScope
 public class SessionScopedContext {
 
