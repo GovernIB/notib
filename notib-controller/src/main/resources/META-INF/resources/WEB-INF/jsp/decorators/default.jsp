@@ -346,14 +346,14 @@
 											</ul>
 										</div>
 									</div>
+									<div class="btn-group">
+										<button id="m_massiu" data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.notificacio.massiva"/>&nbsp;<span class="caret caret-white"></span></button>
+										<ul class="dropdown-menu">
+											<li><a id="mm_enviament" href="<c:url value="/notificacio/massiva/new"/>"><spring:message code="decorator.menu.notificacio.massiva.nova"/></a></li>
+											<li><a id="mm_consulta" href="<c:url value="/notificacio/massiva/"/>"><spring:message code="decorator.menu.notificacio.massiva.consulta"/></a></li>
+										</ul>
+									</div>
 								</c:if>
-								<div class="btn-group">
-									<button id="m_massiu" data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.notificacio.massiva"/>&nbsp;<span class="caret caret-white"></span></button>
-									<ul class="dropdown-menu">
-										<li><a id="mm_enviament" href="<c:url value="/notificacio/massiva/new"/>"><spring:message code="decorator.menu.notificacio.massiva.nova"/></a></li>
-										<li><a id="mm_consulta" href="<c:url value="/notificacio/massiva/"/>"><spring:message code="decorator.menu.notificacio.massiva.consulta"/></a></li>
-									</ul>
-								</div>
 								<div class="btn-group">
 									<a id="ml_notificacio" href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
 								</div>

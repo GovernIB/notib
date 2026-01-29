@@ -26,3 +26,4 @@ ALTER TABLE not_notificacio_env ADD motiu_anulacio VARCHAR(250);
 ALTER TABLE not_notificacio_env_table ADD anulat BOOLEAN DEFAULT FALSE;
 ALTER TABLE not_notificacio_env_table ADD motiu_anulacio VARCHAR(250);
 ALTER TABLE not_notificacio_table ADD organ_id numeric;
+ALTER TABLE not_notificacio_env_table ADD organ_id numeric;

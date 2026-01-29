@@ -81,6 +81,7 @@ public class NotificacioTableHelper {
                     .procedimentIsComu(notificacio.getProcediment() != null && notificacio.getProcediment().isComu())
                     .procedimentRequirePermission(notificacio.getProcediment() != null && notificacio.getProcediment().isRequireDirectPermission())
                     .procedimentTipus(notificacio.getProcediment() != null ? notificacio.getProcediment().getTipus() : null)
+                    .organId(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getId() + "" : null)
                     .organCodi(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getCodi() : null)
                     .organNom(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getNom() : null)
                     .organEstat(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getEstat() : null)
