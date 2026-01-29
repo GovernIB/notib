@@ -66,7 +66,6 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
     } = useAuthContext();
     const { setHttpHeaders: apiSetHttpHeaders } = useResourceApiContext();
     const { isReady: apiIsReady, find: apiFind } = useResourceApiService('entitatResource');
-    const [isReady, setIsReady] = React.useState<boolean>(false);
     const [currentUserId, setCurrentUserId] = React.useState<string>();
     const [rolesAvailable, setRolesAvailable] = React.useState<string[]>();
     const [entitatsAvailable, setEntitatsAvailable] = React.useState<any[]>();
@@ -78,6 +77,7 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
     );
     const { getValue: sessionSessionGetValue, setValue: sessionSessionSetValue } =
         useSessionStorage(currentUserId, 'currentSession');
+    const isReady = rolesAvailable != null && entitatsAvailable != null;
     React.useEffect(() => {
         if (authIsReady) {
             const userId = authGetUserId();
@@ -94,12 +94,7 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
         }
     }, [authIsReady]);
     React.useEffect(() => {
-        if (currentUserId != null && rolesAvailable != null) {
-            setIsReady(true);
-        }
-    }, [currentUserId, rolesAvailable]);
-    React.useEffect(() => {
-        if (isReady && currentRole == null) {
+        if (rolesAvailable != null && currentRole == null) {
             const sessionValue = roleSessionGetValue();
             const isSessionValueInRolesAvailable =
                 sessionValue != null && rolesAvailable?.includes(sessionValue);
@@ -109,7 +104,7 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
                 setCurrentRole(rolesAvailable[0]);
             }
         }
-    }, [isReady, currentRole]);
+    }, [rolesAvailable, currentRole]);
     React.useEffect(() => {
         if (apiIsReady && currentRole != null) {
             if (currentRole !== ROLE_SUPER) {
@@ -145,11 +140,19 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
             const session = createSession(currentEntitatId);
             sessionSessionSetValue(session);
             if (currentRole) {
-                apiSetHttpHeaders([{ 'X-App-Session': session }]);
+                apiSetHttpHeaders([
+                    {
+                        'X-App-Role': currentRole,
+                    },
+                    {
+                        'X-App-Session': session,
+                    },
+                ]);
             }
         }
     }, [currentRole, currentEntitatId]);
     const contextValue = {
+        isReady,
         rolesAvailable,
         entitatsAvailable,
         currentRole,

@@ -1,16 +1,17 @@
 package es.caib.notib.logic.resourceservice;
 
+import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.helper.AclHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
+import es.caib.notib.logic.intf.base.exception.ResourceNotUpdatedException;
 import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import es.caib.notib.logic.intf.base.util.StringUtil;
 import es.caib.notib.logic.intf.model.AclEntryResource;
 import es.caib.notib.logic.intf.model.EntitatResource;
 import es.caib.notib.logic.intf.resourceservice.AclEntryResourceService;
-import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.resourceentity.AclEntryResourceEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,7 @@ import java.util.stream.Collectors;
 public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclEntryResource, String, AclEntryResourceEntity> implements AclEntryResourceService {
 
 	private final AclHelper aclHelper;
+	private final AuthenticationHelper authenticationHelper;
 
 	@Override
 	protected boolean isEntityRepositoryOptional() {
@@ -181,6 +183,22 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 	}
 
 	@Override
+	protected void beforeCreateEntity(
+		AclEntryResourceEntity entity,
+		AclEntryResource resource,
+		Map<String, AnswerRequiredException.AnswerValue> answers) {
+		checkAclPermissionOnResource(resource);
+	}
+
+	@Override
+	protected void beforeUpdateEntity(
+		AclEntryResourceEntity entity,
+		AclEntryResource resource,
+		Map<String, AnswerRequiredException.AnswerValue> answers) {
+		checkAclPermissionOnResource(resource);
+	}
+
+	@Override
 	protected void beforeUpdateSave(
 			AclEntryResourceEntity entity,
 			AclEntryResource resource,
@@ -277,7 +295,7 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 			Pattern.CASE_INSENSITIVE);
 
 	private static final List<Map.Entry<Class<?>, Class<?>>> aclClassMapping = List.of(
-			Map.entry(EntitatResource.class, EntitatEntity.class));
+			Map.entry(EntitatResource.class, AclHelper.ENTITAT_CLASS));
 
 	private List<String[]> extractFilterTriplets(String filter) {
 		Matcher matcher = TRIPLET_PATTERN.matcher(filter);
@@ -346,6 +364,34 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 			}
 		}
 		return value;
+	}
+
+	private void checkAclPermissionOnResource(AclEntryResource resource) {
+		Class<?> resourceClass = getClassFromResourceName(resource.getResourceName());
+		if (Objects.equals(resourceClass, AclHelper.ENTITAT_CLASS)) {
+			// Per a poder modificar les ACLs d'una entitat s'ha de tenir el rol NOT_SUPER o ser administrador d'entitat
+			// (rol NOT_ADMIN) amb permisos d'administració (PERM2) sobre l'entitat.
+			boolean isRoleSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);
+			if (!isRoleSuper) {
+				boolean isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
+				if (isRoleAdmin) {
+					boolean permissionGranted = aclHelper.anyPermissionGranted(
+						AclHelper.ENTITAT_CLASS,
+						resource.getResourceId(),
+						List.of(ExtendedPermission.PERM2), // Permís per administrar
+						aclHelper.getCurrentUserSids().toArray(Sid[]::new));
+					if (permissionGranted) {
+						return;
+					}
+				}
+			} else {
+				return;
+			}
+		}
+		throw new ResourceNotUpdatedException(
+			AclEntryResource.class,
+			resource.getId(),
+			"Not allowed to update ACLs on " + resource.getResourceName() + " resources");
 	}
 
 	private <T> Comparator<T> createGetterBasedComparator(Sort sort) {

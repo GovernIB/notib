@@ -57,8 +57,8 @@ public class AplicacioResourceEntity extends BaseAuditableResourceEntity<Aplicac
 			EntitatResourceEntity entitat) {
 		this.usuariCodi = resource.getUsuariCodi();
 		this.callbackUrl = resource.getCallbackUrl();
-		this.activa = resource.getActiva() != null && resource.getActiva();
-		this.headerCsrf = resource.getHeaderCsrf() != null && resource.getHeaderCsrf();
+		this.activa = resource.isActiva();
+		this.headerCsrf = resource.isHeaderCsrf();
 		this.horariLaboralInici = resource.getHorariLaboralInici();
 		this.horariLaboralFi = resource.getHorariLaboralFi();
 		this.maxEnviamentsMinutLaboral = resource.getMaxEnviamentsMinutLaboral();

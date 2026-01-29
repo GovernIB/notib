@@ -4,7 +4,6 @@ import es.caib.notib.back.command.*;
 import es.caib.notib.back.helper.*;
 import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
-import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaTipus;

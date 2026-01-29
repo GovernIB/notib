@@ -27,7 +27,7 @@ import javax.validation.constraints.NotNull;
 		descriptionField = EntitatTipusDocumentResource.Fields.tipusDocument,
 		accessConstraints = @ResourceAccessConstraint(
 				type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-				roles = { BaseConfig.ROLE_SUPER },
+				roles = { BaseConfig.ROLE_SUPER, BaseConfig.ROLE_ADMIN },
 				grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
 		)
 )

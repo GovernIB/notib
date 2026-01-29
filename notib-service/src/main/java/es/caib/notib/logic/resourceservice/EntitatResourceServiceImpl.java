@@ -1,26 +1,20 @@
 package es.caib.notib.logic.resourceservice;
 
-import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.helper.AclHelper;
-import es.caib.notib.logic.intf.base.config.BaseConfig;
+import es.caib.notib.logic.helper.EntitatPermissionHelper;
+import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.model.FileReference;
-import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
 import es.caib.notib.logic.intf.model.EntitatResource;
 import es.caib.notib.logic.intf.resourceservice.EntitatResourceService;
-import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.acls.model.Sid;
+import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.io.Serializable;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 /**
  * Implementació del servei de gestió d'entitats.
@@ -33,7 +27,7 @@ import java.util.stream.Collectors;
 public class EntitatResourceServiceImpl extends BaseMutableResourceService<EntitatResource, Long, EntitatResourceEntity> implements EntitatResourceService {
 
 	private final AclHelper aclHelper;
-	private final AuthenticationHelper authenticationHelper;
+	private final EntitatPermissionHelper entitatPermissionHelper;
 
 	@PostConstruct
 	public void init() {
@@ -43,30 +37,49 @@ public class EntitatResourceServiceImpl extends BaseMutableResourceService<Entit
 	@Override
 	protected void afterConversion(EntitatResourceEntity entity, EntitatResource resource) {
 		resource.setAclEntryCount(
-				aclHelper.count(EntitatEntity.class, entity.getId(), null));
+				aclHelper.count(AclHelper.ENTITAT_CLASS, entity.getId(), null));
 	}
 
 	@Override
 	protected String additionalSpringFilter(
-			String currentSpringFilter,
-			String[] namedQueries) {
-		boolean isRoleSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);
-		if (!isRoleSuper) {
-			Set<Serializable> allowedIds = aclHelper.findIdsWithAnyPermission(
-					EntitatEntity.class,
-					List.of(ExtendedPermission.PERM0),
-					aclHelper.getCurrentUserSids().toArray(Sid[]::new));
-			String joinedIds = allowedIds.stream()
-					.map(String::valueOf)
-					.collect(Collectors.joining(","));
-			if (!joinedIds.isEmpty()) {
-				return "id in (" + joinedIds + ")";
-			} else {
-				return "id is null";
-			}
-		} else {
-			return null;
-		}
+		String currentSpringFilter,
+		String[] namedQueries) {
+		return entitatPermissionHelper.additionalSpringFilter("id");
+	}
+
+	@Override
+	protected void beforeCreateEntity(
+		EntitatResourceEntity entity,
+		EntitatResource resource,
+		Map<String, AnswerRequiredException.AnswerValue> answers) {
+		entitatPermissionHelper.checkEntitatAdminPermission(
+			getResourceClass(),
+			null,
+			null,
+			BasePermission.CREATE);
+	}
+
+	@Override
+	protected void beforeUpdateEntity(
+		EntitatResourceEntity entity,
+		EntitatResource resource,
+		Map<String, AnswerRequiredException.AnswerValue> answers) {
+		entitatPermissionHelper.checkEntitatAdminPermission(
+			getResourceClass(),
+			resource.getId(),
+			resource.getId(),
+			BasePermission.WRITE);
+	}
+
+	@Override
+	protected void beforeDelete(
+		EntitatResourceEntity entity,
+		Map<String, AnswerRequiredException.AnswerValue> answers) {
+		entitatPermissionHelper.checkEntitatAdminPermission(
+			getResourceClass(),
+			entity.getId(),
+			entity.getId(),
+			BasePermission.DELETE);
 	}
 
 	public static class LogoCapsaleraFieldFileManager implements FieldFileManager<EntitatResourceEntity> {

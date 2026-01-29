@@ -23,6 +23,7 @@ const AppRoutes = () => {
             </Route>
             <Route path="entitats">
                 <Route index element={<EntitatGrid />} />
+                <Route path="current" element={<EntitatForm />} />
                 <Route path="form">
                     <Route index element={<EntitatForm />} />
                     <Route path=":id" element={<EntitatForm />} />

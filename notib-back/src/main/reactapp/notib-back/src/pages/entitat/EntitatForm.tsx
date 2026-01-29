@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import Badge from '@mui/material/Badge';
@@ -23,6 +23,20 @@ import EntitatFormTabPermisos from './EntitatFormTabPermisos';
 import goibLogoLight from '../../assets/goib_logo_light.svg';
 import notibLogoLight from '../../assets/notib_logo_light.png';
 import GridFormField from '../../components/GridFormField';
+import { useNotibContext } from '../../components/NotibContext';
+
+const useEntitatId = () => {
+    const { id: paramId } = useParams();
+    const location = useLocation();
+    const { isReady, currentEntitatId } = useNotibContext();
+    const isCurrentPathname = location.pathname.endsWith('current');
+    const id = isCurrentPathname ? currentEntitatId : paramId != null ? parseInt(paramId) : paramId;
+    return {
+        isReady: isCurrentPathname ? isReady : true,
+        id,
+        hiddenBackButton: isCurrentPathname,
+    };
+};
 
 const CustomToolbar: React.FC = () => {
     const theme = useTheme();
@@ -34,11 +48,9 @@ const CustomToolbar: React.FC = () => {
     const [tokenParsed, setTokenParsed] = React.useState<any>();
     const dataIsReady = data != null;
     const backgroundColor = data?.colorFons ?? '#fff';
-
     React.useEffect(() => {
         setTokenParsed(getTokenParsed());
     }, []);
-
     React.useEffect(() => {
         if (apiIsReady && dataIsReady) {
             if (data.logoCapsalera) {
@@ -51,7 +63,6 @@ const CustomToolbar: React.FC = () => {
             }
         }
     }, [apiIsReady, dataIsReady]);
-
     React.useEffect(() => {
         if (data.logoCapsalera) {
             setLogoUrl(`data:image/png;base64,${data.logoCapsalera.content}`);
@@ -59,7 +70,6 @@ const CustomToolbar: React.FC = () => {
             setLogoUrl(goibLogoLight);
         }
     }, [data?.logoCapsalera]);
-
     return (
         <Toolbar component={Paper} square sx={{ backgroundColor: backgroundColor }}>
             {logoUrl && (
@@ -90,11 +100,9 @@ const EntitatFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> 
     const { setSubtitle } = props;
     const { t } = useTranslation();
     const { data } = useFormContext();
-
     React.useEffect(() => {
         setSubtitle(data?.codi + ', ' + data?.nom);
     }, [data]);
-
     const tipusDocsTabLabel = (
         <Badge badgeContent={data.tipusDocCount} color="primary">
             {t('page.entitats.form.tabs.tipusDocs')}
@@ -117,7 +125,6 @@ const EntitatFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> 
         { label: aplicacionsTabLabel },
         { label: permisosTabLabel },
     ];
-
     return (
         <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[2, 3, 4]}>
             <MuiFormTabContent index={0} showOnCreate>
@@ -166,26 +173,29 @@ const EntitatFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> 
 
 export const EntitatForm: React.FC = () => {
     const { t } = useTranslation();
-    const { id } = useParams();
+    const { isReady, id, hiddenBackButton } = useEntitatId();
     const [subtitle, setSubtitle] = React.useState<string>();
     return (
-        <FormPage>
-            <MuiForm
-                resourceName="entitatResource"
-                id={id != null ? parseInt(id) : id}
-                title={
-                    id != null
-                        ? t('page.entitats.form.titleUpdate')
-                        : t('page.entitats.form.titleCreate')
-                }
-                toolbarSubtitle={id != null ? subtitle : undefined}
-                createLink="./{{id}}"
-                //updateLink="../../"
-                componentProps={{ style: { height: '100%' } }}
-                commonFieldComponentProps={{ size: 'small' }}>
-                <EntitatFormContent setSubtitle={setSubtitle} />
-            </MuiForm>
-        </FormPage>
+        isReady && (
+            <FormPage>
+                <MuiForm
+                    resourceName="entitatResource"
+                    id={id}
+                    title={
+                        id != null
+                            ? t('page.entitats.form.titleUpdate')
+                            : t('page.entitats.form.titleCreate')
+                    }
+                    hiddenBackButton={hiddenBackButton ? true : undefined}
+                    toolbarSubtitle={id != null ? subtitle : undefined}
+                    createLink="./{{id}}"
+                    //updateLink="../../"
+                    componentProps={{ style: { height: '100%' } }}
+                    commonFieldComponentProps={{ size: 'small' }}>
+                    <EntitatFormContent setSubtitle={setSubtitle} />
+                </MuiForm>
+            </FormPage>
+        )
     );
 };
 export default EntitatForm;

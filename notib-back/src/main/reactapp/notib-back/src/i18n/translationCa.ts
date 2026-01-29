@@ -4,10 +4,11 @@ const translationCa = {
         config: 'Configuració',
         entitats: 'Entitats',
         avisos: 'Avisos',
-        enviaments: 'Enviaments',
-        grups: 'Grups',
-        organsGestors: 'Òrgans gestors',
         propietats: 'Propietats',
+        currentEntitat: 'Entitat actual',
+        organsGestors: 'Òrgans gestors',
+        grups: 'Grups',
+        enviaments: 'Enviaments',
     },
     page: {
         home: {

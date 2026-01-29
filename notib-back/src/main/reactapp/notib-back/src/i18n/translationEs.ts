@@ -4,10 +4,11 @@ const translationEs = {
         config: 'Configuración',
         entitats: 'Entidades',
         avisos: 'Avisos',
-        enviaments: 'Envios',
-        grups: 'Grupos',
-        organsGestors: 'Órganos gestores',
         propietats: 'Propiedades',
+        currentEntitat: 'Entidad actual',
+        organsGestors: 'Órganos gestores',
+        grups: 'Grupos',
+        enviaments: 'Envios',
     },
     page: {
         home: {

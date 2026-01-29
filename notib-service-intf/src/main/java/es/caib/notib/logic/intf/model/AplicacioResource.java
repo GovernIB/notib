@@ -28,7 +28,7 @@ import java.time.LocalTime;
 		descriptionField = AplicacioResource.Fields.callbackUrl,
 		accessConstraints = @ResourceAccessConstraint(
 				type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-				roles = { BaseConfig.ROLE_SUPER },
+				roles = { BaseConfig.ROLE_SUPER, BaseConfig.ROLE_ADMIN },
 				grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
 		)
 )
@@ -40,8 +40,8 @@ public class AplicacioResource extends BaseResource<Long> {
 	@NotNull
 	@Size(max = 256)
 	private String callbackUrl;
-	private Boolean activa = true;
-	private Boolean headerCsrf;
+	private boolean activa = true;
+	private boolean headerCsrf;
 	@NotNull
 	private LocalTime horariLaboralInici;
 	@NotNull

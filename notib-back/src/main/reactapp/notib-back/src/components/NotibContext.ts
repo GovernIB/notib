@@ -8,11 +8,12 @@ export const ROLE_ORGAN = ROLE_PREFIX + 'ORGAN';
 export const ROLE_USER = 'tothom';
 
 export type NotibContextType = {
+    isReady: boolean;
     rolesAvailable?: string[];
     entitatsAvailable?: any[];
     currentRole?: string;
     setCurrentRole: (currentRole: string | undefined) => void;
-    currentEntitatId?: any;
+    currentEntitatId?: number;
     setCurrentEntitatId: (currentRole: any | undefined) => void;
 };
 
