@@ -21,4 +21,10 @@ databaseChangeLog:
               - column:
                   name: organ_id
                   type: number
-        - sql: "UPDATE NOT_NOtIFICACIO_TABLE t SET ORGAN_ID = (SELECT o.id FROM not_organ_gestor o WHERE o.entitat = t.entitat_id AND o.codi = t.organ_codi);"
+        - addColumn:
+            tableName: not_notificacio_env_table
+            columns:
+              - column:
+                  name: organ_id
+                  type: number
+        - sql: "UPDATE NOT_NOtIFICACIO_ENV_TABLE t SET ORGAN_ID = (SELECT o.id FROM not_organ_gestor o WHERE o.entitat = t.entitat_id AND o.codi = t.not_organ_codi);"

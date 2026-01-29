@@ -121,6 +121,9 @@ public class EnviamentTableEntity extends NotibAuditable<Long> {
 	@Column(name = "NOT_ORGAN_CODI")
 	private String organCodi;
 
+	@Column(name = "ORGAN_ID")
+	private String organId;
+
     @Column(name = "organ_nom")
     private String organNom;
 	

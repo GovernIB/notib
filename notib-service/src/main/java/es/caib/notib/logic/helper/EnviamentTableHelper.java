@@ -65,6 +65,7 @@ public class EnviamentTableHelper {
                 .grupCodi(notificacio.getGrupCodi())
                 .emisorDir3Codi(notificacio.getEmisorDir3Codi())
                 .usuariCodi(notificacio.getUsuariCodi())
+                .organId(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getId() + "" : null)
                 .organCodi(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getCodi() : null)
                 .organNom(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getNom() : null)
                 .organEstat(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getEstat() : null)
