@@ -542,7 +542,7 @@ public class CieNexeaPluginImpl extends AbstractSalutPlugin implements CiePlugin
                 new QName("https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/","NotificaWsV2Service"),
                 null,
                 null,
-                false,
+                Boolean.parseBoolean(properties.get("es.caib.notib.log.tipus.ENTREGA_CIE").toString()),
                 true,
                 NotificaWsV2PortType.class,
                 new ApiKeySOAPHandlerV2(apiKey));
