@@ -614,7 +614,7 @@ export const Form: React.FC<FormProps> = (props) => {
     React.useEffect(() => {
         // Obté les dades inicials pel formulari
         if (fields != null) {
-            refresh(createId != null);
+            refresh(createId != null || customFields != null);
         }
     }, [id, createId, fields]);
     React.useEffect(() => {

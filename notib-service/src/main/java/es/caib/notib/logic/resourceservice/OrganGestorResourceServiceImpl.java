@@ -28,16 +28,11 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
 	protected String additionalSpringFilter(
 		String currentSpringFilter,
 		String[] namedQueries) {
-		boolean isRoleSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);
-		if (!isRoleSuper) {
-			Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
-			if (currentEntitatId != null) {
-				return "entitat.id:" + currentEntitatId;
-			} else {
-				return "entitat.id is null";
-			}
+		Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
+		if (currentEntitatId != null) {
+			return "entitat.id:" + currentEntitatId;
 		} else {
-			return null;
+			return "entitat.id is null";
 		}
 	}
 
