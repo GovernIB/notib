@@ -70,7 +70,13 @@ export const PropietatsGroups: React.FC<{
             selectedItems={selectedItems}
             onSelectedItemsChange={(_event, ids) =>
                 setSelectedGroupId(ids != null ? Number(ids) : undefined)
-            }>
+            }
+            sx={{
+                '& .MuiTreeItem-content': {
+                    minHeight: 48,
+                    paddingY: 1,
+                },
+            }}>
             <PropietatsGroupTreeItems configGroups={configGroups} />
         </SimpleTreeView>
     );

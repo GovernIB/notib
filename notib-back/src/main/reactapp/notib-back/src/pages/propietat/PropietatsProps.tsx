@@ -110,6 +110,7 @@ const PropsListItem: React.FC<{ item: any; highlight?: string }> = (props) => {
 
 export const PropietatsProps: React.FC<{ quickFilter?: string; group?: any }> = (props) => {
     const { quickFilter, group } = props;
+    const { t } = useTranslation();
     const {
         isReady: apiIsReady,
         find: apiFind,
@@ -139,7 +140,7 @@ export const PropietatsProps: React.FC<{ quickFilter?: string; group?: any }> = 
                     return {
                         name: c.key,
                         type,
-                        label: '', // c.description,
+                        label: '',
                         value: c.value,
                         options,
                     };
@@ -160,21 +161,38 @@ export const PropietatsProps: React.FC<{ quickFilter?: string; group?: any }> = 
                     <Typography variant="h6" sx={{ mb: 1 }}>
                         {group.description}
                     </Typography>
-                    <MuiForm
-                        resourceName="configResource"
-                        customFields={customFields}
-                        hiddenToolbar
-                        commonFieldComponentProps={{ size: 'small' }}>
-                        <List component={Paper}>
-                            {configs?.map((c) => (
-                                <ListItem key={c.key} disablePadding>
-                                    <ListItemButton disableRipple>
-                                        <PropsListItem item={c} highlight={quickFilter} />
-                                    </ListItemButton>
-                                </ListItem>
-                            ))}
-                        </List>
-                    </MuiForm>
+                    <List component={Paper}>
+                        {customFields.length ? (
+                            <MuiForm
+                                resourceName="configResource"
+                                customFields={customFields}
+                                hiddenToolbar
+                                commonFieldComponentProps={{ size: 'small' }}>
+                                {configs?.map((c) => (
+                                    <ListItem key={c.key} disablePadding>
+                                        <ListItemButton disableRipple>
+                                            <PropsListItem item={c} highlight={quickFilter} />
+                                        </ListItemButton>
+                                    </ListItem>
+                                ))}
+                            </MuiForm>
+                        ) : (
+                            <Box
+                                sx={{
+                                    width: '100%',
+                                    textAlign: 'center',
+                                    px: 2,
+                                    py: 4,
+                                }}>
+                                <Icon fontSize="large" color="disabled">
+                                    block
+                                </Icon>
+                                <Typography variant="h5" color="text.secondary">
+                                    {t('page.propietats.empty')}
+                                </Typography>
+                            </Box>
+                        )}
+                    </List>
                 </Box>
             </PropsContext.Provider>
         )
