@@ -3,7 +3,6 @@ package es.caib.notib.logic.resourceservice;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.helper.UserSessionHelper;
-import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.model.OrganGestorResource;
 import es.caib.notib.logic.intf.resourceservice.OrganGestorResourceService;
 import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
