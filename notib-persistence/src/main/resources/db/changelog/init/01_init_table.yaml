@@ -510,6 +510,9 @@ databaseChangeLog:
                   name: USUARI_CODI
                   type: VARCHAR(64 ${varcharUnit})
               - column:
+                  name: ORGAN_ID
+                  type: BIGINT
+              - column:
                   name: NOT_ORGAN_CODI
                   type: VARCHAR(64 ${varcharUnit})
               - column:
@@ -819,6 +822,9 @@ databaseChangeLog:
                   defaultValue: 0
                   name: PROCEDIMENT_IS_COMU
                   type: boolean
+              - column:
+                  name: ORGAN_ID
+                  type: BIGINT
               - column:
                   name: ORGAN_CODI
                   type: VARCHAR(64 ${varcharUnit})

@@ -137,20 +137,48 @@ databaseChangeLog:
             tableName: ${db_prefix}CONFIG
             columnName: config_type_id
   - changeSet:
-        id: 2_1_1_000-5
-        author: limit
-        changes:
-            - addColumn:
-                tableName: ${db_prefix}CONFIG_GROUP
-                columns:
-                    - column:
-                        name: parent_id
-                        type: bigint
-            - addForeignKeyConstraint:
-                baseTableName: ${db_prefix}CONFIG_GROUP
-                baseColumnNames: parent_id
-                referencedTableName: ${db_prefix}CONFIG_GROUP
-                referencedColumnNames: ID
-                constraintName: ${db_prefix}CONFIG_GROUP_PARENT_FK
-            - sql:
-                sql: "UPDATE ${db_prefix}config_group a SET parent_id = (SELECT b.id FROM ${db_prefix}config_group b WHERE a.PARENT_CODE  = b.code) WHERE a.parent_code IS NOT NULL; "
+      id: 2_1_1_000-5
+      author: limit
+      changes:
+        - addColumn:
+            tableName: ${db_prefix}CONFIG_GROUP
+            columns:
+            - column:
+                name: parent_id
+                type: bigint
+        - addForeignKeyConstraint:
+            baseTableName: ${db_prefix}CONFIG_GROUP
+            baseColumnNames: parent_id
+            referencedTableName: ${db_prefix}CONFIG_GROUP
+            referencedColumnNames: ID
+            constraintName: ${db_prefix}CONFIG_GROUP_PARENT_FK
+        - sql:
+            sql: "UPDATE ${db_prefix}config_group a SET parent_id = (SELECT b.id FROM ${db_prefix}config_group b WHERE a.PARENT_CODE  = b.code) WHERE a.parent_code IS NOT NULL; "
+  - changeSet:
+      id: 2_1_1_000-6
+      author: limit
+      changes:
+        - addForeignKeyConstraint:
+              baseTableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
+              baseColumnNames: organ_id
+              referencedTableName: ${db_prefix}ORGAN_GESTOR
+              referencedColumnNames: ID
+              constraintName: ${db_prefix}ENV_TABLE_ORGAN_FK
+  - changeSet:
+      id: 2_1_1_000-7
+      author: limit
+      changes:
+        - addForeignKeyConstraint:
+             baseTableName: ${db_prefix}NOTIFICACIO_TABLE
+             baseColumnNames: organ_id
+             referencedTableName: ${db_prefix}ORGAN_GESTOR
+             referencedColumnNames: ID
+             constraintName: ${db_prefix}NOT_TABLE_ORGAN_FK
+  - changeSet:
+     id: 2_1_1_000-8
+     author: limit
+     changes:
+        - addPrimaryKey:
+            tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
+            columnNames: id
+
