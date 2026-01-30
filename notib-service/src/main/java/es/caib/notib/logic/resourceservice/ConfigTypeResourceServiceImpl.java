@@ -8,6 +8,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+/**
+ * Implementació del servei de gestió de tipus de propietat de configuració.
+ *
+ * @author Límit Tecnologies
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor

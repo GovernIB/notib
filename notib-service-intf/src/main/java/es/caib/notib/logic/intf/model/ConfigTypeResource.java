@@ -12,13 +12,18 @@ import lombok.experimental.FieldNameConstants;
 
 import javax.persistence.Column;
 
+/**
+ * Informació de tipus de camp de configuració.
+ *
+ * @author Límit Tecnologies
+ */
 @Getter
 @Setter
 @NoArgsConstructor
 @FieldNameConstants
 @ResourceConfig(
-        descriptionField = ConfigResource.Fields.description,
-        quickFilterFields = {ConfigResource.Fields.key, ConfigResource.Fields.description},
+        descriptionField = ConfigTypeResource.Fields.code,
+        quickFilterFields = { ConfigTypeResource.Fields.code, ConfigTypeResource.Fields.value },
         accessConstraints = @ResourceAccessConstraint(
                 type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
                 roles = {  BaseConfig.ROLE_SUPER   },

@@ -93,3 +93,23 @@ export type { FormFieldProps, FormFieldCustomProps } from './components/form/For
 export type { DataFormDialogApi as MuiFormDialogApi } from './components/mui/datacommon/DataFormDialog';
 export type { FormSidebarApi as MuiFormSidebarApi } from './components/mui/form/MuiFormSidebar';
 export type { DefaultMuiComponentProps } from './components/mui/MuiBaseAppContext';
+export type {
+    ResourceApiRequestArgs,
+    ResourceApiGetOneArgs,
+    ResourceApiFindArgs,
+    ResourceApiExportArgs,
+    ResourceApiOnChangeArgs,
+    ResourceApiArtifactsArgs,
+    ResourceApiArtifactOnChangeArgs,
+    ResourceApiArtifactFormArgs,
+    ResourceApiArtifactFieldOptionsArgs,
+    ResourceApiArtifactFieldOptionsFindArgs,
+    ResourceApiActionArgs,
+    ResourceApiReportArgs,
+    ResourceApiFieldArgs,
+    ResourceApiFieldOptionsFindArgs,
+    ResourceApiFindResponse,
+    ResourceApiBlobResponse,
+    ResourceApiArtifact,
+    ResourceApiBulkResponse,
+} from './components/ResourceApiProvider';

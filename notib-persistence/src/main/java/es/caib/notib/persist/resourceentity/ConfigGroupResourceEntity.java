@@ -9,6 +9,11 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.util.List;
 
+/**
+ * Entitat de base de dades pels recursos de tipus grup de propietats de configuració.
+ *
+ * @author Límit Tecnologies
+ */
 @Entity
 @Table(name = BaseConfig.DB_PREFIX + "config_group")
 @Getter

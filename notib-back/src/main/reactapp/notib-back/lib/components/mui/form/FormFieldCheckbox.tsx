@@ -58,6 +58,7 @@ export const FormFieldCheckbox: React.FC<FormFieldCheckboxProps> = (props) => {
     const formControlSx = !inline
         ? { top: typeSwitch ? '12px' : '4px', ml: typeSwitch ? 2 : 1.4 }
         : undefined;
+    const formHelperText = helperText ?? componentProps?.helperText;
     return (
         <FormControl error={!!fieldError} sx={formControlSx}>
             <FormControlLabel
@@ -78,7 +79,7 @@ export const FormFieldCheckbox: React.FC<FormFieldCheckboxProps> = (props) => {
                 }}
                 control={control}
             />
-            {helperText && <FormHelperText>{helperText}</FormHelperText>}
+            {formHelperText && <FormHelperText>{formHelperText}</FormHelperText>}
         </FormControl>
     );
 };

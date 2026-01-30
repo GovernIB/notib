@@ -13,6 +13,11 @@ import lombok.experimental.FieldNameConstants;
 
 import java.util.List;
 
+/**
+ * Informació d'un grup de propietats de configuració.
+ *
+ * @author Límit Tecnologies
+ */
 @Getter
 @Setter
 @NoArgsConstructor

@@ -10,6 +10,11 @@ import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 
+/**
+ * Entitat de base de dades pels recursos de tipus propietat de configuració.
+ *
+ * @author Límit Tecnologies
+ */
 @Entity
 @Table(name = BaseConfig.DB_PREFIX + "config")
 @Getter

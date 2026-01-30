@@ -11,6 +11,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+/**
+ * Entitat de base de dades pels recursos de tipus de propietat de configuració.
+ *
+ * @author Límit Tecnologies
+ */
 @Entity
 @Table(name = BaseConfig.DB_PREFIX + "config_type")
 @Getter

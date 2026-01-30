@@ -111,6 +111,13 @@ const translationEs = {
                 },
             },
         },
+        propietats: {
+            find: 'Buscar en las propiedades',
+            save: {
+                success: 'Valor modificado correctamente',
+                error: 'Error modificando la propiedad',
+            },
+        },
         propietatsConfiguracio: {
             grid: {
                 title: 'Propiedades configurables',

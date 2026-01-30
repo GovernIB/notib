@@ -584,7 +584,6 @@ export const Form: React.FC<FormProps> = (props) => {
             setApiActions(apiCurrentActions);
             if (customFields == null) {
                 if (resourceType == null) {
-                    console.log('>>> setFields', apiCurrentFields);
                     setFields(apiCurrentFields);
                 } else if (resourceTypeCode != null) {
                     apiArtifacts({}).then((artifacts: any[]) => {

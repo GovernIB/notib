@@ -15,6 +15,11 @@ import lombok.experimental.FieldNameConstants;
 import javax.persistence.Column;
 import java.util.List;
 
+/**
+ * Informació d'una propietat de configuració.
+ *
+ * @author Límit Tecnologies
+ */
 @Getter
 @Setter
 @NoArgsConstructor

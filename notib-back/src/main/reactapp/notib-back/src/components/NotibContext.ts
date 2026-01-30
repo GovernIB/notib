@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import React from 'react';
 
 export const ROLE_PREFIX = 'NOT_';
 export const ROLE_SUPER = ROLE_PREFIX + 'SUPER';
@@ -17,12 +17,12 @@ export type NotibContextType = {
     setCurrentEntitatId: (currentRole: any | undefined) => void;
 };
 
-export const NotibContext = createContext<NotibContextType | undefined>(undefined);
+export const NotibContext = React.createContext<NotibContextType | undefined>(undefined);
 
 export const useNotibContext = () => {
-    const context = useContext(NotibContext);
+    const context = React.useContext(NotibContext);
     if (context === undefined) {
-        throw new Error('useNotibContext must be used within a ResourceApiProvider');
+        throw new Error('useNotibContext must be used within a ResourceApi provider');
     }
     return context;
 };

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -12,6 +13,7 @@ const PropietatsQuickFilter: React.FC<{ onChange: (quickFilter: string | undefin
     props
 ) => {
     const { onChange } = props;
+    const { t } = useTranslation();
     const [quickFilter, setQuickFilter] = React.useState<string>('');
     const quickFilterDebounced = useDebounce(quickFilter);
     React.useEffect(() => {
@@ -21,7 +23,7 @@ const PropietatsQuickFilter: React.FC<{ onChange: (quickFilter: string | undefin
         <TextField
             value={quickFilter}
             onChange={(event) => setQuickFilter(event.target.value)}
-            label="Cercar a les propietats"
+            label={t('page.propietats.find')}
             variant="outlined"
             fullWidth
             size="small"

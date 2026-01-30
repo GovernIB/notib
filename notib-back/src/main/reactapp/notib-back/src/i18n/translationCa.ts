@@ -110,6 +110,13 @@ const translationCa = {
                 },
             },
         },
+        propietats: {
+            find: 'Cercar a les propietats',
+            save: {
+                success: 'Valor modificat correctament',
+                error: 'Error modificant la propietat',
+            },
+        },
         propietatsConfiguracio: {
             grid: {
                 title: 'Propietats configurables',
