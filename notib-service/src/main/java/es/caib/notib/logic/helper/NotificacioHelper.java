@@ -54,7 +54,7 @@ import java.util.UUID;
 
 /**
  * Helper per notificacions
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -118,9 +118,9 @@ public class NotificacioHelper {
                 return msg;
             }
 
-            var maxEnvMinut =  aplicacio.getMaxEnviamentsMinutLaboral();
             var maxEnvDies =  aplicacio.getMaxEnviamentsDiaLaboral();
             var isHorariLaboral = DatesUtils.isHorariLaboral(aplicacio.getHorariLaboralInici(), aplicacio.getHorariLaboralFi());
+			var maxEnvMinut =  isHorariLaboral ? aplicacio.getMaxEnviamentsMinutLaboral() : aplicacio.getMaxEnviamentsMinutNoLaboral();
             var enviamentsMinutActual = isHorariLaboral ? contadorMinutsLaboral.getOrDefault(aplicacio.getId(), 0)
                     : contadorMinutsNoLaboral.getOrDefault(aplicacio.getId(), 0);
             if (maxEnvMinut <= enviamentsMinutActual) {
