@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.persist.entity;
 
@@ -40,7 +40,7 @@ import java.util.Set;
 
 /**
  * Classe del model de dades que representa una notificació.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @EqualsAndHashCode(callSuper = true)
@@ -136,6 +136,8 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 	private ProcSerTipusEnum procedimentTipus;
 	@Column(name = "ORGAN_CODI")
 	private String organCodi;
+	@Column(name = "ORGAN_ID")
+	private String organId;
 	@Column(name = "ORGAN_NOM")
 	private String organNom;
 	@Column(name = "ORGAN_ESTAT")

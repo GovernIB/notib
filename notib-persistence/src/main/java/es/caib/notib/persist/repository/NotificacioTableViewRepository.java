@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
  * de dades del tipus notificacio.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Eager
@@ -90,13 +90,13 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"					or ntf.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[3]})) " +
 			"			and ntf.procedimentIsComu = false) " +
 			// Té permís consulta sobre l'òrgan
-			"	or (:#{#filtre.organsGestorsCodisNotibNull} = false and ntf.organCodi is not null " +
+			"	or (:#{#filtre.organsGestorsCodisNotibNull} = false and ntf.organId is not null " +
 			"			and ntf.procedimentIsComu = false and ntf.procedimentRequirePermission = false " +
-			"			and ntf.organCodi in (:#{#filtre.organsGestorsCodisNotib})) " +
+			"			and ntf.organId in (:#{#filtre.organsGestorsCodisNotib})) " +
 			// Procediment comú amb permís comú sobre l'òrgan
-			"	or (:#{#filtre.esOrgansGestorsComunsCodisNotibNull} = false and ntf.organCodi is not null " +
+			"	or (:#{#filtre.esOrgansGestorsComunsCodisNotibNull} = false and ntf.organId is not null " +
 			"			and ntf.procedimentIsComu = true and ntf.procedimentRequirePermission = false " +
-			"			and ntf.organCodi in (:#{#filtre.organsGestorsComunsCodisNotib})) " +
+			"			and ntf.organId in (:#{#filtre.organsGestorsComunsCodisNotib})) " +
 			// Procediment comú amb permís de procediment-òrgan
 			"   or (:#{#filtre.procedimentOrgansIdsNotibNull} = false and ntf.procedimentCodiNotib is not null " +
 			"			and CONCAT(ntf.procedimentCodiNotib, '-', ntf.organCodi) in (:#{#filtre.procedimentOrgansIdsNotib})" +

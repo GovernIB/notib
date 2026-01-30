@@ -25,3 +25,4 @@ ALTER TABLE not_notificacio_env ADD anulat NUMBER(1) DEFAULT '0';
 ALTER TABLE not_notificacio_env ADD motiu_anulacio VARCHAR2(250 CHAR);
 ALTER TABLE not_notificacio_env_table ADD anulat NUMBER(1) DEFAULT '0';
 ALTER TABLE not_notificacio_env_table ADD motiu_anulacio VARCHAR2(250 CHAR);
+ALTER TABLE not_notificacio_env_table ADD organ_id NUMBER;

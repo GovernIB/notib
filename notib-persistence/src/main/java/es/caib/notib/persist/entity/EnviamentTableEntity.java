@@ -31,7 +31,7 @@ import java.util.Date;
 
 /**
  * Classe del model de dades que representa una notificació.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @EqualsAndHashCode(callSuper = true)
@@ -121,9 +121,12 @@ public class EnviamentTableEntity extends NotibAuditable<Long> {
 	@Column(name = "NOT_ORGAN_CODI")
 	private String organCodi;
 
+	@Column(name = "ORGAN_ID")
+	private String organId;
+
 	@Column(name = "organ_nom")
 	private String organNom;
-	
+
 	@Column(name = "ORGAN_ESTAT")
 	private OrganGestorEstatEnum organEstat;
 

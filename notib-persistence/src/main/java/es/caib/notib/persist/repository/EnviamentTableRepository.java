@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
  * de dades del tipus notificacio.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Eager
@@ -74,13 +74,13 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"				or nenv.procedimentCodiNotib in (:#{#filtre.procedimentsCodisNotibSplit[3]})) " +
 			"		and nenv.procedimentIsComu = false) " +
 			// Té permís consulta sobre l'òrgan
-			"	or (:#{#filtre.organsGestorsCodisNotibNull} = false and nenv.organCodi is not null " +
+			"	or (:#{#filtre.organsGestorsCodisNotibNull} = false and nenv.organId is not null " +
 			"			and nenv.procedimentIsComu = false and nenv.procedimentRequirePermission = false " +
-			"			and nenv.organCodi in (:#{#filtre.organsGestorsCodisNotib})) " +
+			"			and nenv.organId in (:#{#filtre.organsGestorsCodisNotib})) " +
 			// Procediment comú amb permís comú sobre l'òrgan
-			"	or (:#{#filtre.organsGestorsComunsCodisNotibNull} = false and nenv.organCodi is not null " +
+			"	or (:#{#filtre.organsGestorsComunsCodisNotibNull} = false and nenv.organId is not null " +
 			"			and nenv.procedimentIsComu = true and nenv.procedimentRequirePermission = false " +
-			"			and nenv.organCodi in (:#{#filtre.organsGestorsComunsCodisNotib})) " +
+			"			and nenv.organId in (:#{#filtre.organsGestorsComunsCodisNotib})) " +
 			// Procediment comú amb permís de procediment-òrgan
 			"   or (:#{#filtre.procedimentOrgansAmbPermisNull} = false and nenv.procedimentCodiNotib is not null " +
 			"			and CONCAT(nenv.procedimentCodiNotib, '-', nenv.organCodi) in (:#{#filtre.procedimentOrgansAmbPermis})" +
