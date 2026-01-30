@@ -44,6 +44,8 @@ export type FormProps = React.PropsWithChildren & {
     additionalData?: any;
     /** Perspectives que s'enviaran al consultar la informació del recurs */
     perspectives?: string[];
+    /** Camps personalitzats per a inicialitzar el formulari (si s'especifica aquesta propietat no es consultaran els camps a l'API REST) */
+    customFields?: any[];
     /** Indica si s'ha de fer una petició onChange sense cap camp associat quan es crea el component */
     initOnChangeRequest?: true;
     /** Indica si s'ha d'aturar l'enviament del formulari si hi ha errors del validador (que no siguin errors de validació de l'API REST) */
@@ -151,6 +153,7 @@ export const Form: React.FC<FormProps> = (props) => {
         initialData: initialDataProp,
         additionalData: additionalDataProp,
         perspectives,
+        customFields,
         initOnChangeRequest,
         avoidSubmitIfAnyValidatorErrors,
         saveOnFieldEnterKeyPressed,
@@ -441,14 +444,10 @@ export const Form: React.FC<FormProps> = (props) => {
                 reject('Form validation only available in form artifacts');
             }
         });
-    const navigateToSaveLink = (
-        link: string | undefined,
-        id: any,
-        replace?: boolean) => {
+    const navigateToSaveLink = (link: string | undefined, id: any, replace?: boolean) => {
         const linkIdReplaced = link?.replace('{{id}}', '' + id);
         if (linkIdReplaced?.startsWith('.')) {
-            linkIdReplaced &&
-                navigate(locationPath + '/' + linkIdReplaced, { replace });
+            linkIdReplaced && navigate(locationPath + '/' + linkIdReplaced, { replace });
         } else if (linkIdReplaced?.startsWith('/')) {
             linkIdReplaced &&
                 navigate(linkIdReplaced.substring(1), {
@@ -458,15 +457,12 @@ export const Form: React.FC<FormProps> = (props) => {
             const sli = locationPath?.lastIndexOf('/');
             if (sli != -1) {
                 linkIdReplaced &&
-                    navigate(
-                        locationPath.substring(0, sli + 1) + linkIdReplaced,
-                        { replace }
-                    );
+                    navigate(locationPath.substring(0, sli + 1) + linkIdReplaced, { replace });
             } else {
                 linkIdReplaced && navigate(linkIdReplaced, { replace });
             }
         }
-    }
+    };
     const save = () =>
         new Promise<any>((resolve, reject) => {
             if (resourceType == null) {
@@ -494,7 +490,7 @@ export const Form: React.FC<FormProps> = (props) => {
                                     ? onUpdateSuccess(savedData)
                                     : onSaveSuccess?.(data);
                                 if (updateLink != null || saveLink != null) {
-                                    navigateToSaveLink((updateLink ?? saveLink), savedData.id);
+                                    navigateToSaveLink(updateLink ?? saveLink, savedData.id);
                                 }
                             } else {
                                 setCreateId(savedData.id);
@@ -502,7 +498,7 @@ export const Form: React.FC<FormProps> = (props) => {
                                     ? onCreateSuccess(savedData)
                                     : onSaveSuccess?.(data);
                                 if (createLink || saveLink) {
-                                    navigateToSaveLink((createLink ?? saveLink), savedData.id, true);
+                                    navigateToSaveLink(createLink ?? saveLink, savedData.id, true);
                                 }
                             }
                             resolve(savedData);
@@ -548,7 +544,9 @@ export const Form: React.FC<FormProps> = (props) => {
         });
     };
     const focus = (name?: string) => {
-        const input = divRef.current?.querySelector<HTMLInputElement>('input' + (name != null ? '[name="' + name + '"]' : ''));
+        const input = divRef.current?.querySelector<HTMLInputElement>(
+            'input' + (name != null ? '[name="' + name + '"]' : '')
+        );
         if (input) {
             input.focus();
         }
@@ -584,31 +582,36 @@ export const Form: React.FC<FormProps> = (props) => {
                     resourceTypeCode
                 );
             setApiActions(apiCurrentActions);
-            if (resourceType == null) {
-                setFields(apiCurrentFields);
-            } else if (resourceTypeCode != null) {
-                apiArtifacts({}).then((artifacts: any[]) => {
-                    const artifact = artifacts.find(
-                        (a: any) =>
-                            a.type === resourceType.toUpperCase() && a.code === resourceTypeCode
-                    );
-                    if (artifact != null) {
-                        if (artifact.formClassActive) {
-                            setFields(processApiFields(artifact.fields));
-                        }
-                    } else {
-                        console.warn(
-                            "Couldn't find artifact (type=" +
-                                resourceType +
-                                ', code=' +
-                                resourceTypeCode +
-                                ')'
+            if (customFields == null) {
+                if (resourceType == null) {
+                    console.log('>>> setFields', apiCurrentFields);
+                    setFields(apiCurrentFields);
+                } else if (resourceTypeCode != null) {
+                    apiArtifacts({}).then((artifacts: any[]) => {
+                        const artifact = artifacts.find(
+                            (a: any) =>
+                                a.type === resourceType.toUpperCase() && a.code === resourceTypeCode
                         );
-                    }
-                });
+                        if (artifact != null) {
+                            if (artifact.formClassActive) {
+                                setFields(processApiFields(artifact.fields));
+                            }
+                        } else {
+                            console.warn(
+                                "Couldn't find artifact (type=" +
+                                    resourceType +
+                                    ', code=' +
+                                    resourceTypeCode +
+                                    ')'
+                            );
+                        }
+                    });
+                }
+            } else {
+                setFields(customFields);
             }
         }
-    }, [apiIsReady]);
+    }, [apiIsReady, customFields]);
     React.useEffect(() => {
         // Obté les dades inicials pel formulari
         if (fields != null) {

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 
@@ -46,6 +47,11 @@ public class ConfigResourceEntity extends BaseResourceEntity<ConfigResource> {
 		name = "entitat_id",
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "CONFIG_ENTITAT_FK"))
 	private EntitatResourceEntity entitat;
+
+	@Formula("(select cty.code from " + BaseConfig.DB_PREFIX + "config_type cty where cty.id = config_type_id)")
+	private String configTypeCode;
+	@Formula("(select cty.value from " + BaseConfig.DB_PREFIX + "config_type cty where cty.id = config_type_id)")
+	private String configTypeValue;
 
 	@Builder
 	public ConfigResourceEntity(

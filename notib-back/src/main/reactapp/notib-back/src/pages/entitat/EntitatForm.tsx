@@ -198,4 +198,5 @@ export const EntitatForm: React.FC = () => {
         )
     );
 };
+
 export default EntitatForm;

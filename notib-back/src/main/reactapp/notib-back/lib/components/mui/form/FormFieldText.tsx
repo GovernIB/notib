@@ -1,12 +1,16 @@
 import React from 'react';
 import TextField from '@mui/material/TextField';
 import Icon from '@mui/material/Icon';
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
 import { useDebounce } from '../../../util/useDebounce';
 import { FormFieldCustomProps } from '../../form/FormField';
 import { FormFieldError } from '../../form/FormContext';
 import { TextFieldProps } from '@mui/material/TextField';
 
 type FormFieldTextProps = FormFieldCustomProps & {
+    /** Indica si aquest camp és de tipus password */
+    password?: true;
     /** Indica si s'ha de fer debounce amb els valors del camp */
     debounce?: true;
 };
@@ -62,17 +66,37 @@ const InnerFormFieldText: React.FC<
         onChange,
         componentProps,
         overrideTextFieldProps,
+        password,
     } = props;
+    const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);
     const { helperText, title, startAdornment } = useFormFieldCommon(
         field,
         fieldError,
         inline,
         componentProps
     );
+    const endAdornment = (
+        <>
+            {componentProps?.slotProps?.input?.endAdornment}
+            {password && (
+                <InputAdornment position="end">
+                    <IconButton
+                        disabled={disabled || readOnly}
+                        onClick={() => setPasswordVisible((v) => !v)}
+                        size="small">
+                        <Icon fontSize="small">
+                            {passwordVisible ? 'visibility_off' : 'visibility'}
+                        </Icon>
+                    </IconButton>
+                </InputAdornment>
+            )}
+        </>
+    );
     const inputProps = {
         readOnly,
         ...componentProps?.slotProps?.input,
         startAdornment,
+        endAdornment,
     };
     const htmlInputProps = {
         maxLength: field?.maxLength,
@@ -87,6 +111,7 @@ const InnerFormFieldText: React.FC<
             value={value ?? ''}
             required={required ?? field?.required}
             disabled={disabled}
+            type={password && !passwordVisible ? 'password' : undefined}
             error={fieldError != null}
             title={title}
             helperText={helperText}

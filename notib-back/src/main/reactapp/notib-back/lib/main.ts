@@ -59,6 +59,7 @@ export { DetailField } from './components/detail/DetailField';
 export { useDetailContext } from './components/detail/DetailContext';
 
 export { Toolbar } from './components/mui/Toolbar';
+export { TextHighlight } from './components/mui/TextHighlight';
 export { TextAvatar, IconAvatar } from './components/mui/Avatars';
 export { CopyToClipboard } from './components/mui/CopyToClipboard';
 export { useAuthButtonContext } from './components/mui/AuthButton';

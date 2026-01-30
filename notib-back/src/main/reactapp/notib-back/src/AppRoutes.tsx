@@ -12,7 +12,7 @@ import OrganGrid from './pages/organ/OrganGrid';
 import OrganForm from './pages/organ/OrganForm';
 import Enviaments from './pages/Enviaments';
 import NotFoundPage from './pages/NotFound';
-import Propietats from './pages/Propietats';
+import Propietats from './pages/propietat/Propietats';
 
 const AppRoutes = () => {
     return (

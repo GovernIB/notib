@@ -167,7 +167,7 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
                     input: inputProps,
                     select: {
                         multiple,
-                        textFieldOpen,
+                        open: textFieldOpen,
                         readOnly,
                         // displayEmpty: !isRequired && !multiple, TODO Se ha desactivado ya que causaba bugs visuales en todos los enums y no tenemos un ejemplo claro para probar la funcionalidad
                         onClose: () => setTextFieldOpen(false),

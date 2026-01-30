@@ -21,11 +21,11 @@ import java.util.List;
 @FieldNameConstants
 @ResourceConfig(
 	descriptionField = ConfigResource.Fields.description,
-	quickFilterFields = { ConfigResource.Fields.key, ConfigResource.Fields.description },
+	quickFilterFields = {ConfigResource.Fields.key, ConfigResource.Fields.description},
 	accessConstraints = @ResourceAccessConstraint(
 		type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-		roles = { BaseConfig.ROLE_SUPER },
-		grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
+		roles = {BaseConfig.ROLE_SUPER},
+		grantedPermissions = {PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE}
 	)
 )
 public class ConfigResource extends BaseResource<Long> {
@@ -40,5 +40,8 @@ public class ConfigResource extends BaseResource<Long> {
 	private ResourceReference<ConfigGroupResource, Long> configGroup;
 	private ResourceReference<ConfigTypeResource, Long> configType;
 	private ResourceReference<EntitatResource, Long> entitat; // opcional
+
+	private String configTypeCode;
+	private String configTypeValue;
 
 }
