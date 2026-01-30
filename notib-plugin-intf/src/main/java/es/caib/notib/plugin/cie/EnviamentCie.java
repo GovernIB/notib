@@ -23,4 +23,10 @@ public class EnviamentCie extends NotificacioDtoV2 {
     private CieDto entregaCie;
     private OperadorPostalDto operadorPostal;
     private byte[] contingutDocument;
+
+    @Override
+    public String toString() {
+        return "[identificador: " + identificador + " - codiDir3Entitat:" + codiDir3Entitat
+                + " - entregaCie: " + entregaCie + " - operadorPostal: " + operadorPostal + " - mida del document " + contingutDocument.length+ "]";
+    }
 }
