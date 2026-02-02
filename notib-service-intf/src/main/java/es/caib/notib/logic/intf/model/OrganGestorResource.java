@@ -55,9 +55,7 @@ import java.util.List;
 			grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE }
 		)
 	}
-)
 	)
-)
 public class OrganGestorResource extends BaseResource<Long> {
 
 	public static final String DIR3_SYNC_ACTION_CODE = "DIR3_SYNC";
