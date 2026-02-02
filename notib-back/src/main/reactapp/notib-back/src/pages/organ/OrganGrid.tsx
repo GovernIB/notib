@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import { GridPage, MuiDataGrid, MuiActionReportButton, useBaseAppContext } from 'reactlib';
+import { Typography } from '@mui/material';
 
 const columns = [
     {
@@ -45,7 +46,12 @@ const OrganGridDir3SyncActionForm: React.FC<{ setReal: (value: boolean) => void 
     }, []);
     return (
         <Grid container>
-            <Grid>Hola</Grid>
+            <Grid size={12}>
+                <Typography>
+                    Faci clic al botó de consultar els canvis per a previsualitzar els canvis
+                    pendents d'aplicar.
+                </Typography>
+            </Grid>
         </Grid>
     );
 };
@@ -53,12 +59,17 @@ const OrganGridDir3SyncActionForm: React.FC<{ setReal: (value: boolean) => void 
 const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
     const { result } = props;
     return (
-        <>
-            <p>Substitucions: {result.numSubstitucions}</p>
-            <p>Divisions: {result.numDivisions}</p>
-            <p>Fusions: {result.numFusions}</p>
-            <p>Extincions: {result.numExtincions}</p>
-        </>
+        <Grid container>
+            <Grid size={12}>
+                <p>Substitucions: {result.numSubstitucions}</p>
+                <p>Divisions: {result.numDivisions}</p>
+                <p>Fusions: {result.numFusions}</p>
+                <p>Extincions: {result.numExtincions}</p>
+            </Grid>
+            <Grid size={12}>
+                <Typography>Faci clic al botó d'aplicar per a fer efectius els canvis.</Typography>
+            </Grid>
+        </Grid>
     );
 };
 
