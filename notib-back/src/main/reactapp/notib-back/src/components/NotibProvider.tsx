@@ -120,6 +120,8 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
                         .includes(sessionValue);
                     if (isSessionValueInEntitatsAvailable) {
                         setCurrentEntitatId(sessionValue);
+                    } else if (entitatsAvailable?.length && currentEntitatId == null) {
+                        setCurrentEntitatId(entitatsAvailable[0]);
                     }
                 });
             } else {

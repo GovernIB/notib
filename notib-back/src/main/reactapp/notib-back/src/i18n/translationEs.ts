@@ -82,6 +82,16 @@ const translationEs = {
         organs: {
             grid: {
                 title: 'Órganos gestores',
+                sync: {
+                    title: 'Sincronización DIR3',
+                    dialogTitle: 'Sincronización DIR3',
+                    dialogButton: {
+                        cancel: 'Cancelar',
+                        query: 'Consultar cambios',
+                        apply: 'Aplicar cambios',
+                    },
+                    success: 'Cambios aplicados con éxito',
+                },
             },
             form: {
                 titleCreate: 'Crear órgano gestor',
