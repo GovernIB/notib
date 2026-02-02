@@ -30,22 +30,22 @@ const OrganFormTabPermisosFormContent: React.FC = () => {
             <GridFormField size={8} name="sidName" />
             <GridFormField
                 size={12}
-                name="perm0Allowed"
+                name="adminAllowed"
                 label={t('page.organs.form.permisos.administrador')}
             />
             <GridFormField
                 size={12}
-                name="perm2Allowed"
+                name="readAllowed"
                 label={t('page.organs.form.permisos.consulta')}
             />
             <GridFormField
                 size={12}
-                name="permXAllowed"
+                name="perm1Allowed"
                 label={t('page.organs.form.permisos.processar')}
             />
             <GridFormField
                 size={12}
-                name="perm3Allowed"
+                name="perm2Allowed"
                 label={t('page.organs.form.permisos.gestio')}
             />
             <GridFormField
@@ -55,22 +55,22 @@ const OrganFormTabPermisosFormContent: React.FC = () => {
             />
             <GridFormField
                 size={12}
-                name="perm3Allowed"
+                name="perm4Allowed"
                 label={t('page.organs.form.permisos.notificacions')}
             />
             <GridFormField
                 size={12}
-                name="perm3Allowed"
+                name="perm5Allowed"
                 label={t('page.organs.form.permisos.comunicacions')}
             />
             <GridFormField
                 size={12}
-                name="perm3Allowed"
+                name="perm6Allowed"
                 label={t('page.organs.form.permisos.sir')}
             />
             <GridFormField
                 size={12}
-                name="perm3Allowed"
+                name="perm7Allowed"
                 label={t('page.organs.form.permisos.comSenseProc')}
             />
         </Grid>
@@ -122,25 +122,55 @@ const OrganFormTabPermisos: React.FC = () => {
             },
             {
                 headerName: t('page.organs.form.permisos.administrador'),
-                field: 'perm0Allowed',
+                field: 'adminAllowed',
                 sortable: false,
                 flex: 1,
             },
             {
                 headerName: t('page.organs.form.permisos.consulta'),
-                field: 'perm2Allowed',
+                field: 'readAllowed',
                 sortable: false,
                 flex: 1,
             },
             {
                 headerName: t('page.organs.form.permisos.processar'),
-                field: 'permXAllowed',
+                field: 'perm1Allowed',
                 sortable: false,
                 flex: 1,
             },
             {
                 headerName: t('page.organs.form.permisos.gestio'),
+                field: 'perm2Allowed',
+                sortable: false,
+                flex: 1,
+            },
+            {
+                headerName: t('page.organs.form.permisos.comuns'),
                 field: 'perm3Allowed',
+                sortable: false,
+                flex: 1,
+            },
+            {
+                headerName: t('page.organs.form.permisos.notificacions'),
+                field: 'perm4Allowed',
+                sortable: false,
+                flex: 1,
+            },
+            {
+                headerName: t('page.organs.form.permisos.comunicacions'),
+                field: 'perm5Allowed',
+                sortable: false,
+                flex: 1,
+            },
+            {
+                headerName: t('page.organs.form.permisos.sir'),
+                field: 'perm6Allowed',
+                sortable: false,
+                flex: 1,
+            },
+            {
+                headerName: t('page.organs.form.permisos.comSenseProc'),
+                field: 'perm7Allowed',
                 sortable: false,
                 flex: 1,
             },

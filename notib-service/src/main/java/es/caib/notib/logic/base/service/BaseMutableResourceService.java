@@ -62,7 +62,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 				resource,
 				getEntityClass());
 		E entity = resourceToEntity(resource, pk, referencedEntities);
-		beforeCreateEntity(entity, resource, answers);
+			beforeCreateEntity(entity, resource, answers);
 		updateEntityWithResource(entity, resource, referencedEntities);
 		beforeCreateSave(entity, resource, answers);
 		boolean anyOrderChanged = reorderIfReorderable(

@@ -23,11 +23,23 @@ import java.util.List;
 @ResourceConfig(
         descriptionField = OrganGestorResource.Fields.codi,
         quickFilterFields = { OrganGestorResource.Fields.codi, OrganGestorResource.Fields.nom },
-        accessConstraints = @ResourceAccessConstraint(
-                type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-                roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_SUPER },
-                grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
-        )
+        accessConstraints = {
+			@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN},
+					grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE}
+			),
+			@ResourceAccessConstraint(
+				type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+				roles = { BaseConfig.ROLE_ADMIN_LECTURA},
+				grantedPermissions = { PermissionEnum.READ }
+			),
+			@ResourceAccessConstraint(
+				type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+				roles = { BaseConfig.ROLE_ORGAN},
+				grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE }
+			)
+		}
 )
 public class OrganGestorResource extends BaseResource<Long> {
 
