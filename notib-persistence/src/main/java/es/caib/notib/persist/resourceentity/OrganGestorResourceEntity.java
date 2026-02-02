@@ -103,5 +103,4 @@ public class OrganGestorResourceEntity extends BaseAuditableResourceEntity<Organ
 		nullable = false)
 	protected EntitatEntity entitat;
 
-
 }

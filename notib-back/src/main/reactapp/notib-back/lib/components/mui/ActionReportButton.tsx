@@ -58,6 +58,8 @@ export type ActionReportButtonProps = {
     formI18nKeys?: FormI18nKeys;
     /** Indica que el formulari ha de fer una petició onChange inicial */
     formInitOnChangeRequest?: true;
+    /** Títol del diàleg amb el formulari */
+    formDialogTitle?: string;
     /** Component amb el contingut (camps) del formulari */
     formDialogContent?: React.ReactElement;
     /** Botons pel component de diàleg */
@@ -65,7 +67,7 @@ export type ActionReportButtonProps = {
     /** Propietats pel component de diàleg */
     formDialogComponentProps?: any;
     /** Funció que processa els resultats d'executar l'artefacte i retorna un element per a mostrar al diàleg com a resultat (només per a artefactes de tipus acció) */
-    formDialogResultProcessor?: (result?: any) => React.ReactElement;
+    formDialogResultProcessor?: (result?: any) => React.ReactElement | undefined;
     /** Event que es llença quan l'execució de l'artefacte finalitza sense errors */
     onSuccess?: (result?: any) => void;
     /** Event que es llença quan l'execució de l'artefacte finalitza amb errors */
@@ -163,7 +165,7 @@ export const useActionReportLogic = (
     formDialogContent?: React.ReactElement,
     formDialogButtons?: DialogButton[],
     formDialogComponentPropsArg?: any,
-    formDialogResultProcessor?: (result?: any) => React.ReactElement,
+    formDialogResultProcessor?: (result?: any) => React.ReactElement | undefined,
     onSuccess?: (result?: any) => void,
     onError?: (error?: any) => void,
     onClose?: () => void,
@@ -179,10 +181,14 @@ export const useActionReportLogic = (
         artifactAction: apiArtifactAction,
         artifactReport: apiArtifactReport,
     } = useResourceApiService(resourceName);
-    const execAction: FormDialogSubmitFn = (id: any, data?: any) =>
+    const execAction: FormDialogSubmitFn = (id: any, data: any) =>
         new Promise((resolve, reject) => {
             if (action != null) {
-                const requestArgs = { id, code: action, data };
+                const requestArgs = {
+                    id,
+                    code: action,
+                    data: { ...formAdditionalDataArg, ...data },
+                };
                 apiArtifactAction(id, requestArgs)
                     .then((result: any) => {
                         if (onSuccess) {
@@ -200,7 +206,7 @@ export const useActionReportLogic = (
                 console.error("Couldn't exec action without code");
             }
         });
-    const generateReport: FormDialogSubmitFn = (id: any, data?: any) =>
+    const generateReport: FormDialogSubmitFn = (id: any, data: any) =>
         new Promise((resolve, reject) => {
             if (report != null) {
                 const requestArgs = {
@@ -255,7 +261,7 @@ export const useActionReportLogic = (
                 apiLink?.title ?? (action != null ? 'Exec ' + action : 'Generate ' + report);
             formDialogShow(id, {
                 title: dialogTitle ?? formDialogTitle,
-                additionalData: formAdditionalData ?? formAdditionalDataArg,
+                additionalData: formAdditionalData,
                 initOnChangeRequest: formInitOnChangeRequest,
                 formContent: formDialogContent,
                 dialogComponentProps: formDialogComponentProps ??
@@ -282,14 +288,14 @@ export const useActionReportLogic = (
                     confirmDialogComponentProps
                 ).then((value: any) => {
                     if (value) {
-                        execAction(id, formAdditionalDataArg);
+                        execAction(id);
                     }
                 });
             } else {
-                execAction(id, formAdditionalDataArg);
+                execAction(id);
             }
         } else if (report != null) {
-            generateReport(null, formAdditionalDataArg);
+            generateReport(null);
         }
     };
     const [artifact, setArtifact] = React.useState<any>();
@@ -359,6 +365,7 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
         formAdditionalData,
         formI18nKeys,
         formInitOnChangeRequest,
+        formDialogTitle,
         formDialogContent,
         formDialogButtons,
         formDialogComponentProps,
@@ -401,7 +408,7 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
         <ButtonComponent
             disabled={disabled}
             onClick={() => {
-                handleButtonClick(id);
+                handleButtonClick(id, formDialogTitle);
                 onClickFromComponentProps?.();
             }}
             title={buttonTitle}

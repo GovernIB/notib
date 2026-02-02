@@ -82,6 +82,16 @@ const translationCa = {
         organs: {
             grid: {
                 title: 'Òrgans gestors',
+                sync: {
+                    title: 'Sincronització DIR3',
+                    dialogTitle: 'Sincronització DIR3',
+                    dialogButton: {
+                        cancel: 'Cancel·lar',
+                        query: 'Consultar canvis',
+                        apply: 'Aplicar canvis',
+                    },
+                    success: 'Canvis aplicats amb èxit',
+                },
             },
             form: {
                 titleUpdate: 'Modificar òrgan gestor',
