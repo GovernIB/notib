@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.logic.service;
 
@@ -125,7 +125,7 @@ import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.AWE;
 
 /**
  * Implementació del servei de gestió de notificacions.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -880,7 +880,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<CodiValorDto> llistarNivellsAdministracions() {
@@ -898,7 +898,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<CodiValorDto> llistarComunitatsAutonomes() {
@@ -934,7 +934,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<ProvinciesDto> llistarProvincies() {
@@ -952,7 +952,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<ProvinciesDto> llistarProvincies(String codiCA) {
@@ -1001,7 +1001,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<OrganGestorDto> unitatsPerCodi(String codi) {
@@ -1013,7 +1013,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<OrganGestorDto> unitatsPerDenominacio(String denominacio) {
@@ -1025,7 +1025,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<NotificacioEventDto> eventFindAmbNotificacio(Long entitatId, Long notificacioId) {
@@ -1052,7 +1052,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public NotificacioEventDto findUltimEventCallbackByNotificacio(Long notificacioId) {
@@ -1068,7 +1068,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public NotificacioEventDto findUltimEventRegistreByNotificacio(Long notificacioId) {
@@ -1412,7 +1412,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Transactional
 	@Override
 	public String marcarComProcessada(Long notificacioId, String motiu, boolean isAdministrador) throws Exception {
@@ -1506,7 +1506,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			return true;
 		} catch (Exception e) {
 			log.debug("Error reactivant consultes d'estat de la notificació (notificacioId=" + notificacioId + ")", e);
-			return false;	
+			return false;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1542,7 +1542,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	// SCHEDULLED METHODS
 	////////////////////////////////////////////////////////////////
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public List<Long> getNotificacionsPendentsRegistrar() {
@@ -1679,7 +1679,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Transactional
 	@Override
 	public void enviamentRefrescarEstat(ConsultaNotificaRequest consulta) {
@@ -1693,7 +1693,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public List<Long> getNotificacionsPendentsRefrescarEstatRegistre() {
@@ -1706,7 +1706,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Transactional
 	@Override
 	public void enviamentRefrescarEstatRegistre(Long enviamentId) {
@@ -1794,14 +1794,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 						pluginHelper.getRegistreReintentsMaxProperty(),
 						paginacioHelper.toSpringDataPageable(paginacioParams));
 			}
-				
+
 			return page != null && page.getContent() != null && !page.getContent().isEmpty() ?
 					paginacioHelper.toPaginaDto(page, NotificacioDto.class, notificacioMapper::toErrorRegistreDto): paginacioHelper.getPaginaDtoBuida(NotificacioDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	public List<Long> findNotificacionsIdAmbErrorRegistre(Long entitatId, NotificacioRegistreErrorFiltreDto filtre) {
 
@@ -1873,7 +1873,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			log.debug("Error reactivant consultes d'estat de la notificació (notificacioId=" + notificacioId + ")", e);
 		} finally {
 			metricsHelper.fiMetrica(timer);
-		}		
+		}
 	}
 
 	@Transactional
@@ -1962,6 +1962,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 					var estatEnviament = enviamentSmService.getEstatEnviament(enviament.getUuid());
 					var delay = enviamentCounter.getAndIncrement() * globalDelay;
 					var e = enviament;
+					if (EnviamentSmEstat.NOU.equals(estatEnviament)) {
+						new Thread(() ->enviamentSmService.registreEnviament(e.getUuid(), true)).start();
+						resposta.getExecutades().add(element);
+						continue;
+					}
 					if (EnviamentSmEstat.REGISTRE_ERROR.equals(estatEnviament) || EnviamentSmEstat.REGISTRE_PENDENT.equals(estatEnviament)) {
 						notificacio.refreshRegistre();
 						new Thread(() -> enviamentSmService.registreReset(e.getUuid(), delay)).start();
@@ -2410,7 +2415,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private int getMidaMinIdCsv() {
 		return configHelper.getConfigAsInteger("es.caib.notib.document.consulta.id.csv.mida.min");
 	}
-	
+
 
 	@Transactional
 	public void estatCalcularCampsAddicionals(
@@ -2497,14 +2502,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 
 	public DocumentDto consultaDocumentIMetadades(String identificador, Boolean esUuid) {
-		
+
 		Document documentArxiu = null;
 		try {
 			documentArxiu = pluginHelper.arxiuDocumentConsultar(identificador, null, true, esUuid);
 		} catch (Exception ex){
 			log.debug("S'ha produit un error obtenent els detalls del document con identificador: " + identificador, ex);
 			return null;
-			
+
 		}
 		var documentDto = new DocumentDto();
 		if (documentArxiu != null) {
