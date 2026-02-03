@@ -21,18 +21,18 @@ import javax.validation.constraints.NotNull;
 @Setter
 @NoArgsConstructor
 @ResourceConfig(
-        descriptionField = "id",
-        accessConstraints = @ResourceAccessConstraint(
-                type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-                roles = { BaseConfig.ROLE_ADMIN },
-                grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
-        )
+	descriptionField = "id",
+	accessConstraints = @ResourceAccessConstraint(
+		type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+		roles = {BaseConfig.ROLE_ADMIN},
+		grantedPermissions = {PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE}
+	)
 )
 public class EnviamentResource extends BaseResource<Long> {
-    private Boolean entregaPostalActiva = true;
-    @Transient
-    private Boolean perEmail = true;
-    @Transient
-    @NotNull
-    private String campProva;
+	private Boolean entregaPostalActiva = true;
+	@Transient
+	private Boolean perEmail = true;
+	@Transient
+	@NotNull
+	private String campProva;
 }

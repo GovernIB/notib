@@ -11,8 +11,8 @@ import {
     MuiFormTabContent,
     useFormContext,
 } from 'reactlib';
-import ProcedimentFormTabGrups from './ProcedimentFormTabGrups.tsx';
-import ProcedimentFormTabPermisos from './ProcedimentFormTabPermisos';
+// import ProcedimentFormTabGrups from './ProcedimentFormTabGrups.tsx';
+// import ProcedimentFormTabPermisos from './ProcedimentFormTabPermisos';
 
 const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
     const { setSubtitle } = props;
@@ -23,16 +23,16 @@ const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void
     }, [data]);
     const grupsTabLabel = (
         <Badge badgeContent={data.grupsCount} color="primary">
-            {t('page.procediments.form.tabs.grups')}
+            {t('page.servei.form.tabs.grups')}
         </Badge>
     );
     const permisosTabLabel = (
         <Badge badgeContent={data.aclEntryCount} color="primary">
-            {t('page.procediments.form.tabs.permisos')}
+            {t('page.servei.form.tabs.permisos')}
         </Badge>
     );
     const tabs = [
-        t('page.procediments.form.tabs.dades'),
+        t('page.servei.form.tabs.dades'),
         { label: grupsTabLabel },
         { label: permisosTabLabel },
     ];
@@ -72,12 +72,12 @@ const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void
                     </Grid>
                 </Grid>
             </MuiFormTabContent>
-            <MuiFormTabContent index={2}>
-                <ProcedimentFormTabGrups />
-            </MuiFormTabContent>
-            <MuiFormTabContent index={3}>
-                <ProcedimentFormTabPermisos />
-            </MuiFormTabContent>
+            {/*<MuiFormTabContent index={2}>*/}
+            {/*    <ProcedimentFormTabGrups />*/}
+            {/*</MuiFormTabContent>*/}
+            {/*<MuiFormTabContent index={3}>*/}
+            {/*    <ProcedimentFormTabPermisos />*/}
+            {/*</MuiFormTabContent>*/}
         </MuiFormTabs>
     );
 };
@@ -91,11 +91,11 @@ export const ProcedimentForm: React.FC = () => {
             <MuiForm
                 resourceName="procedimentResource"
                 id={id != null ? parseInt(id) : id}
-                additionalData={{ tipus: 'PROCEDIMENT' }}
+                additionalData={{ tipus: 'SERVEI' }}
                 title={
                     id != null
-                        ? t('page.procediments.form.titleUpdate')
-                        : t('page.procediments.form.titleCreate')
+                        ? t('page.servei.form.titleUpdate')
+                        : t('page.servei.form.titleCreate')
                 }
                 toolbarSubtitle={id != null ? subtitle : undefined}
                 componentProps={{ style: { height: '100%' } }}

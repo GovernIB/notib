@@ -7,6 +7,8 @@ const translationEs = {
         propietats: 'Propiedades',
         currentEntitat: 'Entidad actual',
         organsGestors: 'Órganos gestores',
+        procediments: 'Procediments',
+        serveis: 'Serveis',
         grups: 'Grupos',
         enviaments: 'Envios',
     },
@@ -136,6 +138,34 @@ const translationEs = {
             form: {
                 titleCreate: 'Crear propiedad configurable',
                 titleUpdate: 'Modificar propiedad configurable',
+            },
+        },
+        procediment: {
+            grid: {
+                title: 'Procedimientos',
+            },
+            form: {
+                titleCreate: 'Crear procedimiento',
+                titleUpdate: 'Modificar procedimiento',
+                tabs: {
+                    dades: 'Datos',
+                    grups: 'Grupos',
+                    permisos: 'Permisos',
+                },
+            },
+        },
+        servei: {
+            grid: {
+                title: 'Servicios',
+            },
+            form: {
+                titleCreate: 'Crear servicio',
+                titleUpdate: 'Modificar servicio',
+                tabs: {
+                    dades: 'Datos',
+                    grups: 'Grupos',
+                    permisos: 'Permisos',
+                },
             },
         },
         notFound: {

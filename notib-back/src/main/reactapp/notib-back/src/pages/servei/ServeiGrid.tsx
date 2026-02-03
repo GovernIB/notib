@@ -24,7 +24,7 @@ const columns = [
         flex: 0.6,
     },
     {
-        field: 'cie',
+        field: 'entregaCie',
         flex: 0.6,
     },
     {
@@ -70,16 +70,15 @@ const columns = [
         },
     },
 ];
-
 export const ProcedimentGrid = () => {
     const { t } = useTranslation();
     return (
         <GridPage disableMargins={false}>
             <MuiDataGrid
-                title={t('page.procediment.grid.title')}
+                title={t('page.servei.grid.title')}
                 resourceName="procedimentResource"
                 columns={columns}
-                staticFilter="tipus:'PROCEDIMENT'"
+                staticFilter="tipus:'SERVEI'"
                 paginationActive
                 toolbarCreateLink="form"
                 rowLink="form/{{id}}"
