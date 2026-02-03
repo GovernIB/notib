@@ -25,7 +25,6 @@ const EntitatFormTabTipusDocs: React.FC = () => {
     const [tipusDocumentOptions, setTipusDocumentOptions] = React.useState<any>();
     const [entitatTipusDocumentRows, setEntitatTipusDocumentRows] = React.useState<any[]>();
     const [hiddenEnumValues, setHiddenEnumValues] = React.useState<string[]>();
-
     const refreshRows = () => {
         const args = {
             filter: 'entitat.id:' + id,
@@ -35,20 +34,17 @@ const EntitatFormTabTipusDocs: React.FC = () => {
             setEntitatTipusDocumentRows(response.rows);
         });
     };
-
     React.useEffect(() => {
         if (fields?.length) {
             const tipusDocDefaultField = fields.find((f) => f.name === 'tipusDocDefault');
             tipusDocDefaultField && setTipusDocumentOptions(tipusDocDefaultField.options);
         }
     }, [fields]);
-
     React.useEffect(() => {
         if (apiIsReady) {
             refreshRows();
         }
     }, [apiIsReady]);
-
     React.useEffect(() => {
         if (tipusDocumentOptions) {
             const hiddenEnumValues = Object.keys(tipusDocumentOptions).filter((k) => {
@@ -57,7 +53,6 @@ const EntitatFormTabTipusDocs: React.FC = () => {
             setHiddenEnumValues(hiddenEnumValues);
         }
     }, [tipusDocumentOptions, entitatTipusDocumentRows]);
-
     const hanldleSwitchOnChange = (key: string, checked: boolean) => {
         const found = entitatTipusDocumentRows?.find((r) => r.tipusDocument === key);
         if (checked) {

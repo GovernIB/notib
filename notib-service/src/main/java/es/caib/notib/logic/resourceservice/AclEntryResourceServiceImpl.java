@@ -3,6 +3,7 @@ package es.caib.notib.logic.resourceservice;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.helper.AclHelper;
+import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.exception.ResourceNotUpdatedException;
@@ -11,6 +12,7 @@ import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import es.caib.notib.logic.intf.base.util.StringUtil;
 import es.caib.notib.logic.intf.model.AclEntryResource;
 import es.caib.notib.logic.intf.model.EntitatResource;
+import es.caib.notib.logic.intf.model.OrganGestorResource;
 import es.caib.notib.logic.intf.resourceservice.AclEntryResourceService;
 import es.caib.notib.persist.resourceentity.AclEntryResourceEntity;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +43,7 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 
 	private final AclHelper aclHelper;
 	private final AuthenticationHelper authenticationHelper;
+	private final UserSessionHelper userSessionHelper;
 
 	@Override
 	protected boolean isEntityRepositoryOptional() {
@@ -53,16 +56,16 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 		Class<?> resourceClass = getClassFromResourceName(pk.getResourceName());
 		if (resourceClass != null) {
 			Acl acl = aclHelper.get(
-					resourceClass,
-					pk.getResourceId(),
-					null);
+				resourceClass,
+				pk.getResourceId(),
+				null);
 			if (acl != null) {
 				List<AclEntryResourceEntity> entries = toAclEntries(acl).stream().
-						filter(e -> {
-							AclEntryResource.AclEntryPk epk = AclEntryResource.AclEntryPk.deserializeFromString(e.getId());
-							return epk.getSidName().equals(pk.getSidName()) && epk.isSidGrantedAuthority() == pk.isSidGrantedAuthority();
-						}).
-						collect(Collectors.toList());
+					filter(e -> {
+						AclEntryResource.AclEntryPk epk = AclEntryResource.AclEntryPk.deserializeFromString(e.getId());
+						return epk.getSidName().equals(pk.getSidName()) && epk.isSidGrantedAuthority() == pk.isSidGrantedAuthority();
+					}).
+					collect(Collectors.toList());
 				if (!entries.isEmpty()) {
 					return Optional.of(entries.get(0));
 				}
@@ -73,38 +76,38 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 
 	@Override
 	protected Page<AclEntryResourceEntity> entityRepositoryFindEntities(
-			String quickFilter,
-			String filter,
-			String[] namedQueries,
-			Pageable pageable) {
+		String quickFilter,
+		String filter,
+		String[] namedQueries,
+		Pageable pageable) {
 		boolean filterContainsOr = filter != null && filter.contains(" or ");
 		List<String[]> filterTriplets = extractFilterTriplets(filter);
 		String filterResourceName = filterTriplets.stream().
-				filter(t -> t[0].equals("resourceName") && t[1].equals(":")).
-				findFirst().
-				map(t-> t[2]).
-				orElse(null);
+			filter(t -> t[0].equals("resourceName") && t[1].equals(":")).
+			findFirst().
+			map(t -> t[2]).
+			orElse(null);
 		String filterResourceId = filterTriplets.stream().
-				filter(t -> t[0].equals("resourceId") && t[1].equals(":")).
-				findFirst().
-				map(t-> t[2]).
-				orElse(null);
+			filter(t -> t[0].equals("resourceId") && t[1].equals(":")).
+			findFirst().
+			map(t -> t[2]).
+			orElse(null);
 		boolean filterOk = filter != null && !filterContainsOr && filterResourceName != null && filterResourceId != null;
 		if (filterOk) {
 			Class<?> resourceClass = getClassFromResourceName(filterResourceName);
 			Long resourceId = Long.parseLong(filterResourceId);
 			Acl acl = aclHelper.get(
-					resourceClass,
-					resourceId,
-					null);
+				resourceClass,
+				resourceId,
+				null);
 			if (acl != null) {
 				List<AclEntryResourceEntity> resultList = toAclEntries(acl);
 				return new PageImpl<>(
-						pageable.getSort().isUnsorted() ? resultList : resultList.stream().
-								sorted(createGetterBasedComparator(pageable.getSort())).
-								collect(Collectors.toList()),
-						pageable,
-						resultList.size());
+					pageable.getSort().isUnsorted() ? resultList : resultList.stream().
+						sorted(createGetterBasedComparator(pageable.getSort())).
+						collect(Collectors.toList()),
+					pageable,
+					resultList.size());
 			} else {
 				return Page.empty();
 			}
@@ -134,19 +137,19 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 		if (resource.isPerm9Allowed()) permissionsGranted.add(PermissionEnum.PERM9);
 		if (resource.isPermXAllowed()) permissionsGranted.add(PermissionEnum.PERMX);
 		aclHelper.set(
-				getClassFromResourceName(resource.getResourceName()),
-				resource.getResourceId(),
-				resource.getSidName(),
-				resource.isSidGrantedAuthority(),
-				permissionsGranted);
+			getClassFromResourceName(resource.getResourceName()),
+			resource.getResourceId(),
+			resource.getSidName(),
+			resource.isSidGrantedAuthority(),
+			permissionsGranted);
 		return entity;
 	}
 
 	@Override
 	protected AclEntryResource entityDetachConvertAndMerge(
-			AclEntryResourceEntity entity,
-			Map<String, AnswerRequiredException.AnswerValue> answers,
-			boolean create) {
+		AclEntryResourceEntity entity,
+		Map<String, AnswerRequiredException.AnswerValue> answers,
+		boolean create) {
 		AclEntryResource response = entityToResource(entity);
 		entityAfterMergeLogic(response, entity, answers, create);
 		return response;
@@ -156,10 +159,10 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 	protected void entityRepositoryDelete(AclEntryResourceEntity entity) {
 		AclEntryResource resource = entity.getResource();
 		aclHelper.delete(
-				getClassFromResourceName(resource.getResourceName()),
-				resource.getResourceId(),
-				resource.getSidName(),
-				resource.isSidGrantedAuthority());
+			getClassFromResourceName(resource.getResourceName()),
+			resource.getResourceId(),
+			resource.getSidName(),
+			resource.isSidGrantedAuthority());
 	}
 
 	@Override
@@ -173,13 +176,13 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 
 	@Override
 	protected AclEntryResourceEntity resourceToEntity(
-			AclEntryResource resource,
-			String pk,
-			Map<String, Persistable<?>> referencedEntities) {
+		AclEntryResource resource,
+		String pk,
+		Map<String, Persistable<?>> referencedEntities) {
 		return AclEntryResourceEntity.builder().
-				id(pk).
-				resource(resource).
-				build();
+			id(pk).
+			resource(resource).
+			build();
 	}
 
 	@Override
@@ -200,24 +203,24 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 
 	@Override
 	protected void beforeUpdateSave(
-			AclEntryResourceEntity entity,
-			AclEntryResource resource,
-			Map<String, AnswerRequiredException.AnswerValue> answers) {
+		AclEntryResourceEntity entity,
+		AclEntryResource resource,
+		Map<String, AnswerRequiredException.AnswerValue> answers) {
 		AclEntryResource.AclEntryPk pk = AclEntryResource.AclEntryPk.deserializeFromString(resource.getId());
 		if (pk.isSidGrantedAuthority() != resource.isSidGrantedAuthority() || !pk.getSidName().equals(resource.getSidName())) {
 			aclHelper.delete(
-					getClassFromResourceName(pk.getResourceName()),
-					pk.getResourceId(),
-					pk.getSidName(),
-					pk.isSidGrantedAuthority());
+				getClassFromResourceName(pk.getResourceName()),
+				pk.getResourceId(),
+				pk.getSidName(),
+				pk.isSidGrantedAuthority());
 		}
 	}
 
 	@Override
 	protected void updateEntityWithResource(
-			AclEntryResourceEntity entity,
-			AclEntryResource resource,
-			Map<String, Persistable<?>> referencedEntities) {
+		AclEntryResourceEntity entity,
+		AclEntryResource resource,
+		Map<String, Persistable<?>> referencedEntities) {
 		entity.setResource(resource);
 	}
 
@@ -227,39 +230,39 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 			return Collections.emptyList();
 		}
 		Map<Sid, List<AccessControlEntry>> entriesBySid = accessControlEntries.stream().
-				collect(Collectors.groupingBy(AccessControlEntry::getSid));
+			collect(Collectors.groupingBy(AccessControlEntry::getSid));
 		String resourceClassName = acl.getObjectIdentity().getType();
 		Serializable resourceId = acl.getObjectIdentity().getIdentifier();
 		return entriesBySid.entrySet().stream().
-				map(entry -> formAccessControlEntryToAclEntryEntity(
-						resourceClassName,
-						resourceId,
-						entry.getKey(),
-						entry.getValue())).
-				collect(Collectors.toList());
+			map(entry -> formAccessControlEntryToAclEntryEntity(
+				resourceClassName,
+				resourceId,
+				entry.getKey(),
+				entry.getValue())).
+			collect(Collectors.toList());
 	}
 
 	private AclEntryResourceEntity formAccessControlEntryToAclEntryEntity(
-			String resourceClassName,
-			Serializable resourceId,
-			Sid sid,
-			List<AccessControlEntry> aces) {
+		String resourceClassName,
+		Serializable resourceId,
+		Sid sid,
+		List<AccessControlEntry> aces) {
 		AclEntryResource aclEntry = new AclEntryResource();
 		if (sid instanceof PrincipalSid) {
 			aclEntry.setSidGrantedAuthority(false);
-			aclEntry.setSidName(((PrincipalSid)sid).getPrincipal());
+			aclEntry.setSidName(((PrincipalSid) sid).getPrincipal());
 		} else if (sid instanceof GrantedAuthoritySid) {
 			aclEntry.setSidGrantedAuthority(true);
-			aclEntry.setSidName(((GrantedAuthoritySid)sid).getGrantedAuthority());
+			aclEntry.setSidName(((GrantedAuthoritySid) sid).getGrantedAuthority());
 		}
 		String resourceName = getResourceNameFromClassName(resourceClassName);
 		aclEntry.setResourceName(resourceName);
 		aclEntry.setResourceId(resourceId);
 		AclEntryResource.AclEntryPk pk = new AclEntryResource.AclEntryPk(
-				resourceName,
-				resourceId,
-				aclEntry.isSidGrantedAuthority(),
-				aclEntry.getSidName());
+			resourceName,
+			resourceId,
+			aclEntry.isSidGrantedAuthority(),
+			aclEntry.getSidName());
 		aclEntry.setId(pk.serializeToString());
 		aces.forEach(a -> {
 			int mask = a.getPermission().getMask();
@@ -281,21 +284,22 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 			if ((mask & ExtendedPermission.PERMX.getMask()) != 0) aclEntry.setPermXAllowed(true);
 		});
 		return resourceToEntity(
-				aclEntry,
-				pk.serializeToString(),
-				null);
+			aclEntry,
+			pk.serializeToString(),
+			null);
 	}
 
 	private static final Pattern TRIPLET_PATTERN = Pattern.compile(
-			"([a-zA-Z_][a-zA-Z0-9_\\.]*)" +
-					"\\s*" +
-					"(:|=|!=|>=|<=|>|<|~|!~|\\bin\\b)" +
-					"\\s*" +
-					"(\\[[^\\]]*\\]|'[^']*'|\"[^\"]*\"|\\d+\\.?\\d*|[^\\s\\)]+)",
-			Pattern.CASE_INSENSITIVE);
+		"([a-zA-Z_][a-zA-Z0-9_\\.]*)" +
+			"\\s*" +
+			"(:|=|!=|>=|<=|>|<|~|!~|\\bin\\b)" +
+			"\\s*" +
+			"(\\[[^\\]]*\\]|'[^']*'|\"[^\"]*\"|\\d+\\.?\\d*|[^\\s\\)]+)",
+		Pattern.CASE_INSENSITIVE);
 
 	private static final List<Map.Entry<Class<?>, Class<?>>> aclClassMapping = List.of(
-			Map.entry(EntitatResource.class, AclHelper.ENTITAT_CLASS));
+		Map.entry(EntitatResource.class, AclHelper.ENTITAT_CLASS),
+		Map.entry(OrganGestorResource.class, AclHelper.ORGAN_GESTOR_CLASS));
 
 	private List<String[]> extractFilterTriplets(String filter) {
 		Matcher matcher = TRIPLET_PATTERN.matcher(filter);
@@ -318,15 +322,15 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 				ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 				String basePath = BaseConfig.BASE_PACKAGE.replace(".", "/");
 				org.springframework.core.io.Resource[] resources = resolver.getResources(
-						"classpath*:" + basePath + "/**/" +
-								StringUtil.capitalize(resourceName) +
-								".class");
-				for (org.springframework.core.io.Resource resource: resources) {
+					"classpath*:" + basePath + "/**/" +
+						StringUtil.capitalize(resourceName) +
+						".class");
+				for (org.springframework.core.io.Resource resource : resources) {
 					String path = resource.getURL().getPath();
 					String className = path.
-							substring(path.indexOf(basePath)).
-							replace("/", ".").
-							replace(".class", "");
+						substring(path.indexOf(basePath)).
+						replace("/", ".").
+						replace(".class", "");
 					return getAclClassMappingForKey(Class.forName(className));
 				}
 			} catch (IOException | ClassNotFoundException ex) {
@@ -349,7 +353,7 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 	}
 
 	private Class<?> getAclClassMappingForKey(Class<?> key) {
-		for (Map.Entry<Class<?>, Class<?>> mapping: aclClassMapping) {
+		for (Map.Entry<Class<?>, Class<?>> mapping : aclClassMapping) {
 			if (mapping.getKey().equals(key)) {
 				return mapping.getValue();
 			}
@@ -358,7 +362,7 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 	}
 
 	private Class<?> getAclClassMappingForValue(Class<?> value) {
-		for (Map.Entry<Class<?>, Class<?>> mapping: aclClassMapping) {
+		for (Map.Entry<Class<?>, Class<?>> mapping : aclClassMapping) {
 			if (mapping.getValue().equals(value)) {
 				return mapping.getKey();
 			}
@@ -369,50 +373,66 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 	private void checkAclPermissionOnResource(AclEntryResource resource) {
 		Class<?> resourceClass = getClassFromResourceName(resource.getResourceName());
 		if (Objects.equals(resourceClass, AclHelper.ENTITAT_CLASS)) {
-			// Per a poder modificar les ACLs d'una entitat s'ha de tenir el rol NOT_SUPER o ser administrador d'entitat
-			// (rol NOT_ADMIN) amb permisos d'administració (PERM2) sobre l'entitat.
-			boolean isRoleSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);
-			if (!isRoleSuper) {
-				boolean isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
-				if (isRoleAdmin) {
-					boolean permissionGranted = aclHelper.anyPermissionGranted(
-						AclHelper.ENTITAT_CLASS,
-						resource.getResourceId(),
-						List.of(ExtendedPermission.PERM2), // Permís per administrar
-						aclHelper.getCurrentUserSids().toArray(Sid[]::new));
-					if (permissionGranted) {
-						return;
-					}
-				}
-			} else {
+			boolean permissionGranted = isAclPermissionGrantedForEntitat(resource.getResourceId());
+			if (permissionGranted) {
+				return;
+			}
+		} else if (
+			Objects.equals(resourceClass, AclHelper.ORGAN_GESTOR_CLASS) ||
+				Objects.equals(resourceClass, AclHelper.PROCEDIMENT_CLASS) ||
+				Objects.equals(resourceClass, AclHelper.SERVEI_CLASS)) {
+			Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
+			boolean permissionGranted = isAclPermissionGrantedForEntitat(currentEntitatId);
+			if (permissionGranted) {
 				return;
 			}
 		}
 		throw new ResourceNotUpdatedException(
 			AclEntryResource.class,
 			resource.getId(),
-			"Not allowed to update ACLs on " + resource.getResourceName() + " resources");
+			"You're not allowed to update ACLs on " + resource.getResourceName() + " resources");
+	}
+
+	private boolean isAclPermissionGrantedForEntitat(Serializable entitatId) {
+		// Per a poder modificar les ACLs d'una entitat s'ha de tenir el rol NOT_SUPER o ser administrador d'entitat
+		// (rol NOT_ADMIN) amb permisos d'administració (PERM2) sobre l'entitat especificada.
+		boolean isRoleSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);
+		if (!isRoleSuper) {
+			boolean isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
+			if (isRoleAdmin) {
+				return aclHelper.anyPermissionGranted(
+					AclHelper.ENTITAT_CLASS,
+					entitatId,
+					List.of(ExtendedPermission.PERM2), // Permís per administrar
+					aclHelper.getCurrentUserSids().toArray(Sid[]::new));
+			}
+		} else {
+			return true;
+		}
+		return false;
 	}
 
 	private <T> Comparator<T> createGetterBasedComparator(Sort sort) {
 		return sort.stream().
-				map(this::<T>createComparatorForOrder).
-				reduce(Comparator::thenComparing).
-				orElse((a, b) -> 0);
+			map(this::<T>createComparatorForOrder).
+			reduce(Comparator::thenComparing).
+			orElse((a, b) -> 0);
 	}
+
 	@SuppressWarnings("unchecked")
 	private <T> Comparator<T> createComparatorForOrder(Sort.Order order) {
 		switch (order.getProperty()) {
 			case "subjectType":
-				return (Comparator<T>)createComparator(AclEntryResourceEntity::getSidGrantedAuthority, order.getDirection());
+				return (Comparator<T>) createComparator(AclEntryResourceEntity::getSidGrantedAuthority, order.getDirection());
 			case "subjectValue":
-				return (Comparator<T>)createComparator(AclEntryResourceEntity::getSidName, order.getDirection());
+				return (Comparator<T>) createComparator(AclEntryResourceEntity::getSidName, order.getDirection());
 			default:
 				return (a, b) -> 0;
 		}
 	}
+
 	private <T, U extends Comparable<U>> Comparator<T> createComparator(
-			Function<T, U> extractor, Sort.Direction direction) {
+		Function<T, U> extractor, Sort.Direction direction) {
 		return (a, b) -> {
 			U valueA = extractor.apply(a);
 			U valueB = extractor.apply(b);

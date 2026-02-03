@@ -23,21 +23,21 @@ const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void
     }, [data]);
     const grupsTabLabel = (
         <Badge badgeContent={data.grupsCount} color="primary">
-            {t('page.procediments.form.tabs.grups')}
+            {t('page.procediment.form.tabs.grups')}
         </Badge>
     );
     const permisosTabLabel = (
         <Badge badgeContent={data.aclEntryCount} color="primary">
-            {t('page.procediments.form.tabs.permisos')}
+            {t('page.procediment.form.tabs.permisos')}
         </Badge>
     );
     const tabs = [
-        t('page.procediments.form.tabs.dades'),
+        t('page.procediment.form.tabs.dades'),
         { label: grupsTabLabel },
         { label: permisosTabLabel },
     ];
     return (
-        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1, 2, 4]}>
+        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1, 2]}>
             <MuiFormTabContent index={0} showOnCreate>
                 <Grid container spacing={2}>
                     <Grid size={4}>
@@ -72,10 +72,10 @@ const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void
                     </Grid>
                 </Grid>
             </MuiFormTabContent>
-            <MuiFormTabContent index={2}>
+            <MuiFormTabContent index={1}>
                 <ProcedimentFormTabGrups />
             </MuiFormTabContent>
-            <MuiFormTabContent index={3}>
+            <MuiFormTabContent index={2}>
                 <ProcedimentFormTabPermisos />
             </MuiFormTabContent>
         </MuiFormTabs>
@@ -94,8 +94,8 @@ export const ProcedimentForm: React.FC = () => {
                 additionalData={{ tipus: 'PROCEDIMENT' }}
                 title={
                     id != null
-                        ? t('page.procediments.form.titleUpdate')
-                        : t('page.procediments.form.titleCreate')
+                        ? t('page.procediment.form.titleUpdate')
+                        : t('page.procediment.form.titleCreate')
                 }
                 toolbarSubtitle={id != null ? subtitle : undefined}
                 componentProps={{ style: { height: '100%' } }}
