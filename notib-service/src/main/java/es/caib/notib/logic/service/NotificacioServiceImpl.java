@@ -1961,6 +1961,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 					var estatEnviament = enviamentSmService.getEstatEnviament(enviament.getUuid());
 					var delay = enviamentCounter.getAndIncrement() * globalDelay;
 					var e = enviament;
+					if (EnviamentSmEstat.NOU.equals(estatEnviament)) {
+						new Thread(() ->enviamentSmService.registreEnviament(e.getUuid(), true)).start();
+						resposta.getExecutades().add(element);
+						continue;
+					}
 					if (EnviamentSmEstat.REGISTRE_ERROR.equals(estatEnviament) || EnviamentSmEstat.REGISTRE_PENDENT.equals(estatEnviament)) {
 						notificacio.refreshRegistre();
 						new Thread(() -> enviamentSmService.registreReset(e.getUuid(), delay)).start();
