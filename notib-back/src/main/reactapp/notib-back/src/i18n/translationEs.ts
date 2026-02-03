@@ -11,6 +11,11 @@ const translationEs = {
         serveis: 'Serveis',
         grups: 'Grupos',
         enviaments: 'Envios',
+        pagadors: {
+            cie: "Centros de impresión y ensobrado",
+            postal: "Operadores postal"
+        },
+
     },
     page: {
         home: {
@@ -167,6 +172,18 @@ const translationEs = {
                     permisos: 'Permisos',
                 },
             },
+        },
+        pagador: {
+            cie: {
+                grid: {
+                    title: "Centros de impresión y ensobrado"
+                }
+            },
+            postal: {
+                grid: {
+                    title: "Operadores postal"
+                }
+            }
         },
         notFound: {
             title: 'Página no encontrada',

@@ -12,6 +12,10 @@ import GrupGrid from './pages/grup/GrupGrid';
 import GrupForm from './pages/grup/GrupForm';
 import OrganGrid from './pages/organ/OrganGrid';
 import OrganForm from './pages/organ/OrganForm';
+import PagadorCieGrid from './pages/pagadorCie/PagadorCieGrid';
+import PagadorCieForm from './pages/pagadorCie/PagadorCieForm';
+import PagadorPostalGrid from './pages/pagadorPostal/PagadorPostalGrid';
+import PagadorPostalForm from './pages/pagadorPostal/PagadorPostalForm';
 import Enviaments from './pages/Enviaments';
 import NotFoundPage from './pages/NotFound';
 import Propietats from './pages/propietat/Propietats';
@@ -64,6 +68,20 @@ const AppRoutes = () => {
                 <Route path="form">
                     <Route index element={<OrganForm />} />
                     <Route path=":id" element={<OrganForm />} />
+                </Route>
+            </Route>
+            <Route path="pagadorscie">
+                <Route index element={<PagadorCieGrid />} />
+                <Route path="form">
+                    <Route index element={<PagadorCieForm />} />
+                    <Route path=":id" element={<PagadorCieForm />} />
+                </Route>
+            </Route>
+            <Route path="pagadorspostal">
+                <Route index element={<PagadorPostalGrid />} />
+                <Route path="form">
+                    <Route index element={<PagadorPostalForm />} />
+                    <Route path=":id" element={<PagadorPostalForm />} />
                 </Route>
             </Route>
             <Route path="propietats" element={<Propietats />} />

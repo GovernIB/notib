@@ -11,6 +11,10 @@ const translationCa = {
         serveis: 'Serveis',
         grups: 'Grups',
         enviaments: 'Enviaments',
+        pagadors: {
+            cie: "Centres d'impressió i ensobrat",
+            postal: "Operadors postal"
+        },
     },
     page: {
         home: {
@@ -168,10 +172,22 @@ const translationCa = {
                 },
             },
         },
+        pagador: {
+            cie: {
+                grid: {
+                    title: "Centres d'impressió i ensobrat"
+                }
+            },
+            postal: {
+                grid: {
+                    title: "Operadors postals"
+                }
+            }
+        },
         notFound: {
             title: 'Pàgina no trobada',
             toHome: "Anar a l'inici",
-        },
+        }
     },
     component: {
         HeaderThemeSelector: {
