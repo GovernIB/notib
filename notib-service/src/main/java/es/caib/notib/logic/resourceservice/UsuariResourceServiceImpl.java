@@ -64,6 +64,7 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
 				usuariResource.setNomSencer(jwt.getClaimAsString("name"));
 				usuariResource.setNif(jwt.getClaimAsString("nif"));
 				usuariResource.setEmail(jwt.getClaimAsString("email"));
+				usuariResource.setIdioma("ca");
 				return usuariResource;
 			} else if (authentication.getPrincipal() instanceof User) {
 				UsuariResource usuariResource = new UsuariResource();

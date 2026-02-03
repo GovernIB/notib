@@ -4,6 +4,8 @@ import EntitatGrid from './pages/entitat/EntitatGrid';
 import EntitatForm from './pages/entitat/EntitatForm';
 import ProcedimentGrid from './pages/procediment/ProcedimentGrid';
 import ProcedimentForm from './pages/procediment/ProcedimentForm';
+import ServeiGrid from './pages/servei/ServeiGrid';
+import ServeiForm from './pages/servei/ServeiForm';
 import AvisGrid from './pages/avis/AvisGrid';
 import AvisForm from './pages/avis/AvisForm';
 import GrupGrid from './pages/grup/GrupGrid';
@@ -36,7 +38,6 @@ const AppRoutes = () => {
                     <Route path=":id" element={<AvisForm />} />
                 </Route>
             </Route>
-            <Route index element={<Navigate to="/procediments" replace />} />
             <Route path="procediments">
                 <Route index element={<ProcedimentGrid />} />
                 <Route path="form">
@@ -44,7 +45,13 @@ const AppRoutes = () => {
                     <Route path=":id" element={<ProcedimentForm />} />
                 </Route>
             </Route>
-            <Route index element={<Navigate to="/grups" replace />} />
+            <Route path="serveis">
+                <Route index element={<ServeiGrid />} />
+                <Route path="form">
+                    <Route index element={<ServeiForm />} />
+                    <Route path=":id" element={<ServeiForm />} />
+                </Route>
+            </Route>
             <Route path="grups">
                 <Route index element={<GrupGrid />} />
                 <Route path="form">
@@ -52,7 +59,6 @@ const AppRoutes = () => {
                     <Route path=":id" element={<GrupForm />} />
                 </Route>
             </Route>
-            <Route index element={<Navigate to="/organs" replace />} />
             <Route path="organs">
                 <Route index element={<OrganGrid />} />
                 <Route path="form">

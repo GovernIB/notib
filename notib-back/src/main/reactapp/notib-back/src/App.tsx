@@ -58,6 +58,20 @@ const InnerApp: React.FC = () => {
             hidden: currentRole !== ROLE_ADMIN,
         },
         {
+            id: 'procediment',
+            title: t('menu.procediments'),
+            to: '/procediments',
+            icon: 'view_timeline',
+            resourceName: 'procedimentResource',
+        },
+        {
+            id: 'servei',
+            title: t('menu.serveis'),
+            to: '/serveis',
+            icon: 'miscellaneous_services',
+            resourceName: 'procedimentResource',
+        },
+        {
             id: 'grups',
             title: t('menu.grups'),
             to: '/grups',
@@ -65,13 +79,7 @@ const InnerApp: React.FC = () => {
             resourceName: 'grupResource',
             hidden: currentRole !== ROLE_ADMIN,
         },
-        /*{
-        id: 'procediment',
-        title: t('menu.procediments'),
-        to: '/procediment',
-        icon: 'notifications',
-        resourceName: 'procedimentResource',
-    }*/
+        /**/
         /*, {
         id: 'enviaments',
         title: t('menu.enviaments'),

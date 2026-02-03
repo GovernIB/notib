@@ -7,6 +7,8 @@ const translationCa = {
         propietats: 'Propietats',
         currentEntitat: 'Entitat actual',
         organsGestors: 'Òrgans gestors',
+        procediments: 'Procediments',
+        serveis: 'Serveis',
         grups: 'Grups',
         enviaments: 'Enviaments',
     },
@@ -94,6 +96,7 @@ const translationCa = {
                 },
             },
             form: {
+                titleCreate: 'Crear òrgan gestor',
                 titleUpdate: 'Modificar òrgan gestor',
                 tabs: {
                     dades: 'Dades',
@@ -135,6 +138,34 @@ const translationCa = {
             form: {
                 titleCreate: 'Crear propietat configurable',
                 titleUpdate: 'Modificar propietat configurable',
+            },
+        },
+        procediment: {
+            grid: {
+                title: 'Procediments',
+            },
+            form: {
+                titleCreate: 'Crear procediment',
+                titleUpdate: 'Modificar procediment',
+                tabs: {
+                    dades: 'Dades',
+                    grups: 'Grups',
+                    permisos: 'Permisos',
+                },
+            },
+        },
+        servei: {
+            grid: {
+                title: 'Serveis',
+            },
+            form: {
+                titleCreate: 'Crear servei',
+                titleUpdate: 'Modificar servei',
+                tabs: {
+                    dades: 'Dades',
+                    grups: 'Grups',
+                    permisos: 'Permisos',
+                },
             },
         },
         notFound: {
