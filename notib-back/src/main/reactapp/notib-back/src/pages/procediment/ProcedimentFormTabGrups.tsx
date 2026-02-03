@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import { FormField, MuiDataGrid, useFormContext } from 'reactlib';
 
-const EntitatFormTabAplicacionsFormContent: React.FC = () => {
+const ProcedimentFormTabAplicacionsFormContent: React.FC = () => {
     return (
         <Grid container spacing={2}>
             <Grid size={4}>
@@ -41,7 +41,7 @@ const EntitatFormTabAplicacionsFormContent: React.FC = () => {
     );
 };
 
-const EntitatFormTabAplicacions: React.FC = () => {
+const ProcedimentFormTabGrups: React.FC = () => {
     const { t } = useTranslation();
     const { id, apiRef: formApiRef } = useFormContext();
     const columns = React.useMemo(
@@ -78,11 +78,11 @@ const EntitatFormTabAplicacions: React.FC = () => {
             toolbarHideQuickFilter
             popupEditActive
             popupEditFormDialogResourceTitle={t('page.entitats.form.resourceNames.aplicacio')}
-            popupEditFormContent={<EntitatFormTabAplicacionsFormContent />}
+            popupEditFormContent={<ProcedimentFormTabAplicacionsFormContent />}
             onRowCreate={handleDataGridRowChanges}
             onRowDelete={handleDataGridRowChanges}
         />
     );
 };
 
-export default EntitatFormTabAplicacions;
+export default ProcedimentFormTabGrups;

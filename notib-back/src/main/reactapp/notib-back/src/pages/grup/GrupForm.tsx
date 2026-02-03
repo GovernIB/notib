@@ -23,7 +23,7 @@ export const GrupForm: React.FC = () => {
                 resourceName="grupResource"
                 id={id != null ? parseInt(id) : id}
                 title={
-                    id != null ? t('page.grups.form.titleUpdate') : t('page.grups.form.titleCreate')
+                    id != null ? t('page.grup.form.titleUpdate') : t('page.grup.form.titleCreate')
                 }
                 //createLink="./{{id}}"
                 createLink="../"

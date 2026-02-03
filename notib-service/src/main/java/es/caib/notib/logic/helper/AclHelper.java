@@ -4,6 +4,7 @@ import es.caib.notib.logic.config.AclConfig;
 import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import es.caib.notib.persist.entity.EntitatEntity;
+import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.ProcedimentEntity;
 import es.caib.notib.persist.entity.ServeiEntity;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 public class AclHelper {
 
 	public static final Class<?> ENTITAT_CLASS = EntitatEntity.class;
+	public static final Class<?> ORGAN_GESTOR_CLASS = OrganGestorEntity.class;
 	public static final Class<?> PROCEDIMENT_CLASS = ProcedimentEntity.class;
 	public static final Class<?> SERVEI_CLASS = ServeiEntity.class;
 

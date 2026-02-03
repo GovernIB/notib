@@ -63,14 +63,13 @@ public class OrganGestorResource extends BaseResource<Long> {
 	@NotEmpty
 	@Size(max = 64)
 	private String codi;
-	@Size(max = 64)
-	private String codiPare;
-	@NotEmpty
-	@Size(max = 1000)
-	private String nomPare;
 	@NotEmpty
 	@Size(max = 1000)
 	private String nom;
+	@Size(max = 64)
+	private String codiPare;
+	@Size(max = 1000)
+	private String nomPare;
 	private String nomEs;
 	private Long entitatId;
 	private String entitatNom;
