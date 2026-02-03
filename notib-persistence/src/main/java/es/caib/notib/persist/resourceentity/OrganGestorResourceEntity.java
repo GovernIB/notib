@@ -66,7 +66,7 @@ public class OrganGestorResourceEntity extends BaseAuditableResourceEntity<Organ
 		referencedColumnName = "id",
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "not_organ_entitat_fk"),
 		nullable = false)
-	protected EntitatEntity entitat;
+	protected EntitatResourceEntity entitat;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(
