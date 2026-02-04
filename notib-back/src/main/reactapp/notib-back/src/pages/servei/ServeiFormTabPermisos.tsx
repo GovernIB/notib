@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import { FormField, MuiDataGrid, useFormContext } from 'reactlib';
 
-const ProcedimentFormTabPermisosFormContent: React.FC = () => {
+const ServeiFormTabPermisosFormContent: React.FC = () => {
     const { t } = useTranslation();
     const enumOptions = [
         {
@@ -57,7 +57,7 @@ const ProcedimentFormTabPermisosFormContent: React.FC = () => {
     );
 };
 
-const ProcedimentFormTabPermisos: React.FC = () => {
+const ServeiFormTabPermisos: React.FC = () => {
     const { t } = useTranslation();
     const { id, apiRef: formApiRef } = useFormContext();
     const sidGrantedAuthorityEnumOptions = [
@@ -158,11 +158,11 @@ const ProcedimentFormTabPermisos: React.FC = () => {
             inlineEditActive
             //popupEditActive
             popupEditFormDialogResourceTitle={t('page.procediments.form.resourceNames.permis')}
-            popupEditFormContent={<ProcedimentFormTabPermisosFormContent />}
+            popupEditFormContent={<ServeiFormTabPermisosFormContent />}
             onRowCreate={handleDataGridRowChanges}
             onRowDelete={handleDataGridRowChanges}
         />
     );
 };
 
-export default ProcedimentFormTabPermisos;
+export default ServeiFormTabPermisos;

@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import Chip from '@mui/material/Chip';
 import { GridPage, MuiDataGrid } from 'reactlib';
+import { useNotibContext } from '../../components/NotibContext';
 
 const columns = [
     {
@@ -72,13 +73,14 @@ const columns = [
 ];
 export const ProcedimentGrid = () => {
     const { t } = useTranslation();
+    const { currentEntitatId } = useNotibContext();
     return (
         <GridPage disableMargins={false}>
             <MuiDataGrid
-                title={t('page.servei.grid.title')}
+                title={t('page.serveis.grid.title')}
                 resourceName="procedimentResource"
                 columns={columns}
-                staticFilter="tipus:'SERVEI'"
+                staticFilter={"tipus:'SERVEI' and entitat.id:" + currentEntitatId}
                 paginationActive
                 toolbarCreateLink="form"
                 rowLink="form/{{id}}"

@@ -112,15 +112,19 @@ const EntitatFormTabTipusDocs: React.FC = () => {
                     <Table sx={{ minWidth: 650 }} aria-label="simple table">
                         <TableHead>
                             <TableRow>
-                                <TableCell>Tipus de document</TableCell>
-                                <TableCell align="right">Actiu</TableCell>
+                                <TableCell>
+                                    {t('page.entitats.form.tipusDocuments.tableColumn.tipusDoc')}
+                                </TableCell>
+                                <TableCell align="right">
+                                    {t('page.entitats.form.tipusDocuments.tableColumn.actiu')}
+                                </TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {Object.entries(tipusDocumentOptions).map(([key, value]) => {
-                                const checked =
-                                    entitatTipusDocumentRows.find((r) => r.tipusDocument === key) !=
-                                    null;
+                                const checked = entitatTipusDocumentRows.some(
+                                    (tdr) => tdr.tipusDocument === key
+                                );
                                 return (
                                     <TableRow
                                         key={key}

@@ -45,6 +45,10 @@ const translationEs = {
                     capsalera: 'Cabecera',
                 },
                 tipusDocuments: {
+                    tableColumn: {
+                        tipusDoc: 'Tipo de documento',
+                        actiu: 'Activo',
+                    },
                     enable: {
                         success: 'Tipo de documento activado',
                         error: 'Error al activar el tipo de documento',
@@ -152,6 +156,33 @@ const translationEs = {
                     dades: 'Datos',
                     grups: 'Grupos',
                     permisos: 'Permisos',
+                },
+                grups: {
+                    tableColumn: {
+                        grup: 'Grupo',
+                        actiu: 'Activo',
+                    },
+                    enable: {
+                        success: 'Grupo activado',
+                        error: 'Error activando el grupo',
+                    },
+                    disable: {
+                        success: 'Grupo desactivado',
+                        error: 'Error desactivando el grupo',
+                    },
+                },
+                permisos: {
+                    tipus: 'Tipo',
+                    grantedAuthority: {
+                        user: 'Usuario',
+                        role: 'Rol',
+                    },
+                    consultaAllowed: 'Consulta',
+                    procesAllowed: 'Proceso',
+                    gestioAllowed: 'Gestión',
+                    notificacioAllowed: 'Notificación',
+                    comunicacioAllowed: 'Comunicación',
+                    comunicacioSirAllowed: 'Comunicación SIR',
                 },
             },
         },

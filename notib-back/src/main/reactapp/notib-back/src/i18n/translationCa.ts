@@ -45,6 +45,10 @@ const translationCa = {
                     capsalera: 'Capçalera',
                 },
                 tipusDocuments: {
+                    tableColumn: {
+                        tipusDoc: 'Tipus de document',
+                        actiu: 'Actiu',
+                    },
                     enable: {
                         success: 'Tipus de document activat',
                         error: 'Error activant el tipus de document',
@@ -141,7 +145,7 @@ const translationCa = {
                 titleUpdate: 'Modificar propietat configurable',
             },
         },
-        procediment: {
+        procediments: {
             grid: {
                 title: 'Procediments',
             },
@@ -153,9 +157,39 @@ const translationCa = {
                     grups: 'Grups',
                     permisos: 'Permisos',
                 },
+                resourceNames: {
+                    permis: 'permís',
+                },
+                grups: {
+                    tableColumn: {
+                        grup: 'Grup',
+                        actiu: 'Actiu',
+                    },
+                    enable: {
+                        success: 'Grup activat',
+                        error: 'Error activant el grup',
+                    },
+                    disable: {
+                        success: 'Grup desactivat',
+                        error: 'Error desactivant el grup',
+                    },
+                },
+                permisos: {
+                    tipus: 'Tipus',
+                    grantedAuthority: {
+                        user: 'Usuari',
+                        role: 'Rol',
+                    },
+                    consultaAllowed: 'Consulta',
+                    procesAllowed: 'Processament',
+                    gestioAllowed: 'Gestió',
+                    notificacioAllowed: 'Notificació',
+                    comunicacioAllowed: 'Comunicació',
+                    comunicacioSirAllowed: 'Comunicació SIR',
+                },
             },
         },
-        servei: {
+        serveis: {
             grid: {
                 title: 'Serveis',
             },
@@ -166,6 +200,36 @@ const translationCa = {
                     dades: 'Dades',
                     grups: 'Grups',
                     permisos: 'Permisos',
+                },
+                resourceNames: {
+                    permis: 'permís',
+                },
+                grups: {
+                    tableColumn: {
+                        grup: 'Grup',
+                        actiu: 'Actiu',
+                    },
+                    enable: {
+                        success: 'Grup activat',
+                        error: 'Error activant el grup',
+                    },
+                    disable: {
+                        success: 'Grup desactivat',
+                        error: 'Error desactivant el grup',
+                    },
+                },
+                permisos: {
+                    tipus: 'Tipus',
+                    grantedAuthority: {
+                        user: 'Usuari',
+                        role: 'Rol',
+                    },
+                    consultaAllowed: 'Consulta',
+                    procesAllowed: 'Processament',
+                    gestioAllowed: 'Gestió',
+                    notificacioAllowed: 'Notificació',
+                    comunicacioAllowed: 'Comunicació',
+                    comunicacioSirAllowed: 'Comunicació SIR',
                 },
             },
         },
