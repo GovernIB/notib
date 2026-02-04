@@ -59,11 +59,6 @@ const translationCa = {
                     },
                 },
                 permisos: {
-                    tipus: 'Tipus',
-                    grantedAuthority: {
-                        user: 'Usuari',
-                        role: 'Rol',
-                    },
                     usuariAllowed: 'Usuari',
                     admEntitatAllowed: 'Adm. entitat',
                     admLecturaAllowed: 'Adm. lectura',
@@ -175,11 +170,6 @@ const translationCa = {
                     },
                 },
                 permisos: {
-                    tipus: 'Tipus',
-                    grantedAuthority: {
-                        user: 'Usuari',
-                        role: 'Rol',
-                    },
                     consultaAllowed: 'Consulta',
                     procesAllowed: 'Processament',
                     gestioAllowed: 'Gestió',
@@ -219,11 +209,6 @@ const translationCa = {
                     },
                 },
                 permisos: {
-                    tipus: 'Tipus',
-                    grantedAuthority: {
-                        user: 'Usuari',
-                        role: 'Rol',
-                    },
                     consultaAllowed: 'Consulta',
                     procesAllowed: 'Processament',
                     gestioAllowed: 'Gestió',
@@ -274,6 +259,13 @@ const translationCa = {
             role: {
                 NOT_SUPER: 'Superadministrador',
                 NOT_ADMIN: 'Administrador',
+            },
+        },
+        PermissionGrid: {
+            tipus: 'Tipus',
+            grantedAuthority: {
+                user: 'Usuari',
+                role: 'Rol',
             },
         },
     },

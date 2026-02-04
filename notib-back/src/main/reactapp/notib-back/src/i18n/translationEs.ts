@@ -59,11 +59,6 @@ const translationEs = {
                     },
                 },
                 permisos: {
-                    tipus: 'Tipo',
-                    grantedAuthority: {
-                        user: 'Usuario',
-                        role: 'Rol',
-                    },
                     usuariAllowed: 'Usuario',
                     admEntitatAllowed: 'Adm. entidad',
                     admLecturaAllowed: 'Adm. lectura',
@@ -111,11 +106,6 @@ const translationEs = {
                     permis: 'permiso',
                 },
                 permisos: {
-                    tipus: 'Tipo',
-                    grantedAuthority: {
-                        user: 'Usuario',
-                        role: 'Rol',
-                    },
                     administrador: 'Administrador',
                     consulta: 'Consulta',
                     processar: 'Procesar',
@@ -172,11 +162,6 @@ const translationEs = {
                     },
                 },
                 permisos: {
-                    tipus: 'Tipo',
-                    grantedAuthority: {
-                        user: 'Usuario',
-                        role: 'Rol',
-                    },
                     consultaAllowed: 'Consulta',
                     procesAllowed: 'Proceso',
                     gestioAllowed: 'Gestión',
@@ -186,7 +171,7 @@ const translationEs = {
                 },
             },
         },
-        servei: {
+        serveis: {
             grid: {
                 title: 'Servicios',
             },
@@ -197,6 +182,31 @@ const translationEs = {
                     dades: 'Datos',
                     grups: 'Grupos',
                     permisos: 'Permisos',
+                },
+                resourceNames: {
+                    permis: 'permiso',
+                },
+                grups: {
+                    tableColumn: {
+                        grup: 'Grupo',
+                        actiu: 'Activo',
+                    },
+                    enable: {
+                        success: 'Grupo activado',
+                        error: 'Error activando el grupo',
+                    },
+                    disable: {
+                        success: 'Grupo desactivado',
+                        error: 'Error desactivando el grupo',
+                    },
+                },
+                permisos: {
+                    consultaAllowed: 'Consulta',
+                    procesAllowed: 'Proceso',
+                    gestioAllowed: 'Gestión',
+                    notificacioAllowed: 'Notificación',
+                    comunicacioAllowed: 'Comunicación',
+                    comunicacioSirAllowed: 'Comunicación SIR',
                 },
             },
         },
@@ -241,6 +251,13 @@ const translationEs = {
             role: {
                 NOT_SUPER: 'Superadministrador',
                 NOT_ADMIN: 'Administrador',
+            },
+        },
+        PermissionGrid: {
+            tipus: 'Tipo',
+            grantedAuthority: {
+                user: 'Usuario',
+                role: 'Rol',
             },
         },
     },

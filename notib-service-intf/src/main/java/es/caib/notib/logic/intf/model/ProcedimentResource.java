@@ -64,9 +64,14 @@ public class ProcedimentResource extends BaseResource<Long> {
 
 	private ResourceReference<EntitatResource, Long> entitat;
 	private ResourceReference<OrganGestorResource, Long> organGestor;
-	// private ResourceReference<EntregaCieResource, Long> entregaCie;
+	private ResourceReference<EntregaCieResource, Long> entregaCie;
 
 	private Integer grupCount;
 	private Integer aclEntryCount;
+
+	/* Els següents camps només es fan servir per a crear o modificar la referència entregaCie */
+	private boolean entregaCieActiva;
+	private ResourceReference<PagadorCieResource, Long> pagadorCie;
+	private ResourceReference<PagadorPostalResource, Long> pagadorPostal;
 
 }

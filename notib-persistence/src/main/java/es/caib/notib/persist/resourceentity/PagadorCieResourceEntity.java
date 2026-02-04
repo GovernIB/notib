@@ -1,6 +1,5 @@
 package es.caib.notib.persist.resourceentity;
 
-
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.model.PagadorCieResource;
 import lombok.Getter;
