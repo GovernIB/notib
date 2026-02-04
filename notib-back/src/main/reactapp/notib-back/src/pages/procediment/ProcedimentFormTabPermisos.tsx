@@ -134,10 +134,10 @@ const ProcedimentFormTabPermisos: React.FC = () => {
             title=""
             resourceName="aclEntryResource"
             columns={columns}
-            staticFilter={"resourceName:'entitatResource' and resourceId:" + id}
+            staticFilter={"resourceName:'procedimentResource' and resourceId:" + id}
             formAdditionalData={{
                 sidGrantedAuthority: false,
-                resourceName: 'entitatResource',
+                resourceName: 'procedimentResource',
                 resourceId: id,
             }}
             paginationActive

@@ -9,8 +9,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import Paper from '@mui/material/Paper';
 import Switch from '@mui/material/Switch';
-import { useBaseAppContext, useFormContext, useResourceApiService } from 'reactlib';
-import GridFormField from '../../components/GridFormField';
+import { FormField, useBaseAppContext, useFormContext, useResourceApiService } from 'reactlib';
 
 const EntitatFormTabTipusDocs: React.FC = () => {
     const { t } = useTranslation();
@@ -104,11 +103,9 @@ const EntitatFormTabTipusDocs: React.FC = () => {
     return (
         <>
             <Grid container spacing={2} sx={{ mb: 2 }}>
-                <GridFormField
-                    size={4}
-                    name="tipusDocDefault"
-                    hiddenEnumValues={hiddenEnumValues}
-                />
+                <Grid size={4}>
+                    <FormField name="tipusDocDefault" hiddenEnumValues={hiddenEnumValues} />
+                </Grid>
             </Grid>
             {tipusDocumentOptions && entitatTipusDocumentRows && (
                 <TableContainer component={Paper} variant="outlined">

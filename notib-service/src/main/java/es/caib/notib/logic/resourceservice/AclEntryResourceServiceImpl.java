@@ -13,6 +13,7 @@ import es.caib.notib.logic.intf.base.util.StringUtil;
 import es.caib.notib.logic.intf.model.AclEntryResource;
 import es.caib.notib.logic.intf.model.EntitatResource;
 import es.caib.notib.logic.intf.model.OrganGestorResource;
+import es.caib.notib.logic.intf.model.ProcedimentResource;
 import es.caib.notib.logic.intf.resourceservice.AclEntryResourceService;
 import es.caib.notib.persist.resourceentity.AclEntryResourceEntity;
 import lombok.RequiredArgsConstructor;
@@ -299,7 +300,8 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 
 	private static final List<Map.Entry<Class<?>, Class<?>>> aclClassMapping = List.of(
 		Map.entry(EntitatResource.class, AclHelper.ENTITAT_CLASS),
-		Map.entry(OrganGestorResource.class, AclHelper.ORGAN_GESTOR_CLASS));
+		Map.entry(OrganGestorResource.class, AclHelper.ORGAN_GESTOR_CLASS),
+		Map.entry(ProcedimentResource.class, AclHelper.PROCEDIMENT_CLASS));
 
 	private List<String[]> extractFilterTriplets(String filter) {
 		Matcher matcher = TRIPLET_PATTERN.matcher(filter);

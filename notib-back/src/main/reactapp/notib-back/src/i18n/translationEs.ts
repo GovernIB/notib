@@ -12,10 +12,9 @@ const translationEs = {
         grups: 'Grupos',
         enviaments: 'Envios',
         pagadors: {
-            cie: "Centros de impresión y ensobrado",
-            postal: "Operadores postal"
+            cie: 'Centros de impresión y ensobrado',
+            postal: 'Operadores postal',
         },
-
     },
     page: {
         home: {
@@ -80,10 +79,7 @@ const translationEs = {
         grups: {
             grid: {
                 title: 'Grupos',
-            },
-            form: {
-                titleCreate: 'Crear grupo',
-                titleUpdate: 'Modificar grupo',
+                popupResourceTitle: 'grupo',
             },
         },
         organs: {
@@ -176,14 +172,14 @@ const translationEs = {
         pagador: {
             cie: {
                 grid: {
-                    title: "Centros de impresión y ensobrado"
-                }
+                    title: 'Centros de impresión y ensobrado',
+                },
             },
             postal: {
                 grid: {
-                    title: "Operadores postal"
-                }
-            }
+                    title: 'Operadores postal',
+                },
+            },
         },
         notFound: {
             title: 'Página no encontrada',

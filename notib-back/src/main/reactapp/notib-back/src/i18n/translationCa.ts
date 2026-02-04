@@ -13,7 +13,7 @@ const translationCa = {
         enviaments: 'Enviaments',
         pagadors: {
             cie: "Centres d'impressió i ensobrat",
-            postal: "Operadors postal"
+            postal: 'Operadors postal',
         },
     },
     page: {
@@ -79,10 +79,7 @@ const translationCa = {
         grups: {
             grid: {
                 title: 'Grups',
-            },
-            form: {
-                titleCreate: 'Crear grup',
-                titleUpdate: 'Modificar grup',
+                popupResourceTitle: 'grup',
             },
         },
         organs: {
@@ -175,19 +172,19 @@ const translationCa = {
         pagador: {
             cie: {
                 grid: {
-                    title: "Centres d'impressió i ensobrat"
-                }
+                    title: "Centres d'impressió i ensobrat",
+                },
             },
             postal: {
                 grid: {
-                    title: "Operadors postals"
-                }
-            }
+                    title: 'Operadors postals',
+                },
+            },
         },
         notFound: {
             title: 'Pàgina no trobada',
             toHome: "Anar a l'inici",
-        }
+        },
     },
     component: {
         HeaderThemeSelector: {

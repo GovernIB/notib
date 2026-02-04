@@ -2,7 +2,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import { FormField, MuiDataGrid, useFormContext } from 'reactlib';
-import GridFormField from '../../components/GridFormField';
 
 const OrganFormTabPermisosFormContent: React.FC = () => {
     const { t } = useTranslation();
@@ -19,60 +18,57 @@ const OrganFormTabPermisosFormContent: React.FC = () => {
 
     return (
         <Grid container spacing={2}>
-            <GridFormField
-                size={4}
-                name="sidGrantedAuthority"
-                label={t('page.organs.form.permisos.tipus')}
-                type="enum"
-                options={enumOptions}
-                required
-            />
-            <GridFormField size={8} name="sidName" />
-            <GridFormField
-                size={12}
-                name="adminAllowed"
-                label={t('page.organs.form.permisos.administrador')}
-            />
-            <GridFormField
-                size={12}
-                name="readAllowed"
-                label={t('page.organs.form.permisos.consulta')}
-            />
-            <GridFormField
-                size={12}
-                name="perm1Allowed"
-                label={t('page.organs.form.permisos.processar')}
-            />
-            <GridFormField
-                size={12}
-                name="perm2Allowed"
-                label={t('page.organs.form.permisos.gestio')}
-            />
-            <GridFormField
-                size={12}
-                name="perm3Allowed"
-                label={t('page.organs.form.permisos.comuns')}
-            />
-            <GridFormField
-                size={12}
-                name="perm4Allowed"
-                label={t('page.organs.form.permisos.notificacions')}
-            />
-            <GridFormField
-                size={12}
-                name="perm5Allowed"
-                label={t('page.organs.form.permisos.comunicacions')}
-            />
-            <GridFormField
-                size={12}
-                name="perm6Allowed"
-                label={t('page.organs.form.permisos.sir')}
-            />
-            <GridFormField
-                size={12}
-                name="perm7Allowed"
-                label={t('page.organs.form.permisos.comSenseProc')}
-            />
+            <Grid size={4}>
+                <FormField
+                    name="sidGrantedAuthority"
+                    label={t('page.organs.form.permisos.tipus')}
+                    type="enum"
+                    options={enumOptions}
+                    required
+                />
+            </Grid>
+            <Grid size={8}>
+                <FormField name="sidName" />
+            </Grid>
+            <Grid size={12}>
+                <FormField
+                    name="adminAllowed"
+                    label={t('page.organs.form.permisos.administrador')}
+                />
+            </Grid>
+            <Grid size={12}>
+                <FormField name="readAllowed" label={t('page.organs.form.permisos.consulta')} />
+            </Grid>
+            <Grid size={12}>
+                <FormField name="perm1Allowed" label={t('page.organs.form.permisos.processar')} />
+            </Grid>
+            <Grid size={12}>
+                <FormField name="perm2Allowed" label={t('page.organs.form.permisos.gestio')} />
+            </Grid>
+            <Grid size={12}>
+                <FormField name="perm3Allowed" label={t('page.organs.form.permisos.comuns')} />
+            </Grid>
+            <Grid size={12}>
+                <FormField
+                    name="perm4Allowed"
+                    label={t('page.organs.form.permisos.notificacions')}
+                />
+            </Grid>
+            <Grid size={12}>
+                <FormField
+                    name="perm5Allowed"
+                    label={t('page.organs.form.permisos.comunicacions')}
+                />
+            </Grid>
+            <Grid size={12}>
+                <FormField name="perm6Allowed" label={t('page.organs.form.permisos.sir')} />
+            </Grid>
+            <Grid size={12}>
+                <FormField
+                    name="perm7Allowed"
+                    label={t('page.organs.form.permisos.comSenseProc')}
+                />
+            </Grid>
         </Grid>
     );
 };
