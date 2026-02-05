@@ -4,6 +4,8 @@ import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.helper.EntitatPermissionHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
+import es.caib.notib.logic.helper.organgestor.OrganGestorSyncHelper;
+import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.ActionExecutionException;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.model.OrganGestorResource;
@@ -13,6 +15,7 @@ import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -32,22 +35,24 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
 	private final AuthenticationHelper authenticationHelper;
 	private final UserSessionHelper userSessionHelper;
 	private final EntitatPermissionHelper entitatPermissionHelper;
+	private final OrganGestorSyncHelper organGestorSyncHelper;
 
 	@PostConstruct
 	public void init() {
+		var executor = new Dir3SyncActionExecutor();
+		executor.organGestorSyncHelper = organGestorSyncHelper;
 		register(OrganGestorResource.DIR3_SYNC_ACTION_CODE, new Dir3SyncActionExecutor());
 	}
 
 	@Override
-	protected String additionalSpringFilter(
-		String currentSpringFilter,
-		String[] namedQueries) {
-		Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
-		if (currentEntitatId != null) {
-			return "entitat.id:" + currentEntitatId;
-		} else {
-			return "entitat.id is null";
+	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+
+		var isRoleSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);
+		if (isRoleSuper) {
+			return null;
 		}
+		var currentEntitatId = userSessionHelper.getCurrentEntitatId();
+		return currentEntitatId != null ? "entitat.id:" + currentEntitatId : "entitat.id is null";
 	}
 
 	@Override
@@ -87,20 +92,23 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
 			BasePermission.DELETE);
 	}
 
+	@Component
+	@RequiredArgsConstructor
 	public static class Dir3SyncActionExecutor implements ActionExecutor<OrganGestorResourceEntity, OrganGestorResource.OrganGestorDir3SyncForm, OrganGestorResource.OrganGestorDir3SyncResult> {
+
+		OrganGestorSyncHelper organGestorSyncHelper;
+
 		@Override
-		public OrganGestorResource.OrganGestorDir3SyncResult exec(
-			String code,
-			OrganGestorResourceEntity entity,
-			OrganGestorResource.OrganGestorDir3SyncForm params) throws ActionExecutionException {
-			boolean real = params.getReal() != null ? params.getReal() : false;
-			if (real) {
-				System.out.println(">>> " + code + " real");
-				return new OrganGestorResource.OrganGestorDir3SyncResult(0, 1, 2, 3, false);
-			} else {
+		public OrganGestorResource.OrganGestorDir3SyncResult exec(String code, OrganGestorResourceEntity entity, OrganGestorResource.OrganGestorDir3SyncForm params) throws ActionExecutionException {
+
+			var real = params.getReal() != null && params.getReal();
+			if (!real) {
 				System.out.println(">>> " + code + " simulat");
-				return new OrganGestorResource.OrganGestorDir3SyncResult(0, 1, 2, 3, true);
+				var prediccio = organGestorSyncHelper.predictSyncDir3OrgansGestors(entity.getEntitat().getId());
+				return new OrganGestorResource.OrganGestorDir3SyncResult(0, 1, 2, 3, !real);
 			}
+			System.out.println(">>> " + code + " real");
+			return new OrganGestorResource.OrganGestorDir3SyncResult(0, 1, 2, 3, real);
 		}
 		@Override
 		public void onChange(Serializable id, OrganGestorResource.OrganGestorDir3SyncForm previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, OrganGestorResource.OrganGestorDir3SyncForm target) {

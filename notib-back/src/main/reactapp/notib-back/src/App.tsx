@@ -80,21 +80,22 @@ const InnerApp: React.FC = () => {
             hidden: currentRole !== ROLE_ADMIN,
         },
         {
-            id: 'pagadorscie',
-            title: t('menu.pagadors.cie'),
-            to: '/pagadorscie',
-            icon: 'mark_as_unread',
-            resourceName: 'pagadorPostalResource',
-            hidden: currentRole !== ROLE_ADMIN,
-        },
-        {
             id: 'pagadorspostal',
             title: t('menu.pagadors.postal'),
             to: '/pagadorspostal',
             icon: 'markunread_mailbox',
             resourceName: 'pagadorCieResource',
             hidden: currentRole !== ROLE_ADMIN,
+        },
+        {
+            id: 'pagadorscie',
+            title: t('menu.pagadors.cie'),
+            to: '/pagadorscie',
+            icon: 'mark_as_unread',
+            resourceName: 'pagadorPostalResource',
+            hidden: currentRole !== ROLE_ADMIN,
         }
+
         /**/
         /*, {
         id: 'enviaments',

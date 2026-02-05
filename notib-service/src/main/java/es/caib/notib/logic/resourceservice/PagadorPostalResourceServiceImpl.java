@@ -2,6 +2,8 @@ package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
+import es.caib.notib.logic.helper.AclHelper;
+import es.caib.notib.logic.helper.EntitatPermissionHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.model.PagadorPostalResource;
@@ -11,8 +13,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+
 /**
- * Implementació del servei de gestió de grups.
+ * Implementació del servei de gestió de pagadors postals.
  *
  * @author Límit Tecnologies
  */
@@ -23,22 +26,18 @@ public class PagadorPostalResourceServiceImpl extends BaseMutableResourceService
 
 	private final AuthenticationHelper authenticationHelper;
 	private final UserSessionHelper userSessionHelper;
+	private final AclHelper aclHelper;
+	private final EntitatPermissionHelper entitatPermissionHelper;
 
 	@Override
-	protected String additionalSpringFilter(
-		String currentSpringFilter,
-		String[] namedQueries) {
-		boolean isRoleSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);
-		if (!isRoleSuper) {
-			Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
-			if (currentEntitatId != null) {
-				return "entitat.id:" + currentEntitatId;
-			} else {
-				return "entitat.id is null";
-			}
-		} else {
+	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+
+		var isRoleSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);
+		if (isRoleSuper) {
 			return null;
 		}
+		var currentEntitatId = userSessionHelper.getCurrentEntitatId();
+		return currentEntitatId != null ? "entitat.id:" + currentEntitatId : "entitat.id is null";
 	}
 
 }

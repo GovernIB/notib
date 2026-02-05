@@ -1,184 +1,194 @@
 databaseChangeLog:
-  - changeSet:
-      id: 2_1_1_000-1
-      author: limit
-      changes:
-        - dropPrimaryKey:
-            tableName: ${db_prefix}config
-            constraintName: ${db_prefix}CONFIG_PK
-        - addColumn:
-            tableName: ${db_prefix}config
-            columns:
-              - column:
-                  name: id
-                  type: bigint
-        - update:
-            tableName: ${db_prefix}CONFIG
-            columns:
-                - column:
-                    name: id
-                    valueNumeric: ${hibernateSeqNextVal}
-        - addPrimaryKey:
-            tableName: ${db_prefix}config
-            columnNames: id
-            constraintName: ${db_prefix}CONFIG_PK
-        - addUniqueConstraint:
-            columnNames: key
-            constraintName: ${db_prefix}CONFIG_KEY_UK
-            tableName: ${db_prefix}config
-        - dropForeignKeyConstraint:
-            baseTableName: ${db_prefix}config
-            constraintName: ${db_prefix}CONFIG_GROUP_FK
+    -   changeSet:
+            id: 2_1_1_000-1
+            author: limit
+            changes:
+                -   dropPrimaryKey:
+                        tableName: ${db_prefix}config
+                        constraintName: ${db_prefix}CONFIG_PK
+                -   addColumn:
+                        tableName: ${db_prefix}config
+                        columns:
+                            -   column:
+                                    name: id
+                                    type: bigint
+                -   update:
+                        tableName: ${db_prefix}CONFIG
+                        columns:
+                            -   column:
+                                    name: id
+                                    valueNumeric: ${hibernateSeqNextVal}
+                -   addPrimaryKey:
+                        tableName: ${db_prefix}config
+                        columnNames: id
+                        constraintName: ${db_prefix}CONFIG_PK
+                -   addUniqueConstraint:
+                        columnNames: key
+                        constraintName: ${db_prefix}CONFIG_KEY_UK
+                        tableName: ${db_prefix}config
+                -   dropForeignKeyConstraint:
+                        baseTableName: ${db_prefix}config
+                        constraintName: ${db_prefix}CONFIG_GROUP_FK
 
-  - changeSet:
-      id: 2_1_1_000-2
-      author: limit
-      changes:
-        - dropPrimaryKey:
-            tableName: ${db_prefix}config_group
-            constraintName: ${db_prefix}CONFIG_GROUP_PK
-        - addColumn:
-            tableName: ${db_prefix}config_group
-            columns:
-              - column:
-                  name: id
-                  type: bigint
-        - update:
-            tableName: ${db_prefix}CONFIG_GROUP
-            columns:
-                - column:
-                    name: id
-                    valueNumeric: ${hibernateSeqNextVal}
-        - addPrimaryKey:
-            tableName: ${db_prefix}config_group
-            columnNames: id
-            constraintName: ${db_prefix}CONFIG_GROUP_PK
-        - addUniqueConstraint:
-            columnNames: code
-            constraintName: ${db_prefix}CONFIG_GROUP_CODE_UK
-            tableName: ${db_prefix}config_group
+    -   changeSet:
+            id: 2_1_1_000-2
+            author: limit
+            changes:
+                -   dropPrimaryKey:
+                        tableName: ${db_prefix}config_group
+                        constraintName: ${db_prefix}CONFIG_GROUP_PK
+                -   addColumn:
+                        tableName: ${db_prefix}config_group
+                        columns:
+                            -   column:
+                                    name: id
+                                    type: bigint
+                -   update:
+                        tableName: ${db_prefix}CONFIG_GROUP
+                        columns:
+                            -   column:
+                                    name: id
+                                    valueNumeric: ${hibernateSeqNextVal}
+                -   addPrimaryKey:
+                        tableName: ${db_prefix}config_group
+                        columnNames: id
+                        constraintName: ${db_prefix}CONFIG_GROUP_PK
+                -   addUniqueConstraint:
+                        columnNames: code
+                        constraintName: ${db_prefix}CONFIG_GROUP_CODE_UK
+                        tableName: ${db_prefix}config_group
 
-  - changeSet:
-      id: 2_1_1_000-3
-      author: limit
-      changes:
-        - dropPrimaryKey:
-            tableName: ${db_prefix}config_type
-            constraintName: ${db_prefix}CONFIG_TYPE_PK
-        - addColumn:
-            tableName: ${db_prefix}config_type
-            columns:
-              - column:
-                  name: id
-                  type: bigint
-        - update:
-            tableName: ${db_prefix}CONFIG_TYPE
-            columns:
-                - column:
-                    name: id
-                    valueNumeric: ${hibernateSeqNextVal}
-        - addPrimaryKey:
-            tableName: ${db_prefix}config_type
-            columnNames: id
-            constraintName: ${db_prefix}CONFIG_TYPE_PK
-        - addUniqueConstraint:
-            columnNames: code
-            constraintName: ${db_prefix}CONFIG_TYPE_CODE_UK
-            tableName: ${db_prefix}config_type
-        - addForeignKeyConstraint:
-            baseTableName: ${db_prefix}CONFIG
-            baseColumnNames: GROUP_CODE
-            referencedTableName: ${db_prefix}CONFIG_GROUP
-            referencedColumnNames: CODE
-            constraintName: ${db_prefix}CONFIG_GROUP_FK
+    -   changeSet:
+            id: 2_1_1_000-3
+            author: limit
+            changes:
+                -   dropPrimaryKey:
+                        tableName: ${db_prefix}config_type
+                        constraintName: ${db_prefix}CONFIG_TYPE_PK
+                -   addColumn:
+                        tableName: ${db_prefix}config_type
+                        columns:
+                            -   column:
+                                    name: id
+                                    type: bigint
+                -   update:
+                        tableName: ${db_prefix}CONFIG_TYPE
+                        columns:
+                            -   column:
+                                    name: id
+                                    valueNumeric: ${hibernateSeqNextVal}
+                -   addPrimaryKey:
+                        tableName: ${db_prefix}config_type
+                        columnNames: id
+                        constraintName: ${db_prefix}CONFIG_TYPE_PK
+                -   addUniqueConstraint:
+                        columnNames: code
+                        constraintName: ${db_prefix}CONFIG_TYPE_CODE_UK
+                        tableName: ${db_prefix}config_type
+                -   addForeignKeyConstraint:
+                        baseTableName: ${db_prefix}CONFIG
+                        baseColumnNames: GROUP_CODE
+                        referencedTableName: ${db_prefix}CONFIG_GROUP
+                        referencedColumnNames: CODE
+                        constraintName: ${db_prefix}CONFIG_GROUP_FK
 
-  - changeSet:
-      id: 2_1_1_000-4
-      author: limit
-      changes:
-        - addColumn:
-            tableName: ${db_prefix}CONFIG
-            columns:
-                - column:
-                    name: config_group_id
-                    type: bigint
-                - column:
-                    name: config_type_id
-                    type: bigint
-                - column:
-                    name: entitat_id
-                    type: bigint
-        - addForeignKeyConstraint:
-            baseTableName: ${db_prefix}CONFIG
-            baseColumnNames: config_group_id
-            referencedTableName: ${db_prefix}CONFIG_GROUP
-            referencedColumnNames: ID
-            constraintName: ${db_prefix}CONFIG_GROUP_ID_FK
-        - addForeignKeyConstraint:
-            baseTableName: ${db_prefix}CONFIG
-            baseColumnNames: config_type_id
-            referencedTableName: ${db_prefix}CONFIG_TYPE
-            referencedColumnNames: ID
-            constraintName: ${db_prefix}CONFIG_TYPE_ID_FK
-        - addForeignKeyConstraint:
-            baseTableName: ${db_prefix}CONFIG
-            baseColumnNames: entitat_id
-            referencedTableName: ${db_prefix}ENTITAT
-            referencedColumnNames: ID
-            constraintName: ${db_prefix}CONFIG_ENTITAT_FK
-        - sql:
-            sql: " UPDATE ${db_prefix}config a SET config_group_id = (SELECT b.id FROM ${db_prefix}config_group b WHERE a.GROUP_CODE = b.code) WHERE a.GROUP_CODE IS NOT NULL;
+    -   changeSet:
+            id: 2_1_1_000-4
+            author: limit
+            changes:
+                -   addColumn:
+                        tableName: ${db_prefix}CONFIG
+                        columns:
+                            -   column:
+                                    name: config_group_id
+                                    type: bigint
+                            -   column:
+                                    name: config_type_id
+                                    type: bigint
+                            -   column:
+                                    name: entitat_id
+                                    type: bigint
+                -   addForeignKeyConstraint:
+                        baseTableName: ${db_prefix}CONFIG
+                        baseColumnNames: config_group_id
+                        referencedTableName: ${db_prefix}CONFIG_GROUP
+                        referencedColumnNames: ID
+                        constraintName: ${db_prefix}CONFIG_GROUP_ID_FK
+                -   addForeignKeyConstraint:
+                        baseTableName: ${db_prefix}CONFIG
+                        baseColumnNames: config_type_id
+                        referencedTableName: ${db_prefix}CONFIG_TYPE
+                        referencedColumnNames: ID
+                        constraintName: ${db_prefix}CONFIG_TYPE_ID_FK
+                -   addForeignKeyConstraint:
+                        baseTableName: ${db_prefix}CONFIG
+                        baseColumnNames: entitat_id
+                        referencedTableName: ${db_prefix}ENTITAT
+                        referencedColumnNames: ID
+                        constraintName: ${db_prefix}CONFIG_ENTITAT_FK
+                -   sql:
+                        sql: " UPDATE ${db_prefix}config a SET config_group_id = (SELECT b.id FROM ${db_prefix}config_group b WHERE a.GROUP_CODE = b.code) WHERE a.GROUP_CODE IS NOT NULL;
             UPDATE ${db_prefix}config a SET config_type_id = (SELECT b.id FROM ${db_prefix}config_type b WHERE a.TYPE_CODE = b.code) WHERE a.TYPE_CODE IS NOT NULL;
             UPDATE ${db_prefix}config a SET entitat_id = (SELECT b.id FROM ${db_prefix}entitat b WHERE a.ENTITAT_CODI = b.CODI) WHERE a.ENTITAT_CODI IS NOT NULL; "
-        - addNotNullConstraint:
-            tableName: ${db_prefix}CONFIG
-            columnName: config_group_id
-        - addNotNullConstraint:
-            tableName: ${db_prefix}CONFIG
-            columnName: config_type_id
-  - changeSet:
-      id: 2_1_1_000-5
-      author: limit
-      changes:
-        - addColumn:
-            tableName: ${db_prefix}CONFIG_GROUP
-            columns:
-            - column:
-                name: parent_id
-                type: bigint
-        - addForeignKeyConstraint:
-            baseTableName: ${db_prefix}CONFIG_GROUP
-            baseColumnNames: parent_id
-            referencedTableName: ${db_prefix}CONFIG_GROUP
-            referencedColumnNames: ID
-            constraintName: ${db_prefix}CONFIG_GROUP_PARENT_FK
-        - sql:
-            sql: "UPDATE ${db_prefix}config_group a SET parent_id = (SELECT b.id FROM ${db_prefix}config_group b WHERE a.PARENT_CODE  = b.code) WHERE a.parent_code IS NOT NULL; "
-  - changeSet:
-      id: 2_1_1_000-6
-      author: limit
-      changes:
-        - addForeignKeyConstraint:
-              baseTableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
-              baseColumnNames: organ_id
-              referencedTableName: ${db_prefix}ORGAN_GESTOR
-              referencedColumnNames: ID
-              constraintName: ${db_prefix}ENV_TABLE_ORGAN_FK
-  - changeSet:
-      id: 2_1_1_000-7
-      author: limit
-      changes:
-        - addForeignKeyConstraint:
-             baseTableName: ${db_prefix}NOTIFICACIO_TABLE
-             baseColumnNames: organ_id
-             referencedTableName: ${db_prefix}ORGAN_GESTOR
-             referencedColumnNames: ID
-             constraintName: ${db_prefix}NOT_TABLE_ORGAN_FK
-  - changeSet:
-     id: 2_1_1_000-8
-     author: limit
-     changes:
-        - addPrimaryKey:
-            tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
-            columnNames: id
+                -   addNotNullConstraint:
+                        tableName: ${db_prefix}CONFIG
+                        columnName: config_group_id
+                -   addNotNullConstraint:
+                        tableName: ${db_prefix}CONFIG
+                        columnName: config_type_id
+    -   changeSet:
+            id: 2_1_1_000-5
+            author: limit
+            changes:
+                -   addColumn:
+                        tableName: ${db_prefix}CONFIG_GROUP
+                        columns:
+                            -   column:
+                                    name: parent_id
+                                    type: bigint
+                -   addForeignKeyConstraint:
+                        baseTableName: ${db_prefix}CONFIG_GROUP
+                        baseColumnNames: parent_id
+                        referencedTableName: ${db_prefix}CONFIG_GROUP
+                        referencedColumnNames: ID
+                        constraintName: ${db_prefix}CONFIG_GROUP_PARENT_FK
+                -   sql:
+                        sql: "UPDATE ${db_prefix}config_group a SET parent_id = (SELECT b.id FROM ${db_prefix}config_group b WHERE a.PARENT_CODE  = b.code) WHERE a.parent_code IS NOT NULL; "
+    -   changeSet:
+            id: 2_1_1_000-6
+            author: limit
+            changes:
+                -   addForeignKeyConstraint:
+                        baseTableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
+                        baseColumnNames: organ_id
+                        referencedTableName: ${db_prefix}ORGAN_GESTOR
+                        referencedColumnNames: ID
+                        constraintName: ${db_prefix}ENV_TABLE_ORGAN_FK
+    -   changeSet:
+            id: 2_1_1_000-7
+            author: limit
+            changes:
+                -   addForeignKeyConstraint:
+                        baseTableName: ${db_prefix}NOTIFICACIO_TABLE
+                        baseColumnNames: organ_id
+                        referencedTableName: ${db_prefix}ORGAN_GESTOR
+                        referencedColumnNames: ID
+                        constraintName: ${db_prefix}NOT_TABLE_ORGAN_FK
+    -   changeSet:
+            id: 2_1_1_000-8
+            author: limit
+            changes:
+                -   addPrimaryKey:
+                        tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
+                        columnNames: id
+    -   changeSet:
+            id: 2_1_1_000-9
+            author: limit
+            changes:
+                -   addNotNullConstraint:
+                        tableName: ${db_prefix}PAGADOR_POSTAL
+                        columnName: contracte_num
+                -   addNotNullConstraint:
+                        tableName: ${db_prefix}PAGADOR_POSTAL
+                        columnName: facturacio_codi_client
 

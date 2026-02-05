@@ -181,6 +181,17 @@ const translationCa = {
             postal: {
                 grid: {
                     title: "Operadors postals"
+                },
+                form: {
+                    nom: "Nom de l'operador",
+                    organGestor: "Organisme pagador",
+                    contracteNum: "Número del contracte",
+                    contracteDataVig: "Data vigència del contracte",
+                    facturacioClientCodi: "Codi del client postal",
+                    tabs: {
+                        dades: 'Dades',
+                        permisos: 'Permisos',
+                    }
                 }
             }
         },
