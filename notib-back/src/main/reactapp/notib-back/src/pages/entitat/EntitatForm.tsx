@@ -9,6 +9,7 @@ import Paper from '@mui/material/Paper';
 import { useTheme } from '@mui/material/styles';
 import {
     FormPage,
+    FormField,
     MuiForm,
     MuiFormTabs,
     MuiFormTabContent,
@@ -22,7 +23,6 @@ import EntitatFormTabAplicacions from './EntitatFormTabAplicacions';
 import EntitatFormTabPermisos from './EntitatFormTabPermisos';
 import goibLogoLight from '../../assets/goib_logo_light.svg';
 import notibLogoLight from '../../assets/notib_logo_light.png';
-import GridFormField from '../../components/GridFormField';
 import { useNotibContext } from '../../components/NotibContext';
 
 const useEntitatId = () => {
@@ -129,18 +129,40 @@ const EntitatFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> 
         <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[2, 3, 4]}>
             <MuiFormTabContent index={0} showOnCreate>
                 <Grid container spacing={2}>
-                    <GridFormField size={4} name="codi" />
+                    <Grid size={4}>
+                        <FormField name="codi" />
+                    </Grid>
                     <Grid size={8} />
-                    <GridFormField size={4} name="tipus" />
-                    <GridFormField size={8} name="nom" />
-                    <GridFormField size={6} name="dir3Codi" />
-                    <GridFormField size={6} name="dir3CodiReg" />
-                    <GridFormField size={3} name="activa" />
-                    <GridFormField size={3} name="ambEntregaDeh" />
-                    <GridFormField size={3} name="llibreEntitat" />
-                    <GridFormField size={3} name="oficinaEntitat" />
-                    <GridFormField size={12} name="apiKey" />
-                    <GridFormField size={12} name="descripcio" type="textarea" />
+                    <Grid size={4}>
+                        <FormField name="tipus" />
+                    </Grid>
+                    <Grid size={8}>
+                        <FormField name="nom" />
+                    </Grid>
+                    <Grid size={6}>
+                        <FormField name="dir3Codi" />
+                    </Grid>
+                    <Grid size={6}>
+                        <FormField name="dir3CodiReg" />
+                    </Grid>
+                    <Grid size={3}>
+                        <FormField name="activa" />
+                    </Grid>
+                    <Grid size={3}>
+                        <FormField name="ambEntregaDeh" />
+                    </Grid>
+                    <Grid size={3}>
+                        <FormField name="llibreEntitat" />
+                    </Grid>
+                    <Grid size={3}>
+                        <FormField name="oficinaEntitat" />
+                    </Grid>
+                    <Grid size={12}>
+                        <FormField name="apiKey" />
+                    </Grid>
+                    <Grid size={12}>
+                        <FormField name="descripcio" type="textarea" />
+                    </Grid>
                 </Grid>
             </MuiFormTabContent>
             <MuiFormTabContent index={1}>
@@ -149,9 +171,15 @@ const EntitatFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> 
                         {t('page.entitats.form.personalitzar.capsalera')}
                     </Typography>
                     <Grid container spacing={2} sx={{ mt: 2 }}>
-                        <GridFormField size={6} name="logoCapsalera" accept="image/jpeg" />
-                        <GridFormField size={3} name="colorLletra" type="color" />
-                        <GridFormField size={3} name="colorFons" type="color" />
+                        <Grid size={6}>
+                            <FormField name="logoCapsalera" accept="image/jpeg" />
+                        </Grid>
+                        <Grid size={3}>
+                            <FormField name="colorLletra" type="color" />
+                        </Grid>
+                        <Grid size={3}>
+                            <FormField name="colorFons" type="color" />
+                        </Grid>
                         <Grid size={12}>
                             <CustomToolbar />
                         </Grid>

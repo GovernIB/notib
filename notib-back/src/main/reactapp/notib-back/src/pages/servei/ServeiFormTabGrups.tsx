@@ -10,7 +10,7 @@ import Paper from '@mui/material/Paper';
 import Switch from '@mui/material/Switch';
 import { useFormContext, useResourceApiService, useBaseAppContext } from 'reactlib';
 
-const ProcedimentFormTabGrups: React.FC = () => {
+const ServeiFormTabGrups: React.FC = () => {
     const { t } = useTranslation();
     const { id, apiRef: formApiRef } = useFormContext();
     const {
@@ -61,13 +61,13 @@ const ProcedimentFormTabGrups: React.FC = () => {
                         formApiRef.current?.refresh();
                         temporalMessageShow(
                             null,
-                            t('page.procediments.form.grups.enable.success'),
+                            t('page.serveis.form.grups.enable.success'),
                             'success'
                         );
                     })
                     .catch((error) => {
                         temporalMessageShow(
-                            t('page.procediments.form.grups.enable.error'),
+                            t('page.serveis.form.grups.enable.error'),
                             error.message,
                             'error'
                         );
@@ -81,13 +81,13 @@ const ProcedimentFormTabGrups: React.FC = () => {
                         formApiRef.current?.refresh();
                         temporalMessageShow(
                             null,
-                            t('page.procediments.form.grups.disable.success'),
+                            t('page.serveis.form.grups.disable.success'),
                             'success'
                         );
                     })
                     .catch((error) => {
                         temporalMessageShow(
-                            t('page.procediments.form.grups.disable.error'),
+                            t('page.serveis.form.grups.disable.error'),
                             error.message,
                             'error'
                         );
@@ -102,11 +102,9 @@ const ProcedimentFormTabGrups: React.FC = () => {
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                     <TableHead>
                         <TableRow>
-                            <TableCell>
-                                {t('page.procediments.form.grups.tableColumn.grup')}
-                            </TableCell>
+                            <TableCell>{t('page.serveis.form.grups.tableColumn.grup')}</TableCell>
                             <TableCell align="right">
-                                {t('page.procediments.form.grups.tableColumn.actiu')}
+                                {t('page.serveis.form.grups.tableColumn.actiu')}
                             </TableCell>
                         </TableRow>
                     </TableHead>
@@ -141,4 +139,4 @@ const ProcedimentFormTabGrups: React.FC = () => {
     );
 };
 
-export default ProcedimentFormTabGrups;
+export default ServeiFormTabGrups;

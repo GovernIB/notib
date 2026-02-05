@@ -9,10 +9,10 @@ import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.FieldNameConstants;
+import lombok.experimental.FieldNameConstants;import javax.validation.constraints.NotNull;
 
 /**
- * Informació d'una relació procediment - grup.
+ * Informació d'una combinació pagador CIE - pagador postal.
  *
  * @author Límit Tecnologies
  */
@@ -24,12 +24,14 @@ import lombok.experimental.FieldNameConstants;
 	accessConstraints = @ResourceAccessConstraint(
 		type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
 		roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_SUPER },
-		grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
+		grantedPermissions = {PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE}
 	)
 )
-public class ProcedimentGrupResource extends BaseResource<Long> {
+public class EntregaCieResource extends BaseResource<Long> {
 
-	private ResourceReference<ProcedimentResource, Long> procediment;
-	private ResourceReference<GrupResource, Long> grup;
+	@NotNull
+	private ResourceReference<PagadorCieResource, Long> pagadorCie;
+	@NotNull
+	private ResourceReference<PagadorPostalResource, Long> pagadorPostal;
 
 }

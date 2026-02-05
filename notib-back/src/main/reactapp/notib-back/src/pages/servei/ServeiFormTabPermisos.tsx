@@ -3,32 +3,32 @@ import { useTranslation } from 'react-i18next';
 import { useFormContext } from 'reactlib';
 import PermissionGrid from '../../components/PermissionGrid';
 
-const ProcedimentFormTabPermisos: React.FC = () => {
+const ServeiFormTabPermisos: React.FC = () => {
     const { t } = useTranslation();
     const { id } = useFormContext();
     const permissionEntries = [
         {
-            headerName: t('page.procediments.form.permisos.consultaAllowed'),
+            headerName: t('page.serveis.form.permisos.consultaAllowed'),
             field: 'readAllowed',
         },
         {
-            headerName: t('page.procediments.form.permisos.procesAllowed'),
+            headerName: t('page.serveis.form.permisos.procesAllowed'),
             field: 'perm4Allowed',
         },
         {
-            headerName: t('page.procediments.form.permisos.gestioAllowed'),
+            headerName: t('page.serveis.form.permisos.gestioAllowed'),
             field: 'adminAllowed',
         },
         {
-            headerName: t('page.procediments.form.permisos.notificacioAllowed'),
+            headerName: t('page.serveis.form.permisos.notificacioAllowed'),
             field: 'perm5Allowed',
         },
         {
-            headerName: t('page.procediments.form.permisos.comunicacioAllowed'),
+            headerName: t('page.serveis.form.permisos.comunicacioAllowed'),
             field: 'perm8Allowed',
         },
         {
-            headerName: t('page.procediments.form.permisos.comunicacioSirAllowed'),
+            headerName: t('page.serveis.form.permisos.comunicacioSirAllowed'),
             field: 'perm7Allowed',
         },
     ];
@@ -41,4 +41,4 @@ const ProcedimentFormTabPermisos: React.FC = () => {
     );
 };
 
-export default ProcedimentFormTabPermisos;
+export default ServeiFormTabPermisos;

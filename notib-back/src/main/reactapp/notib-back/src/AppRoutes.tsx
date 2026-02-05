@@ -8,8 +8,7 @@ import ServeiGrid from './pages/servei/ServeiGrid';
 import ServeiForm from './pages/servei/ServeiForm';
 import AvisGrid from './pages/avis/AvisGrid';
 import AvisForm from './pages/avis/AvisForm';
-import GrupGrid from './pages/grup/GrupGrid';
-import GrupForm from './pages/grup/GrupForm';
+import Grups from './pages/Grups';
 import OrganGrid from './pages/organ/OrganGrid';
 import OrganForm from './pages/organ/OrganForm';
 import PagadorCieGrid from './pages/pagadorCie/PagadorCieGrid';
@@ -56,13 +55,7 @@ const AppRoutes = () => {
                     <Route path=":id" element={<ServeiForm />} />
                 </Route>
             </Route>
-            <Route path="grups">
-                <Route index element={<GrupGrid />} />
-                <Route path="form">
-                    <Route index element={<GrupForm />} />
-                    <Route path=":id" element={<GrupForm />} />
-                </Route>
-            </Route>
+            <Route path="grups" element={<Grups />} />
             <Route path="organs">
                 <Route index element={<OrganGrid />} />
                 <Route path="form">

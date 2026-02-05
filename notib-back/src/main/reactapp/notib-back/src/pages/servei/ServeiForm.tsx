@@ -11,10 +11,10 @@ import {
     MuiFormTabContent,
     useFormContext,
 } from 'reactlib';
-// import ProcedimentFormTabGrups from './ProcedimentFormTabGrups.tsx';
-// import ProcedimentFormTabPermisos from './ProcedimentFormTabPermisos';
+import ServeiFormTabGrups from './ServeiFormTabGrups.tsx';
+import ServeiFormTabPermisos from './ServeiFormTabPermisos';
 
-const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
+const ServeiFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
     const { setSubtitle } = props;
     const { t } = useTranslation();
     const { data } = useFormContext();
@@ -22,67 +22,68 @@ const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void
         setSubtitle(data?.codi + ', ' + data?.nom);
     }, [data]);
     const grupsTabLabel = (
-        <Badge badgeContent={data.grupsCount} color="primary">
-            {t('page.servei.form.tabs.grups')}
+        <Badge badgeContent={data.grupCount} color="primary">
+            {t('page.serveis.form.tabs.grups')}
         </Badge>
     );
     const permisosTabLabel = (
         <Badge badgeContent={data.aclEntryCount} color="primary">
-            {t('page.servei.form.tabs.permisos')}
+            {t('page.serveis.form.tabs.permisos')}
         </Badge>
     );
     const tabs = [
-        t('page.servei.form.tabs.dades'),
+        t('page.serveis.form.tabs.dades'),
         { label: grupsTabLabel },
         { label: permisosTabLabel },
     ];
     return (
-        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1, 2, 4]}>
+        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1, 2]}>
             <MuiFormTabContent index={0} showOnCreate>
                 <Grid container spacing={2}>
                     <Grid size={4}>
                         <FormField name="codi" />
                     </Grid>
-                    <Grid size={8}>
+                    <Grid size={8} />
+                    <Grid size={12}>
                         <FormField name="nom" />
                     </Grid>
-                    <Grid size={4}>
-                        <FormField name="organGestor" />
-                    </Grid>
-                    <Grid size={4}>
+                    <Grid size={6}>
                         <FormField name="retard" />
                     </Grid>
-                    <Grid size={4}>
+                    <Grid size={6}>
                         <FormField name="caducitat" />
                     </Grid>
-                    <Grid size={3}>
+                    <Grid size={10}>
+                        <FormField name="organGestor" />
+                    </Grid>
+                    <Grid size={2}>
                         <FormField name="comu" />
                     </Grid>
-                    <Grid size={3}>
+                    <Grid size={12}>
                         <FormField name="entregaCie" />
                     </Grid>
-                    <Grid size={3}>
+                    <Grid size={4}>
                         <FormField name="agrupar" />
                     </Grid>
-                    <Grid size={12}>
+                    <Grid size={4}>
                         <FormField name="requireDirectPermission" />
                     </Grid>
-                    <Grid size={12}>
+                    <Grid size={4}>
                         <FormField name="manual" />
                     </Grid>
                 </Grid>
             </MuiFormTabContent>
-            {/*<MuiFormTabContent index={2}>*/}
-            {/*    <ProcedimentFormTabGrups />*/}
-            {/*</MuiFormTabContent>*/}
-            {/*<MuiFormTabContent index={3}>*/}
-            {/*    <ProcedimentFormTabPermisos />*/}
-            {/*</MuiFormTabContent>*/}
+            <MuiFormTabContent index={1}>
+                <ServeiFormTabGrups />
+            </MuiFormTabContent>
+            <MuiFormTabContent index={2}>
+                <ServeiFormTabPermisos />
+            </MuiFormTabContent>
         </MuiFormTabs>
     );
 };
 
-export const ProcedimentForm: React.FC = () => {
+export const ServeiForm: React.FC = () => {
     const { t } = useTranslation();
     const { id } = useParams();
     const [subtitle, setSubtitle] = React.useState<string>();
@@ -94,15 +95,15 @@ export const ProcedimentForm: React.FC = () => {
                 additionalData={{ tipus: 'SERVEI' }}
                 title={
                     id != null
-                        ? t('page.servei.form.titleUpdate')
-                        : t('page.servei.form.titleCreate')
+                        ? t('page.serveis.form.titleUpdate')
+                        : t('page.serveis.form.titleCreate')
                 }
                 toolbarSubtitle={id != null ? subtitle : undefined}
                 componentProps={{ style: { height: '100%' } }}
                 commonFieldComponentProps={{ size: 'small' }}>
-                <ProcedimentFormContent setSubtitle={setSubtitle} />
+                <ServeiFormContent setSubtitle={setSubtitle} />
             </MuiForm>
         </FormPage>
     );
 };
-export default ProcedimentForm;
+export default ServeiForm;

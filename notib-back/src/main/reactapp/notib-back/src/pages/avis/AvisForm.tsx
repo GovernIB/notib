@@ -2,19 +2,29 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
-import { FormPage, MuiForm } from 'reactlib';
-import GridFormField from '../../components/GridFormField';
+import { FormPage, FormField, MuiForm } from 'reactlib';
 
 const AvisFormContent: React.FC = () => {
     return (
         <Grid container spacing={2}>
-            <GridFormField size={12} name="entitat" />
-            <GridFormField size={12} name="assumpte" />
-            <GridFormField size={12} name="missatge" type="textarea" />
-            <GridFormField size={6} name="dataInici" type="date" />
-            <GridFormField size={6} name="dataFinal" type="date" />
-            <GridFormField size={6} name="avisNivell" />
-            <GridFormField size={6} name="actiu" />
+            <Grid size={12}>
+                <FormField name="entitat" />
+            </Grid>
+            <Grid size={12}>
+                <FormField name="missatge" type="textarea" />
+            </Grid>
+            <Grid size={6}>
+                <FormField name="dataInici" type="date" />
+            </Grid>
+            <Grid size={6}>
+                <FormField name="dataFinal" type="date" />
+            </Grid>
+            <Grid size={6}>
+                <FormField name="avisNivell" />
+            </Grid>
+            <Grid size={6}>
+                <FormField name="actiu" />
+            </Grid>
         </Grid>
     );
 };

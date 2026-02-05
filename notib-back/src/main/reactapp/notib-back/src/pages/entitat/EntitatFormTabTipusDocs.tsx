@@ -9,8 +9,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import Paper from '@mui/material/Paper';
 import Switch from '@mui/material/Switch';
-import { useBaseAppContext, useFormContext, useResourceApiService } from 'reactlib';
-import GridFormField from '../../components/GridFormField';
+import { FormField, useBaseAppContext, useFormContext, useResourceApiService } from 'reactlib';
 
 const EntitatFormTabTipusDocs: React.FC = () => {
     const { t } = useTranslation();
@@ -104,26 +103,28 @@ const EntitatFormTabTipusDocs: React.FC = () => {
     return (
         <>
             <Grid container spacing={2} sx={{ mb: 2 }}>
-                <GridFormField
-                    size={4}
-                    name="tipusDocDefault"
-                    hiddenEnumValues={hiddenEnumValues}
-                />
+                <Grid size={4}>
+                    <FormField name="tipusDocDefault" hiddenEnumValues={hiddenEnumValues} />
+                </Grid>
             </Grid>
             {tipusDocumentOptions && entitatTipusDocumentRows && (
                 <TableContainer component={Paper} variant="outlined">
                     <Table sx={{ minWidth: 650 }} aria-label="simple table">
                         <TableHead>
                             <TableRow>
-                                <TableCell>Tipus de document</TableCell>
-                                <TableCell align="right">Actiu</TableCell>
+                                <TableCell>
+                                    {t('page.entitats.form.tipusDocuments.tableColumn.tipusDoc')}
+                                </TableCell>
+                                <TableCell align="right">
+                                    {t('page.entitats.form.tipusDocuments.tableColumn.actiu')}
+                                </TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {Object.entries(tipusDocumentOptions).map(([key, value]) => {
-                                const checked =
-                                    entitatTipusDocumentRows.find((r) => r.tipusDocument === key) !=
-                                    null;
+                                const checked = entitatTipusDocumentRows.some(
+                                    (tdr) => tdr.tipusDocument === key
+                                );
                                 return (
                                     <TableRow
                                         key={key}

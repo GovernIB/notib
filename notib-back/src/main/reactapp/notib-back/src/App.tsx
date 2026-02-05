@@ -63,6 +63,7 @@ const InnerApp: React.FC = () => {
             to: '/procediments',
             icon: 'view_timeline',
             resourceName: 'procedimentResource',
+            hidden: currentRole !== ROLE_ADMIN,
         },
         {
             id: 'servei',
@@ -70,6 +71,7 @@ const InnerApp: React.FC = () => {
             to: '/serveis',
             icon: 'miscellaneous_services',
             resourceName: 'procedimentResource',
+            hidden: currentRole !== ROLE_ADMIN,
         },
         {
             id: 'grups',

@@ -12,10 +12,9 @@ const translationEs = {
         grups: 'Grupos',
         enviaments: 'Envios',
         pagadors: {
-            cie: "Centros de impresión y ensobrado",
-            postal: "Operadores postal"
+            cie: 'Centros de impresión y ensobrado',
+            postal: 'Operadores postal'
         },
-
     },
     page: {
         home: {
@@ -46,6 +45,10 @@ const translationEs = {
                     capsalera: 'Cabecera',
                 },
                 tipusDocuments: {
+                    tableColumn: {
+                        tipusDoc: 'Tipo de documento',
+                        actiu: 'Activo',
+                    },
                     enable: {
                         success: 'Tipo de documento activado',
                         error: 'Error al activar el tipo de documento',
@@ -56,11 +59,6 @@ const translationEs = {
                     },
                 },
                 permisos: {
-                    tipus: 'Tipo',
-                    grantedAuthority: {
-                        user: 'Usuario',
-                        role: 'Rol',
-                    },
                     usuariAllowed: 'Usuario',
                     admEntitatAllowed: 'Adm. entidad',
                     admLecturaAllowed: 'Adm. lectura',
@@ -80,10 +78,7 @@ const translationEs = {
         grups: {
             grid: {
                 title: 'Grupos',
-            },
-            form: {
-                titleCreate: 'Crear grupo',
-                titleUpdate: 'Modificar grupo',
+                popupResourceTitle: 'grupo',
             },
         },
         organs: {
@@ -111,11 +106,6 @@ const translationEs = {
                     permis: 'permiso',
                 },
                 permisos: {
-                    tipus: 'Tipo',
-                    grantedAuthority: {
-                        user: 'Usuario',
-                        role: 'Rol',
-                    },
                     administrador: 'Administrador',
                     consulta: 'Consulta',
                     processar: 'Procesar',
@@ -157,9 +147,31 @@ const translationEs = {
                     grups: 'Grupos',
                     permisos: 'Permisos',
                 },
+                grups: {
+                    tableColumn: {
+                        grup: 'Grupo',
+                        actiu: 'Activo',
+                    },
+                    enable: {
+                        success: 'Grupo activado',
+                        error: 'Error activando el grupo',
+                    },
+                    disable: {
+                        success: 'Grupo desactivado',
+                        error: 'Error desactivando el grupo',
+                    },
+                },
+                permisos: {
+                    consultaAllowed: 'Consulta',
+                    procesAllowed: 'Proceso',
+                    gestioAllowed: 'Gestión',
+                    notificacioAllowed: 'Notificación',
+                    comunicacioAllowed: 'Comunicación',
+                    comunicacioSirAllowed: 'Comunicación SIR',
+                },
             },
         },
-        servei: {
+        serveis: {
             grid: {
                 title: 'Servicios',
             },
@@ -170,6 +182,31 @@ const translationEs = {
                     dades: 'Datos',
                     grups: 'Grupos',
                     permisos: 'Permisos',
+                },
+                resourceNames: {
+                    permis: 'permiso',
+                },
+                grups: {
+                    tableColumn: {
+                        grup: 'Grupo',
+                        actiu: 'Activo',
+                    },
+                    enable: {
+                        success: 'Grupo activado',
+                        error: 'Error activando el grupo',
+                    },
+                    disable: {
+                        success: 'Grupo desactivado',
+                        error: 'Error desactivando el grupo',
+                    },
+                },
+                permisos: {
+                    consultaAllowed: 'Consulta',
+                    procesAllowed: 'Proceso',
+                    gestioAllowed: 'Gestión',
+                    notificacioAllowed: 'Notificación',
+                    comunicacioAllowed: 'Comunicación',
+                    comunicacioSirAllowed: 'Comunicación SIR',
                 },
             },
         },
@@ -230,6 +267,13 @@ const translationEs = {
             role: {
                 NOT_SUPER: 'Superadministrador',
                 NOT_ADMIN: 'Administrador',
+            },
+        },
+        PermissionGrid: {
+            tipus: 'Tipo',
+            grantedAuthority: {
+                user: 'Usuario',
+                role: 'Rol',
             },
         },
     },

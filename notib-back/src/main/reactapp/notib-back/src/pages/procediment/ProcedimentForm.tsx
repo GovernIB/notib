@@ -22,17 +22,17 @@ const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void
         setSubtitle(data?.codi + ', ' + data?.nom);
     }, [data]);
     const grupsTabLabel = (
-        <Badge badgeContent={data.grupsCount} color="primary">
-            {t('page.procediment.form.tabs.grups')}
+        <Badge badgeContent={data.grupCount} color="primary">
+            {t('page.procediments.form.tabs.grups')}
         </Badge>
     );
     const permisosTabLabel = (
         <Badge badgeContent={data.aclEntryCount} color="primary">
-            {t('page.procediment.form.tabs.permisos')}
+            {t('page.procediments.form.tabs.permisos')}
         </Badge>
     );
     const tabs = [
-        t('page.procediment.form.tabs.dades'),
+        t('page.procediments.form.tabs.dades'),
         { label: grupsTabLabel },
         { label: permisosTabLabel },
     ];
@@ -94,8 +94,8 @@ export const ProcedimentForm: React.FC = () => {
                 additionalData={{ tipus: 'PROCEDIMENT' }}
                 title={
                     id != null
-                        ? t('page.procediment.form.titleUpdate')
-                        : t('page.procediment.form.titleCreate')
+                        ? t('page.procediments.form.titleUpdate')
+                        : t('page.procediments.form.titleCreate')
                 }
                 toolbarSubtitle={id != null ? subtitle : undefined}
                 componentProps={{ style: { height: '100%' } }}

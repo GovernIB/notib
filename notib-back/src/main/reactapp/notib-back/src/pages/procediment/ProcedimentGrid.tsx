@@ -78,7 +78,7 @@ export const ProcedimentGrid = () => {
     return (
         <GridPage disableMargins={false}>
             <MuiDataGrid
-                title={t('page.procediment.grid.title')}
+                title={t('page.procediments.grid.title')}
                 resourceName="procedimentResource"
                 columns={columns}
                 staticFilter={"tipus:'PROCEDIMENT' and entitat.id:" + currentEntitatId}
