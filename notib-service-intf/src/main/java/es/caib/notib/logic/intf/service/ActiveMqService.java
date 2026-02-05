@@ -32,4 +32,7 @@ public interface ActiveMqService {
     @PreAuthorize("hasRole('NOT_SUPER')")
     boolean buidarCua(String queueName);
 
+    @PreAuthorize("hasRole('NOT_SUPER')")
+    String getJobSchedulerStats() throws Exception;
+
 }

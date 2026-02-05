@@ -8,8 +8,6 @@ import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
-import javax.management.MalformedObjectNameException;
-import javax.management.openmbean.OpenDataException;
 import java.util.List;
 
 @Primary
@@ -68,6 +66,12 @@ public class ActiveMqService extends AbstractService<es.caib.notib.logic.intf.se
     @RolesAllowed({"NOT_SUPER"})
     public boolean buidarCua(String queueName) {
         return getDelegateService().buidarCua(queueName);
+    }
+
+    @Override
+    @RolesAllowed({"NOT_SUPER"})
+    public String getJobSchedulerStats() throws Exception {
+        return getDelegateService().getJobSchedulerStats();
     }
 
 }

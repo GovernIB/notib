@@ -23,12 +23,11 @@ import javax.management.JMX;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.OpenDataException;
+import javax.management.openmbean.TabularData;
 import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -285,5 +284,54 @@ public class ActiveMqServiceImpl implements ActiveMqService {
             log.error("[Monitor MQ] Error al buidar la cua " + queueName, ex);
             return false;
         }
+    }
+
+    @Override
+    public String getJobSchedulerStats() throws Exception {
+        var connection = ManagementFactory.getPlatformMBeanServer();
+        var jobSchedulerName = new ObjectName("org.apache.activemq:type=Broker,brokerName=localhost,service=JobScheduler,jobSchedulerName=JMS");
+
+        // El nom de l'objecte JMX per al JobScheduler pot variar si no s'usa el nom per defecte
+        // Intentem trobar-lo si el de dalt no funciona
+        if (!connection.isRegistered(jobSchedulerName)) {
+             Set<ObjectName> names = connection.queryNames(new ObjectName("org.apache.activemq:type=Broker,brokerName=localhost,service=JobScheduler,*"), null);
+             if (!names.isEmpty()) {
+                 jobSchedulerName = names.iterator().next();
+             }
+        }
+
+        JSONObject result = new JSONObject();
+        if (connection.isRegistered(jobSchedulerName)) {
+            TabularData jobs = (TabularData) connection.invoke(jobSchedulerName, "getAllJobs", null, null);
+
+            int totalJobs = 0;
+            long totalSize = 0;
+
+            if (jobs != null) {
+                for (Object value : jobs.values()) {
+                    CompositeData jobData = (CompositeData) value;
+                    totalJobs++;
+
+                    // Mida aproximada del contingut
+                    if (jobData.containsKey("payload")) {
+                        byte[] payload = (byte[]) jobData.get("payload");
+                        if (payload != null) {
+                            totalSize += payload.length;
+                        }
+                    }
+                }
+            }
+
+            result.put("nombreJobs", totalJobs);
+            result.put("midaTotalBytes", totalSize);
+            result.put("midaTotalMB", String.format("%.2f", totalSize / (1024.0 * 1024.0)));
+
+            // Intentem obtenir més detalls si és possible
+            result.put("detallJobs", "Nota: El detall per destinació requereix inspecció manual dels missatges.");
+        } else {
+            result.put("error", "JobScheduler no trobat o no actiu. Verifiqui que schedulerSupport='true' està configurat.");
+        }
+
+        return result.toString();
     }
 }
