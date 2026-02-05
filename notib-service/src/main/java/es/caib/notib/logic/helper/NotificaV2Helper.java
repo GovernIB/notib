@@ -137,7 +137,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			notificacio.updateNotificaNouEnviament();
 			// Validacions
 			if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()) && !NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
-				var msg = "la notificació no té l'estat REGISTRADA o ENVIADA AMB ERRORS.";
+				var msg = "la notificació no té l'estat REGISTRADA o ENVIADA AMB ERRORS. Estat " + notificacio.getEstat();
 				log.error(" [NOT] " + msg);
 				integracioHelper.addAccioError(info, msg);
 				throw new ValidationException(notificacioId, NotificacioEntity.class, msg);
