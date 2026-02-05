@@ -86,11 +86,7 @@ public class CallbackServiceImpl implements CallbackService {
 
 		var noEnviats = callbackRepository.findEnviamentIdPendentsNoEnviats();
 		for (var noEnviat : noEnviats) {
-			jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, noEnviat,
-					m -> {
-						m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 1000L);
-						return m;
-					});
+			jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, noEnviat);
 		}
 	}
 
