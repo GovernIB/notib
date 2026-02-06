@@ -13,6 +13,7 @@ import es.caib.notib.logic.intf.model.OrganGestorResource;
 import es.caib.notib.logic.intf.resourceservice.OrganGestorResourceService;
 import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
 import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
+import es.caib.notib.persist.resourcerepository.EntitatResourceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.acls.domain.BasePermission;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Implementació del servei de gestió d'òrgans gestors.
@@ -37,11 +39,10 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
 	private final UserSessionHelper userSessionHelper;
 	private final EntitatPermissionHelper entitatPermissionHelper;
 	private final OrganGestorSyncHelper organGestorSyncHelper;
+	private final EntitatResourceRepository entitatResourceRepository;
 
 	@PostConstruct
 	public void init() {
-		var executor = new Dir3SyncActionExecutor();
-		executor.organGestorSyncHelper = organGestorSyncHelper;
 		register(OrganGestorResource.DIR3_SYNC_ACTION_CODE, new Dir3SyncActionExecutor());
 	}
 
@@ -95,13 +96,21 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
 
 	@Component
 	@RequiredArgsConstructor
-	public static class Dir3SyncActionExecutor implements ActionExecutor<OrganGestorResourceEntity, OrganGestorResource.OrganGestorDir3SyncForm, OrganGestorDir3Sync> {
-		OrganGestorSyncHelper organGestorSyncHelper;
+	public class Dir3SyncActionExecutor implements ActionExecutor<OrganGestorResourceEntity, OrganGestorResource.OrganGestorDir3SyncForm, OrganGestorDir3Sync> {
 		@Override
 		public OrganGestorDir3Sync exec(String code, OrganGestorResourceEntity entity, OrganGestorResource.OrganGestorDir3SyncForm params) throws ActionExecutionException {
-			return organGestorSyncHelper.sincronitzar(
-				entity.getEntitat(),
-				params.getSimular() != null && params.getSimular());
+			Optional<EntitatResourceEntity> entitat = entitatResourceRepository.findById(userSessionHelper.getCurrentEntitatId());
+			if (entitat.isPresent()) {
+				return organGestorSyncHelper.sincronitzar(
+					entitat.get(),
+					params.getSimular() != null && params.getSimular());
+			} else {
+				throw new ActionExecutionException(
+					OrganGestorResource.class,
+					null,
+					code,
+					"Couldn't find current entitat in user session");
+			}
 		}
 		@Override
 		public void onChange(Serializable id, OrganGestorResource.OrganGestorDir3SyncForm previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, OrganGestorResource.OrganGestorDir3SyncForm target) {
