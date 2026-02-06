@@ -7,6 +7,14 @@ databaseChangeLog:
       name: varcharUnit
       value: ''
       dbms: postgresql
+  - property:
+      name: clobType
+      value: CLOB
+      dbms: oracle
+  - property:
+      name: clobType
+      value: TEXT
+      dbms: postgresql
   - changeSet:
       id: 1770311768254-1
       author: limit
@@ -27,3 +35,37 @@ databaseChangeLog:
               - column:
                   name: dies
                   type: Integer
+  - changeSet:
+      id: 1770311768254-2
+      author: limit
+      changes:
+        - createTable:
+            tableName: not_sincronizar_envio
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: not_sincronizar_envio_pk
+              - column:
+                  name: identificador
+                  type: varchar(255 ${varcharUnit})
+              - column:
+                  name: json_contingut
+                  type: ${clobType}
+              - column:
+                  name: data_creacio
+                  type: timestamp
+  - changeSet:
+      id: 1770311768254-3
+      author: limit
+      context: caib
+      changes:
+        - sql:
+            dbms: oracle
+            sql: "
+            GRANT SELECT, UPDATE, INSERT, DELETE ON NOT_SINCRONIZAR_ENVIO TO WWW_NOTIB;
+            ALTER TABLE NOT_SINCRONIZAR_ENVIO MOVE LOB(JSON_CONTINGUT) STORE AS NOT_SINC_ENVIO_JSON_LOB(TABLESPACE notib_lob INDEX NOT_SINC_ENVIO_JSON_LOB_I);
+            "

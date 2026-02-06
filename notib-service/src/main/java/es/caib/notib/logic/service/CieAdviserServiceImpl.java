@@ -1,5 +1,6 @@
 package es.caib.notib.logic.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
@@ -31,6 +32,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.CieAdviserService;
+import es.caib.notib.logic.intf.util.DatesUtils;
 import es.caib.notib.logic.intf.util.NifHelper;
 import es.caib.notib.logic.intf.ws.adviser.nexea.NexeaAdviserWs;
 import es.caib.notib.logic.intf.ws.adviser.nexea.common.Opciones;
@@ -39,14 +41,14 @@ import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.Receptor;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.ResultadoSincronizarEnvio;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnvio;
 import es.caib.notib.logic.objectes.LoggingTipus;
-import es.caib.notib.logic.intf.util.DatesUtils;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.entity.SincronizarEnvioEntity;
 import es.caib.notib.persist.repository.EntregaPostalRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioTableViewRepository;
+import es.caib.notib.persist.repository.SincronizarEnvioRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.activemq.ScheduledMessage;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.JmsException;
@@ -81,6 +83,8 @@ public class CieAdviserServiceImpl implements CieAdviserService {
     private NotificacioEventHelper notificacioEventHelper;
     @Autowired
     private MetricsHelper metricsHelper;
+    @Autowired
+    private SincronizarEnvioRepository sincronizarEnvioRepository;
     @Autowired
     private ConfigHelper configHelper;
     @Autowired
@@ -185,12 +189,29 @@ public class CieAdviserServiceImpl implements CieAdviserService {
         if (!CieEstat.NOTIFICADA.equals(enviament.getEntregaPostal().getCieEstat()) || enviament.isNotificaEstatFinal()) {
             return;
         }
-        NotibLogger.getInstance().info("[CIE ADVISER] Enviant a la cua " + NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, log, LoggingTipus.ENTREGA_CIE);
-        jmsTemplate.convertAndSend(NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, sincronizarEnvio,
-                m -> {
-                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY,  0L);
-                    return m;
-                });
+
+        Long sincronizarEnvioId = null;
+        try {
+            var objectMapper = new ObjectMapper();
+            var jsonContingut = objectMapper.writeValueAsString(sincronizarEnvio);
+
+            var entity = SincronizarEnvioEntity.builder()
+                    .identificador(sincronizarEnvio.getIdentificador())
+                    .jsonContingut(jsonContingut)
+                    .dataCreacio(new Date())
+                    .build();
+            sincronizarEnvioRepository.saveAndFlush(entity);
+            sincronizarEnvioId = entity.getId();
+        } catch (Exception ex) {
+            log.error("[CIE ADVISER] Error persistint SincronizarEnvio", ex);
+            // Si falla la persistència, intentem enviar l'objecte original per no bloquejar el procés,
+            // tot i que això podria omplir el JobScheduler.
+            jmsTemplate.convertAndSend(NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, sincronizarEnvio);
+            return;
+        }
+
+        NotibLogger.getInstance().info("[CIE ADVISER] Enviant a la cua " + NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE + " l'ID " + sincronizarEnvioId, log, LoggingTipus.ENTREGA_CIE);
+        jmsTemplate.convertAndSend(NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, sincronizarEnvioId);
     }
 
     private ResultadoSincronizarEnvio sincronitzarEntregaPostal(SincronizarEnvio sincronizarEnvio, IntegracioInfo info) {
