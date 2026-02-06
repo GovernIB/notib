@@ -39,10 +39,10 @@ const columns = [
     },
 ];
 
-const OrganGridDir3SyncActionForm: React.FC<{ setReal: (value: boolean) => void }> = (props) => {
-    const { setReal } = props;
+const OrganGridDir3SyncActionForm: React.FC<{ setSimular: (value: boolean) => void }> = (props) => {
+    const { setSimular } = props;
     React.useEffect(() => {
-        setReal(false);
+        setSimular(true);
     }, []);
     return (
         <Grid container>
@@ -61,10 +61,12 @@ const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
     return (
         <Grid container>
             <Grid size={12}>
-                <p>Substitucions: {result.numSubstitucions}</p>
-                <p>Divisions: {result.numDivisions}</p>
-                <p>Fusions: {result.numFusions}</p>
-                <p>Extincions: {result.numExtincions}</p>
+                <p>Creacions: {result.creacions?.length ?? 0}</p>
+                <p>Modificacions: {result.modificacions?.length ?? 0}</p>
+                <p>Substitucions: {result.substitucions?.length ?? 0}</p>
+                <p>Extincions: {result.extincions?.length ?? 0}</p>
+                <p>Fusions: {result.fusions?.length ?? 0}</p>
+                <p>Divisions: {result.divisions?.length ?? 0}</p>
             </Grid>
             <Grid size={12}>
                 <Typography>Faci clic al botó d'aplicar per a fer efectius els canvis.</Typography>
@@ -76,7 +78,7 @@ const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
 const OrganGridDir3SyncActionButton: React.FC = () => {
     const { t } = useTranslation();
     const { temporalMessageShow } = useBaseAppContext();
-    const [simular, setSimular] = React.useState<boolean>(true);
+    const [simular, setSimular] = React.useState<boolean>();
     const resultProcessor = (result: any) => {
         if (result.simulat) {
             setSimular(false);
@@ -99,9 +101,9 @@ const OrganGridDir3SyncActionButton: React.FC = () => {
         {
             value: true,
             text: simular
-                ? t('page.organs.grid.sync.dialogButton.apply')
-                : t('page.organs.grid.sync.dialogButton.query'),
-            icon: simular ? 'check' : 'search',
+                ? t('page.organs.grid.sync.dialogButton.query')
+                : t('page.organs.grid.sync.dialogButton.apply'),
+            icon: simular ? 'search' : 'check',
             componentProps: { variant: 'contained', disabled: false },
         },
     ];
@@ -114,7 +116,7 @@ const OrganGridDir3SyncActionButton: React.FC = () => {
             formAdditionalData={{ simular }}
             formDialogTitle={t('page.organs.grid.sync.dialogTitle')}
             formDialogButtons={formDialogButtons}
-            formDialogContent={<OrganGridDir3SyncActionForm setReal={setSimular} />}
+            formDialogContent={<OrganGridDir3SyncActionForm setSimular={setSimular} />}
             formDialogResultProcessor={resultProcessor}
             buttonComponentProps={{ variant: 'contained' }}
             onSuccess={handleSuccess}
