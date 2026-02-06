@@ -76,13 +76,13 @@ const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
 const OrganGridDir3SyncActionButton: React.FC = () => {
     const { t } = useTranslation();
     const { temporalMessageShow } = useBaseAppContext();
-    const [real, setReal] = React.useState<boolean>();
+    const [simular, setSimular] = React.useState<boolean>(true);
     const resultProcessor = (result: any) => {
         if (result.simulat) {
-            setReal(true);
+            setSimular(false);
             return <OrganGridDir3SyncActionResults result={result} />;
         } else {
-            setReal(false);
+            setSimular(true);
         }
     };
     const handleSuccess = (result?: any) => {
@@ -98,10 +98,10 @@ const OrganGridDir3SyncActionButton: React.FC = () => {
         },
         {
             value: true,
-            text: real
+            text: simular
                 ? t('page.organs.grid.sync.dialogButton.apply')
                 : t('page.organs.grid.sync.dialogButton.query'),
-            icon: real ? 'check' : 'search',
+            icon: simular ? 'check' : 'search',
             componentProps: { variant: 'contained', disabled: false },
         },
     ];
@@ -111,10 +111,10 @@ const OrganGridDir3SyncActionButton: React.FC = () => {
             action="DIR3_SYNC"
             title={t('page.organs.grid.sync.title')}
             icon="sync"
-            formAdditionalData={{ real }}
+            formAdditionalData={{ simular }}
             formDialogTitle={t('page.organs.grid.sync.dialogTitle')}
             formDialogButtons={formDialogButtons}
-            formDialogContent={<OrganGridDir3SyncActionForm setReal={setReal} />}
+            formDialogContent={<OrganGridDir3SyncActionForm setReal={setSimular} />}
             formDialogResultProcessor={resultProcessor}
             buttonComponentProps={{ variant: 'contained' }}
             onSuccess={handleSuccess}

@@ -33,7 +33,7 @@ import java.util.Set;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class OrganGestorSyncHelper {
+public class OrganGestorSyncHelperDeprecated {
 
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
@@ -45,6 +45,8 @@ public class OrganGestorSyncHelper {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private OrganGestorResourceRepository organGestorResourceRepository;
+
+
 
 	@Transactional(readOnly = true)
 	public PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId) {
@@ -126,7 +128,7 @@ public class OrganGestorSyncHelper {
 			}
 			// Obtenir llistat d'unitats que ara estan vigents en BBDD, i després de la sincronització continuen vigents, però amb les propietats canviades
 			// ====================  CANVIS EN ATRIBUTS ===================
-			unitatsVigents = getVigentsFromWebService(entitat, unitatsWS, organsVigents);
+			unitatsVigents = getVigentsFromWebService(entitat, unitatsWS);
 
 			// Obtenir el llistat d'unitats que son totalment noves (no existeixen en BBDD): Creació
 			// ====================  NOUS ===================
@@ -320,7 +322,7 @@ public class OrganGestorSyncHelper {
 	}
 
 	// Obtenir unitats que no fan cap transició a cap altre unitat, però a la que se'ls canvia alguna propietat
-	private List<UnitatOrganitzativaDto> getVigentsFromWebService(EntitatEntity entitat, List<NodeDir3> unitatsWS, List<OrganGestorEntity> organsVigents){
+	private List<UnitatOrganitzativaDto> getVigentsFromWebService(EntitatEntity entitat, List<NodeDir3> unitatsWS){
 
 		// list of vigent unitats from webservice
 		List<NodeDir3> unitatsVigentsWithChangedAttributes = new ArrayList<>();

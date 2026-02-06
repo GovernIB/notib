@@ -11,7 +11,6 @@ import es.caib.notib.logic.intf.dto.PermisDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
@@ -20,6 +19,11 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * Informació d'un òrgan gestor.
+ *
+ * @author Límit Tecnologies
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -137,18 +141,7 @@ public class OrganGestorResource extends BaseResource<Long> {
 	@Setter
 	@NoArgsConstructor
 	public static class OrganGestorDir3SyncForm implements Serializable {
-		private Boolean real;
-	}
-
-	@Getter
-	@Setter
-	@RequiredArgsConstructor
-	public static class OrganGestorDir3SyncResult implements Serializable {
-		private final int numSubstitucions;
-		private final int numDivisions;
-		private final int numFusions;
-		private final int numExtincions;
-		private final boolean simulat;
+		private Boolean simular;
 	}
 
 }

@@ -4,5 +4,5 @@ public enum OrganGestorEstatEnum {
     V,  // Vigent
     E,  // Extingit
     A,  // Anulat
-    T   // Transitori
+    T   // Transitori (com extingit però amb fills encara vigents)
 }

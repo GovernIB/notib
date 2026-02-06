@@ -4,10 +4,11 @@ import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.helper.EntitatPermissionHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
-import es.caib.notib.logic.helper.organgestor.OrganGestorSyncHelper;
+import es.caib.notib.logic.helper.OrganGestorSyncHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.ActionExecutionException;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
+import es.caib.notib.logic.intf.model.OrganGestorDir3Sync;
 import es.caib.notib.logic.intf.model.OrganGestorResource;
 import es.caib.notib.logic.intf.resourceservice.OrganGestorResourceService;
 import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
@@ -94,21 +95,13 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
 
 	@Component
 	@RequiredArgsConstructor
-	public static class Dir3SyncActionExecutor implements ActionExecutor<OrganGestorResourceEntity, OrganGestorResource.OrganGestorDir3SyncForm, OrganGestorResource.OrganGestorDir3SyncResult> {
-
+	public static class Dir3SyncActionExecutor implements ActionExecutor<OrganGestorResourceEntity, OrganGestorResource.OrganGestorDir3SyncForm, OrganGestorDir3Sync> {
 		OrganGestorSyncHelper organGestorSyncHelper;
-
 		@Override
-		public OrganGestorResource.OrganGestorDir3SyncResult exec(String code, OrganGestorResourceEntity entity, OrganGestorResource.OrganGestorDir3SyncForm params) throws ActionExecutionException {
-
-			var real = params.getReal() != null && params.getReal();
-			if (!real) {
-				System.out.println(">>> " + code + " simulat");
-				var prediccio = organGestorSyncHelper.predictSyncDir3OrgansGestors(entity.getEntitat().getId());
-				return new OrganGestorResource.OrganGestorDir3SyncResult(0, 1, 2, 3, !real);
-			}
-			System.out.println(">>> " + code + " real");
-			return new OrganGestorResource.OrganGestorDir3SyncResult(0, 1, 2, 3, real);
+		public OrganGestorDir3Sync exec(String code, OrganGestorResourceEntity entity, OrganGestorResource.OrganGestorDir3SyncForm params) throws ActionExecutionException {
+			return organGestorSyncHelper.sincronitzar(
+				entity.getEntitat(),
+				params.getSimular() != null && params.getSimular());
 		}
 		@Override
 		public void onChange(Serializable id, OrganGestorResource.OrganGestorDir3SyncForm previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, OrganGestorResource.OrganGestorDir3SyncForm target) {

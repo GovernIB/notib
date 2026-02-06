@@ -55,7 +55,15 @@ const PermissionGrid: React.FC<{
                 sortable: false,
                 flex: 4,
                 renderEditCell: (params: any) => {
-                    return <FormField name={params.field} label="" required inline readOnly />;
+                    return (
+                        <FormField
+                            name={params.field}
+                            label=""
+                            required
+                            inline
+                            readOnly={!params.id.startsWith('###')}
+                        />
+                    );
                 },
             }
         );
