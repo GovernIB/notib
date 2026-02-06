@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
+  - changeSet:
+      id: 1770311768254-1
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_accio_massiva
+            columns:
+              - column:
+                  name: tipus_seleccionat
+                  type: varchar(20 ${varcharUnit})
+              - column:
+                  name: motiu
+                  type: varchar(250 ${varcharUnit})
+              - column:
+                  name: admin_entitat
+                  type: boolean
+                  defaultValue: 0
+              - column:
+                  name: dies
+                  type: Integer

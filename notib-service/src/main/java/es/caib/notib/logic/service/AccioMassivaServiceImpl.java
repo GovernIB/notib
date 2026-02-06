@@ -19,14 +19,13 @@ import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.JustificantService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.statemachine.SmConstants;
-import es.caib.notib.persist.entity.AccioMassivaEntity;
 import es.caib.notib.persist.entity.AccioMassivaElementEntity;
+import es.caib.notib.persist.entity.AccioMassivaEntity;
 import es.caib.notib.persist.repository.AccioMassivaRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.persist.repository.statemachine.AccioMassivaElementRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.activemq.ScheduledMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jms.core.JmsTemplate;
@@ -95,12 +94,12 @@ public class AccioMassivaServiceImpl implements AccioMassivaService {
             String referencia;
             boolean tipusNotificacio;
             for (var element : accio.getElements()) {
-                tipusNotificacio = SeleccioTipus.NOTIFICACIO.equals(element.getSeleccioTipus());
+                tipusNotificacio = SeleccioTipus.NOTIFICACIO.equals(accio.getTipusElementSeleccionat());
                 referencia = tipusNotificacio ? notificacioRepository.findById(element.getElementId()).orElseThrow().getReferencia()
                 : notificacioEnviamentRepository.findById(element.getElementId()).orElseThrow().getUuid();
                 detall = AccioMassivaDetall.builder()
                         .referencia(referencia)
-                        .seleccioTipus(element.getSeleccioTipus())
+                        .seleccioTipus(accio.getTipusElementSeleccionat())
                         .data(element.getDataExecucio())
                         .errorDesc(element.getErrorDescripcio())
                         .errorStacktrace(element.getExcepcioStackTrace()).build();
@@ -131,11 +130,18 @@ public class AccioMassivaServiceImpl implements AccioMassivaService {
     public Long altaAccioMassiva(AccioMassivaExecucio accio) {
 
         try {
-            var entity = AccioMassivaEntity.builder().tipus(accio.getTipus()).entitatId(accio.getEntitatId()).build();
+            var entity = AccioMassivaEntity.builder()
+                    .tipus(accio.getTipus())
+                    .entitatId(accio.getEntitatId())
+                    .tipusElementSeleccionat(accio.getTipusElementSeleccionat())
+                    .motiu(accio.getMotiu())
+                    .dies(accio.getDies())
+                    .adminEntitat(accio.isAdminEntitat())
+                    .build();
             entity = accioMassivaRepository.saveAndFlush(entity);
             AccioMassivaElementEntity elem;
             for (var element : accio.getSeleccio()) {
-                elem = AccioMassivaElementEntity.builder().accioMassiva(entity).elementId(element).seleccioTipus(accio.getSeleccioTipus()).build();
+                elem = AccioMassivaElementEntity.builder().accioMassiva(entity).elementId(element).build();
                 accioMassivaElementRepository.saveAndFlush(elem);
             }
             return entity.getId();
@@ -338,9 +344,7 @@ public class AccioMassivaServiceImpl implements AccioMassivaService {
     @Override
     public void executarAccio(AccioMassivaExecucio accio) {
 
-        jmsTemplate.convertAndSend(SmConstants.CUA_ACCIONS_MASSIVES, accio,
-                m -> {m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 1000L);return m;
-        });
+        jmsTemplate.convertAndSend(SmConstants.CUA_ACCIONS_MASSIVES, accio.getAccioId());
     }
 
 }
