@@ -88,6 +88,12 @@ public class AdviserServiceImpl implements AdviserService {
             generateInfoLog(sincronizarEnvio, identificador, sdf, dataEstat);
             IntegracioInfo info = generateInfoEnvio(sincronizarEnvio, identificador, sdf, dataEstat);
             var enviament = enviamentRepository.findByNotificaIdentificador(identificador);
+            if (enviament == null || enviament.getNotificacio() == null) {
+                var resultadoSincronizarEnvio = new ResultadoSincronizarEnvio();
+                resultadoSincronizarEnvio.setCodigoRespuesta(ResultatEnviamentEnum.ERROR_IDENTIFICADOR.getCodi());
+                resultadoSincronizarEnvio.setCodigoRespuesta(ResultatEnviamentEnum.ERROR_IDENTIFICADOR.getDesc());
+                return resultadoSincronizarEnvio;
+            }
             info.setNotificacioId(enviament.getNotificacio().getId());
             return updateEnviament(
                     sincronizarEnvio.getIdentificador(),
