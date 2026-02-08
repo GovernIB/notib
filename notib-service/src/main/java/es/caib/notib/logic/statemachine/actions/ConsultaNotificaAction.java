@@ -53,10 +53,20 @@ public class ConsultaNotificaAction implements Action<EnviamentSmEstat, Enviamen
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
         var reintents = (int) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
         var accioMassivaElementId = (Long) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ACCIO_MASSIVA_ID, null);
-        var consulta = ConsultaNotificaRequest.builder().enviamentUuid(enviamentUuid).accioMassivaId(accioMassivaElementId).consultaNotificaDto(consultaNotificaMapper.toDto(enviament)).numIntent(reintents + 1).build();
+        var codiUsuari = (String) stateContext.getExtendedState().getVariables().get(SmConstants.CODI_USUARI);
+        var consulta = ConsultaNotificaRequest.builder()
+                .enviamentUuid(enviamentUuid)
+                .id(enviament.getId())
+                .accioMassivaId(accioMassivaElementId)
+                .numIntent(reintents + 1)
+                .codiUsuari(codiUsuari)
+                .build();
         jmsTemplate.convertAndSend(SmConstants.CUA_CONSULTA_ESTAT, consulta,
                 m -> {
-                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, SmConstants.delay(reintents));
+                    var d = SmConstants.delay(reintents);
+                    if (d > 0) {
+                        m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, d);
+                    }
                     return m;
                 });
 

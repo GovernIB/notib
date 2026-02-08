@@ -80,10 +80,19 @@ public class ConsultaSirPoolingAction implements Action<EnviamentSmEstat, Enviam
                 return;
             }
         }
-        var consulta = ConsultaSirRequest.builder().enviamentUuid(enviamentUuid).consultaSirDto(consultaSirMapper.toDto(enviament)).numIntent(reintents + 1).build();
+        var codiUsuari = (String) stateContext.getExtendedState().getVariables().get(SmConstants.CODI_USUARI);
+        var consulta = ConsultaSirRequest.builder()
+                .enviamentUuid(enviamentUuid)
+                .id(enviament.getId())
+                .numIntent(reintents + 1)
+                .codiUsuari(codiUsuari)
+                .build();
         jmsTemplate.convertAndSend(SmConstants.CUA_CONSULTA_SIR, consulta,
                 m -> {
-                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, refrescarPeriode());
+                    var d = refrescarPeriode();
+                    if (d > 0) {
+                        m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, d);
+                    }
                     return m;
                 });
 

@@ -48,10 +48,19 @@ public class ConsultaNotificaPoolingAction implements Action<EnviamentSmEstat, E
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
         NotibLogger.getInstance().info("[SM] ConsultaNotificaPoolingAction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
-        var consulta = ConsultaNotificaRequest.builder().enviamentUuid(enviamentUuid).consultaNotificaDto(consultaNotificaMapper.toDto(enviament)).numIntent(1).build();
+        var codiUsuari = (String) stateContext.getExtendedState().getVariables().get(SmConstants.CODI_USUARI);
+        var consulta = ConsultaNotificaRequest.builder()
+                .enviamentUuid(enviamentUuid)
+                .id(enviament.getId())
+                .numIntent(1)
+                .codiUsuari(codiUsuari)
+                .build();
         jmsTemplate.convertAndSend(SmConstants.CUA_CONSULTA_ESTAT, consulta,
                 m -> {
-                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, refrescarPeriode());
+                    var d = refrescarPeriode();
+                    if (d > 0) {
+                        m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, d);
+                    }
                     return m;
                 });
 

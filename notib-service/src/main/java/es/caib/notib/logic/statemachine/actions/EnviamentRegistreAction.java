@@ -79,7 +79,9 @@ public class EnviamentRegistreAction implements Action<EnviamentSmEstat, Enviame
         NotibLogger.getInstance().info("[SM] Enviant peticio de registre per l'enviament amb UUID " + enviamentUuid + " delay " + delay + "ms", log, LoggingTipus.STATE_MACHINE);
         jmsTemplate.convertAndSend(SmConstants.CUA_REGISTRE, env,
                 m -> {
-                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, delay);
+                    if (delay > 0) {
+                        m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, delay);
+                    }
                     return m;
                 });
 

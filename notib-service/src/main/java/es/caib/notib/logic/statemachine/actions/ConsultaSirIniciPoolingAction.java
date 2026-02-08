@@ -49,7 +49,9 @@ public class ConsultaSirIniciPoolingAction implements Action<EnviamentSmEstat, E
         NotibLogger.getInstance().info("[SM] ConsultaSirIniciPoolingAction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         var delay = configHelper.getConfigAsLong("es.caib.notib.pooling.delay", DELAY_DEFECTE);
         jmsTemplate.convertAndSend(SmConstants.CUA_POOLING_SIR, enviamentUuid, m -> {
-            m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, delay);
+            if (delay > 0) {
+                m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, delay);
+            }
             return m;
         });
         NotibLogger.getInstance().info("[SM] Inici pooling consulta a SIR", log, LoggingTipus.STATE_MACHINE);

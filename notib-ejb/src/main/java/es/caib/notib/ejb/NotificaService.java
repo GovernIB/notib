@@ -1,7 +1,6 @@
 package es.caib.notib.ejb;
 
 
-import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentNotificaRequest;
 import org.springframework.context.annotation.Primary;

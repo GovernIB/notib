@@ -273,13 +273,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		}
 	}
 
-//	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
-//	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId, boolean raiseExceptions) throws Exception {
-//
-//		var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
-//		return enviamentRefrescarEstat(enviament, raiseExceptions);
-//	}
-
 	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(ConsultaNotificaRequest consulta, boolean raiseExceptions) throws Exception {
 
