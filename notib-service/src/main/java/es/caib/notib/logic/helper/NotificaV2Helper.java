@@ -1,6 +1,7 @@
 package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
+import es.caib.comanda.model.v1.avis.AvisTipus;
 import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.InteressatTipus;
@@ -10,7 +11,6 @@ import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.comanda.ComandaListener;
 import es.caib.notib.logic.intf.dto.AccioParam;
-import es.caib.notib.logic.intf.dto.AvisDescripcio;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
@@ -87,7 +87,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.CIE;
 import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.NOT;
 
 /**
@@ -204,7 +203,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						enviament.setNotificaDataDisposicio(dataDisposicio);
                         //Enviar estat pendent a Comanda
 //                        comandaListener.enviarTasca(enviament);
-                        comandaListener.enviarAvis(enviament, AvisDescripcio.ENVIAMENT_NOTIFICA);
+                        comandaListener.enviarAvis(enviament, AvisTipus.INFO);
                     }
 
 					var cieNotifica = isCieNotifica(notificacio);
@@ -266,7 +265,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(ConsultaNotificaRequest consulta) throws Exception {
 
-		log.info(String.format(" [NOT] Refrescant estat de notific@ de l'enviament (Id=%d)", consulta.getConsultaNotificaDto().getId()));
+		log.info(String.format(" [NOT] Refrescant estat de notific@ de l'enviament (Id=%d)", consulta.getId()));
 		try {
 			return enviamentRefrescarEstat(consulta, false);
 		} catch (Exception e) {
@@ -284,7 +283,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(ConsultaNotificaRequest consulta, boolean raiseExceptions) throws Exception {
 
-		var enviament = notificacioEnviamentRepository.findById(consulta.getConsultaNotificaDto().getId()).orElseThrow();
+		var enviament = notificacioEnviamentRepository.findById(consulta.getId()).orElseThrow();
 		var info = new IntegracioInfo(IntegracioCodi.NOTIFICA,"Consultar estat d'un enviament", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Identificador de l'enviament", String.valueOf(enviament.getId())));
 		info.setAplicacio(enviament.getNotificacio().getTipusUsuari(), enviament.getNotificacio().getCreatedBy().get().getCodi());
@@ -713,7 +712,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				null,
 				enviament);
         //Enviar la informacio del canvi d'estat a Comanda
-        comandaListener.enviarAvis(enviament, AvisDescripcio.ACTUALTIZAR_ESTAT_NOTIFICA);
+        comandaListener.enviarAvis(enviament, AvisTipus.INFO);
 		log.info(" [EST] Fi actualització Datat");
 	}
 

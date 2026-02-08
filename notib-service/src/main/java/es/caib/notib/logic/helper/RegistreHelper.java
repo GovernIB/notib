@@ -3,9 +3,9 @@
  */
 package es.caib.notib.logic.helper;
 
+import es.caib.comanda.model.v1.avis.AvisTipus;
 import es.caib.notib.logic.comanda.ComandaListener;
 import es.caib.notib.logic.email.EmailConstants;
-import es.caib.notib.logic.intf.dto.AvisDescripcio;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -62,7 +62,7 @@ public class RegistreHelper {
 
     public NotificacioEnviamentEntity enviamentRefrescarEstatRegistre(ConsultaSirRequest consulta) {
 
-		var enviamentId = consulta.getConsultaSirDto().getId();
+		var enviamentId = consulta.getId();
 		var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
 		var notificacio = enviament.getNotificacio();
 		var logTimeHelper = new LogTimeHelper(log);
@@ -102,7 +102,7 @@ public class RegistreHelper {
 			enviamentUpdateDatat(resposta, enviament);
             if (canviEstat) {
 //                comandaListener.enviarTasca(enviament);
-                comandaListener.enviarAvis(enviament, AvisDescripcio.ACTUALITZAR_ESTAT_REGISTRE);
+                comandaListener.enviarAvis(enviament, AvisTipus.INFO);
             }
 			logTimeHelper.info(" [TIMER-SIR] Actualitzar estat comunicació SIR [Id: " + enviamentId + "]: ");
 			if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA && canviEstat) {

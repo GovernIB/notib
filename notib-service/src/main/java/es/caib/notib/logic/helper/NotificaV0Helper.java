@@ -2,6 +2,7 @@
 package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
+import es.caib.comanda.model.v1.avis.AvisTipus;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.RespostaAnulacio;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliacionPlazo;
@@ -10,7 +11,6 @@ import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.comanda.ComandaListener;
 import es.caib.notib.logic.intf.dto.AccioParam;
-import es.caib.notib.logic.intf.dto.AvisDescripcio;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
@@ -135,7 +135,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 				}
                 for (var enviament : notificacio.getEnviaments()) {
 //                    comandaListener.enviarTasca(enviament);
-                    comandaListener.enviarAvis(enviament, AvisDescripcio.ENVIAMENT_NOTIFICA);
+                    comandaListener.enviarAvis(enviament, AvisTipus.INFO);
                     if (enviament.getEntregaPostal() == null) {
                         callbackHelper.crearCallback(notificacio, enviament, error, errorDescripcio);
                     }
@@ -171,8 +171,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(ConsultaNotificaRequest consulta) throws Exception {
 
 		Thread.sleep(1000);
-		var consultaDto = consulta.getConsultaNotificaDto();
-		log.info(String.format(" [NOT] Refrescant estat de notific@ de l'enviament (Id=%d)", consultaDto.getId()));
+		log.info(String.format(" [NOT] Refrescant estat de notific@ de l'enviament (Id=%d)", consulta.getId()));
 		try {
 			return enviamentRefrescarEstat(consulta, false);
 		} catch (Exception e) {
@@ -246,7 +245,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(ConsultaNotificaRequest consulta, boolean raiseExceptions) throws Exception {
 
-		var enviament = notificacioEnviamentRepository.findById(consulta.getConsultaNotificaDto().getId()).orElseThrow();
+		var enviament = notificacioEnviamentRepository.findById(consulta.getId()).orElseThrow();
 		log.info(" [EST] Inici actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 		var notificacio = notificacioRepository.findById(enviament.getNotificacio().getId()).orElseThrow();
 		mockPlay = new MockPlay(notificacio.getConcepte());
@@ -295,7 +294,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
                     enviament.setNotificaEstat(estat);
                     enviament.setNotificaEstatData(datatData);
 //                    comandaListener.enviarTasca(enviament);
-                    comandaListener.enviarAvis(enviament, AvisDescripcio.ACTUALTIZAR_ESTAT_NOTIFICA);
+                    comandaListener.enviarAvis(enviament, AvisTipus.INFO);
                 }
 				var event = new NotificaRespostaDatatDto.NotificaRespostaDatatEventDto();
 				event.setData(datatData);
