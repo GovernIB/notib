@@ -102,6 +102,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+
 import javax.annotation.Resource;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -247,6 +250,21 @@ public class NotificacioServiceImpl implements NotificacioService {
 			notificacioHelper.altaEnviamentsWeb(entitat, notificacioEntity, notificacio.getEnviaments());
 			auditHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.CREATE, "NotificacioServiceImpl.create");
 			notificacioEntity.getEnviaments().forEach(e -> enviamentSmService.acquireStateMachine(e.getNotificaReferencia()));
+
+//			notificacioEntity.getEnviaments().forEach(e -> {
+//				var ref = e.getNotificaReferencia();
+//				if (TransactionSynchronizationManager.isActualTransactionActive()) {
+//					TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+//						@Override
+//						public void afterCommit() {
+//							enviamentSmService.acquireStateMachine(ref);
+//						}
+//					});
+//				} else {
+//					enviamentSmService.acquireStateMachine(ref);
+//				}
+//			});
+
 			SubsistemesHelper.addSuccessOperation(AWE, System.currentTimeMillis() - start);
 			return conversioTipusHelper.convertir(notificacioEntity, Notificacio.class);
 		} catch (Exception e) {
@@ -282,7 +300,21 @@ public class NotificacioServiceImpl implements NotificacioService {
 					}
 					not.setSeguentRemesa(notificacionsEntity.get(i+1).getReferencia());
 					not.getEnviaments().forEach(e -> enviamentSmService.acquireStateMachine(e.getNotificaReferencia()));
-//					notificacioRepository.saveAndFlush(not);
+
+//					not.getEnviaments().forEach(e -> {
+//						var ref = e.getNotificaReferencia();
+//						if (TransactionSynchronizationManager.isActualTransactionActive()) {
+//							TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+//								@Override
+//								public void afterCommit() {
+//									enviamentSmService.acquireStateMachine(ref);
+//								}
+//							});
+//						} else {
+//							enviamentSmService.acquireStateMachine(ref);
+//						}
+//					});
+
 				}
 
 			}
@@ -1181,7 +1213,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			}
 			// #779: Obtenim la certificació de forma automàtica
 			if (enviament.getNotificaCertificacioArxiuId() == null) {
-				var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviamentId).build()).build();
+				var consulta = ConsultaNotificaRequest.builder().id(enviamentId).build();
 				try {
 					enviament = notificaHelper.enviamentRefrescarEstat(consulta);
 				} catch (Exception ex) {
@@ -1399,7 +1431,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (enviament.isNotificaEstatFinal()) {
 				enviamentSmService.consultaForward(enviament.getUuid());
 			}
-			var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviamentId).build()).build();
+			var consulta = ConsultaNotificaRequest.builder().id(enviamentId).build();
 			enviament = notificaHelper.enviamentRefrescarEstat(consulta);
 			var estatDto = conversioTipusHelper.convertir(enviament, NotificacioEnviamenEstatDto.class);
 			estatCalcularCampsAddicionals(enviament, estatDto);
@@ -1712,7 +1744,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			registreHelper.enviamentRefrescarEstatRegistre(ConsultaSirRequest.builder().consultaSirDto(ConsultaSirDto.builder().id(enviamentId).build()).build());
+			registreHelper.enviamentRefrescarEstatRegistre(ConsultaSirRequest.builder().id(enviamentId).build());
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1729,7 +1761,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (!enviament.isPendentRefrescarEstatRegistre()) {
 				return null;
 			}
-			var consulta = ConsultaSirRequest.builder().consultaSirDto(ConsultaSirDto.builder().id(enviament.getId()).build()).build();
+			var consulta = ConsultaSirRequest.builder().id(enviament.getId()).build();
 			enviament = registreHelper.enviamentRefrescarEstatRegistre(consulta);
 			totBe = enviament.getSirConsultaIntent() == 0;
 			if (totBe) {

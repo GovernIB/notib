@@ -1,10 +1,23 @@
 package es.caib.notib.logic.service;
 
 import com.google.common.base.Strings;
-import es.caib.notib.logic.helper.*;
+import es.caib.notib.logic.helper.CacheHelper;
+import es.caib.notib.logic.helper.ConfigHelper;
+import es.caib.notib.logic.helper.EnviamentHelper;
+import es.caib.notib.logic.helper.IntegracioHelper;
+import es.caib.notib.logic.helper.MetricsHelper;
+import es.caib.notib.logic.helper.NotificaHelper;
+import es.caib.notib.logic.helper.NotificacioHelper;
+import es.caib.notib.logic.helper.OrganGestorHelper;
+import es.caib.notib.logic.helper.PluginHelper;
+import es.caib.notib.logic.helper.PropertiesConstants;
 import es.caib.notib.logic.intf.dto.EntitatDto;
-import es.caib.notib.logic.intf.service.*;
-import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
+import es.caib.notib.logic.intf.service.EntitatService;
+import es.caib.notib.logic.intf.service.EstadisticaService;
+import es.caib.notib.logic.intf.service.NotificacioService;
+import es.caib.notib.logic.intf.service.ProcedimentService;
+import es.caib.notib.logic.intf.service.SchedulledService;
+import es.caib.notib.logic.intf.service.ServeiService;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
@@ -149,7 +162,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 					for (Long enviament: pendents) {
 						log.info("[DEH] >>> Consultat l'estat a Notific@ de l'enviament: [Id: " + enviament + "]");
 						enviamentHelper.updateDEHCertNovaConsulta(enviament);
-						var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviament).build()).build();
+						var consulta = ConsultaNotificaRequest.builder().id(enviament).build();
 						notificacioService.enviamentRefrescarEstat(consulta);
 					}
 				} else {
@@ -178,7 +191,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 					for (Long enviament: pendents) {
 						log.info("[CIE] >>> Consultat l'estat a Notific@ de l'enviament: [Id: " + enviament + "]");
 						enviamentHelper.updateCIECertNovaConsulta(enviament);
-						var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviament).build()).build();
+						var consulta = ConsultaNotificaRequest.builder().id(enviament).build();
 						notificacioService.enviamentRefrescarEstat(consulta);
 					}
 				} else {

@@ -49,7 +49,9 @@ public class CiePluginJms {
             final var d = delay;
             jmsTemplate.convertAndSend(CiePluginConstants.CUA_CIE_PLUGIN_ENVIAR, uuid,
                     m -> {
-                        m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, d);
+                        if (d > 0) {
+                            m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, d);
+                        }
                         return m;
                     });
             return true;
@@ -68,7 +70,6 @@ public class CiePluginJms {
             }
             jmsTemplate.convertAndSend(CiePluginConstants.CUA_CIE_PLUGIN_CANCELAR, uuid,
                     m -> {
-                        m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 0L);
                         return m;
                     });
             return true;

@@ -67,12 +67,21 @@ public class EnviamentNotificaAction implements Action<EnviamentSmEstat, Enviame
             return;
         }
         var codiUsuari = (String) variables.get(SmConstants.CODI_USUARI);
-        var env = EnviamentNotificaRequest.builder().enviamentUuid(enviamentUuid).enviamentNotificaDto(enviamentNotificaMapper.toDto(enviament)).numIntent(reintents + 1).codiUsuari(codiUsuari).build();
+        var env = EnviamentNotificaRequest.builder()
+                .enviamentUuid(enviamentUuid)
+                .id(enviament.getId())
+                .numIntent(reintents + 1)
+                .codiUsuari(codiUsuari)
+                .build();
         var retry = (boolean) variables.getOrDefault(SmConstants.NT_RETRY, false);
         var isRetry = EnviamentSmEvent.NT_RETRY.equals(stateContext.getMessage().getPayload()) || retry;
         variables.put(SmConstants.RG_RETRY, false);
         jmsTemplate.convertAndSend(SmConstants.CUA_NOTIFICA, env,
                 m -> {
+                    var d = !isRetry ? SmConstants.delay(reintents) : 0L;
+                    if (d > 0) {
+                        m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, d);
+                    }
                     m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, !isRetry ? SmConstants.delay(reintents) : 0L);
                     var mida = 0;
                     if (configHelper.getConfigAsBoolean("es.caib.notib.log.tipus.STATE_MACHINE")) {

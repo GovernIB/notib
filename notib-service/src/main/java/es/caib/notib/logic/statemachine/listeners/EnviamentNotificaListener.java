@@ -33,22 +33,26 @@ public class EnviamentNotificaListener {
     public void receiveEnviamentNotifica(@Payload EnviamentNotificaRequest enviamentNotificaRequest, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
 
         message.acknowledge();
-        var enviament = enviamentNotificaRequest.getEnviamentNotificaDto();
-        if (enviament == null || Strings.isNullOrEmpty(enviament.getUuid())) {
-            log.error("[SM] Rebut enviament notifica sense Enviament");
+        var enviamentUuid = enviamentNotificaRequest.getEnviamentUuid();
+        if (Strings.isNullOrEmpty(enviamentUuid)) {
+            log.error("[SM] Rebut enviament notifica sense Enviament UUID");
             return;
         }
-        NotibLogger.getInstance().info("[SM] Rebut enviament a notifica <" + enviament.getUuid() + ">", log, LoggingTipus.STATE_MACHINE);
-        var enviamentEntity = notificacioEnviamentRepository.findByUuid(enviament.getUuid()).orElse(null);
-        if (enviament.isDeleted() || enviamentEntity != null && enviamentEntity.getNotificacio().isDeleted()) {
-            NotibLogger.getInstance().info("[SM] Petició de notificació NO enviada. Enviament marcat com a deleted - UUID " + enviament.getUuid(), log, LoggingTipus.STATE_MACHINE);
+        NotibLogger.getInstance().info("[SM] Rebut enviament a notifica <" + enviamentUuid + ">", log, LoggingTipus.STATE_MACHINE);
+        var enviamentEntity = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElse(null);
+        if (enviamentEntity == null) {
+            log.error("[SM] No s'ha trobat l'enviament amb UUID " + enviamentUuid);
+            return;
+        }
+        if (enviamentEntity.getNotificacio().isDeleted()) {
+            NotibLogger.getInstance().info("[SM] Petició de notificació NO enviada. Enviament marcat com a deleted - UUID " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
             return;
         }
 
         semaphore.acquire();
         try {
-            notificaService.enviarNotifica(enviament.getUuid(), enviamentNotificaRequest);
-            notificaService.enviarEvents(enviament.getUuid(), enviamentNotificaRequest.getCodiUsuari());
+            notificaService.enviarNotifica(enviamentUuid, enviamentNotificaRequest);
+            notificaService.enviarEvents(enviamentUuid, enviamentNotificaRequest.getCodiUsuari());
         } finally {
             semaphore.release();
         }

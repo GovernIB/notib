@@ -60,10 +60,21 @@ public class ConsultaSirAction implements Action<EnviamentSmEstat, EnviamentSmEv
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
         var reintents = (int) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
         var accioMassivaElementId = (Long) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ACCIO_MASSIVA_ID, null);
-        var env = ConsultaSirRequest.builder().enviamentUuid(enviamentUuid).accioMassivaId(accioMassivaElementId).consultaSirDto(enviamentSirMapper.toDto(enviament)).numIntent(reintents + 1).build();
+        var codiUsuari = (String) stateContext.getExtendedState().getVariables().get(SmConstants.CODI_USUARI);
+        var env = ConsultaSirRequest.builder()
+                .enviamentUuid(enviamentUuid)
+                .id(enviament.getId())
+                .accioMassivaId(accioMassivaElementId)
+                .numIntent(reintents + 1)
+                .codiUsuari(codiUsuari)
+                .build();
         var isRetry = EnviamentSmEvent.SR_RETRY.equals(stateContext.getMessage().getPayload());
         jmsTemplate.convertAndSend(SmConstants.CUA_CONSULTA_SIR, env,
                 m -> {
+                    var d = !isRetry ? SmConstants.delay(reintents) : 0L;
+                    if (d > 0) {
+                        m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, d);
+                    }
                     m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, !isRetry ? SmConstants.delay(reintents) : 0L);
                     if (configHelper.getConfigAsBoolean("es.caib.notib.log.tipus.STATE_MACHINE")) {
                         var mida = 0;

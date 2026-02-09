@@ -2,14 +2,13 @@ package es.caib.notib.logic.accionsMassives;
 
 
 import es.caib.notib.logic.helper.ConversioTipusHelper;
-import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.plugin.CarpetaPluginHelper;
 import es.caib.notib.logic.intf.dto.AmpliacionPlazoDto;
 import es.caib.notib.logic.intf.dto.RespostaAccio;
-import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaDto;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaElement;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
 import es.caib.notib.logic.intf.dto.accioMassiva.SeleccioTipus;
+import es.caib.notib.logic.intf.dto.anular.AnularDto;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.statemachine.SmConstants;
@@ -29,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -50,10 +50,23 @@ public class AccionsMassivesListener {
 
     @Transactional
     @JmsListener(destination = SmConstants.CUA_ACCIONS_MASSIVES, containerFactory = SmConstants.JMS_FACTORY_ACK)
-    public void receiveAccioMassiva(@Payload AccioMassivaExecucio accio, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
+    public void receiveAccioMassiva(@Payload Long accioId, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
 
         message.acknowledge();
-        var accioEntity = accioMassivaRepository.findById(accio.getAccioId()).orElseThrow();
+        var accioEntity = accioMassivaRepository.findById(accioId).orElseThrow();
+
+        // Reconstruim l'objecte AccioMassivaExecucio a partir de l'entitat
+        var accio = AccioMassivaExecucio.builder()
+                .tipus(accioEntity.getTipus())
+                .accioId(accioEntity.getId())
+                .entitatId(accioEntity.getEntitatId())
+                .tipusElementSeleccionat(accioEntity.getTipusElementSeleccionat())
+                .seleccio(accioEntity.getElements().stream().map(AccioMassivaElementEntity::getElementId).collect(Collectors.toList()))
+                .motiu(accioEntity.getMotiu())
+                .dies(accioEntity.getDies())
+                .isAdminEntitat(accioEntity.isAdminEntitat())
+                .build();
+
         accioEntity.setDataInici(new Date());
         RespostaAccio<AccioMassivaElement> resposta;
 //        List<String> errors;
@@ -141,40 +154,55 @@ public class AccionsMassivesListener {
                     accioEntity.setDataFi(new Date());
                     break;
                 case AMPLIAR_TERMINI:
-                    accio.getAmpliacionPlazo().setAccioMassiva(accioEntity.getId());
-                    var respostaAmpliarPlazo = notificacioService.ampliacionPlazoOE(accio.getAmpliacionPlazo());
+                    AmpliacionPlazoDto ampliacionPlazoDto = new AmpliacionPlazoDto();
+                    ampliacionPlazoDto.setAccioMassiva(accioEntity.getId());
+                    ampliacionPlazoDto.setMotiu(accio.getMotiu());
+                    ampliacionPlazoDto.setDies(accio.getDies());
+                    if (SeleccioTipus.NOTIFICACIO.equals(accio.getTipusElementSeleccionat())) {
+                        ampliacionPlazoDto.setNotificacionsId(new ArrayList<>(accio.getSeleccio()));
+                    } else {
+                        ampliacionPlazoDto.setEnviamentsId(new ArrayList<>(accio.getSeleccio()));
+                    }
+                    var respostaAmpliarPlazo = notificacioService.ampliacionPlazoOE(ampliacionPlazoDto);
                     NotificacioEnviamentEntity enviamentEntity;
                     Long id;
                     String errorAmpliacion;
                     for (var ampliacion : respostaAmpliarPlazo.getAmpliacionesPlazo().getAmpliacionPlazo()) {
                         enviamentEntity = enviamentRepository.findByUuid(ampliacion.getIdentificador()).orElseThrow();
                         errorAmpliacion = ampliacion.getMensajeError();
-                        id = SeleccioTipus.NOTIFICACIO.equals(accio.getSeleccioTipus()) ? enviamentEntity.getNotificacio().getId() : enviamentEntity.getId();
+                        id = SeleccioTipus.NOTIFICACIO.equals(accio.getTipusElementSeleccionat()) ? enviamentEntity.getNotificacio().getId() : enviamentEntity.getId();
                         accioEntity.getElement(id).actualitzar(errorAmpliacion, "");
                     }
                     for (var uuid : respostaAmpliarPlazo.getNoExecutades()) {
                         enviamentEntity = enviamentRepository.findByUuid(uuid).orElseThrow();
                         errorAmpliacion = "Enviament amb entrega postal o sense identificador de Notific@. No es pot ampliar el termini";
-                        id = SeleccioTipus.NOTIFICACIO.equals(accio.getSeleccioTipus()) ? enviamentEntity.getNotificacio().getId() : enviamentEntity.getId();
+                        id = SeleccioTipus.NOTIFICACIO.equals(accio.getTipusElementSeleccionat()) ? enviamentEntity.getNotificacio().getId() : enviamentEntity.getId();
                         accioEntity.getElement(id).actualitzar(errorAmpliacion, "");
                     }
                     break;
                 case ANULAR:
-                    accio.getAnulacio().setAccioMassiva(accioEntity.getId());
-                    var respostaAnulacio = notificacioService.anular(accio.getAnulacio());
+                    AnularDto anular = new AnularDto();
+                    anular.setAccioMassiva(accioEntity.getId());
+                    anular.setMotiu(accio.getMotiu());
+                    if (SeleccioTipus.NOTIFICACIO.equals(accio.getTipusElementSeleccionat())) {
+                        anular.setNotificacionsId(new ArrayList<>(accio.getSeleccio()));
+                    } else {
+                        anular.setEnviamentsId(new ArrayList<>(accio.getSeleccio()));
+                    }
+                    var respostaAnulacio = notificacioService.anular(anular);
                     for (var anulacio : respostaAnulacio.getRespostes()) {
                         enviamentEntity = enviamentRepository.findByNotificaReferencia(anulacio.getIdentificador());
                         if (enviamentEntity == null) {
                             throw new Exception("Enviament inexistent. Identificador de Notifica " + anulacio.getIdentificador());
                         }
-                        id = SeleccioTipus.NOTIFICACIO.equals(accio.getSeleccioTipus()) ? enviamentEntity.getNotificacio().getId() : enviamentEntity.getId();
+                        id = SeleccioTipus.NOTIFICACIO.equals(accio.getTipusElementSeleccionat()) ? enviamentEntity.getNotificacio().getId() : enviamentEntity.getId();
                         accioEntity.getElement(id).actualitzar(anulacio.getDescripcioResposta(), "");
                     }
                     String errorAnulacio;
                     for (var uuid : respostaAnulacio.getNoExecutades()) {
                         enviamentEntity = enviamentRepository.findByUuid(uuid).orElseThrow();
                         errorAnulacio = "L'enviament no compleix les condicions per ser anul·lat";
-                        id = SeleccioTipus.NOTIFICACIO.equals(accio.getSeleccioTipus()) ? enviamentEntity.getNotificacio().getId() : enviamentEntity.getId();
+                        id = SeleccioTipus.NOTIFICACIO.equals(accio.getTipusElementSeleccionat()) ? enviamentEntity.getNotificacio().getId() : enviamentEntity.getId();
                         accioEntity.getElement(id).actualitzar(errorAnulacio, "");
                     }
                     break;

@@ -37,22 +37,23 @@ public class ConsultaSirListener {
     public void receiveConsultaSir(@Payload ConsultaSirRequest consultaSirRequest, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
 
         message.acknowledge();
-        var enviament = consultaSirRequest.getConsultaSirDto();
-        if (enviament == null || enviament.getUuid() == null) {
-            var msg = "[SM] Rebuda consulta d'estat a Sir sense Enviament";
+        var enviamentUuid = consultaSirRequest.getEnviamentUuid();
+        if (enviamentUuid == null) {
+            var msg = "[SM] Rebuda consulta d'estat a Sir sense Enviament UUID";
             log.error(msg);
-            if (consultaSirRequest.getAccioMassivaId() != null) {
-                accioMassivaHelper.actualitzar(consultaSirRequest.getAccioMassivaId(), enviament.getId(), msg, "");
-            }
             return;
         }
-        NotibLogger.getInstance().info("[SM] Rebut consulta d'estat a Sir <" + enviament.getUuid() + ">", log, LoggingTipus.STATE_MACHINE);
-        var enviamentEntity = notificacioEnviamentRepository.findByUuid(enviament.getUuid()).orElse(null);
-        if (enviament.isDeleted() || enviamentEntity != null && enviamentEntity.getNotificacio().isDeleted()) {
-            var msg = "[SM] Petició de notificació NO enviada. Enviament marcat com a deleted - UUID " + enviament.getUuid();
+        NotibLogger.getInstance().info("[SM] Rebut consulta d'estat a Sir <" + enviamentUuid + ">", log, LoggingTipus.STATE_MACHINE);
+        var enviamentEntity = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElse(null);
+        if (enviamentEntity == null) {
+            log.error("[SM] No s'ha trobat l'enviament amb UUID " + enviamentUuid);
+            return;
+        }
+        if (enviamentEntity.getNotificacio().isDeleted()) {
+            var msg = "[SM] Petició de notificació NO enviada. Enviament marcat com a deleted - UUID " + enviamentUuid;
             NotibLogger.getInstance().info(msg, log, LoggingTipus.STATE_MACHINE);
             if (consultaSirRequest.getAccioMassivaId() != null) {
-                accioMassivaHelper.actualitzar(consultaSirRequest.getAccioMassivaId(), enviament.getId(), msg, "");
+                accioMassivaHelper.actualitzar(consultaSirRequest.getAccioMassivaId(), enviamentEntity.getId(), msg, "");
             }
             return;
         }
@@ -60,9 +61,9 @@ public class ConsultaSirListener {
         try {
             var success = registreService.consultaSir(consultaSirRequest);
             if (success) {
-                enviamentSmService.sirSuccess(enviament.getUuid());
+                enviamentSmService.sirSuccess(enviamentUuid);
             } else {
-                enviamentSmService.sirFailed(enviament.getUuid());
+                enviamentSmService.sirFailed(enviamentUuid);
             }
         } finally {
             semaphore.release();

@@ -25,11 +25,10 @@ import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.EstadisticaService;
 import es.caib.notib.logic.intf.service.MonitorIntegracioService;
 import es.caib.notib.logic.intf.service.UsuariAplicacioService;
-import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
+import es.caib.notib.logic.intf.util.DatesUtils;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.plugin.cie.CiePluginHelper;
-import es.caib.notib.logic.intf.util.DatesUtils;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.filtres.FiltreMonitorIntegracio;
@@ -196,7 +195,7 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 					break;
 				case NOTIFICA:
 					enviament = enviamentRepository.findTopByNotificaIdentificadorNotNullOrderByIdDesc().orElseThrow();
-					var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviament.getId()).build()).build();
+					var consulta = ConsultaNotificaRequest.builder().id(enviament.getId()).build();
 					try {
 						notificaHelper.enviamentRefrescarEstat(consulta);
 						diagnostic.setCorrecte(true);

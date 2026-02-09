@@ -1,5 +1,6 @@
 package es.caib.notib.logic.service;
 
+import es.caib.comanda.model.v1.avis.AvisTipus;
 import es.caib.notib.logic.comanda.ComandaListener;
 import es.caib.notib.logic.helper.AuditHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
@@ -8,7 +9,6 @@ import es.caib.notib.logic.helper.RegistreHelper;
 import es.caib.notib.logic.helper.RegistreSmHelper;
 import es.caib.notib.logic.helper.SubsistemesHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
-import es.caib.notib.logic.intf.dto.AvisDescripcio;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
@@ -20,7 +20,6 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.service.RegistreService;
-import es.caib.notib.logic.intf.statemachine.dto.ConsultaSirDto;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaSirRequest;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentRegistreRequest;
 import es.caib.notib.logic.objectes.LoggingTipus;
@@ -90,7 +89,7 @@ public class RegistreServiceImpl implements RegistreService {
                     notificacio.updateEstat(nouEstat);
                     notificacio.updateMotiu(enviament.getRegistreEstat().name());
                     notificacio.updateEstatDate(new Date());
-                    comandaListener.enviarAvis(enviament, AvisDescripcio.ACTUALITZAR_ESTAT_REGISTRE);
+                    comandaListener.enviarAvis(enviament, AvisTipus.INFO);
                 }
             }
             NotibLogger.getInstance().info("[REGISTRE] Enviament de registre <" + enviamentUuid + "> actualitzant registre", log, LoggingTipus.REGISTRE);
@@ -168,7 +167,7 @@ public class RegistreServiceImpl implements RegistreService {
                 integracioHelper.addAccioError(info, desc);
                 return RespostaSirAdviser.builder().ok(false).errorDescripcio(desc).build();
             }
-            var consulta = ConsultaSirRequest.builder().consultaSirDto(ConsultaSirDto.builder().id(enviament.getId()).build()).build();
+            var consulta = ConsultaSirRequest.builder().id(enviament.getId()).build();
             registreHelper.enviamentRefrescarEstatRegistre(consulta);
             integracioHelper.addAccioOk(info);
             SubsistemesHelper.addSuccessOperation(CSR, System.currentTimeMillis() - start);

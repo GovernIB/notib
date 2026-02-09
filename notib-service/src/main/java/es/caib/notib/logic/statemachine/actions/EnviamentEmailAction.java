@@ -50,16 +50,21 @@ public class EnviamentEmailAction implements Action<EnviamentSmEstat, EnviamentS
 //                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, SmConstants.delay(reintents));
 //                    return m;
 //                });
+        var codiUsuari = (String) stateContext.getExtendedState().getVariables().get(SmConstants.CODI_USUARI);
         // Per ara els emails s'envien utilitzant la funcionalitat d'enviament de notificació
         jmsTemplate.convertAndSend(
                 SmConstants.CUA_NOTIFICA,
                 EnviamentNotificaRequest.builder()
                         .enviamentUuid(enviamentUuid)
-                        .enviamentNotificaDto(enviamentNotificaMapper.toDto(enviament))
+                        .id(enviament.getId())
                         .numIntent(reintents + 1)
+                        .codiUsuari(codiUsuari)
                         .build(),
                 m -> {
-                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, SmConstants.delay(reintents));
+                    var d = SmConstants.delay(reintents);
+                    if (d > 0) {
+                        m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, d);
+                    }
                     return m;
                 });
 

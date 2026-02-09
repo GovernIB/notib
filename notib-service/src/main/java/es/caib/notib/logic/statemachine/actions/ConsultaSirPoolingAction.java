@@ -11,7 +11,6 @@ import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaSirRequest;
 import es.caib.notib.logic.objectes.LoggingTipus;
-import es.caib.notib.logic.service.ActiveMqServiceImpl;
 import es.caib.notib.logic.service.EnviamentSmServiceImpl;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.statemachine.mappers.ConsultaSirMapper;
@@ -83,9 +82,19 @@ public class ConsultaSirPoolingAction implements Action<EnviamentSmEstat, Enviam
                 return;
             }
         }
-        var consulta = ConsultaSirRequest.builder().enviamentUuid(enviamentUuid).consultaSirDto(consultaSirMapper.toDto(enviament)).numIntent(reintents + 1).build();
+        var codiUsuari = (String) stateContext.getExtendedState().getVariables().get(SmConstants.CODI_USUARI);
+        var consulta = ConsultaSirRequest.builder()
+                .enviamentUuid(enviamentUuid)
+                .id(enviament.getId())
+                .numIntent(reintents + 1)
+                .codiUsuari(codiUsuari)
+                .build();
         jmsTemplate.convertAndSend(SmConstants.CUA_CONSULTA_SIR, consulta,
                 m -> {
+                    var d = refrescarPeriode();
+                    if (d > 0) {
+                        m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, d);
+                    }
                     m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, refrescarPeriode());
                     if (configHelper.getConfigAsBoolean("es.caib.notib.log.tipus.STATE_MACHINE")) {
                         var mida = 0;

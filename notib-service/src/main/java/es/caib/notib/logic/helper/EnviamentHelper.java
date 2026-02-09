@@ -6,7 +6,6 @@ import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioCertificacioDto;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
-import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.NonNull;
@@ -100,7 +99,7 @@ public class EnviamentHelper {
 			var msgInfoUpdating = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.actualitzant", new Object[] {enviamentId});
 			progres.addInfo(TipusActInfo.INFO, msgInfoUpdating);
 			info.getParams().add(new AccioParam("Msg. procés:", msgInfoUpdating + " [" + progres.getProgres() + "%]"));
-			var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviamentId).build()).build();
+			var consulta = ConsultaNotificaRequest.builder().id(enviamentId).build();
 			notificaHelper.enviamentRefrescarEstat(consulta, true);
 			var msgInfoUpdated = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.actualitzant.ok", new Object[] {enviamentId});
 			progres.addInfo(TipusActInfo.SUB_INFO, msgInfoUpdated);
