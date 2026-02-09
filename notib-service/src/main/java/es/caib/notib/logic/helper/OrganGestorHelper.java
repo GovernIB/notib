@@ -1,14 +1,7 @@
 package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
-import es.caib.notib.logic.intf.dto.AvisNivellEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.IntegracioCodi;
-import es.caib.notib.logic.intf.dto.IntegracioInfo;
-import es.caib.notib.logic.intf.dto.LlibreDto;
-import es.caib.notib.logic.intf.dto.OficinaDto;
-import es.caib.notib.logic.intf.dto.PermisEnum;
-import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto;
+import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.dto.organisme.TipusTransicioEnumDto;
@@ -40,7 +33,7 @@ import java.util.Set;
 
 /**
  * Helper per a convertir entities a dto
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -106,9 +99,9 @@ public class OrganGestorHelper {
 		avisRepository.save(avis);
 	}
 
-//	@Transactional
+	//	@Transactional
 	public void sincronitzarOrgans(Long entitatId, List<NodeDir3> unitatsWs, List<OrganGestorEntity> obsoleteUnitats, List<OrganGestorEntity> organsDividits,
-								   List<OrganGestorEntity> organsFusionats, List<OrganGestorEntity> organsSubstituits, ProgresActualitzacioDto progres) {
+	                               List<OrganGestorEntity> organsFusionats, List<OrganGestorEntity> organsSubstituits, ProgresActualitzacioDto progres) {
 
 		var entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false);
 		var nombreUnitatsTotal = unitatsWs.size();
@@ -116,8 +109,8 @@ public class OrganGestorHelper {
 		// Agafa totes les unitats del WS i les guarda a BBDD. Si la unitat no existeix la crea, i si existeix la sobreescriu.
 		var prefix = "[SYNC-ORGANS] ";
 		log.debug(prefix + "Sincronitzant òrgans gestors");
-		for (var unitatWS: unitatsWs) {
-			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.sincronitzar.unitat", new Object[] {unitatWS.getCodi() + " - " + unitatWS.getDenominacio()}));
+		for (var unitatWS : unitatsWs) {
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.sincronitzar.unitat", new Object[]{unitatWS.getCodi() + " - " + unitatWS.getDenominacio()}));
 			sincronizarUnitat(unitatWS, entitat);
 			progres.setProgres(2 + (nombreUnitatsProcessades++ * 10 / nombreUnitatsTotal));
 		}
@@ -126,7 +119,7 @@ public class OrganGestorHelper {
 		log.debug(prefix + "Sincronitzant històric unitats");
 		nombreUnitatsProcessades = 0;
 		for (var unitatWS : unitatsWs) {
-			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.sincronitzar.historic", new Object[] {unitatWS.getCodi() + " - " + unitatWS.getDenominacio()}));
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.sincronitzar.historic", new Object[]{unitatWS.getCodi() + " - " + unitatWS.getDenominacio()}));
 			var unitat = organGestorRepository.findByEntitatAndCodi(entitat, unitatWS.getCodi());
 			if (unitat == null) {
 				log.info("Unitat amb codi " + unitatWS.getCodi() + " no trobada a la bdd per l'entitat " + entitat.getCodi());
@@ -147,7 +140,7 @@ public class OrganGestorHelper {
 		nombreUnitatsProcessades = 0;
 		nombreUnitatsTotal = obsoleteUnitats.size();
 		for (var obsoleteUnitat : obsoleteUnitats) {
-			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.definir.transicio", new Object[] {obsoleteUnitat.getCodi() + " - " + obsoleteUnitat.getNom()}));
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.definir.transicio", new Object[]{obsoleteUnitat.getCodi() + " - " + obsoleteUnitat.getNom()}));
 			obsoleteUnitat.setEstat(OrganGestorEstatEnum.E);
 			if (obsoleteUnitat.getNous() == null || obsoleteUnitat.getNous().isEmpty()) {
 				obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.EXTINCIO);
@@ -199,17 +192,17 @@ public class OrganGestorHelper {
 			unitat.update(nom, unitatWS.getDenominacio(), unitatWS.getEstat(), unitatWS.getSuperior());
 			updateLlibreAndOficina(unitat, entitat.getDir3Codi());
 			log.debug(prefix + "guardant nova unitat amb codi " + unitat.getCodi() + " - " + unitat.getNom());
-			organGestorRepository.save(unitat);
+//			organGestorRepository.save(unitat);
 			return unitat;
 		}
 		// Venen les unitats ordenades, primer el pare i després els fills?
 		unitat = OrganGestorEntity.builder()
-				.codi(unitatWS.getCodi())
-				.entitat(entitat)
-				.nom(nom)
-				.nomEs(unitatWS.getDenominacio())
-				.codiPare(unitatWS.getSuperior())
-				.estat(unitatWS.getEstat()).build();
+			.codi(unitatWS.getCodi())
+			.entitat(entitat)
+			.nom(nom)
+			.nomEs(unitatWS.getDenominacio())
+			.codiPare(unitatWS.getSuperior())
+			.estat(unitatWS.getEstat()).build();
 		organGestorRepository.save(unitat);
 		updateLlibreAndOficina(unitat, entitat.getDir3Codi());
 		log.debug(prefix + "guardant nova unitat amb codi " + unitat.getCodi() + " - " + unitat.getNom());
@@ -223,7 +216,7 @@ public class OrganGestorHelper {
 			organ.updateLlibre(llibre.getCodi(), llibre.getNomLlarg());
 		}
 		var info = new IntegracioInfo(IntegracioCodi.UNITATS, "Actualització d'oficines SIR per l'entitat " + entitatDir3Codi,
-				IntegracioAccioTipusEnumDto.PROCESSAR);
+			IntegracioAccioTipusEnumDto.PROCESSAR);
 		var arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitatDir3Codi);
 		processarOficinaOrgan(info, arbreUnitats, organ);
 	}
@@ -285,7 +278,7 @@ public class OrganGestorHelper {
 		}
 	}
 
-//	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	//	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void processarOficinaOrgan(IntegracioInfo info, Map<String, OrganismeDto> arbreUnitats, OrganGestorEntity organ) {
 
 		List<OficinaDto> oficines;
@@ -304,7 +297,7 @@ public class OrganGestorHelper {
 			return;
 		}
 		if (Strings.isNullOrEmpty(organ.getOficina()) || !Strings.isNullOrEmpty(organ.getOficina()) && !oficines.toString().contains(organ.getOficina())) {
-			log.info("OFISYNC - Actualitzant oficina. Antiga: {} - {} , Nova: {} - {}", new Object[] {organ.getOficina(), organ.getOficinaNom(), oficines.get(0).getCodi(), oficines.get(0).getNom()});
+			log.info("OFISYNC - Actualitzant oficina. Antiga: {} - {} , Nova: {} - {}", new Object[]{organ.getOficina(), organ.getOficinaNom(), oficines.get(0).getCodi(), oficines.get(0).getNom()});
 			info.addParam(organ.getCodi(), "Actualitzant la oficina. Antiga: " + organ.getOficina() + " - Nova: " + oficines.get(0).getCodi());
 			actualitzarOficinaOrgan(organ, oficines.get(0));
 			log.info("OFISYNC - Oficina actualitzada");

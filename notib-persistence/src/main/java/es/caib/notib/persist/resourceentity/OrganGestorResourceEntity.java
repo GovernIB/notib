@@ -4,9 +4,9 @@ import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.dto.organisme.TipusTransicioEnumDto;
 import es.caib.notib.logic.intf.model.OrganGestorResource;
-import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.cie.EntregaCieEntity;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -35,6 +35,9 @@ public class OrganGestorResourceEntity extends BaseAuditableResourceEntity<Organ
 	protected String nom;
 	@Column(name = "nom_es", length = 1000)
 	protected String nomEs;
+	@Column(name = "estat", length = 1)
+	@Enumerated(EnumType.STRING)
+	protected OrganGestorEstatEnum estat;
 	@Column(name = "llibre")
 	protected String llibre;
 	@Column(name = "llibre_nom")
@@ -43,9 +46,6 @@ public class OrganGestorResourceEntity extends BaseAuditableResourceEntity<Organ
 	protected String oficina;
 	@Column(name = "oficina_nom")
 	protected String oficinaNom;
-	@Column(name = "estat", length = 1)
-	@Enumerated(EnumType.STRING)
-	protected OrganGestorEstatEnum estat;
 	@Column(name = "sir")
 	private Boolean sir;
 	@Column(name = "permetre_sir")
@@ -83,5 +83,27 @@ public class OrganGestorResourceEntity extends BaseAuditableResourceEntity<Organ
 
 	@ManyToMany(mappedBy = "nous")
 	private List<OrganGestorEntity> antics = new ArrayList<>();
+
+	@Builder
+	public OrganGestorResourceEntity(
+		OrganGestorResource resource,
+		EntitatResourceEntity entitat,
+		EntregaCieEntity entregaCie) {
+		this.codi = resource.getCodi();
+		this.codiPare = resource.getCodiPare();
+		this.nom = resource.getNom();
+		this.nomEs = resource.getNomEs();
+		this.estat = resource.getEstat();
+		this.llibre = resource.getLlibre();
+		this.llibreNom = resource.getLlibreNom();
+		this.oficina = resource.getOficina();
+		this.oficinaNom = resource.getOficinaNom();
+		this.sir = resource.getSir();
+		this.permetreSir = resource.isPermetreSir();
+		this.entregaCieDesactivada = resource.isEntregaCieDesactivada();
+		this.sobrescriureCieOrganEmisor = resource.isSobrescriureCieOrganEmisor();
+		this.entitat = entitat;
+		this.entregaCie = entregaCie;
+	}
 
 }

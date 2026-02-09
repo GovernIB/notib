@@ -59,7 +59,7 @@ import java.util.List;
 
 /**
  * Helper MOCK de prova.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -80,8 +80,8 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	private EnviamentTableHelper enviamentTableHelper;
 	@Autowired
 	private AccioMassivaHelper accioMassivaHelper;
-    @Autowired
-    private ComandaListener comandaListener;
+	@Autowired
+	private ComandaListener comandaListener;
 
 	private MockPlay mockPlay;
 
@@ -91,8 +91,8 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	public NotificacioEntity notificacioEnviar(Long notificacioId, boolean ambEnviamentPerEmail) {
 
 		Thread.sleep(1000);
-		var info = new IntegracioInfo(IntegracioCodi.NOTIFICA,"Enviament d'una notificació", IntegracioAccioTipusEnumDto.ENVIAMENT,
-				new AccioParam("Identificador de la notificacio", String.valueOf(notificacioId)));
+		var info = new IntegracioInfo(IntegracioCodi.NOTIFICA, "Enviament d'una notificació", IntegracioAccioTipusEnumDto.ENVIAMENT,
+			new AccioParam("Identificador de la notificacio", String.valueOf(notificacioId)));
 		info.setNotificacioId(notificacioId);
 		var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
 		var usuari = notificacio.getCreatedBy().get().getCodi();
@@ -210,7 +210,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		Date data, dataAmpliada;
 		String entitat;
 		List<AmpliacionPlazo> ampliacionesPlazo = new ArrayList<>();
-		AmpliacionesPlazo ampliaciones =  new AmpliacionesPlazo();
+		AmpliacionesPlazo ampliaciones = new AmpliacionesPlazo();
 		for (var enviament : enviaments) {
 			data = enviament.getNotificaDataCaducitat();
 			if (data == null) {
@@ -279,7 +279,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			}
 
 			Datado datatDarrer = null;
-			for (var datado: resultadoInfoEnvio.getDatados().getDatado()) {
+			for (var datado : resultadoInfoEnvio.getDatados().getDatado()) {
 				var datatData = toDate(datado.getFecha());
 				if (datatDarrer == null) {
 					datatDarrer = datado;
@@ -290,7 +290,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 						datatDarrer = datado;
 					}
 				}
-                var estat = getEstatNotifica(datatDarrer.getResultado());
+				var estat = getEstatNotifica(datatDarrer.getResultado());
 				if (datatData != null && !datatData.equals(dataUltimDatat) || estat != null && !estat.equals(enviament.getNotificaEstat())) {
 					enviament.setNotificaEstat(estat);
 					enviament.setNotificaEstatData(datatData);
@@ -383,7 +383,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		}
 		enviamentTableHelper.actualitzarRegistre(enviament);
 		auditHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "NotificaV0Helper.enviamentRefrescarEstat");
-		if (error && raiseExceptions){
+		if (error && raiseExceptions) {
 			throw excepcio;
 		}
 		return enviament;
@@ -394,7 +394,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 
 		var enviament = notificacioEnviamentRepository.findByNotificaReferencia(identificador);
 		try {
-			var resposta =  new RespostaAnulacio();
+			var resposta = new RespostaAnulacio();
 			resposta.setCodiResposta("000");
 			resposta.setIdentificador(identificador);
 			resposta.setError(false);
@@ -431,8 +431,8 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			datat.setFecha(date);
 			datat.setNifReceptor(enviament.getTitular().getNif());
 			datat.setNombreReceptor(enviament.getTitular().getNom()
-					+ (enviament.getTitular().getLlinatge1() != null ? " " + enviament.getTitular().getLlinatge1() : "")
-					+ (enviament.getTitular().getLlinatge2() != null ? " " + enviament.getTitular().getLlinatge2() : ""));
+				+ (enviament.getTitular().getLlinatge1() != null ? " " + enviament.getTitular().getLlinatge1() : "")
+				+ (enviament.getTitular().getLlinatge2() != null ? " " + enviament.getTitular().getLlinatge2() : ""));
 			datat.setOrigen("electronico");
 			datat.setResultado("expirada");
 			datats.getDatado().add(datat);
@@ -478,7 +478,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		}
 		var resultadoEnvios = new ResultadoEnvios();
 		ResultadoEnvio resultatEnviament;
-		for (var enviament: notificacio.getEnviaments()) {
+		for (var enviament : notificacio.getEnviaments()) {
 			resultatEnviament = new ResultadoEnvio();
 //			resultatEnviament.setNifTitular(enviament.getTitular().getNif());
 			if (enviament.getTitular().isIncapacitat() && enviament.getDestinataris() != null) {
@@ -492,17 +492,17 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		resultat.setResultadoEnvios(resultadoEnvios);
 		return resultat;
 	}
-	
+
 	private String getRandomAlphaNumericString(int n) {
 
 		var alphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
 		var sb = new StringBuilder(n);
 		int index;
 		for (var i = 0; i < n; i++) {
-			index = (int)(alphaNumericString.length() * Math.random());
+			index = (int) (alphaNumericString.length() * Math.random());
 			sb.append(alphaNumericString.charAt(index));
-		} 
-		return sb.toString(); 
+		}
+		return sb.toString();
 	}
 
 	@Getter
