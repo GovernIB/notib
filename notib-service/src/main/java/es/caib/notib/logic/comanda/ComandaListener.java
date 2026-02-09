@@ -151,11 +151,7 @@ public class ComandaListener {
         mapper.registerModule(new JavaTimeModule());
 //        var requestBody = mapper.writeValueAsString(avis);
         NotibLogger.getInstance().info("[ComandaListener] Enviant avis a la cua de tasques de Comanda " + avis, log, LoggingTipus.COMANDA);
-        jmsTemplate.convertAndSend(SmConstants.CUA_COMANDA_AVISOS, avis,
-                m -> {
-                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 0);
-                    return m;
-                });
+        jmsTemplate.convertAndSend(SmConstants.CUA_COMANDA_AVISOS, avis);
     }
 
     @Transactional
@@ -199,11 +195,7 @@ public class ComandaListener {
         mapper.registerModule(new JavaTimeModule());
 //        var requestBody = mapper.writeValueAsString(tasca);
         NotibLogger.getInstance().info("[ComandaListener] Enviant tasca a la cua de tasques de Comanda " + tasca, log, LoggingTipus.COMANDA);
-        jmsTemplate.convertAndSend(SmConstants.CUA_COMANDA_TASQUES, tasca,
-                m -> {
-                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 0);
-                    return m;
-                });
+        jmsTemplate.convertAndSend(SmConstants.CUA_COMANDA_TASQUES, tasca);
     }
 
 

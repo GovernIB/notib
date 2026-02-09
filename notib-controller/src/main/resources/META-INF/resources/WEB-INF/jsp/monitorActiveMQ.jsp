@@ -20,20 +20,12 @@
 	<script src="<c:url value="/webjars/jsrender/1.0.0-rc.70/jsrender.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
-
-	<script type="text/javascript">
-		$(document).ready(function() {
-			$("#refrescar").on("click", () => window.location.reload());
-
-		});
-	</script>
 </head>
 <body>
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<div class="text-right">
 			<div class="btn-group">
-				<a href="<c:url value="/monitor/activemq/scheduler/stats"/>" class="btn btn-info"><span class="fa fa-download"></span>&nbsp;JobScheduler JSON</a>
-				<button id="refrescar" class="btn btn-default"><span class="fa fa-reload"></span>Refrescar</a>
+				<a href="<c:url value="/monitor/activemq/scheduler/stats"/>" class="btn btn-info" style="margin-right:10px"><span class="fa fa-download"></span>&nbsp;JobScheduler JSON</a>
 			</div>
 		</div>
 	</script>
@@ -41,13 +33,13 @@
 		id="taulaInfoQueues"
 		data-toggle="datatable"
 		data-url="<c:url value="/monitor/activemq/datatable"/>"
-		data-search-enabled="false"
+<%--		data-search-enabled="false"--%>
 		data-selection-enabled="false"
 		data-default-order="0"
 		data-default-dir="asc"
 		data-paging="false"
 		class="table table-bordered table-striped"
-		data-info-type="search"
+<%--		data-info-type="search"--%>
 		data-botons-template="#botonsTemplate"
 		style="width:100%">
 		<thead>

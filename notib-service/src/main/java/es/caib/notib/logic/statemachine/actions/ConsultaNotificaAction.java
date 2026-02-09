@@ -8,6 +8,7 @@ import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.service.ActiveMqServiceImpl;
 import es.caib.notib.logic.service.EnviamentSmServiceImpl;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.statemachine.mappers.ConsultaNotificaMapper;
@@ -18,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ScheduledMessage;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.retry.annotation.Backoff;
@@ -27,6 +29,8 @@ import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
 
 @Slf4j
 @Component
@@ -57,6 +61,15 @@ public class ConsultaNotificaAction implements Action<EnviamentSmEstat, Enviamen
         jmsTemplate.convertAndSend(SmConstants.CUA_CONSULTA_ESTAT, consulta,
                 m -> {
                     m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, SmConstants.delay(reintents));
+                    if (configHelper.getConfigAsBoolean("es.caib.notib.log.tipus.STATE_MACHINE")) {
+                        var mida = 0;
+                        try {
+                            mida = new ObjectMapper().writeValueAsBytes(consulta).length;
+                        } catch (IOException e) {
+                            NotibLogger.getInstance().info("[SM] Error convertint el missatge a json " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
+                        }
+                        ActiveMqServiceImpl.afegirJob(SmConstants.CUA_CONSULTA_ESTAT, mida);
+                    }
                     return m;
                 });
 

@@ -7,6 +7,7 @@ import es.caib.notib.logic.intf.dto.ActiveMqMissatgeInfo;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.service.ActiveMqService;
+import es.caib.notib.logic.objectes.JobSchedulerCount;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +24,10 @@ import javax.management.JMX;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-import javax.management.openmbean.CompositeData;
-import javax.management.openmbean.OpenDataException;
 import javax.management.openmbean.TabularData;
 import java.lang.management.ManagementFactory;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Slf4j
@@ -40,6 +41,23 @@ public class ActiveMqServiceImpl implements ActiveMqService {
     private final MessageHelper messageHelper;
     private final NotificacioRepository notificacioRepository;
     private final NotificacioEnviamentRepository notificacioEnviamentRepository;
+
+    public static Map<String, JobSchedulerCount> jobSchedulerHistoric = new HashMap<>();
+
+    public static void afegirJob(String cua, int mida) {
+
+        if (!jobSchedulerHistoric.containsKey(cua)) {
+            jobSchedulerHistoric.put(cua, JobSchedulerCount.builder().mida(mida).build());
+            return;
+        }
+        var jobCount = jobSchedulerHistoric.get(cua);
+        jobCount.incrementer(mida);
+        jobSchedulerHistoric.put(cua, jobCount);
+    }
+
+    public static void resetJobSchedulerHistoric() {
+        jobSchedulerHistoric = new HashMap<>();
+    }
 
     @Override
     public PaginaDto<ActiveMqInfo> getInfoQueues(PaginacioParamsDto paginacioParams) {
@@ -294,35 +312,57 @@ public class ActiveMqServiceImpl implements ActiveMqService {
         // El nom de l'objecte JMX per al JobScheduler pot variar si no s'usa el nom per defecte
         // Intentem trobar-lo si el de dalt no funciona
         if (!connection.isRegistered(jobSchedulerName)) {
-             Set<ObjectName> names = connection.queryNames(new ObjectName("org.apache.activemq:type=Broker,brokerName=localhost,service=JobScheduler,*"), null);
-             if (!names.isEmpty()) {
-                 jobSchedulerName = names.iterator().next();
-             }
+//             Set<ObjectName> names = connection.queryNames(new ObjectName("org.apache.activemq:type=Broker,brokerName=localhost,service=JobScheduler,*"), null);
+//             if (!names.isEmpty()) {
+//                 jobSchedulerName = names.iterator().next();
+//             }
+
+            var names = connection.queryNames(new ObjectName("org.apache.activemq:type=Broker,service=JobScheduler,*"), null);
+
+            if (names.isEmpty()) {
+                throw new IllegalStateException("JobScheduler no trobat via JMX");
+            }
+
+            jobSchedulerName = names.iterator().next();
         }
+
+
 
         JSONObject result = new JSONObject();
         if (connection.isRegistered(jobSchedulerName)) {
-            TabularData jobs = (TabularData) connection.invoke(jobSchedulerName, "getAllJobs", null, null);
+
+//            String start = String.valueOf(System.currentTimeMillis());
+//            String finish = String.valueOf(System.currentTimeMillis() + 24L*60*60*1000); // +24h
+
+            var start = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            var finish = LocalDateTime.now().plusMinutes(10).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")); // +24h
+
+            TabularData jobs = (TabularData) connection.invoke(
+                    jobSchedulerName,
+                    "getAllJobs",
+                    new Object[]{ start, finish },
+                    new String[]{ "java.lang.String", "java.lang.String" }
+            );
+//            TabularData jobs = (TabularData) connection.invoke(jobSchedulerName, "getAllJobs",  new Object[]{ "", "" },
+//                    new String[]{ "java.lang.String", "java.lang.String" });
 
             int totalJobs = 0;
             long totalSize = 0;
 
             if (jobs != null) {
-                for (Object value : jobs.values()) {
-                    CompositeData jobData = (CompositeData) value;
+                var mida = jobs.values().size();
+                for (var i = 0; i < mida; i++) {
                     totalJobs++;
-
-                    // Mida aproximada del contingut
-                    if (jobData.containsKey("payload")) {
-                        byte[] payload = (byte[]) jobData.get("payload");
-                        if (payload != null) {
-                            totalSize += payload.length;
-                        }
-                    }
                 }
             }
 
             result.put("nombreJobs", totalJobs);
+            JobSchedulerCount element;
+            for (var key : jobSchedulerHistoric.keySet()) {
+                element = jobSchedulerHistoric.get(key);
+                totalSize += element.getMida();
+                result.put(key, "count: " + element.getCount() + " - mida: " + element.getMida());
+            }
             result.put("midaTotalBytes", totalSize);
             result.put("midaTotalMB", String.format("%.2f", totalSize / (1024.0 * 1024.0)));
 

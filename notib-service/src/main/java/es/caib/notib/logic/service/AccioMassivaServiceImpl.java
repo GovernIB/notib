@@ -2,6 +2,7 @@ package es.caib.notib.logic.service;
 
 import es.caib.notib.logic.accionsMassives.AccionsMassivesListener;
 import es.caib.notib.logic.helper.AccioMassivaHelper;
+import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.FitxerDto;
@@ -18,7 +19,9 @@ import es.caib.notib.logic.intf.service.AccioMassivaService;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.JustificantService;
 import es.caib.notib.logic.intf.service.NotificacioService;
+import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.statemachine.SmConstants;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.AccioMassivaEntity;
 import es.caib.notib.persist.entity.AccioMassivaElementEntity;
 import es.caib.notib.persist.repository.AccioMassivaRepository;
@@ -27,12 +30,14 @@ import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.persist.repository.statemachine.AccioMassivaElementRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ScheduledMessage;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -51,6 +56,8 @@ public class AccioMassivaServiceImpl implements AccioMassivaService {
     private AccioMassivaRepository accioMassivaRepository;
     @Autowired
     private PaginacioHelper paginacioHelper;
+    @Autowired
+    private ConfigHelper configHelper;
     @Autowired
     private EnviamentService enviamentService;
     @Autowired
@@ -339,7 +346,18 @@ public class AccioMassivaServiceImpl implements AccioMassivaService {
     public void executarAccio(AccioMassivaExecucio accio) {
 
         jmsTemplate.convertAndSend(SmConstants.CUA_ACCIONS_MASSIVES, accio,
-                m -> {m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 1000L);return m;
+        m -> {
+            m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 1000L);
+            if (configHelper.getConfigAsBoolean("es.caib.notib.log.tipus.STATE_MACHINE")) {
+                var mida = 0;
+                try {
+                    mida = new ObjectMapper().writeValueAsBytes(accio).length;
+                } catch (IOException e) {
+                    NotibLogger.getInstance().info("[SM] Error convertint el missatge a json " + accio.getAccioId(), log, LoggingTipus.STATE_MACHINE);
+                }
+                ActiveMqServiceImpl.afegirJob(SmConstants.CUA_ACCIONS_MASSIVES, mida);
+            }
+            return m;
         });
     }
 

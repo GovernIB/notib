@@ -42,6 +42,14 @@ public class SmJmsConfig {
     private String fileBaseDir;
     @Value("${es.caib.notib.activemq.max.concurrency:50}")
     private Integer BROKER_MAX_CONCURRENCY;
+    @Value("${es.caib.notib.activemq.max.kaha.limit.gb:60}")
+    private Long KAHA_LIMIT_GB;
+    @Value("${es.caib.notib.activemq.max.jobscheduler.limit.gb:40}")
+    private Long JOB_SCHEDULER_LIMIT_GB;
+    @Value("${es.caib.notib.activemq.max.tmp.limit.gb:10}")
+    private Long TMP_LIMIT_GB;
+    @Value("${es.caib.notib.activemq.max.tmp.limit.MB:1024}")
+    private Long MEMORIA_BROKER_LIMIT_MB;
 
     @Bean // Serialize message content to json using TextMessage
     public MessageConverter jacksonJmsMessageConverter() {
@@ -111,13 +119,13 @@ public class SmJmsConfig {
         // Límit d’ús de storage (KahaDB + scheduler)
         SystemUsage usage = broker.getSystemUsage();
         // 1) Persistència “normal” (KahaDB)
-        usage.getStoreUsage().setLimit(60L * 1024 * 1024 * 1024); // 60 GB
+        usage.getStoreUsage().setLimit(KAHA_LIMIT_GB * 1024 * 1024 * 1024); // 60 GB
         // 2) Scheduler (PListStore)
-        usage.getJobSchedulerUsage().setLimit(40L * 1024 * 1024 * 1024); // 40 GB
+        usage.getJobSchedulerUsage().setLimit(JOB_SCHEDULER_LIMIT_GB * 1024 * 1024 * 1024); // 40 GB
         // 3) Temporal (cursors / temp store)
-        usage.getTempUsage().setLimit(10L * 1024 * 1024 * 1024);  // 10 GB (opcional)
+        usage.getTempUsage().setLimit(TMP_LIMIT_GB * 1024 * 1024 * 1024);  // 10 GB (opcional)
         // 4) Memòria del broker
-        usage.getMemoryUsage().setLimit(1024L * 1024 * 1024);      // 1 GB (opcional)
+        usage.getMemoryUsage().setLimit(MEMORIA_BROKER_LIMIT_MB * 1024 * 1024);      // 1 GB (opcional)
         // 5) No bloquejar productors si no hi ha espai, que falli el send() en lloc de bloquejar
         usage.setSendFailIfNoSpace(true);
         // opcional: si prefereixes “esperar una mica” i després fallar

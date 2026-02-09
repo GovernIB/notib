@@ -28,9 +28,13 @@ import org.apache.activemq.ScheduledMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.handler.annotation.Headers;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.jms.Message;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -125,8 +129,9 @@ public class NotificaHelper {
 
 	@Transactional
 	@JmsListener(destination = CUA_SINCRONIZAR_ENVIO_OE, containerFactory = JMS_FACTORY_ACK)
-	public void enviamentEntregaPostalNotificada(SincronizarEnvio sincronizarEnvio) throws Exception {
+	public void enviamentEntregaPostalNotificada(@Payload SincronizarEnvio sincronizarEnvio, @Headers MessageHeaders headers, Message message) throws Exception {
 
+		message.acknowledge();
 		var resposta = getNotificaHelper().enviamentEntregaPostalNotificada(sincronizarEnvio);
 		if (NexeaAdviserWs.SYNC_ENVIO_OE_OK.equals(resposta.getCodigoRespuesta())) {
 			return;
