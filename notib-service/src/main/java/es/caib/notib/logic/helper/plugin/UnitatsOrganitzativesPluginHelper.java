@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 
 /**
  * Helper per a interactuar amb els plugins.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -137,12 +137,12 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 			// peticionsPlugin.updatePeticioTotal(entitatCodi);
 			var unitatsOrganitzatives = getPlugin().findAmbPare(pareCodi, dataActualitzacio, dataSincronitzacio);
 			removeUnitatsSubstitutedByItself(unitatsOrganitzatives);
-			if (unitatsOrganitzatives == null || unitatsOrganitzatives.isEmpty()) {
+			/*if (unitatsOrganitzatives == null || unitatsOrganitzatives.isEmpty()) {
 				var errorMissatge = messageManager.getMessage("organgestor.actualitzacio.sense.canvis");
 				info.addParam("Resultat", "No s'han obtingut canvis.");
 				integracioHelper.addAccioOk(info);
 				throw new SistemaExternException(IntegracioCodi.UNITATS.name(), errorMissatge);
-			}
+			}*/
 			integracioHelper.addAccioOk(info);
 			return unitatsOrganitzatives;
 		} catch (SistemaExternException sex) {
@@ -204,7 +204,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 
 
 	public List<ObjetoDirectorio> llistarOrganismesPerEntitat(String entitatcodi) throws SistemaExternException {
-		
+
 		var info = new IntegracioInfo(IntegracioCodi.UNITATS,"Obtenir llista d'organismes per entitat", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Codi Dir3 de l'entitat", entitatcodi));
 
@@ -222,9 +222,9 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 			throw new SistemaExternException(IntegracioCodi.UNITATS.name(), errorDescripcio, ex);
 		}
 	}
-	
+
 	public String getDenominacio(String codiDir3) {
-		
+
             var info = new IntegracioInfo(IntegracioCodi.UNITATS,"Obtenir denominació d'organisme", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Codi Dir3 de l'organisme", codiDir3));
 		var entitatCodi = getCodiEntitatActual();
@@ -241,10 +241,10 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 			throw new SistemaExternException(IntegracioCodi.UNITATS.name(), errorDescripcio, ex);
 		}
 	}
-	
+
 	public List<OrganGestorDto> cercaUnitats(String codi, String denominacio, Long nivellAdministracio, Long comunitatAutonoma,
 											 Boolean ambOficines, Boolean esUnitatArrel, Long provincia, String municipi) throws SistemaExternException {
-		
+
 		var info = new IntegracioInfo(IntegracioCodi.UNITATS,"Obtenir llista de tots els organismes a partir d'un text",
 				IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Text de la cerca", codi));
 
@@ -275,7 +275,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 //	}
 
 	public List<OrganGestorDto> unitatsPerDenominacio(String denominacio) throws SistemaExternException {
-		
+
 		var info = new IntegracioInfo(IntegracioCodi.UNITATS,"Obtenir llista de tots els organismes a partir d'un text",
 				IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Text de la cerca", denominacio));
 
@@ -314,9 +314,9 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 	private OrganGestorDto toOrganGestorDto(ObjetoDirectorio organ) {
 		return OrganGestorDto.builder().codi(organ.getCodi()).nom(organ.getDenominacio()).build();
 	}
-	
+
 	public List<CodiValor> llistarNivellsAdministracions() throws SistemaExternException {
-		
+
 		var info = new IntegracioInfo(IntegracioCodi.UNITATS,"Obtenint llista dels nivells de les administracions", IntegracioAccioTipusEnumDto.ENVIAMENT);
 		var entitatCodi = getCodiEntitatActual();
 		info.setCodiEntitat(entitatCodi);
@@ -333,7 +333,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 			throw new SistemaExternException(IntegracioCodi.UNITATS.name(), errorDescripcio, ex);
 		}
 	}
-	
+
 	public List<CodiValor> llistarComunitatsAutonomes() throws SistemaExternException {
 
 		var info = new IntegracioInfo(IntegracioCodi.UNITATS,"Obtenint llista les comunitats autònomes", IntegracioAccioTipusEnumDto.ENVIAMENT);
@@ -373,7 +373,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 	}
 
 	public List<CodiValor> llistarProvincies() throws SistemaExternException {
-		
+
 		var info = new IntegracioInfo(IntegracioCodi.UNITATS,"Obtenint llista de províncies", IntegracioAccioTipusEnumDto.ENVIAMENT);
 		var entitatCodi = getCodiEntitatActual();
 		info.setCodiEntitat(entitatCodi);
@@ -390,9 +390,9 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 			throw new SistemaExternException(IntegracioCodi.UNITATS.name(), errorDescripcio, ex);
 		}
 	}
-	
+
 	public List<CodiValor> llistarProvincies(String codiCA) throws SistemaExternException {
-		
+
 		var info = new IntegracioInfo(IntegracioCodi.UNITATS,"Obtenint llista de províncies", IntegracioAccioTipusEnumDto.ENVIAMENT);
 		var entitatCodi = getCodiEntitatActual();
 		info.setCodiEntitat(entitatCodi);
@@ -409,9 +409,9 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 			throw new SistemaExternException(IntegracioCodi.UNITATS.name(), errorDescripcio, ex);
 		}
 	}
-	
+
 	public List<CodiValor> llistarLocalitats(String codiProvincia) throws SistemaExternException {
-		
+
 		var info = new IntegracioInfo(IntegracioCodi.UNITATS, "Obtenint llista de localitats d'una província", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Codi de la província", codiProvincia));
 

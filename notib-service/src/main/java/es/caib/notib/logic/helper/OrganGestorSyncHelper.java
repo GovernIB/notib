@@ -16,6 +16,7 @@ import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 
@@ -135,10 +136,16 @@ public class OrganGestorSyncHelper {
 			extincions.toArray(OrganGestorDir3Sync.OrganGestorDir3SyncCanviExtincio[]::new),
 			fusions,
 			divisions,
+			dir3SyncNodes.isEmpty(),
 			simular);
 		// Actualitza la base de dades amb els nodes de DIR3 si no és una simulació
 		if (!simular) {
 			actualitzarOrgansGestors(entitat, dir3SyncNodes, organsGestors);
+			LocalDate now = LocalDate.now();
+			if (entitat.getDataSincronitzacio() == null) {
+				entitat.setDataSincronitzacio(now);
+			}
+			entitat.setDataActualitzacio(now);
 		}
 		return resposta;
 	}
@@ -159,21 +166,18 @@ public class OrganGestorSyncHelper {
 		EntitatResourceEntity entitat,
 		NodeDir3 dir3SyncNode,
 		Optional<OrganGestorResourceEntity> organGestorOptional) {
-		String nom = !StringUtils.isEmpty(dir3SyncNode.getDenominacionCooficial()) ?
-			dir3SyncNode.getDenominacionCooficial() :
-			dir3SyncNode.getDenominacio();
 		OrganGestorResourceEntity organGestor;
 		// Actualitza l'òrgan gestor si ja existeix a la BD o el crea si no existeix
 		if (organGestorOptional.isPresent()) {
 			organGestor = organGestorOptional.get();
-			organGestor.setNom(nom);
+			organGestor.setNom(getOrganGestorNomFromDir3Node(dir3SyncNode));
 			organGestor.setNomEs(dir3SyncNode.getDenominacio());
 			organGestor.setCodiPare(dir3SyncNode.getSuperior());
 			organGestor.setEstat(OrganGestorEstatEnum.valueOf(dir3SyncNode.getEstat()));
 		} else {
 			OrganGestorResource organGestorResource = new OrganGestorResource();
 			organGestorResource.setCodi(dir3SyncNode.getCodi());
-			organGestorResource.setNom(nom);
+			organGestorResource.setNom(getOrganGestorNomFromDir3Node(dir3SyncNode));
 			organGestorResource.setNomEs(dir3SyncNode.getDenominacio());
 			organGestorResource.setCodiPare(dir3SyncNode.getSuperior());
 			organGestorResource.setEstat(OrganGestorEstatEnum.valueOf(dir3SyncNode.getEstat()));
@@ -244,10 +248,18 @@ public class OrganGestorSyncHelper {
 				Optional<OrganGestorResourceEntity> organGestor = organsGestors.stream().
 					filter(o -> o.getCodi().equals(dir3SyncNode.getCodi())).
 					findFirst();
-				organGestor.ifPresent(o -> modificacions.add(
-					new OrganGestorDir3Sync.OrganGestorDir3SyncCanviModificacio(
-						toArbreItem(o),
-						toArbreItem(dir3SyncNode))));
+				if (organGestor.isPresent()) {
+					boolean nomChanged = !getOrganGestorNomFromDir3Node(dir3SyncNode).equals(organGestor.get().getNom());
+					boolean nomEsChanged = !dir3SyncNode.getDenominacio().equals(organGestor.get().getNomEs());
+					boolean codiPareChanged = !dir3SyncNode.getSuperior().equals(organGestor.get().getCodiPare());
+					boolean estatChanged = !dir3SyncNode.getEstat().equals(organGestor.get().getEstat().name());
+					if (nomChanged || nomEsChanged || codiPareChanged || estatChanged) {
+						modificacions.add(
+							new OrganGestorDir3Sync.OrganGestorDir3SyncCanviModificacio(
+								toArbreItem(organGestor.get()),
+								toArbreItem(dir3SyncNode)));
+					}
+				}
 			}
 		}
 		return modificacions.toArray(OrganGestorDir3Sync.OrganGestorDir3SyncCanviModificacio[]::new);
@@ -348,6 +360,12 @@ public class OrganGestorSyncHelper {
 		nodeDir3.setDenominacionCooficial(entity.getNom());
 		nodeDir3.setEstat(entity.getEstat().name());
 		return nodeDir3;
+	}
+
+	private String getOrganGestorNomFromDir3Node(NodeDir3 node) {
+		return !StringUtils.isEmpty(node.getDenominacionCooficial()) ?
+			node.getDenominacionCooficial() :
+			node.getDenominacio();
 	}
 
 	@SafeVarargs

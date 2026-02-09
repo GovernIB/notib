@@ -39,10 +39,14 @@ const columns = [
     },
 ];
 
-const OrganGridDir3SyncActionForm: React.FC<{ setSimular: (value: boolean) => void }> = (props) => {
-    const { setSimular } = props;
+const OrganGridDir3SyncActionForm: React.FC<{
+    setSimular: (value: boolean) => void;
+    setSenseCanvis: (value: boolean | undefined) => void;
+}> = (props) => {
+    const { setSimular, setSenseCanvis } = props;
     React.useEffect(() => {
         setSimular(true);
+        setSenseCanvis(undefined);
     }, []);
     return (
         <Grid container>
@@ -61,15 +65,19 @@ const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
     return (
         <Grid container>
             <Grid size={12}>
-                <p>Creacions: {result.creacions?.length ?? 0}</p>
-                <p>Modificacions: {result.modificacions?.length ?? 0}</p>
-                <p>Substitucions: {result.substitucions?.length ?? 0}</p>
-                <p>Extincions: {result.extincions?.length ?? 0}</p>
-                <p>Fusions: {result.fusions?.length ?? 0}</p>
-                <p>Divisions: {result.divisions?.length ?? 0}</p>
-            </Grid>
-            <Grid size={12}>
-                <Typography>Faci clic al botó d'aplicar per a fer efectius els canvis.</Typography>
+                {result.senseCanvis ? (
+                    <p>Sense canvis</p>
+                ) : (
+                    <>
+                        <p>Creacions: {result.creacions?.length ?? 0}</p>
+                        <p>Modificacions: {result.modificacions?.length ?? 0}</p>
+                        <p>Substitucions: {result.substitucions?.length ?? 0}</p>
+                        <p>Extincions: {result.extincions?.length ?? 0}</p>
+                        <p>Fusions: {result.fusions?.length ?? 0}</p>
+                        <p>Divisions: {result.divisions?.length ?? 0}</p>
+                        <p>Faci clic al botó d'aplicar per a fer efectius els canvis.</p>
+                    </>
+                )}
             </Grid>
         </Grid>
     );
@@ -79,7 +87,9 @@ const OrganGridDir3SyncActionButton: React.FC = () => {
     const { t } = useTranslation();
     const { temporalMessageShow } = useBaseAppContext();
     const [simular, setSimular] = React.useState<boolean>();
+    const [senseCanvis, setSenseCanvis] = React.useState<boolean>();
     const resultProcessor = (result: any) => {
+        setSenseCanvis(result.senseCanvis);
         if (result.simulat) {
             setSimular(false);
             return <OrganGridDir3SyncActionResults result={result} />;
@@ -104,7 +114,7 @@ const OrganGridDir3SyncActionButton: React.FC = () => {
                 ? t('page.organs.grid.sync.dialogButton.query')
                 : t('page.organs.grid.sync.dialogButton.apply'),
             icon: simular ? 'search' : 'check',
-            componentProps: { variant: 'contained', disabled: false },
+            componentProps: { variant: 'contained', disabled: senseCanvis === true },
         },
     ];
     return (
@@ -116,7 +126,12 @@ const OrganGridDir3SyncActionButton: React.FC = () => {
             formAdditionalData={{ simular }}
             formDialogTitle={t('page.organs.grid.sync.dialogTitle')}
             formDialogButtons={formDialogButtons}
-            formDialogContent={<OrganGridDir3SyncActionForm setSimular={setSimular} />}
+            formDialogContent={
+                <OrganGridDir3SyncActionForm
+                    setSimular={setSimular}
+                    setSenseCanvis={setSenseCanvis}
+                />
+            }
             formDialogResultProcessor={resultProcessor}
             buttonComponentProps={{ variant: 'contained' }}
             onSuccess={handleSuccess}

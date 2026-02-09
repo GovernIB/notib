@@ -22,6 +22,7 @@ public class OrganGestorDir3Sync implements Serializable {
 	private final OrganGestorDir3SyncCanviExtincio[] extincions;
 	private final OrganGestorDir3SyncCanviFusio[] fusions;
 	private final OrganGestorDir3SyncCanviDivisio[] divisions;
+	private final boolean senseCanvis;
 	private final boolean simulat;
 
 	@Getter
