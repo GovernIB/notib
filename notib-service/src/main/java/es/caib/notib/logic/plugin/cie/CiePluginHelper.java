@@ -1,8 +1,10 @@
 package es.caib.notib.logic.plugin.cie;
 
 import com.google.common.base.Strings;
+import es.caib.comanda.model.v1.avis.AvisTipus;
 import es.caib.comanda.model.v1.salut.IntegracioApp;
 import es.caib.notib.client.domini.CieEstat;
+import es.caib.notib.logic.comanda.ComandaListener;
 import es.caib.notib.logic.helper.CallbackHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
@@ -54,6 +56,7 @@ import es.caib.plugins.arxiu.api.ArxiuException;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,7 +73,6 @@ import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.CIE;
 @Component
 public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
 
-    private final NotificacioTableViewRepository notificacioTableViewRepository;
     private final MessageHelper messageHelper;
     private final NotificacioTableHelper notificacioTableHelper;
     private final ConversioTipusHelper conversioTipusHelper;
@@ -84,6 +86,7 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
     private final NotificacioEnviamentRepository enviamentRepository;
     private final OrganGestorRepository organGestorRepository;
     private final CallbackHelper callbackHelper;
+    private ComandaListener comandaListener;
     public static final String GRUP = "CIE";
     private static final String ERROR_INESPERAT = "Error inesperat";
 
@@ -99,12 +102,12 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
                            ArxiuPluginHelper arxiuPluginHelper,
                            EntregaPostalRepository entregaPostalRepository,
                            NotificacioEnviamentRepository enviamentRepository,
-                           NotificacioTableViewRepository notificacioTableViewRepository,
                            MessageHelper messageHelper,
                            NotificacioTableHelper notificacioTableHelper,
                            MeterRegistry meterRegistry,
                            CallbackHelper callbackHelper,
-                           OrganGestorRepository organGestorRepository) {
+                           OrganGestorRepository organGestorRepository,
+                           @Lazy ComandaListener comandaListener) {
 
         super(integracioHelper, configHelper, entitatRepository, meterRegistry);
 
@@ -117,11 +120,11 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
         this.arxiuPluginHelper = arxiuPluginHelper;
         this.entregaPostalRepository = entregaPostalRepository;
         this.enviamentRepository = enviamentRepository;
-        this.notificacioTableViewRepository = notificacioTableViewRepository;
         this.messageHelper = messageHelper;
         this.notificacioTableHelper = notificacioTableHelper;
         this.callbackHelper = callbackHelper;
         this.organGestorRepository = organGestorRepository;
+        this.comandaListener = comandaListener;
     }
 
     @Transactional
@@ -185,6 +188,9 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
                     integracioHelper.addAccioOk(info);
                 } else {
                     integracioHelper.addAccioError(info, resposta.getDescripcioError());
+                    for (var enviament : notificacio.getEnviamentsPerNotifica()) {
+                        comandaListener.enviarAvis(enviament, AvisTipus.ALERTA);
+                    }
                 }
             } catch (Exception ex) {
                 var errorDescripcio = "Error al accedir al plugin CIE";
@@ -195,12 +201,22 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
                 resposta.setCodiResposta(ERROR_INESPERAT);
                 resposta.setDescripcioError(errorDescripcio);
                 errorSbs = true;
+                for (var enviament : notificacio.getEnviamentsPerNotifica()) {
+                    comandaListener.enviarAvis(enviament, AvisTipus.ALERTA);
+                }
 //            throw new SistemaExternException(IntegracioCodiEnum.CIE.name(), errorDescripcio, ex);
             }
             guardarRespostaCie(notificacioReferencia, resposta);
             notificacioTableHelper.actualitzarRegistre(notificacio);
         } catch (Exception ex) {
             SubsistemesHelper.addErrorOperation(CIE);
+            var notificacio = notificacioRepository.findByReferencia(notificacioReferencia);
+            if (notificacio == null) {
+                throw ex;
+            }
+            for (var enviament : notificacio.getEnviamentsPerNotifica()) {
+                comandaListener.enviarAvis(enviament, AvisTipus.ALERTA);
+            }
             throw ex;
         }
         if (errorSbs) {

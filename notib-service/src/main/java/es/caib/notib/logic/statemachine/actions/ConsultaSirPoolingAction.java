@@ -11,6 +11,7 @@ import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaSirRequest;
 import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.service.ActiveMqServiceImpl;
 import es.caib.notib.logic.service.EnviamentSmServiceImpl;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.statemachine.mappers.ConsultaSirMapper;

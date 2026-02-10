@@ -1,6 +1,5 @@
 package es.caib.notib.logic.service;
 
-import es.caib.notib.logic.comanda.ComandaListener;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.logic.intf.dto.AvisDto;
@@ -34,8 +33,6 @@ public class AvisServiceImpl implements AvisService {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private PaginacioHelper paginacioHelper;
-    @Autowired
-    private ComandaListener comandaListener;
 
 	
 	@Transactional

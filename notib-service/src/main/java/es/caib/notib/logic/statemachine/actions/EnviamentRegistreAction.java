@@ -82,24 +82,17 @@ public class EnviamentRegistreAction implements Action<EnviamentSmEstat, Enviame
         NotibLogger.getInstance().info("[SM] Enviant peticio de registre per l'enviament amb UUID " + enviamentUuid + " delay " + delay + "ms", log, LoggingTipus.STATE_MACHINE);
         jmsTemplate.convertAndSend(SmConstants.CUA_REGISTRE, env,
                 m -> {
-                    if (delay > 0) {
-                        m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, delay);
-                    }
-                    return m;
-                });
-
-            m -> {
-                        if (delay <= 0) {
+                        if (delay > 0) {
                             m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, delay);
-                            var mida = 0;
-                            if (configHelper.getConfigAsBoolean("es.caib.notib.log.tipus.STATE_MACHINE")) {
-                                try {
-                                    mida = new ObjectMapper().writeValueAsBytes(env).length;
-                                } catch (IOException e) {
-                                    NotibLogger.getInstance().info("[SM] Error convertint el missatge a json " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
-                                }
-                                ActiveMqServiceImpl.afegirJob(SmConstants.CUA_REGISTRE, mida);
+                        }
+                        var mida = 0;
+                        if (configHelper.getConfigAsBoolean("es.caib.notib.log.tipus.STATE_MACHINE")) {
+                            try {
+                                mida = new ObjectMapper().writeValueAsBytes(env).length;
+                            } catch (IOException e) {
+                                NotibLogger.getInstance().info("[SM] Error convertint el missatge a json " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
                             }
+                            ActiveMqServiceImpl.afegirJob(SmConstants.CUA_REGISTRE, mida);
                         }
                         return m;
                     });

@@ -41,6 +41,7 @@ import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.Receptor;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.ResultadoSincronizarEnvio;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnvio;
 import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.SincronizarEnvioEntity;
@@ -55,6 +56,8 @@ import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.Holder;
@@ -105,7 +108,7 @@ public class CieAdviserServiceImpl implements CieAdviserService {
     @Autowired
     private ComandaListener comandaListener;
 
-
+    @Transactional
     @Override
     public ResultadoSincronizarEnvio sincronizarEnvio(SincronizarEnvio sincronizarEnvio) {
 
@@ -206,12 +209,30 @@ public class CieAdviserServiceImpl implements CieAdviserService {
             log.error("[CIE ADVISER] Error persistint SincronizarEnvio", ex);
             // Si falla la persistència, intentem enviar l'objecte original per no bloquejar el procés,
             // tot i que això podria omplir el JobScheduler.
-            jmsTemplate.convertAndSend(NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, sincronizarEnvio);
+            jmsTemplate.convertAndSend(NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, sincronizarEnvio, m -> {
+                m.setIntProperty("intents", 0);
+                return m;
+            });
             return;
         }
-
+        final Long sincEnvioId = sincronizarEnvioId;
         NotibLogger.getInstance().info("[CIE ADVISER] Enviant a la cua " + NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE + " l'ID " + sincronizarEnvioId, log, LoggingTipus.ENTREGA_CIE);
-        jmsTemplate.convertAndSend(NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, sincronizarEnvioId);
+        if (TransactionSynchronizationManager.isActualTransactionActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    jmsTemplate.convertAndSend(NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, sincEnvioId, m -> {
+                        m.setIntProperty("intents", 0);
+                        return m;
+                    });
+                }
+            });
+            return;
+        }
+        jmsTemplate.convertAndSend(NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, sincronizarEnvioId, m -> {
+            m.setIntProperty("intents", 0);
+            return m;
+        });
     }
 
     private ResultadoSincronizarEnvio sincronitzarEntregaPostal(SincronizarEnvio sincronizarEnvio, IntegracioInfo info) {
@@ -352,6 +373,7 @@ public class CieAdviserServiceImpl implements CieAdviserService {
                             integracioHelper.addAccioError(info, "Tipus d'entrega " + tipoEntrega + " no reconeguda");
                             break;
                     }
+                    comandaListener.enviarAvis(enviament, AvisTipus.INFO);
                 } else {
                     NotibLogger.getInstance().info("[CIE ADVISER] Entrega postal " + identificador + " no esta en estat final. Estat: " + entregaPostal.getCieEstat(), log, LoggingTipus.ENTREGA_CIE);
                     var receptorNombre = receptor != null ? receptor.getNombreReceptor() : null;

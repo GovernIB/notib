@@ -101,7 +101,6 @@ public class RegistreHelper {
 			canviEstat = !enviament.getRegistreEstat().equals(resposta.getEstat());
 			enviamentUpdateDatat(resposta, enviament);
             if (canviEstat) {
-//                comandaListener.enviarTasca(enviament);
                 comandaListener.enviarAvis(enviament, AvisTipus.INFO);
             }
 			logTimeHelper.info(" [TIMER-SIR] Actualitzar estat comunicació SIR [Id: " + enviamentId + "]: ");

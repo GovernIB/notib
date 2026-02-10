@@ -3,6 +3,7 @@
  */
 package es.caib.notib.logic.helper;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.RespostaAnulacio;
@@ -24,6 +25,7 @@ import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioEventRepository;
 import org.apache.activemq.ScheduledMessage;
+import org.apache.activemq.command.ActiveMQTextMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
@@ -32,6 +34,8 @@ import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.jms.Message;
 import java.security.GeneralSecurityException;
@@ -133,41 +137,71 @@ public class NotificaHelper {
 	@JmsListener(destination = CUA_SINCRONIZAR_ENVIO_OE, containerFactory = JMS_FACTORY_ACK)
 	public void enviamentEntregaPostalNotificada(@Payload Object payload, @Headers MessageHeaders headers, Message message) throws Exception {
 
-		SincronizarEnvio sincronizarEnvio = null;
-		if (payload instanceof Long) {
-			var entity = sincronizarEnvioRepository.findById((Long) payload).orElseThrow();
-			var objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
-			sincronizarEnvio = objectMapper.readValue(entity.getJsonContingut(), SincronizarEnvio.class);
-		} else if (payload instanceof SincronizarEnvio) {
-			sincronizarEnvio = (SincronizarEnvio) payload;
-		} else {
-			throw new IllegalArgumentException("Payload no vàlid per enviamentEntregaPostalNotificada");
-		}
-
 		message.acknowledge();
+		SincronizarEnvio sincronizarEnvio = null;
+		Long id = null;
+		try {
+			id = Long.valueOf(((ActiveMQTextMessage) payload).getText());
+			var entity = sincronizarEnvioRepository.findById(id).orElseThrow();
+			var objectMapper = new ObjectMapper();
+			sincronizarEnvio = objectMapper.readValue(entity.getJsonContingut(), SincronizarEnvio.class);
+		} catch (NumberFormatException e) {
+			var objectMapper = new ObjectMapper();
+			sincronizarEnvio = objectMapper.readValue(((ActiveMQTextMessage) payload).getText(), SincronizarEnvio.class);
+		}
+//		if (payload instanceof Long) {
+//			var entity = sincronizarEnvioRepository.findById((Long) payload).orElseThrow();
+//			var objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+//			sincronizarEnvio = objectMapper.readValue(entity.getJsonContingut(), SincronizarEnvio.class);
+//		} else if (payload instanceof SincronizarEnvio) {
+//			sincronizarEnvio = (SincronizarEnvio) payload;
+//		} else {
+//			throw new IllegalArgumentException("Payload no vàlid per enviamentEntregaPostalNotificada");
+//		}
+
 		var resposta = getNotificaHelper().enviamentEntregaPostalNotificada(sincronizarEnvio);
-		if (NexeaAdviserWs.SYNC_ENVIO_OE_OK.equals(resposta.getCodigoRespuesta())) {
-			if (payload instanceof Long) {
-				sincronizarEnvioRepository.deleteById((Long) payload);
+		if (NexeaAdviserWs.SYNC_ENVIO_OE_OK.equals(resposta.getCodigoRespuesta()) || "OK".equals(resposta.getDescripcionRespuesta())) {
+			if (id != null) {
+				final var idDelete = id;
+				if (TransactionSynchronizationManager.isActualTransactionActive()) {
+					TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+						@Override
+						public void afterCommit() {
+							var entity = sincronizarEnvioRepository.findById(idDelete);
+                            entity.ifPresent(sincronizarEnvioEntity -> sincronizarEnvioRepository.delete(sincronizarEnvioEntity));
+						}
+					});
+				}
 			}
 			return;
 		}
 		var enviament = enviamentRepository.findByCieId(sincronizarEnvio.getIdentificador());
 		var events = eventRepository.findByEnviamentIdAndTipus(enviament.getId(), NotificacioEventTipusEnumDto.NOTIFICA_ENVIO_OE);
-		var reintents = !events.isEmpty() ? events.get(0).getIntents() : 0;
+		var intents = message.getIntProperty("intents");
 		var maxIntents = configHelper.getConfigAsInteger("es.caib.notib.tasca.notifica.sincronizar.envioOE.reintents.maxim");
 		maxIntents = maxIntents != null ? maxIntents : 3;
-		if (reintents > maxIntents) {
+		if (intents > maxIntents) {
 			for (var event : events) {
 				event.setFiReintents(true);
 			}
-			sincronizarEnvioRepository.deleteById((Long) payload);
+			if (id != null) {
+				final var idDelete = id;
+				if (TransactionSynchronizationManager.isActualTransactionActive()) {
+					TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+						@Override
+						public void afterCommit() {
+							var entity = sincronizarEnvioRepository.findById(idDelete);
+							entity.ifPresent(sincronizarEnvioEntity -> sincronizarEnvioRepository.delete(sincronizarEnvioEntity));
+						}
+					});
+				}
+			}
 			return;
 		}
 		jmsTemplate.convertAndSend(NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, payload,
 				m -> {
-					if (reintents > 0) {
-					    var d = SmConstants.delay(reintents);
+					if (intents > 0) {
+					    var d = SmConstants.delay(intents);
 						m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, d);
 					}
 					return m;

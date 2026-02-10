@@ -107,6 +107,10 @@ public class RegistreServiceImpl implements RegistreService {
             return registreSuccess;
         } catch (Exception ex) {
             NotibLogger.getInstance().info("[REGISTRE] Enviament de registre <" + enviamentUuid + "> error ", ex, log, LoggingTipus.REGISTRE);
+            var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElse(null);
+            if (enviament != null) {
+                comandaListener.enviarAvis(enviament, AvisTipus.ERROR);
+            }
             return false;
         }
     }

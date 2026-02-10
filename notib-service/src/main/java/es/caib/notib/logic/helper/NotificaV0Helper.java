@@ -133,7 +133,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 						pluginHelper.enviarNotificacioMobil(e);
 					}
 				}
-                for (var enviament : notificacio.getEnviaments()) {
+                for (var enviament : notificacio.getEnviamentsPerNotifica()) {
 //                    comandaListener.enviarTasca(enviament);
                     comandaListener.enviarAvis(enviament, AvisTipus.INFO);
                     if (enviament.getEntregaPostal() == null) {
@@ -147,12 +147,18 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 				errorDescripcio = "Error retornat per Notifica: [" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta();
 				log.info(" >>> ... ERROR: " + errorDescripcio);
 				integracioHelper.addAccioError(info, errorDescripcio);
+				for (var enviament: notificacio.getEnviamentsPerNotifica()) {
+					comandaListener.enviarAvis(enviament, AvisTipus.ERROR);
+				}
 			}
 		} catch (Exception ex) {
 			log.error(ex.getMessage(), ex);
 			error = true;
 			errorDescripcio = ex instanceof SOAPFaultException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex);
 			integracioHelper.addAccioError(info, "Error al enviar la notificació", ex);
+			for (var enviament: notificacio.getEnviamentsPerNotifica()) {
+				comandaListener.enviarAvis(enviament, AvisTipus.ERROR);
+			}
 		}
 		var fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
 		if (fiReintents && (NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())/* || NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat())*/)) {

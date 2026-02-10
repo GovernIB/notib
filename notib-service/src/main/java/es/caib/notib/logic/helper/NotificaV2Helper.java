@@ -229,6 +229,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						integracioHelper.addAccioError(info, errorDescripcio);
 						errorSbs = true;
 					}
+					for (var enviament: notificacio.getEnviamentsPerNotifica()) {
+						comandaListener.enviarAvis(enviament, AvisTipus.ERROR);
+					}
 				}
 			} catch (Exception ex) {
 				log.error(ex.getMessage(), ex);
@@ -236,6 +239,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				errorDescripcio = ex instanceof SOAPFaultException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex);
 				integracioHelper.addAccioError(info, "Error al enviar la notificació", ex);
 				errorSbs = true;
+				for (var enviament: notificacio.getEnviamentsPerNotifica()) {
+					comandaListener.enviarAvis(enviament, AvisTipus.ERROR);
+				}
 			}
 			var fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
 			if (fiReintents && (NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat()) /*|| NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat())*/)) {
@@ -458,6 +464,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		} catch (Exception e) {
 			var resposta = new RespuestaSincronizarEnvioOE();
 			resposta.setCodigoRespuesta("error");
+			var enviament = notificacioEnviamentRepository.findByCieId(sincronizarEnvio.getIdentificador());
+			notificacioEventHelper.addNotificaEnvioOE(enviament, true, e.getMessage(), false);
 			return resposta;
 		}
 	}
