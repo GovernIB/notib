@@ -65,7 +65,7 @@ public class OrganGestorSyncHelper {
 			dataSincronitzacio);
 		publishProgressEvent(
 			SseEvent.SseEventStatus.RUNNING,
-			5,
+			simular ? 70 : 5,
 			"Processant canvis rebuts de DIR3CAIB");
 		// Obté els òrgans gestors de l'entitat
 		List<OrganGestorResourceEntity> organsGestors = organGestorResourceRepository.findByEntitat(entitat);
@@ -149,20 +149,6 @@ public class OrganGestorSyncHelper {
 			divisions,
 			dir3SyncNodes.isEmpty(),
 			simular);
-		// Actualitza la base de dades amb els nodes de DIR3 si no és una simulació
-		//
-		for (int i = 0; i < 10; i++) {
-			try {
-				publishProgressEvent(
-					SseEvent.SseEventStatus.RUNNING,
-					(i + 1) * 10,
-					"Actualitzant informació dels òrgans gestors");
-				TimeUnit.SECONDS.sleep(1);
-			} catch (InterruptedException ex) {
-				Thread.currentThread().interrupt();
-			}
-		}
-		//
 		if (!simular) {
 			publishProgressEvent(
 				SseEvent.SseEventStatus.RUNNING,
