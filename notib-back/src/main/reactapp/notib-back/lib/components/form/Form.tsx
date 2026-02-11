@@ -22,19 +22,6 @@ import ResourceApiFormContext, {
 
 const LOG_PREFIX = 'FORM';
 
-const shallowEqual = (obj1: any, obj2: any) => {
-    const keys1 = Object.keys(obj1);
-    const keys2 = Object.keys(obj2);
-    if (keys1.length === keys2.length) {
-        for (let key of keys1) {
-            if (obj1[key] !== obj2[key]) return false;
-        }
-        return true;
-    } else {
-        return false;
-    }
-};
-
 /**
  * Propietats del component Form.
  */
@@ -75,6 +62,8 @@ export type FormProps = React.PropsWithChildren & {
     saveLink?: string;
     /** Adreça que s'ha de mostrar al fer click al botó de retrocedir (només s'utilitzarà si l'historial està buit) */
     goBackLink?: string;
+    /** Event que es llença quan s'han carregat les dades del formulari */
+    onReady?: (data: any) => void;
     /** Event que es llença quan es modifica alguna dada del formulari */
     onDataChange?: (data: any) => void;
     /** Event que es llença quan es crea un nou registre */
@@ -106,6 +95,19 @@ export type FormI18nKeys = {
     updateError?: string;
     deleteSuccess?: string;
     deleteError?: string;
+};
+
+const shallowEqual = (obj1: any, obj2: any) => {
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+    if (keys1.length === keys2.length) {
+        for (let key of keys1) {
+            if (obj1[key] !== obj2[key]) return false;
+        }
+        return true;
+    } else {
+        return false;
+    }
 };
 
 const formDataReducer = (state: any, action: FormFieldDataAction): any => {
@@ -175,6 +177,7 @@ export const Form: React.FC<FormProps> = (props) => {
         updateLink,
         saveLink,
         goBackLink,
+        onReady,
         onDataChange,
         onCreateSuccess,
         onUpdateSuccess,
@@ -375,24 +378,27 @@ export const Form: React.FC<FormProps> = (props) => {
         setIsDataInitialized(true);
         idFromExternalResetRef.current = null;
     };
-    const refresh = (force?: boolean) => {
-        if (fields && (force || !isDataInitialized)) {
-            if (initialDataProp != null) {
-                reset(initialDataProp);
-            } else {
-                const calcId = calculatedId(id);
-                getInitialData(calcId, fields, additionalData, initOnChangeRequest).then(
-                    (initialData: any) => {
-                        debug && logConsole.debug('Initial data loaded', initialData);
-                        const { _actions: initialDataActions, ...initialDataWithoutLinks } =
-                            initialData;
-                        calcId != null && setApiActions(initialDataActions);
-                        reset(initialDataWithoutLinks);
-                    }
-                );
+    const refresh = (force?: boolean) =>
+        new Promise((resolve, reject) => {
+            if (fields && (force || !isDataInitialized)) {
+                if (initialDataProp != null) {
+                    reset(initialDataProp);
+                    resolve(initialDataProp);
+                } else {
+                    const calcId = calculatedId(id);
+                    getInitialData(calcId, fields, additionalData, initOnChangeRequest)
+                        .then((initialData: any) => {
+                            debug && logConsole.debug('Initial data loaded', initialData);
+                            const { _actions: initialDataActions, ...initialDataWithoutLinks } =
+                                initialData;
+                            calcId != null && setApiActions(initialDataActions);
+                            reset(initialDataWithoutLinks);
+                            resolve(initialDataWithoutLinks);
+                        })
+                        .catch(reject);
+                }
             }
-        }
-    };
+        });
     const externalReset = (data?: any, id?: any) => {
         // Versió de reset per a cridar externament mitjançant l'API
         const mergedData = {
@@ -628,7 +634,9 @@ export const Form: React.FC<FormProps> = (props) => {
     React.useEffect(() => {
         // Obté les dades inicials pel formulari
         if (apiIsReady && fields != null) {
-            refresh(createId != null || customFields != null);
+            refresh(createId != null || customFields != null).then((data) => {
+                onReady?.(data);
+            });
         }
     }, [id, createId, fields]);
     React.useEffect(() => {

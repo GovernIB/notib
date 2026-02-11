@@ -80,6 +80,8 @@ export type ActionReportButtonProps = {
     buttonComponentProps?: any;
     /** Propietats pel component de l'icona (només per a botons de tipus icona) */
     iconComponentProps?: any;
+    /** Indica si s'ha d'executar l'acció automàticament al obrir el diàleg */
+    dialogAutoSubmit?: boolean;
 };
 
 export type ActionReportLogicExecFn = (
@@ -153,6 +155,7 @@ const TextCustomButton: React.FC<TextCustomButtonProps> = (props) => {
  * @param onError - Event que es llença quan l'execució de l'artefacte finalitza amb errors.
  * @param onClose - Event que es llença quan es tanca la modal del formulari de l'artefacte.
  * @param dialogCloseCallback - Callback que es crida quan es tanca el diàleg.
+ * @param dialogAutoSubmit - Indica si s'ha d'executar l'acció automàticament al obrir el diàleg.
  * @returns un objecte amb el resultat d'executar la lògica.
  */
 export const useActionReportLogic = (
@@ -173,7 +176,8 @@ export const useActionReportLogic = (
     onSuccess?: (result?: any) => void,
     onError?: (error?: any) => void,
     onClose?: () => void,
-    dialogCloseCallback?: (reason?: string) => boolean
+    dialogCloseCallback?: (reason?: string) => boolean,
+    dialogAutoSubmit?: boolean
 ): ActionReportLogicResult => {
     const { t, messageDialogShow, temporalMessageShow, saveAs } = useBaseAppContext();
     const actionDialogButtons = useActionDialogButtons();
@@ -254,7 +258,8 @@ export const useActionReportLogic = (
         },
         formI18nKeys,
         dialogCloseCallback,
-        false
+        false,
+        dialogAutoSubmit
     );
     const exec = (
         id: any,
@@ -382,6 +387,7 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
         onClose,
         buttonComponentProps,
         iconComponentProps,
+        dialogAutoSubmit,
     } = props;
     const {
         available,
@@ -405,7 +411,9 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
         formDialogResultProcessor,
         onSuccess,
         onError,
-        onClose
+        onClose,
+        undefined,
+        dialogAutoSubmit
     );
     const buttonTitle = title ?? apiLink?.title ?? action ?? report;
     const ButtonComponent =

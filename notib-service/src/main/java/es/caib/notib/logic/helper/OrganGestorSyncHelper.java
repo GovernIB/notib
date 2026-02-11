@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Helper per a sincronitzar les unitats organitzatives d'una entitat amb DIR3.

@@ -97,27 +97,6 @@ const OrganGridDir3SyncLoading: React.FC = () => {
     );
 };
 
-const OrganGridDir3SyncActionForm: React.FC<{
-    setSimular: (value: boolean) => void;
-    setSenseCanvis: (value: boolean | undefined) => void;
-}> = (props) => {
-    const { setSimular, setSenseCanvis } = props;
-    React.useEffect(() => {
-        setSimular(true);
-        setSenseCanvis(undefined);
-    }, []);
-    return (
-        <Grid container>
-            <Grid size={12}>
-                <Typography>
-                    Faci clic al botó de consultar els canvis per a previsualitzar els canvis
-                    pendents d'aplicar.
-                </Typography>
-            </Grid>
-        </Grid>
-    );
-};
-
 const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
     const { result } = props;
     return (
@@ -144,7 +123,7 @@ const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
 const OrganGridDir3SyncActionButton: React.FC = () => {
     const { t } = useTranslation();
     const { temporalMessageShow } = useBaseAppContext();
-    const [simular, setSimular] = React.useState<boolean>();
+    const [simular, setSimular] = React.useState<boolean>(true);
     const [senseCanvis, setSenseCanvis] = React.useState<boolean>();
     const resultProcessor = (result: any) => {
         setSenseCanvis(result.senseCanvis);
@@ -184,16 +163,15 @@ const OrganGridDir3SyncActionButton: React.FC = () => {
             formAdditionalData={{ simular }}
             formDialogTitle={t('page.organs.grid.sync.dialogTitle')}
             formDialogButtons={formDialogButtons}
-            formDialogContent={
-                <OrganGridDir3SyncActionForm
-                    setSimular={setSimular}
-                    setSenseCanvis={setSenseCanvis}
-                />
-            }
             formDialogLoading={<OrganGridDir3SyncLoading />}
             formDialogResultProcessor={resultProcessor}
             buttonComponentProps={{ variant: 'contained' }}
             onSuccess={handleSuccess}
+            onClose={() => {
+                setSimular(true);
+                setSenseCanvis(undefined);
+            }}
+            dialogAutoSubmit
         />
     );
 };
