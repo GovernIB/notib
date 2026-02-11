@@ -35,6 +35,7 @@ databaseChangeLog:
               - column:
                   name: dies
                   type: Integer
+                  defaultValue: 0
   - changeSet:
       id: 1770311768254-2
       author: limit
