@@ -186,6 +186,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             i18nAddResourceBundleCallback={i18nAddResourceBundleCallback}
             routerGoBack={goBack}
             routerNavigate={navigate}
+            //routerUseBlocker={useBlocker}
             routerUseLocationPath={useLocationPath}
             routerAnyHistoryEntryExist={anyHistoryEntryExist}
             linkComponent={Link}

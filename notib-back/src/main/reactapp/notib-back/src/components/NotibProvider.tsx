@@ -64,7 +64,7 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
         getUserId: authGetUserId,
         getToken: authGetToken,
     } = useAuthContext();
-    const { setHttpHeaders: apiSetHttpHeaders } = useResourceApiContext();
+    const { setHttpHeaders: apiSetHttpHeaders, offline: apiOffline } = useResourceApiContext();
     const { isReady: apiIsReady, find: apiFind } = useResourceApiService('entitatResource');
     const [currentUserId, setCurrentUserId] = React.useState<string>();
     const [rolesAvailable, setRolesAvailable] = React.useState<string[]>();
@@ -77,7 +77,8 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
     );
     const { getValue: sessionSessionGetValue, setValue: sessionSessionSetValue } =
         useSessionStorage(currentUserId, 'currentSession');
-    const isReady = rolesAvailable != null && entitatsAvailable != null;
+    const isReady =
+        apiOffline || (apiIsReady && rolesAvailable != null && entitatsAvailable != null);
     React.useEffect(() => {
         if (authIsReady) {
             const userId = authGetUserId();
@@ -121,7 +122,7 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
                     if (isSessionValueInEntitatsAvailable) {
                         setCurrentEntitatId(sessionValue);
                     } else if (entitatsAvailable?.length && currentEntitatId == null) {
-                        setCurrentEntitatId(entitatsAvailable[0]);
+                        setCurrentEntitatId(entitatsAvailable[0].id);
                     }
                 });
             } else {

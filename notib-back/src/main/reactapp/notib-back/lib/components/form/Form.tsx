@@ -22,6 +22,19 @@ import ResourceApiFormContext, {
 
 const LOG_PREFIX = 'FORM';
 
+const shallowEqual = (obj1: any, obj2: any) => {
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+    if (keys1.length === keys2.length) {
+        for (let key of keys1) {
+            if (obj1[key] !== obj2[key]) return false;
+        }
+        return true;
+    } else {
+        return false;
+    }
+};
+
 /**
  * Propietats del component Form.
  */
@@ -179,6 +192,7 @@ export const Form: React.FC<FormProps> = (props) => {
     const {
         goBack,
         navigate,
+        useBlocker,
         useLocationPath,
         temporalMessageShow,
         messageDialogShow,
@@ -613,20 +627,20 @@ export const Form: React.FC<FormProps> = (props) => {
     }, [apiIsReady, customFields]);
     React.useEffect(() => {
         // Obté les dades inicials pel formulari
-        if (fields != null) {
+        if (apiIsReady && fields != null) {
             refresh(createId != null || customFields != null);
         }
     }, [id, createId, fields]);
     React.useEffect(() => {
         // Controla l'estat de formulari amb modificacions
         if (isReady) {
-            setModified(true);
+            setModified(!shallowEqual(data, revertData));
             onDataChange?.(data);
             validateWithValidator(data);
         }
     }, [isReady, data]);
-    /*React.useEffect(() => {
-        if (modified) {
+    React.useEffect(() => {
+        if (useBlocker != null && modified) {
             const handleBeforeUnload = (e: Event) => {
                 if (modified) {
                     e.preventDefault();
@@ -637,7 +651,8 @@ export const Form: React.FC<FormProps> = (props) => {
                 window.removeEventListener('beforeunload', handleBeforeUnload);
             };
         }
-    }, [modified]);*/
+    }, [modified]);
+    useBlocker?.(modified);
     apiRef.current = {
         getId,
         getData,
