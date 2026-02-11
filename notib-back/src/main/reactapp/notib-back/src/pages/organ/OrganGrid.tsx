@@ -1,8 +1,18 @@
 import React from 'react';
+import { EventSource } from 'eventsource';
 import { useTranslation } from 'react-i18next';
+import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import { GridPage, MuiDataGrid, MuiActionReportButton, useBaseAppContext } from 'reactlib';
-import { Typography } from '@mui/material';
+import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
+import {
+    GridPage,
+    MuiDataGrid,
+    MuiActionReportButton,
+    useBaseAppContext,
+    useResourceApiService,
+    useAuthContext,
+} from 'reactlib';
 
 const columns = [
     {
@@ -38,6 +48,54 @@ const columns = [
         flex: 2,
     },
 ];
+
+const useSse = (queueId: string, eventName: string, onEvent: (event: any) => void) => {
+    const { getToken } = useAuthContext();
+    const { isReady: apiIsReady, currentLinks } = useResourceApiService('sse');
+    React.useEffect(() => {
+        if (apiIsReady) {
+            const subscribeHref = currentLinks['subscribe'].href;
+            const eventSourceHref = subscribeHref.replace('{queueId}', queueId);
+            const eventSource = new EventSource(eventSourceHref, {
+                fetch: (input, init) =>
+                    fetch(input, {
+                        ...init,
+                        headers: {
+                            ...init.headers,
+                            Authorization: 'Bearer ' + getToken(),
+                        },
+                    }),
+            });
+            eventSource.addEventListener(eventName, (event) => {
+                const data = JSON.parse(event.data);
+                onEvent?.(data);
+            });
+            eventSource.onerror = () => {
+                eventSource.close();
+            };
+            return () => {
+                eventSource.close();
+            };
+        }
+    }, [apiIsReady]);
+};
+
+const OrganGridDir3SyncLoading: React.FC = () => {
+    const [percent, setPercent] = React.useState<number>();
+    const [message, setMessage] = React.useState<string>();
+    useSse('PROGRESS', 'DIR3_SYNC', (event: any) => {
+        setPercent(event.percent);
+        setMessage(event.message);
+    });
+    return (
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Box sx={{ textAlign: 'center', my: 4 }}>
+                <CircularProgress enableTrackSlot variant="determinate" value={percent} size={50} />
+                <Typography variant="body2">{message}</Typography>
+            </Box>
+        </Box>
+    );
+};
 
 const OrganGridDir3SyncActionForm: React.FC<{
     setSimular: (value: boolean) => void;
@@ -132,6 +190,7 @@ const OrganGridDir3SyncActionButton: React.FC = () => {
                     setSenseCanvis={setSenseCanvis}
                 />
             }
+            formDialogLoading={<OrganGridDir3SyncLoading />}
             formDialogResultProcessor={resultProcessor}
             buttonComponentProps={{ variant: 'contained' }}
             onSuccess={handleSuccess}

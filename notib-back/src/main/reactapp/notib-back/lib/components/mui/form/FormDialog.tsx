@@ -1,4 +1,6 @@
 import React from 'react';
+import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
 import { DialogButton } from '../../BaseAppContext';
 import { ResourceType } from '../../ResourceApiContext';
 import { useFormDialogButtons } from '../../AppButtons';
@@ -40,11 +42,20 @@ export type UseFormDialogFn = (
     customSubmit?: FormDialogSubmitFn,
     customSubmitErrorMessage?: string,
     defaultFormContent?: React.ReactNode,
+    loadingComponent?: React.ReactNode,
     defaultDialogComponentProps?: any,
     defaultFormComponentProps?: any,
     formI18nKeys?: FormI18nKeys,
     closeFn?: (reason?: string) => boolean
 ) => [FormDialogShowFn, React.ReactElement, FormDialogCloseFn];
+
+const FormDialogLoading: React.FC = () => {
+    return (
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <CircularProgress size={50} sx={{ my: 4 }} />
+        </Box>
+    );
+};
 
 export const useFormDialog: UseFormDialogFn = (
     resourceName: string,
@@ -54,6 +65,7 @@ export const useFormDialog: UseFormDialogFn = (
     customSubmit?: FormDialogSubmitFn,
     customSubmitErrorMessage?: string,
     defaultFormContent?: React.ReactNode,
+    loadingComponent?: React.ReactNode,
     defaultDialogComponentProps?: any,
     defaultFormComponentProps?: any,
     formI18nKeys?: FormI18nKeys,
@@ -82,6 +94,7 @@ export const useFormDialog: UseFormDialogFn = (
     const [submitReturnedContent, setSubmitReturnedContent] = React.useState<
         React.ReactNode | undefined
     >();
+    const [loading, setLoading] = React.useState<boolean>();
     const show = (id: any, args?: FormDialogShowArgs) => {
         setId(id);
         setTitle(args?.title);
@@ -100,6 +113,7 @@ export const useFormDialog: UseFormDialogFn = (
         );
         setOpen(true);
         setSubmitReturnedContent(undefined);
+        setLoading(undefined);
         return new Promise<any>((resolve, reject) => {
             setResolveFn(() => resolve);
             setRejectFn(() => reject);
@@ -111,6 +125,7 @@ export const useFormDialog: UseFormDialogFn = (
             const result = isCustomSubmit
                 ? customSubmit(formApiRef.current.getId(), formApiRef.current.getData())
                 : formApiRef.current.save();
+            setLoading(true);
             result
                 .then((value: any) => {
                     if (isCustomSubmit) {
@@ -135,6 +150,7 @@ export const useFormDialog: UseFormDialogFn = (
                         formApiRef.current.handleSubmissionErrors(error, customSubmitErrorMessage);
                     }
                 });
+            //.finally(() => setLoading(false));
         } else {
             // S'ha fet clic al botó de cancel·lar
             rejectFn?.(undefined);
@@ -150,6 +166,10 @@ export const useFormDialog: UseFormDialogFn = (
         }
     };
     const close = () => setOpen(false);
+    const processedButtons = (dialogButtons ?? formDialogButtons).map((b) => ({
+        ...b,
+        disabled: loading,
+    }));
     const dialogComponent = (
         <FormDialog
             resourceName={resourceName}
@@ -163,12 +183,13 @@ export const useFormDialog: UseFormDialogFn = (
             buttonCallback={buttonCallback}
             closeCallback={closeCallback}
             title={title}
-            buttons={dialogButtons ?? formDialogButtons}
+            buttons={processedButtons}
             dialogComponentProps={dialogComponentProps}
             formComponentProps={formComponentProps}
             formI18nKeys={formI18nKeys}
             noForm={submitReturnedContent != null}>
-            {submitReturnedContent ?? formContent}
+            {submitReturnedContent ??
+                (loading ? (loadingComponent ?? <FormDialogLoading />) : formContent)}
         </FormDialog>
     );
     return [show, dialogComponent, close];

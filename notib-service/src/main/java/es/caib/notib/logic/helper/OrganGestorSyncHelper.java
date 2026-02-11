@@ -5,6 +5,8 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.intf.model.OrganGestorDir3Sync;
 import es.caib.notib.logic.intf.model.OrganGestorResource;
+import es.caib.notib.logic.intf.model.SseEvent;
+import es.caib.notib.logic.intf.resourceservice.SseEventService;
 import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
 import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
 import es.caib.notib.persist.resourcerepository.OrganGestorResourceRepository;
@@ -19,9 +21,10 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
- * Helper per a sincronitzar laes unitats organitzatives d'una entitat amb DIR3.
+ * Helper per a sincronitzar les unitats organitzatives d'una entitat amb DIR3.
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
@@ -34,18 +37,22 @@ public class OrganGestorSyncHelper {
 	private final OrganGestorLlibreOficinaUpdateHelper organGestorLlibreOficinaHelper;
 	private final OrganGestorResourceRepository organGestorResourceRepository;
 
+	private final SseEventService progressEventService;
+
 	/**
 	 * Sincronitza els òrgans gestors d'una entitat amb la informació actualitzada de DIR3.
 	 *
-	 * @param entitat
-	 *            l'entitat de la qual es volen actualitzar els òrgans.
-	 * @param simular
-	 *            indica si s'han de guardar o no els canvis a la base de dades.
+	 * @param entitat l'entitat de la qual es volen actualitzar els òrgans.
+	 * @param simular indica si s'han de guardar o no els canvis a la base de dades.
 	 * @return la llista de canvis a realitzar als òrgans de la base de dades.
 	 */
 	public OrganGestorDir3Sync sincronitzar(
 		EntitatResourceEntity entitat,
 		boolean simular) {
+		publishProgressEvent(
+			SseEvent.SseEventStatus.RUNNING,
+			0,
+			"Consultant canvis a DIR3CAIB");
 		// Consulta els canvis des de la darrera sincronització DIR3
 		Date dataActualitzacio = entitat.getDataActualitzacio() != null ? Date.from(
 			entitat.getDataActualitzacio().atStartOfDay(ZoneId.systemDefault()).toInstant()) : null;
@@ -56,6 +63,10 @@ public class OrganGestorSyncHelper {
 			entitat.getDir3Codi(),
 			dataActualitzacio,
 			dataSincronitzacio);
+		publishProgressEvent(
+			SseEvent.SseEventStatus.RUNNING,
+			5,
+			"Processant canvis rebuts de DIR3CAIB");
 		// Obté els òrgans gestors de l'entitat
 		List<OrganGestorResourceEntity> organsGestors = organGestorResourceRepository.findByEntitat(entitat);
 		// Obté una llista dels nodes de la sincronització DIR3 que existeixen a la base de dades i que acaben en una
@@ -65,7 +76,7 @@ public class OrganGestorSyncHelper {
 		List<OrganGestorDir3Sync.OrganGestorDir3SyncCanviExtincio> extincions = new ArrayList<>();
 		MultiValuedMap<NodeDir3, NodeDir3> divisionsMap = new ArrayListValuedHashMap<>();
 		MultiValuedMap<NodeDir3, NodeDir3> fusionsOSubstitucionsMap = new ArrayListValuedHashMap<>();
-		for (NodeDir3 extincioDarreraVersio: extincionsDarreraVersio) {
+		for (NodeDir3 extincioDarreraVersio : extincionsDarreraVersio) {
 			List<NodeDir3> historicosUo = getHistoricosUo(extincioDarreraVersio, dir3SyncNodes, organsGestors);
 			long numHistoricosUoVigents = historicosUo.stream().
 				filter(uo -> OrganGestorEstatEnum.V.name().equals(uo.getEstat())).
@@ -77,15 +88,15 @@ public class OrganGestorSyncHelper {
 			} else if (numHistoricosUoVigents == 1) {
 				NodeDir3 primerHistoricoUo = historicosUo.get(0);
 				Optional<NodeDir3> fusionsOSubstitucionsKeyWithSameCodi = fusionsOSubstitucionsMap.keySet().stream().
-						filter(uo -> uo.getCodi().equals(primerHistoricoUo.getCodi())).
-						findFirst();
+					filter(uo -> uo.getCodi().equals(primerHistoricoUo.getCodi())).
+					findFirst();
 				if (fusionsOSubstitucionsKeyWithSameCodi.isPresent()) {
 					fusionsOSubstitucionsMap.put(fusionsOSubstitucionsKeyWithSameCodi.get(), extincioDarreraVersio);
 				} else {
 					fusionsOSubstitucionsMap.put(primerHistoricoUo, extincioDarreraVersio);
 				}
 			} else { // numHistoricosUoVigents > 1
-				for (NodeDir3 historicoUo: historicosUo) {
+				for (NodeDir3 historicoUo : historicosUo) {
 					divisionsMap.put(extincioDarreraVersio, historicoUo);
 				}
 			}
@@ -113,11 +124,11 @@ public class OrganGestorSyncHelper {
 		});
 		// Emplena la resposta
 		OrganGestorDir3Sync.OrganGestorDir3SyncCanviSubstitucio[] substitucions = substitucionsMap.keySet().stream()
-				.flatMap(key -> substitucionsMap.get(key).stream().
-					map(value -> new OrganGestorDir3Sync.OrganGestorDir3SyncCanviSubstitucio(
-						toArbreItem(key),
-						toArbreItem(value))))
-				.toArray(OrganGestorDir3Sync.OrganGestorDir3SyncCanviSubstitucio[]::new);
+			.flatMap(key -> substitucionsMap.get(key).stream().
+				map(value -> new OrganGestorDir3Sync.OrganGestorDir3SyncCanviSubstitucio(
+					toArbreItem(key),
+					toArbreItem(value))))
+			.toArray(OrganGestorDir3Sync.OrganGestorDir3SyncCanviSubstitucio[]::new);
 		OrganGestorDir3Sync.OrganGestorDir3SyncCanviFusio[] fusions = fusionsMap.keySet().stream().
 			map(key -> new OrganGestorDir3Sync.OrganGestorDir3SyncCanviFusio(
 				toArbreItems(fusionsMap.get(key)),
@@ -139,13 +150,39 @@ public class OrganGestorSyncHelper {
 			dir3SyncNodes.isEmpty(),
 			simular);
 		// Actualitza la base de dades amb els nodes de DIR3 si no és una simulació
+		//
+		for (int i = 0; i < 10; i++) {
+			try {
+				publishProgressEvent(
+					SseEvent.SseEventStatus.RUNNING,
+					(i + 1) * 10,
+					"Actualitzant informació dels òrgans gestors");
+				TimeUnit.SECONDS.sleep(1);
+			} catch (InterruptedException ex) {
+				Thread.currentThread().interrupt();
+			}
+		}
+		//
 		if (!simular) {
+			publishProgressEvent(
+				SseEvent.SseEventStatus.RUNNING,
+				10,
+				"Actualitzant informació dels òrgans gestors");
 			actualitzarOrgansGestors(entitat, dir3SyncNodes, organsGestors);
 			LocalDate now = LocalDate.now();
 			if (entitat.getDataSincronitzacio() == null) {
 				entitat.setDataSincronitzacio(now);
 			}
 			entitat.setDataActualitzacio(now);
+			publishProgressEvent(
+				SseEvent.SseEventStatus.DONE,
+				100,
+				null);
+		} else {
+			publishProgressEvent(
+				SseEvent.SseEventStatus.DONE,
+				100,
+				null);
 		}
 		return resposta;
 	}
@@ -154,26 +191,38 @@ public class OrganGestorSyncHelper {
 		EntitatResourceEntity entitat,
 		List<NodeDir3> dir3SyncNodes,
 		List<OrganGestorResourceEntity> organsGestors) {
-		for (NodeDir3 dir3SyncNode: dir3SyncNodes) {
+		int numDir3SyncNodes = dir3SyncNodes.size();
+		int nextPublishableProgress = 0;
+		for (int i = 0; i < numDir3SyncNodes; i++) {
+			NodeDir3 dir3SyncNode = dir3SyncNodes.get(i);
 			Optional<OrganGestorResourceEntity> organGestor = organsGestors.stream().
 				filter(o -> o.getCodi().equals(dir3SyncNode.getCodi())).
 				findFirst();
-			actualitzarOrganGestor(entitat, dir3SyncNode, organGestor);
+			actualitzarOrganGestor(entitat, dir3SyncNode, organGestor.orElse(null));
+			int percentProcessed = (i + 1) * 100 / numDir3SyncNodes;
+			if (percentProcessed >= nextPublishableProgress) {
+				int percent = 10 + 90 * percentProcessed / 100;
+				publishProgressEvent(
+					SseEvent.SseEventStatus.RUNNING,
+					percent,
+					"Actualitzant informació dels òrgans gestors");
+				nextPublishableProgress += 10;
+			}
 		}
 	}
 
 	private void actualitzarOrganGestor(
 		EntitatResourceEntity entitat,
 		NodeDir3 dir3SyncNode,
-		Optional<OrganGestorResourceEntity> organGestorOptional) {
-		OrganGestorResourceEntity organGestor;
+		OrganGestorResourceEntity organGestor) {
+		OrganGestorResourceEntity updated;
 		// Actualitza l'òrgan gestor si ja existeix a la BD o el crea si no existeix
-		if (organGestorOptional.isPresent()) {
-			organGestor = organGestorOptional.get();
+		if (organGestor != null) {
 			organGestor.setNom(getOrganGestorNomFromDir3Node(dir3SyncNode));
 			organGestor.setNomEs(dir3SyncNode.getDenominacio());
 			organGestor.setCodiPare(dir3SyncNode.getSuperior());
 			organGestor.setEstat(OrganGestorEstatEnum.valueOf(dir3SyncNode.getEstat()));
+			updated = organGestor;
 		} else {
 			OrganGestorResource organGestorResource = new OrganGestorResource();
 			organGestorResource.setCodi(dir3SyncNode.getCodi());
@@ -181,14 +230,15 @@ public class OrganGestorSyncHelper {
 			organGestorResource.setNomEs(dir3SyncNode.getDenominacio());
 			organGestorResource.setCodiPare(dir3SyncNode.getSuperior());
 			organGestorResource.setEstat(OrganGestorEstatEnum.valueOf(dir3SyncNode.getEstat()));
-			organGestor = organGestorResourceRepository.save(
+			updated = organGestorResourceRepository.save(
 				OrganGestorResourceEntity.builder().
 					resource(organGestorResource).
 					entitat(entitat).
 					build());
 		}
-		organGestorLlibreOficinaHelper.updateLlibre(organGestor);
-		organGestorLlibreOficinaHelper.updateOficina(organGestor, null);
+		organGestorLlibreOficinaHelper.updateLlibre(updated);
+		organGestorLlibreOficinaHelper.updateOficina(updated, null);
+		organGestorResourceRepository.delete(updated);
 	}
 
 	private NodeDir3[] getDir3SyncNodesExistentsDarreraVersioExtincio(
@@ -200,7 +250,7 @@ public class OrganGestorSyncHelper {
 		Map<String, List<NodeDir3>> dir3SyncNodesMapSorted = getDir3SyncNodesMapSortedByVersionAsc(dir3SyncNodes);
 		List<NodeDir3> extincions = new ArrayList<>();
 		// Fa una iteració dels codis DIR3 per anar emplentat la llista amb el resultat.
-		for (Map.Entry<String, List<NodeDir3>> entry: dir3SyncNodesMapSorted.entrySet()) {
+		for (Map.Entry<String, List<NodeDir3>> entry : dir3SyncNodesMapSorted.entrySet()) {
 			// Obté la darrera versió de cada codi DIR3 diferent de la llista retornada per la sincronització
 			NodeDir3 lastNode = entry.getValue().get(entry.getValue().size() - 1);
 			// Mira si el codi DIR3 existeix als òrganis obtinguts de la base de dades.
@@ -222,7 +272,7 @@ public class OrganGestorSyncHelper {
 		MultiValuedMap<NodeDir3, NodeDir3>... multiValuedMaps) {
 		List<OrganGestorDir3Sync.OrganGestorDir3SyncCanviCreacio> creacions = new ArrayList<>();
 		Map<String, List<NodeDir3>> dir3SyncNodesMapSorted = getDir3SyncNodesMapSortedByVersionAsc(dir3SyncNodes);
-		for (Map.Entry<String, List<NodeDir3>> entry: dir3SyncNodesMapSorted.entrySet()) {
+		for (Map.Entry<String, List<NodeDir3>> entry : dir3SyncNodesMapSorted.entrySet()) {
 			NodeDir3 lastNode = entry.getValue().get(entry.getValue().size() - 1);
 			Optional<OrganGestorResourceEntity> organGestor = organsGestors.stream().
 				filter(o -> o.getCodi().equals(entry.getKey())).
@@ -243,7 +293,7 @@ public class OrganGestorSyncHelper {
 		// - El node DIR3 no te cap historicoUO.
 		// - Existeix un òrgan gestor en estat vigent (V) a la base de dades amb el mateix codi.
 		List<OrganGestorDir3Sync.OrganGestorDir3SyncCanviModificacio> modificacions = new ArrayList<>();
-		for (NodeDir3 dir3SyncNode: dir3SyncNodes) {
+		for (NodeDir3 dir3SyncNode : dir3SyncNodes) {
 			if (dir3SyncNode.getHistoricosUO() == null || dir3SyncNode.getHistoricosUO().isEmpty()) {
 				Optional<OrganGestorResourceEntity> organGestor = organsGestors.stream().
 					filter(o -> o.getCodi().equals(dir3SyncNode.getCodi())).
@@ -270,13 +320,13 @@ public class OrganGestorSyncHelper {
 		// nodes amb el mateix codi ordenats per versió creixent. Si un node te una versió null queda al principi de la
 		// llista.
 		Map<String, List<NodeDir3>> dir3SyncNodesMap = new HashMap<>();
-		for (NodeDir3 dir3SyncNode: dir3SyncNodes) {
+		for (NodeDir3 dir3SyncNode : dir3SyncNodes) {
 			if (!dir3SyncNodesMap.containsKey(dir3SyncNode.getCodi())) {
 				dir3SyncNodesMap.put(dir3SyncNode.getCodi(), new ArrayList<>());
 			}
 			dir3SyncNodesMap.get(dir3SyncNode.getCodi()).add(dir3SyncNode);
 		}
-		for (Map.Entry<String, List<NodeDir3>> entry: dir3SyncNodesMap.entrySet()) {
+		for (Map.Entry<String, List<NodeDir3>> entry : dir3SyncNodesMap.entrySet()) {
 			entry.getValue().sort((o1, o2) -> {
 				if (o1.getVersio() == null) {
 					// Fa que els nodes sense versió (valor null) es posin abans que els altres.
@@ -296,7 +346,7 @@ public class OrganGestorSyncHelper {
 		// codis DIR3 als nodes provinents de la sincronizació intenta obtenir la informació de la base de dades.
 		List<NodeDir3> historicosUo = new ArrayList<>();
 		if (node.getHistoricosUO() != null && !node.getHistoricosUO().isEmpty()) {
-			for (String historicoUo: node.getHistoricosUO()) {
+			for (String historicoUo : node.getHistoricosUO()) {
 				Optional<NodeDir3> historicoUoNode = dir3SyncNodes.stream().
 					filter(n -> n.getCodi().equals(historicoUo)).
 					findFirst();
@@ -350,7 +400,7 @@ public class OrganGestorSyncHelper {
 
 	private OrganGestorDir3Sync.OrganGestorDir3SyncArbreItem[] toArbreItems(Collection<NodeDir3> dir3SyncNodes) {
 		return dir3SyncNodes.stream().map(this::toArbreItem).
-			toArray(OrganGestorDir3Sync.OrganGestorDir3SyncArbreItem[]:: new);
+			toArray(OrganGestorDir3Sync.OrganGestorDir3SyncArbreItem[]::new);
 	}
 
 	private NodeDir3 toNodeDir3(OrganGestorResourceEntity entity) {
@@ -372,12 +422,25 @@ public class OrganGestorSyncHelper {
 	private boolean isCodiInAnyMap(
 		String codi,
 		MultiValuedMap<NodeDir3, NodeDir3>... maps) {
-		for (MultiValuedMap<NodeDir3, NodeDir3> map: maps) {
+		for (MultiValuedMap<NodeDir3, NodeDir3> map : maps) {
 			if (map.keySet().stream().anyMatch(n -> n.getCodi().equals(codi))) {
 				return true;
 			}
 		}
 		return false;
+	}
+
+	private void publishProgressEvent(
+		SseEvent.SseEventStatus status,
+		int percent,
+		String message) {
+		progressEventService.publishEvent(
+			SseEventService.SseQueue.PROGRESS,
+			new SseEvent(
+				SseEvent.EVENT_NAME_DIR3_SYNC,
+				percent,
+				status,
+				message));
 	}
 
 }

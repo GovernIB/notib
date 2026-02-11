@@ -1,12 +1,11 @@
 import React from 'react';
-import TextField from '@mui/material/TextField';
+import TextField, { TextFieldProps } from '@mui/material/TextField';
 import Icon from '@mui/material/Icon';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import { useDebounce } from '../../../util/useDebounce';
 import { FormFieldCustomProps } from '../../form/FormField';
 import { FormFieldError } from '../../form/FormContext';
-import { TextFieldProps } from '@mui/material/TextField';
 
 type FormFieldTextProps = FormFieldCustomProps & {
     /** Indica si aquest camp és de tipus password */
@@ -132,7 +131,6 @@ const InnerFormFieldText: React.FC<
 const useIsUserTypingRef = (delay: number = 250): [React.RefObject<boolean>, () => void] => {
     const isUserTypingRef = React.useRef(false);
     const timeoutIdRef = React.useRef<any>(null);
-
     const onUserInput = () => {
         isUserTypingRef.current = true;
 

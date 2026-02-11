@@ -62,6 +62,8 @@ export type ActionReportButtonProps = {
     formDialogTitle?: string;
     /** Component amb el contingut (camps) del formulari */
     formDialogContent?: React.ReactElement;
+    /** Component que mostra que l'acció/informe s'està executant */
+    formDialogLoading?: React.ReactElement;
     /** Botons pel component de diàleg */
     formDialogButtons?: DialogButton[];
     /** Propietats pel component de diàleg */
@@ -143,6 +145,7 @@ const TextCustomButton: React.FC<TextCustomButtonProps> = (props) => {
  * @param formI18nKeys - Claus de traducció personalitzades pel component Form.
  * @param formInitOnChangeRequest - Indica si el formulari ha de fer una petició onChange inicial.
  * @param formDialogContent - Contingut (camps) pel formulari del diàleg.
+ * @param formDialogLoading - Component que mostra que l'acció/informe s'està executant.
  * @param formDialogButtons - Botons pel component de diàleg.
  * @param formDialogComponentPropsArg - Propietats pel component del diàleg.
  * @param formDialogResultProcessor - Funció que processa els resultats d'executar l'artefacte i retorna un element per a mostrar al diàleg com a resultat (només per a artefactes de tipus acció).
@@ -163,6 +166,7 @@ export const useActionReportLogic = (
     formI18nKeys?: FormI18nKeys,
     formInitOnChangeRequest?: boolean,
     formDialogContent?: React.ReactElement,
+    formDialogLoading?: React.ReactElement,
     formDialogButtons?: DialogButton[],
     formDialogComponentPropsArg?: any,
     formDialogResultProcessor?: (result?: any) => React.ReactElement | undefined,
@@ -242,6 +246,7 @@ export const useActionReportLogic = (
         action ? execAction : generateReport,
         action ? t('actionreport.action.error') : t('actionreport.report.error'),
         null,
+        formDialogLoading,
         null,
         {
             resourceType: action ? 'action' : 'report',
@@ -367,6 +372,7 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
         formInitOnChangeRequest,
         formDialogTitle,
         formDialogContent,
+        formDialogLoading,
         formDialogButtons,
         formDialogComponentProps,
         formDialogResultProcessor,
@@ -392,6 +398,7 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
         formI18nKeys,
         formInitOnChangeRequest,
         formDialogContent,
+        formDialogLoading,
         formDialogButtons,
         formDialogComponentProps,
         formDialogResultProcessor,
