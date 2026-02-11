@@ -437,7 +437,7 @@ public class OrganGestorSyncHelper {
 		progressEventService.publishEvent(
 			SseEventService.SseQueue.PROGRESS,
 			new SseEvent(
-				SseEvent.EVENT_NAME_DIR3_SYNC,
+				SseEvent.SseEventName.DIR3_SYNC,
 				percent,
 				status,
 				message));

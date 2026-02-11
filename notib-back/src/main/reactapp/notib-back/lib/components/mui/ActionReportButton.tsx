@@ -253,7 +253,8 @@ export const useActionReportLogic = (
             resourceTypeCode: action ?? report,
         },
         formI18nKeys,
-        dialogCloseCallback
+        dialogCloseCallback,
+        false
     );
     const exec = (
         id: any,

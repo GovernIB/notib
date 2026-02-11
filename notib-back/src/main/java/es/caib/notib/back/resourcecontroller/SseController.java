@@ -9,13 +9,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.*;
@@ -55,7 +53,7 @@ public class SseController extends BaseController {
 		summary = "Subscriure's a un flux d'events",
 		description = "Es subscriu al flux d'events indicat amb queueId"
 	)
-	public SseEmitter stream(@PathVariable String queueId) {
+	public ResponseEntity<SseEmitter> stream(@PathVariable String queueId) {
 		Optional<SseEventService.SseQueue> queue =
 			Arrays.stream(SseEventService.SseQueue.values())
 				.filter(q -> q.name().equals(queueId))
@@ -64,7 +62,7 @@ public class SseController extends BaseController {
 			SseEmitter emitter = new SseEmitter(0L);
 			sseEventService.addListener(queue.get(), event -> {
 				try {
-					emitter.send(SseEmitter.event().name(event.getEventName()).data(event));
+					emitter.send(SseEmitter.event().name(event.getEventName().name()).data(event));
 					if (SseEvent.SseEventStatus.DONE.equals(event.getStatus()) || SseEvent.SseEventStatus.ERROR.equals(event.getStatus())) {
 						emitter.complete();
 						sseEventService.removeListener(queue.get());
@@ -77,11 +75,9 @@ public class SseController extends BaseController {
 			emitter.onCompletion(() -> sseEventService.removeListener(queue.get()));
 			emitter.onTimeout(() -> sseEventService.removeListener(queue.get()));
 			emitter.onError(e -> sseEventService.removeListener(queue.get()));
-			return emitter;
+			return ResponseEntity.ok(emitter);
 		} else {
-			throw new ResponseStatusException(
-				HttpStatus.NOT_FOUND,
-				"Couldn't find SSE queue with id " + queueId);
+			return ResponseEntity.notFound().build();
 		}
 	}
 

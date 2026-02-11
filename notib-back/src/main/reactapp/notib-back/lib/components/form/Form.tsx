@@ -625,6 +625,19 @@ export const Form: React.FC<FormProps> = (props) => {
             validateWithValidator(data);
         }
     }, [isReady, data]);
+    /*React.useEffect(() => {
+        if (modified) {
+            const handleBeforeUnload = (e: Event) => {
+                if (modified) {
+                    e.preventDefault();
+                }
+            };
+            window.addEventListener('beforeunload', handleBeforeUnload);
+            return () => {
+                window.removeEventListener('beforeunload', handleBeforeUnload);
+            };
+        }
+    }, [modified]);*/
     apiRef.current = {
         getId,
         getData,

@@ -46,7 +46,8 @@ export type UseFormDialogFn = (
     defaultDialogComponentProps?: any,
     defaultFormComponentProps?: any,
     formI18nKeys?: FormI18nKeys,
-    closeFn?: (reason?: string) => boolean
+    closeFn?: (reason?: string) => boolean,
+    closeIcon?: boolean
 ) => [FormDialogShowFn, React.ReactElement, FormDialogCloseFn];
 
 const FormDialogLoading: React.FC = () => {
@@ -69,7 +70,8 @@ export const useFormDialog: UseFormDialogFn = (
     defaultDialogComponentProps?: any,
     defaultFormComponentProps?: any,
     formI18nKeys?: FormI18nKeys,
-    closeFn?: (reason?: string) => boolean
+    closeFn?: (reason?: string) => boolean,
+    closeIcon?: boolean
 ) => {
     const formApiRef = React.useRef<FormApi | any>({});
     const formDialogButtons = useFormDialogButtons();
@@ -149,8 +151,8 @@ export const useFormDialog: UseFormDialogFn = (
                     if (isCustomSubmit) {
                         formApiRef.current.handleSubmissionErrors(error, customSubmitErrorMessage);
                     }
-                });
-            //.finally(() => setLoading(false));
+                })
+                .finally(() => setLoading(false));
         } else {
             // S'ha fet clic al botó de cancel·lar
             rejectFn?.(undefined);
@@ -158,18 +160,28 @@ export const useFormDialog: UseFormDialogFn = (
         }
     };
     const closeCallback = (reason: string) => {
-        // S'ha tancat la modal amb la 'x' o s'ha fet click a fora de la finestra
-        const doClose = closeFn != null ? closeFn(reason) : true;
-        if (doClose) {
-            rejectFn?.(undefined);
-            setOpen(false);
+        // S'ha tancat la modal amb la 'x' o s'ha fet click a fora de la finestra.
+        if (!loading) {
+            // Només es pot tancar la modal si no s'està en estat loading.
+            const doClose = closeFn != null ? closeFn(reason) : true;
+            if (doClose) {
+                rejectFn?.(undefined);
+                setOpen(false);
+            }
         }
     };
+    // Deshabilita els botons si s'està en estat loading
+    const buttons = dialogButtons ?? formDialogButtons;
+    const processedButtons = loading
+        ? buttons.map((b) => ({
+              ...b,
+              componentProps: {
+                  ...b.componentProps,
+                  disabled: true,
+              },
+          }))
+        : buttons;
     const close = () => setOpen(false);
-    const processedButtons = (dialogButtons ?? formDialogButtons).map((b) => ({
-        ...b,
-        disabled: loading,
-    }));
     const dialogComponent = (
         <FormDialog
             resourceName={resourceName}
@@ -187,7 +199,8 @@ export const useFormDialog: UseFormDialogFn = (
             dialogComponentProps={dialogComponentProps}
             formComponentProps={formComponentProps}
             formI18nKeys={formI18nKeys}
-            noForm={submitReturnedContent != null}>
+            noForm={submitReturnedContent != null}
+            closeIcon={closeIcon}>
             {submitReturnedContent ??
                 (loading ? (loadingComponent ?? <FormDialogLoading />) : formContent)}
         </FormDialog>

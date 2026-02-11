@@ -16,7 +16,7 @@ public class SseEvent {
 
 	public static final String EVENT_NAME_DIR3_SYNC = "DIR3_SYNC";
 
-	private String eventName;
+	private SseEventName eventName;
 	private int percent;
 	private SseEventStatus status;
 	private String message;
@@ -25,6 +25,10 @@ public class SseEvent {
 		RUNNING,
 		DONE,
 		ERROR
+	}
+
+	public enum SseEventName {
+		DIR3_SYNC
 	}
 
 }
