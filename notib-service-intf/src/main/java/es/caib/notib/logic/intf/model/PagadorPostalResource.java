@@ -30,13 +30,13 @@ import java.util.Date;
 	accessConstraints = {
 		@ResourceAccessConstraint(
 			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-			roles = {BaseConfig.ROLE_ADMIN},
-			grantedPermissions = {PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE}
+			roles = { BaseConfig.ROLE_ADMIN },
+			grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
 		),
 		@ResourceAccessConstraint(
 			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-			roles = {BaseConfig.ROLE_ADMIN_LECTURA},
-			grantedPermissions = {PermissionEnum.READ}
+			roles = { BaseConfig.ROLE_ADMIN_LECTURA },
+			grantedPermissions = { PermissionEnum.READ }
 		)
 	}
 )

@@ -3,6 +3,24 @@ import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import { MuiDataGrid, FormField, useFormContext } from 'reactlib';
 
+const columns = [
+    {
+        field: 'usuariCodi',
+        sortable: false,
+        flex: 1,
+    },
+    {
+        field: 'callbackUrl',
+        sortable: false,
+        flex: 4,
+    },
+    {
+        field: 'activa',
+        sortable: false,
+        flex: 1,
+    },
+];
+
 const EntitatFormTabAplicacionsFormContent: React.FC = () => {
     return (
         <Grid container spacing={2}>
@@ -44,26 +62,6 @@ const EntitatFormTabAplicacionsFormContent: React.FC = () => {
 const EntitatFormTabAplicacions: React.FC = () => {
     const { t } = useTranslation();
     const { id, apiRef: formApiRef } = useFormContext();
-    const columns = React.useMemo(
-        () => [
-            {
-                field: 'usuariCodi',
-                sortable: false,
-                flex: 1,
-            },
-            {
-                field: 'callbackUrl',
-                sortable: false,
-                flex: 4,
-            },
-            {
-                field: 'activa',
-                sortable: false,
-                flex: 1,
-            },
-        ],
-        []
-    );
     const handleDataGridRowChanges = () => {
         formApiRef.current?.refresh();
     };

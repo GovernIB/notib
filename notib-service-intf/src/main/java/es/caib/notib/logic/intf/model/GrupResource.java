@@ -30,7 +30,7 @@ import javax.validation.constraints.Size;
 	accessConstraints = @ResourceAccessConstraint(
 		type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
 		roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_SUPER },
-		grantedPermissions = {PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE}
+		grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
 	)
 )
 public class GrupResource extends BaseResource<Long> {

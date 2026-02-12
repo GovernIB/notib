@@ -13,10 +13,9 @@ import lombok.experimental.FieldNameConstants;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.Date;
 
 /**
- * Informació d'un pagador CIE.
+ * Informació del format de sobre d'un pagador CIE.
  *
  * @author Límit Tecnologies
  */
@@ -25,27 +24,21 @@ import java.util.Date;
 @NoArgsConstructor
 @FieldNameConstants
 @ResourceConfig(
-	descriptionField = PagadorCieResource.Fields.organGestorPagador,
-	quickFilterFields = { PagadorCieResource.Fields.organGestorPagador },
+	descriptionField = PagadorCieFormatSobreResource.Fields.codi,
+	quickFilterFields = { PagadorCieFormatSobreResource.Fields.codi },
 	accessConstraints = @ResourceAccessConstraint(
 		type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
 		roles = { BaseConfig.ROLE_ADMIN },
 		grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
 	)
 )
-public class PagadorCieResource extends BaseResource<Long> {
+public class PagadorCieFormatSobreResource extends BaseResource<Long> {
 
-	@Size(max = 256)
-	private String nom;
-	@Size(max = 255)
-	private String apiKey;
-	private boolean cieExtern;
-	private Date contracteDataVig;
+	@NotNull
+	@Size(max = 64)
+	private String codi;
 
-	private ResourceReference<EntitatResource, Long> entitat;
 	@NotNull
-	private ResourceReference<OrganGestorResource, Long> organGestorEmissor;
-	@NotNull
-	private ResourceReference<OrganGestorResource, Long> organGestorPagador;
+	private ResourceReference<PagadorCieResource, Long> pagadorCie;
 
 }

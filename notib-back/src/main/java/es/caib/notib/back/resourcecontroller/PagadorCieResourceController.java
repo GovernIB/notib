@@ -7,12 +7,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Servei REST de gestió de pagadorCie.
+ * Servei REST de gestió de pagadors CIE.
  *
  * @author Límit Tecnologies
  */
 @RestController
-@RequestMapping(BaseConfig.API_PATH + "/pagadorscie")
+@RequestMapping(BaseConfig.API_PATH + "/pagadorsCie")
 public class PagadorCieResourceController extends BaseMutableResourceController<PagadorCieResource, Long> {
 
 }

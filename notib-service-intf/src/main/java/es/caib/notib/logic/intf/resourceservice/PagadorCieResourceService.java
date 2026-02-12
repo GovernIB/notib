@@ -5,7 +5,7 @@ import es.caib.notib.logic.intf.model.GrupResource;
 import es.caib.notib.logic.intf.model.PagadorCieResource;
 
 /**
- * Definició del servei de gestió de grups.
+ * Definició del servei de gestió de pagadors CIE.
  *
  * @author Límit Tecnologies
  */

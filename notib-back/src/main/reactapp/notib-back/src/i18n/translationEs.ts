@@ -221,6 +221,11 @@ const translationEs = {
             form: {
                 titleCreate: 'Crear centro de impresión y ensobrado',
                 titleUpdate: 'Modificar centro de impresión y ensobrado',
+                tabs: {
+                    dades: 'Datos',
+                    fulles: 'Formatos de hoja',
+                    sobres: 'Formatos de sobre',
+                },
             },
         },
         notFound: {

@@ -7,12 +7,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Servei REST de gestió de grups.
+ * Servei REST de gestió de pagadors postals.
  *
  * @author Límit Tecnologies
  */
 @RestController
-@RequestMapping(BaseConfig.API_PATH + "/pagadorspostal")
+@RequestMapping(BaseConfig.API_PATH + "/pagadorsPostals")
 public class PagadorPostalResourceController extends BaseMutableResourceController<PagadorPostalResource, Long> {
 
 }

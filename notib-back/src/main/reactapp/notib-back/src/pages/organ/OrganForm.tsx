@@ -25,7 +25,7 @@ const OrganFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = 
             {t('page.organs.form.tabs.permisos')}
         </Badge>
     );
-    const tabs = [t('page.entitats.form.tabs.dades'), { label: permisosTabLabel }];
+    const tabs = [t('page.organs.form.tabs.dades'), { label: permisosTabLabel }];
     return (
         <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1]}>
             <MuiFormTabContent index={0} showOnCreate>

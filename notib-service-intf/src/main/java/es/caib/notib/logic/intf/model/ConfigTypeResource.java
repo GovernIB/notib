@@ -23,11 +23,11 @@ import javax.persistence.Column;
 @FieldNameConstants
 @ResourceConfig(
 	descriptionField = ConfigTypeResource.Fields.code,
-	quickFilterFields = {ConfigTypeResource.Fields.code, ConfigTypeResource.Fields.value},
+	quickFilterFields = { ConfigTypeResource.Fields.code, ConfigTypeResource.Fields.value },
 	accessConstraints = @ResourceAccessConstraint(
 		type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-		roles = {BaseConfig.ROLE_SUPER},
-		grantedPermissions = {PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE}
+		roles = { BaseConfig.ROLE_SUPER },
+		grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
 	)
 )
 public class ConfigTypeResource extends BaseResource<Long> {

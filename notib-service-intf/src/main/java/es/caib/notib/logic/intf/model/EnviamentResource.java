@@ -24,8 +24,8 @@ import javax.validation.constraints.NotNull;
 	descriptionField = "id",
 	accessConstraints = @ResourceAccessConstraint(
 		type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-		roles = {BaseConfig.ROLE_ADMIN},
-		grantedPermissions = {PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE}
+		roles = { BaseConfig.ROLE_ADMIN },
+		grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
 	)
 )
 public class EnviamentResource extends BaseResource<Long> {

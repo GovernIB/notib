@@ -12,6 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Límit Tecnologies
  */
 @RestController
-@RequestMapping(BaseConfig.API_PATH + "/enviament")
+@RequestMapping(BaseConfig.API_PATH + "/enviaments")
 public class EnviamentResourceController extends BaseMutableResourceController<EnviamentResource, Long> {
 }

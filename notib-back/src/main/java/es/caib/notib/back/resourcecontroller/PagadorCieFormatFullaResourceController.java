@@ -2,17 +2,17 @@ package es.caib.notib.back.resourcecontroller;
 
 import es.caib.notib.back.base.controller.BaseMutableResourceController;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
-import es.caib.notib.logic.intf.model.OrganGestorResource;
+import es.caib.notib.logic.intf.model.PagadorCieFormatFullaResource;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Servei REST de gestió d'organs gestors.
+ * Servei REST de gestió de formats de fulla de pagadors CIE.
  *
  * @author Límit Tecnologies
  */
 @RestController
-@RequestMapping(BaseConfig.API_PATH + "/organsGestors")
-public class OrganGestorResourceController extends BaseMutableResourceController<OrganGestorResource, Long> {
+@RequestMapping(BaseConfig.API_PATH + "/pagadorsCieformatsFulla")
+public class PagadorCieFormatFullaResourceController extends BaseMutableResourceController<PagadorCieFormatFullaResource, Long> {
 
 }

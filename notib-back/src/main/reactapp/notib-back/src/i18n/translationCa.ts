@@ -229,6 +229,11 @@ const translationCa = {
             form: {
                 titleCreate: "Crear centre d'impressió i ensobrat",
                 titleUpdate: "Modificar centre d'impressió i ensobrat",
+                tabs: {
+                    dades: 'Dades',
+                    fulles: 'Formats de fulla',
+                    sobres: 'Formats de sobre',
+                },
             },
         },
         notFound: {
