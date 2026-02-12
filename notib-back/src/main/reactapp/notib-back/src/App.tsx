@@ -82,9 +82,9 @@ const InnerApp: React.FC = () => {
             hidden: currentRole !== ROLE_ADMIN,
         },
         {
-            id: 'pagadorspostal',
+            id: 'pagadorspostals',
             title: t('menu.pagadorsPostals'),
-            to: '/pagadorspostal',
+            to: '/pagadorspostals',
             icon: 'markunread_mailbox',
             resourceName: 'pagadorCieResource',
             hidden: currentRole !== ROLE_ADMIN,

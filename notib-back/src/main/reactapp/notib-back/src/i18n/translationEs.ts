@@ -208,30 +208,19 @@ const translationEs = {
                 },
             },
         },
-        pagador: {
-            cie: {
-                grid: {
-                    title: 'Centros de impresión y ensobrado',
-                },
-                form: {},
+        pagadorPostal: {
+            grid: {
+                title: 'Operadores postales',
+                popupResourceTitle: 'operador postal',
             },
-            postal: {
-                grid: {
-                    title: 'Operadores postal',
-                },
-                form: {
-                    titleCreate: 'Crear operador postal',
-                    titleUpdate: 'Modificar operador postal',
-                    nom: 'Nombre del operador',
-                    organGestor: 'Organismo pagador',
-                    contracteNum: 'Número del contrato',
-                    contracteDataVig: 'Fecha de vigencia del contrato',
-                    facturacioClientCodi: 'Código cliente facturación',
-                    tabs: {
-                        dades: 'Datos',
-                        permisos: 'Permisos',
-                    },
-                },
+        },
+        pagadorCie: {
+            grid: {
+                title: 'Centros de impresión y ensobrado',
+            },
+            form: {
+                titleCreate: 'Crear centro de impresión y ensobrado',
+                titleUpdate: 'Modificar centro de impresión y ensobrado',
             },
         },
         notFound: {

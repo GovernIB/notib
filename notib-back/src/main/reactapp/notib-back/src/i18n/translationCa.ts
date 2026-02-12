@@ -219,10 +219,7 @@ const translationCa = {
         pagadorPostal: {
             grid: {
                 title: 'Operadors postals',
-            },
-            form: {
-                titleCreate: 'Crear pagador postal',
-                titleUpdate: 'Modificar pagador postal',
+                popupResourceTitle: 'operador postal',
             },
         },
         pagadorCie: {

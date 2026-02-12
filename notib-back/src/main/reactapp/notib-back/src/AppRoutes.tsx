@@ -13,9 +13,7 @@ import OrganGrid from './pages/organ/OrganGrid';
 import OrganForm from './pages/organ/OrganForm';
 import PagadorCieGrid from './pages/pagadorCie/PagadorCieGrid';
 import PagadorCieForm from './pages/pagadorCie/PagadorCieForm';
-import PagadorPostalGrid from './pages/pagadorPostal/PagadorPostalGrid';
-import PagadorPostalForm from './pages/pagadorPostal/PagadorPostalForm';
-import Enviaments from './pages/Enviaments';
+import PagadorsPostals from './pages/PagadorsPostals';
 import NotFoundPage from './pages/NotFound';
 import Propietats from './pages/propietat/Propietats';
 
@@ -63,6 +61,7 @@ const AppRoutes = () => {
                     <Route path=":id" element={<OrganForm />} />
                 </Route>
             </Route>
+            <Route path="pagadorspostals" element={<PagadorsPostals />} />
             <Route path="pagadorscie">
                 <Route index element={<PagadorCieGrid />} />
                 <Route path="form">
@@ -70,15 +69,7 @@ const AppRoutes = () => {
                     <Route path=":id" element={<PagadorCieForm />} />
                 </Route>
             </Route>
-            <Route path="pagadorspostal">
-                <Route index element={<PagadorPostalGrid />} />
-                <Route path="form">
-                    <Route index element={<PagadorPostalForm />} />
-                    <Route path=":id" element={<PagadorPostalForm />} />
-                </Route>
-            </Route>
             <Route path="propietats" element={<Propietats />} />
-            <Route path="enviaments" element={<Enviaments />} />
             <Route path="*" element={<NotFoundPage />} />
         </Routes>
     );
