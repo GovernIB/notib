@@ -11,10 +11,8 @@ const translationEs = {
         serveis: 'Serveis',
         grups: 'Grupos',
         enviaments: 'Envios',
-        pagadors: {
-            cie: 'Centros de impresión y ensobrado',
-            postal: 'Operadores postal'
-        },
+        pagadorsPostals: 'Operadores postales',
+        pagadorsCie: 'Centros de impresión y ensobrado',
     },
     page: {
         home: {
@@ -213,30 +211,28 @@ const translationEs = {
         pagador: {
             cie: {
                 grid: {
-                    title: "Centros de impresión y ensobrado"
+                    title: 'Centros de impresión y ensobrado',
                 },
-                form: {
-
-                }
+                form: {},
             },
             postal: {
                 grid: {
-                    title: "Operadores postal"
+                    title: 'Operadores postal',
                 },
                 form: {
                     titleCreate: 'Crear operador postal',
                     titleUpdate: 'Modificar operador postal',
-                    nom: "Nombre del operador",
-                    organGestor: "Organismo pagador",
-                    contracteNum: "Número del contrato",
-                    contracteDataVig: "Fecha de vigencia del contrato",
-                    facturacioClientCodi: "Código cliente facturación",
+                    nom: 'Nombre del operador',
+                    organGestor: 'Organismo pagador',
+                    contracteNum: 'Número del contrato',
+                    contracteDataVig: 'Fecha de vigencia del contrato',
+                    facturacioClientCodi: 'Código cliente facturación',
                     tabs: {
                         dades: 'Datos',
                         permisos: 'Permisos',
-                    }
-                }
-            }
+                    },
+                },
+            },
         },
         notFound: {
             title: 'Página no encontrada',

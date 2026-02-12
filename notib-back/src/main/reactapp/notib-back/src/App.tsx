@@ -83,7 +83,7 @@ const InnerApp: React.FC = () => {
         },
         {
             id: 'pagadorspostal',
-            title: t('menu.pagadors.postal'),
+            title: t('menu.pagadorsPostals'),
             to: '/pagadorspostal',
             icon: 'markunread_mailbox',
             resourceName: 'pagadorCieResource',
@@ -91,21 +91,12 @@ const InnerApp: React.FC = () => {
         },
         {
             id: 'pagadorscie',
-            title: t('menu.pagadors.cie'),
+            title: t('menu.pagadorsCie'),
             to: '/pagadorscie',
             icon: 'mark_as_unread',
             resourceName: 'pagadorPostalResource',
             hidden: currentRole !== ROLE_ADMIN,
-        }
-
-        /**/
-        /*, {
-        id: 'enviaments',
-        title: t('menu.enviaments'),
-        to: '/enviaments',
-        icon: 'mail_outline',
-        resourceName: 'enviamentResource',
-    }*/
+        },
     ];
     const menuEntries = [
         {

@@ -11,10 +11,8 @@ const translationCa = {
         serveis: 'Serveis',
         grups: 'Grups',
         enviaments: 'Enviaments',
-        pagadors: {
-            cie: "Centres d'impressió i ensobrat",
-            postal: 'Operadors postal',
-        },
+        pagadorsPostals: 'Operadors postals',
+        pagadorsCie: "Centres d'impressió i ensobrat",
     },
     page: {
         home: {

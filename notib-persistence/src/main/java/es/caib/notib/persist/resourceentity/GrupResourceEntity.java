@@ -43,16 +43,10 @@ public class GrupResourceEntity
 		nullable = false)
 	protected EntitatResourceEntity entitat;
 
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(
-		name = "organ_gestor",
-		referencedColumnName = "id",
-		foreignKey = @javax.persistence.ForeignKey(name = BaseConfig.DB_PREFIX + "grup_organ_fk"),
-		nullable = false)
-	protected OrganGestorResourceEntity organGestor;
-
 	@Builder
-	public GrupResourceEntity(GrupResource resource, EntitatResourceEntity entitat) {
+	public GrupResourceEntity(
+		GrupResource resource,
+		EntitatResourceEntity entitat) {
 		this.codi = resource.getCodi();
 		this.nom = resource.getNom();
 		this.entitat = entitat;

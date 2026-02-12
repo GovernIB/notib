@@ -73,18 +73,12 @@ public abstract class BaseAdminEntitatResourceServiceImpl<R extends Resource<Lon
 		Map<String, AnswerRequiredException.AnswerValue> answers) {
 		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
 		if (currentEntitat != null) {
-			if (Objects.equals(entity.getEntitat(), currentEntitat)) {
-				entitatPermissionHelper.checkEntitatAdminPermission(
-					getResourceClass(),
-					null,
-					entity.getEntitat().getId(),
-					BasePermission.CREATE);
-			} else {
-				throw new ResourceNotCreatedException(
-					getResourceClass(),
-					"Not allowed to create a " + getResourceClass() + " belonging to a different entitat than the " +
-						"one selected in the session (sessionEntitatId=" + currentEntitat.getId() + ")");
-			}
+			entity.setEntitat(currentEntitat);
+			entitatPermissionHelper.checkEntitatAdminPermission(
+				getResourceClass(),
+				null,
+				entity.getEntitat().getId(),
+				BasePermission.CREATE);
 		} else {
 			throw new ResourceNotCreatedException(
 				getResourceClass(),

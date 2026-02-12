@@ -53,7 +53,6 @@ public class PagadorPostalResource extends BaseResource<Long> {
 	private String facturacioClientCodi;
 	private Date contracteDataVig;
 
-	@NotNull
 	private ResourceReference<EntitatResource, Long> entitat;
 	@NotNull
 	private ResourceReference<OrganGestorResource, Long> organGestor;

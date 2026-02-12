@@ -4,6 +4,7 @@ import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
+import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -41,12 +42,7 @@ public class GrupResource extends BaseResource<Long> {
 	@NotNull
 	@Size(max = 100)
 	private String nom;
-	private Long entitatId;
-	private Long organGestorId;
-	private String organGestorCodi;
 
-	public String getNomIRol() {
-		return nom + " (" + codi + ")";
-	}
+	private ResourceReference<EntitatResource, Long> entitat;
 
 }

@@ -42,7 +42,6 @@ public class PagadorCieResource extends BaseResource<Long> {
 	private boolean cieExtern;
 	private Date contracteDataVig;
 
-	@NotNull
 	private ResourceReference<EntitatResource, Long> entitat;
 	@NotNull
 	private ResourceReference<OrganGestorResource, Long> organGestorEmissor;

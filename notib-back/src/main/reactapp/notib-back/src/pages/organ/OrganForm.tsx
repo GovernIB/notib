@@ -17,18 +17,15 @@ const OrganFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = 
     const { setSubtitle } = props;
     const { t } = useTranslation();
     const { data } = useFormContext();
-
     React.useEffect(() => {
         setSubtitle(data?.codi + ', ' + data?.nom);
     }, [data]);
-
     const permisosTabLabel = (
         <Badge badgeContent={data.aclEntryCount} color="primary">
             {t('page.organs.form.tabs.permisos')}
         </Badge>
     );
     const tabs = [t('page.entitats.form.tabs.dades'), { label: permisosTabLabel }];
-
     return (
         <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1]}>
             <MuiFormTabContent index={0} showOnCreate>
@@ -93,4 +90,5 @@ export const OrganForm: React.FC = () => {
         </FormPage>
     );
 };
+
 export default OrganForm;
