@@ -475,7 +475,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
         var receptor = new Receptor();
         var titular = enviament.getTitular();
         receptor.setNifReceptor(titular.getNif());
-        receptor.setNombreReceptor(titular.getNomSencer());
+        receptor.setNombreReceptor(InteressatTipus.FISICA.equals(titular.getInteressatTipus()) ? titular.getNomSencer() : titular.getRaoSocial());
         receptor.setVinculoReceptor(BigInteger.ONE);
         if (!titular.isIncapacitat()) {
             return receptor;

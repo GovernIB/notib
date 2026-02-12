@@ -108,7 +108,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"and (:#{#filtre.dataCaducitatFiNull} = true or nenv.notificaDataCaducitat <= :#{#filtre.dataCaducitatFi}) " +
 			"and (:#{#filtre.enviamentTipusNull} = true or nenv.tipusEnviament = :#{#filtre.enviamentTipus}) " +
 			"and (:#{#filtre.csvUuidNull} = true or lower(CASE WHEN nenv.csv_uuid is null THEN '' ELSE nenv.csv_uuid END) like lower('%'||:#{#filtre.csvUuid}||'%')) " +
-			"and (:#{#filtre.estatNull} = true or nenv.estat = :#{#filtre.estat} or nenv.notificaEstat = :#{#filtre.notificaEstat})" +
+			"and (:#{#filtre.estatNull} = true or nenv.estat = :#{#filtre.estat} or nenv.notificaEstat = :#{#filtre.notificaEstat} or (:#{#filtre.estatAnulada} = true  and nenv.anulat = true))" +
 			"and (:#{#filtre.dataEnviamentFiNull} = true or nenv.createdDate <= :#{#filtre.dataEnviamentFi}) " +
 			"and (:#{#filtre.codiNotificaNull} = true or lower(CASE WHEN nenv.notificaIdentificador is null THEN '' ELSE nenv.notificaIdentificador END) like lower('%'||:#{#filtre.codiNotifica}||'%')) " +
 			"and (:#{#filtre.creadaPerNull} = true or lower(CASE WHEN nenv.createdBy.codi is null THEN '' ELSE nenv.createdBy.codi END) like lower('%'||:#{#filtre.creadaPerCodi}||'%')) " +
@@ -185,7 +185,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"and (:#{#filtre.dataCaducitatFiNull} = true or nenv.notificaDataCaducitat <= :#{#filtre.dataCaducitatFi}) " +
 			"and (:#{#filtre.enviamentTipusNull} = true or nenv.tipusEnviament = :#{#filtre.enviamentTipus}) " +
 			"and (:#{#filtre.csvUuidNull} = true or lower(CASE WHEN nenv.csv_uuid is null THEN '' ELSE nenv.csv_uuid END) like lower('%'||:#{#filtre.csvUuid}||'%')) " +
-			"and (:#{#filtre.estatNull} = true or nenv.estat = :#{#filtre.estat} or nenv.notificaEstat = :#{#filtre.notificaEstat})" +
+			"and (:#{#filtre.estatNull} = true or nenv.estat = :#{#filtre.estat} or nenv.notificaEstat = :#{#filtre.notificaEstat} or (:#{#filtre.estatAnulada} = true  and nenv.anulat = true))" +
 			"and (:#{#filtre.dataEnviamentFiNull} = true or nenv.createdDate <= :#{#filtre.dataEnviamentFi}) " +
 			"and (:#{#filtre.codiNotificaNull} = true or lower(CASE WHEN nenv.notificaIdentificador is null THEN '' ELSE nenv.notificaIdentificador END) like lower('%'||:#{#filtre.codiNotifica}||'%')) " +
 			"and (:#{#filtre.creadaPerNull} = true or lower(CASE WHEN nenv.createdBy.codi is null THEN '' ELSE nenv.createdBy.codi END) like lower('%'||:#{#filtre.creadaPerCodi}||'%')) " +
