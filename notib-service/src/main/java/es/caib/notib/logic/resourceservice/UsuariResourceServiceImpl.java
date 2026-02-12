@@ -26,7 +26,9 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UsuariResourceServiceImpl extends BaseMutableResourceService<UsuariResource, String, UsuariResourceEntity> implements UsuariResourceService {
+public class UsuariResourceServiceImpl
+	extends BaseMutableResourceService<UsuariResource, String, UsuariResourceEntity>
+	implements UsuariResourceService {
 
 	private final AuthenticationHelper authenticationHelper;
 	private final UsuariResourceRepository usuariResourceRepository;

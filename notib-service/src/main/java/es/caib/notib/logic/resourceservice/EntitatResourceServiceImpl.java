@@ -24,7 +24,9 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class EntitatResourceServiceImpl extends BaseMutableResourceService<EntitatResource, Long, EntitatResourceEntity> implements EntitatResourceService {
+public class EntitatResourceServiceImpl
+	extends BaseMutableResourceService<EntitatResource, Long, EntitatResourceEntity>
+	implements EntitatResourceService {
 
 	private final AclHelper aclHelper;
 	private final EntitatPermissionHelper entitatPermissionHelper;

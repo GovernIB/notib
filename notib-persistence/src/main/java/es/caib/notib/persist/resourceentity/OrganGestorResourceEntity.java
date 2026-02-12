@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -25,7 +26,9 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class OrganGestorResourceEntity extends BaseAuditableResourceEntity<OrganGestorResource> {
+public class OrganGestorResourceEntity
+	extends BaseAuditableResourceEntity<OrganGestorResource>
+	implements AdminEntitatResourceEntity<OrganGestorResource> {
 
 	@Column(name = "codi", length = 64, nullable = false)
 	protected String codi;
@@ -83,6 +86,9 @@ public class OrganGestorResourceEntity extends BaseAuditableResourceEntity<Organ
 
 	@ManyToMany(mappedBy = "nous")
 	private List<OrganGestorEntity> antics = new ArrayList<>();
+
+	@Formula("(codi||', '||nom)")
+	private String codiNom;
 
 	@Builder
 	public OrganGestorResourceEntity(

@@ -6,7 +6,6 @@ import es.caib.notib.logic.intf.base.exception.ResourceNotCreatedException;
 import es.caib.notib.logic.intf.base.exception.ResourceNotUpdatedException;
 import es.caib.notib.logic.intf.base.model.Resource;
 import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
-import es.caib.notib.logic.intf.model.EntitatTipusDocumentResource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.acls.domain.BasePermission;
@@ -92,12 +91,12 @@ public class EntitatPermissionHelper {
 			if (!permissionGranted) {
 				if (Objects.equals(permission, BasePermission.CREATE)) {
 					throw new ResourceNotCreatedException(
-						EntitatTipusDocumentResource.class,
+						resourceClass,
 						"Not allowed to create " + resourceClass.getSimpleName());
 				} else {
 					String permissionText = Objects.equals(permission, BasePermission.DELETE) ? "delete" : "update";
 					throw new ResourceNotUpdatedException(
-						EntitatTipusDocumentResource.class,
+						resourceClass,
 						"" + id,
 						"Not allowed to " + permissionText + " " + resourceClass.getSimpleName());
 				}

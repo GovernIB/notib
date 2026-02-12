@@ -4,7 +4,7 @@ import es.caib.notib.persist.base.repository.BaseRepository;
 import es.caib.notib.persist.resourceentity.PagadorCieResourceEntity;
 
 /**
- * Repositori per a la gestió d'entitats de tipus grup.
+ * Repositori per a la gestió d'entitats de tipus pagador CIE.
  *
  * @author Límit Tecnologies
  */

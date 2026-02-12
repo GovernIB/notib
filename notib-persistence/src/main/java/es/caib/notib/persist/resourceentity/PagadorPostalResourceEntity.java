@@ -21,12 +21,19 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.util.Date;
 
+/**
+ * Entitat de base de dades pels recursos de tipus pagador postal.
+ *
+ * @author Límit Tecnologies
+ */
 @Entity
 @Table(name = BaseConfig.DB_PREFIX + "pagador_postal")
 @Getter
 @Setter
 @NoArgsConstructor
-public class PagadorPostalResourceEntity extends BaseAuditableResourceEntity<PagadorPostalResource> {
+public class PagadorPostalResourceEntity
+	extends BaseAuditableResourceEntity<PagadorPostalResource>
+	implements AdminEntitatResourceEntity<PagadorPostalResource> {
 
 	@Column(name = "contracte_num", length = 20)
 	private String contracteNum;
@@ -53,8 +60,10 @@ public class PagadorPostalResourceEntity extends BaseAuditableResourceEntity<Pag
 	private String nom;
 
 	@Builder
-	public PagadorPostalResourceEntity(PagadorPostalResource resource, OrganGestorResourceEntity organGestor, EntitatResourceEntity entitat) {
-
+	public PagadorPostalResourceEntity(
+		PagadorPostalResource resource,
+		OrganGestorResourceEntity organGestor,
+		EntitatResourceEntity entitat) {
 		this.contracteNum = resource.getContracteNum();
 		this.contracteDataVig = resource.getContracteDataVig();
 		this.facturacioClientCodi = resource.getFacturacioClientCodi();

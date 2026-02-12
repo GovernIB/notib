@@ -52,6 +52,8 @@ public class PagadorPostalResource extends BaseResource<Long> {
 	@NotNull
 	@Size(max = 100)
 	private String nom;
+
+	@NotNull
 	private ResourceReference<EntitatResource, Long> entitat;
 	@NotNull
 	private ResourceReference<OrganGestorResource, Long> organGestor;

@@ -2,6 +2,7 @@ package es.caib.notib.persist.resourceentity;
 
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
+import es.caib.notib.logic.intf.model.GrupResource;
 import es.caib.notib.logic.intf.model.ProcedimentResource;
 import es.caib.notib.persist.entity.cie.EntregaCieEntity;
 import lombok.*;
@@ -20,7 +21,9 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ProcedimentResourceEntity extends BaseAuditableResourceEntity<ProcedimentResource> {
+public class ProcedimentResourceEntity
+	extends BaseAuditableResourceEntity<ProcedimentResource>
+	implements AdminEntitatResourceEntity<ProcedimentResource> {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "tipus", length = 32, nullable = false, updatable = false)

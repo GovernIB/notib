@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JoinFormula;
 
 import javax.persistence.*;
 
@@ -19,7 +20,9 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ProcedimentGrupResourceEntity extends BaseAuditableResourceEntity<ProcedimentGrupResource> {
+public class ProcedimentGrupResourceEntity
+	extends BaseAuditableResourceEntity<ProcedimentGrupResource>
+	implements AdminEntitatResourceEntity<ProcedimentGrupResource> {
 
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(
@@ -34,6 +37,10 @@ public class ProcedimentGrupResourceEntity extends BaseAuditableResourceEntity<P
 		referencedColumnName = "id",
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "grup_pro_fk"))
 	private GrupResourceEntity grup;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinFormula("(select pro.entitat from " + BaseConfig.DB_PREFIX + "procediment pro where pro.id = procediment)")
+	private EntitatResourceEntity entitat;
 
 	@Builder
 	public ProcedimentGrupResourceEntity(

@@ -40,7 +40,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclEntryResource, String, AclEntryResourceEntity> implements AclEntryResourceService {
+public class AclEntryResourceServiceImpl
+	extends BaseMutableResourceService<AclEntryResource, String, AclEntryResourceEntity>
+	implements AclEntryResourceService {
 
 	private final AclHelper aclHelper;
 	private final AuthenticationHelper authenticationHelper;

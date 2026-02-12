@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ConfigResourceServiceImpl extends BaseMutableResourceService<ConfigResource, Long, ConfigResourceEntity> implements ConfigResourceService {
+public class ConfigResourceServiceImpl
+	extends BaseMutableResourceService<ConfigResource, Long, ConfigResourceEntity>
+	implements ConfigResourceService {
 
 }

@@ -25,7 +25,9 @@ import javax.persistence.Table;
 @Getter
 @Setter
 @NoArgsConstructor
-public class GrupResourceEntity extends BaseAuditableResourceEntity<GrupResource> {
+public class GrupResourceEntity
+	extends BaseAuditableResourceEntity<GrupResource>
+	implements AdminEntitatResourceEntity<GrupResource> {
 
 	@EqualsAndHashCode.Include
 	@Column(name = "codi", length = 64, nullable = false)
