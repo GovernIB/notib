@@ -25,8 +25,8 @@ import java.util.Date;
 @NoArgsConstructor
 @FieldNameConstants
 @ResourceConfig(
-	descriptionField = PagadorCieResource.Fields.organGestorPagador,
-	quickFilterFields = { PagadorCieResource.Fields.organGestorPagador },
+	descriptionField = PagadorCieResource.Fields.nom,
+	quickFilterFields = { PagadorCieResource.Fields.nom },
 	accessConstraints = @ResourceAccessConstraint(
 		type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
 		roles = { BaseConfig.ROLE_ADMIN },
@@ -47,5 +47,9 @@ public class PagadorCieResource extends BaseResource<Long> {
 	private ResourceReference<OrganGestorResource, Long> organGestorEmissor;
 	@NotNull
 	private ResourceReference<OrganGestorResource, Long> organGestorPagador;
+
+	// Camps calculats
+	private Integer fullaCount;
+	private Integer sobreCount;
 
 }

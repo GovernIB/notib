@@ -12,6 +12,7 @@ import {
     useFormContext,
 } from 'reactlib';
 import PagadorCieFormTabFulles from './PagadorCieFormTabFulles';
+import PagadorCieFormTabSobres from './PagadorCieFormTabSobres';
 
 const PagadorCieFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
     const { setSubtitle } = props;
@@ -21,12 +22,12 @@ const PagadorCieFormContent: React.FC<{ setSubtitle: (subtitle: string) => void 
         setSubtitle(data?.nom);
     }, [data]);
     const fullesTabLabel = (
-        <Badge badgeContent={data.aclEntryCount} color="primary">
+        <Badge badgeContent={data.fullaCount} color="primary">
             {t('page.pagadorCie.form.tabs.fulles')}
         </Badge>
     );
     const sobresTabLabel = (
-        <Badge badgeContent={data.aclEntryCount} color="primary">
+        <Badge badgeContent={data.sobreCount} color="primary">
             {t('page.pagadorCie.form.tabs.sobres')}
         </Badge>
     );
@@ -36,7 +37,7 @@ const PagadorCieFormContent: React.FC<{ setSubtitle: (subtitle: string) => void 
         { label: sobresTabLabel },
     ];
     return (
-        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1]}>
+        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1, 2]}>
             <MuiFormTabContent index={0} showOnCreate>
                 <Grid container spacing={2}>
                     <Grid size={6}>
@@ -63,7 +64,9 @@ const PagadorCieFormContent: React.FC<{ setSubtitle: (subtitle: string) => void 
             <MuiFormTabContent index={1}>
                 <PagadorCieFormTabFulles />
             </MuiFormTabContent>
-            <MuiFormTabContent index={2}>Sobres</MuiFormTabContent>
+            <MuiFormTabContent index={2}>
+                <PagadorCieFormTabSobres />
+            </MuiFormTabContent>
         </MuiFormTabs>
     );
 };

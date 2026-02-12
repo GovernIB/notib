@@ -3,6 +3,7 @@ package es.caib.notib.persist.resourceentity;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.model.PagadorCieResource;
 import lombok.*;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -47,6 +48,11 @@ public class PagadorCieResourceEntity
 		referencedColumnName = "id",
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "pagcie_organ_fk"))
 	private OrganGestorResourceEntity organGestor; // Organ gestor emisor
+
+	@Formula("(select count(*) from " + BaseConfig.DB_PREFIX + "formats_fulla ful where ful.pagador_cie_id = id)")
+	private Integer fullaCount;
+	@Formula("(select count(*) from " + BaseConfig.DB_PREFIX + "formats_sobre sob where sob.pagador_cie_id = id)")
+	private Integer sobreCount;
 
 	@Builder
 	public PagadorCieResourceEntity(
