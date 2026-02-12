@@ -1,11 +1,11 @@
 package es.caib.notib.persist.resourcerepository;
 
-import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.persist.base.repository.BaseRepository;
 import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
 import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repositori per a la gestió d'entitats de tipus òrgan gestor.
@@ -16,6 +16,6 @@ public interface OrganGestorResourceRepository extends BaseRepository<OrganGesto
 
 	List<OrganGestorResourceEntity> findByEntitat(EntitatResourceEntity entitat);
 
-	List<OrganGestorResourceEntity> findByEntitatAndEstat(EntitatResourceEntity entitat, OrganGestorEstatEnum estat);
+	Optional<OrganGestorResourceEntity> findByEntitatAndCodi(EntitatResourceEntity entitat, String codi);
 
 }

@@ -43,21 +43,19 @@ import java.util.Date;
 public class PagadorPostalResource extends BaseResource<Long> {
 
 	@NotNull
+	@Size(max = 256)
+	private String nom;
+	@NotNull
 	@Size(max = 20)
 	private String contracteNum;
-	private Date contracteDataVig;
 	@NotNull
 	@Size(max = 20)
 	private String facturacioClientCodi;
-	@NotNull
-	@Size(max = 100)
-	private String nom;
+	private Date contracteDataVig;
 
 	@NotNull
 	private ResourceReference<EntitatResource, Long> entitat;
 	@NotNull
 	private ResourceReference<OrganGestorResource, Long> organGestor;
-
-	private Integer aclEntryCount;
 
 }

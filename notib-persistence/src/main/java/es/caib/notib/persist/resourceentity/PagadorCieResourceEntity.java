@@ -1,7 +1,6 @@
 package es.caib.notib.persist.resourceentity;
 
 import es.caib.notib.logic.intf.base.config.BaseConfig;
-import es.caib.notib.logic.intf.model.OrganGestorResource;
 import es.caib.notib.logic.intf.model.PagadorCieResource;
 import lombok.*;
 
@@ -27,22 +26,22 @@ public class PagadorCieResourceEntity
 	private String organismePagadorCodi; // Organ gestor pagador
 	@Column(name = "nom", length = 256)
 	private String nom;
-	@Column(name = "contracte_data_vig")
-	@Temporal(TemporalType.DATE)
-	private Date contracteDataVig;
 	@Column(name = "api_key")
 	private String apiKey;
 	@Column(name = "cie_extern", nullable = false)
 	private boolean cieExtern;
+	@Temporal(TemporalType.DATE)
+	@Column(name = "contracte_data_vig")
+	private Date contracteDataVig;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(
 		name = "entitat",
 		referencedColumnName = "id",
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "pagador_cie_entitat_fk"))
 	private EntitatResourceEntity entitat;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(
 		name = "organ_gestor",
 		referencedColumnName = "id",

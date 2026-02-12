@@ -37,6 +37,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * Implementació del servei per a gestionar entrades ACL.
+ * Aquest servei simula que les ACLs son un recurs gestionat per BaseMutableResourceService però per darrera gestiona
+ * les ACLs mitjançant la classe MutableAclService de Spring Security.
+ *
+ * @author Límit Tecnologies
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -53,6 +60,9 @@ public class AclEntryResourceServiceImpl
 		return true;
 	}
 
+	/*
+	 * Consulta la informació d'un AclEntryResource utilitzant el MutableAclService.
+	 */
 	@Override
 	protected Optional<AclEntryResourceEntity> entityRepositoryFindOne(String id) {
 		AclEntryResource.AclEntryPk pk = AclEntryResource.AclEntryPk.deserializeFromString(id);
@@ -77,6 +87,9 @@ public class AclEntryResourceServiceImpl
 		return Optional.empty();
 	}
 
+	/*
+	 * Consulta pàginada dels AclEntryResource utilitzant el MutableAclService.
+	 */
 	@Override
 	protected Page<AclEntryResourceEntity> entityRepositoryFindEntities(
 		String quickFilter,
@@ -119,6 +132,9 @@ public class AclEntryResourceServiceImpl
 		}
 	}
 
+	/*
+	 * Desa els canvis d'un AclEntryResource utilitzant el MutableAclService.
+	 */
 	@Override
 	protected AclEntryResourceEntity entitySaveFlushAndRefresh(AclEntryResourceEntity entity) {
 		AclEntryResource resource = entity.getResource();
@@ -148,6 +164,9 @@ public class AclEntryResourceServiceImpl
 		return entity;
 	}
 
+	/*
+	 * Converteix una ACL retornat per MutableAclService un AclEntryResource.
+	 */
 	@Override
 	protected AclEntryResource entityDetachConvertAndMerge(
 		AclEntryResourceEntity entity,
@@ -158,6 +177,9 @@ public class AclEntryResourceServiceImpl
 		return response;
 	}
 
+	/*
+	 * Esborra un AclEntryResource utilitzant el MutableAclService.
+	 */
 	@Override
 	protected void entityRepositoryDelete(AclEntryResourceEntity entity) {
 		AclEntryResource resource = entity.getResource();
@@ -168,15 +190,17 @@ public class AclEntryResourceServiceImpl
 			resource.isSidGrantedAuthority());
 	}
 
-	@Override
-	protected void entityRepositoryFlush() {
-	}
-
+	/*
+	 * Converteix una ACL retornat per MutableAclService un AclEntryResource.
+	 */
 	@Override
 	protected AclEntryResource entityToResource(AclEntryResourceEntity entity) {
 		return entity.getResource();
 	}
 
+	/*
+	 * Converteix AclEntryResource a una ACL de MutableAclService.
+	 */
 	@Override
 	protected AclEntryResourceEntity resourceToEntity(
 		AclEntryResource resource,
@@ -186,6 +210,10 @@ public class AclEntryResourceServiceImpl
 			id(pk).
 			resource(resource).
 			build();
+	}
+
+	@Override
+	protected void entityRepositoryFlush() {
 	}
 
 	@Override

@@ -36,7 +36,7 @@ const ProcedimentFormTabGrups: React.FC = () => {
         if (procedimentGrupApiIsReady) {
             refreshProcedimentGrupRows();
         }
-    }, [grupApiIsReady]);
+    }, [procedimentGrupApiIsReady]);
     React.useEffect(() => {
         if (grupApiIsReady) {
             const args = {

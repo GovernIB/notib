@@ -1,31 +1,36 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { GridPage, MuiDataGrid, MuiDataGridColDef } from 'reactlib';
+import { GridPage, MuiDataGrid } from 'reactlib';
 
-export const PagadorCieGrid = () => {
+const columns = [
+    {
+        field: 'nom',
+        flex: 1,
+    },
+    {
+        field: 'organGestorEmissor',
+        flex: 2,
+    },
+    {
+        field: 'organGestorPagador',
+        flex: 2,
+    },
+    {
+        field: 'contracteDataVig',
+        flex: 1,
+    },
+];
+
+export const PagadorCieGrid: React.FC = () => {
     const { t } = useTranslation();
-    const columns: MuiDataGridColDef[] = React.useMemo(
-        () => [
-            {
-                field: 'nom',
-                flex: 4,
-            },
-            {
-                field: 'codi',
-                flex: 4,
-            },
-        ],
-        []
-    );
     return (
         <GridPage disableMargins={false}>
             <MuiDataGrid
-                title={t('page.pagador.cie.grid.title')}
+                title={t('page.pagadorCie.grid.title')}
                 resourceName="pagadorCieResource"
                 columns={columns}
                 paginationActive
                 toolbarCreateLink="form"
-                //rowLink="form/{{id}}"
+                rowLink="form/{{id}}"
                 rowUpdateLink="form/{{id}}"
             />
         </GridPage>

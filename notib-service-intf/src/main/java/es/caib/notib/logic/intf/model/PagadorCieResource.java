@@ -6,15 +6,11 @@ import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
-import javax.persistence.Column;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
@@ -41,16 +37,16 @@ public class PagadorCieResource extends BaseResource<Long> {
 
 	@Size(max = 256)
 	private String nom;
-	private Date contracteDataVig;
 	@Size(max = 255)
 	private String apiKey;
 	private boolean cieExtern;
+	private Date contracteDataVig;
 
 	@NotNull
 	private ResourceReference<EntitatResource, Long> entitat;
 	@NotNull
-	private ResourceReference<OrganGestorResource, Long> organGestorPagador;
+	private ResourceReference<OrganGestorResource, Long> organGestorEmissor;
 	@NotNull
-	private ResourceReference<OrganGestorResource, Long> organGestorEmisor;
+	private ResourceReference<OrganGestorResource, Long> organGestorPagador;
 
 }

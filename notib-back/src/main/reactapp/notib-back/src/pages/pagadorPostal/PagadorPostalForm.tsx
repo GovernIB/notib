@@ -1,40 +1,35 @@
 import React from 'react';
-import {useParams} from 'react-router-dom';
-import {useTranslation} from 'react-i18next';
+import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
-import {FormPage, MuiForm, MuiFormTabs, MuiFormTabContent, useFormContext} from 'reactlib';
-import GridFormField from '../../components/GridFormField';
+import { FormPage, MuiForm, FormField } from 'reactlib';
 
-const PagadorPostalFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
-    const {setSubtitle} = props;
-    const {t} = useTranslation();
-    const {data} = useFormContext();
-
-    React.useEffect(() => {
-        setSubtitle(data?.nom);
-    }, [data]);
-
-    const tabs = [t('page.pagador.postal.form.tabs.dades')];
-
+const PagadorPostalFormContent: React.FC = () => {
     return (
-        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1]}>
-            <MuiFormTabContent index={0} showOnCreate>
-                <Grid container spacing={2}>
-                    <GridFormField size={6} name="nom"/>
-                    <GridFormField size={6} name="organGestor"/>
-                    <GridFormField size={4} name="contracteNum"/>
-                    <GridFormField size={4} name="contracteDataVig"/>
-                    <GridFormField size={4} name="facturacioClientCodi"/>
-                </Grid>
-            </MuiFormTabContent>
-        </MuiFormTabs>
+        <Grid container spacing={2}>
+            <Grid size={6}>
+                <FormField name="nom" />
+            </Grid>
+            <Grid size={6} />
+            <Grid size={6}>
+                <FormField name="organGestor" />
+            </Grid>
+            <Grid size={6}>
+                <FormField name="contracteNum" />
+            </Grid>
+            <Grid size={6}>
+                <FormField name="facturacioClientCodi" />
+            </Grid>
+            <Grid size={6}>
+                <FormField name="contracteDataVig" />
+            </Grid>
+        </Grid>
     );
 };
 
 export const PagadorPostalForm: React.FC = () => {
-    const {t} = useTranslation();
-    const {id} = useParams();
-    const [subtitle, setSubtitle] = React.useState<string>();
+    const { t } = useTranslation();
+    const { id } = useParams();
     return (
         <FormPage>
             <MuiForm
@@ -42,17 +37,17 @@ export const PagadorPostalForm: React.FC = () => {
                 id={id != null ? parseInt(id) : id}
                 title={
                     id != null
-                        ? t('page.pagador.postal.form.titleUpdate')
-                        : t('page.pagador.postal.form.titleCreate')
+                        ? t('page.pagadorPostal.form.titleUpdate')
+                        : t('page.pagadorPostal.form.titleCreate')
                 }
-                toolbarSubtitle={id != null ? subtitle : undefined}
                 createLink="./{{id}}"
                 //updateLink="../../"
-                componentProps={{style: {height: '100%'}}}
-                commonFieldComponentProps={{size: 'small'}}>
-                <PagadorPostalFormContent setSubtitle={setSubtitle}/>
+                componentProps={{ style: { height: '100%' } }}
+                commonFieldComponentProps={{ size: 'small' }}>
+                <PagadorPostalFormContent />
             </MuiForm>
         </FormPage>
     );
 };
+
 export default PagadorPostalForm;

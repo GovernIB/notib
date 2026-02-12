@@ -1,43 +1,41 @@
 import React from 'react';
-import {useTranslation} from 'react-i18next';
-import {GridPage, MuiDataGrid, MuiDataGridColDef} from 'reactlib';
+import { useTranslation } from 'react-i18next';
+import { GridPage, MuiDataGrid } from 'reactlib';
 
-export const PagadorPostalGrid = () => {
-    const {t} = useTranslation();
-    const columns: MuiDataGridColDef[] = React.useMemo(
-        () => [
-            {
-                field: 'nom',
-                flex: 4,
-            },
-            {
-                field: 'organGestor',
-                flex: 6,
-            },
-            {
-                field: 'contracteNum',
-                flex: 2,
-            },
-            {
-                field: 'contracteDataVig',
-                flex: 3,
-            },
-            {
-                field: 'facturacioClientCodi',
-                flex: 2,
-            }
-        ],
-        []
-    );
+const columns = [
+    {
+        field: 'nom',
+        flex: 4,
+    },
+    {
+        field: 'organGestor',
+        flex: 6,
+    },
+    {
+        field: 'contracteNum',
+        flex: 2,
+    },
+    {
+        field: 'contracteDataVig',
+        flex: 3,
+    },
+    {
+        field: 'facturacioClientCodi',
+        flex: 2,
+    },
+];
+
+export const PagadorPostalGrid: React.FC = () => {
+    const { t } = useTranslation();
     return (
         <GridPage disableMargins={false}>
             <MuiDataGrid
-                title={t('page.pagador.postal.grid.title')}
+                title={t('page.pagadorPostal.grid.title')}
                 resourceName="pagadorPostalResource"
                 columns={columns}
                 paginationActive
                 toolbarCreateLink="form"
-                //rowLink="form/{{id}}"
+                rowLink="form/{{id}}"
                 rowUpdateLink="form/{{id}}"
             />
         </GridPage>
