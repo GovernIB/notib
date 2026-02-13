@@ -211,6 +211,7 @@ public class NotificacioHelper {
 
 		return notificacioEntity;
 	}
+
 	public NotificacioEntity saveNotificacio(EntitatEntity entitat, Notificacio notificacio, boolean checkProcedimentPermissions, NotificacioMassivaEntity notificacioMassivaEntity, Map<String, Long> documentsProcessatsMassiu) {
 
 		var notData = buildNotificacioData(entitat, notificacio, checkProcedimentPermissions, notificacioMassivaEntity, documentsProcessatsMassiu);
@@ -443,13 +444,13 @@ public class NotificacioHelper {
 		log.trace("Processam organ gestor");
 		if (organGestor == null && notificacio.getOrganGestor() != null ) {
 //			organGestor = organGestorRepository.findByEntitatAndCodi(entitat, notificacio.getOrganGestor());
-            long id;
-            try {
-                id = Long.valueOf(notificacio.getOrganGestor());
-			    organGestor = organGestorRepository.findById(id).orElse(null);
-            } catch (Exception ex) {
-			    throw new NotFoundException("Organ gestor not long" + notificacio.getOrganGestor(), OrganGestorEntity.class);
-            }
+			long id;
+			try {
+				id = Long.valueOf(notificacio.getOrganGestor());
+				organGestor = organGestorRepository.findById(id).orElse(null);
+			} catch (Exception ex) {
+				organGestor = organGestorRepository.findByEntitatAndCodi(entitat, notificacio.getOrganGestor());
+			}
 		}
 		if (organGestor == null) {
 			throw new NotFoundException("Organ gestor no trobat " + notificacio.getOrganGestor(), OrganGestorEntity.class);
