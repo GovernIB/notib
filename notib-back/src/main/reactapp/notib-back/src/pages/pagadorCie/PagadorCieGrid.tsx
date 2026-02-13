@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import Chip from '@mui/material/Chip';
 import { GridPage, MuiDataGrid } from 'reactlib';
 
 const columns = [
@@ -16,6 +17,32 @@ const columns = [
     },
     {
         field: 'contracteDataVig',
+        flex: 1,
+    },
+    {
+        field: 'fullaCount',
+        renderCell: (params: any) => {
+            return (
+                <Chip
+                    label={params.value}
+                    color={params.value ? 'primary' : undefined}
+                    size="small"
+                />
+            );
+        },
+        flex: 1,
+    },
+    {
+        field: 'sobreCount',
+        renderCell: (params: any) => {
+            return (
+                <Chip
+                    label={params.value}
+                    color={params.value ? 'primary' : undefined}
+                    size="small"
+                />
+            );
+        },
         flex: 1,
     },
 ];

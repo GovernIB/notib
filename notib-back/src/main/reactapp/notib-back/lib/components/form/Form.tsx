@@ -132,6 +132,34 @@ const getInitialDataFromFields = (fields: any[] | undefined) => {
     return initialDataFromFields;
 };
 
+const useControlledId = (idProp: any) => {
+    const wasControlled = React.useRef<boolean>(idProp !== undefined);
+    const isIdControlled = idProp !== undefined;
+    const [internalId, setInternalId] = React.useState<any>(idProp ?? null);
+    React.useEffect(() => {
+        if (wasControlled.current !== isIdControlled) {
+            console.warn(
+                'Form is changing from ' +
+                    (wasControlled.current ? 'controlled' : 'uncontrolled') +
+                    ' to ' +
+                    (isIdControlled ? 'controlled' : 'uncontrolled') +
+                    ' state.'
+            );
+        }
+    }, [idProp]);
+    return {
+        id: isIdControlled ? idProp : internalId,
+        setInternalId: (id: any) => {
+            setInternalId(id);
+            if (isIdControlled) {
+                console.warn(
+                    "You shouldn't set internalId in a controlled id Form (idProp=" + idProp + ')'
+                );
+            }
+        },
+    };
+};
+
 /**
  * Hook per a accedir a l'API de Form des de fora del context del component.
  *
@@ -163,7 +191,7 @@ export const Form: React.FC<FormProps> = (props) => {
         resourceName,
         resourceType,
         resourceTypeCode,
-        id,
+        id: idProp,
         apiRef: apiRefProp,
         initialData: initialDataProp,
         additionalData: additionalDataProp,
@@ -228,15 +256,13 @@ export const Form: React.FC<FormProps> = (props) => {
     const [revertData, setRevertData] = React.useState<any>(undefined);
     const [isDataInitialized, setIsDataInitialized] = React.useState<boolean>(false);
     const [apiActions, setApiActions] = React.useState<any>(undefined);
-    const [createId, setCreateId] = React.useState<any>(undefined);
     const apiRef = React.useRef<FormApi>(undefined);
-    const idFromExternalResetRef = React.useRef<any>(undefined);
+    const { id, setInternalId } = useControlledId(idProp);
+    const location = useLocation();
+    const additionalData = additionalDataProp ?? location.state?.additionalData;
     const isSaveActionPresent =
         resourceType == null ? apiActions?.[id != null ? 'update' : 'create'] != null : true;
     const isDeleteActionPresent = id && apiActions?.['delete'] != null;
-    const location = useLocation();
-    const additionalData = additionalDataProp ?? location.state?.additionalData;
-    const calculatedId = (id?: any) => idFromExternalResetRef.current ?? createId ?? id;
     const isReady = !isLoading;
     const sendOnChangeRequest = React.useCallback(
         (id: any, args: ResourceApiOnChangeArgs): Promise<any> => {
@@ -269,7 +295,7 @@ export const Form: React.FC<FormProps> = (props) => {
                             fieldValue,
                             previous: state,
                         };
-                        sendOnChangeRequest(calculatedId(id), onChangeArgs)
+                        sendOnChangeRequest(id, onChangeArgs)
                             .then((changes: any) => {
                                 resolve({
                                     type: action.type,
@@ -289,7 +315,6 @@ export const Form: React.FC<FormProps> = (props) => {
         onChangeActionMiddleware,
         (error: any) => temporalMessageShow(t('form.onChange.error'), error.message, 'error')
     );
-    const getId = () => calculatedId(id);
     const getData = () => data;
     const dataGetValue = (callback: (state: any) => any) => callback(data);
     const getInitialData = React.useCallback(
@@ -348,7 +373,7 @@ export const Form: React.FC<FormProps> = (props) => {
                         message: e.message,
                     }));
                 setApiFieldErrors(fieldErrors);
-                onValidationErrorsChange?.(getId(), fieldErrors);
+                onValidationErrorsChange?.(id, fieldErrors);
             } else {
                 temporalMessageShow(
                     temporalMessageTitle ?? '',
@@ -365,7 +390,7 @@ export const Form: React.FC<FormProps> = (props) => {
         }
         reject?.(error);
     };
-    const reset = (data: any) => {
+    const reset = (data: any, id?: any) => {
         dataDispatchAction({
             type: FormFieldDataActionType.RESET,
             payload: data,
@@ -376,7 +401,28 @@ export const Form: React.FC<FormProps> = (props) => {
         setApiFieldErrors(undefined);
         validateWithValidator(data);
         setIsDataInitialized(true);
-        idFromExternalResetRef.current = null;
+        id !== undefined && setInternalId(id);
+    };
+    const externalReset = (data?: any, id?: any) => {
+        // Versió de reset per a cridar externament mitjançant l'API
+        const {
+            _actions: initialDataActions,
+            _links: initialDataLinks,
+            _templates: initialDataTemplates,
+            ...realInitialData
+        } = data ?? {};
+        id != null && setApiActions(initialDataActions);
+        const mergedData = {
+            ...additionalData,
+            ...realInitialData,
+        };
+        if (initOnChangeRequest) {
+            sendOnChangeRequest(id, { previous: mergedData }).then((changedData: any) => {
+                reset({ ...additionalData, ...changedData }, id);
+            });
+        } else {
+            reset(mergedData, id);
+        }
     };
     const refresh = (force?: boolean) =>
         new Promise((resolve, reject) => {
@@ -385,37 +431,23 @@ export const Form: React.FC<FormProps> = (props) => {
                     reset(initialDataProp);
                     resolve(initialDataProp);
                 } else {
-                    const calcId = calculatedId(id);
-                    getInitialData(calcId, fields, additionalData, initOnChangeRequest)
+                    getInitialData(id, fields, additionalData, initOnChangeRequest)
                         .then((initialData: any) => {
                             debug && logConsole.debug('Initial data loaded', initialData);
-                            const { _actions: initialDataActions, ...initialDataWithoutLinks } =
-                                initialData;
-                            calcId != null && setApiActions(initialDataActions);
-                            reset(initialDataWithoutLinks);
-                            resolve(initialDataWithoutLinks);
+                            const {
+                                _actions: initialDataActions,
+                                _links: initialDataLinks,
+                                _templates: initialDataTemplates,
+                                ...realInitialData
+                            } = initialData;
+                            id != null && setApiActions(initialDataActions);
+                            reset(realInitialData);
+                            resolve(realInitialData);
                         })
                         .catch(reject);
                 }
             }
         });
-    const externalReset = (data?: any, id?: any) => {
-        // Versió de reset per a cridar externament mitjançant l'API
-        const mergedData = {
-            ...getInitialDataFromFields(fields),
-            ...additionalData,
-            ...data,
-        };
-        if (initOnChangeRequest) {
-            sendOnChangeRequest(id, { previous: mergedData }).then((changedData: any) => {
-                reset({ ...additionalData, ...changedData });
-                idFromExternalResetRef.current = id;
-            });
-        } else {
-            reset(mergedData);
-            idFromExternalResetRef.current = id;
-        }
-    };
     const revert = (unconfirmed?: boolean) => {
         const revertFn = () => {
             dataDispatchAction({
@@ -440,7 +472,7 @@ export const Form: React.FC<FormProps> = (props) => {
     const validateWithValidator = (data: any) => {
         const validatorFieldErrors = dataValidator?.(data);
         setValidatorFieldErrors(validatorFieldErrors);
-        onValidationErrorsChange?.(getId(), fieldErrors);
+        onValidationErrorsChange?.(id, fieldErrors);
     };
     const validate = () =>
         new Promise<any>((resolve, reject) => {
@@ -489,14 +521,12 @@ export const Form: React.FC<FormProps> = (props) => {
                 if (avoidSubmitIfAnyValidatorErrors && validatorFieldErrors?.length) {
                     reject(t('form.validate.saveErrors'));
                 } else {
-                    const calcId = calculatedId(id);
                     setApiFieldErrors(undefined);
-                    const apiAction =
-                        calcId != null ? apiUpdate(calcId, { data }) : apiCreate({ data });
+                    const apiAction = id != null ? apiUpdate(id, { data }) : apiCreate({ data });
                     apiAction
                         .then((savedData: any) => {
                             const message =
-                                calcId != null
+                                id != null
                                     ? t(i18nKeys?.updateSuccess ?? 'form.update.success', {
                                           data: savedData,
                                       })
@@ -504,8 +534,8 @@ export const Form: React.FC<FormProps> = (props) => {
                                           data: savedData,
                                       });
                             temporalMessageShow(null, message, 'success');
-                            reset(savedData);
-                            if (calcId != null) {
+                            reset(savedData, id == null ? savedData.id : undefined);
+                            if (id != null) {
                                 onUpdateSuccess != null
                                     ? onUpdateSuccess(savedData)
                                     : onSaveSuccess?.(data);
@@ -513,7 +543,6 @@ export const Form: React.FC<FormProps> = (props) => {
                                     navigateToSaveLink(updateLink ?? saveLink, savedData.id);
                                 }
                             } else {
-                                setCreateId(savedData.id);
                                 onCreateSuccess != null
                                     ? onCreateSuccess(savedData)
                                     : onSaveSuccess?.(data);
@@ -525,7 +554,7 @@ export const Form: React.FC<FormProps> = (props) => {
                         })
                         .catch((error: ResourceApiError) => {
                             const title =
-                                calcId != null
+                                id != null
                                     ? t(i18nKeys?.updateError ?? 'form.update.error', { error })
                                     : t(i18nKeys?.createError ?? 'form.create.error', { error });
                             handleSubmissionErrors(error, title, reject);
@@ -543,8 +572,7 @@ export const Form: React.FC<FormProps> = (props) => {
             confirmDialogComponentProps
         ).then((value: any) => {
             if (value) {
-                const calcId = calculatedId(id);
-                apiDelete(calcId)
+                apiDelete(id)
                     .then(() => {
                         goBack(goBackLink);
                         temporalMessageShow(
@@ -634,11 +662,11 @@ export const Form: React.FC<FormProps> = (props) => {
     React.useEffect(() => {
         // Obté les dades inicials pel formulari
         if (apiIsReady && fields != null) {
-            refresh(createId != null || customFields != null).then((data) => {
+            refresh(customFields != null).then((data) => {
                 onReady?.(data);
             });
         }
-    }, [id, createId, fields]);
+    }, [id, fields]);
     React.useEffect(() => {
         // Controla l'estat de formulari amb modificacions
         if (isReady) {
@@ -662,7 +690,6 @@ export const Form: React.FC<FormProps> = (props) => {
     }, [modified]);
     useBlocker?.(modified);
     apiRef.current = {
-        getId,
         getData,
         refresh: () => refresh(true),
         reset: externalReset,
@@ -676,7 +703,6 @@ export const Form: React.FC<FormProps> = (props) => {
     };
     if (apiRefProp) {
         if (apiRefProp.current) {
-            apiRefProp.current.getId = getId;
             apiRefProp.current.getData = getData;
             apiRefProp.current.refresh = () => refresh(true);
             apiRefProp.current.reset = externalReset;
@@ -698,7 +724,7 @@ export const Form: React.FC<FormProps> = (props) => {
     ];
     const context = React.useMemo(
         () => ({
-            id: calculatedId(id),
+            id,
             resourceName,
             resourceType,
             resourceTypeCode,
