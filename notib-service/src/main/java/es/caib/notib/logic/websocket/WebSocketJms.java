@@ -13,12 +13,7 @@ public class WebSocketJms {
 
     private final JmsTemplate jmsTemplate;
 
-    public void enviarMissatge(MissatgeWs missatge) {
-
-        jmsTemplate.convertAndSend(WebSocketConstants.CUA_WEBSOCKET, missatge,
-                m -> {
-                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY,  0L);
-                    return m;
-                });
-    }
+	public void enviarMissatge(MissatgeWs missatge) {
+		jmsTemplate.convertAndSend(WebSocketConstants.CUA_WEBSOCKET, missatge);
+	}
 }

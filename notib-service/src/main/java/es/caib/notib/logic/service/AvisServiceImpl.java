@@ -24,7 +24,7 @@ import java.util.List;
 
 /**
  * Implementació del servei de gestió d'avisos.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -40,7 +40,7 @@ public class AvisServiceImpl implements AvisService {
     @Autowired
     private ComandaListener comandaListener;
 
-	
+
 	@Transactional
 	@Override
 	public AvisDto create(AvisDto avis) {
@@ -49,7 +49,6 @@ public class AvisServiceImpl implements AvisService {
 		var entity = AvisEntity.getBuilder(avis.getAssumpte(), avis.getMissatge(), avis.getDataInici(), avis.getDataFinal(), avis.getAvisNivell(),
 							avis.getAvisAdministrador(), avis.getEntitatId()).build();
 		var dto = conversioTipusHelper.convertir(avisRepository.save(entity), AvisDto.class);
-      comandaListener.enviarAvis(dto);
 	    return dto;
     }
 
@@ -61,7 +60,6 @@ public class AvisServiceImpl implements AvisService {
 		var avisEntity = avisRepository.findById(avis.getId()).orElseThrow();
 		avisEntity.update(avis.getAssumpte(), avis.getMissatge(), avis.getDataInici(), avis.getDataFinal(), avis.getAvisNivell());
 		var dto = conversioTipusHelper.convertir(avisEntity, AvisDto.class);
-		comandaListener.enviarAvis(dto);
 	    return dto;
     }
 
@@ -91,7 +89,6 @@ public class AvisServiceImpl implements AvisService {
 			avisRepository.delete(avisEntity);
 			var dto = conversioTipusHelper.convertir(avisEntity, AvisDto.class);
 			dto.setDataFinal(new Date());
-			comandaListener.enviarAvis(dto);
 			return dto;
 		} catch (Exception e) {
 			log.error("[Avis] Error esborrant l'avis " + id, e);

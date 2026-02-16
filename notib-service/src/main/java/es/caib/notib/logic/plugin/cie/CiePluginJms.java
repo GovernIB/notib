@@ -47,11 +47,13 @@ public class CiePluginJms {
                 delay = configHelper.getConfigAsInteger("es.caib.notib.plugin.cie.reintents.delay");
             }
             final var d = delay;
-            jmsTemplate.convertAndSend(CiePluginConstants.CUA_CIE_PLUGIN_ENVIAR, uuid,
-                    m -> {
-                        m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, d);
-                        return m;
-                    });
+			jmsTemplate.convertAndSend(CiePluginConstants.CUA_CIE_PLUGIN_ENVIAR, uuid,
+				m -> {
+					if (d > 0) {
+						m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, d);
+					}
+					return m;
+				});
             return true;
         } catch (Exception ex) {
             log.error("[CieJms] Error al enviar la entrega postal per la notificacio " + uuid, ex);
@@ -68,7 +70,6 @@ public class CiePluginJms {
             }
             jmsTemplate.convertAndSend(CiePluginConstants.CUA_CIE_PLUGIN_CANCELAR, uuid,
                     m -> {
-                        m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 0L);
                         return m;
                     });
             return true;
