@@ -7,6 +7,7 @@ import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.service.ActiveMqServiceImpl;
 import es.caib.notib.logic.service.EnviamentSmServiceImpl;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.statemachine.mappers.ConsultaNotificaMapper;
@@ -15,6 +16,7 @@ import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ScheduledMessage;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.retry.annotation.Backoff;
@@ -23,6 +25,8 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 @Slf4j
 @Component
@@ -48,10 +52,29 @@ public class ConsultaNotificaPoolingAction implements Action<EnviamentSmEstat, E
         var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
         NotibLogger.getInstance().info("[SM] ConsultaNotificaPoolingAction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
-        var consulta = ConsultaNotificaRequest.builder().enviamentUuid(enviamentUuid).consultaNotificaDto(consultaNotificaMapper.toDto(enviament)).numIntent(1).build();
+        var codiUsuari = (String) stateContext.getExtendedState().getVariables().get(SmConstants.CODI_USUARI);
+        var consulta = ConsultaNotificaRequest.builder()
+                .enviamentUuid(enviamentUuid)
+                .id(enviament.getId())
+                .numIntent(1)
+                .codiUsuari(codiUsuari)
+                .build();
         jmsTemplate.convertAndSend(SmConstants.CUA_CONSULTA_ESTAT, consulta,
                 m -> {
+                    var d = refrescarPeriode();
+                    if (d > 0) {
+                        m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, d);
+                    }
                     m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, refrescarPeriode());
+                    if (configHelper.getConfigAsBoolean("es.caib.notib.log.tipus.STATE_MACHINE")) {
+                        var mida = 0;
+                        try {
+                            mida = new ObjectMapper().writeValueAsBytes(consulta).length;
+                        } catch (IOException e) {
+                            NotibLogger.getInstance().info("[SM] Error convertint el missatge a json " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
+                        }
+                        ActiveMqServiceImpl.afegirJob(SmConstants.CUA_CONSULTA_ESTAT, mida);
+                    }
                     return m;
                 });
 

@@ -220,7 +220,7 @@ public class NotificaV2HelperTest {
         Assert.assertNull(enviamentMock.getNotificaCertificacioTamany());
 
         // When
-        var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviamentMock.getId()).build()).build();
+        var consulta = ConsultaNotificaRequest.builder().id(enviamentMock.getId()).build();
         notificaV2Helper.enviamentRefrescarEstat(consulta, true);
 
         // Then
@@ -269,7 +269,7 @@ public class NotificaV2HelperTest {
         );
 
         // When
-        var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviamentMock.getId()).build()).build();
+        var consulta = ConsultaNotificaRequest.builder().id(enviamentMock.getId()).build();
         notificaV2Helper.enviamentRefrescarEstat(consulta, true);
 
         // Then
@@ -319,7 +319,7 @@ public class NotificaV2HelperTest {
                 null);
 
         // When
-        var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviamentMock.getId()).build()).build();
+        var consulta = ConsultaNotificaRequest.builder().id(enviamentMock.getId()).build();
         notificaV2Helper.enviamentRefrescarEstat(consulta, true);
 
         // Then

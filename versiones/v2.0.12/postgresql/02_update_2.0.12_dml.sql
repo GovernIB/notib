@@ -17,3 +17,4 @@ INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PRO
 UPDATE not_notificacio_env_table t SET t.NOT_ESTAT = (SELECT n.estat FROM not_notificacio n WHERE t.NOT_ID  = n.id) WHERE t.not_id IS NOT null;
 UPDATE NOT_NOtIFICACIO_TABLE t SET ORGAN_ID = (SELECT o.id FROM not_organ_gestor o WHERE o.entitat = t.entitat_id AND o.codi = t.organ_codi);
 UPDATE NOT_NOtIFICACIO_ENV_TABLE t SET ORGAN_ID = (SELECT o.id FROM not_organ_gestor o WHERE o.entitat = t.entitat_id AND o.codi = t.not_organ_codi);
+UPDATE not_accio_massiva SET dies = 0;

@@ -121,14 +121,14 @@ public class NotificaServiceImpl implements NotificaService {
     @Override
     public boolean consultaEstatEnviament(ConsultaNotificaRequest consulta) {
 
-        var consultaDto = consulta.getConsultaNotificaDto();
+        var uuid = consulta.getEnviamentUuid();
         try {
         // Consultar enviament a notifica
             notificacioService.enviamentRefrescarEstat(consulta);
-            var enviamentEntity = notificacioEnviamentRepository.findByUuid(consultaDto.getUuid()).orElseThrow();
+            var enviamentEntity = notificacioEnviamentRepository.findByUuid(uuid).orElseThrow();
             return enviamentEntity.getNotificaIntentNum() == 0;
         } catch (Exception ex) {
-            log.error("Error en la consulta de l'estat de l'enviament " + consultaDto.getUuid(), ex);
+            log.error("Error en la consulta de l'estat de l'enviament " + uuid, ex);
             return false;
         }
     }

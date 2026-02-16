@@ -1,20 +1,16 @@
 package es.caib.notib.logic.service;
 
-import es.caib.notib.logic.comanda.ComandaListener;
+import es.caib.notib.logic.helper.ConversioTipusHelper;
+import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.logic.intf.dto.AvisDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.service.AvisService;
-import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.persist.entity.AvisEntity;
-import es.caib.notib.logic.helper.ConversioTipusHelper;
-import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.persist.repository.AvisRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.activemq.ScheduledMessage;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,8 +33,6 @@ public class AvisServiceImpl implements AvisService {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private PaginacioHelper paginacioHelper;
-    @Autowired
-    private ComandaListener comandaListener;
 
 	
 	@Transactional
@@ -49,7 +43,6 @@ public class AvisServiceImpl implements AvisService {
 		var entity = AvisEntity.getBuilder(avis.getAssumpte(), avis.getMissatge(), avis.getDataInici(), avis.getDataFinal(), avis.getAvisNivell(),
 							avis.getAvisAdministrador(), avis.getEntitatId()).build();
 		var dto = conversioTipusHelper.convertir(avisRepository.save(entity), AvisDto.class);
-        comandaListener.enviarAvis(dto);
 	    return dto;
     }
 
@@ -61,7 +54,6 @@ public class AvisServiceImpl implements AvisService {
 		var avisEntity = avisRepository.findById(avis.getId()).orElseThrow();
 		avisEntity.update(avis.getAssumpte(), avis.getMissatge(), avis.getDataInici(), avis.getDataFinal(), avis.getAvisNivell());
 		var dto = conversioTipusHelper.convertir(avisEntity, AvisDto.class);
-        comandaListener.enviarAvis(dto);
 	    return dto;
     }
 
@@ -91,7 +83,6 @@ public class AvisServiceImpl implements AvisService {
 			avisRepository.delete(avisEntity);
 			var dto = conversioTipusHelper.convertir(avisEntity, AvisDto.class);
             dto.setDataFinal(new Date());
-            comandaListener.enviarAvis(dto);
             return dto;
 		} catch (Exception e) {
 			log.error("[Avis] Error esborrant l'avis " + id, e);

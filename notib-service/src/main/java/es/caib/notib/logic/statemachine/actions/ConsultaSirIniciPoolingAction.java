@@ -5,6 +5,7 @@ import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.service.ActiveMqServiceImpl;
 import es.caib.notib.logic.service.EnviamentSmServiceImpl;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.utils.NotibLogger;
@@ -12,6 +13,7 @@ import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ScheduledMessage;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.retry.annotation.Backoff;
@@ -22,6 +24,8 @@ import org.springframework.statemachine.action.Action;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
 
 @Slf4j
 @Component
@@ -49,7 +53,19 @@ public class ConsultaSirIniciPoolingAction implements Action<EnviamentSmEstat, E
         NotibLogger.getInstance().info("[SM] ConsultaSirIniciPoolingAction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
         var delay = configHelper.getConfigAsLong("es.caib.notib.pooling.delay", DELAY_DEFECTE);
         jmsTemplate.convertAndSend(SmConstants.CUA_POOLING_SIR, enviamentUuid, m -> {
+            if (delay > 0) {
+                m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, delay);
+            }
             m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, delay);
+            if (configHelper.getConfigAsBoolean("es.caib.notib.log.tipus.STATE_MACHINE")) {
+                var mida = 0;
+                try {
+                    mida = new ObjectMapper().writeValueAsBytes(enviamentUuid).length;
+                } catch (IOException e) {
+                    NotibLogger.getInstance().info("[SM] Error convertint el missatge a json " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
+                }
+                ActiveMqServiceImpl.afegirJob(SmConstants.CUA_POOLING_SIR, mida);
+            }
             return m;
         });
         NotibLogger.getInstance().info("[SM] Inici pooling consulta a SIR", log, LoggingTipus.STATE_MACHINE);

@@ -9,6 +9,7 @@ import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentRegistreRequest;
 import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.service.ActiveMqServiceImpl;
 import es.caib.notib.logic.service.EnviamentSmServiceImpl;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.utils.NotibLogger;
@@ -18,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ScheduledMessage;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.retry.annotation.Backoff;
@@ -28,7 +30,8 @@ import org.springframework.statemachine.action.Action;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.io.IOException;
+
 
 @Slf4j
 @Component
@@ -79,10 +82,20 @@ public class EnviamentRegistreAction implements Action<EnviamentSmEstat, Enviame
         NotibLogger.getInstance().info("[SM] Enviant peticio de registre per l'enviament amb UUID " + enviamentUuid + " delay " + delay + "ms", log, LoggingTipus.STATE_MACHINE);
         jmsTemplate.convertAndSend(SmConstants.CUA_REGISTRE, env,
                 m -> {
-                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, delay);
-                    return m;
-                });
-
+                        if (delay > 0) {
+                            m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, delay);
+                        }
+                        var mida = 0;
+                        if (configHelper.getConfigAsBoolean("es.caib.notib.log.tipus.STATE_MACHINE")) {
+                            try {
+                                mida = new ObjectMapper().writeValueAsBytes(env).length;
+                            } catch (IOException e) {
+                                NotibLogger.getInstance().info("[SM] Error convertint el missatge a json " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
+                            }
+                            ActiveMqServiceImpl.afegirJob(SmConstants.CUA_REGISTRE, mida);
+                        }
+                        return m;
+                    });
         NotibLogger.getInstance().info("[SM] Enviada peticio de registre per l'enviament amb UUID " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
     }
 

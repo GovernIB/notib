@@ -1,20 +1,19 @@
-package es.caib.notib.logic.intf.statemachine.events;
+package es.caib.notib.logic.intf.dto.missatges;
 
+import es.caib.comanda.model.v1.avis.AvisTipus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.io.Serializable;
-
-//@Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @SuperBuilder
 @Getter
 @Setter
-public class EnviamentNotificaRequest extends EnviamentSm implements Serializable {
+public class MissatgeComanda {
 
     private Long id;
+    private AvisTipus tipus;
 }

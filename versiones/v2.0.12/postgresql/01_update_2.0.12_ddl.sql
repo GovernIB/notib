@@ -27,3 +27,11 @@ ALTER TABLE not_notificacio_env_table ADD anulat BOOLEAN DEFAULT FALSE;
 ALTER TABLE not_notificacio_env_table ADD motiu_anulacio VARCHAR(250);
 ALTER TABLE not_notificacio_table ADD organ_id numeric;
 ALTER TABLE not_notificacio_env_table ADD organ_id NUMBER;
+
+ALTER TABLE not_accio_massiva ADD tipus_seleccionat VARCHAR(20);
+ALTER TABLE not_accio_massiva ADD motiu VARCHAR(250);
+ALTER TABLE not_accio_massiva ADD admin_entitat BOOLEAN DEFAULT FALSE;
+ALTER TABLE not_accio_massiva ADD dies INTEGER;
+CREATE TABLE not_sincronizar_envio (id BIGINT NOT NULL, identificador VARCHAR(255), json_contingut TEXT, data_creacio TIMESTAMP WITHOUT TIME ZONE, CONSTRAINT not_sincronizar_envio_pk PRIMARY KEY (id));
+GRANT SELECT, UPDATE, INSERT, DELETE ON NOT_SINCRONIZAR_ENVIO TO WWW_NOTIB;
+ALTER TABLE NOT_SINCRONIZAR_ENVIO MOVE LOB(JSON_CONTINGUT) STORE AS NOT_SINC_ENVIO_JSON_LOB(TABLESPACE notib_lob INDEX NOT_SINC_ENVIO_JSON_LOB_I);

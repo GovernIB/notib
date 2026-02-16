@@ -1,6 +1,8 @@
 package es.caib.notib.logic.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
+import es.caib.comanda.model.v1.avis.AvisTipus;
 import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.comanda.ComandaListener;
@@ -17,7 +19,6 @@ import es.caib.notib.logic.helper.NotificacioTableHelper;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.helper.SubsistemesHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
-import es.caib.notib.logic.intf.dto.AvisDescripcio;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
@@ -31,6 +32,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.CieAdviserService;
+import es.caib.notib.logic.intf.util.DatesUtils;
 import es.caib.notib.logic.intf.util.NifHelper;
 import es.caib.notib.logic.intf.ws.adviser.nexea.NexeaAdviserWs;
 import es.caib.notib.logic.intf.ws.adviser.nexea.common.Opciones;
@@ -39,20 +41,23 @@ import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.Receptor;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.ResultadoSincronizarEnvio;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnvio;
 import es.caib.notib.logic.objectes.LoggingTipus;
-import es.caib.notib.logic.intf.util.DatesUtils;
+import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.entity.SincronizarEnvioEntity;
 import es.caib.notib.persist.repository.EntregaPostalRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioTableViewRepository;
+import es.caib.notib.persist.repository.SincronizarEnvioRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.activemq.ScheduledMessage;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.Holder;
@@ -82,6 +87,8 @@ public class CieAdviserServiceImpl implements CieAdviserService {
     @Autowired
     private MetricsHelper metricsHelper;
     @Autowired
+    private SincronizarEnvioRepository sincronizarEnvioRepository;
+    @Autowired
     private ConfigHelper configHelper;
     @Autowired
     private PluginHelper pluginHelper;
@@ -101,7 +108,7 @@ public class CieAdviserServiceImpl implements CieAdviserService {
     @Autowired
     private ComandaListener comandaListener;
 
-
+    @Transactional
     @Override
     public ResultadoSincronizarEnvio sincronizarEnvio(SincronizarEnvio sincronizarEnvio) {
 
@@ -185,12 +192,47 @@ public class CieAdviserServiceImpl implements CieAdviserService {
         if (!CieEstat.NOTIFICADA.equals(enviament.getEntregaPostal().getCieEstat()) || enviament.isNotificaEstatFinal()) {
             return;
         }
-        NotibLogger.getInstance().info("[CIE ADVISER] Enviant a la cua " + NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, log, LoggingTipus.ENTREGA_CIE);
-        jmsTemplate.convertAndSend(NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, sincronizarEnvio,
-                m -> {
-                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY,  0L);
-                    return m;
-                });
+
+        Long sincronizarEnvioId = null;
+        try {
+            var objectMapper = new ObjectMapper();
+            var jsonContingut = objectMapper.writeValueAsString(sincronizarEnvio);
+
+            var entity = SincronizarEnvioEntity.builder()
+                    .identificador(sincronizarEnvio.getIdentificador())
+                    .jsonContingut(jsonContingut)
+                    .dataCreacio(new Date())
+                    .build();
+            sincronizarEnvioRepository.saveAndFlush(entity);
+            sincronizarEnvioId = entity.getId();
+        } catch (Exception ex) {
+            log.error("[CIE ADVISER] Error persistint SincronizarEnvio", ex);
+            // Si falla la persistència, intentem enviar l'objecte original per no bloquejar el procés,
+            // tot i que això podria omplir el JobScheduler.
+            jmsTemplate.convertAndSend(NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, sincronizarEnvio, m -> {
+                m.setIntProperty("intents", 0);
+                return m;
+            });
+            return;
+        }
+        final Long sincEnvioId = sincronizarEnvioId;
+        NotibLogger.getInstance().info("[CIE ADVISER] Enviant a la cua " + NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE + " l'ID " + sincronizarEnvioId, log, LoggingTipus.ENTREGA_CIE);
+        if (TransactionSynchronizationManager.isActualTransactionActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    jmsTemplate.convertAndSend(NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, sincEnvioId, m -> {
+                        m.setIntProperty("intents", 0);
+                        return m;
+                    });
+                }
+            });
+            return;
+        }
+        jmsTemplate.convertAndSend(NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, sincronizarEnvioId, m -> {
+            m.setIntProperty("intents", 0);
+            return m;
+        });
     }
 
     private ResultadoSincronizarEnvio sincronitzarEntregaPostal(SincronizarEnvio sincronizarEnvio, IntegracioInfo info) {
@@ -331,6 +373,7 @@ public class CieAdviserServiceImpl implements CieAdviserService {
                             integracioHelper.addAccioError(info, "Tipus d'entrega " + tipoEntrega + " no reconeguda");
                             break;
                     }
+                    comandaListener.enviarAvis(enviament, AvisTipus.INFO);
                 } else {
                     NotibLogger.getInstance().info("[CIE ADVISER] Entrega postal " + identificador + " no esta en estat final. Estat: " + entregaPostal.getCieEstat(), log, LoggingTipus.ENTREGA_CIE);
                     var receptorNombre = receptor != null ? receptor.getNombreReceptor() : null;
@@ -513,7 +556,7 @@ public class CieAdviserServiceImpl implements CieAdviserService {
             notificacio.updateMotiu(cieEstat.name());
             notificacio.updateEstatDate(new Date());
             auditHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "AbstractNotificaHelper.enviamentUpdateDatat");
-            comandaListener.enviarAvis(enviament, AvisDescripcio.ACTUALITZAR_ESTAT_ENTREGA_POSTAL);
+            comandaListener.enviarAvis(enviament, AvisTipus.INFO);
             if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
                 try {
                     log.info("Enviar email en cas d'usuaris INTERFICIE WEB");

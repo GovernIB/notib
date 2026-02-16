@@ -1,6 +1,5 @@
 package es.caib.notib.persist.entity;
 
-import es.caib.notib.logic.intf.dto.accioMassiva.SeleccioTipus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,8 +11,6 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -39,9 +36,9 @@ public class AccioMassivaElementEntity extends AbstractPersistable<Long>  {
     @ForeignKey(name = "FK_ACCIOMASSIVA_ELEMENT")
     private AccioMassivaEntity accioMassiva;
 
-    @Column(name = "seleccio_tipus", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private SeleccioTipus seleccioTipus;
+//    @Column(name = "seleccio_tipus", nullable = false)
+//    @Enumerated(EnumType.STRING)
+//    private SeleccioTipus seleccioTipus;
 
     @Column(name = "element_id", nullable = false)
     private Long elementId;

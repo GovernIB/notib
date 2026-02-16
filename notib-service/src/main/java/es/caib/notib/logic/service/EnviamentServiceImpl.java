@@ -57,11 +57,10 @@ import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.PermisosService;
-import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
 import es.caib.notib.logic.intf.statemachine.dto.ParametresSm;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
-import es.caib.notib.logic.mapper.EnviamentTableMapper;
 import es.caib.notib.logic.intf.util.DatesUtils;
+import es.caib.notib.logic.mapper.EnviamentTableMapper;
 import es.caib.notib.persist.entity.CallbackEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.NotificacioEventEntity;
@@ -260,7 +259,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			if (enviament.getNotificaCertificacioArxiuId() == null && isEstatFinal) {
 
 				try {
-					var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviamentId).build()).build();
+					var consulta = ConsultaNotificaRequest.builder().id(enviamentId).build();
 					notificaHelper.enviamentRefrescarEstat(consulta);
 					notificacioEnviamentRepository.flush();
 					enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();

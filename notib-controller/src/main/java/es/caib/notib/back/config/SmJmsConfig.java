@@ -70,8 +70,8 @@ public class SmJmsConfig {
         ActiveMQConnectionFactory connectionFactory = new  ActiveMQConnectionFactory();
         connectionFactory.setTrustAllPackages(true);
         connectionFactory.setBrokerURL(BROKER_URL);
-        connectionFactory.setPassword(BROKER_USERNAME);
-        connectionFactory.setUserName(BROKER_PASSWORD);
+        connectionFactory.setUserName(BROKER_USERNAME);
+        connectionFactory.setPassword(BROKER_PASSWORD);
         return connectionFactory;
     }
 

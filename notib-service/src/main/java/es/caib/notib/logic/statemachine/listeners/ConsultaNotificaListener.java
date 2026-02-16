@@ -38,29 +38,33 @@ public class ConsultaNotificaListener {
     public void receiveEnviamentConsultaNotifica(@Payload ConsultaNotificaRequest consultaNotificaRequest, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
 
         message.acknowledge();
-        var enviament = consultaNotificaRequest.getConsultaNotificaDto();
-        if (enviament != null && Strings.isNullOrEmpty(enviament.getUuid())) {
-            log.error("[SM] Rebuda consulta d'estat a notifica sense Enviament");
+        var enviamentUuid = consultaNotificaRequest.getEnviamentUuid();
+        if (Strings.isNullOrEmpty(enviamentUuid)) {
+            log.error("[SM] Rebuda consulta d'estat a notifica sense Enviament UUID");
             return;
         }
-        NotibLogger.getInstance().info("[SM] Rebut consulta d'estat a notifica <" + enviament.getUuid() + ">", log, LoggingTipus.STATE_MACHINE);
-        var enviamentEntity = notificacioEnviamentRepository.findByUuid(enviament.getUuid()).orElse(null);
-        if (enviament.isDeleted() || enviamentEntity != null && enviamentEntity.getNotificacio().isDeleted()) {
-            var msg = "[SM] Petició de notificació NO enviada. Enviament marcat com a deleted - UUID " + enviament.getUuid();
+        NotibLogger.getInstance().info("[SM] Rebut consulta d'estat a notifica <" + enviamentUuid + ">", log, LoggingTipus.STATE_MACHINE);
+        var enviamentEntity = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElse(null);
+        if (enviamentEntity == null) {
+            log.error("[SM] No s'ha trobat l'enviament amb UUID " + enviamentUuid);
+            return;
+        }
+        if (enviamentEntity.getNotificacio().isDeleted()) {
+            var msg = "[SM] Petició de notificació NO enviada. Enviament marcat com a deleted - UUID " + enviamentUuid;
             NotibLogger.getInstance().info(msg, log, LoggingTipus.STATE_MACHINE);
             if (consultaNotificaRequest.getAccioMassivaId() != null) {
-               accioMassivaHelper.actualitzar(consultaNotificaRequest.getAccioMassivaId(), enviament.getId(), msg, "");
+               accioMassivaHelper.actualitzar(consultaNotificaRequest.getAccioMassivaId(), enviamentEntity.getId(), msg, "");
             }
             return;
         }
         semaphore.acquire();
         try {
             var success = notificaService.consultaEstatEnviament(consultaNotificaRequest);
-            NotibLogger.getInstance().info("[SM] Consulta per l'enviament <" + enviament.getUuid() + "> ok -> " + success, log, LoggingTipus.STATE_MACHINE);
+            NotibLogger.getInstance().info("[SM] Consulta per l'enviament <" + enviamentUuid + "> ok -> " + success, log, LoggingTipus.STATE_MACHINE);
             if (success) {
-                enviamentSmService.consultaSuccess(enviament.getUuid());
+                enviamentSmService.consultaSuccess(enviamentUuid);
             } else {
-                enviamentSmService.consultaFailed(enviament.getUuid());
+                enviamentSmService.consultaFailed(enviamentUuid);
             }
         } finally {
             semaphore.release();

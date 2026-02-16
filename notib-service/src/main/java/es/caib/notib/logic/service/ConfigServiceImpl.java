@@ -83,6 +83,9 @@ public class ConfigServiceImpl implements ConfigService {
         if ("es.caib.notib.state.machine.delay".equals(property.getKey())) {
             carregarDelaysReintentsRemeses();
         }
+        if ("es.caib.notib.log.tipus.STATE_MACHINE".equals(property.getKey())) {
+            ActiveMqServiceImpl.resetJobSchedulerHistoric ();
+        }
 
         if (property.getKey().contains(NotibLogger.PREFIX)) {
             if (property.getKey().endsWith(LoggingTipus.KEYCLOAK.name())) {

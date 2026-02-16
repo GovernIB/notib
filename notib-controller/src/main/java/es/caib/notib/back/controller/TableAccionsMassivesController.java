@@ -4,16 +4,11 @@ import com.google.common.base.Strings;
 import es.caib.notib.back.helper.MissatgesHelper;
 import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.back.helper.RolHelper;
-import es.caib.notib.logic.intf.dto.ArxiuDto;
-import es.caib.notib.logic.intf.dto.FitxerDto;
-import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaTipus;
 import es.caib.notib.logic.intf.dto.accioMassiva.SeleccioTipus;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
-import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.service.AccioMassivaService;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.JustificantService;
@@ -33,19 +28,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import static es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaTipus.EXPORTAR_FULL_CALCUL;
 
 @Slf4j
 public abstract class TableAccionsMassivesController extends BaseUserController {
@@ -157,7 +147,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         try {
             var seleccioTipus = SeleccioTipus.ENVIAMENT;
             var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
-            var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.EXPORTAR_FULL_CALCUL).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).format(format).build();
+            var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.EXPORTAR_FULL_CALCUL).tipusElementSeleccionat(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).format(format).build();
             var accioId = accioMassivaService.altaAccioMassiva(accio);
             accio.setAccioId(accioId);
             var fitxer = accioMassivaService.exportar(accio);
@@ -184,7 +174,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
 
         var seleccioTipus = requestIsRemesesEnviamentMassiu(request) ? SeleccioTipus.NOTIFICACIO : SeleccioTipus.ENVIAMENT;
         var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
-        var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.DESCARREGA_JUSTIFICANT_ENVIAMENT).seleccio(seleccio).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).build();
+        var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.DESCARREGA_JUSTIFICANT_ENVIAMENT).seleccio(seleccio).tipusElementSeleccionat(seleccioTipus).entitatId(entitatActual.getId()).build();
         var accioId = accioMassivaService.altaAccioMassiva(accio);
         accio.setAccioId(accioId);
         var justificants = accioMassivaService.descarregarJustificant(accio);
@@ -216,7 +206,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         var entitatActual = sessionScopedContext.getEntitatActual();
         var seleccioTipus = requestIsRemesesEnviamentMassiu(request) ? SeleccioTipus.NOTIFICACIO : SeleccioTipus.ENVIAMENT;
         var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
-        var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.DESCARREGA_CERTIFICAT_RECEPCIO).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+        var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.DESCARREGA_CERTIFICAT_RECEPCIO).tipusElementSeleccionat(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
         var accioId = accioMassivaService.altaAccioMassiva(accio);
         accio.setAccioId(accioId);
         response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
@@ -255,7 +245,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         var entitatActual = sessionScopedContext.getEntitatActual();
         var seleccioTipus = SeleccioTipus.ENVIAMENT;
         var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
-        var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.TORNA_ENVIAR_AMB_ERROR).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+        var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.TORNA_ENVIAR_AMB_ERROR).tipusElementSeleccionat(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
         var accioId = accioMassivaService.altaAccioMassiva(accio);
         accio.setAccioId(accioId);
         try {
@@ -284,7 +274,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         var entitatActual = sessionScopedContext.getEntitatActual();
         var seleccioTipus = SeleccioTipus.ENVIAMENT;
         var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
-        var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.TORNA_ACTIVAR_CONSULTES_CANVI_ESTAT).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+        var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.TORNA_ACTIVAR_CONSULTES_CANVI_ESTAT).tipusElementSeleccionat(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
         var accioId = accioMassivaService.altaAccioMassiva(accio);
         accio.setAccioId(accioId);
         try {
@@ -312,7 +302,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         var entitatActual = sessionScopedContext.getEntitatActual();
         var seleccioTipus = requestIsRemesesEnviamentMassiu(request) ? SeleccioTipus.NOTIFICACIO : SeleccioTipus.ENVIAMENT;
         var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
-        var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.REACTIVAR_SIR).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+        var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.REACTIVAR_SIR).tipusElementSeleccionat(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
         var accioId = accioMassivaService.altaAccioMassiva(accio);
         accio.setAccioId(accioId);
         try {
@@ -340,7 +330,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         log.info("Acualitzam estat dels enviaments: " + StringUtils.join(seleccio, ", "));
         var entitatActual = sessionScopedContext.getEntitatActual();
         var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
-        var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.ACTUALITZAR_ESTAT).seleccioTipus(SeleccioTipus.ENVIAMENT).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+        var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.ACTUALITZAR_ESTAT).tipusElementSeleccionat(SeleccioTipus.ENVIAMENT).entitatId(entitatActual.getId()).seleccio(seleccio).build();
         var accioId = accioMassivaService.altaAccioMassiva(accio);
         accio.setAccioId(accioId);
         accioMassivaService.executarAccio(accio);
@@ -379,7 +369,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         var entitatActual = sessionScopedContext.getEntitatActual();
         var seleccioTipus = requestIsRemesesEnviamentMassiu(request) ? SeleccioTipus.NOTIFICACIO : SeleccioTipus.ENVIAMENT;
         var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
-        var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.ENVIAR_CALLBACK).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+        var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.ENVIAR_CALLBACK).tipusElementSeleccionat(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
         var accioId = accioMassivaService.altaAccioMassiva(accio);
         accio.setAccioId(accioId);
         var hasErrors = false;
@@ -415,7 +405,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         var entitatActual = sessionScopedContext.getEntitatActual();
         var seleccioTipus = SeleccioTipus.ENVIAMENT;
         var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
-        var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.TORNA_ACTIVAR_CALLBACK).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+        var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.TORNA_ACTIVAR_CALLBACK).tipusElementSeleccionat(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
         var accioId = accioMassivaService.altaAccioMassiva(accio);
         accio.setAccioId(accioId);
         accioMassivaService.executarAccio(accio);

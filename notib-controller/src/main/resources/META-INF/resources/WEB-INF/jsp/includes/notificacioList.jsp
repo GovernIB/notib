@@ -185,6 +185,10 @@
             bsIconCode = "fa fa-times";
             translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.REBUTJADA_SIR"/>";
         }
+        if (element.id == 'ANULADA') {
+            bsIconCode = "fa fa-ban";
+            translate = "<spring:message code="es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ANULADA"/>";
+        }
 
         return $('<span style= " ' + style + ' " class="' + bsIconCode + '">' + text + ' </span><span>  ' + translate + '</span>');
     }

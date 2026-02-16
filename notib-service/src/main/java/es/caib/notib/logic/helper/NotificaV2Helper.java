@@ -1,6 +1,7 @@
 package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
+import es.caib.comanda.model.v1.avis.AvisTipus;
 import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.InteressatTipus;
@@ -10,7 +11,6 @@ import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.comanda.ComandaListener;
 import es.caib.notib.logic.intf.dto.AccioParam;
-import es.caib.notib.logic.intf.dto.AvisDescripcio;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
@@ -87,7 +87,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.CIE;
 import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.NOT;
 
 /**
@@ -137,7 +136,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			notificacio.updateNotificaNouEnviament();
 			// Validacions
 			if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()) && !NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
-				var msg = "la notificació no té l'estat REGISTRADA o ENVIADA AMB ERRORS.";
+				var msg = "la notificació no té l'estat REGISTRADA o ENVIADA AMB ERRORS. Estat " + notificacio.getEstat();
 				log.error(" [NOT] " + msg);
 				integracioHelper.addAccioError(info, msg);
 				throw new ValidationException(notificacioId, NotificacioEntity.class, msg);
@@ -204,7 +203,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						enviament.setNotificaDataDisposicio(dataDisposicio);
                         //Enviar estat pendent a Comanda
 //                        comandaListener.enviarTasca(enviament);
-                        comandaListener.enviarAvis(enviament, AvisDescripcio.ENVIAMENT_NOTIFICA);
+                        comandaListener.enviarAvis(enviament, AvisTipus.INFO);
                     }
 
 					var cieNotifica = isCieNotifica(notificacio);
@@ -230,6 +229,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						integracioHelper.addAccioError(info, errorDescripcio);
 						errorSbs = true;
 					}
+					for (var enviament: notificacio.getEnviamentsPerNotifica()) {
+						comandaListener.enviarAvis(enviament, AvisTipus.ERROR);
+					}
 				}
 			} catch (Exception ex) {
 				log.error(ex.getMessage(), ex);
@@ -237,6 +239,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				errorDescripcio = ex instanceof SOAPFaultException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex);
 				integracioHelper.addAccioError(info, "Error al enviar la notificació", ex);
 				errorSbs = true;
+				for (var enviament: notificacio.getEnviamentsPerNotifica()) {
+					comandaListener.enviarAvis(enviament, AvisTipus.ERROR);
+				}
 			}
 			var fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
 			if (fiReintents && (NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat()) /*|| NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat())*/)) {
@@ -266,7 +271,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(ConsultaNotificaRequest consulta) throws Exception {
 
-		log.info(String.format(" [NOT] Refrescant estat de notific@ de l'enviament (Id=%d)", consulta.getConsultaNotificaDto().getId()));
+		log.info(String.format(" [NOT] Refrescant estat de notific@ de l'enviament (Id=%d)", consulta.getId()));
 		try {
 			return enviamentRefrescarEstat(consulta, false);
 		} catch (Exception e) {
@@ -274,17 +279,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		}
 	}
 
-//	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
-//	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId, boolean raiseExceptions) throws Exception {
-//
-//		var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
-//		return enviamentRefrescarEstat(enviament, raiseExceptions);
-//	}
-
 	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(ConsultaNotificaRequest consulta, boolean raiseExceptions) throws Exception {
 
-		var enviament = notificacioEnviamentRepository.findById(consulta.getConsultaNotificaDto().getId()).orElseThrow();
+		var enviament = notificacioEnviamentRepository.findById(consulta.getId()).orElseThrow();
 		var info = new IntegracioInfo(IntegracioCodi.NOTIFICA,"Consultar estat d'un enviament", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Identificador de l'enviament", String.valueOf(enviament.getId())));
 		info.setAplicacio(enviament.getNotificacio().getTipusUsuari(), enviament.getNotificacio().getCreatedBy().get().getCodi());
@@ -466,6 +464,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		} catch (Exception e) {
 			var resposta = new RespuestaSincronizarEnvioOE();
 			resposta.setCodigoRespuesta("error");
+			var enviament = notificacioEnviamentRepository.findByCieId(sincronizarEnvio.getIdentificador());
+			notificacioEventHelper.addNotificaEnvioOE(enviament, true, e.getMessage(), false);
 			return resposta;
 		}
 	}
@@ -475,7 +475,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
         var receptor = new Receptor();
         var titular = enviament.getTitular();
         receptor.setNifReceptor(titular.getNif());
-        receptor.setNombreReceptor(titular.getNomSencer());
+        receptor.setNombreReceptor(InteressatTipus.FISICA.equals(titular.getInteressatTipus()) ? titular.getNomSencer() : titular.getRaoSocial());
         receptor.setVinculoReceptor(BigInteger.ONE);
         if (!titular.isIncapacitat()) {
             return receptor;
@@ -713,7 +713,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				null,
 				enviament);
         //Enviar la informacio del canvi d'estat a Comanda
-        comandaListener.enviarAvis(enviament, AvisDescripcio.ACTUALTIZAR_ESTAT_NOTIFICA);
+        comandaListener.enviarAvis(enviament, AvisTipus.INFO);
 		log.info(" [EST] Fi actualització Datat");
 	}
 

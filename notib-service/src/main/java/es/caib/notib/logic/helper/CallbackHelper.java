@@ -21,23 +21,21 @@ import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.AplicacioRepository;
 import es.caib.notib.persist.repository.CallbackRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
-import joptsimple.internal.Strings;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.activemq.ScheduledMessage;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
@@ -104,11 +102,16 @@ public class CallbackHelper {
 			c.setErrorDesc(errorDesc);
 			c.setEstat(CallbackEstatEnumDto.PENDENT);
 			callbackRepository.saveAndFlush(c);
-			jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId(),
-					m -> {
-						m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 1000L);
-						return m;
-					});
+			if (TransactionSynchronizationManager.isActualTransactionActive()) {
+				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+					@Override
+					public void afterCommit() {
+						jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId());
+					}
+				});
+			} else {
+				jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId());
+			}
 		} catch (NoSuchElementException ex) {
 			log.error("L'enviament " + env.getId() + " i la notificacio " + env.getNotificacio().getId() + " no tenen assignat el createdBy", ex);
 		} catch (Exception ex) {
@@ -145,11 +148,16 @@ public class CallbackHelper {
 		}
 		callback.setData(new Date());
 		callback.setEstat(CallbackEstatEnumDto.PENDENT);
-		jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId(),
-				m -> {
-					m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 1000L);
-					return m;
-				});
+		if (TransactionSynchronizationManager.isActualTransactionActive()) {
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+				@Override
+				public void afterCommit() {
+					jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId());
+				}
+			});
+		} else {
+			jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId());
+		}
 		return callback;
 	}
 

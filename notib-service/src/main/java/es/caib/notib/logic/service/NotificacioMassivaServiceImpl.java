@@ -86,6 +86,9 @@ import org.supercsv.io.CsvListWriter;
 import org.supercsv.io.ICsvListWriter;
 import org.supercsv.prefs.CsvPreference;
 
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+
 import javax.annotation.Resource;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -668,15 +671,23 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         if (Strings.isNullOrEmpty(notificacioMassiva.getEmail())) {
             return;
         }
-        try {
-
-            jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_MASSIVA, notificacioMassiva.getId(), m -> {
-                // Esperam 5 segons a enviar el correu per asseguar que ja s'hagi desat la notificació massiva
-                m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 5000L);
-                return m;
+        if (TransactionSynchronizationManager.isActualTransactionActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    try {
+                        jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_MASSIVA, notificacioMassiva.getId());
+                    } catch (JmsException ex) {
+                        log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar enviar el correu electrònic.", ex);
+                    }
+                }
             });
-        } catch (JmsException ex) {
-            log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar enviar el correu electrònic.", ex);
+        } else {
+            try {
+                jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_MASSIVA, notificacioMassiva.getId());
+            } catch (JmsException ex) {
+                log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar enviar el correu electrònic.", ex);
+            }
         }
     }
 

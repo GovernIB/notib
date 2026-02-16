@@ -45,3 +45,12 @@ UPDATE NOT_NOtIFICACIO_TABLE t SET ORGAN_ID = (SELECT o.id FROM not_organ_gestor
 UPDATE NOT_NOtIFICACIO_ENV_TABLE t SET ORGAN_ID = (SELECT o.id FROM not_organ_gestor o WHERE o.entitat = t.entitat_id AND o.codi = t.not_organ_codi);
 
 DELETE FROM not_config WHERE key = 'es.caib.notib.tasques.actives';
+
+ALTER TABLE not_accio_massiva ADD tipus_seleccionat VARCHAR2(20 CHAR);
+ALTER TABLE not_accio_massiva ADD motiu VARCHAR2(250 CHAR);
+ALTER TABLE not_accio_massiva ADD admin_entitat NUMBER(1) DEFAULT '0';
+ALTER TABLE not_accio_massiva ADD dies INTEGER;
+CREATE TABLE not_sincronizar_envio (id NUMBER(38, 0) NOT NULL, identificador VARCHAR2(255 CHAR), json_contingut CLOB, data_creacio TIMESTAMP, CONSTRAINT not_sincronizar_envio_pk PRIMARY KEY (id));
+GRANT SELECT, UPDATE, INSERT, DELETE ON NOT_SINCRONIZAR_ENVIO TO WWW_NOTIB;
+ALTER TABLE NOT_SINCRONIZAR_ENVIO MOVE LOB(JSON_CONTINGUT) STORE AS NOT_SINC_ENVIO_JSON_LOB(TABLESPACE notib_lob INDEX NOT_SINC_ENVIO_JSON_LOB_I);
+UPDATE not_accio_massiva SET dies = 0;

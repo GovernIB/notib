@@ -7,6 +7,9 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.activemq.store.kahadb.KahaDBPersistenceAdapter;
+import org.apache.activemq.usage.SystemUsage;
+import org.apache.activemq.broker.region.policy.PolicyEntry;
+import org.apache.activemq.broker.region.policy.PolicyMap;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.boot.autoconfigure.jms.JmsProperties;
@@ -39,6 +42,14 @@ public class SmJmsConfig {
     private String fileBaseDir;
     @Value("${es.caib.notib.activemq.max.concurrency:50}")
     private Integer BROKER_MAX_CONCURRENCY;
+    @Value("${es.caib.notib.activemq.max.kaha.limit.gb:60}")
+    private Long KAHA_LIMIT_GB;
+    @Value("${es.caib.notib.activemq.max.jobscheduler.limit.gb:40}")
+    private Long JOB_SCHEDULER_LIMIT_GB;
+    @Value("${es.caib.notib.activemq.max.tmp.limit.gb:10}")
+    private Long TMP_LIMIT_GB;
+    @Value("${es.caib.notib.activemq.max.tmp.limit.MB:1024}")
+    private Long MEMORIA_BROKER_LIMIT_MB;
 
     @Bean // Serialize message content to json using TextMessage
     public MessageConverter jacksonJmsMessageConverter() {
@@ -73,8 +84,8 @@ public class SmJmsConfig {
         ActiveMQConnectionFactory connectionFactory = new  ActiveMQConnectionFactory();
         connectionFactory.setTrustAllPackages(true);
         connectionFactory.setBrokerURL(BROKER_URL);
-        connectionFactory.setPassword(BROKER_USERNAME);
-        connectionFactory.setUserName(BROKER_PASSWORD);
+        connectionFactory.setUserName(BROKER_USERNAME);
+        connectionFactory.setPassword(BROKER_PASSWORD);
         return connectionFactory;
     }
 
@@ -84,6 +95,8 @@ public class SmJmsConfig {
 
         final BrokerService broker = new BrokerService();
         broker.addConnector(BROKER_URL);
+
+        // KahaDB
         KahaDBPersistenceAdapter persistenceAdapter = new KahaDBPersistenceAdapter();
         File dir = new File(fileBaseDir + "/kaha");
         if (!dir.exists()) {
@@ -94,7 +107,38 @@ public class SmJmsConfig {
         persistenceAdapter.setCleanupInterval(1000 * 60 * 60);              // 1h
         broker.setPersistenceAdapter(persistenceAdapter);
         broker.setPersistent(true);
+
+        // Scheduler
+        File schedDir = new File(fileBaseDir + "/scheduler");
+        if (!schedDir.exists()) {
+            schedDir.mkdirs();
+        }
+        broker.setSchedulerDirectoryFile(schedDir);
         broker.setSchedulerSupport(true);
+
+        // Límit d’ús de storage (KahaDB + scheduler)
+        SystemUsage usage = broker.getSystemUsage();
+        // 1) Persistència “normal” (KahaDB)
+        usage.getStoreUsage().setLimit(KAHA_LIMIT_GB * 1024 * 1024 * 1024); // 60 GB
+        // 2) Scheduler (PListStore)
+        usage.getJobSchedulerUsage().setLimit(JOB_SCHEDULER_LIMIT_GB * 1024 * 1024 * 1024); // 40 GB
+        // 3) Temporal (cursors / temp store)
+        usage.getTempUsage().setLimit(TMP_LIMIT_GB * 1024 * 1024 * 1024);  // 10 GB (opcional)
+        // 4) Memòria del broker
+        usage.getMemoryUsage().setLimit(MEMORIA_BROKER_LIMIT_MB * 1024 * 1024);      // 1 GB (opcional)
+        // 5) No bloquejar productors si no hi ha espai, que falli el send() en lloc de bloquejar
+        usage.setSendFailIfNoSpace(true);
+        // opcional: si prefereixes “esperar una mica” i després fallar
+        usage.setSendFailIfNoSpaceAfterTimeout(5_000); // 5s
+
+        // 6) Configuració de polítiques per evitar el bloqueig per Producer Flow Control
+        PolicyMap policyMap = new PolicyMap();
+        PolicyEntry defaultEntry = new PolicyEntry();
+        defaultEntry.setProducerFlowControl(true); // Activa el control de flux
+        // Si el control de flux està actiu i sendFailIfNoSpace és cert, el productor rebrà una excepció en lloc de bloquejar-se
+        policyMap.setDefaultEntry(defaultEntry);
+        broker.setDestinationPolicy(policyMap);
+
         return broker;
     }
 

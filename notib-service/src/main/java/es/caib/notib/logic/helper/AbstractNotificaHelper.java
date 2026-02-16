@@ -107,6 +107,11 @@ public abstract class AbstractNotificaHelper {
 
 	public void incrementarDataCaducitat(NotificacioEntity notificacio, Date dataEnviament) {
 
+		if (dataEnviament == null || notificacio.getCaducitat() == null || notificacio.getCreatedDate() == null) {
+			log.error("[AbstractNotificaHelper.incrementarDataCaducitat] No es pot incrementar dates nules. Caducitat: " + notificacio.getCaducitat()
+					+ ", dataEnviament: " + dataEnviament + " createdDate: " + notificacio.getCreatedDate() + " notificacioId: " + notificacio.getId());
+			return;
+		}
 		var dataCreacio = DatesUtils.convertir(notificacio.getCreatedDate());
 		var mateixDia = DatesUtils.compareDatesWithoutTime(dataCreacio, dataEnviament);
 		if (mateixDia) {
