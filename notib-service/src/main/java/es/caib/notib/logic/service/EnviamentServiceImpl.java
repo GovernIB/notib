@@ -115,7 +115,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Implementació del servei de gestió de enviaments.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -245,7 +245,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	@Transactional
 	public NotificacioEnviamentDto enviamentFindAmbId(Long enviamentId) {
@@ -260,7 +260,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			if (enviament.getNotificaCertificacioArxiuId() == null && isEstatFinal) {
 
 				try {
-					var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviamentId).build()).build();
+					var consulta = ConsultaNotificaRequest.builder().id(enviamentId).build();
 					notificaHelper.enviamentRefrescarEstat(consulta);
 					notificacioEnviamentRepository.flush();
 					enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
@@ -659,7 +659,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			throw new WriteCsvException(messageHelper.getMessage("error.tancar.fitxer.csv"));
 		}
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<NotificacioEventDto> eventFindAmbNotificacio(Long notificacioId) {
@@ -673,7 +673,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	@Transactional
 	public void reactivaConsultes(Set<Long> enviaments) {
@@ -694,7 +694,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	@Transactional
 	public void reactivaSir(AccioMassivaExecucio accio) {
@@ -771,7 +771,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 	private String calcularNomArxiuCertificacio(NotificacioEnviamentEntity enviament) {
 		return "certificacio_" + enviament.getNotificaIdentificador() + ".pdf";
 	}
-	
+
 	@Transactional
 	@Override
 	public NotificacioEnviamentDtoV2 getOne(Long enviamentId) {
@@ -783,9 +783,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	public byte[] getDocumentJustificant(Long enviamentId) {
-		
+
 		var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
 		try {
 			ConfigHelper.setEntitatCodi(enviament.getNotificacio().getEntitat().getCodi());
@@ -797,7 +797,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		}
 		return pluginHelper.obtenirJustificant(enviament.getNotificacio().getEmisorDir3Codi(), enviament.getRegistreNumeroFormatat()).getJustificant();
 	}
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public Resposta findEnviaments(ApiConsulta consulta) {
@@ -909,10 +909,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 		transmissio.setError(enviament.isNotificaError());
 		transmissio.setErrorData(enviament.getNotificaErrorData());
 		transmissio.setErrorDescripcio(enviament.getNotificaErrorDescripcio());
-		
+
 		// Justificant de registre
 		if (NotificacioEstatEnumDto.REGISTRADA.equals(not.getEstat()) && (enviament.getRegistreEstat() != null &&
-				(NotificacioRegistreEstatEnumDto.DISTRIBUIT.equals(enviament.getRegistreEstat()) || 
+				(NotificacioRegistreEstatEnumDto.DISTRIBUIT.equals(enviament.getRegistreEstat()) ||
 				 NotificacioRegistreEstatEnumDto.OFICI_EXTERN.equals(enviament.getRegistreEstat()) ||
 				 NotificacioRegistreEstatEnumDto.OFICI_SIR.equals(enviament.getRegistreEstat()) ) ||
 				(enviament.getRegistreData() != null && enviament.getRegistreNumeroFormatat() != null && !enviament.getRegistreNumeroFormatat().isEmpty()))) {
@@ -953,7 +953,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 						enviament.isEnviamentEnviat() ? Estat.ENVIADA : EnviamentEstat.REGISTRADA.equals(enviament.getNotificaEstat()) ? Estat.REGISTRADA : Estat.PENDENT;
 		}
 	}
-	
+
 	private Persona toPersona(PersonaDto dto) {
 
 		var persona = new Persona();

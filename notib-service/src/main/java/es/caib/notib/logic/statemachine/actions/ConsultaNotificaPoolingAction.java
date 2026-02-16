@@ -38,25 +38,34 @@ public class ConsultaNotificaPoolingAction implements Action<EnviamentSmEstat, E
     // No es pot injectar degut a error cíclic
     private EnviamentSmService enviamentSmService;
 
-    @Override
-    @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 30000, multiplier = 10, maxDelay = 3600000))
-    public void execute(StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
+	@Override
+	@Retryable(maxAttempts = 5, backoff = @Backoff(delay = 30000, multiplier = 10, maxDelay = 3600000))
+	public void execute(StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
 
-        if (isAdviserActiu()) {
-            return;
-        }
-        var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
-        NotibLogger.getInstance().info("[SM] ConsultaNotificaPoolingAction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
-        var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
-        var consulta = ConsultaNotificaRequest.builder().enviamentUuid(enviamentUuid).consultaNotificaDto(consultaNotificaMapper.toDto(enviament)).numIntent(1).build();
-        jmsTemplate.convertAndSend(SmConstants.CUA_CONSULTA_ESTAT, consulta,
-                m -> {
-                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, refrescarPeriode());
-                    return m;
-                });
+		if (isAdviserActiu()) {
+			return;
+		}
+		var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
+		NotibLogger.getInstance().info("[SM] ConsultaNotificaPoolingAction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
+		var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
+		var codiUsuari = (String) stateContext.getExtendedState().getVariables().get(SmConstants.CODI_USUARI);
+		var consulta = ConsultaNotificaRequest.builder()
+			.enviamentUuid(enviamentUuid)
+			.id(enviament.getId())
+			.numIntent(1)
+			.codiUsuari(codiUsuari)
+			.build();
+		jmsTemplate.convertAndSend(SmConstants.CUA_CONSULTA_ESTAT, consulta,
+			m -> {
+				var d = refrescarPeriode();
+				if (d > 0) {
+					m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, d);
+				}
+				return m;
+			});
 
-        NotibLogger.getInstance().info("[SM] Enviada petició de consulta d'estat a notifica per pooling l'enviament amb UUID " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
-    }
+		NotibLogger.getInstance().info("[SM] Enviada petició de consulta d'estat a notifica per pooling l'enviament amb UUID " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
+	}
 
     @Recover
     public void recover(Throwable t, StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {

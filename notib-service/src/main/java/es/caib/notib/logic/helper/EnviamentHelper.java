@@ -6,7 +6,6 @@ import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioCertificacioDto;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
-import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.NonNull;
@@ -21,7 +20,7 @@ import javax.annotation.Resource;
 
 /**
  * Helper per notificacions
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -77,14 +76,14 @@ public class EnviamentHelper {
 		progres.setProgres(100);
 		integracioHelper.addAccioOk(info);
 	}
-	
+
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void updateDEHCertNovaConsulta(Long enviamentId) {
 
 		var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
 		enviament.updateDEHCertNovaConsulta(configHelper.getConfigAsInteger(PropertiesConstants.ENVIAMENT_DEH_REFRESCAR_CERT_PENDENTS_RATE));
 	}
-	
+
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void updateCIECertNovaConsulta(Long enviamentId) {
 
@@ -100,7 +99,7 @@ public class EnviamentHelper {
 			var msgInfoUpdating = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.actualitzant", new Object[] {enviamentId});
 			progres.addInfo(TipusActInfo.INFO, msgInfoUpdating);
 			info.getParams().add(new AccioParam("Msg. procés:", msgInfoUpdating + " [" + progres.getProgres() + "%]"));
-			var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviamentId).build()).build();
+			var consulta = ConsultaNotificaRequest.builder().id(enviamentId).build();
 			notificaHelper.enviamentRefrescarEstat(consulta, true);
 			var msgInfoUpdated = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.actualitzant.ok", new Object[] {enviamentId});
 			progres.addInfo(TipusActInfo.SUB_INFO, msgInfoUpdated);

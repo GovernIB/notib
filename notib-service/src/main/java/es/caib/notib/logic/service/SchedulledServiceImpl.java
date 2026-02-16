@@ -42,7 +42,7 @@ import static java.util.Calendar.DAY_OF_MONTH;
 
 /**
  * Implementació del servei de gestió de notificacions.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -118,7 +118,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
-		}	
+		}
 	}
 
 	//2. Refrescar notificacions expirades
@@ -149,7 +149,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 					for (Long enviament: pendents) {
 						log.info("[DEH] >>> Consultat l'estat a Notific@ de l'enviament: [Id: " + enviament + "]");
 						enviamentHelper.updateDEHCertNovaConsulta(enviament);
-						var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviament).build()).build();
+						var consulta = ConsultaNotificaRequest.builder().id(enviament).build();
 						notificacioService.enviamentRefrescarEstat(consulta);
 					}
 				} else {
@@ -162,7 +162,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	//5. Consulta certificació notificacions CIE finalitzades
 	//////////////////////////////////////////////////////////////////
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -178,7 +178,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 					for (Long enviament: pendents) {
 						log.info("[CIE] >>> Consultat l'estat a Notific@ de l'enviament: [Id: " + enviament + "]");
 						enviamentHelper.updateCIECertNovaConsulta(enviament);
-						var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviament).build()).build();
+						var consulta = ConsultaNotificaRequest.builder().id(enviament).build();
 						notificacioService.enviamentRefrescarEstat(consulta);
 					}
 				} else {
@@ -191,7 +191,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	//6. Esborra documents temporals
 	//////////////////////////////////////////////////////////////////
 	@Override
@@ -217,7 +217,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	// 7. Actualització dels serveis a partir de la informació de Rolsac
 	/////////////////////////////////////////////////////////////////////////
 	@Override
@@ -243,7 +243,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
-		}	
+		}
 	}
 
 	// 8. Consulta de canvis en l'organigrama
