@@ -71,11 +71,12 @@ public class CallbackListener {
     }
 
     private void enviarCua(Long enviamentId, Long delay) {
-
-        jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, enviamentId,
-            m -> {
-                m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, delay);
-                return m;
-            });
+		jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, enviamentId,
+			m -> {
+				if (delay > 0) {
+					m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, delay);
+				}
+				return m;
+			});
     }
 }

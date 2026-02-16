@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.logic.helper;
 
@@ -23,6 +23,7 @@ import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioEventRepository;
+import es.caib.notib.persist.repository.SincronizarEnvioRepository;
 import org.apache.activemq.ScheduledMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
@@ -39,7 +40,7 @@ import java.util.Map;
 
 /**
  * Helper per a interactuar amb el servei web de Notific@.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Component
@@ -66,6 +67,9 @@ public class NotificaHelper {
 	private CiePluginHelper ciePluginHelper;
 	@Autowired
 	private EnviamentTableHelper enviamentTableHelper;
+
+	@Autowired
+	private SincronizarEnvioRepository sincronizarEnvioRepository;
 
 
 	public NotificacioEntity notificacioEnviar(Long notificacioId) {
@@ -122,12 +126,27 @@ public class NotificaHelper {
 		return  totsEnviamentsAnulats;
 	}
 
+
 	@Transactional
 	@JmsListener(destination = CUA_SINCRONIZAR_ENVIO_OE, containerFactory = JMS_FACTORY_ACK)
-	public void enviamentEntregaPostalNotificada(SincronizarEnvio sincronizarEnvio) throws Exception {
+	public void enviamentEntregaPostalNotificada(Object payload) throws Exception {
+
+		SincronizarEnvio sincronizarEnvio = null;
+		if (payload instanceof Long) {
+			var entity = sincronizarEnvioRepository.findById((Long) payload).orElseThrow();
+			var objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+			sincronizarEnvio = objectMapper.readValue(entity.getJsonContingut(), SincronizarEnvio.class);
+		} else if (payload instanceof SincronizarEnvio) {
+			sincronizarEnvio = (SincronizarEnvio) payload;
+		} else {
+			throw new IllegalArgumentException("Payload no vàlid per enviamentEntregaPostalNotificada");
+		}
 
 		var resposta = getNotificaHelper().enviamentEntregaPostalNotificada(sincronizarEnvio);
 		if (NexeaAdviserWs.SYNC_ENVIO_OE_OK.equals(resposta.getCodigoRespuesta())) {
+			if (payload instanceof Long) {
+				sincronizarEnvioRepository.deleteById((Long) payload);
+			}
 			return;
 		}
 		var enviament = enviamentRepository.findByCieId(sincronizarEnvio.getIdentificador());
@@ -139,13 +158,17 @@ public class NotificaHelper {
 			for (var event : events) {
 				event.setFiReintents(true);
 			}
+			sincronizarEnvioRepository.deleteById((Long) payload);
 			return;
 		}
-		jmsTemplate.convertAndSend(NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, sincronizarEnvio,
-				m -> {
-					m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, SmConstants.delay(reintents));
-					return m;
-				});
+		jmsTemplate.convertAndSend(NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, payload,
+			m -> {
+				var d = SmConstants.delay(reintents);
+				if (d > 0) {
+					m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, d);
+				}
+				return m;
+			});
 	}
 
 	public RespuestaAmpliarPlazoOE ampliarPlazoOE(AmpliarPlazoOE ampliarPlazo) {
