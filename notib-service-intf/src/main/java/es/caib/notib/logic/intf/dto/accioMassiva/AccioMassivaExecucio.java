@@ -18,15 +18,13 @@ import java.util.Collection;
 @AllArgsConstructor
 public class AccioMassivaExecucio {
 
-    private AccioMassivaTipus tipus;
-    private Long accioId;
-    private Long entitatId;
-    private SeleccioTipus seleccioTipus;
-    private Collection<Long> seleccio;
-    private String format;
-    private boolean isAdminEntitat;
-    private String motiu;
-    private AmpliacionPlazoDto ampliacionPlazo;
-    private AnularDto anulacio;
-
+	private AccioMassivaTipus tipus;
+	private Long accioId;
+	private Long entitatId;
+	private SeleccioTipus tipusElementSeleccionat;
+	private Collection<Long> seleccio;
+	private String format;
+	private boolean isAdminEntitat;
+	private String motiu;
+	private int dies;
 }

@@ -39,9 +39,9 @@ public class AccioMassivaElementEntity extends AbstractPersistable<Long>  {
     @ForeignKey(name = "FK_ACCIOMASSIVA_ELEMENT")
     private AccioMassivaEntity accioMassiva;
 
-    @Column(name = "seleccio_tipus", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private SeleccioTipus seleccioTipus;
+//    @Column(name = "seleccio_tipus", nullable = false)
+//    @Enumerated(EnumType.STRING)
+//    private SeleccioTipus seleccioTipus;
 
     @Column(name = "element_id", nullable = false)
     private Long elementId;

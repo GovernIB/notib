@@ -10,6 +10,7 @@ import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaDto;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaElement;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
 import es.caib.notib.logic.intf.dto.accioMassiva.SeleccioTipus;
+import es.caib.notib.logic.intf.dto.anular.AnularDto;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.statemachine.SmConstants;
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -50,181 +52,209 @@ public class AccionsMassivesListener {
 
     @Transactional
     @JmsListener(destination = SmConstants.CUA_ACCIONS_MASSIVES, containerFactory = SmConstants.JMS_FACTORY_ACK)
-    public void receiveAccioMassiva(@Payload AccioMassivaExecucio accio, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
+	public void receiveAccioMassiva(@Payload Long accioId, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
 
-        message.acknowledge();
-        var accioEntity = accioMassivaRepository.findById(accio.getAccioId()).orElseThrow();
-        accioEntity.setDataInici(new Date());
-        RespostaAccio<AccioMassivaElement> resposta;
+		message.acknowledge();
+		var accioEntity = accioMassivaRepository.findById(accioId).orElseThrow();
+
+		// Reconstruim l'objecte AccioMassivaExecucio a partir de l'entitat
+		var accio = AccioMassivaExecucio.builder()
+			.tipus(accioEntity.getTipus())
+			.accioId(accioEntity.getId())
+			.entitatId(accioEntity.getEntitatId())
+			.tipusElementSeleccionat(accioEntity.getTipusElementSeleccionat())
+			.seleccio(accioEntity.getElements().stream().map(AccioMassivaElementEntity::getElementId).collect(Collectors.toList()))
+			.motiu(accioEntity.getMotiu())
+			.dies(accioEntity.getDies())
+			.isAdminEntitat(accioEntity.isAdminEntitat())
+			.build();
+
+		accioEntity.setDataInici(new Date());
+		RespostaAccio<AccioMassivaElement> resposta;
 //        List<String> errors;
-        try {
-            var error = false;
-            Set<Long> seleccio = new HashSet<>(accio.getSeleccio());
+		try {
+			var error = false;
+			Set<Long> seleccio = new HashSet<>(accio.getSeleccio());
             /* Les seguents accions no passen per la cua:
                 EXPORTAR_FULL_CALCUL, DESCARREGA_JUSTIFICANT_ENVIAMENT, DESCARREGA_CERTIFICAT_RECEPCIO, TORNA_ENVIAR_AMB_ERROR,
                 ESBORRAR,
             * */
-            switch (accio.getTipus()) {
-                case TORNA_ACTIVAR_CONSULTES_CANVI_ESTAT:
-                    resposta = notificacioService.resetConsultaEstat(accio);
-                    actualitzarElements(accioEntity.getElements(), resposta);
-                    error = !resposta.getErrors().isEmpty() || !resposta.getNoExecutables().isEmpty();
-                    break;
-                case REACTIVAR_SIR:
-                    enviamentService.reactivaSir(accio);
-                    break;
-                case ACTUALITZAR_ESTAT:
-                    for(var enviamentId : seleccio) {
-                        try {
-                            enviamentService.actualitzarEstat(enviamentId, accioEntity.getId());
+			switch (accio.getTipus()) {
+				case TORNA_ACTIVAR_CONSULTES_CANVI_ESTAT:
+					resposta = notificacioService.resetConsultaEstat(accio);
+					actualitzarElements(accioEntity.getElements(), resposta);
+					error = !resposta.getErrors().isEmpty() || !resposta.getNoExecutables().isEmpty();
+					break;
+				case REACTIVAR_SIR:
+					enviamentService.reactivaSir(accio);
+					break;
+				case ACTUALITZAR_ESTAT:
+					for(var enviamentId : seleccio) {
+						try {
+							enviamentService.actualitzarEstat(enviamentId, accioEntity.getId());
 //                            accioEntity.getElement(enviamentId).actualitzarData();
-                        } catch (Exception ex) {
-                            error = true;
-                            accioEntity.getElement(enviamentId).actualitzar(ex.getMessage(), Arrays.toString(ex.getStackTrace()));
-                        }
-                    }
-                    break;
-                case ENVIAR_CALLBACK:
-                    try {
-                        var enviamentsAmbError = enviamentService.enviarCallback(seleccio, accioEntity.getId());
-                        error = !enviamentsAmbError.isEmpty();
-                        accioEntity.setError(error);
-                        if (error) {
-                            for (var id : enviamentsAmbError) {
-                                accioEntity.getElement(id).actualitzar("Error enviant el callback", "");
-                            }
-                        }
-                    } catch (Exception ex) {
-                        error = true;
-                    }
-                    break;
-                case TORNA_ACTIVAR_CALLBACK:
-                    for(var enviamentId : seleccio) {
-                        try {
-                            enviamentService.activarCallback(enviamentId);
-                            accioEntity.getElement(enviamentId).actualitzar();
-                        } catch (Exception ex) {
-                            error = true;
-                            accioEntity.getElement(enviamentId).actualitzar(ex.getMessage(), Arrays.toString(ex.getStackTrace()));
-                        }
-                    }
-                    accioEntity.setDataFi(new Date());
-                    break;
-                case REACTIVAR_REGISTRE:
-                    for (var notificacioId : seleccio) {
-                        try {
-                            notificacioService.reactivarRegistre(notificacioId);
-                            resposta = notificacioService.resetNotificacioARegistre(notificacioId);
-                            actualitzarElements(accioEntity.getElements(), resposta);
-                            error = !resposta.getErrors().isEmpty() || !resposta.getNoExecutables().isEmpty();
-                        } catch (Exception ex) {
-                            error = true;
-                            accioEntity.getElement(notificacioId).actualitzar(ex.getMessage(), Arrays.toString(ex.getStackTrace()));
-                        }
-                    }
-                    break;
-                case MARCAR_PROCESSADES:
-                    for (var notificacioId : accio.getSeleccio()) {
-                        try {
-                            var resultat = notificacioService.marcarComProcessada(notificacioId, accio.getMotiu(), accio.isAdminEntitat());
-                            if (Strings.isNullOrEmpty(resultat)) {
-                                accioEntity.getElement(notificacioId).actualitzar();
-                            } else {
-                                error = true;
-                                accioEntity.getElement(notificacioId).actualitzar(resultat, "");
-                            }
-                        } catch (Exception ex) {
-                            error = true;
-                            accioEntity.getElement(notificacioId).actualitzar(ex.getMessage(), Arrays.toString(ex.getStackTrace()));
-                        }
-                    }
-                    accioEntity.setDataFi(new Date());
-                    break;
-                case AMPLIAR_TERMINI:
-                    accio.getAmpliacionPlazo().setAccioMassiva(accioEntity.getId());
-                    var respostaAmpliarPlazo = notificacioService.ampliacionPlazoOE(accio.getAmpliacionPlazo());
-                    NotificacioEnviamentEntity enviamentEntity;
-                    Long id;
-                    String errorAmpliacion;
-                    for (var ampliacion : respostaAmpliarPlazo.getAmpliacionesPlazo().getAmpliacionPlazo()) {
-                        enviamentEntity = enviamentRepository.findByUuid(ampliacion.getIdentificador()).orElseThrow();
-                        errorAmpliacion = ampliacion.getMensajeError();
-                        id = SeleccioTipus.NOTIFICACIO.equals(accio.getSeleccioTipus()) ? enviamentEntity.getNotificacio().getId() : enviamentEntity.getId();
-                        accioEntity.getElement(id).actualitzar(errorAmpliacion, "");
-                    }
-                    for (var uuid : respostaAmpliarPlazo.getNoExecutades()) {
-                        enviamentEntity = enviamentRepository.findByUuid(uuid).orElseThrow();
-                        errorAmpliacion = "Enviament amb entrega postal o sense identificador de Notific@. No es pot ampliar el termini";
-                        id = SeleccioTipus.NOTIFICACIO.equals(accio.getSeleccioTipus()) ? enviamentEntity.getNotificacio().getId() : enviamentEntity.getId();
-                        accioEntity.getElement(id).actualitzar(errorAmpliacion, "");
-                    }
-                    break;
-                case ANULAR:
-                    accio.getAnulacio().setAccioMassiva(accioEntity.getId());
-                    var respostaAnulacio = notificacioService.anular(accio.getAnulacio());
-                    for (var anulacio : respostaAnulacio.getRespostes()) {
-                        enviamentEntity = enviamentRepository.findByNotificaReferencia(anulacio.getIdentificador());
-                        if (enviamentEntity == null) {
-                            throw new Exception("Enviament inexistent. Identificador de Notifica " + anulacio.getIdentificador());
-                        }
-                        id = SeleccioTipus.NOTIFICACIO.equals(accio.getSeleccioTipus()) ? enviamentEntity.getNotificacio().getId() : enviamentEntity.getId();
-                        accioEntity.getElement(id).actualitzar(anulacio.getDescripcioResposta(), "");
-                    }
-                    String errorAnulacio;
-                    for (var uuid : respostaAnulacio.getNoExecutades()) {
-                        enviamentEntity = enviamentRepository.findByUuid(uuid).orElseThrow();
-                        errorAnulacio = "L'enviament no compleix les condicions per ser anul·lat";
-                        id = SeleccioTipus.NOTIFICACIO.equals(accio.getSeleccioTipus()) ? enviamentEntity.getNotificacio().getId() : enviamentEntity.getId();
-                        accioEntity.getElement(id).actualitzar(errorAnulacio, "");
-                    }
-                    break;
-                case ENVIAR_NOT_MOVIL:
-                    var enviarCarpeta = carpetaPluginHelper.enviarCarpeta();
-                    if (!enviarCarpeta) {
-                        error = true;
-                        accioEntity.setNumErrors(accioEntity.getElements().size());
-                        var errorDesc = "El plugin de CARPETA no està configurat";
-                        accioEntity.setErrorDescripcio(errorDesc);
-                        var elements = accioEntity.getElements();
-                        for (var element : elements) {
-                            element.setErrorDescripcio(errorDesc);
-                            element.setDataExecucio(new Date());
-                        }
-                        accioEntity.setDataFi(new Date());
-                        break;
-                    }
-                    for (Long notificacioId : seleccio) {
-                        try {
-                            var respostaAccio = notificacioService.reenviarNotificaionsMovil(notificacioId);
-                            if (!respostaAccio.getErrors().isEmpty()) {
-                                for (var r : respostaAccio.getErrors()) {
-                                    accioEntity.getElement(notificacioId).actualitzar(r.getErrorDescripcio(), r.getErrorStackTrace());
-                                }
-                            } else {
-                                accioEntity.getElement(notificacioId).actualitzar();
-                            }
-                        } catch (Exception e) {
-                            error = true;
-                            accioEntity.getElement(notificacioId).actualitzar(e.getMessage(), Arrays.toString(e.getStackTrace()));
-                        }
-                    }
-                    accioEntity.setDataFi(new Date());
-                    break;
-                default:
-                    log.error("[AccionsMassivesListener] Tipus accio massiva inexistent: " + accio.getTipus());
-            }
-            accioEntity.setError(error);
+						} catch (Exception ex) {
+							error = true;
+							accioEntity.getElement(enviamentId).actualitzar(ex.getMessage(), Arrays.toString(ex.getStackTrace()));
+						}
+					}
+					break;
+				case ENVIAR_CALLBACK:
+					try {
+						var enviamentsAmbError = enviamentService.enviarCallback(seleccio, accioEntity.getId());
+						error = !enviamentsAmbError.isEmpty();
+						accioEntity.setError(error);
+						if (error) {
+							for (var id : enviamentsAmbError) {
+								accioEntity.getElement(id).actualitzar("Error enviant el callback", "");
+							}
+						}
+					} catch (Exception ex) {
+						error = true;
+					}
+					break;
+				case TORNA_ACTIVAR_CALLBACK:
+					for(var enviamentId : seleccio) {
+						try {
+							enviamentService.activarCallback(enviamentId);
+							accioEntity.getElement(enviamentId).actualitzar();
+						} catch (Exception ex) {
+							error = true;
+							accioEntity.getElement(enviamentId).actualitzar(ex.getMessage(), Arrays.toString(ex.getStackTrace()));
+						}
+					}
+					accioEntity.setDataFi(new Date());
+					break;
+				case REACTIVAR_REGISTRE:
+					for (var notificacioId : seleccio) {
+						try {
+							notificacioService.reactivarRegistre(notificacioId);
+							resposta = notificacioService.resetNotificacioARegistre(notificacioId);
+							actualitzarElements(accioEntity.getElements(), resposta);
+							error = !resposta.getErrors().isEmpty() || !resposta.getNoExecutables().isEmpty();
+						} catch (Exception ex) {
+							error = true;
+							accioEntity.getElement(notificacioId).actualitzar(ex.getMessage(), Arrays.toString(ex.getStackTrace()));
+						}
+					}
+					break;
+				case MARCAR_PROCESSADES:
+					for (var notificacioId : accio.getSeleccio()) {
+						try {
+							var resultat = notificacioService.marcarComProcessada(notificacioId, accio.getMotiu(), accio.isAdminEntitat());
+							if (Strings.isNullOrEmpty(resultat)) {
+								accioEntity.getElement(notificacioId).actualitzar();
+							} else {
+								error = true;
+								accioEntity.getElement(notificacioId).actualitzar(resultat, "");
+							}
+						} catch (Exception ex) {
+							error = true;
+							accioEntity.getElement(notificacioId).actualitzar(ex.getMessage(), Arrays.toString(ex.getStackTrace()));
+						}
+					}
+					accioEntity.setDataFi(new Date());
+					break;
+				case AMPLIAR_TERMINI:
+					AmpliacionPlazoDto ampliacionPlazoDto = new AmpliacionPlazoDto();
+					ampliacionPlazoDto.setAccioMassiva(accioEntity.getId());
+					ampliacionPlazoDto.setMotiu(accio.getMotiu());
+					ampliacionPlazoDto.setDies(accio.getDies());
+					if (SeleccioTipus.NOTIFICACIO.equals(accio.getTipusElementSeleccionat())) {
+						ampliacionPlazoDto.setNotificacionsId(new ArrayList<>(accio.getSeleccio()));
+					} else {
+						ampliacionPlazoDto.setEnviamentsId(new ArrayList<>(accio.getSeleccio()));
+					}
+					var respostaAmpliarPlazo = notificacioService.ampliacionPlazoOE(ampliacionPlazoDto);
+					NotificacioEnviamentEntity enviamentEntity;
+					Long id;
+					String errorAmpliacion;
+					for (var ampliacion : respostaAmpliarPlazo.getAmpliacionesPlazo().getAmpliacionPlazo()) {
+						enviamentEntity = enviamentRepository.findByUuid(ampliacion.getIdentificador()).orElseThrow();
+						errorAmpliacion = ampliacion.getMensajeError();
+						id = SeleccioTipus.NOTIFICACIO.equals(accio.getTipusElementSeleccionat()) ? enviamentEntity.getNotificacio().getId() : enviamentEntity.getId();
+						accioEntity.getElement(id).actualitzar(errorAmpliacion, "");
+					}
+					for (var uuid : respostaAmpliarPlazo.getNoExecutades()) {
+						enviamentEntity = enviamentRepository.findByUuid(uuid).orElseThrow();
+						errorAmpliacion = "Enviament amb entrega postal o sense identificador de Notific@. No es pot ampliar el termini";
+						id = SeleccioTipus.NOTIFICACIO.equals(accio.getTipusElementSeleccionat()) ? enviamentEntity.getNotificacio().getId() : enviamentEntity.getId();
+						accioEntity.getElement(id).actualitzar(errorAmpliacion, "");
+					}
+					break;
+				case ANULAR:
+					AnularDto anular = new AnularDto();
+					anular.setAccioMassiva(accioEntity.getId());
+					anular.setMotiu(accio.getMotiu());
+					if (SeleccioTipus.NOTIFICACIO.equals(accio.getTipusElementSeleccionat())) {
+						anular.setNotificacionsId(new ArrayList<>(accio.getSeleccio()));
+					} else {
+						anular.setEnviamentsId(new ArrayList<>(accio.getSeleccio()));
+					}
+					var respostaAnulacio = notificacioService.anular(anular);
+					for (var anulacio : respostaAnulacio.getRespostes()) {
+						enviamentEntity = enviamentRepository.findByNotificaReferencia(anulacio.getIdentificador());
+						if (enviamentEntity == null) {
+							throw new Exception("Enviament inexistent. Identificador de Notifica " + anulacio.getIdentificador());
+						}
+						id = SeleccioTipus.NOTIFICACIO.equals(accio.getTipusElementSeleccionat()) ? enviamentEntity.getNotificacio().getId() : enviamentEntity.getId();
+						accioEntity.getElement(id).actualitzar(anulacio.getDescripcioResposta(), "");
+					}
+					String errorAnulacio;
+					for (var uuid : respostaAnulacio.getNoExecutades()) {
+						enviamentEntity = enviamentRepository.findByUuid(uuid).orElseThrow();
+						errorAnulacio = "L'enviament no compleix les condicions per ser anul·lat";
+						id = SeleccioTipus.NOTIFICACIO.equals(accio.getTipusElementSeleccionat()) ? enviamentEntity.getNotificacio().getId() : enviamentEntity.getId();
+						accioEntity.getElement(id).actualitzar(errorAnulacio, "");
+					}
+					break;
+				case ENVIAR_NOT_MOVIL:
+					var enviarCarpeta = carpetaPluginHelper.enviarCarpeta();
+					if (!enviarCarpeta) {
+						error = true;
+						accioEntity.setNumErrors(accioEntity.getElements().size());
+						var errorDesc = "El plugin de CARPETA no està configurat";
+						accioEntity.setErrorDescripcio(errorDesc);
+						var elements = accioEntity.getElements();
+						for (var element : elements) {
+							element.setErrorDescripcio(errorDesc);
+							element.setDataExecucio(new Date());
+						}
+						accioEntity.setDataFi(new Date());
+						break;
+					}
+					for (Long notificacioId : seleccio) {
+						try {
+							var respostaAccio = notificacioService.reenviarNotificaionsMovil(notificacioId);
+							if (!respostaAccio.getErrors().isEmpty()) {
+								for (var r : respostaAccio.getErrors()) {
+									accioEntity.getElement(notificacioId).actualitzar(r.getErrorDescripcio(), r.getErrorStackTrace());
+								}
+							} else {
+								accioEntity.getElement(notificacioId).actualitzar();
+							}
+						} catch (Exception e) {
+							error = true;
+							accioEntity.getElement(notificacioId).actualitzar(e.getMessage(), Arrays.toString(e.getStackTrace()));
+						}
+					}
+					accioEntity.setDataFi(new Date());
+					break;
+				default:
+					log.error("[AccionsMassivesListener] Tipus accio massiva inexistent: " + accio.getTipus());
+			}
+			accioEntity.setError(error);
 //            accioEntity.setErrorDescripcio(errorDescricpio);
 //            accioEntity.setExcepcioStacktrace(excepcioStacktrace);
-        } catch (Exception ex) {
-            log.error("[AccionsMassivesListener] Error al executar no controlat l'acció massiva " + accio, ex);
-            accioEntity.setError(true);
-            accioEntity.setErrorDescripcio(ex.getMessage());
-            accioEntity.setExcepcioStacktrace(Arrays.toString(ex.getStackTrace()));
-        }
+		} catch (Exception ex) {
+			log.error("[AccionsMassivesListener] Error no controlat al executar l'acció massiva " + accio, ex);
+			accioEntity.setError(true);
+			accioEntity.setErrorDescripcio(ex.getMessage());
+			accioEntity.setExcepcioStacktrace(Arrays.toString(ex.getStackTrace()));
+		}
 //        accioEntity.setDataFi(new Date());
-        accioMassivaRepository.save(accioEntity);
-    }
+		accioMassivaRepository.save(accioEntity);
+	}
 
     @Transactional
     public List<AccioMassivaElementEntity> actualitzarElements(List<AccioMassivaElementEntity> elements, RespostaAccio<AccioMassivaElement> resposta) {

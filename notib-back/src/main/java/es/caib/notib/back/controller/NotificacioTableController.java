@@ -955,38 +955,45 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @PostMapping(value = "/anular")
     public String anularPost(HttpServletResponse response, HttpServletRequest request, Model model, @Valid AnularCommand command, BindingResult bindingResult) {
 
-        try {
-            if (bindingResult.hasErrors()) {
-                model.addAttribute("motiuSize", command.getMotiuDefaultSize());
-                return "anularForm";
-            }
+		try {
+			if (bindingResult.hasErrors()) {
+				model.addAttribute("motiuSize", command.getMotiuDefaultSize());
+				return "anularForm";
+			}
 
-            Long accioMassivaId;
-            if (command.isMassiu()) {
-                var entitatActual = sessionScopedContext.getEntitatActual();
-                var seleccio = command.getNotificacionsId() != null && !command.getNotificacionsId().isEmpty() ? command.getNotificacionsId() : command.getEnviamentsId();
-                var seleccioTipus = command.getSeleccioTipus();
-                var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
-                var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.ANULAR).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
-                accioMassivaId = accioMassivaService.altaAccioMassiva(accio);
-                accio.setAccioId(accioMassivaId);
-                accio.setAnulacio(ConversioTipusHelper.convertir(command, AnularDto.class));
-                accioMassivaService.executarAccio(accio);
-                return getModalControllerReturnValueSuccess(request, "redirect:/enviament", "anular.massiva.ok");
-            }
-            var resposta = notificacioService.anular(ConversioTipusHelper.convertir(command, AnularDto.class));
-            var noExecutades = !resposta.getNoExecutades().isEmpty();
-            var ok = resposta != null && resposta.isOk();
-            var msgKey = ok ? noExecutades ? "anular.ok.no.executades" : "anular.ok" :
-                    resposta.getErrors().isEmpty() ?  noExecutades ? "anular.no.executades" : "anular.error" : noExecutades ? "anular.error.no.executades" : "anular.error";
-            Object[] params = "anular.no.executades".equals(msgKey) ? new Object[]{resposta.getNoExecutades()} : new Object[]{resposta.getErrors(), resposta.getNoExecutades()};
+			Long accioMassivaId;
+			if (command.isMassiu()) {
+				var entitatActual = sessionScopedContext.getEntitatActual();
+				var seleccio = command.getNotificacionsId() != null && !command.getNotificacionsId().isEmpty() ? command.getNotificacionsId() : command.getEnviamentsId();
+				var seleccioTipus = command.getSeleccioTipus();
+				var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
+				var accio = AccioMassivaExecucio.builder()
+					.isAdminEntitat(isAdminEntitat)
+					.tipus(AccioMassivaTipus.ANULAR)
+					.tipusElementSeleccionat(seleccioTipus)
+					.entitatId(entitatActual.getId())
+					.seleccio(seleccio)
+					.motiu(command.getMotiu())
+					.build();
+				accioMassivaId = accioMassivaService.altaAccioMassiva(accio);
+				accio.setAccioId(accioMassivaId);
+//                accio.setAnulacio(ConversioTipusHelper.convertir(command, AnularDto.class));
+				accioMassivaService.executarAccio(accio);
+				return getModalControllerReturnValueSuccess(request, "redirect:/enviament", "anular.massiva.ok");
+			}
+			var resposta = notificacioService.anular(ConversioTipusHelper.convertir(command, AnularDto.class));
+			var noExecutades = !resposta.getNoExecutades().isEmpty();
+			var ok = resposta != null && resposta.isOk();
+			var msgKey = ok ? noExecutades ? "anular.ok.no.executades" : "anular.ok" :
+				resposta.getErrors().isEmpty() ?  noExecutades ? "anular.no.executades" : "anular.error" : noExecutades ? "anular.error.no.executades" : "anular.error";
+			Object[] params = "anular.no.executades".equals(msgKey) ? new Object[]{resposta.getNoExecutades()} : new Object[]{resposta.getErrors(), resposta.getNoExecutades()};
 
-            return ok ? getModalControllerReturnValueSuccess(request, "redirect:/enviament", msgKey, params)
-                    : getModalControllerReturnValueError(request, "redirect:/enviament", msgKey, params);
-        } catch (Exception ex) {
-            log.error("Error anulat enviaments ", ex);
-            return getModalControllerReturnValueError(request, "redirect:/enviament", "anular.error");
-        }
+			return ok ? getModalControllerReturnValueSuccess(request, "redirect:/enviament", msgKey, params)
+				: getModalControllerReturnValueError(request, "redirect:/enviament", msgKey, params);
+		} catch (Exception ex) {
+			log.error("Error anulat enviaments ", ex);
+			return getModalControllerReturnValueError(request, "redirect:/enviament", "anular.error");
+		}
     }
 
 
@@ -1035,33 +1042,41 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @PostMapping(value = "/ampliacion/plazo")
     public String ampliarPlazoOEPost(HttpServletResponse response, HttpServletRequest request, Model model, @Valid AmpliacionPlazoCommand ampliacionPlazo, BindingResult bindingResult) {
 
-        try {
-            if (bindingResult.hasErrors()) {
-                model.addAttribute("motiuSize", ampliacionPlazo.getMotiuDefaultSize());
-                return "ampliarPlazoForm";
-            }
-            var ampliarPlazoOE = new AmpliarPlazoOE();
-            ampliarPlazoOE.setPlazo(ampliacionPlazo.getDies());
-            ampliarPlazoOE.setMotivo(ampliacionPlazo.getMotiu());
-            Long accioMassivaId;
-            if (ampliacionPlazo.isMassiu()) {
-                var entitatActual = sessionScopedContext.getEntitatActual();
-                var seleccio = ampliacionPlazo.getNotificacionsId() != null && !ampliacionPlazo.getNotificacionsId().isEmpty() ? ampliacionPlazo.getNotificacionsId() : ampliacionPlazo.getEnviamentsId();
-                var seleccioTipus = requestIsRemesesEnviamentMassiu(request) ? SeleccioTipus.NOTIFICACIO : SeleccioTipus.ENVIAMENT;
-                var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
-                var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.AMPLIAR_TERMINI).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
-                accioMassivaId = accioMassivaService.altaAccioMassiva(accio);
-                accio.setAccioId(accioMassivaId);
-                accio.setAmpliacionPlazo(ConversioTipusHelper.convertir(ampliacionPlazo, AmpliacionPlazoDto.class));
-                accioMassivaService.executarAccio(accio);
-            }
-            var resposta = notificacioService.ampliacionPlazoOE(ConversioTipusHelper.convertir(ampliacionPlazo, AmpliacionPlazoDto.class));
-            return resposta != null && resposta.isOk() ? getModalControllerReturnValueSuccess(request, "redirect:/enviament", "ampliar.plazo.ok")
-                    : getModalControllerReturnValueError(request, "redirect:/enviament", "ampliar.plazo.error", new Object[]{resposta.getDescripcions() != null ? resposta.getDescripcions() : resposta.getDescripcionRespuesta()});
-        } catch (Exception ex) {
-            log.error("Error ampliant el plazo", ex);
-            return getModalControllerReturnValueError(request, "redirect:/enviament", "ampliar.plazo.error");
-        }
+		try {
+			if (bindingResult.hasErrors()) {
+				model.addAttribute("motiuSize", ampliacionPlazo.getMotiuDefaultSize());
+				return "ampliarPlazoForm";
+			}
+			var ampliarPlazoOE = new AmpliarPlazoOE();
+			ampliarPlazoOE.setPlazo(ampliacionPlazo.getDies());
+			ampliarPlazoOE.setMotivo(ampliacionPlazo.getMotiu());
+			Long accioMassivaId;
+			if (ampliacionPlazo.isMassiu()) {
+				var entitatActual = sessionScopedContext.getEntitatActual();
+				var seleccio = ampliacionPlazo.getNotificacionsId() != null && !ampliacionPlazo.getNotificacionsId().isEmpty() ? ampliacionPlazo.getNotificacionsId() : ampliacionPlazo.getEnviamentsId();
+				var seleccioTipus = requestIsRemesesEnviamentMassiu(request) ? SeleccioTipus.NOTIFICACIO : SeleccioTipus.ENVIAMENT;
+				var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
+				var accio = AccioMassivaExecucio.builder()
+					.isAdminEntitat(isAdminEntitat)
+					.tipus(AccioMassivaTipus.AMPLIAR_TERMINI)
+					.tipusElementSeleccionat(seleccioTipus)
+					.entitatId(entitatActual.getId())
+					.seleccio(seleccio)
+					.motiu(ampliacionPlazo.getMotiu())
+					.dies(ampliacionPlazo.getDies())
+					.build();
+				accioMassivaId = accioMassivaService.altaAccioMassiva(accio);
+				accio.setAccioId(accioMassivaId);
+//                accio.setAmpliacionPlazo(ConversioTipusHelper.convertir(ampliacionPlazo, AmpliacionPlazoDto.class));
+				accioMassivaService.executarAccio(accio);
+			}
+			var resposta = notificacioService.ampliacionPlazoOE(ConversioTipusHelper.convertir(ampliacionPlazo, AmpliacionPlazoDto.class));
+			return resposta != null && resposta.isOk() ? getModalControllerReturnValueSuccess(request, "redirect:/enviament", "ampliar.plazo.ok")
+				: getModalControllerReturnValueError(request, "redirect:/enviament", "ampliar.plazo.error", new Object[]{resposta.getDescripcions() != null ? resposta.getDescripcions() : resposta.getDescripcionRespuesta()});
+		} catch (Exception ex) {
+			log.error("Error ampliant el plazo", ex);
+			return getModalControllerReturnValueError(request, "redirect:/enviament", "ampliar.plazo.error");
+		}
     }
 
 
@@ -1085,7 +1100,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         var entitatActual = sessionScopedContext.getEntitatActual();
         var seleccioTipus = requestIsRemesesEnviamentMassiu(request) ? SeleccioTipus.NOTIFICACIO : SeleccioTipus.ENVIAMENT;
         var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
-        var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.ENVIAR_NOT_MOVIL).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+		var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.ENVIAR_NOT_MOVIL).tipusElementSeleccionat(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
         var accioId = accioMassivaService.altaAccioMassiva(accio);
         accio.setAccioId(accioId);
         try {
@@ -1129,7 +1144,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         var entitatActual = sessionScopedContext.getEntitatActual();
         var seleccioTipus = requestIsRemesesEnviamentMassiu(request) ? SeleccioTipus.NOTIFICACIO : SeleccioTipus.ENVIAMENT;
         var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
-        var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.REACTIVAR_REGISTRE).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+		var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.REACTIVAR_REGISTRE).tipusElementSeleccionat(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
         var accioId = accioMassivaService.altaAccioMassiva(accio);
         accio.setAccioId(accioId);
         accioMassivaService.executarAccio(accio);
@@ -1184,7 +1199,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         var entitatActual = sessionScopedContext.getEntitatActual();
         var seleccioTipus = requestIsRemesesEnviamentMassiu(request) ? SeleccioTipus.NOTIFICACIO : SeleccioTipus.ENVIAMENT;
         var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
-        var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.MARCAR_PROCESSADES).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+		var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.MARCAR_PROCESSADES).tipusElementSeleccionat(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
         var accioId = accioMassivaService.altaAccioMassiva(accio);
         accio.setAccioId(accioId);
         accioMassivaService.executarAccio(accio);
@@ -1225,7 +1240,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         }
         var seleccioTipus = requestIsRemesesEnviamentMassiu(request) ? SeleccioTipus.NOTIFICACIO : SeleccioTipus.ENVIAMENT;
         var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
-        var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.ESBORRAR).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+		var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.ESBORRAR).tipusElementSeleccionat(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
         var accioId = accioMassivaService.altaAccioMassiva(accio);
         accio.setAccioId(accioId);
         var notificacionsNoEsborrades = accioMassivaService.esborrarNotificacions(accio);
@@ -1256,7 +1271,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         }
         var seleccioTipus = requestIsRemesesEnviamentMassiu(request) ? SeleccioTipus.NOTIFICACIO : SeleccioTipus.ENVIAMENT;
         var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
-        var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.RECUPERAR_ESBORRADES).seleccioTipus(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
+		var accio = AccioMassivaExecucio.builder().isAdminEntitat(isAdminEntitat).tipus(AccioMassivaTipus.RECUPERAR_ESBORRADES).tipusElementSeleccionat(seleccioTipus).entitatId(entitatActual.getId()).seleccio(seleccio).build();
         var accioId = accioMassivaService.altaAccioMassiva(accio);
         accio.setAccioId(accioId);
         var notificacionsNoRecuperades = accioMassivaService.recuperarNotificacionsEsborrades(accio);
