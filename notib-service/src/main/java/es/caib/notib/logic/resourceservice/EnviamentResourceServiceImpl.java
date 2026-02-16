@@ -1,7 +1,7 @@
 package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
-import es.caib.notib.logic.intf.model.EnviamentResource;
+import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 import es.caib.notib.logic.intf.resourceservice.EnviamentResourceService;
 import es.caib.notib.persist.entity.resourceentity.EnviamentResourceEntity;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class EnviamentResourceServiceImpl
-	extends BaseMutableResourceService<EnviamentResource, Long, EnviamentResourceEntity>
+	extends BaseMutableResourceService<NotificacioEnviamentResource, Long, EnviamentResourceEntity>
 	implements EnviamentResourceService {
 
 }

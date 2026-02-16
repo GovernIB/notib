@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Entitat de base de dades pels recursos de tipus òrgan gestor.
+ * Entitat de base d'òrgan gestor.
  *
  * @author Límit Tecnologies
  */

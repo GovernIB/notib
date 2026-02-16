@@ -16,7 +16,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
- * Entitat de base de dades pels recursos de tipus grup.
+ * Entitat de base de dades de grup.
  *
  * @author Límit Tecnologies
  */

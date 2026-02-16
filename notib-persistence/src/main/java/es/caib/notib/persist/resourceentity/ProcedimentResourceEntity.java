@@ -12,7 +12,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- * Entitat de base de dades pels recursos de tipus procediment.
+ * Entitat de base de dades de procediment.
  *
  * @author Límit Tecnologies
  */

@@ -4,7 +4,7 @@ import es.caib.notib.persist.base.repository.BaseRepository;
 import es.caib.notib.persist.resourceentity.AplicacioResourceEntity;
 
 /**
- * Repositori per a la gestió d'entitats de tipus aplicació.
+ * Repositori per a la gestió d'aplicacions.
  *
  * @author Límit Tecnologies
  */

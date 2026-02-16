@@ -11,7 +11,7 @@ import lombok.Setter;
 import javax.persistence.*;
 
 /**
- * Entitat de base de dades pels recursos de tipus de documents associats a una entitat.
+ * Entitat de base de dades de document associat a una entitat.
  *
  * @author Límit Tecnologies
  */

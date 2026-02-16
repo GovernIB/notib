@@ -11,7 +11,7 @@ import org.hibernate.annotations.Formula;
 import javax.persistence.*;
 
 /**
- * Entitat de base de dades pels recursos de tipus propietat de configuració.
+ * Entitat de base de dades de propietat de configuració.
  *
  * @author Límit Tecnologies
  */

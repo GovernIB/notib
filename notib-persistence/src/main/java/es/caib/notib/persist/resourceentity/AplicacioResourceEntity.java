@@ -11,7 +11,7 @@ import javax.persistence.*;
 import java.time.LocalTime;
 
 /**
- * Entitat de base de dades pels recursos de tipus aplicació.
+ * Entitat de base de dades d'aplicació.
  *
  * @author Límit Tecnologies
  */

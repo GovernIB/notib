@@ -10,7 +10,7 @@ import lombok.Setter;
 import javax.persistence.*;
 
 /**
- * Entitat de base de dades per a les combinacions pagador CIE - pagador postal.
+ * Entitat de base de dades de la combinació pagador CIE - pagador postal.
  *
  * @author Límit Tecnologies
  */

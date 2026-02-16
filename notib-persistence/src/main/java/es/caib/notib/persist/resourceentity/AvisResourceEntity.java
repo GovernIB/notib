@@ -12,7 +12,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- * Entitat de base de dades pels recursos de tipus avís.
+ * Entitat de base de dades d'avís.
  *
  * @author Límit Tecnologies
  */

@@ -8,7 +8,7 @@ import org.hibernate.annotations.JoinFormula;
 import javax.persistence.*;
 
 /**
- * Entitat de base de dades pels recursos de tipus format de sobre d'un pagador CIE.
+ * Entitat de base de dades de format de sobre d'un pagador CIE.
  *
  * @author Límit Tecnologies
  */
