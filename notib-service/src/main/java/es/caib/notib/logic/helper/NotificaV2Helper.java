@@ -769,9 +769,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					envios.setFechaEnvioProgramado(toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
 				}
 			}
-			envios.setConcepto(notificacio.getConcepte().replace('·', '.').replace("'","´"));
+			envios.setConcepto(notificacio.getConcepte().replace('·', '.').replace("'"," "));
 			if (!Strings.isNullOrEmpty(notificacio.getDescripcio())) {
 				envios.setDescripcion(notificacio.getDescripcio().replace('·', '.'));
+				envios.setDescripcion(notificacio.getDescripcio().replace("'", " "));
 			}
 			envios.setProcedimiento(notificacio.getProcedimentCodiNotib());
 			var documento = new Documento();
