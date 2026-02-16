@@ -14,6 +14,8 @@ import OrganForm from './pages/organ/OrganForm';
 import PagadorCieGrid from './pages/pagadorCie/PagadorCieGrid';
 import PagadorCieForm from './pages/pagadorCie/PagadorCieForm';
 import PagadorsPostals from './pages/PagadorsPostals';
+import NotificacioGrid from './pages/notificacio/NotificacioGrid';
+import NotificacioForm from './pages/notificacio/NotificacioForm';
 import NotFoundPage from './pages/NotFound';
 import Propietats from './pages/propietat/Propietats';
 
@@ -32,6 +34,7 @@ const AppRoutes = () => {
                     <Route path=":id" element={<EntitatForm />} />
                 </Route>
             </Route>
+            <Route path="propietats" element={<Propietats />} />
             <Route path="avisos">
                 <Route index element={<AvisGrid />} />
                 <Route path="form">
@@ -69,7 +72,13 @@ const AppRoutes = () => {
                     <Route path=":id" element={<PagadorCieForm />} />
                 </Route>
             </Route>
-            <Route path="propietats" element={<Propietats />} />
+            <Route path="notificacions">
+                <Route index element={<NotificacioGrid />} />
+                <Route path="form">
+                    <Route index element={<NotificacioForm />} />
+                    <Route path=":id" element={<NotificacioForm />} />
+                </Route>
+            </Route>
             <Route path="*" element={<NotFoundPage />} />
         </Routes>
     );

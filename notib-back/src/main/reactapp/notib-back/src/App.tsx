@@ -107,6 +107,12 @@ const InnerApp: React.FC = () => {
         },
         {
             id: 'config',
+            title: t('menu.notificacions'),
+            to: '/notificacions',
+            icon: 'notifications',
+        },
+        {
+            id: 'config',
             title: t('menu.config'),
             icon: 'settings',
             children: menuConfig,
