@@ -81,6 +81,8 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.validation.BindException;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.io.ICsvListWriter;
@@ -662,23 +664,30 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 filtre.getEstatProces(), createdByNull, filtre.getCreatedByCodi(), paginacioHelper.toSpringDataPageable(paginacioParams));
     }
 
-    private void enviarCorreuElectronic(NotificacioMassivaEntity notificacioMassiva) {
+	private void enviarCorreuElectronic(NotificacioMassivaEntity notificacioMassiva) {
 
-        if (Strings.isNullOrEmpty(notificacioMassiva.getEmail())) {
-            return;
-        }
-        try {
-
-            jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_MASSIVA, notificacioMassiva.getId(), m -> {
-                // Esperam 5 segons a enviar el correu per asseguar que ja s'hagi desat la notificació massiva
-                m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 5000L);
-                return m;
-            });
-        } catch (JmsException ex) {
-            log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar enviar el correu electrònic.", ex);
-        }
-    }
-
+		if (Strings.isNullOrEmpty(notificacioMassiva.getEmail())) {
+			return;
+		}
+		if (TransactionSynchronizationManager.isActualTransactionActive()) {
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+				@Override
+				public void afterCommit() {
+					try {
+						jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_MASSIVA, notificacioMassiva.getId());
+					} catch (JmsException ex) {
+						log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar enviar el correu electrònic.", ex);
+					}
+				}
+			});
+		} else {
+			try {
+				jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_MASSIVA, notificacioMassiva.getId());
+			} catch (JmsException ex) {
+				log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar enviar el correu electrònic.", ex);
+			}
+		}
+	}
     private NotificacioMassivaEntity registrarNotificacioMassiva(EntitatEntity entitat, NotificacioMassivaDto notMassivaDto, int size) {
 
         var csvGesdocId = pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_MASSIUS_CSV, notMassivaDto.getFicheroCsvBytes());

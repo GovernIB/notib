@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.back.controller;
 
@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
 import java.util.List;
 
 @Slf4j
@@ -93,6 +95,21 @@ public class MonitorActiveMqController extends BaseController {
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("Error getting queue details!");
+		}
+	}
+
+	@GetMapping("/scheduler/stats")
+	public void getJobSchedulerStats(HttpServletResponse response) {
+		try {
+			String stats = activeMqService.getJobSchedulerStats();
+			response.setContentType("application/json");
+			response.setHeader("Content-Disposition", "attachment; filename=jobscheduler-stats.json");
+			PrintWriter out = response.getWriter();
+			out.print(stats);
+			out.flush();
+		} catch (Exception e) {
+			log.error("Error al generar les estadístiques del JobScheduler", e);
+			throw new RuntimeException("Error al generar les estadístiques del JobScheduler");
 		}
 	}
 

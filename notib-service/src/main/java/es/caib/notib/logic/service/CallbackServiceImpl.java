@@ -49,7 +49,7 @@ import java.util.concurrent.Future;
 /**
  * Classe que implementa el servei de callback cap a les aplicacions clients de Notib
  * que estan configurades per rebre actualitzacions dels events de les notificacions.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -86,11 +86,7 @@ public class CallbackServiceImpl implements CallbackService {
 
 		var noEnviats = callbackRepository.findEnviamentIdPendentsNoEnviats();
 		for (var noEnviat : noEnviats) {
-			jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, noEnviat,
-					m -> {
-						m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 1000L);
-						return m;
-					});
+			jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, noEnviat);
 		}
 	}
 

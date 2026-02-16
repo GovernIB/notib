@@ -32,6 +32,7 @@
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<div class="text-right">
 			<div class="btn-group">
+				<a href="<c:url value="/monitor/activemq/scheduler/stats"/>" class="btn btn-info"><span class="fa fa-download"></span>&nbsp;JobScheduler JSON</a>
 				<button id="refrescar" class="btn btn-default"><span class="fa fa-reload"></span>Refrescar</a>
 			</div>
 		</div>

@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
+import org.apache.activemq.broker.region.policy.PolicyEntry;
+import org.apache.activemq.broker.region.policy.PolicyMap;
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.activemq.store.kahadb.KahaDBPersistenceAdapter;
 import org.apache.activemq.usage.SystemUsage;
@@ -116,6 +118,15 @@ public class SmJmsConfig {
 		usage.setSendFailIfNoSpace(true);
 		// opcional: si prefereixes “esperar una mica” i després fallar
 		usage.setSendFailIfNoSpaceAfterTimeout(5_000); // 5s
+
+		// 6) Configuració de polítiques per evitar el bloqueig per Producer Flow Control
+		PolicyMap policyMap = new PolicyMap();
+		PolicyEntry defaultEntry = new PolicyEntry();
+		defaultEntry.setProducerFlowControl(true); // Activa el control de flux
+		// Si el control de flux està actiu i sendFailIfNoSpace és cert, el productor rebrà una excepció en lloc de bloquejar-se
+		policyMap.setDefaultEntry(defaultEntry);
+		broker.setDestinationPolicy(policyMap);
+
 		return broker;
 	}
 

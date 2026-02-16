@@ -31,6 +31,8 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -104,11 +106,16 @@ public class CallbackHelper {
 			c.setErrorDesc(errorDesc);
 			c.setEstat(CallbackEstatEnumDto.PENDENT);
 			callbackRepository.saveAndFlush(c);
-			jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId(),
-					m -> {
-						m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 1000L);
-						return m;
-					});
+			if (TransactionSynchronizationManager.isActualTransactionActive()) {
+				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+					@Override
+					public void afterCommit() {
+						jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId());
+					}
+				});
+			} else {
+				jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId());
+			}
 		} catch (NoSuchElementException ex) {
 			log.error("L'enviament " + env.getId() + " i la notificacio " + env.getNotificacio().getId() + " no tenen assignat el createdBy", ex);
 		} catch (Exception ex) {
@@ -145,11 +152,16 @@ public class CallbackHelper {
 		}
 		callback.setData(new Date());
 		callback.setEstat(CallbackEstatEnumDto.PENDENT);
-		jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId(),
-				m -> {
-					m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 1000L);
-					return m;
-				});
+		if (TransactionSynchronizationManager.isActualTransactionActive()) {
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+				@Override
+				public void afterCommit() {
+					jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId());
+				}
+			});
+		} else {
+			jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId());
+		}
 		return callback;
 	}
 
