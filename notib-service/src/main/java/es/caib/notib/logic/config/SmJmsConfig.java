@@ -71,7 +71,7 @@ public class SmJmsConfig {
         connectionFactory.setTrustAllPackages(true);
         connectionFactory.setBrokerURL(BROKER_URL);
 		connectionFactory.setUserName(BROKER_USERNAME);
-		connectionFactory.setPassword(BROKER_PASSWORD););
+		connectionFactory.setPassword(BROKER_PASSWORD);
         return connectionFactory;
     }
 
