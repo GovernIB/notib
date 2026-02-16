@@ -201,7 +201,7 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 			}
 		};
 		SimpleMappableAttributesRetriever mappableAttributesRetriever = new SimpleMappableAttributesRetriever();
-		mappableAttributesRetriever.setMappableAttributes(new HashSet<>(Arrays.asList(mappableRoles.split(","))));
+		mappableAttributesRetriever.setMappableAttributes(getAllowedRoles());
 		authenticationDetailsSource.setMappableRolesRetriever(mappableAttributesRetriever);
 		SimpleAttributes2GrantedAuthoritiesMapper attributes2GrantedAuthoritiesMapper = new SimpleAttributes2GrantedAuthoritiesMapper();
 		attributes2GrantedAuthoritiesMapper.setAttributePrefix(MethodSecurityConfig.DEFAULT_ROLE_PREFIX);

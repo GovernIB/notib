@@ -12,7 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 /**
- * Entitat de base de dades pels recursos de tipus de propietat de configuració.
+ * Entitat de base de dades de propietat de configuració.
  *
  * @author Límit Tecnologies
  */

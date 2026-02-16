@@ -1,6 +1,6 @@
 package es.caib.notib.persist.entity.resourceentity;
 
-import es.caib.notib.logic.intf.model.EnviamentResource;
+import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 import es.caib.notib.persist.base.entity.BaseAuditableEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +14,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class EnviamentResourceEntity extends BaseAuditableEntity<EnviamentResource, Long> {
+public class EnviamentResourceEntity extends BaseAuditableEntity<NotificacioEnviamentResource, Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private @Nullable Long id;

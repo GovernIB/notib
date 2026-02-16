@@ -9,7 +9,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- * Entitat de base de dades pels recursos de tipus pagador CIE.
+ * Entitat de base de dades de pagador CIE.
  *
  * @author Límit Tecnologies
  */

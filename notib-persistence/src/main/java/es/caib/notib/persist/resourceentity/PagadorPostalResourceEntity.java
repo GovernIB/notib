@@ -17,7 +17,7 @@ import javax.persistence.Table;
 import java.util.Date;
 
 /**
- * Entitat de base de dades pels recursos de tipus pagador postal.
+ * Entitat de base de dades de pagador postal.
  *
  * @author Límit Tecnologies
  */

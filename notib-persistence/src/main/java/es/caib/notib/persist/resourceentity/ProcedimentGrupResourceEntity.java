@@ -11,7 +11,7 @@ import org.hibernate.annotations.JoinFormula;
 import javax.persistence.*;
 
 /**
- * Entitat de base de dades pels recursos de tipus relació procediment - grup.
+ * Entitat de base de dades de relació procediment - grup.
  *
  * @author Límit Tecnologies
  */

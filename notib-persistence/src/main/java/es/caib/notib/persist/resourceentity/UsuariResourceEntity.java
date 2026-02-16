@@ -7,7 +7,7 @@ import lombok.*;
 import javax.persistence.*;
 
 /**
- * Entitat de base de dades pels recursos de tipus usuari de l'aplicació.
+ * Entitat de base de dades d'usuari de l'aplicació.
  *
  * @author Límit Tecnologies
  */

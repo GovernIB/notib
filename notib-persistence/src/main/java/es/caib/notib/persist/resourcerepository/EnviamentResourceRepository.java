@@ -4,7 +4,7 @@ import es.caib.notib.persist.base.repository.BaseRepository;
 import es.caib.notib.persist.entity.resourceentity.EnviamentResourceEntity;
 
 /**
- * Repositori per a la gestió d'entitats de tipus enviament.
+ * Repositori per a la gestió d'enviaments.
  *
  * @author Límit Tecnologies
  */
