@@ -138,12 +138,11 @@ public class CallbackHelper {
 		var callback = callbackRepository.findByEnviamentId(env.getId());
 		if (callback == null) {
 			var usuari = env.getCreatedBy().orElse(env.getNotificacio().getCreatedBy().orElse(null));
-			var codi = "";
 			if (usuari == null) {
 				log.error("[CALLBACK] Error usuari null per enviament " + env.getId() + "  i null a la notificacio " + env.getNotificacio().getId());
 				return null;
 			}
-			callback = CallbackEntity.builder().usuariCodi(codi).notificacioId(env.getNotificacio().getId()).enviamentId(env.getId()).build();
+			callback = CallbackEntity.builder().usuariCodi(usuari.getCodi()).notificacioId(env.getNotificacio().getId()).enviamentId(env.getId()).build();
 			callbackRepository.saveAndFlush(callback);
 		}
 		callback.setData(new Date());
