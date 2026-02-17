@@ -2,29 +2,17 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import { FormPage, MuiForm, FormField } from 'reactlib';
-
-const NotificacioFormEnviament: React.FC = () => {
-    return (
-        <>
-            <Typography variant="h5" sx={{ mt: 3, mb: 1 }}>
-                Enviaments
-            </Typography>
-            <Paper sx={{ p: 2 }}>
-                <Grid container spacing={2}>
-                    <FormField name="concepte" />
-                </Grid>
-            </Paper>
-        </>
-    );
-};
+import NotificacioFormEnviaments from './NotificacioFormEnviaments';
 
 const NotificacioFormContent: React.FC = () => {
     return (
         <Grid container spacing={2}>
             <Grid size={12}>
+                <Typography variant="h6" sx={{ mb: 1 }}>
+                    Informació de la remesa
+                </Typography>
                 <FormField name="concepte" />
             </Grid>
             <Grid size={12}>
@@ -73,7 +61,7 @@ export const NotificacioForm: React.FC = () => {
                 componentProps={{ style: { height: '100%' } }}
                 commonFieldComponentProps={{ size: 'small' }}>
                 <NotificacioFormContent />
-                <NotificacioFormEnviament />
+                <NotificacioFormEnviaments />
             </MuiForm>
         </FormPage>
     );

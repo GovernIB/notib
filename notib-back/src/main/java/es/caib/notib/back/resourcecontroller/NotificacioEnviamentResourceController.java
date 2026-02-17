@@ -7,11 +7,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Servei REST de gestió d'enviaments.
+ * Servei REST de gestió d'enviaments d'una notificació.
  *
  * @author Límit Tecnologies
  */
 @RestController
-@RequestMapping(BaseConfig.API_PATH + "/enviaments")
-public class EnviamentResourceController extends BaseMutableResourceController<NotificacioEnviamentResource, Long> {
+@RequestMapping(BaseConfig.API_PATH + "/notificacioEnviaments")
+public class NotificacioEnviamentResourceController extends BaseMutableResourceController<NotificacioEnviamentResource, Long> {
+
 }

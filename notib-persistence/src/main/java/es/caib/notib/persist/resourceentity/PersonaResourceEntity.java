@@ -4,7 +4,6 @@ import es.caib.notib.client.domini.DocumentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.model.PersonaResource;
-import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,14 +27,6 @@ public class PersonaResourceEntity
 	@Column(name = "interessattipus", nullable = false)
 	@Enumerated(EnumType.STRING)
 	private InteressatTipus interessatTipus;
-	@Column(name = "incapacitat")
-	private boolean incapacitat;
-	@Column(name = "email", length = 255)
-	private String email;
-	@Column(name = "llinatge1", length = 30)
-	private String llinatge1;
-	@Column(name = "llinatge2", length = 30)
-	private String llinatge2;
 	@Column(name = "document_tipus")
 	@Enumerated(EnumType.STRING)
 	private DocumentTipus documentTipus;
@@ -43,12 +34,20 @@ public class PersonaResourceEntity
 	private String nif;
 	@Column(name = "nom", length = 255)
 	private String nom;
+	@Column(name = "llinatge1", length = 30)
+	private String llinatge1;
+	@Column(name = "llinatge2", length = 30)
+	private String llinatge2;
 	@Column(name = "telefon", length = 16)
 	private String telefon;
+	@Column(name = "email", length = 255)
+	private String email;
 	@Column(name = "rao_social", length = 100)
 	private String raoSocial;
 	@Column(name = "cod_entitat_desti", length = 9)
 	private String dir3Codi;
+	@Column(name = "incapacitat")
+	private boolean incapacitat;
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(
