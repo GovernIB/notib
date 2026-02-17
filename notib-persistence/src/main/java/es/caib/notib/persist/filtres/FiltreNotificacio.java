@@ -28,6 +28,7 @@ public class FiltreNotificacio {
     private boolean concepteNull;
     private String concepte;
     private boolean estatNull;
+	private boolean estatAnulada;
     private Integer estatMask;
     private boolean dataIniciNull;
     private Date dataInici;
@@ -84,6 +85,10 @@ public class FiltreNotificacio {
     private List<? extends String> organsGestorsComunsCodisNotib;
 
     private boolean deleted;
+
+	public boolean isEstatAnulada() {
+		return estatMask != null && estatMask.intValue() == 16384;
+	}
 
     public void crearProcedimentsCodisNotibSplit() {
 
