@@ -448,7 +448,7 @@ public class NotificacioHelper {
 				id = Long.valueOf(notificacio.getOrganGestor());
 				organGestor = organGestorRepository.findById(id).orElse(null);
 			} catch (Exception ex) {
-				throw new NotFoundException("Organ gestor not long" + notificacio.getOrganGestor(), OrganGestorEntity.class);
+				organGestor = organGestorRepository.findByEntitatAndCodi(entitat, notificacio.getOrganGestor());
 			}
 		}
 		if (organGestor == null) {

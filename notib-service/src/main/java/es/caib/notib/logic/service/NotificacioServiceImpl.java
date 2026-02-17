@@ -102,6 +102,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.annotation.Resource;
 import javax.crypto.Cipher;
@@ -246,21 +248,21 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var notificacioEntity = notificacioHelper.saveNotificacio(notData, TipusUsuariEnumDto.INTERFICIE_WEB);
 			notificacioHelper.altaEnviamentsWeb(entitat, notificacioEntity, notificacio.getEnviaments());
 			auditHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.CREATE, "NotificacioServiceImpl.create");
-			notificacioEntity.getEnviaments().forEach(e -> enviamentSmService.acquireStateMachine(e.getNotificaReferencia()));
+//			notificacioEntity.getEnviaments().forEach(e -> enviamentSmService.acquireStateMachine(e.getNotificaReferencia()));
 
-//			notificacioEntity.getEnviaments().forEach(e -> {
-//				var ref = e.getNotificaReferencia();
-//				if (TransactionSynchronizationManager.isActualTransactionActive()) {
-//					TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-//						@Override
-//						public void afterCommit() {
-//							enviamentSmService.acquireStateMachine(ref);
-//						}
-//					});
-//				} else {
-//					enviamentSmService.acquireStateMachine(ref);
-//				}
-//			});
+			notificacioEntity.getEnviaments().forEach(e -> {
+				var ref = e.getNotificaReferencia();
+				if (TransactionSynchronizationManager.isActualTransactionActive()) {
+					TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+						@Override
+						public void afterCommit() {
+							enviamentSmService.acquireStateMachine(ref);
+						}
+					});
+					return;
+				}
+				enviamentSmService.acquireStateMachine(ref);
+			});
 
 			SubsistemesHelper.addSuccessOperation(AWE, System.currentTimeMillis() - start);
 			return conversioTipusHelper.convertir(notificacioEntity, Notificacio.class);
