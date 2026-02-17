@@ -61,10 +61,15 @@ public class SmConstants {
 	public static Long delay(int reintent) {
 
 		switch (reintent) {
-			case 0: return 0L;// Inmediat
-			case 1: return INTENT2 != null ? INTENT2 : 300000L;    // Per defecte delay de 5min
-			case 2: return INTENT3 != null ? INTENT3 : 1800000L;   // Per defecte delay de 30min
-			default: return INTENT4 != null ? INTENT4 : 7200000L;  // Per defecte delay de 2h
+			case 0:
+				return 0L;// Inmediat
+			case 1:
+				return INTENT2 != null ? INTENT2 : 300000L;    // Per defecte delay de 5min
+			case 2:
+				return INTENT3 != null ? INTENT3 : 1800000L;   // Per defecte delay de 30min
+			default:
+				return INTENT4 != null ? INTENT4 : 7200000L;  // Per defecte delay de 2h
 		}
+	}
 
 }
