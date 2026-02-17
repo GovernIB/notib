@@ -249,12 +249,21 @@ public class MassivaFile {
         String numDocument;
         String email;
         String dir3Codi;
+        var fila = 0;
         for (var enviamentCsv: enviamentsCsv) {
-
+            fila++;
             numDocument = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.DEST_DOC));
             email = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.DEST_EMAIL));
             dir3Codi = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.UNITAT_DESTI));
             interessatTipus = getInteressatTipus(numDocument, email, dir3Codi);
+            if (interessatTipus == null) {
+                var msg = "Es descarta la fila. Error determinant el tipus d'interessat";
+                log.error(msg + " per la remesa massiva " + enviamentCsv);
+//                List<String> error = new ArrayList<>();
+//                error.add("Fila " + fila + " Error: " + msg);
+//                errors.add(error);
+//                continue;
+            }
             perEmail = InteressatTipus.FISICA_SENSE_NIF.equals(interessatTipus);
 
             var headerEntregaPostal = headerColumns.get(MassivaColumnsEnum.ENTREGA_POSTAL);
@@ -409,9 +418,13 @@ public class MassivaFile {
         if (!Strings.isNullOrEmpty(numDocument) && NifHelper.isValidNifNie(numDocument)) {
             return InteressatTipus.FISICA;
         }
-        var lista = pluginHelper.unitatsPerCodi(dir3Codi);
-        if (lista != null && !lista.isEmpty()) {
-            return InteressatTipus.ADMINISTRACIO;
+        try {
+            var lista = pluginHelper.unitatsPerCodi(dir3Codi);
+            if (lista != null && !lista.isEmpty()) {
+                return InteressatTipus.ADMINISTRACIO;
+            }
+        } catch (Exception ex) {
+            log.error("[MassivaFile.getInteressatTipus] Error obtinguent el tipus del interessat. numDocument=" + numDocument + " email=" + email + " dir3Codi=" + dir3Codi, ex);
         }
         return null;
     }

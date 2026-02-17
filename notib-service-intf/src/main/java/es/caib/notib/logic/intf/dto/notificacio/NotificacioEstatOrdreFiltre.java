@@ -17,6 +17,7 @@ public enum NotificacioEstatOrdreFiltre implements Serializable {
     EXPIRADA,
     FINALITZADA,
     FINALITZADA_AMB_ERRORS,
-    PROCESSADA;
+    PROCESSADA,
+    ANULADA;
 
 }

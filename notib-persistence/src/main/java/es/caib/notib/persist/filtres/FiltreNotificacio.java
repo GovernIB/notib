@@ -2,6 +2,7 @@ package es.caib.notib.persist.filtres;
 
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioMassivaEntity;
 import lombok.Builder;
@@ -28,6 +29,7 @@ public class FiltreNotificacio {
     private boolean concepteNull;
     private String concepte;
     private boolean estatNull;
+    private boolean estatAnulada;
     private Integer estatMask;
     private boolean dataIniciNull;
     private Date dataInici;
@@ -84,6 +86,10 @@ public class FiltreNotificacio {
     private List<? extends String> organsGestorsComunsCodisNotib;
 
     private boolean deleted;
+
+    public boolean isEstatAnulada() {
+        return estatMask != null && estatMask.intValue() == 16384;
+    }
 
     public void crearProcedimentsCodisNotibSplit() {
 

@@ -64,6 +64,7 @@ public class FiltreEnviament {
     private String csvUuid;
     private boolean estatNull;
     private NotificacioEstatEnumDto estat;
+    private boolean estatAnulada;
     private EnviamentEstat notificaEstat;
     private Boolean entregaPostal;
     private boolean dir3CodiNull;
@@ -98,6 +99,10 @@ public class FiltreEnviament {
 
     public boolean isUsuari() {
         return isUsuari;
+    }
+
+    public boolean isEstatAnulada() {
+        return NotificacioEstatEnumDto.ANULADA.equals(estat);
     }
 
     public void crearProcedimentsCodisNotibSplit() {

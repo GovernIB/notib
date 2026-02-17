@@ -27,6 +27,7 @@ import es.caib.notib.logic.intf.service.GestioDocumentalService;
 import es.caib.notib.logic.intf.service.NotificacioMassivaService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.service.OperadorPostalService;
+import es.caib.notib.logic.intf.service.PermisosService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
@@ -77,6 +78,8 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     private GestioDocumentalService gestioDocumentalService;
     @Autowired
     private ColumnesService columnesService;
+    @Autowired
+    private PermisosService permisosService;
 
     private static final  String TABLE_FILTRE = "not_massiva_filtre";
     public static final String TABLE_NOTIFICACIONS_FILTRE = "not_massiva_nots_filtre";
@@ -92,7 +95,6 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
 
     @GetMapping
     public String mainPage(HttpServletRequest request, Model model) {
-
         var filtre = getFiltreCommand(request);
         model.addAttribute("notificacioMassivaFiltreCommand", filtre);
         model.addAttribute("notificacioMassivaEstats", EnumHelper.getOptionsForEnum(NotificacioMassivaEstatDto.class,
@@ -297,7 +299,13 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     @GetMapping(value = "/new")
     public String get(HttpServletRequest request, Model model) {
 
+
         var entitat = getEntitatActualComprovantPermisos(request);
+        var procedimentsAmbPermis = permisosService.getProcedimentsAmbPermis(entitat.getId(), sessionScopedContext.getUsuariActualCodi());
+        var organsAmbPermis = permisosService.getOrgansAmbPermis(entitat.getId(), sessionScopedContext.getUsuariActualCodi(), false);
+        if (procedimentsAmbPermis.isEmpty() && organsAmbPermis.isEmpty()) {
+            return "redirect:/notificacio";
+        }
         var notificacioMassiuCommand = new NotificacioMassivaCommand();
         notificacioMassiuCommand.setCaducitat(CaducitatHelper.sumarDiesNaturals(10));
         model.addAttribute("notificacioMassivaCommand", notificacioMassiuCommand);

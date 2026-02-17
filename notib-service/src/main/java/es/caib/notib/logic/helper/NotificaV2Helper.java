@@ -475,7 +475,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
         var receptor = new Receptor();
         var titular = enviament.getTitular();
         receptor.setNifReceptor(titular.getNif());
-        receptor.setNombreReceptor(titular.getNomSencer());
+        receptor.setNombreReceptor(InteressatTipus.FISICA.equals(titular.getInteressatTipus()) ? titular.getNomSencer() : titular.getRaoSocial());
         receptor.setVinculoReceptor(BigInteger.ONE);
         if (!titular.isIncapacitat()) {
             return receptor;
@@ -769,9 +769,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					envios.setFechaEnvioProgramado(toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
 				}
 			}
-			envios.setConcepto(notificacio.getConcepte().replace('·', '.').replace("'","´"));
+			envios.setConcepto(notificacio.getConcepte().replace('·', '.').replace("'"," "));
 			if (!Strings.isNullOrEmpty(notificacio.getDescripcio())) {
 				envios.setDescripcion(notificacio.getDescripcio().replace('·', '.'));
+				envios.setDescripcion(notificacio.getDescripcio().replace("'", " "));
 			}
 			envios.setProcedimiento(notificacio.getProcedimentCodiNotib());
 			var documento = new Documento();
