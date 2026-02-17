@@ -72,6 +72,12 @@ export type FormProps = React.PropsWithChildren & {
     onUpdateSuccess?: (data: any) => void;
     /** Event que es llença quan es desa un registre (creat o modificat) */
     onSaveSuccess?: (data: any) => void;
+    /** Event que es llença just abans de crear un registre (creat o modificat). El resultat retornat és el que s'enviarà en la petició. */
+    onBeforeCreateSuccess?: (data: any) => any;
+    /** Event que es llença just abans de modificar un registre (creat o modificat). El resultat retornat és el que s'enviarà en la petició. */
+    onBeforeUpdateSuccess?: (data: any) => any;
+    /** Event que es llença just abans de desar un registre (creat o modificat). El resultat retornat és el que s'enviarà en la petició. */
+    onBeforeSaveSuccess?: (data: any) => any;
     /** Event que es llença quan es produeixen errors de validació al enviar el formulari */
     onValidationErrorsChange?: (id: any, validationErrors?: FormFieldError[]) => void;
     /** Validador per a les dades del formulari. Es crida en cada canvi i retorna una llista d'errors (o null/undefined si tot es correcte) */
@@ -95,6 +101,24 @@ export type FormI18nKeys = {
     updateError?: string;
     deleteSuccess?: string;
     deleteError?: string;
+};
+
+const getApiSaveProcessedData = (
+    id: any,
+    data: any,
+    onBeforeCreateSuccess: ((data: any) => any) | undefined,
+    onBeforeUpdateSuccess: ((data: any) => any) | undefined,
+    onBeforeSaveSuccess: ((data: any) => any) | undefined
+) => {
+    if (id == null && onBeforeCreateSuccess != null) {
+        return onBeforeCreateSuccess(data);
+    } else if (id != null && onBeforeUpdateSuccess != null) {
+        return onBeforeUpdateSuccess(data);
+    } else if (onBeforeSaveSuccess != null) {
+        return onBeforeSaveSuccess(data);
+    } else {
+        return data;
+    }
 };
 
 const shallowEqual = (obj1: any, obj2: any) => {
@@ -210,6 +234,9 @@ export const Form: React.FC<FormProps> = (props) => {
         onCreateSuccess,
         onUpdateSuccess,
         onSaveSuccess,
+        onBeforeCreateSuccess,
+        onBeforeUpdateSuccess,
+        onBeforeSaveSuccess,
         onValidationErrorsChange,
         dataValidator,
         validationErrors,
@@ -522,8 +549,18 @@ export const Form: React.FC<FormProps> = (props) => {
                     reject(t('form.validate.saveErrors'));
                 } else {
                     setApiFieldErrors(undefined);
-                    const apiAction = id != null ? apiUpdate(id, { data }) : apiCreate({ data });
-                    apiAction
+                    const apiSaveData = getApiSaveProcessedData(
+                        id,
+                        data,
+                        onBeforeCreateSuccess,
+                        onBeforeUpdateSuccess,
+                        onBeforeSaveSuccess
+                    );
+                    const apiSaveAction =
+                        id != null
+                            ? apiUpdate(id, { data: apiSaveData })
+                            : apiCreate({ data: apiSaveData });
+                    apiSaveAction
                         .then((savedData: any) => {
                             const message =
                                 id != null
