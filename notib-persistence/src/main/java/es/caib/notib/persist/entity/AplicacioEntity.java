@@ -63,6 +63,7 @@ public class AplicacioEntity extends NotibAuditable<Long> {
 		usuariCodi = aplicacio.getUsuariCodi();
 		callbackUrl = aplicacio.getCallbackUrl();
 		headerCsrf = aplicacio.isHeaderCsrf();
+		aplicarLimitEnviaments = aplicacio.isAplicarLimitEnviaments();
         horariLaboralInici = aplicacio.getHorariLaboralInici();
         horariLaboralFi = aplicacio.getHorariLaboralFi();
         maxEnviamentsMinutLaboral = aplicacio.getMaxEnviamentsMinutLaboral();

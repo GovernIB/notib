@@ -24,6 +24,7 @@ public class AplicacioDto extends AuditoriaDto {
 	private boolean activa;
 	private boolean headerCsrf;
 	private Long entitatId;
+	private boolean aplicarLimitEnviaments;
     private LocalTime horariLaboralInici;
     private LocalTime horariLaboralFi;
     private Integer maxEnviamentsMinutLaboral;
