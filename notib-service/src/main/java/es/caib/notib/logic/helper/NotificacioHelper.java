@@ -98,7 +98,7 @@ public class NotificacioHelper {
     public String checkLimitEnviamentsAplicacioSuperat(String usuariCodi, Long entitatId) {
 
         try {
-            String msg = null;
+            String msg = "";
             var aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(usuariCodi, entitatId);
 			// Si no es troba l'aplicació, o aquesta no aplica límits
 			if (aplicacio == null || !aplicacio.isAplicarLimitEnviaments()) {
