@@ -8,7 +8,6 @@ import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.model.NotificacioResource;
-import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.ProcSerEntity;
 import lombok.Builder;
 import lombok.Getter;
@@ -116,11 +115,12 @@ public class NotificacioResourceEntity
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(
-		name = "entitat",
+		name = "entitat_id",
 		referencedColumnName = "id",
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "organ_entitat_fk"),
 		nullable = false)
 	protected EntitatResourceEntity entitat;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(
 		name = "organ_gestor",

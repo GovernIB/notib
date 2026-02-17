@@ -1,11 +1,10 @@
 /**
- * 
+ *
  */
 package es.caib.notib.back.config;
 
 import es.caib.notib.logic.intf.base.service.PermissionEvaluatorService;
 import es.caib.notib.logic.intf.base.service.ResourceApiService;
-import es.caib.notib.logic.intf.resourceservice.EnviamentResourceService;
 import es.caib.notib.logic.intf.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWarDeployment;
@@ -176,10 +175,6 @@ public class EjbClientConfig {
 	@Bean
 	public LocalStatelessSessionProxyFactoryBean resourceApiService() {
 		return getLocalEjbFactoyBean(ResourceApiService.class);
-	}
-	@Bean
-	public LocalStatelessSessionProxyFactoryBean enviamentResourceService() {
-		return getLocalEjbFactoyBean(EnviamentResourceService.class);
 	}
 	@Bean
 	public LocalStatelessSessionProxyFactoryBean logService() {

@@ -13,6 +13,7 @@ const translationEs = {
         enviaments: 'Envios',
         pagadorsPostals: 'Operadores postales',
         pagadorsCie: 'Centros de impresión y ensobrado',
+        notificacions: 'Notificaciones',
     },
     page: {
         home: {
@@ -226,6 +227,15 @@ const translationEs = {
                     fulles: 'Formatos de hoja',
                     sobres: 'Formatos de sobre',
                 },
+            },
+        },
+        notificacio: {
+            grid: {
+                title: 'Notificaciones',
+            },
+            form: {
+                titleCreate: 'Crear notificación',
+                titleUpdate: 'Modificar notificación',
             },
         },
         notFound: {

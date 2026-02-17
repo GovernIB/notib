@@ -1,10 +1,12 @@
 package es.caib.notib.logic.intf.model;
 
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
+import es.caib.notib.logic.intf.base.annotation.ResourceArtifact;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.model.FileReference;
+import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import es.caib.notib.logic.intf.dto.EntitatTipusEnumDto;
 import es.caib.notib.logic.intf.dto.TipusDocumentEnumDto;
@@ -16,6 +18,7 @@ import lombok.experimental.FieldNameConstants;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 
 /**
  * Informació d'una entitat.
@@ -45,9 +48,17 @@ import javax.validation.constraints.Size;
 						roles = { BaseConfig.ROLE_USER },
 						grantedPermissions = { PermissionEnum.READ }
 				),
+		},
+		artifacts = {
+			@ResourceArtifact(
+				type = ResourceArtifactType.FILTER,
+				code = EntitatResource.FILTER_CODE,
+				formClass = EntitatResource.EntitatResourceFilter.class)
 		}
 )
 public class EntitatResource extends BaseResource<Long> {
+
+	public static final String FILTER_CODE = "FILTER";
 
 	@NotNull
 	@Size(max = 64)
@@ -100,5 +111,16 @@ public class EntitatResource extends BaseResource<Long> {
 	private Integer tipusDocCount;
 	private Integer aplicacioCount;
 	private Integer aclEntryCount;
+
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	public static class EntitatResourceFilter implements Serializable {
+		private String codi;
+		private String nom;
+		private EntitatTipusEnumDto tipus;
+		private String dir3Codi;
+		private boolean activa;
+	}
 
 }

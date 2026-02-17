@@ -13,6 +13,7 @@ const translationCa = {
         enviaments: 'Enviaments',
         pagadorsPostals: 'Operadors postals',
         pagadorsCie: "Centres d'impressió i ensobrat",
+        notificacions: 'Notificacions',
     },
     page: {
         home: {
@@ -234,6 +235,15 @@ const translationCa = {
                     fulles: 'Formats de fulla',
                     sobres: 'Formats de sobre',
                 },
+            },
+        },
+        notificacio: {
+            grid: {
+                title: 'Notificacions',
+            },
+            form: {
+                titleCreate: 'Crear notificació',
+                titleUpdate: 'Modificar notificació',
             },
         },
         notFound: {

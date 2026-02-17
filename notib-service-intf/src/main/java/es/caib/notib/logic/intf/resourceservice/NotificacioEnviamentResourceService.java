@@ -4,8 +4,10 @@ import es.caib.notib.logic.intf.base.service.MutableResourceService;
 import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 
 /**
- * Definició del servei de gestió d'enviaments'.
+ * Definició del servei de gestió d'enviaments d'una notificació.
  *
  * @author Límit Tecnologies
  */
-public interface EnviamentResourceService extends MutableResourceService<NotificacioEnviamentResource, Long> {}
+public interface NotificacioEnviamentResourceService extends MutableResourceService<NotificacioEnviamentResource, Long> {
+
+}

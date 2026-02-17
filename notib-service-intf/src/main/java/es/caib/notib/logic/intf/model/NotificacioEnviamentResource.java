@@ -4,7 +4,6 @@ import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
-import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
@@ -20,7 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Informació d'un enviament.
+ * Informació d'un enviament d'una notificació.
  *
  * @author Límit Tecnologies
  */
@@ -30,9 +29,8 @@ import java.util.List;
 @ResourceConfig(
 	descriptionField = "id",
 	accessConstraints = @ResourceAccessConstraint(
-		type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-		roles = { BaseConfig.ROLE_ADMIN },
-		grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
+		type = ResourceAccessConstraint.ResourceAccessConstraintType.AUTHENTICATED,
+		grantedPermissions = { PermissionEnum.READ, PermissionEnum.CREATE }
 	)
 )
 public class NotificacioEnviamentResource extends BaseResource<Long> {

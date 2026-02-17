@@ -4,7 +4,6 @@ import es.caib.notib.client.domini.DocumentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
-import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
@@ -27,18 +26,11 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @FieldNameConstants
 @ResourceConfig(
-	//descriptionField = NotificacioResource.Fields.codi,
-	//quickFilterFields = { NotificacioResource.Fields.codi, NotificacioResource.Fields.nom },
+	descriptionField = PersonaResource.Fields.nom,
 	accessConstraints = {
 		@ResourceAccessConstraint(
-			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-			roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_SUPER },
-			grantedPermissions = { PermissionEnum.READ }
-		),
-		@ResourceAccessConstraint(
-			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-			roles = { BaseConfig.ROLE_USER },
-			grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE }
+			type = ResourceAccessConstraint.ResourceAccessConstraintType.AUTHENTICATED,
+			grantedPermissions = { PermissionEnum.READ, PermissionEnum.CREATE }
 		),
 	}
 )
@@ -46,24 +38,24 @@ public class PersonaResource extends BaseResource<Long> {
 
 	@NotNull
 	private InteressatTipus interessatTipus;
-	private boolean incapacitat;
-	@Size(max = 255)
-	private String email;
-	@Size(max = 30)
-	private String llinatge1;
-	@Size(max = 30)
-	private String llinatge2;
 	private DocumentTipus documentTipus;
 	@Size(max = 9)
 	private String nif;
 	@Size(max = 255)
 	private String nom;
+	@Size(max = 30)
+	private String llinatge1;
+	@Size(max = 30)
+	private String llinatge2;
 	@Size(max = 16)
 	private String telefon;
+	@Size(max = 255)
+	private String email;
 	@Size(max = 100)
 	private String raoSocial;
 	@Size(max = 9)
 	private String dir3Codi;
+	private boolean incapacitat;
 
 	private ResourceReference<NotificacioEnviamentResource, Long> enviament;
 
