@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-2
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_aplicacio
+            columns:
+              - column:
+                  name: aplicar_limit_env
+                  type: boolean
+                  constraints:
+                    nullable: false
+                  defaultValue: 1
