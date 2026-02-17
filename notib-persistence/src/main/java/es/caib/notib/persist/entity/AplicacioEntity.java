@@ -38,6 +38,8 @@ public class AplicacioEntity extends NotibAuditable<Long> {
 	private boolean activa;
 	@Column(name = "header_csrf", nullable = false)
 	private boolean headerCsrf;
+	@Column(name = "aplicar_limit_env", nullable = false)
+	private boolean aplicarLimitEnviaments = true;
 	@Column(name = "horari_laboral_inici", nullable = false)
     private LocalTime horariLaboralInici;
 	@Column(name = "horari_laboral_fi", nullable = false)
@@ -61,6 +63,7 @@ public class AplicacioEntity extends NotibAuditable<Long> {
 		usuariCodi = aplicacio.getUsuariCodi();
 		callbackUrl = aplicacio.getCallbackUrl();
 		headerCsrf = aplicacio.isHeaderCsrf();
+		aplicarLimitEnviaments = aplicacio.isAplicarLimitEnviaments();
         horariLaboralInici = aplicacio.getHorariLaboralInici();
         horariLaboralFi = aplicacio.getHorariLaboralFi();
         maxEnviamentsMinutLaboral = aplicacio.getMaxEnviamentsMinutLaboral();

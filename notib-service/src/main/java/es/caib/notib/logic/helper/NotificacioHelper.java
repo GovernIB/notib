@@ -18,6 +18,7 @@ import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
 import es.caib.notib.logic.intf.util.DatesUtils;
+import es.caib.notib.persist.entity.AplicacioEntity;
 import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.GrupEntity;
@@ -98,23 +99,35 @@ public class NotificacioHelper {
     public String checkLimitEnviamentsAplicacioSuperat(String usuariCodi, Long entitatId) {
 
         try {
-            String msg = null;
+            var msg = "";
             var aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(usuariCodi, entitatId);
-            if (!DatesUtils.isDiaLaboral()) {
+			// Si no es troba l'aplicació, o aquesta no aplica límits
+			if (aplicacio == null || !aplicacio.isAplicarLimitEnviaments()) {
+				return null;
+			}
+
+			var diaLaboral = DatesUtils.isDiaLaboral();
+            if (!diaLaboral) {
                 var maxEnvMinut =  aplicacio.getMaxEnviamentsMinutNoLaboral();
                 var maxEnvDies =  aplicacio.getMaxEnviamentsDiaNoLaboral();
                 var enviamentsMinutActual = contadorMinutsNoLaboral.getOrDefault(aplicacio.getId(), 0);
                 if (maxEnvMinut < enviamentsMinutActual) {
                     msg = "Superat el nombre màxim d'enviaments per minut en dies no laborals. ";
-                } else {
-                    contadorMinutsNoLaboral.put(aplicacio.getId(), enviamentsMinutActual+1);
                 }
+				contadorMinutsNoLaboral.put(aplicacio.getId(), enviamentsMinutActual+1);
                 var enviamentsDiesActual = contadorDiesNoLaboral.getOrDefault(aplicacio.getId(),0);
                 if (maxEnvDies < enviamentsDiesActual) {
                     msg += "Superat el nombre màxim d'enviaments per dia en dies no laborals";
-                }  else {
-                    contadorDiesNoLaboral.put(aplicacio.getId(), enviamentsDiesActual+1);
                 }
+				contadorDiesNoLaboral.put(aplicacio.getId(), enviamentsDiesActual+1);
+				if (!Strings.isNullOrEmpty(msg)) {
+					enviamentsMinutActual = contadorMinutsNoLaboral.get(aplicacio.getId());
+                	enviamentsDiesActual = contadorDiesNoLaboral.get(aplicacio.getId());
+					log.warn(msg + " aplicacio=" + aplicacio.getUsuariCodi() + "enviamentsMinutActual=" + enviamentsMinutActual + "maxEnvMinut=" + maxEnvMinut +
+							"enviamentsDiesActual=" + enviamentsDiesActual + "maxEnvDies=" + maxEnvDies);
+
+					printMissatgeDies(msg, aplicacio, maxEnvMinut, maxEnvDies, false, false);
+				}
                 return msg;
             }
 
@@ -125,7 +138,8 @@ public class NotificacioHelper {
                     : contadorMinutsNoLaboral.getOrDefault(aplicacio.getId(), 0);
             if (maxEnvMinut <= enviamentsMinutActual) {
                 msg = "Superat el nombre màxim d'enviaments per minut en dies laborals. ";
-            } else if (isHorariLaboral){
+            }
+			if (isHorariLaboral){
                 contadorMinutsLaboral.put(aplicacio.getId(), enviamentsMinutActual+1);
             } else {
                 contadorMinutsNoLaboral.put(aplicacio.getId(), enviamentsMinutActual+1);
@@ -133,18 +147,31 @@ public class NotificacioHelper {
             var enviamentsDiesActual = contadorDiesLaboral.getOrDefault(aplicacio.getId(), 0);
             if (maxEnvDies <= enviamentsDiesActual) {
                 msg += "Superat el nombre màxim d'enviaments per dia en dies laborals";
-            }  else if (isHorariLaboral) {
+            }
+			if (isHorariLaboral) {
                 contadorDiesLaboral.put(aplicacio.getId(), enviamentsDiesActual+1);
             }  else {
                 contadorDiesNoLaboral.put(aplicacio.getId(), enviamentsDiesActual+1);
             }
+			printMissatgeDies(msg, aplicacio, maxEnvMinut, maxEnvDies, isHorariLaboral, true);
             return msg;
         } catch (Exception ex) {
             var msg = "Error checkejant el limit d'enviaments per l'aplicacio";
             log.error(msg, ex);
-            return msg;
+			return null;
         }
     }
+
+	private void printMissatgeDies(String msg, AplicacioEntity aplicacio, int maxEnvMinut, int  maxEnvDies, boolean horariLaboral, boolean diaLaboral) {
+
+		if (Strings.isNullOrEmpty(msg)) {
+			return;
+		}
+		var enviamentsMinutActual = horariLaboral ? contadorMinutsLaboral.get(aplicacio.getId()) : contadorMinutsNoLaboral.get(aplicacio.getId());
+		var enviamentsDiesActual = diaLaboral ? contadorDiesLaboral.get(aplicacio.getId()) : contadorDiesNoLaboral.get(aplicacio.getId());
+		log.warn(msg + " aplicacio=" + aplicacio.getUsuariCodi() + " enviamentsMinutActual=" + enviamentsMinutActual + " maxEnvMinut=" + maxEnvMinut +
+				" enviamentsDiesActual=" + enviamentsDiesActual + " maxEnvDies=" + maxEnvDies);
+	}
 
     public void netejarLimitEnviamentsMinutAplicacions() {
 

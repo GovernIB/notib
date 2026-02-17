@@ -53,6 +53,7 @@
 
 		<not:inputText name="callbackUrl" textKey="aplicacio.form.camp.callback.url" required="true"/>
 		<not:inputCheckbox name="headerCsrf" generalClass="row" textKey="aplicacio.form.camp.callback.header.csrf"/>
+		<not:inputCheckbox name="aplicarLimitEnviaments" generalClass="row" textKey="aplicacio.form.camp.limit.enviaments.actiu"/>
         <not:inputTime name="horariLaboralInici" textKey="aplicacio.form.camp.horari.laboral.inici"/>
         <not:inputTime name="horariLaboralFi" textKey="aplicacio.form.camp.horari.laboral.fi"/>
 <%--        <form:input  id="limitEnviamentsMinutLaboral" cssClass="form-control" path="limitEnviamentsMinutLaboral" placeholder="aplicacio.form.camp.limit.enviament.minut.laboral" type="number" step="1" maxlength="2048"/>--%>

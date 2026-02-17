@@ -75,6 +75,7 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 							.callbackUrl(aplicacio.getCallbackUrl())
                             .activa(true)
 							.headerCsrf(aplicacio.isHeaderCsrf())
+							.aplicarLimitEnviaments(aplicacio.isAplicarLimitEnviaments())
                             .horariLaboralInici(aplicacio.getHorariLaboralInici())
                             .horariLaboralFi(aplicacio.getHorariLaboralFi())
                             .maxEnviamentsMinutLaboral(aplicacio.getMaxEnviamentsMinutLaboral())
