@@ -56,6 +56,7 @@ export const NotificacioForm: React.FC = () => {
                         ? t('page.notificacio.form.titleUpdate')
                         : t('page.notificacio.form.titleCreate')
                 }
+                initialData={{ enviaments: [{ id: 0 }] }}
                 createLink="./{{id}}"
                 //updateLink="../../"
                 componentProps={{ style: { height: '100%' } }}

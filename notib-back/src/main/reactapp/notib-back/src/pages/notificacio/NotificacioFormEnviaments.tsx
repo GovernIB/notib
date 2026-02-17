@@ -5,15 +5,18 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Icon from '@mui/material/Icon';
 import IconButton from '@mui/material/IconButton';
-import { MuiForm, FormField } from 'reactlib';
+import { MuiForm, FormField, useFormContext, useFormApiRef } from 'reactlib';
 
-const NotificacioFormEnviamentPersona: React.FC = () => {
+const NotificacioFormEnviamentPersona: React.FC<{ title: string }> = (props) => {
+    const { title } = props;
     return (
         <MuiForm
             resourceName="personaResource"
             hiddenToolbar
-            commonFieldComponentProps={{ size: 'small' }}>
+            commonFieldComponentProps={{ size: 'small' }}
+            componentProps={{ sx: { mb: 3 } }}>
             <Grid container spacing={2}>
+                <Grid size={12}>{title}</Grid>
                 <Grid size={6}>
                     <FormField name="interessatTipus" />
                 </Grid>
@@ -39,19 +42,31 @@ const NotificacioFormEnviamentPersona: React.FC = () => {
 
 const NotificacioFormEnviament: React.FC<{
     indexKey: string;
-    onRemove: (indexKey: string) => void;
+    handleRemove: (indexKey: string) => void;
 }> = (props) => {
-    const { indexKey, onRemove } = props;
+    const { indexKey, handleRemove } = props;
+    const [ambRepresentant, setAmbRepresentant] = React.useState<boolean>(false);
+    const formApiRef = useFormApiRef();
+    const { data: parentFormData, apiRef: parentFormApiRef } = useFormContext();
+    const handleDataChange = (data: any) => {
+        const enviamentsWithData = parentFormData?.enviaments?.map((e: any) =>
+            e.id === indexKey ? { id: indexKey, ...data } : e
+        );
+        parentFormApiRef.current?.setFieldValue('enviaments', enviamentsWithData);
+    };
     return (
         <MuiForm
             resourceName="notificacioEnviamentResource"
+            onDataChange={handleDataChange}
+            apiRef={formApiRef}
             hiddenToolbar
+            componentProps={{ sx: { mb: 2 } }}
             commonFieldComponentProps={{ size: 'small' }}>
             <Paper sx={{ p: 2 }}>
                 <Grid container spacing={2}>
                     <Grid size={10}>{indexKey}</Grid>
                     <Grid size={2} sx={{ textAlign: 'right' }}>
-                        <IconButton onClick={() => onRemove(indexKey)}>
+                        <IconButton onClick={() => handleRemove(indexKey)}>
                             <Icon fontSize="small">delete</Icon>
                         </IconButton>
                     </Grid>
@@ -59,7 +74,17 @@ const NotificacioFormEnviament: React.FC<{
                         <FormField name="serveiTipus" />
                     </Grid>
                     <Grid size={12}>
-                        <NotificacioFormEnviamentPersona />
+                        <NotificacioFormEnviamentPersona title="Interessat" />
+                        {ambRepresentant && (
+                            <NotificacioFormEnviamentPersona title="Representant" />
+                        )}
+                        <Button
+                            variant="contained"
+                            startIcon={<Icon>{ambRepresentant ? 'remove' : 'add'}</Icon>}
+                            onClick={() => setAmbRepresentant((r) => !r)}
+                            size="small">
+                            {ambRepresentant ? 'Eliminar representant' : 'Afegir representant'}
+                        </Button>
                     </Grid>
                 </Grid>
             </Paper>
@@ -68,29 +93,34 @@ const NotificacioFormEnviament: React.FC<{
 };
 
 const NotificacioFormEnviaments: React.FC = () => {
-    const [enviaments, setEnviaments] = React.useState({ first: {} });
+    const { data, apiRef } = useFormContext();
+    const enviaments = data?.enviaments;
     const handleAddClick = () => {
-        setEnviaments((e) => ({ ...e, ['' + new Date().valueOf()]: {} }));
+        apiRef.current?.setFieldValue('enviaments', [...enviaments, { id: new Date().valueOf() }]);
     };
     const handleRemoveClick = (indexKey: string) => {
-        setEnviaments((e: any) => {
-            const { [indexKey]: removed, ...otherKeys } = e;
-            return otherKeys;
-        });
+        apiRef.current?.setFieldValue(
+            'enviaments',
+            enviaments.filter((e: any) => e.id !== indexKey)
+        );
     };
     return (
         <>
             <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>
                 Enviaments
             </Typography>
-            {Object.keys(enviaments).map((k) => (
-                <NotificacioFormEnviament key={k} indexKey={k} onRemove={handleRemoveClick} />
+            {enviaments?.map((e: any) => (
+                <NotificacioFormEnviament
+                    key={e.id}
+                    indexKey={e.id}
+                    handleRemove={handleRemoveClick}
+                />
             ))}
             <Button
-                variant="outlined"
+                variant="contained"
                 startIcon={<Icon>add</Icon>}
                 onClick={handleAddClick}
-                sx={{ mt: 1 }}>
+                size="small">
                 Afegir enviament
             </Button>
         </>
