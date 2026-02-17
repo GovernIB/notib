@@ -37,8 +37,6 @@ public class AvisServiceImpl implements AvisService {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private PaginacioHelper paginacioHelper;
-    @Autowired
-    private ComandaListener comandaListener;
 
 
 	@Transactional
