@@ -4,6 +4,7 @@ import es.caib.notib.client.domini.DocumentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
+import es.caib.notib.logic.intf.base.annotation.ResourceField;
 import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
@@ -37,8 +38,10 @@ import javax.validation.constraints.Size;
 public class PersonaResource extends BaseResource<Long> {
 
 	@NotNull
+	@ResourceField(onChangeActive = true)
 	private InteressatTipus interessatTipus;
 	private DocumentTipus documentTipus;
+	@NotNull
 	@Size(max = 9)
 	private String nif;
 	@Size(max = 255)
@@ -58,5 +61,28 @@ public class PersonaResource extends BaseResource<Long> {
 	private boolean incapacitat;
 
 	private ResourceReference<NotificacioEnviamentResource, Long> enviament;
+
+	// El següent camp s'utilitza per a informar des del front del tipus d'interessat per a poder fer els càlculs amb
+	// el camp interessatTipus
+	private boolean representant;
+
+	// Els següents camps s'utilitzen per a informar al front de quins camps son visibles / obligatoris depenent del
+	// valor del camp interessatTipus
+	private boolean visibleDocumentTipus;
+	private boolean visibleNif;
+	private boolean visibleNom;
+	private boolean visibleLlinatge1;
+	private boolean visibleLlinatge2;
+	private boolean visibleTelefon;
+	private boolean visibleEmail;
+	private boolean visibleRaoSocial;
+	private boolean visibleDir3Codi;
+	private boolean visibleIncapacitat;
+	private boolean requiredNif;
+	private boolean requiredNom;
+	private boolean requiredLlinatge1;
+	private boolean requiredEmail;
+	private boolean requiredRaoSocial;
+	private boolean requiredDir3Codi;
 
 }

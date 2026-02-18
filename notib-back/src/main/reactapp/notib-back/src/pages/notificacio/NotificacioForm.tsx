@@ -7,16 +7,17 @@ import { FormPage, MuiForm, FormField } from 'reactlib';
 import NotificacioFormEnviaments from './NotificacioFormEnviaments';
 
 const NotificacioFormContent: React.FC = () => {
+    const { t } = useTranslation();
     return (
         <Grid container spacing={2}>
             <Grid size={12}>
                 <Typography variant="h6" sx={{ mb: 1 }}>
-                    Informació de la remesa
+                    {t('page.notificacio.form.tabs.remesa')}
                 </Typography>
-                <FormField name="concepte" />
+                <FormField name="concepte" debounce />
             </Grid>
             <Grid size={12}>
-                <FormField name="descripcio" type="textarea" />
+                <FormField name="descripcio" type="textarea" debounce />
             </Grid>
             <Grid size={6}>
                 <FormField name="organGestor" />
@@ -34,7 +35,7 @@ const NotificacioFormContent: React.FC = () => {
                 <FormField name="caducitatOriginal" />
             </Grid>
             <Grid size={6}>
-                <FormField name="numExpedient" />
+                <FormField name="numExpedient" debounce />
             </Grid>
             <Grid size={6}>
                 <FormField name="idioma" />
@@ -56,7 +57,6 @@ export const NotificacioForm: React.FC = () => {
                         ? t('page.notificacio.form.titleUpdate')
                         : t('page.notificacio.form.titleCreate')
                 }
-                initialData={{ enviaments: [{ id: 0 }] }}
                 createLink="./{{id}}"
                 //updateLink="../../"
                 componentProps={{ style: { height: '100%' } }}

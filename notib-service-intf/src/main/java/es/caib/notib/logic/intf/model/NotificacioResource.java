@@ -115,6 +115,6 @@ public class NotificacioResource extends BaseResource<Long> {
 	private ResourceReference<DocumentResource, Long> document4;
 	private ResourceReference<DocumentResource, Long> document5;*/
 
-	private List<NotificacioEnviamentResource> enviaments;
+	private List<NotificacioEnviamentResource> enviamentsInfo;
 
 }
