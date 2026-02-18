@@ -4,6 +4,7 @@ import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.exception.ResourceNotCreatedException;
+import es.caib.notib.logic.intf.base.exception.ResourceNotUpdatedException;
 import es.caib.notib.logic.intf.model.PersonaResource;
 import es.caib.notib.logic.intf.resourceservice.PersonaResourceService;
 import es.caib.notib.persist.resourceentity.PersonaResourceEntity;
@@ -45,7 +46,7 @@ public class PersonaResourceServiceImpl
 
 	/*
 	 * Com que aquest servei no s'ha d'utilitzar més que per a consultar els fields feim que si s'intenta crear un
-	 * recurs llençam una excepció.
+	 * recurs es llença una excepció.
 	 */
 	@Override
 	protected void beforeCreateSave(
@@ -55,6 +56,21 @@ public class PersonaResourceServiceImpl
 		throw new ResourceNotCreatedException(getResourceClass(), "Create is not allowed");
 	}
 
+	/*
+	 * Com que aquest servei no s'ha d'utilitzar més que per a consultar els fields feim que si s'intenta modificar un
+	 * recurs es llença una excepció.
+	 */
+	@Override
+	protected void beforeUpdateSave(
+		PersonaResourceEntity entity,
+		PersonaResource resource,
+		Map<String, AnswerRequiredException.AnswerValue> answers) {
+		throw new ResourceNotUpdatedException(getResourceClass(), "" + resource.getId(), "Update is not allowed");
+	}
+
+	/*
+	 * Lògica onChange pel camp interessatTipus. Segons el valor d'aquest camp canvien els camps visibles / obligatoris.
+	 */
 	private static class InteressatTipusOnChangeLogicProcessor implements OnChangeLogicProcessor<PersonaResource> {
 		@Override
 		public void onChange(

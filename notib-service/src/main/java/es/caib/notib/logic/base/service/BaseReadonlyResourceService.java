@@ -720,10 +720,10 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		return null;
 	}
 
-	protected String namedFilterToSpringFilter(String name) {
+	protected String namedQueryToSpringFilter(String namedQuery) {
 		return null;
 	}
-	protected <P> Specification<P> namedFilterToSpecification(String name) {
+	protected <P> Specification<P> namedQueryToSpecification(String namedQuery) {
 		return null;
 	}
 
@@ -916,7 +916,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	protected <P> Specification<P> toFindProcessedSpecification(
 			String quickFilter,
 			String filter,
-			String[] namedFilters) {
+			String[] namedQueries) {
 		Specification<P> processedSpecification = getSpringFilterSpecification(
 				buildSpringFilterForQuickFilter(
 						getResourceClass(),
@@ -928,18 +928,18 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		processedSpecification = appendSpecificationWithAnd(
 				processedSpecification,
 				getSpringFilterSpecification(
-						additionalSpringFilter(filter, namedFilters)));
+						additionalSpringFilter(filter, namedQueries)));
 		processedSpecification = appendSpecificationWithAnd(
 				processedSpecification,
-				(Specification<P>)additionalSpecification(namedFilters));
-		if (namedFilters != null) {
-			for (String namedFilter: namedFilters) {
+				(Specification<P>)additionalSpecification(namedQueries));
+		if (namedQueries != null) {
+			for (String namedQuery: namedQueries) {
 				Specification<P> namedSpecification;
-				String namedSpringFilter = namedFilterToSpringFilter(namedFilter);
+				String namedSpringFilter = namedQueryToSpringFilter(namedQuery);
 				if (namedSpringFilter != null) {
 					namedSpecification = getSpringFilterSpecification(namedSpringFilter);
 				} else {
-					namedSpecification = namedFilterToSpecification(namedFilter);
+					namedSpecification = namedQueryToSpecification(namedQuery);
 				}
 				processedSpecification = appendSpecificationWithAnd(
 						processedSpecification,

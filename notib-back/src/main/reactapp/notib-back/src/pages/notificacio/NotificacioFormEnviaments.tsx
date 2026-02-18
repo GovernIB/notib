@@ -33,6 +33,7 @@ const NotificacioFormEnviamentPersona: React.FC<{ indexKey?: number; interessat?
         <MuiForm
             resourceName="personaResource"
             onDataChange={handleDataChange}
+            initOnChangeRequest
             hiddenToolbar
             commonFieldComponentProps={{ size: 'small' }}
             componentProps={{ sx: { mb: 3 } }}>

@@ -31,7 +31,7 @@ import javax.validation.constraints.Size;
 	accessConstraints = {
 		@ResourceAccessConstraint(
 			type = ResourceAccessConstraint.ResourceAccessConstraintType.AUTHENTICATED,
-			grantedPermissions = { PermissionEnum.READ, PermissionEnum.CREATE }
+			grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE }
 		),
 	}
 )
@@ -39,7 +39,7 @@ public class PersonaResource extends BaseResource<Long> {
 
 	@NotNull
 	@ResourceField(onChangeActive = true)
-	private InteressatTipus interessatTipus;
+	private InteressatTipus interessatTipus = InteressatTipus.FISICA;
 	private DocumentTipus documentTipus;
 	@NotNull
 	@Size(max = 9)
