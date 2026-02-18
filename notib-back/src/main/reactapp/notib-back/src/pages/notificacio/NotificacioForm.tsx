@@ -8,10 +8,11 @@ import NotificacioFormEnviaments from './NotificacioFormEnviaments';
 
 const NotificacioFormContent: React.FC = () => {
     const { t } = useTranslation();
+
     return (
         <Grid container spacing={2}>
             <Grid size={12}>
-                <Typography variant="h6" sx={{ mb: 1 }}>
+                <Typography variant="h6" sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}>
                     {t('page.notificacio.form.tabs.remesa')}
                 </Typography>
                 <FormField name="concepte" debounce />

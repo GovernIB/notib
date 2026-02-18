@@ -246,10 +246,16 @@ const translationEs = {
                     remove: 'Eliminar envio',
                 },
                 interessats: {
-                    interessat: 'Interesado',
-                    representant: 'Representante',
+                    interessat: 'Interesado (titular en Notifica)',
+                    representant: 'Representante (destinatario en Notifica)',
                     add: 'Añadir representante',
                     remove: 'Eliminar representante',
+                    nifLabel: {
+                        FISICA: 'NIF/NIE/identificador EIDAS',
+                        JURIDICA: 'CIF/identificador EIDAS',
+                        ADMINISTRACIO: 'NIF',
+                        FISICA_SENSE_NIF: 'Tipo de documento',
+                    },
                 },
             },
         },

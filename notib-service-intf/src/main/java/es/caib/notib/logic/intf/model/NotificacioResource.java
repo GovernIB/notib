@@ -93,7 +93,7 @@ public class NotificacioResource extends BaseResource<Long> {
 	@Size(max = 255)
 	private String registreLlibreNom;
 	private boolean errorLastCallback;
-	private Idioma idioma;
+	private Idioma idioma = Idioma.CA;
 	protected Date estatProcessatDate;
 	@Size(max = 255)
 	protected String referencia;

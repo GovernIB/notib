@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.List;
@@ -35,8 +36,9 @@ import java.util.List;
 )
 public class NotificacioEnviamentResource extends BaseResource<Long> {
 
+	@NotNull
 	@Size(max = 64)
-	private ServeiTipus serveiTipus;
+	private ServeiTipus serveiTipus = ServeiTipus.NORMAL;
 	@Size(max = 36)
 	private String notificaReferencia;
 	@Size(max = 20)
