@@ -4,6 +4,7 @@ package es.caib.notib.logic.callbacks;
 import es.caib.notib.logic.helper.CallbackHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.service.ActiveMqServiceImpl;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.repository.AplicacioRepository;
@@ -12,19 +13,18 @@ import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ScheduledMessage;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.ws.rs.NotFoundException;
+import java.io.IOException;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -70,12 +70,23 @@ public class CallbackListener {
         }
     }
 
-    private void enviarCua(Long enviamentId, Long delay) {
+	private void enviarCua(Long enviamentId, Long delay) {
 
-        jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, enviamentId,
-            m -> {
-                m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, delay);
-                return m;
-            });
-    }
+		jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, enviamentId,
+			m -> {
+				if (delay > 0) {
+					m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, delay);
+					if (configHelper.getConfigAsBoolean("es.caib.notib.log.tipus.STATE_MACHINE")) {
+						var mida = 0;
+						try {
+							mida = new ObjectMapper().writeValueAsBytes(enviamentId).length;
+						} catch (IOException e) {
+							NotibLogger.getInstance().info("[SM] Error convertint el missatge a json " + enviamentId, log, LoggingTipus.STATE_MACHINE);
+						}
+						ActiveMqServiceImpl.afegirJob(SmConstants.CUA_CALLBACKS, mida);
+					}
+				}
+				return m;
+			});
+	}
 }

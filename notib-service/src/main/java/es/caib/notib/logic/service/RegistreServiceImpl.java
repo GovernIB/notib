@@ -1,5 +1,6 @@
 package es.caib.notib.logic.service;
 
+import es.caib.comanda.model.v1.avis.AvisTipus;
 import es.caib.notib.logic.comanda.ComandaListener;
 import es.caib.notib.logic.helper.AuditHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
@@ -91,7 +92,7 @@ public class RegistreServiceImpl implements RegistreService {
                     notificacio.updateEstat(nouEstat);
                     notificacio.updateMotiu(enviament.getRegistreEstat().name());
                     notificacio.updateEstatDate(new Date());
-                    comandaListener.enviarAvis(enviament, AvisDescripcio.ACTUALITZAR_ESTAT_REGISTRE);
+					comandaListener.enviarAvis(enviament, AvisTipus.INFO);
                 }
             }
             NotibLogger.getInstance().info("[REGISTRE] Enviament de registre <" + enviamentUuid + "> actualitzant registre", log, LoggingTipus.REGISTRE);
@@ -109,7 +110,11 @@ public class RegistreServiceImpl implements RegistreService {
             return registreSuccess;
         } catch (Exception ex) {
             NotibLogger.getInstance().info("[REGISTRE] Enviament de registre <" + enviamentUuid + "> error ", ex, log, LoggingTipus.REGISTRE);
-            return false;
+			var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElse(null);
+			if (enviament != null) {
+				comandaListener.enviarAvis(enviament, AvisTipus.ERROR);
+			}
+			return false;
         }
     }
 
@@ -169,7 +174,7 @@ public class RegistreServiceImpl implements RegistreService {
                 integracioHelper.addAccioError(info, desc);
                 return RespostaSirAdviser.builder().ok(false).errorDescripcio(desc).build();
             }
-            var consulta = ConsultaSirRequest.builder().consultaSirDto(ConsultaSirDto.builder().id(enviament.getId()).build()).build();
+			var consulta = ConsultaSirRequest.builder().id(enviament.getId()).build();
             registreHelper.enviamentRefrescarEstatRegistre(consulta);
             integracioHelper.addAccioOk(info);
             SubsistemesHelper.addSuccessOperation(CSR, System.currentTimeMillis() - start);

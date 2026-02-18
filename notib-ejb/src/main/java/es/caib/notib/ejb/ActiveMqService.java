@@ -70,4 +70,10 @@ public class ActiveMqService extends AbstractService<es.caib.notib.logic.intf.se
         return getDelegateService().buidarCua(queueName);
     }
 
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public String getJobSchedulerStats() throws Exception {
+		return getDelegateService().getJobSchedulerStats();
+	}
+
 }

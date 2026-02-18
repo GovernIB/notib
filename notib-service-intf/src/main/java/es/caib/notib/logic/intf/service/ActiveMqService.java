@@ -31,5 +31,7 @@ public interface ActiveMqService {
     boolean deleteMessage(String queueName, String messageId);
     @PreAuthorize("hasRole('NOT_SUPER')")
     boolean buidarCua(String queueName);
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	String getJobSchedulerStats() throws Exception;
 
 }

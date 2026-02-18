@@ -2,6 +2,7 @@ package es.caib.notib.persist.entity;
 
 
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaTipus;
+import es.caib.notib.logic.intf.dto.accioMassiva.SeleccioTipus;
 import es.caib.notib.persist.audit.NotibAuditable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -60,6 +61,18 @@ public class AccioMassivaEntity  extends NotibAuditable<Long> {
     private String errorDescripcio;
     @Column(name = "excepcio_stacktrace", length = 2048)
     private String excepcioStacktrace;
+
+	@Column(name = "tipus_seleccionat", length = 20, nullable = false)
+	@Enumerated(EnumType.STRING)
+	SeleccioTipus tipusElementSeleccionat;
+
+	// Paràmetres de la acció massiva
+	@Column(name = "motiu", length = 250)
+	String motiu;
+	@Column(name = "admin_entitat")
+	boolean adminEntitat;
+	@Column(name = "dies")
+	int dies;
 
     @OneToMany(mappedBy = "accioMassiva", fetch = FetchType.LAZY, orphanRemoval = true, cascade={CascadeType.ALL})
     private List<AccioMassivaElementEntity> elements;

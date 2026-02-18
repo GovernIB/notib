@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.logic.service;
 
@@ -50,7 +50,7 @@ import java.util.Map;
 
 /**
  * Implementació del servei de gestió d'items monitorIntegracio.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -196,7 +196,7 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 					break;
 				case NOTIFICA:
 					enviament = enviamentRepository.findTopByNotificaIdentificadorNotNullOrderByIdDesc().orElseThrow();
-					var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviament.getId()).build()).build();
+					var consulta = ConsultaNotificaRequest.builder().id(enviament.getId()).build();
 					try {
 						notificaHelper.enviamentRefrescarEstat(consulta);
 						diagnostic.setCorrecte(true);

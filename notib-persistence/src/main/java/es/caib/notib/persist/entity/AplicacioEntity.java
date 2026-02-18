@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.persist.entity;
 
@@ -18,7 +18,7 @@ import java.time.LocalTime;
 /**
  * Classe del model de dades que representa una aplicació amb
  * accés a NOTIB.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Builder
@@ -38,6 +38,8 @@ public class AplicacioEntity extends NotibAuditable<Long> {
 	private boolean activa;
 	@Column(name = "header_csrf", nullable = false)
 	private boolean headerCsrf;
+	@Column(name = "aplicar_limit_env", nullable = false)
+	private boolean aplicarLimitEnviaments = true;
 	@Column(name = "horari_laboral_inici", nullable = false)
     private LocalTime horariLaboralInici;
 	@Column(name = "horari_laboral_fi", nullable = false)
@@ -68,7 +70,7 @@ public class AplicacioEntity extends NotibAuditable<Long> {
         maxEnviamentsDiaLaboral = aplicacio.getMaxEnviamentsDiaLaboral();
         maxEnviamentsDiaNoLaboral = aplicacio.getMaxEnviamentsDiaNoLaboral();
 	}
-	
+
 	public void updateActiva(boolean activa) {
 		this.activa = activa;
 	}

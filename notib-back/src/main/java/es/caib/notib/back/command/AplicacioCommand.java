@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.back.command;
 
@@ -17,7 +17,7 @@ import java.time.LocalTime;
 
 /**
  * Command per al manteniment d'aplicacions.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter @Setter
@@ -28,10 +28,12 @@ public class AplicacioCommand {
 	@NotEmpty
 	@Size(max=64)
 	private String usuariCodi;
-	@NotEmpty @Size(max=256) 
+	@NotEmpty @Size(max=256)
 	private String callbackUrl;
 	private Long entitatId;
 	private boolean headerCsrf;
+	@NotNull
+	private boolean aplicarLimitEnviaments;
 	@NotNull
 	private LocalTime horariLaboralInici = LocalTime.of(7, 0);
 	@NotNull

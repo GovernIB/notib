@@ -31,6 +31,8 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -104,11 +106,16 @@ public class CallbackHelper {
 			c.setErrorDesc(errorDesc);
 			c.setEstat(CallbackEstatEnumDto.PENDENT);
 			callbackRepository.saveAndFlush(c);
-			jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId(),
-					m -> {
-						m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 1000L);
-						return m;
-					});
+			if (TransactionSynchronizationManager.isActualTransactionActive()) {
+				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+					@Override
+					public void afterCommit() {
+						jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId());
+					}
+				});
+			} else {
+				jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId());
+			}
 		} catch (NoSuchElementException ex) {
 			log.error("L'enviament " + env.getId() + " i la notificacio " + env.getNotificacio().getId() + " no tenen assignat el createdBy", ex);
 		} catch (Exception ex) {
@@ -135,21 +142,25 @@ public class CallbackHelper {
 		var callback = callbackRepository.findByEnviamentId(env.getId());
 		if (callback == null) {
 			var usuari = env.getCreatedBy().orElse(env.getNotificacio().getCreatedBy().orElse(null));
-			var codi = "";
 			if (usuari == null) {
 				log.error("[CALLBACK] Error usuari null per enviament " + env.getId() + "  i null a la notificacio " + env.getNotificacio().getId());
 				return null;
 			}
-			callback = CallbackEntity.builder().usuariCodi(codi).notificacioId(env.getNotificacio().getId()).enviamentId(env.getId()).build();
+			callback = CallbackEntity.builder().usuariCodi(usuari.getCodi()).notificacioId(env.getNotificacio().getId()).enviamentId(env.getId()).build();
 			callbackRepository.saveAndFlush(callback);
 		}
 		callback.setData(new Date());
 		callback.setEstat(CallbackEstatEnumDto.PENDENT);
-		jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId(),
-				m -> {
-					m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 1000L);
-					return m;
-				});
+		if (TransactionSynchronizationManager.isActualTransactionActive()) {
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+				@Override
+				public void afterCommit() {
+					jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId());
+				}
+			});
+		} else {
+			jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId());
+		}
 		return callback;
 	}
 

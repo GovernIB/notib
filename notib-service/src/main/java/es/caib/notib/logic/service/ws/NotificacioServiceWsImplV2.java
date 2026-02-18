@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.logic.service.ws;
 
@@ -51,7 +51,6 @@ import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.JustificantService;
 import es.caib.notib.logic.intf.service.NotificacioServiceWs;
 import es.caib.notib.logic.intf.service.OrganGestorService;
-import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.intf.util.EidasValidator;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
@@ -114,7 +113,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * Implementació del servei per a l'enviament i consulta de notificacions V2 (Sense paràmetres SEU).
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -702,7 +701,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 				if (!notificaHelper.isAdviserActiu() && !enviament.isNotificaEstatFinal()
 						&& !enviament.getNotificaEstat().equals(EnviamentEstat.NOTIB_PENDENT)) {
 					log.debug("Consultat estat de l'enviament amb referencia " + referencia + " a Notifica.");
-					var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviament.getId()).build()).build();
+					var consulta = ConsultaNotificaRequest.builder().id(enviament.getId()).build();
 					enviament = notificaHelper.enviamentRefrescarEstat(consulta);
 				}
 				resposta.setIdentificador(enviament.getNotificacio().getReferencia());
@@ -1217,7 +1216,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		var isEstatFinal = EnviamentEstat.EXPIRADA.equals(enviament.getNotificaEstat()) || EnviamentEstat.REBUTJADA.equals(enviament.getNotificaEstat()) || EnviamentEstat.NOTIFICADA.equals(enviament.getNotificaEstat());
 		if (enviament.getNotificaCertificacioArxiuId() == null && isEstatFinal) {
 			try {
-				var consulta = ConsultaNotificaRequest.builder().consultaNotificaDto(ConsultaNotificaDto.builder().id(enviament.getId()).build()).build();
+				var consulta = ConsultaNotificaRequest.builder().id(enviament.getId()).build();
 				notificaHelper.enviamentRefrescarEstat(consulta);
 				entityManager.refresh(enviament);
 			} catch (Exception ex) {

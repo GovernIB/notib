@@ -9,6 +9,7 @@ import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaSirRequest;
 import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.service.ActiveMqServiceImpl;
 import es.caib.notib.logic.service.EnviamentSmServiceImpl;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.statemachine.mappers.ConsultaSirMapper;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ScheduledMessage;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.retry.annotation.Backoff;
@@ -29,6 +31,8 @@ import org.springframework.statemachine.action.Action;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
 
 @Slf4j
 @Component
@@ -51,20 +55,37 @@ public class ConsultaSirAction implements Action<EnviamentSmEstat, EnviamentSmEv
     @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 30000, multiplier = 10, maxDelay = 3600000))
     public void execute(StateContext<EnviamentSmEstat, EnviamentSmEvent> stateContext) {
 
-        var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
-        NotibLogger.getInstance().info("[SM] EnviamentNotificaAction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
-        var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
-        var reintents = (int) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
-        var accioMassivaElementId = (Long) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ACCIO_MASSIVA_ID, null);
-        var env = ConsultaSirRequest.builder().enviamentUuid(enviamentUuid).accioMassivaId(accioMassivaElementId).consultaSirDto(enviamentSirMapper.toDto(enviament)).numIntent(reintents + 1).build();
-        var isRetry = EnviamentSmEvent.SR_RETRY.equals(stateContext.getMessage().getPayload());
-        jmsTemplate.convertAndSend(SmConstants.CUA_CONSULTA_SIR, env,
-                m -> {
-                    m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, !isRetry ? SmConstants.delay(reintents) : 0L);
-                    return m;
-                });
-        NotibLogger.getInstance().info("[SM] Enviada consulta d'estat SIR per l'enviament amb UUID " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
-    }
+		var enviamentUuid = (String) stateContext.getMessage().getHeaders().get(SmConstants.ENVIAMENT_UUID_HEADER);
+		NotibLogger.getInstance().info("[SM] EnviamentNotificaAction enviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
+		var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
+		var reintents = (int) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ENVIAMENT_REINTENTS, 0);
+		var accioMassivaElementId = (Long) stateContext.getExtendedState().getVariables().getOrDefault(SmConstants.ACCIO_MASSIVA_ID, null);
+		var codiUsuari = (String) stateContext.getExtendedState().getVariables().get(SmConstants.CODI_USUARI);
+		var env = ConsultaSirRequest.builder()
+			.enviamentUuid(enviamentUuid)
+			.id(enviament.getId())
+			.accioMassivaId(accioMassivaElementId)
+			.numIntent(reintents + 1)
+			.codiUsuari(codiUsuari)
+			.build();
+		var isRetry = EnviamentSmEvent.SR_RETRY.equals(stateContext.getMessage().getPayload());
+		jmsTemplate.convertAndSend(SmConstants.CUA_CONSULTA_SIR, env,
+			m -> {
+				m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, !isRetry ? SmConstants.delay(reintents) : 0L);
+				if (configHelper.getConfigAsBoolean("es.caib.notib.log.tipus.STATE_MACHINE")) {
+					var mida = 0;
+					try {
+						mida = new ObjectMapper().writeValueAsBytes(env).length;
+					} catch (IOException e) {
+						NotibLogger.getInstance().info("[SM] Error convertint el missatge a json " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
+					}
+					ActiveMqServiceImpl.afegirJob(SmConstants.CUA_CONSULTA_SIR, mida);
+				}
+				return m;
+			});
+		NotibLogger.getInstance().info("[SM] Enviada consulta d'estat SIR per l'enviament amb UUID " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
+	}
+
 
     @Transactional
     @Recover

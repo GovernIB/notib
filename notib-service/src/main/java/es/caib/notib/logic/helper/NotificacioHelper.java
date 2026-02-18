@@ -98,8 +98,12 @@ public class NotificacioHelper {
     public String checkLimitEnviamentsAplicacioSuperat(String usuariCodi, Long entitatId) {
 
         try {
-            String msg = null;
+            String msg = "";
             var aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(usuariCodi, entitatId);
+			// Si no es troba l'aplicació, o aquesta no aplica límits
+			if (aplicacio == null || !aplicacio.isAplicarLimitEnviaments()) {
+				return null;
+			}
             if (!DatesUtils.isDiaLaboral()) {
                 var maxEnvMinut =  aplicacio.getMaxEnviamentsMinutNoLaboral();
                 var maxEnvDies =  aplicacio.getMaxEnviamentsDiaNoLaboral();
@@ -142,7 +146,8 @@ public class NotificacioHelper {
         } catch (Exception ex) {
             var msg = "Error checkejant el limit d'enviaments per l'aplicacio";
             log.error(msg, ex);
-            return msg;
+			//            return msg;
+			return null;
         }
     }
 
@@ -448,7 +453,7 @@ public class NotificacioHelper {
 				id = Long.valueOf(notificacio.getOrganGestor());
 				organGestor = organGestorRepository.findById(id).orElse(null);
 			} catch (Exception ex) {
-				throw new NotFoundException("Organ gestor not long" + notificacio.getOrganGestor(), OrganGestorEntity.class);
+				organGestor = organGestorRepository.findByEntitatAndCodi(entitat, notificacio.getOrganGestor());
 			}
 		}
 		if (organGestor == null) {

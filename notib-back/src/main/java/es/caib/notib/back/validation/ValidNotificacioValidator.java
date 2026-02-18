@@ -382,7 +382,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 
 	public static ArrayList<Character> validFormat(String value) {
 
-		String controlCaracters = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-–_/:().,¿?!¡;ºª";
+		String controlCaracters = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-–_/:().,¿?!¡;ºª·";
 		controlCaracters += apostrofPermes ? "'" : "";
 		ArrayList<Character> charsNoValids = new ArrayList<>();
 		char[] chars = value.replace("\n", "").replace("\r", "").toCharArray();
