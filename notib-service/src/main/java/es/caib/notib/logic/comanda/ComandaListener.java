@@ -16,11 +16,13 @@ import es.caib.notib.logic.intf.dto.AvisDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
+import es.caib.notib.logic.intf.dto.missatges.MissatgeComanda;
 import es.caib.notib.logic.intf.util.DatesUtils;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import joptsimple.internal.Strings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,6 +57,7 @@ public class ComandaListener {
 	private final IntegracioHelper integracioHelper;
 	private final ProcSerHelper procSerHelper;
 	private final JmsTemplate jmsTemplate;
+	private final NotificacioEnviamentRepository enviamentRepository;
 
 	private static final String APP_CODI = "NOT";
 
@@ -78,34 +81,36 @@ public class ComandaListener {
 		return entornCodi;
 	}
 
-	public void enviarAvis(AvisDto dto) {
+	public void enviarAvis(NotificacioEnviamentEntity enviament, AvisTipus tipus) {
+
 		try {
 			if (!isComandaActiva()) {
 				return;
 			}
-			var entornCodi = getEntornCodi();
-			var avis = Avis.builder()
-				.appCodi(APP_CODI)
-				.entornCodi(entornCodi)
-				.identificador(dto.getId() + "")
-				.tipus(AvisTipus.INFO)
-				.nom(dto.getAssumpte())
-				.descripcio(dto.getMissatge())
-				.dataInici(DatesUtils.toOffsetDateTime(dto.getDataInici()))
-				.dataFi(DatesUtils.toOffsetDateTime(dto.getDataFinal()))
-				.build();
-			enviarAvisComanda(avis);
+			enviarMissatgeComanda(MissatgeComanda.builder()
+				.id(enviament.getId())
+				.tipus(tipus)
+				.build());
 		} catch (Exception ex) {
-			log.error("[ComandaListener.avisDto] Error generant l'avis", ex);
+			log.error("[ComandaListener.avisEnviament] Error enviant l'avis", ex);
 		}
 	}
 
-	public void enviarAvis(NotificacioEnviamentEntity enviament, AvisDescripcio descripcio) {
+	private void enviarMissatgeComanda(MissatgeComanda missatge) throws Exception {
 
+		NotibLogger.getInstance().info("[ComandaListener] Enviant missatge a la cua de tasques de Comanda " + missatge, log, LoggingTipus.COMANDA);
+		jmsTemplate.convertAndSend(SmConstants.CUA_COMANDA_AVISOS, missatge);
+	}
+
+	@Transactional
+	@JmsListener(destination = SmConstants.CUA_COMANDA_AVISOS, containerFactory = SmConstants.JMS_FACTORY_ACK)
+	public void enviarAvisComanda(@Payload MissatgeComanda missatgeComanda, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
+
+		message.acknowledge();
+		Avis avis = null;
 		try {
-			if (!isComandaActiva()) {
-				return;
-			}
+			var enviament = enviamentRepository.findById(missatgeComanda.getId()).orElseThrow();
+			var tipus = missatgeComanda.getTipus();
 			var entornCodi = getEntornCodi();
 			var notificacio = enviament.getNotificacio();
 			var dataInici = enviament.getCreatedDate().isPresent() ? Date.from(enviament.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()) : null;
@@ -117,13 +122,13 @@ public class ComandaListener {
 			} else if(isSir) {
 				dataFi = enviament.getSirRegDestiData();
 			}
-			var desc = descripcio.getDescripcio() + " Tipus: " + tipusEnviament+ ". Estat "
-				+ (!EnviamentTipus.SIR.equals(tipusEnviament) ? enviament.getNotificaEstat() : enviament.getRegistreEstat());
+			var desc = " Tipus: " + tipusEnviament + "."
+				+ " Estat " + (!EnviamentTipus.SIR.equals(tipusEnviament) ? enviament.getNotificaEstat() : enviament.getRegistreEstat());
 			var permisos = procSerHelper.findUsuarisAndRolsAmbPermis(notificacio);
 			var appBaseUrl = configHelper.getConfig("es.caib.notib.app.base.url");
 			var redireccio = appBaseUrl + "/notificacio/" + notificacio.getId() + "/enviament/" + enviament.getId();
 
-			var avis = Avis.builder()
+			avis = Avis.builder()
 				.appCodi(APP_CODI)
 				.entornCodi(entornCodi)
 				.identificador(enviament.getNotificaReferencia())
@@ -131,33 +136,18 @@ public class ComandaListener {
 				.dataInici(dataInici != null ? DatesUtils.toOffsetDateTime(dataInici) : null)
 				.dataFi(dataFi != null ? DatesUtils.toOffsetDateTime(dataFi) : null)
 				.descripcio(desc)
-				.tipus(AvisTipus.INFO)
+				.tipus(tipus)
 				.responsable(notificacio.getUsuariCodi())
 				.usuarisAmbPermis(permisos.getUsuarisAmbPermis())
 				.grupsAmbPermis(permisos.getRolsAmbPermis())
 				.redireccio(new URL(redireccio))
 				.grup(notificacio.getGrupCodi())
 				.build();
-			enviarAvisComanda(avis);
 		} catch (Exception ex) {
-			log.error("[ComandaListener.avisEnviament] Error generant l'avis", ex);
+			log.error("[enviarAvisComanda] Error reconstruint l'avis de Comanda", ex);
+			return;
 		}
-	}
-
-	private void enviarAvisComanda(Avis avis) throws Exception {
-
-		var mapper = new ObjectMapper();
-		mapper.registerModule(new JavaTimeModule());
-//        var requestBody = mapper.writeValueAsString(avis);
-		NotibLogger.getInstance().info("[ComandaListener] Enviant avis a la cua de tasques de Comanda " + avis, log, LoggingTipus.COMANDA);
-		jmsTemplate.convertAndSend(SmConstants.CUA_COMANDA_AVISOS, avis);
-	}
-
-	@Transactional
-	@JmsListener(destination = SmConstants.CUA_COMANDA_AVISOS, containerFactory = SmConstants.JMS_FACTORY_ACK)
-	public void enviarAvisComanda(@Payload Avis avis, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
-
-		message.acknowledge();
+		NotibLogger.getInstance().info("[ComandaListener] Enviant avis a la cua d'avisos de Comanda " + avis, log, LoggingTipus.COMANDA);
 		var info = new IntegracioInfo(IntegracioCodi.COMANDA, "Enviament d'avis a comanda", IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Avis", avis.toString()));
 		String url;
 		try {
@@ -185,92 +175,6 @@ public class ComandaListener {
 			var msg = "Error al enviar l'avis a Commanda";
 			integracioHelper.addAccioError(info, msg, ex);
 			log.error("[enviarAvisComanda] " + msg, ex);
-		}
-	}
-
-	private void enviarTascaComanda(Tasca tasca) throws Exception  {
-
-		var mapper = new ObjectMapper();
-		mapper.registerModule(new JavaTimeModule());
-//        var requestBody = mapper.writeValueAsString(tasca);
-		NotibLogger.getInstance().info("[ComandaListener] Enviant tasca a la cua de tasques de Comanda " + tasca, log, LoggingTipus.COMANDA);
-		jmsTemplate.convertAndSend(SmConstants.CUA_COMANDA_TASQUES, tasca);
-	}
-
-
-	@Transactional
-	@JmsListener(destination = SmConstants.CUA_COMANDA_TASQUES, containerFactory = SmConstants.JMS_FACTORY_ACK)
-	public void enviarTascaComanda(@Payload Tasca tasca, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
-
-		message.acknowledge();
-		var info = new IntegracioInfo(IntegracioCodi.COMANDA, "Enviament de tasca a comanda", IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Tasca", tasca.toString()));
-		String url;
-		try {
-			url = configHelper.getConfig("es.caib.notib.plugin.comanda.url");
-			if (url == null) {
-				throw new Exception("La propietat es.caib.notib.plugin.comanda.url.base no pot ser null");
-			}
-			url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "api/v1/jms/tasques";
-			info.addParam("url", url);
-		} catch (Exception ex) {
-			var msg = "Error al obtenir la url per enviar la tasca a Commanda";
-			integracioHelper.addAccioError(info, msg, ex);
-			log.error("[enviarTascaCommanda] " + msg, ex);
-			return;
-		}
-		try {
-			var username = configHelper.getConfig("es.caib.notib.plugin.comanda.usuari");
-			var password = configHelper.getConfig("es.caib.notib.plugin.comanda.password");
-			NotibLogger.getInstance().info("[enviarTascaCommanda] Enviant tasca a Comanda url " + url, log, LoggingTipus.COMANDA);
-			var comandaClient = new ComandaClient(url, username, password);
-			var resposta = comandaClient.crearTasca(tasca);
-			NotibLogger.getInstance().info("[enviarTascaCommanda] Resposta: " + resposta, log, LoggingTipus.COMANDA);
-			integracioHelper.addAccioOk(info);
-		} catch (Exception ex) {
-			var msg = "Error al enviar la tasca a Commanda";
-			integracioHelper.addAccioError(info, msg, ex);
-			log.error("[enviarTascaCommanda] " + msg, ex);
-		}
-	}
-
-	public void enviarTasca(NotificacioEnviamentEntity enviament) {
-
-		try {
-			if (!isComandaActiva()) {
-				return;
-			}
-			var entornCodi = getEntornCodi();
-			var notificacio = enviament.getNotificacio();
-			var permisos = procSerHelper.findUsuarisAndRolsAmbPermis(notificacio);
-			var descripcio = notificacio.getDescripcio();
-			var appBaseUrl = configHelper.getConfig("es.caib.notib.app.base.url");
-			var redireccio = appBaseUrl + "/notificacio/"+notificacio.getId()+"/enviament/"+ enviament.getId();
-			var estatDesc = EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus()) ? "Estat SIR: " + enviament.getRegistreEstat().name()
-				: "Estat Notifica: " + enviament.getNotificaEstat().name();
-			estatDesc += enviament.getEntregaPostal() != null ? ", Estat CIE: " + (enviament.getEntregaPostal().getCieEstat() != null ? enviament.getEntregaPostal().getCieEstat() : "Pendent d'enviar al centre CIE" ) : "";
-			var dataInici = notificacio.getCreatedDate().isPresent() ? notificacio.getCreatedDate().get().atZone(ZoneId.systemDefault()).toOffsetDateTime() : null;
-			var tasca =  Tasca.builder()
-				.appCodi(APP_CODI)
-				.entornCodi(entornCodi)
-				.identificador(enviament.getId() + "")
-				.tipus(notificacio.getEnviamentTipus().name())
-				.nom(notificacio.getConcepte())
-				.descripcio(descripcio)
-				.dataInici(dataInici)
-				.dataFi(DatesUtils.toOffsetDateTime(notificacio.getEstatProcessatDate()))
-				.dataCaducitat(DatesUtils.toOffsetDateTime(notificacio.getCaducitat()))
-				.estat(enviament.getEstatPerComanda())
-				.estatDescripcio(estatDesc)
-				.numeroExpedient(notificacio.getNumExpedient())
-				.responsable(notificacio.getUsuariCodi())
-				.usuarisAmbPermis(permisos.getUsuarisAmbPermis())
-				.grupsAmbPermis(permisos.getRolsAmbPermis())
-				.redireccio(new URL(redireccio))
-				.grup(notificacio.getGrupCodi())
-				.build();
-			enviarTascaComanda(tasca);
-		} catch (Exception ex) {
-			log.error("[ComandaListener] Error generant la tasca", ex );
 		}
 	}
 
