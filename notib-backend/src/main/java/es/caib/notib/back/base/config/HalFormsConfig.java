@@ -249,8 +249,13 @@ public class HalFormsConfig {
 
 	private FieldOption[] getInlineOptionsEnumConstants(Field field) {
 		Object[] enumConstants;
-		if (field.getType().isArray()) {
-			enumConstants = field.getType().getComponentType().getEnumConstants();
+		if (TypeUtil.isMultipleFieldType(field)) {
+			Class<?> multipleFieldType = TypeUtil.getMultipleFieldType(field);
+			if (multipleFieldType != null) {
+				enumConstants = multipleFieldType.getEnumConstants();
+			} else {
+				enumConstants = new Object[0];
+			}
 		} else {
 			enumConstants = field.getType().getEnumConstants();
 		}

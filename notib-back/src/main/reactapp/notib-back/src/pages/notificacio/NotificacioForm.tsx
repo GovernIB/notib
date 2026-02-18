@@ -26,14 +26,14 @@ const NotificacioFormContent: React.FC = () => {
             <Grid size={6}>
                 <FormField name="procediment" />
             </Grid>
-            <Grid size={12}>
-                <FormField name="enviamentDataProgramada" />
+            <Grid size={6}>
+                <FormField name="enviamentDataProgramada" type="date" />
+            </Grid>
+            <Grid size={2}>
+                <FormField name="caducitatDiesNaturals" />
             </Grid>
             <Grid size={4}>
-                <FormField name="caducitat" />
-            </Grid>
-            <Grid size={8}>
-                <FormField name="caducitatOriginal" />
+                <FormField name="caducitat" type="date" />
             </Grid>
             <Grid size={6}>
                 <FormField name="numExpedient" debounce />
@@ -58,6 +58,7 @@ export const NotificacioForm: React.FC = () => {
                         ? t('page.notificacio.form.titleUpdate')
                         : t('page.notificacio.form.titleCreate')
                 }
+                initOnChangeRequest
                 createLink="./{{id}}"
                 //updateLink="../../"
                 componentProps={{ style: { height: '100%' } }}

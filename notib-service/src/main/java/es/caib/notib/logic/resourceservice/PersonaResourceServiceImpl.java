@@ -30,7 +30,7 @@ public class PersonaResourceServiceImpl
 
 	@PostConstruct
 	public void init() {
-		register(null, new InteressatTipusOnChangeLogicProcessor());
+		register(null, new InitOnChangeLogicProcessor());
 		register(PersonaResource.Fields.interessatTipus, new InteressatTipusOnChangeLogicProcessor());
 	}
 
@@ -70,6 +70,23 @@ public class PersonaResourceServiceImpl
 	}
 
 	/*
+	 * Lògica onChange que s'executa al carregar el formulari.
+	 */
+	private static class InitOnChangeLogicProcessor implements OnChangeLogicProcessor<PersonaResource> {
+		@Override
+		public void onChange(
+			Serializable id,
+			PersonaResource previous,
+			String fieldName,
+			Object fieldValue,
+			Map<String, AnswerRequiredException.AnswerValue> answers,
+			String[] previousFieldNames,
+			PersonaResource target) {
+			interessatTipusOnChange(previous.getInteressatTipus(), target);
+		}
+	}
+
+	/*
 	 * Lògica onChange pel camp interessatTipus. Segons el valor d'aquest camp canvien els camps visibles / obligatoris.
 	 */
 	private static class InteressatTipusOnChangeLogicProcessor implements OnChangeLogicProcessor<PersonaResource> {
@@ -82,101 +99,105 @@ public class PersonaResourceServiceImpl
 			Map<String, AnswerRequiredException.AnswerValue> answers,
 			String[] previousFieldNames,
 			PersonaResource target) {
-			// Si el canvi és l'inicial el valor interessatTipus s'agafa de previous, en cas contrari s'agafa de fieldValue.
-			InteressatTipus interessatTipus = (fieldValue != null) ? (InteressatTipus)fieldValue : previous.getInteressatTipus();
-			// En funció del tipus d'interessat configura:
-			//   - La visibilitat dels camps
-			//   - L'obligatorietat dels camps
-			//   - Posa a null tots els camps no visibles
-			if (InteressatTipus.FISICA.equals(interessatTipus)) {
-				target.setVisibleDocumentTipus(false);
-				target.setVisibleNif(true);
-				target.setVisibleNom(true);
-				target.setVisibleLlinatge1(true);
-				target.setVisibleLlinatge2(true);
-				target.setVisibleTelefon(true);
-				target.setVisibleEmail(true);
-				target.setVisibleRaoSocial(false);
-				target.setVisibleDir3Codi(false);
-				target.setVisibleIncapacitat(true);
-				target.setRequiredNif(true);
-				target.setRequiredNom(true);
-				target.setRequiredLlinatge1(true);
-				target.setRequiredEmail(false);
-				target.setRequiredRaoSocial(false);
-				target.setRequiredDir3Codi(false);
-				target.setDocumentTipus(null);
-				target.setRaoSocial(null);
-				target.setDir3Codi(null);
-			} else if (InteressatTipus.ADMINISTRACIO.equals(interessatTipus)) {
-				target.setVisibleDocumentTipus(false);
-				target.setVisibleNif(true);
-				target.setVisibleNom(false);
-				target.setVisibleLlinatge1(false);
-				target.setVisibleLlinatge2(false);
-				target.setVisibleTelefon(false);
-				target.setVisibleEmail(true);
-				target.setVisibleRaoSocial(false);
-				target.setVisibleDir3Codi(true);
-				target.setVisibleIncapacitat(false);
-				target.setRequiredNif(true);
-				target.setRequiredNom(false);
-				target.setRequiredLlinatge1(false);
-				target.setRequiredEmail(false);
-				target.setRequiredRaoSocial(false);
-				target.setRequiredDir3Codi(true);
-				target.setDocumentTipus(null);
-				target.setNom(null);
-				target.setLlinatge1(null);
-				target.setLlinatge2(null);
-				target.setTelefon(null);
-				target.setRaoSocial(null);
-				target.setDir3Codi(null);
-				target.setIncapacitat(false);
-			} else if (InteressatTipus.JURIDICA.equals(interessatTipus)) {
-				target.setVisibleDocumentTipus(false);
-				target.setVisibleNif(true);
-				target.setVisibleNom(false);
-				target.setVisibleLlinatge1(false);
-				target.setVisibleLlinatge2(false);
-				target.setVisibleTelefon(false);
-				target.setVisibleEmail(true);
-				target.setVisibleRaoSocial(true);
-				target.setVisibleDir3Codi(false);
-				target.setVisibleIncapacitat(true);
-				target.setRequiredNif(true);
-				target.setRequiredNom(false);
-				target.setRequiredLlinatge1(false);
-				target.setRequiredEmail(false);
-				target.setRequiredRaoSocial(true);
-				target.setRequiredDir3Codi(false);
-				target.setDocumentTipus(null);
-				target.setNom(null);
-				target.setLlinatge1(null);
-				target.setLlinatge2(null);
-				target.setTelefon(null);
-				target.setDir3Codi(null);
-			} else if (InteressatTipus.FISICA_SENSE_NIF.equals(interessatTipus)) {
-				target.setVisibleDocumentTipus(true);
-				target.setVisibleNif(true);
-				target.setVisibleNom(true);
-				target.setVisibleLlinatge1(true);
-				target.setVisibleLlinatge2(true);
-				target.setVisibleTelefon(false);
-				target.setVisibleEmail(true);
-				target.setVisibleRaoSocial(false);
-				target.setVisibleDir3Codi(false);
-				target.setVisibleIncapacitat(true);
-				target.setRequiredNif(false);
-				target.setRequiredNom(true);
-				target.setRequiredLlinatge1(true);
-				target.setRequiredEmail(true);
-				target.setRequiredRaoSocial(false);
-				target.setRequiredDir3Codi(false);
-				target.setTelefon(null);
-				target.setRaoSocial(null);
-				target.setDir3Codi(null);
-			}
+			interessatTipusOnChange((InteressatTipus)fieldValue, target);
+		}
+	}
+
+	private static void interessatTipusOnChange(
+		InteressatTipus interessatTipus,
+		PersonaResource target) {
+		// En funció del tipus d'interessat configura:
+		//   - La visibilitat dels camps
+		//   - L'obligatorietat dels camps
+		//   - Posa a null tots els camps no visibles
+		if (InteressatTipus.FISICA.equals(interessatTipus)) {
+			target.setVisibleDocumentTipus(false);
+			target.setVisibleNif(true);
+			target.setVisibleNom(true);
+			target.setVisibleLlinatge1(true);
+			target.setVisibleLlinatge2(true);
+			target.setVisibleTelefon(true);
+			target.setVisibleEmail(true);
+			target.setVisibleRaoSocial(false);
+			target.setVisibleDir3Codi(false);
+			target.setVisibleIncapacitat(true);
+			target.setRequiredNif(true);
+			target.setRequiredNom(true);
+			target.setRequiredLlinatge1(true);
+			target.setRequiredEmail(false);
+			target.setRequiredRaoSocial(false);
+			target.setRequiredDir3Codi(false);
+			target.setDocumentTipus(null);
+			target.setRaoSocial(null);
+			target.setDir3Codi(null);
+		} else if (InteressatTipus.ADMINISTRACIO.equals(interessatTipus)) {
+			target.setVisibleDocumentTipus(false);
+			target.setVisibleNif(true);
+			target.setVisibleNom(false);
+			target.setVisibleLlinatge1(false);
+			target.setVisibleLlinatge2(false);
+			target.setVisibleTelefon(false);
+			target.setVisibleEmail(true);
+			target.setVisibleRaoSocial(false);
+			target.setVisibleDir3Codi(true);
+			target.setVisibleIncapacitat(false);
+			target.setRequiredNif(true);
+			target.setRequiredNom(false);
+			target.setRequiredLlinatge1(false);
+			target.setRequiredEmail(false);
+			target.setRequiredRaoSocial(false);
+			target.setRequiredDir3Codi(true);
+			target.setDocumentTipus(null);
+			target.setNom(null);
+			target.setLlinatge1(null);
+			target.setLlinatge2(null);
+			target.setTelefon(null);
+			target.setRaoSocial(null);
+			target.setDir3Codi(null);
+			target.setIncapacitat(false);
+		} else if (InteressatTipus.JURIDICA.equals(interessatTipus)) {
+			target.setVisibleDocumentTipus(false);
+			target.setVisibleNif(true);
+			target.setVisibleNom(false);
+			target.setVisibleLlinatge1(false);
+			target.setVisibleLlinatge2(false);
+			target.setVisibleTelefon(false);
+			target.setVisibleEmail(true);
+			target.setVisibleRaoSocial(true);
+			target.setVisibleDir3Codi(false);
+			target.setVisibleIncapacitat(true);
+			target.setRequiredNif(true);
+			target.setRequiredNom(false);
+			target.setRequiredLlinatge1(false);
+			target.setRequiredEmail(false);
+			target.setRequiredRaoSocial(true);
+			target.setRequiredDir3Codi(false);
+			target.setDocumentTipus(null);
+			target.setNom(null);
+			target.setLlinatge1(null);
+			target.setLlinatge2(null);
+			target.setTelefon(null);
+			target.setDir3Codi(null);
+		} else if (InteressatTipus.FISICA_SENSE_NIF.equals(interessatTipus)) {
+			target.setVisibleDocumentTipus(true);
+			target.setVisibleNif(true);
+			target.setVisibleNom(true);
+			target.setVisibleLlinatge1(true);
+			target.setVisibleLlinatge2(true);
+			target.setVisibleTelefon(false);
+			target.setVisibleEmail(true);
+			target.setVisibleRaoSocial(false);
+			target.setVisibleDir3Codi(false);
+			target.setVisibleIncapacitat(true);
+			target.setRequiredNif(false);
+			target.setRequiredNom(true);
+			target.setRequiredLlinatge1(true);
+			target.setRequiredEmail(true);
+			target.setRequiredRaoSocial(false);
+			target.setRequiredDir3Codi(false);
+			target.setTelefon(null);
+			target.setRaoSocial(null);
+			target.setDir3Codi(null);
 		}
 	}
 

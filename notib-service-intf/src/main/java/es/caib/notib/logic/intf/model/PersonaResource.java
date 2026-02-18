@@ -15,6 +15,7 @@ import lombok.experimental.FieldNameConstants;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 /**
  * Informació d'una persona destinatària d'una notificació. Una persona pot ser tant l'interessat de la notificació com

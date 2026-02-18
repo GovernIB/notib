@@ -194,7 +194,6 @@ const NotificacioFormEnviaments: React.FC = () => {
     React.useEffect(() => {
         const reset = !enviaments?.length;
         if (reset) {
-            console.log('>>> reset', reset);
             formApiRef.current?.setFieldValue('enviaments', [{ id: new Date().valueOf() }]);
         }
     }, [enviaments]);

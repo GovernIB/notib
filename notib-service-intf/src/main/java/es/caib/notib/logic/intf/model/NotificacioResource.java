@@ -5,6 +5,7 @@ import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.explotacio.EnviamentOrigen;
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
+import es.caib.notib.logic.intf.base.annotation.ResourceField;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
@@ -66,6 +67,7 @@ public class NotificacioResource extends BaseResource<Long> {
 	@Size(max = 1000)
 	private String descripcio;
 	private Integer retard;
+	@ResourceField(onChangeActive = true)
 	private Date caducitat;
 	private Date caducitatOriginal;
 	@Size(max = 9)
@@ -116,5 +118,9 @@ public class NotificacioResource extends BaseResource<Long> {
 	private ResourceReference<DocumentResource, Long> document5;*/
 
 	private List<NotificacioEnviamentResource> enviamentsInfo;
+
+	// El següent camp s'utilitza per a fer el càlcul de la data de caducitat especificant els dies naturals
+	@ResourceField(onChangeActive = true)
+	private Integer caducitatDiesNaturals = 10;
 
 }
