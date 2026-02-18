@@ -1,5 +1,6 @@
 package es.caib.notib.logic.resourceservice;
 
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.exception.ResourceNotCreatedException;
@@ -9,6 +10,8 @@ import es.caib.notib.persist.resourceentity.PersonaResourceEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -23,6 +26,11 @@ import java.util.Map;
 public class PersonaResourceServiceImpl
 	extends BaseMutableResourceService<PersonaResource, Long, PersonaResourceEntity>
 	implements PersonaResourceService {
+
+	@PostConstruct
+	public void init() {
+		register(PersonaResource.Fields.interessatTipus, new InteressatTipusOnChangeLogicProcessor());
+	}
 
 	/*
 	 * Com que aquest servei no s'ha d'utilitzar més que per a consultar els fields feim que no es retorni mai cap
@@ -45,6 +53,93 @@ public class PersonaResourceServiceImpl
 		PersonaResource resource,
 		Map<String, AnswerRequiredException.AnswerValue> answers) {
 		throw new ResourceNotCreatedException(getResourceClass(), "Create is not allowed");
+	}
+
+	private static class InteressatTipusOnChangeLogicProcessor implements OnChangeLogicProcessor<PersonaResource> {
+		@Override
+		public void onChange(
+			Serializable id,
+			PersonaResource previous,
+			String fieldName,
+			Object fieldValue,
+			Map<String, AnswerRequiredException.AnswerValue> answers,
+			String[] previousFieldNames,
+			PersonaResource target) {
+			if (PersonaResource.Fields.interessatTipus.equals(fieldName)) {
+				if (fieldValue != null) {
+					InteressatTipus interessatTipus = (InteressatTipus)fieldValue;
+					if (InteressatTipus.ADMINISTRACIO.equals(interessatTipus)) {
+						target.setVisibleDocumentTipus(false);
+						target.setVisibleNif(true);
+						target.setVisibleNom(false);
+						target.setVisibleLlinatge1(false);
+						target.setVisibleLlinatge2(false);
+						target.setVisibleTelefon(false);
+						target.setVisibleEmail(true);
+						target.setVisibleRaoSocial(false);
+						target.setVisibleDir3Codi(true);
+						target.setVisibleIncapacitat(false);
+						target.setRequiredNif(true);
+						target.setRequiredNom(false);
+						target.setRequiredLlinatge1(false);
+						target.setRequiredEmail(false);
+						target.setRequiredRaoSocial(false);
+						target.setRequiredDir3Codi(true);
+					} else if (InteressatTipus.FISICA.equals(interessatTipus)) {
+						target.setVisibleDocumentTipus(false);
+						target.setVisibleNif(true);
+						target.setVisibleNom(true);
+						target.setVisibleLlinatge1(true);
+						target.setVisibleLlinatge2(true);
+						target.setVisibleTelefon(true);
+						target.setVisibleEmail(true);
+						target.setVisibleRaoSocial(false);
+						target.setVisibleDir3Codi(false);
+						target.setVisibleIncapacitat(true);
+						target.setRequiredNif(true);
+						target.setRequiredNom(true);
+						target.setRequiredLlinatge1(true);
+						target.setRequiredEmail(false);
+						target.setRequiredRaoSocial(false);
+						target.setRequiredDir3Codi(false);
+					} else if (InteressatTipus.JURIDICA.equals(interessatTipus)) {
+						target.setVisibleDocumentTipus(false);
+						target.setVisibleNif(true);
+						target.setVisibleNom(false);
+						target.setVisibleLlinatge1(false);
+						target.setVisibleLlinatge2(false);
+						target.setVisibleTelefon(false);
+						target.setVisibleEmail(true);
+						target.setVisibleRaoSocial(true);
+						target.setVisibleDir3Codi(false);
+						target.setVisibleIncapacitat(true);
+						target.setRequiredNif(true);
+						target.setRequiredNom(false);
+						target.setRequiredLlinatge1(false);
+						target.setRequiredEmail(false);
+						target.setRequiredRaoSocial(true);
+						target.setRequiredDir3Codi(false);
+					} else if (InteressatTipus.FISICA_SENSE_NIF.equals(interessatTipus)) {
+						target.setVisibleDocumentTipus(true);
+						target.setVisibleNif(true);
+						target.setVisibleNom(true);
+						target.setVisibleLlinatge1(true);
+						target.setVisibleLlinatge2(true);
+						target.setVisibleTelefon(false);
+						target.setVisibleEmail(true);
+						target.setVisibleRaoSocial(false);
+						target.setVisibleDir3Codi(false);
+						target.setVisibleIncapacitat(true);
+						target.setRequiredNif(false);
+						target.setRequiredNom(true);
+						target.setRequiredLlinatge1(true);
+						target.setRequiredEmail(true);
+						target.setRequiredRaoSocial(false);
+						target.setRequiredDir3Codi(false);
+					}
+				}
+			}
+		}
 	}
 
 }

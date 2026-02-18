@@ -50,8 +50,8 @@ public class NotificacioResourceServiceImpl
 		NotificacioResource resource,
 		Map<String, AnswerRequiredException.AnswerValue> answers,
 		boolean anyOrderChanged) {
-		if (resource.getEnviaments() != null) {
-			saveEnviaments(entity, resource.getEnviaments());
+		if (resource.getEnviamentsInfo() != null) {
+			saveEnviaments(entity, resource.getEnviamentsInfo());
 		}
 	}
 

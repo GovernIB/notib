@@ -236,6 +236,21 @@ const translationEs = {
             form: {
                 titleCreate: 'Crear notificación',
                 titleUpdate: 'Modificar notificación',
+                tabs: {
+                    remesa: 'Información de la remesa',
+                    enviaments: 'Envios',
+                    documents: 'Documentos adjuntos',
+                },
+                enviaments: {
+                    add: 'Añadir envio',
+                    remove: 'Eliminar envio',
+                },
+                interessats: {
+                    interessat: 'Interesado',
+                    representant: 'Representante',
+                    add: 'Añadir representante',
+                    remove: 'Eliminar representante',
+                },
             },
         },
         notFound: {

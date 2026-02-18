@@ -244,6 +244,21 @@ const translationCa = {
             form: {
                 titleCreate: 'Crear notificació',
                 titleUpdate: 'Modificar notificació',
+                tabs: {
+                    remesa: 'Informació de la remesa',
+                    enviaments: 'Enviaments',
+                    documents: 'Documents adjunts',
+                },
+                enviaments: {
+                    add: 'Afegir enviament',
+                    remove: 'Eliminar enviament',
+                },
+                interessats: {
+                    interessat: 'Interessat',
+                    representant: 'Representant',
+                    add: 'Afegir representant',
+                    remove: 'Eliminar representant',
+                },
             },
         },
         notFound: {
