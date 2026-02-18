@@ -219,22 +219,6 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 (Supplier<SchedulledService> s) -> s.get().generarEstadistiques(),
                 PropertiesConstants.GENERAR_DADES_EXPLOTACIO_CRON,
                 GENERAR_DADES_EXPLOTACIO_DEFCRON);
-        // 13. Reset limit enviaments per minut aplicacions callback
-        ////////////////////////////////////////////////////////////////////////
-        registerCronTask(
-                "netejarLimitEnviamentsMinutAplicacions",
-                schedulledServiceSupplier,
-                (Supplier<SchedulledService> s) -> s.get().netejarLimitEnviamentsMinutAplicacions(),
-                null,
-                NETEJAR_LIMIT_ENVIAMENTS_MINUT_APLICACIONS);
-        // 14. Reset limit enviaments per dia aplicacions callback
-        ////////////////////////////////////////////////////////////////////////
-        registerCronTask(
-                "netejarLimitEnviamentsDiesAplicacions",
-                schedulledServiceSupplier,
-                (Supplier<SchedulledService> s) -> s.get().netejarLimitEnviamentsDiesAplicacions(),
-                null,
-                NETEJAR_LIMIT_ENVIAMENTS_DIES_APLICACIONS);
     }
 
     private <T> void registerCronTask(String taskName, Supplier<T> supplier, Consumer<Supplier<T>> method, String cronConfig, String defualtCron) {

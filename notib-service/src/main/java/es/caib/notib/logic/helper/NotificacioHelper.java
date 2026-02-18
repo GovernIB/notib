@@ -90,100 +90,100 @@ public class NotificacioHelper {
 	private MessageHelper messageHelper;
     @Autowired
     private AplicacioRepository aplicacioRepository;
-
-    private static Map<Long, Integer> contadorMinutsLaboral = new HashMap<>();
-    private static Map<Long, Integer> contadorMinutsNoLaboral = new HashMap<>();
-    private static Map<Long, Integer> contadorDiesLaboral = new HashMap<>();
-    private static Map<Long, Integer> contadorDiesNoLaboral = new HashMap<>();
-
-    public String checkLimitEnviamentsAplicacioSuperat(String usuariCodi, Long entitatId) {
-
-        try {
-            var msg = "";
-            var aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(usuariCodi, entitatId);
-			// Si no es troba l'aplicació, o aquesta no aplica límits
-			if (aplicacio == null || !aplicacio.isAplicarLimitEnviaments()) {
-				return null;
-			}
-
-			var diaLaboral = DatesUtils.isDiaLaboral();
-            if (!diaLaboral) {
-                var maxEnvMinut =  aplicacio.getMaxEnviamentsMinutNoLaboral();
-                var maxEnvDies =  aplicacio.getMaxEnviamentsDiaNoLaboral();
-                var enviamentsMinutActual = contadorMinutsNoLaboral.getOrDefault(aplicacio.getId(), 0);
-                if (maxEnvMinut < enviamentsMinutActual) {
-                    msg = "Superat el nombre màxim d'enviaments per minut en dies no laborals. ";
-                }
-				contadorMinutsNoLaboral.put(aplicacio.getId(), enviamentsMinutActual+1);
-                var enviamentsDiesActual = contadorDiesNoLaboral.getOrDefault(aplicacio.getId(),0);
-                if (maxEnvDies < enviamentsDiesActual) {
-                    msg += "Superat el nombre màxim d'enviaments per dia en dies no laborals";
-                }
-				contadorDiesNoLaboral.put(aplicacio.getId(), enviamentsDiesActual+1);
-				if (!Strings.isNullOrEmpty(msg)) {
-					enviamentsMinutActual = contadorMinutsNoLaboral.get(aplicacio.getId());
-                	enviamentsDiesActual = contadorDiesNoLaboral.get(aplicacio.getId());
-					log.warn(msg + " aplicacio=" + aplicacio.getUsuariCodi() + "enviamentsMinutActual=" + enviamentsMinutActual + "maxEnvMinut=" + maxEnvMinut +
-							"enviamentsDiesActual=" + enviamentsDiesActual + "maxEnvDies=" + maxEnvDies);
-
-					printMissatgeDies(msg, aplicacio, maxEnvMinut, maxEnvDies, false, false);
-				}
-                return msg;
-            }
-
-            var maxEnvDies =  aplicacio.getMaxEnviamentsDiaLaboral();
-            var isHorariLaboral = DatesUtils.isHorariLaboral(aplicacio.getHorariLaboralInici(), aplicacio.getHorariLaboralFi());
-            var maxEnvMinut =  isHorariLaboral ? aplicacio.getMaxEnviamentsMinutLaboral() : aplicacio.getMaxEnviamentsMinutNoLaboral();
-            var enviamentsMinutActual = isHorariLaboral ? contadorMinutsLaboral.getOrDefault(aplicacio.getId(), 0)
-                    : contadorMinutsNoLaboral.getOrDefault(aplicacio.getId(), 0);
-            if (maxEnvMinut <= enviamentsMinutActual) {
-                msg = "Superat el nombre màxim d'enviaments per minut en dies laborals. ";
-            }
-			if (isHorariLaboral){
-                contadorMinutsLaboral.put(aplicacio.getId(), enviamentsMinutActual+1);
-            } else {
-                contadorMinutsNoLaboral.put(aplicacio.getId(), enviamentsMinutActual+1);
-            }
-            var enviamentsDiesActual = contadorDiesLaboral.getOrDefault(aplicacio.getId(), 0);
-            if (maxEnvDies <= enviamentsDiesActual) {
-                msg += "Superat el nombre màxim d'enviaments per dia en dies laborals";
-            }
-			if (isHorariLaboral) {
-                contadorDiesLaboral.put(aplicacio.getId(), enviamentsDiesActual+1);
-            }  else {
-                contadorDiesNoLaboral.put(aplicacio.getId(), enviamentsDiesActual+1);
-            }
-			printMissatgeDies(msg, aplicacio, maxEnvMinut, maxEnvDies, isHorariLaboral, true);
-            return msg;
-        } catch (Exception ex) {
-            var msg = "Error checkejant el limit d'enviaments per l'aplicacio";
-            log.error(msg, ex);
-			return null;
-        }
-    }
-
-	private void printMissatgeDies(String msg, AplicacioEntity aplicacio, int maxEnvMinut, int  maxEnvDies, boolean horariLaboral, boolean diaLaboral) {
-
-		if (Strings.isNullOrEmpty(msg)) {
-			return;
-		}
-		var enviamentsMinutActual = horariLaboral ? contadorMinutsLaboral.get(aplicacio.getId()) : contadorMinutsNoLaboral.get(aplicacio.getId());
-		var enviamentsDiesActual = diaLaboral ? contadorDiesLaboral.get(aplicacio.getId()) : contadorDiesNoLaboral.get(aplicacio.getId());
-		log.warn(msg + " aplicacio=" + aplicacio.getUsuariCodi() + " enviamentsMinutActual=" + enviamentsMinutActual + " maxEnvMinut=" + maxEnvMinut +
-				" enviamentsDiesActual=" + enviamentsDiesActual + " maxEnvDies=" + maxEnvDies);
-	}
-
-    public void netejarLimitEnviamentsMinutAplicacions() {
-
-        contadorMinutsLaboral = new HashMap<>();
-        contadorMinutsNoLaboral = new HashMap<>();
-    }
-
-    public void netejarLimitEnviamentsDiesAplicacions() {
-
-        contadorDiesLaboral = new HashMap<>();
-        contadorDiesNoLaboral = new HashMap<>();
-    }
+//
+//    private static Map<Long, Integer> contadorMinutsLaboral = new HashMap<>();
+//    private static Map<Long, Integer> contadorMinutsNoLaboral = new HashMap<>();
+//    private static Map<Long, Integer> contadorDiesLaboral = new HashMap<>();
+//    private static Map<Long, Integer> contadorDiesNoLaboral = new HashMap<>();
+//
+//    public String checkLimitEnviamentsAplicacioSuperat(String usuariCodi, Long entitatId) {
+//
+//        try {
+//            var msg = "";
+//            var aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(usuariCodi, entitatId);
+//			// Si no es troba l'aplicació, o aquesta no aplica límits
+//			if (aplicacio == null || !aplicacio.isAplicarLimitEnviaments()) {
+//				return null;
+//			}
+//
+//			var diaLaboral = DatesUtils.isDiaLaboral();
+//            if (!diaLaboral) {
+//                var maxEnvMinut =  aplicacio.getMaxEnviamentsMinutNoLaboral();
+//                var maxEnvDies =  aplicacio.getMaxEnviamentsDiaNoLaboral();
+//                var enviamentsMinutActual = contadorMinutsNoLaboral.getOrDefault(aplicacio.getId(), 0);
+//                if (maxEnvMinut < enviamentsMinutActual) {
+//                    msg = "Superat el nombre màxim d'enviaments per minut en dies no laborals. ";
+//                }
+//				contadorMinutsNoLaboral.put(aplicacio.getId(), enviamentsMinutActual+1);
+//                var enviamentsDiesActual = contadorDiesNoLaboral.getOrDefault(aplicacio.getId(),0);
+//                if (maxEnvDies < enviamentsDiesActual) {
+//                    msg += "Superat el nombre màxim d'enviaments per dia en dies no laborals";
+//                }
+//				contadorDiesNoLaboral.put(aplicacio.getId(), enviamentsDiesActual+1);
+//				if (!Strings.isNullOrEmpty(msg)) {
+//					enviamentsMinutActual = contadorMinutsNoLaboral.get(aplicacio.getId());
+//                	enviamentsDiesActual = contadorDiesNoLaboral.get(aplicacio.getId());
+//					log.warn(msg + " aplicacio=" + aplicacio.getUsuariCodi() + "enviamentsMinutActual=" + enviamentsMinutActual + "maxEnvMinut=" + maxEnvMinut +
+//							"enviamentsDiesActual=" + enviamentsDiesActual + "maxEnvDies=" + maxEnvDies);
+//
+//					printMissatgeDies(msg, aplicacio, maxEnvMinut, maxEnvDies, false, false);
+//				}
+//                return msg;
+//            }
+//
+//            var maxEnvDies =  aplicacio.getMaxEnviamentsDiaLaboral();
+//            var isHorariLaboral = DatesUtils.isHorariLaboral(aplicacio.getHorariLaboralInici(), aplicacio.getHorariLaboralFi());
+//            var maxEnvMinut =  isHorariLaboral ? aplicacio.getMaxEnviamentsMinutLaboral() : aplicacio.getMaxEnviamentsMinutNoLaboral();
+//            var enviamentsMinutActual = isHorariLaboral ? contadorMinutsLaboral.getOrDefault(aplicacio.getId(), 0)
+//                    : contadorMinutsNoLaboral.getOrDefault(aplicacio.getId(), 0);
+//            if (maxEnvMinut <= enviamentsMinutActual) {
+//                msg = "Superat el nombre màxim d'enviaments per minut en dies laborals. ";
+//            }
+//			if (isHorariLaboral){
+//                contadorMinutsLaboral.put(aplicacio.getId(), enviamentsMinutActual+1);
+//            } else {
+//                contadorMinutsNoLaboral.put(aplicacio.getId(), enviamentsMinutActual+1);
+//            }
+//            var enviamentsDiesActual = contadorDiesLaboral.getOrDefault(aplicacio.getId(), 0);
+//            if (maxEnvDies <= enviamentsDiesActual) {
+//                msg += "Superat el nombre màxim d'enviaments per dia en dies laborals";
+//            }
+//			if (isHorariLaboral) {
+//                contadorDiesLaboral.put(aplicacio.getId(), enviamentsDiesActual+1);
+//            }  else {
+//                contadorDiesNoLaboral.put(aplicacio.getId(), enviamentsDiesActual+1);
+//            }
+//			printMissatgeDies(msg, aplicacio, maxEnvMinut, maxEnvDies, isHorariLaboral, true);
+//            return msg;
+//        } catch (Exception ex) {
+//            var msg = "Error checkejant el limit d'enviaments per l'aplicacio";
+//            log.error(msg, ex);
+//			return null;
+//        }
+//    }
+//
+//	private void printMissatgeDies(String msg, AplicacioEntity aplicacio, int maxEnvMinut, int  maxEnvDies, boolean horariLaboral, boolean diaLaboral) {
+//
+//		if (Strings.isNullOrEmpty(msg)) {
+//			return;
+//		}
+//		var enviamentsMinutActual = horariLaboral ? contadorMinutsLaboral.get(aplicacio.getId()) : contadorMinutsNoLaboral.get(aplicacio.getId());
+//		var enviamentsDiesActual = diaLaboral ? contadorDiesLaboral.get(aplicacio.getId()) : contadorDiesNoLaboral.get(aplicacio.getId());
+//		log.warn(msg + " aplicacio=" + aplicacio.getUsuariCodi() + " enviamentsMinutActual=" + enviamentsMinutActual + " maxEnvMinut=" + maxEnvMinut +
+//				" enviamentsDiesActual=" + enviamentsDiesActual + " maxEnvDies=" + maxEnvDies);
+//	}
+//
+//    public void netejarLimitEnviamentsMinutAplicacions() {
+//
+//        contadorMinutsLaboral = new HashMap<>();
+//        contadorMinutsNoLaboral = new HashMap<>();
+//    }
+//
+//    public void netejarLimitEnviamentsDiesAplicacions() {
+//
+//        contadorDiesLaboral = new HashMap<>();
+//        contadorDiesNoLaboral = new HashMap<>();
+//    }
 
 
 	public NotificacioEntity altaEnviamentsWeb(EntitatEntity entitat, NotificacioEntity notificacioEntity, List<Enviament> enviaments) throws RegistreNotificaException {
