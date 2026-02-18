@@ -23,6 +23,7 @@ import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.DocumentHelper;
 import es.caib.notib.logic.helper.EnviamentTableHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
+import es.caib.notib.logic.helper.LimitadorEnviamentsHelper;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.NotificaHelper;
@@ -194,6 +195,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private OrganGestorService organGestorService;
+	@Autowired
+	private LimitadorEnviamentsHelper limitadorEnviamentsHelper;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -224,7 +227,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
             log.error("Error entitat no trobada a la bdd " + notificacio.getEmisorDir3Codi(), ex);
         }
         var usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
-        var msg = notificacioHelper.checkLimitEnviamentsAplicacioSuperat(usuariCodi, entitat.getId());
+        var msg = limitadorEnviamentsHelper.checkLimitEnviamentsAplicacioSuperat(usuariCodi, entitat.getId());
         if (!Strings.isNullOrEmpty(msg)) {
             return RespostaAlta.builder().error(true).errorDescripcio(msg).build();
         }
@@ -251,7 +254,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		try {
 			log.debug("[ALTA] Alta de notificació: " + notificacio.toString());
             var usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
-            var msg = notificacioHelper.checkLimitEnviamentsAplicacioSuperat(usuariCodi, entitat.getId());
+            var msg = limitadorEnviamentsHelper.checkLimitEnviamentsAplicacioSuperat(usuariCodi, entitat.getId());
             if (!Strings.isNullOrEmpty(msg)) {
 			    return RespostaAltaV2.builder().error(true).errorData(new Date()).errorDescripcio(msg).build();
             }

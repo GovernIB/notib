@@ -91,16 +91,4 @@ public class SchedulledService extends AbstractService<es.caib.notib.logic.intf.
 		getDelegateService().generarEstadistiques();
 	}
 
-    @Override
-	@PermitAll
-    public void netejarLimitEnviamentsMinutAplicacions() {
-        getDelegateService().netejarLimitEnviamentsMinutAplicacions();
-    }
-
-    @Override
-	@PermitAll
-    public void netejarLimitEnviamentsDiesAplicacions() {
-        getDelegateService().netejarLimitEnviamentsDiesAplicacions();
-    }
-
 }
