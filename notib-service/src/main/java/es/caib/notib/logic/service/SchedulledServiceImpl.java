@@ -380,20 +380,6 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}
 	}
 
-    // 13. Reset limit enviaments per minut aplicacions callback
-    /////////////////////////////////////////////////////////////////////////
-    @Override
-    public void netejarLimitEnviamentsMinutAplicacions() {
-        notificacioHelper.netejarLimitEnviamentsMinutAplicacions();
-    }
-
-    // 14. Reset limit enviaments per dia aplicacions callback
-    /////////////////////////////////////////////////////////////////////////
-    @Override
-    public void netejarLimitEnviamentsDiesAplicacions() {
-        notificacioHelper.netejarLimitEnviamentsDiesAplicacions();
-    }
-
     private void esborrarTemporals(String dir) throws Exception {
 
 		if (Strings.isNullOrEmpty(dir)) {

@@ -23,6 +23,7 @@ import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.DocumentHelper;
 import es.caib.notib.logic.helper.EnviamentTableHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
+import es.caib.notib.logic.helper.LimitadorEnviamentsHelper;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.NotificaHelper;
@@ -194,6 +195,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private OrganGestorService organGestorService;
+	@Autowired
+	private LimitadorEnviamentsHelper limitadorEnviamentsHelper;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -217,17 +220,17 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	@Override
 	public RespostaAlta alta(Notificacio notificacio) throws NotificacioServiceWsException {
 
-		EntitatEntity entitat = null;
-		try {
-			entitat = entitatRepository.findByDir3Codi(notificacio.getEmisorDir3Codi());
-		} catch (Exception ex) {
-			log.error("Error entitat no trobada a la bdd " + notificacio.getEmisorDir3Codi(), ex);
-		}
-		var usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
-		var msg = notificacioHelper.checkLimitEnviamentsAplicacioSuperat(usuariCodi, entitat.getId());
-		if (!Strings.isNullOrEmpty(msg)) {
-			return RespostaAlta.builder().error(true).errorDescripcio(msg).build();
-		}
+        EntitatEntity entitat = null;
+        try {
+            entitat = entitatRepository.findByDir3Codi(notificacio.getEmisorDir3Codi());
+        } catch (Exception ex) {
+            log.error("Error entitat no trobada a la bdd " + notificacio.getEmisorDir3Codi(), ex);
+        }
+        var usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
+        var msg = limitadorEnviamentsHelper.checkLimitEnviamentsAplicacioSuperat(usuariCodi, entitat.getId());
+        if (!Strings.isNullOrEmpty(msg)) {
+            return RespostaAlta.builder().error(true).errorDescripcio(msg).build();
+        }
 		var resposta = altaV2(notificacio);
 		resposta.getReferenciesAsV1().forEach(r -> enviamentSmService.altaEnviament(r.getReferencia()));
 		return RespostaAlta.builder().identificador(resposta.getIdentificador()).estat(resposta.getEstat()).referencies(resposta.getReferenciesAsV1())
@@ -250,11 +253,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 //		var info = generateInfoAlta(notificacio, entitat != null ? entitat.getId() : null);
 		try {
 			log.debug("[ALTA] Alta de notificació: " + notificacio.toString());
-			var usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
-			var msg = notificacioHelper.checkLimitEnviamentsAplicacioSuperat(usuariCodi, entitat.getId());
-			if (!Strings.isNullOrEmpty(msg)) {
-				return RespostaAltaV2.builder().error(true).errorData(new Date()).errorDescripcio(msg).build();
-			}
+            var usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
+            var msg = limitadorEnviamentsHelper.checkLimitEnviamentsAplicacioSuperat(usuariCodi, entitat.getId());
+            if (!Strings.isNullOrEmpty(msg)) {
+			    return RespostaAltaV2.builder().error(true).errorData(new Date()).errorDescripcio(msg).build();
+            }
 			// Obtenir dades bàsiques per a la notificació
 			ProcSerEntity procediment = null;
 			OrganGestorEntity organGestor = null;
