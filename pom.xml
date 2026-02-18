@@ -57,6 +57,7 @@
 
 		<module>notib-client</module>
         <module>notib-client-2</module>
+		<module>notib-client-jaxrs</module>
 		<module>notib-client-intf</module>
 
 		<module>notib-ear</module>
