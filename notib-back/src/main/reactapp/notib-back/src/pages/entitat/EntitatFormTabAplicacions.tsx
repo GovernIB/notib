@@ -105,7 +105,7 @@ const EntitatFormTabAplicacionsFilter: React.FC = () => {
             code="FILTER_APLICACIO"
             apiRef={filterApiRef}
             springFilterBuilder={springFilterBuilder}
-            componentProps={{ sx: { mb: 2 } }}
+            // componentProps={{ sx: { mb: 2, mt: 0 } }}
             commonFieldComponentProps={{ size: 'small' }}
         >
             <ContentFilter filterApiRef={filterApiRef} />
@@ -128,7 +128,13 @@ const EntitatFormTabAplicacions: React.FC = () => {
             columns={columns}
             paginationActive
             toolbarHideQuickFilter
-            toolbarAdditionalRow={<EntitatFormTabAplicacionsFilter />}
+            toolbarElementsWithPositions={[
+                {
+                    position: 0,
+                    element: <EntitatFormTabAplicacionsFilter />
+                }
+            ]}
+            // toolbarAdditionalRow={<EntitatFormTabAplicacionsFilter />}
             popupEditActive
             popupEditFormDialogResourceTitle={t('page.entitats.form.resourceNames.aplicacio')}
             popupEditFormContent={<EntitatFormTabAplicacionsFormContent />}
