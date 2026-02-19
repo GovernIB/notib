@@ -175,7 +175,7 @@ const EntitatFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> 
     ];
 
     return (
-        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[2, 3, 4]}>
+        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[2, 3, 4]} initialIndex={2}>
             <MuiFormTabContent index={0} showOnCreate>
                 <EntitatFormTabDades />
             </MuiFormTabContent>

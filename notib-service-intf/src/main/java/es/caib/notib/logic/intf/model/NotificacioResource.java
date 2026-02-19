@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
@@ -119,7 +120,14 @@ public class NotificacioResource extends BaseResource<Long> {
 	private ResourceReference<DocumentResource, Long> document4;
 	private ResourceReference<DocumentResource, Long> document5;*/
 
+	@NotNull
+	@Size(min = 1)
+	@Valid
 	private List<NotificacioEnviamentResource> enviamentsInfo;
+	@NotNull
+	@Size(min = 1)
+	@Valid
+	private List<DocumentResource> documentsInfo;
 
 	// El següent camp s'utilitza per a fer el càlcul de la data de caducitat especificant els dies naturals
 	@ResourceField(onChangeActive = true)

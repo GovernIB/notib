@@ -42,6 +42,8 @@ interface FormTabsProps {
     tabs: FormTabsValue[];
     /** Índexos de les pipelles con contenen graelles (per a que l'alçada ocupi el 100%) */
     tabIndexesWithGrids?: number[];
+    /** Índex de la pipella inicial */
+    initialIndex?: number;
     /** Event que es llença quan es canvia l'índex de la pipella activa */
     onIndexChange?: (index: number) => void;
     /** Contingut de la pipella */
@@ -65,7 +67,8 @@ export const MuiFormTabContent: React.FC<FormTabContentProps> = (props) => {
             id={`tabpanel-${index}`}
             aria-labelledby={`tab-${index}`}
             style={{ height: '100%' }}
-            {...other}>
+            {...other}
+        >
             {currentIndex === index && <Box sx={{ pt: 3, pb: 2, height: '100%' }}>{children}</Box>}
         </div>
     ) : showOnCreate ? (
@@ -80,10 +83,10 @@ export const MuiFormTabContent: React.FC<FormTabContentProps> = (props) => {
  * @returns Element JSX de les pipelles.
  */
 export const MuiFormTabs: React.FC<FormTabsProps> = (props) => {
-    const { tabs, tabIndexesWithGrids, onIndexChange, children } = props;
+    const { tabs, tabIndexesWithGrids, initialIndex, onIndexChange, children } = props;
     const theme = useTheme();
     const { id } = useFormContext();
-    const [index, setIndex] = React.useState<number>(0);
+    const [index, setIndex] = React.useState<number>(initialIndex ?? 0);
     const { setContentExpandsToAvailableHeight } = useBaseAppContext();
     const gridCheck = (index: number) => {
         if (tabIndexesWithGrids != null) {
@@ -107,7 +110,8 @@ export const MuiFormTabs: React.FC<FormTabsProps> = (props) => {
                 <Tabs
                     value={index}
                     onChange={handleIndexChange}
-                    sx={{ borderBottom: '1px solid ' + theme.palette.divider }}>
+                    sx={{ borderBottom: '1px solid ' + theme.palette.divider }}
+                >
                     {tabs.map((t, i) => {
                         if (typeof t === 'string') {
                             return <Tab key={i} value={i} label={t} sx={tabsHeightFix} />;

@@ -46,7 +46,6 @@ public class DocumentResource extends BaseResource<Long> {
 	@Size(max = 256)
 	private String mediaType;
 	private Long mida;
-	@Size(max = 256)
 	private OrigenEnum origen = OrigenEnum.ADMINISTRACIO;
 	private ValidesaEnum validesa = ValidesaEnum.ORIGINAL;
 	private TipusDocumentalEnum tipoDocumental = TipusDocumentalEnum.ALTRES;

@@ -111,7 +111,8 @@ const NotificacioFormEnviamentPersona: React.FC<{ indexKey?: number; interessat?
             initOnChangeRequest
             hiddenToolbar
             commonFieldComponentProps={{ size: 'small' }}
-            componentProps={{ sx: { mb: 3 } }}>
+            componentProps={{ sx: { mb: 3 } }}
+        >
             <NotificacioFormEnviamentPersonaFormContent interessat={interessat} />
         </MuiForm>
     );
@@ -127,10 +128,10 @@ const NotificacioFormEnviament: React.FC<{
     const [ambRepresentant, setAmbRepresentant] = React.useState<boolean>(false);
     const { data: parentFormData, apiRef: parentFormApiRef } = useFormContext();
     const handleDataChange = (data: any) => {
-        const enviamentsWithData = parentFormData?.enviaments?.map((e: any) =>
+        const enviamentsWithData = parentFormData?.enviamentsInfo?.map((e: any) =>
             e.id === indexKey ? { id: indexKey, ...data } : e
         );
-        parentFormApiRef.current?.setFieldValue('enviaments', enviamentsWithData);
+        parentFormApiRef.current?.setFieldValue('enviamentsInfo', enviamentsWithData);
     };
     const formContent = React.useMemo(
         () => (
@@ -145,7 +146,8 @@ const NotificacioFormEnviament: React.FC<{
                         variant="contained"
                         startIcon={<Icon>{ambRepresentant ? 'remove' : 'add'}</Icon>}
                         onClick={() => setAmbRepresentant((r) => !r)}
-                        size="small">
+                        size="small"
+                    >
                         {ambRepresentant
                             ? t('page.notificacio.form.interessats.remove')
                             : t('page.notificacio.form.interessats.add')}
@@ -176,7 +178,8 @@ const NotificacioFormEnviament: React.FC<{
                         onDataChange={handleDataChange}
                         hiddenToolbar
                         componentProps={{ sx: { mb: 2 } }}
-                        commonFieldComponentProps={{ size: 'small' }}>
+                        commonFieldComponentProps={{ size: 'small' }}
+                    >
                         {formContent}
                     </MuiForm>
                 </Grid>
@@ -188,23 +191,23 @@ const NotificacioFormEnviament: React.FC<{
 const NotificacioFormEnviaments: React.FC = () => {
     const { t } = useTranslation();
     const { data, apiRef: formApiRef } = useFormContext();
-    const enviaments = data?.enviaments;
+    const enviamentsInfo = data?.enviamentsInfo;
     React.useEffect(() => {
-        const reset = !enviaments?.length;
+        const reset = !enviamentsInfo?.length;
         if (reset) {
-            formApiRef.current?.setFieldValue('enviaments', [{ id: new Date().valueOf() }]);
+            formApiRef.current?.setFieldValue('enviamentsInfo', [{ id: new Date().valueOf() }]);
         }
-    }, [enviaments]);
+    }, [enviamentsInfo]);
     const handleAddClick = () => {
-        formApiRef.current?.setFieldValue('enviaments', [
-            ...(enviaments ?? []),
+        formApiRef.current?.setFieldValue('enviamentsInfo', [
+            ...(enviamentsInfo ?? []),
             { id: new Date().valueOf() },
         ]);
     };
     const handleRemoveClick = (indexKey: number) => {
         formApiRef.current?.setFieldValue(
-            'enviaments',
-            enviaments.filter((e: any) => e.id !== indexKey)
+            'enviamentsInfo',
+            enviamentsInfo.filter((e: any) => e.id !== indexKey)
         );
     };
     return (
@@ -212,7 +215,7 @@ const NotificacioFormEnviaments: React.FC = () => {
             <Typography variant="h6" sx={{ mt: 3, mb: 2, borderBottom: 1, borderColor: 'divider' }}>
                 {t('page.notificacio.form.tabs.enviaments')}
             </Typography>
-            {enviaments?.map((e: any, i: number) => (
+            {enviamentsInfo?.map((e: any, i: number) => (
                 <NotificacioFormEnviament
                     key={e.id}
                     index={i + 1}
@@ -224,7 +227,8 @@ const NotificacioFormEnviaments: React.FC = () => {
                 variant="contained"
                 startIcon={<Icon>add</Icon>}
                 onClick={handleAddClick}
-                size="small">
+                size="small"
+            >
                 {t('page.notificacio.form.enviaments.add')}
             </Button>
         </>

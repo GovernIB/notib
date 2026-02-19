@@ -37,7 +37,6 @@ import java.util.List;
 public class NotificacioEnviamentResource extends BaseResource<Long> {
 
 	@NotNull
-	@Size(max = 64)
 	private ServeiTipus serveiTipus = ServeiTipus.NORMAL;
 	@Size(max = 36)
 	private String notificaReferencia;
@@ -93,7 +92,6 @@ public class NotificacioEnviamentResource extends BaseResource<Long> {
 	private String notificaCertificacioCsv;
 	@Size(max = 20)
 	private String notificaCertificacioMime;
-	@Size(max = 20)
 	private Integer notificaCertificacioTamany;
 	private NotificaCertificacioTipusEnumDto notificaCertificacioTipus;
 	private NotificaCertificacioArxiuTipusEnumDto notificaCertificacioArxiuTipus;

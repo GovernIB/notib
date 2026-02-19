@@ -70,10 +70,10 @@ const NotificacioFormDocument: React.FC<{
     const { t } = useTranslation();
     const { data: parentFormData, apiRef: parentFormApiRef } = useFormContext();
     const handleDataChange = (data: any) => {
-        const enviamentsWithData = parentFormData?.documents?.map((e: any) =>
+        const documentsWithData = parentFormData?.documentsInfo?.map((e: any) =>
             e.id === indexKey ? { id: indexKey, ...data } : e
         );
-        parentFormApiRef.current?.setFieldValue('documents', enviamentsWithData);
+        parentFormApiRef.current?.setFieldValue('documentsInfo', documentsWithData);
     };
     return (
         <Paper sx={{ px: 2, py: 1, mb: 2 }}>
@@ -96,7 +96,8 @@ const NotificacioFormDocument: React.FC<{
                         onDataChange={handleDataChange}
                         hiddenToolbar
                         componentProps={{ sx: { mb: 2 } }}
-                        commonFieldComponentProps={{ size: 'small' }}>
+                        commonFieldComponentProps={{ size: 'small' }}
+                    >
                         <NotificacioFormDocumentContent />
                     </MuiForm>
                 </Grid>
@@ -108,23 +109,23 @@ const NotificacioFormDocument: React.FC<{
 const NotificacioFormDocuments: React.FC = () => {
     const { t } = useTranslation();
     const { data, apiRef: formApiRef } = useFormContext();
-    const documents = data?.documents;
+    const documentsInfo = data?.documentsInfo;
     React.useEffect(() => {
-        const reset = !documents?.length;
+        const reset = !documentsInfo?.length;
         if (reset) {
-            formApiRef.current?.setFieldValue('documents', [{ id: new Date().valueOf() }]);
+            formApiRef.current?.setFieldValue('documentsInfo', [{ id: new Date().valueOf() }]);
         }
-    }, [documents]);
+    }, [documentsInfo]);
     const handleAddClick = () => {
-        formApiRef.current?.setFieldValue('documents', [
-            ...(documents ?? []),
+        formApiRef.current?.setFieldValue('documentsInfo', [
+            ...(documentsInfo ?? []),
             { id: new Date().valueOf() },
         ]);
     };
     const handleRemoveClick = (indexKey: number) => {
         formApiRef.current?.setFieldValue(
-            'documents',
-            documents.filter((e: any) => e.id !== indexKey)
+            'documentsInfo',
+            documentsInfo.filter((e: any) => e.id !== indexKey)
         );
     };
     return (
@@ -132,7 +133,7 @@ const NotificacioFormDocuments: React.FC = () => {
             <Typography variant="h6" sx={{ mt: 3, mb: 2, borderBottom: 1, borderColor: 'divider' }}>
                 {t('page.notificacio.form.tabs.documents')}
             </Typography>
-            {documents?.map((e: any, i: number) => (
+            {documentsInfo?.map((e: any, i: number) => (
                 <NotificacioFormDocument
                     key={e.id}
                     index={i + 1}
@@ -144,7 +145,8 @@ const NotificacioFormDocuments: React.FC = () => {
                 variant="contained"
                 startIcon={<Icon>add</Icon>}
                 onClick={handleAddClick}
-                size="small">
+                size="small"
+            >
                 {t('page.notificacio.form.documents.add')}
             </Button>
         </>
