@@ -1,9 +1,11 @@
 package es.caib.notib.logic.intf.model;
 
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
+import es.caib.notib.logic.intf.base.annotation.ResourceArtifact;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
+import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,9 +33,17 @@ import java.util.Base64;
 						roles = { BaseConfig.ROLE_SUPER, BaseConfig.ROLE_ADMIN },
 						grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
 				)
+		},
+		artifacts = {
+			@ResourceArtifact(
+				type = ResourceArtifactType.FILTER,
+				code = AclEntryResource.FILTER_CODE,
+				formClass = AclEntryResource.PermisosResourceFilter.class)
 		}
 )
 public class AclEntryResource extends BaseResource<String> {
+
+	public static final String FILTER_CODE = "FILTER_PERMISOS";
 
 	private boolean sidGrantedAuthority;
 	@NotBlank
@@ -82,6 +92,18 @@ public class AclEntryResource extends BaseResource<String> {
 					"1".equals(parts[2]),
 					parts[3]);
 		}
+	}
+
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	public static class PermisosResourceFilter implements Serializable {
+		private String sidName;
+		private boolean sidGrantedAuthority;
+		private boolean perm0Allowed;
+		private boolean perm2Allowed;
+		private boolean perm3Allowed;
+		private boolean permXAllowed;
 	}
 
 }

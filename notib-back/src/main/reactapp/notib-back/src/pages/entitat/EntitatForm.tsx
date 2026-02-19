@@ -9,7 +9,6 @@ import Paper from '@mui/material/Paper';
 import { useTheme } from '@mui/material/styles';
 import {
     FormPage,
-    FormField,
     MuiForm,
     MuiFormTabs,
     MuiFormTabContent,
@@ -24,6 +23,7 @@ import EntitatFormTabPermisos from './EntitatFormTabPermisos';
 import goibLogoLight from '../../assets/goib_logo_light.svg';
 import notibLogoLight from '../../assets/notib_logo_light.png';
 import { useNotibContext } from '../../components/NotibContext';
+import GridFormField from '../../components/GridFormField';
 
 const useEntitatId = () => {
     const { id: paramId } = useParams();
@@ -48,9 +48,11 @@ const CustomToolbar: React.FC = () => {
     const [tokenParsed, setTokenParsed] = React.useState<any>();
     const dataIsReady = data != null;
     const backgroundColor = data?.colorFons ?? '#fff';
+
     React.useEffect(() => {
         setTokenParsed(getTokenParsed());
     }, []);
+
     React.useEffect(() => {
         if (apiIsReady && dataIsReady) {
             if (data.logoCapsalera) {
@@ -63,6 +65,7 @@ const CustomToolbar: React.FC = () => {
             }
         }
     }, [apiIsReady, dataIsReady]);
+
     React.useEffect(() => {
         if (data.logoCapsalera) {
             setLogoUrl(`data:image/png;base64,${data.logoCapsalera.content}`);
@@ -70,6 +73,7 @@ const CustomToolbar: React.FC = () => {
             setLogoUrl(goibLogoLight);
         }
     }, [data?.logoCapsalera]);
+
     return (
         <Toolbar component={Paper} square sx={{ backgroundColor: backgroundColor }}>
             {logoUrl && (
@@ -96,28 +100,72 @@ const CustomToolbar: React.FC = () => {
     );
 };
 
+const EntitatFormTabPersonalitzar: React.FC = () => {
+    const { t } = useTranslation();
+
+    return (
+        <Paper variant="outlined" sx={{ p: 2, pt: 1 }}>
+            <Typography variant="h6" gutterBottom>
+                {t('page.entitats.form.personalitzar.capsalera')}
+            </Typography>
+            <Grid container spacing={2} sx={{ mt: 2 }}>
+                <GridFormField size={6} name="logoCapsalera" accept="image/jpeg" />
+                <GridFormField size={3} name="colorLletra" type="color" />
+                <GridFormField size={3} name="colorFons" type="color" />
+                <Grid size={12}>
+                    <CustomToolbar />
+                </Grid>
+            </Grid>
+        </Paper>
+    );
+};
+
+const EntitatFormTabDades: React.FC = () => {
+    return (
+        <Grid container spacing={2}>
+            <GridFormField size={4} name="codi" />
+            <Grid size={8} />
+            <GridFormField size={4} name="tipus" />
+            <GridFormField size={8} name="nom" />
+            <GridFormField size={6} name="dir3Codi" />
+            <GridFormField size={6} name="dir3CodiReg" />
+            <GridFormField size={3} name="activa" />
+            <GridFormField size={3} name="ambEntregaDeh" />
+            <GridFormField size={3} name="llibreEntitat" />
+            <GridFormField size={3} name="oficinaEntitat" />
+            <GridFormField size={12} name="apiKey" />
+            <GridFormField size={12} name="descripcio" type="textarea" />
+        </Grid>
+    );
+};
+
 const EntitatFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
     const { setSubtitle } = props;
     const { t } = useTranslation();
     const { data } = useFormContext();
+
     React.useEffect(() => {
         setSubtitle(data?.codi + ', ' + data?.nom);
     }, [data]);
+
     const tipusDocsTabLabel = (
         <Badge badgeContent={data.tipusDocCount} color="primary">
             {t('page.entitats.form.tabs.tipusDocs')}
         </Badge>
     );
+
     const aplicacionsTabLabel = (
         <Badge badgeContent={data.aplicacioCount} color="primary">
             {t('page.entitats.form.tabs.aplicacions')}
         </Badge>
     );
+
     const permisosTabLabel = (
         <Badge badgeContent={data.aclEntryCount} color="primary">
             {t('page.entitats.form.tabs.permisos')}
         </Badge>
     );
+
     const tabs = [
         t('page.entitats.form.tabs.dades'),
         t('page.entitats.form.tabs.personalitzar'),
@@ -125,66 +173,14 @@ const EntitatFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> 
         { label: aplicacionsTabLabel },
         { label: permisosTabLabel },
     ];
+
     return (
         <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[2, 3, 4]}>
             <MuiFormTabContent index={0} showOnCreate>
-                <Grid container spacing={2}>
-                    <Grid size={4}>
-                        <FormField name="codi" />
-                    </Grid>
-                    <Grid size={8} />
-                    <Grid size={4}>
-                        <FormField name="tipus" />
-                    </Grid>
-                    <Grid size={8}>
-                        <FormField name="nom" />
-                    </Grid>
-                    <Grid size={6}>
-                        <FormField name="dir3Codi" />
-                    </Grid>
-                    <Grid size={6}>
-                        <FormField name="dir3CodiReg" />
-                    </Grid>
-                    <Grid size={3}>
-                        <FormField name="activa" />
-                    </Grid>
-                    <Grid size={3}>
-                        <FormField name="ambEntregaDeh" />
-                    </Grid>
-                    <Grid size={3}>
-                        <FormField name="llibreEntitat" />
-                    </Grid>
-                    <Grid size={3}>
-                        <FormField name="oficinaEntitat" />
-                    </Grid>
-                    <Grid size={12}>
-                        <FormField name="apiKey" />
-                    </Grid>
-                    <Grid size={12}>
-                        <FormField name="descripcio" type="textarea" />
-                    </Grid>
-                </Grid>
+                <EntitatFormTabDades />
             </MuiFormTabContent>
             <MuiFormTabContent index={1}>
-                <Paper variant="outlined" sx={{ p: 2, pt: 1 }}>
-                    <Typography variant="h6" gutterBottom>
-                        {t('page.entitats.form.personalitzar.capsalera')}
-                    </Typography>
-                    <Grid container spacing={2} sx={{ mt: 2 }}>
-                        <Grid size={6}>
-                            <FormField name="logoCapsalera" accept="image/jpeg" />
-                        </Grid>
-                        <Grid size={3}>
-                            <FormField name="colorLletra" type="color" />
-                        </Grid>
-                        <Grid size={3}>
-                            <FormField name="colorFons" type="color" />
-                        </Grid>
-                        <Grid size={12}>
-                            <CustomToolbar />
-                        </Grid>
-                    </Grid>
-                </Paper>
+                <EntitatFormTabPersonalitzar />
             </MuiFormTabContent>
             <MuiFormTabContent index={2}>
                 <EntitatFormTabTipusDocs />
@@ -219,7 +215,8 @@ export const EntitatForm: React.FC = () => {
                     createLink="./{{id}}"
                     //updateLink="../../"
                     componentProps={{ style: { height: '100%' } }}
-                    commonFieldComponentProps={{ size: 'small' }}>
+                    commonFieldComponentProps={{ size: 'small' }}
+                >
                     <EntitatFormContent setSubtitle={setSubtitle} />
                 </MuiForm>
             </FormPage>

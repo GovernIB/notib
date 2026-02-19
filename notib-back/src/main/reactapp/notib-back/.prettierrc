@@ -6,6 +6,6 @@
     "tabWidth": 4,
     "printWidth": 100,
     "bracketSpacing": true,
-    "bracketSameLine": true,
+    "bracketSameLine": false,
     "arrowParens": "always"
 }
