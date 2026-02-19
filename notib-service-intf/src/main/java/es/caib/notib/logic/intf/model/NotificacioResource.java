@@ -108,7 +108,9 @@ public class NotificacioResource extends BaseResource<Long> {
 	private boolean deleted;
 
 	private ResourceReference<EntitatResource, Long> entitat;
+	@NotNull
 	private ResourceReference<OrganGestorResource, Long> organGestor;
+	@NotNull
 	private ResourceReference<ProcedimentResource, Long> procediment;
 	/*private ResourceReference<ProcedimentOrganResource, Long> procedimentOrgan;
 	private ResourceReference<DocumentResource, Long> document1;

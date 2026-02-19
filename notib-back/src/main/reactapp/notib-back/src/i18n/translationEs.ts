@@ -245,6 +245,7 @@ const translationEs = {
                     documents: 'Documentos adjuntos',
                 },
                 enviaments: {
+                    title: 'Envio',
                     add: 'Añadir envio',
                     remove: 'Eliminar envio',
                 },
@@ -258,6 +259,17 @@ const translationEs = {
                         JURIDICA: 'CIF/identificador EIDAS',
                         ADMINISTRACIO: 'NIF',
                         FISICA_SENSE_NIF: 'Tipo de documento',
+                    },
+                },
+                documents: {
+                    title: 'Adjunto',
+                    add: 'Añadir adjunto',
+                    remove: 'Eliminar adjunto',
+                    helperText: {
+                        attachment:
+                            'El tamaño máximo del documento es de 10 MB. Los formatos admitidos son PDF y ZIP.',
+                        normalitzat:
+                            'Está la primera página del documento preparada para el ensobrado?',
                     },
                 },
             },

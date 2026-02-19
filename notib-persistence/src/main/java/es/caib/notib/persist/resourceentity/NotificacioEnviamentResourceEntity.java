@@ -17,7 +17,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- * Entitat de base de dades d'enviament de notficació.
+ * Entitat de base de dades d'enviament d'una notificació.
  *
  * @author Límit Tecnologies
  */

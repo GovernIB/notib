@@ -3,12 +3,23 @@ import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import { FormPage, MuiForm, FormField } from 'reactlib';
+import IconButton from '@mui/material/IconButton';
+import Icon from '@mui/material/Icon';
+import { FormPage, MuiForm, FormField, useFormContext } from 'reactlib';
 import NotificacioFormEnviaments from './NotificacioFormEnviaments';
+import NotificacioFormDocuments from './NotificacioFormDocuments';
+
+const JSonButton: React.FC = () => {
+    const { data } = useFormContext();
+    return (
+        <IconButton onClick={() => console.log(data)}>
+            <Icon>question_mark</Icon>
+        </IconButton>
+    );
+};
 
 const NotificacioFormContent: React.FC = () => {
     const { t } = useTranslation();
-
     return (
         <Grid container spacing={2}>
             <Grid size={12}>
@@ -27,6 +38,12 @@ const NotificacioFormContent: React.FC = () => {
                 <FormField name="procediment" />
             </Grid>
             <Grid size={6}>
+                <FormField name="numExpedient" debounce />
+            </Grid>
+            <Grid size={6}>
+                <FormField name="idioma" />
+            </Grid>
+            <Grid size={6}>
                 <FormField name="enviamentDataProgramada" type="date" />
             </Grid>
             <Grid size={2}>
@@ -34,12 +51,6 @@ const NotificacioFormContent: React.FC = () => {
             </Grid>
             <Grid size={4}>
                 <FormField name="caducitat" type="date" />
-            </Grid>
-            <Grid size={6}>
-                <FormField name="numExpedient" debounce />
-            </Grid>
-            <Grid size={6}>
-                <FormField name="idioma" />
             </Grid>
         </Grid>
     );
@@ -61,10 +72,12 @@ export const NotificacioForm: React.FC = () => {
                 initOnChangeRequest
                 createLink="./{{id}}"
                 //updateLink="../../"
+                toolbarElementsWithPositions={[{ position: 2, element: <JSonButton /> }]}
                 componentProps={{ style: { height: '100%' } }}
                 commonFieldComponentProps={{ size: 'small' }}>
                 <NotificacioFormContent />
                 <NotificacioFormEnviaments />
+                <NotificacioFormDocuments />
             </MuiForm>
         </FormPage>
     );

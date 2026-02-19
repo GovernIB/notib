@@ -159,18 +159,16 @@ const NotificacioFormEnviament: React.FC<{
         <Paper sx={{ px: 2, py: 1, mb: 2 }}>
             <Grid container spacing={2}>
                 <Grid size={10}>
-                    <Typography variant="h6">Enviament {index}</Typography>
+                    <Typography variant="h6">
+                        {t('page.notificacio.form.enviaments.title')} {index}
+                    </Typography>
                 </Grid>
                 <Grid size={2} sx={{ textAlign: 'right' }}>
-                    {indexKey !== 0 && (
-                        <IconButton onClick={() => handleRemove(indexKey)}>
-                            <Icon
-                                fontSize="small"
-                                title={t('page.notificacio.form.enviaments.remove')}>
-                                delete
-                            </Icon>
-                        </IconButton>
-                    )}
+                    <IconButton onClick={() => handleRemove(indexKey)}>
+                        <Icon fontSize="small" title={t('page.notificacio.form.enviaments.remove')}>
+                            delete
+                        </Icon>
+                    </IconButton>
                 </Grid>
                 <Grid size={12}>
                     <MuiForm

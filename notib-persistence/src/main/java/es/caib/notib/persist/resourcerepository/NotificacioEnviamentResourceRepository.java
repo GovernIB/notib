@@ -4,7 +4,7 @@ import es.caib.notib.persist.base.repository.BaseRepository;
 import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
 
 /**
- * Repositori per a la gestió d'enviaments de notificacions.
+ * Repositori per a la gestió d'enviaments d'una notificació.
  *
  * @author Límit Tecnologies
  */
