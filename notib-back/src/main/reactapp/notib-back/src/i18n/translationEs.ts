@@ -15,6 +15,9 @@ const translationEs = {
         pagadorsCie: 'Centros de impresión y ensobrado',
         notificacions: 'Notificaciones',
     },
+    comu: {
+        netejarFiltre: 'Limpiar filtro',
+    },
     page: {
         home: {
             toolbar: {

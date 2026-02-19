@@ -2,15 +2,17 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
-import Button from '@mui/material/Button';
 import {
     GridPage,
     MuiDataGrid,
     MuiDataGridColDef,
     MuiFilter,
-    FormField,
     useFilterApiRef,
+    springFilterBuilder as filterBuilder,
+    FilterApi,
 } from 'reactlib';
+import GridFormField from '../../components/GridFormField';
+import { Icon, IconButton } from '@mui/material';
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -31,7 +33,7 @@ const columns: MuiDataGridColDef[] = [
     },
     {
         field: 'tipusDocCount',
-        flex: 0.6,
+        flex: 0.8,
         align: 'center',
         renderCell: (params: any) => {
             return (
@@ -73,33 +75,50 @@ const columns: MuiDataGridColDef[] = [
     },
 ];
 
-const EntitatGridFilter: React.FC = () => {
-    const springFilterBuilder = (_data: any) => {
-        return '';
-    };
-    const filterApiRef = useFilterApiRef();
+const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (props) => {
+    const { filterApiRef } = props;
+    const { t } = useTranslation();
+
     const handleButtonClick = () => {
         filterApiRef.current.clear();
     };
     return (
+        <Grid container spacing={2}>
+            <GridFormField size={1.5} name="codi" />
+            <GridFormField size={5} name="nom" />
+            <GridFormField size={1.5} name="dir3Codi" />
+            <GridFormField size={1} name="activa" />
+            {/* <GridFormField size={2} name="tipus" /> */}
+            <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
+                <Icon>filter_alt_off</Icon>
+            </IconButton>
+        </Grid>
+    );
+};
+
+const EntitatGridFilter: React.FC = () => {
+    const filterApiRef = useFilterApiRef();
+
+    const springFilterBuilder = (data: any) => {
+        return filterBuilder.and(
+            filterBuilder.like('codi', data.codi),
+            filterBuilder.like('nom', data.nom),
+            // filterBuilder.eq('tipus', data.tipus),
+            filterBuilder.like('dir3Codi', data.dir3Codi),
+            filterBuilder.eq('activa', data.activa)
+        );
+    };
+
+    return (
         <MuiFilter
             resourceName="entitatResource"
             code="FILTER"
-            springFilterBuilder={springFilterBuilder}
             apiRef={filterApiRef}
+            springFilterBuilder={springFilterBuilder}
             componentProps={{ sx: { mb: 2 } }}
-            commonFieldComponentProps={{ size: 'small' }}>
-            <Grid container spacing={2}>
-                <Grid size={4}>
-                    <FormField name="codi" />
-                </Grid>
-                <Grid size={4}>
-                    <FormField name="nom" />
-                </Grid>
-                <Grid size={4}>
-                    <Button onClick={handleButtonClick}>Netejar</Button>
-                </Grid>
-            </Grid>
+            commonFieldComponentProps={{ size: 'small' }}
+        >
+            <ContentFilter filterApiRef={filterApiRef} />
         </MuiFilter>
     );
 };
