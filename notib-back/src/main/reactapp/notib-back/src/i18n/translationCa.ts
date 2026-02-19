@@ -15,6 +15,9 @@ const translationCa = {
         pagadorsCie: "Centres d'impressió i ensobrat",
         notificacions: 'Notificacions',
     },
+    comu: {
+        netejarFiltre: 'Netejar filtre',
+    },
     page: {
         home: {
             toolbar: {
