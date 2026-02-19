@@ -58,7 +58,7 @@ import java.io.Serializable;
 )
 public class EntitatResource extends BaseResource<Long> {
 
-	public static final String FILTER_CODE = "FILTER";
+	public static final String FILTER_CODE = "FILTER_ENTITAT";
 
 	@NotNull
 	@Size(max = 64)

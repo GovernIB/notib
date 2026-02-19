@@ -105,14 +105,14 @@ const EntitatGridFilter: React.FC = () => {
             filterBuilder.like('nom', data.nom),
             // filterBuilder.eq('tipus', data.tipus),
             filterBuilder.like('dir3Codi', data.dir3Codi),
-            filterBuilder.eq('activa', data.activa)
+            filterBuilder.eq('activa', `'${data?.activa}'`)
         );
     };
 
     return (
         <MuiFilter
             resourceName="entitatResource"
-            code="FILTER"
+            code="FILTER_ENTITAT"
             apiRef={filterApiRef}
             springFilterBuilder={springFilterBuilder}
             componentProps={{ sx: { mb: 2 } }}

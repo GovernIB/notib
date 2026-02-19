@@ -11,8 +11,9 @@ const PermissionGrid: React.FC<{
     resourceName: string;
     id: any;
     permissionEntries: PermissionGridEntry[];
+    toolbarAdditionalRow?: React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | undefined;
 }> = (props) => {
-    const { resourceName, id, permissionEntries } = props;
+    const { resourceName, id, permissionEntries, toolbarAdditionalRow } = props;
     const { t } = useTranslation();
     const { apiRef: formApiRef } = useFormContext();
     const sidGrantedAuthorityEnumOptions = [
@@ -94,6 +95,7 @@ const PermissionGrid: React.FC<{
             paginationActive
             //density="standard"
             toolbarHideQuickFilter
+            toolbarAdditionalRow={toolbarAdditionalRow}
             inlineEditActive
             onRowCreate={handleDataGridRowChanges}
             onRowDelete={handleDataGridRowChanges}
