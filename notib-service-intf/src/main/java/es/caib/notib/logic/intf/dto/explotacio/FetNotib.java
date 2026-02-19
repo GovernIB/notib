@@ -1,4 +1,4 @@
-package es.caib.notib.client.domini.explotacio;
+package es.caib.notib.logic.intf.dto.explotacio;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import es.caib.comanda.model.v1.estadistica.Fet;

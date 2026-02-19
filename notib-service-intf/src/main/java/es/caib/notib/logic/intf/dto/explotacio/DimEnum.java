@@ -1,4 +1,4 @@
-package es.caib.notib.client.domini.explotacio;
+package es.caib.notib.logic.intf.dto.explotacio;
 
 public enum DimEnum {
     ENT ("Entitat", "Codi de l'entitat a la que pertany la comunicació/notificació"),
