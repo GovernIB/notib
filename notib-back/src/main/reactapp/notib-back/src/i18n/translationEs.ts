@@ -318,6 +318,10 @@ const translationEs = {
                 role: 'Rol',
             },
         },
+        GridToolbarButton: {
+            add: 'Añadir',
+            refresh: 'Refrescar',
+        },
     },
 };
 

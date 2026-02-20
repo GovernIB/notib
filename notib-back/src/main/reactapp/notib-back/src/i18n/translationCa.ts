@@ -326,6 +326,10 @@ const translationCa = {
                 role: 'Rol',
             },
         },
+        GridToolbarButton: {
+            add: 'Afegir',
+            refresh: 'Refrescar',
+        },
     },
 };
 
