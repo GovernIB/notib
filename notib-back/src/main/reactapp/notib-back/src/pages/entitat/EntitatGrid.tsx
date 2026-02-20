@@ -115,7 +115,7 @@ const EntitatGridFilter: React.FC = () => {
             code="FILTER_ENTITAT"
             apiRef={filterApiRef}
             springFilterBuilder={springFilterBuilder}
-            componentProps={{ sx: { mb: 2 } }}
+            componentProps={{ sx: { mb: 2, mt: 0 } }}
             commonFieldComponentProps={{ size: 'small' }}
         >
             <ContentFilter filterApiRef={filterApiRef} />

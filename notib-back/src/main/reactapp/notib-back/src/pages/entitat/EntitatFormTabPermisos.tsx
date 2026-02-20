@@ -6,13 +6,19 @@ import {
     useFormContext,
     springFilterBuilder as filterBuilder,
     FilterApi,
+    MuiDataGridApiRef,
+    useMuiDataGridApiRef,
 } from 'reactlib';
 import PermissionGrid from '../../components/PermissionGrid';
-import { Grid, Icon, IconButton } from '@mui/material';
+import { Box, Grid, Icon, IconButton } from '@mui/material';
 import GridFormField from '../../components/GridFormField';
+import GridToolbarButton from '../../components/GridToolbarButton';
 
-const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (props) => {
-    const { filterApiRef } = props;
+const ContentFilter: React.FC<{
+    filterApiRef: React.RefObject<FilterApi>;
+    gridApiRef: MuiDataGridApiRef;
+}> = (props) => {
+    const { filterApiRef, gridApiRef } = props;
     const { t } = useTranslation();
     const sidGrantedAuthorityEnumOptions = [
         {
@@ -31,25 +37,25 @@ const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (p
     return (
         <Grid container spacing={2}>
             <GridFormField
-                size={1.5}
+                size={1}
                 name="sidGrantedAuthority"
                 label={t('component.PermissionGrid.tipus')}
                 type="enum"
                 options={sidGrantedAuthorityEnumOptions}
             />
-            <GridFormField size={4} name="sidName" />
+            <GridFormField size={5} name="sidName" />
             <GridFormField
-                size={1.5}
+                size={1}
                 name="perm0Allowed"
                 label={t('page.entitats.form.permisos.usuariAllowed')}
             />
             <GridFormField
-                size={1.5}
+                size={1.2}
                 name="perm2Allowed"
                 label={t('page.entitats.form.permisos.admEntitatAllowed')}
             />
             <GridFormField
-                size={1.5}
+                size={1.2}
                 name="permXAllowed"
                 label={t('page.entitats.form.permisos.admLecturaAllowed')}
             />
@@ -58,17 +64,23 @@ const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (p
                 name="perm3Allowed"
                 label={t('page.entitats.form.permisos.aplicacioAllowed')}
             />
-            <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
-                <Icon>filter_alt_off</Icon>
-            </IconButton>
+            <Grid size={1.4}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
+                        <Icon>filter_alt_off</Icon>
+                    </IconButton>
+                    <GridToolbarButton gridApiRef={gridApiRef} />
+                </Box>
+            </Grid>
         </Grid>
     );
 };
 
-const EntitatGridFilter: React.FC = () => {
+const EntitatGridFilter: React.FC<{ gridApiRef: MuiDataGridApiRef }> = (props) => {
+    const { gridApiRef } = props;
     const filterApiRef = useFilterApiRef();
 
-    // TODO: Falta aclarar com es pot filtrar de forma correcte a la bbdd, 
+    // TODO: Falta aclarar com es pot filtrar de forma correcte a la bbdd,
     // ja que actualment el filtre s'envia al backend però no s'aplica correctament.
     const springFilterBuilder = (data: any) => {
         return filterBuilder.and(
@@ -87,10 +99,10 @@ const EntitatGridFilter: React.FC = () => {
             code="FILTER_PERMISOS"
             apiRef={filterApiRef}
             springFilterBuilder={springFilterBuilder}
-            componentProps={{ sx: { mb: 2 } }}
+            componentProps={{ sx: { mb: 2, mt: 0 } }}
             commonFieldComponentProps={{ size: 'small' }}
         >
-            <ContentFilter filterApiRef={filterApiRef} />
+            <ContentFilter filterApiRef={filterApiRef} gridApiRef={gridApiRef} />
         </MuiFilter>
     );
 };
@@ -98,6 +110,7 @@ const EntitatGridFilter: React.FC = () => {
 const EntitatFormTabPermisos: React.FC = () => {
     const { t } = useTranslation();
     const { id } = useFormContext();
+    const gridApiRef = useMuiDataGridApiRef();
 
     const permissionEntries = [
         {
@@ -120,10 +133,12 @@ const EntitatFormTabPermisos: React.FC = () => {
 
     return (
         <PermissionGrid
+            apiRef={gridApiRef}
             resourceName="entitatResource"
             id={id}
             permissionEntries={permissionEntries}
-            toolbarAdditionalRow={<EntitatGridFilter />}
+            toolbarHide
+            toolbarAdditionalRow={<EntitatGridFilter gridApiRef={gridApiRef} />}
         />
     );
 };

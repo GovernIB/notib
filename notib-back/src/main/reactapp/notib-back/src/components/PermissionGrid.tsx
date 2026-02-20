@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { FormField, MuiDataGrid, useFormContext } from 'reactlib';
+import { FormField, MuiDataGrid, MuiDataGridApiRef, useFormContext } from 'reactlib';
 
 export type PermissionGridEntry = {
     headerName: string;
@@ -10,10 +10,12 @@ export type PermissionGridEntry = {
 const PermissionGrid: React.FC<{
     resourceName: string;
     id: any;
+    apiRef?: MuiDataGridApiRef;
     permissionEntries: PermissionGridEntry[];
     toolbarAdditionalRow?: React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | undefined;
+    toolbarHide?: true | undefined;
 }> = (props) => {
-    const { resourceName, id, permissionEntries, toolbarAdditionalRow } = props;
+    const { resourceName, id, permissionEntries, toolbarAdditionalRow, apiRef, toolbarHide } = props;
     const { t } = useTranslation();
     const { apiRef: formApiRef } = useFormContext();
     const sidGrantedAuthorityEnumOptions = [
@@ -83,6 +85,7 @@ const PermissionGrid: React.FC<{
     };
     return (
         <MuiDataGrid
+            apiRef={apiRef}
             title=""
             resourceName="aclEntryResource"
             columns={columns}
@@ -94,6 +97,7 @@ const PermissionGrid: React.FC<{
             }}
             paginationActive
             //density="standard"
+            toolbarHide={toolbarHide}
             toolbarHideQuickFilter
             toolbarAdditionalRow={toolbarAdditionalRow}
             inlineEditActive
