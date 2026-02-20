@@ -97,6 +97,14 @@ const InnerApp: React.FC = () => {
             resourceName: 'pagadorPostalResource',
             hidden: currentRole !== ROLE_ADMIN,
         },
+        {
+            id: 'integracions',
+            title: t('menu.integracions'),
+            to: '/integracions',
+            icon: 'build',
+            resourceName: 'monitorIntegracioResource',
+            hidden: currentRole !== ROLE_SUPER,
+        },
     ];
     const menuEntries = [
         {

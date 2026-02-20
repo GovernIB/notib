@@ -18,6 +18,7 @@ import NotificacioGrid from './pages/notificacio/NotificacioGrid';
 import NotificacioForm from './pages/notificacio/NotificacioForm';
 import NotFoundPage from './pages/NotFound';
 import Propietats from './pages/propietat/Propietats';
+import MonitorIntegracioGrid from "./pages/Integracions/MonitorIntegracioGrid.tsx";
 
 const AppRoutes = () => {
     return (
@@ -78,6 +79,9 @@ const AppRoutes = () => {
                     <Route index element={<NotificacioForm />} />
                     <Route path=":id" element={<NotificacioForm />} />
                 </Route>
+            </Route>
+            <Route path="integracions">
+                <Route index element={<MonitorIntegracioGrid />} />
             </Route>
             <Route path="*" element={<NotFoundPage />} />
         </Routes>

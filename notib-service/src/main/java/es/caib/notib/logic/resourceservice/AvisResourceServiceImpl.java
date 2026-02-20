@@ -16,8 +16,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AvisResourceServiceImpl
-	extends BaseMutableResourceService<AvisResource, Long, AvisResourceEntity>
-	implements AvisResourceService {
+public class AvisResourceServiceImpl extends BaseMutableResourceService<AvisResource, Long, AvisResourceEntity> implements AvisResourceService {
 
 }
