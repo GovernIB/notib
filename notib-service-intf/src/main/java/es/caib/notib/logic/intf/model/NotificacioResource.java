@@ -2,7 +2,7 @@ package es.caib.notib.logic.intf.model;
 
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
-import es.caib.notib.client.domini.explotacio.EnviamentOrigen;
+import es.caib.notib.logic.intf.dto.explotacio.EnviamentOrigen;
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.annotation.ResourceField;

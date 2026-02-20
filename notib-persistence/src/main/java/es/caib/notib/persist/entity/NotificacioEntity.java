@@ -4,7 +4,7 @@ import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.InteressatTipus;
-import es.caib.notib.client.domini.explotacio.EnviamentOrigen;
+import es.caib.notib.logic.intf.dto.explotacio.EnviamentOrigen;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -45,7 +45,7 @@ import java.util.Set;
 
 /**
  * Classe del model de dades que representa una notificació.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Builder
@@ -60,29 +60,29 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 
 	@Column(name = "usuari_codi", length = 64, nullable = false)
 	protected String usuariCodi;
-	
+
 	@Column(name = "emisor_dir3codi", length = 9, nullable = false)
 	protected String emisorDir3Codi;
-	
+
 	@Column(name = "com_tipus", nullable = false)
 	protected NotificacioComunicacioTipusEnumDto comunicacioTipus;
-	
+
 	@Column(name = "env_tipus", nullable = false)
 	protected EnviamentTipus enviamentTipus;
-	
+
 	@Column(name = "env_data_prog")
 	@Temporal(TemporalType.DATE)
 	protected Date enviamentDataProgramada;
-	
+
 	@Column(name = "concepte", length = 255, nullable = false)
 	protected String concepte;
-	
+
 	@Column(name = "descripcio", length = 1000)
 	protected String descripcio;
-	
+
 	@Column(name = "retard_postal")
 	protected Integer retard;
-	
+
 	@Column(name = "caducitat")
 	@Temporal(TemporalType.DATE)
 	protected Date caducitat;
@@ -90,29 +90,29 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Column(name = "caducitat_original")
 	@Temporal(TemporalType.DATE)
 	protected Date caducitatOriginal;
-	
+
 	@Column(name = "proc_codi_notib", length = 9)
 	protected String procedimentCodiNotib;
-	
+
 	@Column(name = "grup_codi", length = 64)
 	protected String grupCodi;
-	
+
 	@Column(name = "estat", nullable = false)
 	protected NotificacioEstatEnumDto estat;
-	
+
 	@Column(name = "estat_date")
 	protected Date estatDate;
-	
+
 	@Column(name = "tipus_usuari")
 	protected TipusUsuariEnumDto tipusUsuari;
-	
+
 	@Column(name = "motiu")
 	protected String motiu;
 
 	@Column(name = "not_env_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date notificaEnviamentData;
-	
+
 	@Column(name = "not_env_data_notifica")
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date notificaEnviamentNotificaData;
@@ -162,13 +162,13 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@JoinColumn(name = "procediment_id")
 	@ForeignKey(name = "not_procediment_not_fk")
 	protected ProcSerEntity procediment;
-	
+
 	/*Procediment*/
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "procediment_organ_id")
 	@ForeignKey(name = "not_procorgan_not_fk")
 	protected ProcSerOrganEntity procedimentOrgan;
-	
+
 	/*document*/
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "document_id")
@@ -200,7 +200,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@ForeignKey(name = "not_document5_notificacio_fk")
 	protected DocumentEntity document5;
 
-	
+
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "organ_gestor", referencedColumnName = "id")
 	@ForeignKey(name = "NOT_ORGAN_GESTOR_FK")
@@ -229,7 +229,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH},
 			orphanRemoval = true)
 	protected Set<NotificacioEnviamentEntity> enviaments = new LinkedHashSet<>();
-	
+
 	@OneToMany(
 			mappedBy = "notificacio",
 			fetch = FetchType.LAZY,
@@ -268,7 +268,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public void updateRegistreNumero(Integer registreNumero) {
 		this.registreNumero = registreNumero;
 	}
-	
+
 	public void updateRegistreNumeroFormatat(String registreNumeroFormatat) {
 		this.registreNumeroFormatat = registreNumeroFormatat;
 	}
@@ -276,7 +276,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public void updateRegistreData(Date registreData) {
 		this.registreData = registreData;
 	}
-	
+
 	public void updateEstat(NotificacioEstatEnumDto estat) {
 		this.estat = estat;
 	}
@@ -284,15 +284,15 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public void updateEstatProcessatDate(Date estatProcessatDate) {
 		this.estatProcessatDate = estatProcessatDate;
 	}
-	
+
 	public void updateEstatDate(Date estatDate) {
 		this.estatDate = estatDate;
 	}
-	
+
 	public void updateMotiu(String motiu) {
 		this.motiu = motiu;
 	}
-	
+
 	public void updateLastCallbackError(boolean error) {
 		this.errorLastCallback = error;
 	}
@@ -300,22 +300,22 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public void updateCodiSia(String codiSia) {
 		this.procedimentCodiNotib=codiSia;
 	}
-	
+
 	public void resetIntentsNotificacio() {
 		this.notificaEnviamentIntent = 0;
 	}
-	
+
 	public void updateNotificaNouEnviament() {
 		this.notificaEnviamentIntent++;
 //		Calendar cal = Calendar.getInstance();
 //		cal.add(Calendar.SECOND, (int) (((double)reintentsPeriodeNotifica/1000)*Math.pow(2, notificaEnviamentIntent)));
 //		this.notificaEnviamentData = cal.getTime();
 	}
-	
+
 	public void updateNotificaEnviamentData() {
 		this.notificaEnviamentNotificaData = new Date();
 	}
-	
+
 	public void updateRegistreNouEnviament(int reintentsPeriodeRegistre) {
 		this.registreEnviamentIntent++;
 		decreaseRegistreEnviamentPrioritat((int) (((double)reintentsPeriodeRegistre/1000)*Math.pow(2, registreEnviamentIntent)));
@@ -495,11 +495,11 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		this.document5 = document5;
 		this.procedimentOrgan = procedimentOrgan;
 		this.idioma = idioma;
-		
+
 		this.registreEnviamentIntent = 0;
 		this.notificaEnviamentIntent = 0;
 	}
-	
+
 	public static BuilderV2 getBuilderV2(
 			EntitatEntity entitat,
 			String emisorDir3Codi,
@@ -541,7 +541,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				idioma,
 				referencia);
 	}
-	
+
 
 	public static class BuilderV2 {
 		NotificacioEntity built;
@@ -594,12 +594,12 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.usuariCodi = usuariCodi;
 			return this;
 		}
-		
+
 		public BuilderV2 enviaments(Set<NotificacioEnviamentEntity> enviaments) {
 			built.enviaments = enviaments;
 			return this;
 		}
-		
+
 		public BuilderV2 descripcio(String descripcio) {
 			built.descripcio = descripcio;
 			return this;

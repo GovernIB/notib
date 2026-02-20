@@ -1,12 +1,12 @@
 /**
- * 
+ *
  */
 package es.caib.notib.logic.aspect;
 
 import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentTipus;
-import es.caib.notib.client.domini.explotacio.EnviamentOrigen;
+import es.caib.notib.logic.intf.dto.explotacio.EnviamentOrigen;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentRegistreRequest;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -36,7 +36,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Advice AspectJ que intercepta les excepcions llençades des dels
  * services.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -206,7 +206,7 @@ public class EstadistiquesAdvice {
 				log.error("[estNotificacioRecepcio] Enviament amb ID: " + enviament.getId() + " no trobat amb entitats relacionades.");
 				return;
 			}
-			
+
 			ExplotEnvInfoEntity explotEnvInfoEntity = getExplotEnvInfo(enviamentWithRelatedEntities, EstatActualEnv.ENVIAT_NOT);
 
 			if (enviamentWithRelatedEntities.isNotificaEstatFinal()) {

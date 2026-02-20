@@ -1,6 +1,6 @@
 package es.caib.notib.persist.entity.explotacio;
 
-import es.caib.notib.client.domini.explotacio.EnviamentOrigen;
+import es.caib.notib.logic.intf.dto.explotacio.EnviamentOrigen;
 import es.caib.notib.client.domini.EnviamentTipus;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;

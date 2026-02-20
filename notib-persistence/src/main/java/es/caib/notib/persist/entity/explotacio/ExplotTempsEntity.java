@@ -1,6 +1,6 @@
 package es.caib.notib.persist.entity.explotacio;
 
-import es.caib.notib.client.domini.explotacio.DiaSetmanaEnum;
+import es.caib.notib.logic.intf.dto.explotacio.DiaSetmanaEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,16 +26,16 @@ public class ExplotTempsEntity extends AbstractPersistable<Long> implements Seri
 
 	@Column(name = "data")
 	private LocalDate data;
-	
+
 	@Column(name = "anualitat")
 	private Integer anualitat;
-	
+
 	@Column(name = "mes")
 	private Integer mes;
-	
+
 	@Column(name = "trimestre")
 	private Integer trimestre;
-	
+
 	@Column(name = "setmana")
 	private Integer setmana;
 
