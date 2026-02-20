@@ -1,6 +1,6 @@
 package es.caib.notib.persist.entity.explotacio;
 
-import es.caib.notib.client.domini.explotacio.DiaSetmanaEnum;
+import es.caib.notib.logic.intf.dto.explotacio.DiaSetmanaEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

@@ -8,11 +8,11 @@ import es.caib.comanda.model.v1.estadistica.RegistreEstadistic;
 import es.caib.comanda.model.v1.estadistica.RegistresEstadistics;
 import es.caib.comanda.model.v1.estadistica.Temps;
 import es.caib.notib.client.domini.EnviamentTipus;
-import es.caib.notib.client.domini.explotacio.DiaSetmanaEnum;
-import es.caib.notib.client.domini.explotacio.DimEnum;
-import es.caib.notib.client.domini.explotacio.DimensioNotib;
-import es.caib.notib.client.domini.explotacio.EnviamentOrigen;
-import es.caib.notib.client.domini.explotacio.FetNotib;
+import es.caib.notib.logic.intf.dto.explotacio.DiaSetmanaEnum;
+import es.caib.notib.logic.intf.dto.explotacio.DimEnum;
+import es.caib.notib.logic.intf.dto.explotacio.DimensioNotib;
+import es.caib.notib.logic.intf.dto.explotacio.EnviamentOrigen;
+import es.caib.notib.logic.intf.dto.explotacio.FetNotib;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
@@ -59,7 +59,7 @@ import java.util.stream.Collectors;
 
 import static es.caib.comanda.model.v1.estadistica.Format.DECIMAL;
 import static es.caib.comanda.model.v1.estadistica.Format.LONG;
-import static es.caib.notib.client.domini.explotacio.FetEnum.*;
+import static es.caib.notib.logic.intf.dto.explotacio.FetEnum.*;
 
 @Slf4j
 @Service

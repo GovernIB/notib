@@ -1,5 +1,5 @@
 
-package es.caib.notib.client.domini.explotacio;
+package es.caib.notib.logic.intf.dto.explotacio;
 
 import java.io.Serializable;
 

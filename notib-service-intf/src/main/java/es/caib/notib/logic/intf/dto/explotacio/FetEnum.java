@@ -1,4 +1,4 @@
-package es.caib.notib.client.domini.explotacio;
+package es.caib.notib.logic.intf.dto.explotacio;
 
 public enum FetEnum {
     PND ("Pendent", "La comunicació/notificació està pendent de ser registrada"),
