@@ -8,6 +8,8 @@ import es.caib.notib.logic.intf.base.annotation.ResourceField;
 import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
+import es.caib.notib.logic.intf.base.validation.CustomValidation;
+import es.caib.notib.logic.intf.model.validator.PersonaInteressatTipusRequiredFields;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -36,13 +38,15 @@ import java.util.List;
 		),
 	}
 )
+@CustomValidation.List({
+	@CustomValidation(customValidatorType = PersonaInteressatTipusRequiredFields.class)
+})
 public class PersonaResource extends BaseResource<Long> {
 
 	@NotNull
 	@ResourceField(onChangeActive = true)
 	private InteressatTipus interessatTipus = InteressatTipus.FISICA;
 	private DocumentTipus documentTipus;
-	@NotNull
 	@Size(max = 9)
 	private String nif;
 	@Size(max = 255)

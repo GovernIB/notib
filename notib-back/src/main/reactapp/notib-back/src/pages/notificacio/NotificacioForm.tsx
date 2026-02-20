@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
@@ -59,6 +59,8 @@ const NotificacioFormContent: React.FC = () => {
 export const NotificacioForm: React.FC = () => {
     const { t } = useTranslation();
     const { id } = useParams();
+    const [searchParams] = useSearchParams();
+    const type = searchParams.get('type');
     return (
         <FormPage>
             <MuiForm
@@ -70,11 +72,13 @@ export const NotificacioForm: React.FC = () => {
                         : t('page.notificacio.form.titleCreate')
                 }
                 initOnChangeRequest
+                additionalData={type ? { enviamentTipus: type } : undefined}
                 createLink="./{{id}}"
                 //updateLink="../../"
                 toolbarElementsWithPositions={[{ position: 2, element: <JSonButton /> }]}
                 componentProps={{ style: { height: '100%' } }}
-                commonFieldComponentProps={{ size: 'small' }}>
+                commonFieldComponentProps={{ size: 'small' }}
+            >
                 <NotificacioFormContent />
                 <NotificacioFormEnviaments />
                 <NotificacioFormDocuments />

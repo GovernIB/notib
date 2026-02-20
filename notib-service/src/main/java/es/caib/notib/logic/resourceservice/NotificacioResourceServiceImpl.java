@@ -4,6 +4,8 @@ import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.helper.EntitatPermissionHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 import es.caib.notib.logic.intf.model.NotificacioResource;
 import es.caib.notib.logic.intf.model.PersonaResource;
@@ -56,6 +58,18 @@ public class NotificacioResourceServiceImpl
 		register(null, new NotificacioResourceServiceImpl.InitOnChangeLogicProcessor());
 		register(NotificacioResource.Fields.caducitat, new NotificacioResourceServiceImpl.CaducitatOnChangeLogicProcessor());
 		register(NotificacioResource.Fields.caducitatDiesNaturals, new NotificacioResourceServiceImpl.CaducitatOnChangeLogicProcessor());
+	}
+
+	@Override
+	public void beforeCreateSave(
+		NotificacioResourceEntity entity,
+		NotificacioResource resource,
+		Map<String, AnswerRequiredException.AnswerValue> answers) {
+		super.beforeCreateSave(entity, resource, answers);
+		entity.setUsuariCodi(authenticationHelper.getCurrentUserName());
+		entity.setEmisorDir3Codi(entity.getEntitat().getDir3Codi());
+		entity.setComunicacioTipus(NotificacioComunicacioTipusEnumDto.ASINCRON);
+		entity.setEstat(NotificacioEstatEnumDto.PENDENT);
 	}
 
 	@Override

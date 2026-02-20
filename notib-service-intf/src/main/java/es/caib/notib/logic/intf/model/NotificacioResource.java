@@ -11,7 +11,6 @@ import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -52,14 +51,6 @@ import java.util.List;
 public class NotificacioResource extends BaseResource<Long> {
 
 	@NotNull
-	@Size(max = 64)
-	private String usuariCodi;
-	@NotNull
-	@Size(max = 9)
-	private String emisorDir3Codi;
-	@NotNull
-	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
-	@NotNull
 	private EnviamentTipus enviamentTipus;
 	private Date enviamentDataProgramada;
 	@NotNull
@@ -75,7 +66,6 @@ public class NotificacioResource extends BaseResource<Long> {
 	private String procedimentCodiNotib;
 	@Size(max = 64)
 	private String grupCodi;
-	@NotNull
 	private NotificacioEstatEnumDto estat;
 	private Date estatDate;
 	private TipusUsuariEnumDto tipusUsuari;
