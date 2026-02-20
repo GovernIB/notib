@@ -14,6 +14,7 @@ const translationCa = {
         pagadorsPostals: 'Operadors postals',
         pagadorsCie: "Centres d'impressió i ensobrat",
         notificacions: 'Notificacions',
+        integracions: 'Integracions'
     },
     comu: {
         netejarFiltre: 'Netejar filtre',
@@ -287,6 +288,11 @@ const translationCa = {
                     },
                 },
             },
+        },
+        integracions: {
+            grid: {
+                title: "Monitor de integraciones"
+            }
         },
         notFound: {
             title: 'Pàgina no trobada',

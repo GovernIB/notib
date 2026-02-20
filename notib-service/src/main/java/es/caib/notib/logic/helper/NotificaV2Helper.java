@@ -695,9 +695,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		//Crea un nou event
 		log.info(" [EST] Creant nou event per Datat...");
 		notificacioEventHelper.addAdviserDatatEvent(enviament, false, null);
-		if (enviament.isNotificaEstatFinal()) {
-			callbackHelper.updateCallback(enviament, false, null);
-		}
 		log.info(" [EST] L'event s'ha guardat correctament...");
 		log.info(" [EST] Actualitzant Datat enviament...");
 		enviamentUpdateDatat(estat,
@@ -709,6 +706,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				null,
 				null,
 				enviament);
+		if (enviament.isNotificaEstatFinal()) {
+			callbackHelper.updateCallback(enviament, false, null);
+		}
         //Enviar la informacio del canvi d'estat a Comanda
 		comandaListener.enviarAvis(enviament, AvisTipus.INFO);
 		log.info(" [EST] Fi actualització Datat");
