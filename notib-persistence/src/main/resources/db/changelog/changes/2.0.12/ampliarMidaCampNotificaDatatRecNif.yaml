@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
+  - changeSet:
+      id: 1770311768254-1
+      author: limit
+      changes:
+        - modifyDataType:
+            tableName: NOT_NOTIFICACIO_ENV
+            columnName: NOTIFICA_DATAT_RECNIF
+            newDataType: varchar(50 ${varcharUnit})
