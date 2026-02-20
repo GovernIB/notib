@@ -131,10 +131,10 @@ export const InnerFormFieldNumber: React.FC<
             disabled={disabled}
             error={fieldError != null}
             title={title}
-            helperText={helperText}
             onChange={(e) => onChange(e.target.value === '' ? null : e.target.value)}
             fullWidth
             {...componentProps}
+            helperText={helperText ?? componentProps.helperText}
             slotProps={{
                 input: inputProps,
                 htmlInput: htmlInputProps,

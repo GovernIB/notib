@@ -156,13 +156,13 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
                 disabled={disabled}
                 error={fieldError != null}
                 title={title}
-                helperText={helperText}
                 onChange={(e) => {
                     const value = e.target.value;
                     onChange(value !== '' ? value : null);
                 }}
                 fullWidth
                 {...componentProps}
+                helperText={helperText ?? componentProps.helperText}
                 slotProps={{
                     input: inputProps,
                     select: {
@@ -185,7 +185,8 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
                                 : selectedText(value);
                         },
                     },
-                }}>
+                }}
+            >
                 {/* Diría que los enumValues vacíos vienen definidos como string vacío en lugar de null */}
                 {!isRequired && !multiple && enumOptions?.find((o) => o.value == null) == null && (
                     <MenuItem key="" value="">

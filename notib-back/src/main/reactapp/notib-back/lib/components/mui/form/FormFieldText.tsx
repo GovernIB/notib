@@ -82,7 +82,8 @@ const InnerFormFieldText: React.FC<
                     <IconButton
                         disabled={disabled || readOnly}
                         onClick={() => setPasswordVisible((v) => !v)}
-                        size="small">
+                        size="small"
+                    >
                         <Icon fontSize="small">
                             {passwordVisible ? 'visibility_off' : 'visibility'}
                         </Icon>
@@ -113,12 +114,12 @@ const InnerFormFieldText: React.FC<
             type={password && !passwordVisible ? 'password' : undefined}
             error={fieldError != null}
             title={title}
-            helperText={helperText}
             onChange={(e) => onChange(e.target.value === '' ? null : e.target.value)}
             fullWidth
             multiline={isTextAreaType}
             rows={isTextAreaType ? 4 : undefined}
             {...componentProps}
+            helperText={helperText ?? componentProps.helperText}
             slotProps={{
                 input: inputProps,
                 htmlInput: htmlInputProps,

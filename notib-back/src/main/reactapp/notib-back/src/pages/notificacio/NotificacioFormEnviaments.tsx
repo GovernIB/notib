@@ -187,11 +187,11 @@ const NotificacioFormEnviament: React.FC<{
                 {currentEnviamentGlobalValidationErrors?.length ? (
                     <Grid size={12}>
                         <Alert severity="error">
-                            {currentEnviamentGlobalValidationErrors.map((e) => (
-                                <>
+                            {currentEnviamentGlobalValidationErrors.map((e, i) => (
+                                <React.Fragment key={i}>
                                     {e.message}
                                     <br />
-                                </>
+                                </React.Fragment>
                             ))}
                         </Alert>
                     </Grid>

@@ -34,6 +34,7 @@ const NotificacioFormDocumentContent: React.FC = () => {
                                   }
                                 : undefined
                         }
+                        accept={data.source === 'ATTACHED' ? '.zip,.pdf' : undefined}
                         required
                     />
                 )}

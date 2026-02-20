@@ -43,13 +43,13 @@ export const FormFieldCheckboxSelect: React.FC<FormFieldCustomProps> = (props) =
             disabled={disabled}
             error={fieldError != null}
             title={title}
-            helperText={helperText}
             onChange={(e) => {
                 const value = e.target.value;
                 onChange(value !== '' ? value : null);
             }}
             fullWidth
             {...componentProps}
+            helperText={helperText ?? componentProps.helperText}
             slotProps={{
                 input: inputProps,
                 select: {
@@ -58,7 +58,8 @@ export const FormFieldCheckboxSelect: React.FC<FormFieldCustomProps> = (props) =
                     onClose: () => setOpen(false),
                     onOpen: () => setOpen(true),
                 },
-            }}>
+            }}
+        >
             <MenuItem value={''}>&nbsp;</MenuItem>
             <MenuItem value={'true'}>{t('form.field.checkboxSelect.true')}</MenuItem>
             <MenuItem value={'false'}>{t('form.field.checkboxSelect.false')}</MenuItem>
