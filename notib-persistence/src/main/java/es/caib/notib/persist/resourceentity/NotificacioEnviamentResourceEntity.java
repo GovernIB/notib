@@ -22,9 +22,7 @@ import java.util.Date;
  * @author Límit Tecnologies
  */
 @Entity
-@Table(
-	name = BaseConfig.DB_PREFIX + "notificacio",
-	uniqueConstraints = @UniqueConstraint(columnNames = { "referencia" }))
+@Table(name = BaseConfig.DB_PREFIX + "notificacio_env")
 @Getter
 @Setter
 @NoArgsConstructor

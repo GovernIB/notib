@@ -1,18 +1,23 @@
 package es.caib.notib.logic.resourceservice;
 
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.helper.EntitatPermissionHelper;
+import es.caib.notib.logic.helper.LegacyHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
+import es.caib.notib.logic.intf.model.DocumentResource;
 import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 import es.caib.notib.logic.intf.model.NotificacioResource;
 import es.caib.notib.logic.intf.model.PersonaResource;
 import es.caib.notib.logic.intf.resourceservice.NotificacioResourceService;
+import es.caib.notib.persist.resourceentity.DocumentResourceEntity;
 import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
 import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
 import es.caib.notib.persist.resourceentity.PersonaResourceEntity;
+import es.caib.notib.persist.resourcerepository.DocumentResourceRepository;
 import es.caib.notib.persist.resourcerepository.NotificacioEnviamentResourceRepository;
 import es.caib.notib.persist.resourcerepository.PersonaResourceRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -40,17 +45,23 @@ public class NotificacioResourceServiceImpl
 	implements NotificacioResourceService {
 
 	private final NotificacioEnviamentResourceRepository notificacioEnviamentResourceRepository;
+	private final DocumentResourceRepository documentResourceRepository;
 	private final PersonaResourceRepository personaResourceRepository;
+	private final LegacyHelper legacyHelper;
 
 	public NotificacioResourceServiceImpl(
 		UserSessionHelper userSessionHelper,
 		AuthenticationHelper authenticationHelper,
 		EntitatPermissionHelper entitatPermissionHelper,
 		NotificacioEnviamentResourceRepository notificacioEnviamentResourceRepository,
-		PersonaResourceRepository personaResourceRepository) {
+		DocumentResourceRepository documentResourceRepository,
+		PersonaResourceRepository personaResourceRepository,
+		LegacyHelper legacyHelper) {
 		super(userSessionHelper, authenticationHelper, entitatPermissionHelper);
 		this.notificacioEnviamentResourceRepository = notificacioEnviamentResourceRepository;
+		this.documentResourceRepository = documentResourceRepository;
 		this.personaResourceRepository = personaResourceRepository;
+		this.legacyHelper = legacyHelper;
 	}
 
 	@PostConstruct
@@ -70,6 +81,9 @@ public class NotificacioResourceServiceImpl
 		entity.setEmisorDir3Codi(entity.getEntitat().getDir3Codi());
 		entity.setComunicacioTipus(NotificacioComunicacioTipusEnumDto.ASINCRON);
 		entity.setEstat(NotificacioEstatEnumDto.PENDENT);
+		if (resource.getDocumentsInfo() != null) {
+			saveDocuments(entity, resource.getDocumentsInfo());
+		}
 	}
 
 	@Override
@@ -88,17 +102,42 @@ public class NotificacioResourceServiceImpl
 		List<NotificacioEnviamentResource> enviaments) {
 		// Crea els enviaments associats amb la notificació a la base de dades.
 		enviaments.forEach(e -> {
-			NotificacioEnviamentResourceEntity enviament = notificacioEnviamentResourceRepository.save(
-				NotificacioEnviamentResourceEntity.builder().
-					resource(e).
-					notificacio(notificacio).
-					build());
-			PersonaResourceEntity titular = saveDestinatari(enviament, e.getTitularInfo());
-			enviament.setTitular(titular);
+			NotificacioEnviamentResourceEntity enviamentNou = NotificacioEnviamentResourceEntity.builder().
+				resource(e).
+				notificacio(notificacio).
+				build();
+			enviamentNou.setNotificaEstat(EnviamentEstat.PENDENT);
+			NotificacioEnviamentResourceEntity enviamentCreat = notificacioEnviamentResourceRepository.save(enviamentNou);
+			PersonaResourceEntity titular = saveDestinatari(enviamentCreat, e.getTitularInfo());
+			enviamentCreat.setTitular(titular);
 			if (e.getRepresentantsInfo() != null) {
-				e.getRepresentantsInfo().forEach(r -> saveDestinatari(enviament, r));
+				e.getRepresentantsInfo().forEach(r -> saveDestinatari(enviamentCreat, r));
 			}
 		});
+	}
+
+	private void saveDocuments(
+		NotificacioResourceEntity notificacio,
+		List<DocumentResource> documents) {
+		// Crea els documents associats amb la notificació a la base de dades.
+		for (int i = 0; i < documents.size(); i++) {
+			DocumentResource document = documents.get(i);
+			DocumentResourceEntity documentNou = DocumentResourceEntity.builder().resource(document).build();
+			String arxiuGestdocId = legacyHelper.notificacioAdjuntCreate(document.getAttachment());
+			documentNou.setArxiuGestdocId(arxiuGestdocId);
+			DocumentResourceEntity documentCreat = documentResourceRepository.save(documentNou);
+			if (i == 0) {
+				notificacio.setDocument(documentCreat);
+			} else if (i == 1) {
+				notificacio.setDocument2(documentCreat);
+			} else if (i == 2) {
+				notificacio.setDocument3(documentCreat);
+			} else if (i == 3) {
+				notificacio.setDocument4(documentCreat);
+			} else if (i == 4) {
+				notificacio.setDocument5(documentCreat);
+			}
+		}
 	}
 
 	private PersonaResourceEntity saveDestinatari(
@@ -177,7 +216,6 @@ public class NotificacioResourceServiceImpl
 		if (caducitat != null) {
 			LocalDate dataConvertida = caducitat.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 			numDiesNaturals = (int)ChronoUnit.DAYS.between(LocalDate.now(), dataConvertida);
-
 		}
 		// Només feim el canvi si el nombre de dies naturals és diferent a la que ja hi havia per a evitar bucle
 		// infinit d'onChange.

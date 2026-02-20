@@ -282,16 +282,24 @@ public class ObjectMappingHelper {
 			Object object,
 			Field field,
 			Object value) {
-		String setMethodName = methodNameFromFieldName(field.getName(), "set");
-		Method method = ReflectionUtils.findMethod(object.getClass(), setMethodName, field.getType());
-		if (method != null) {
-			ReflectionUtils.invokeMethod(method, object, value);
-		} else {
-			ReflectionUtils.makeAccessible(field);
-			ReflectionUtils.setField(
+		try {
+			String setMethodName = methodNameFromFieldName(field.getName(), "set");
+			Method method = ReflectionUtils.findMethod(object.getClass(), setMethodName, field.getType());
+			if (method != null) {
+				ReflectionUtils.invokeMethod(method, object, value);
+			} else {
+				ReflectionUtils.makeAccessible(field);
+				ReflectionUtils.setField(
 					field,
 					object,
 					value);
+			}
+		} catch (IllegalArgumentException ex) {
+			log.warn("Couldn't set field value (targetClass={}, fieldName={}, valueType={})",
+				object.getClass().getName(),
+				field.getName(),
+				value != null ? value.getClass().getName() : "<null>",
+				ex);
 		}
 	}
 

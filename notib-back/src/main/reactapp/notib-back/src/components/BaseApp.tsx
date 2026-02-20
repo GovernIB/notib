@@ -2,6 +2,7 @@ import React from 'react';
 import {
     useNavigate,
     useLocation,
+    useBlocker,
     Link as RouterLink,
     type LinkProps as RouterLinkProps,
 } from 'react-router-dom';
@@ -169,7 +170,8 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             headerAdditionalAuthComponents={[
                 <Box
                     key="sel_lang"
-                    sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 2 }}>
+                    sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 2 }}
+                >
                     <HeaderLanguageSelector languages={availableLanguages} />
                 </Box>,
                 <Box key="sel_theme_mode" sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
@@ -190,7 +192,8 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             routerUseLocationPath={useLocationPath}
             routerAnyHistoryEntryExist={anyHistoryEntryExist}
             linkComponent={Link}
-            menuEntries={baseAppMenuEntries}>
+            menuEntries={baseAppMenuEntries}
+        >
             <CustomLocalizationProvider>{children}</CustomLocalizationProvider>
         </MuiBaseApp>
     );

@@ -8,7 +8,6 @@ import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.model.NotificacioResource;
-import es.caib.notib.persist.entity.ProcSerEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,59 +33,59 @@ public class NotificacioResourceEntity
 	implements AdminEntitatResourceEntity<NotificacioResource> {
 
 	@Column(name = "usuari_codi", length = 64, nullable = false)
-	protected String usuariCodi;
+	private String usuariCodi;
 	@Column(name = "emisor_dir3codi", length = 9, nullable = false)
-	protected String emisorDir3Codi;
+	private String emisorDir3Codi;
 	@Column(name = "com_tipus", nullable = false)
-	protected NotificacioComunicacioTipusEnumDto comunicacioTipus;
+	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	@Column(name = "env_tipus", nullable = false)
-	protected EnviamentTipus enviamentTipus;
+	private EnviamentTipus enviamentTipus;
 	@Column(name = "env_data_prog")
 	@Temporal(TemporalType.DATE)
-	protected Date enviamentDataProgramada;
+	private Date enviamentDataProgramada;
 	@Column(name = "concepte", length = 240, nullable = false)
-	protected String concepte;
+	private String concepte;
 	@Column(name = "descripcio", length = 1000)
-	protected String descripcio;
+	private String descripcio;
 	@Column(name = "retard_postal")
-	protected Integer retard;
+	private Integer retard;
 	@Column(name = "caducitat")
 	@Temporal(TemporalType.DATE)
-	protected Date caducitat;
+	private Date caducitat;
 	@Column(name = "caducitat_original")
 	@Temporal(TemporalType.DATE)
-	protected Date caducitatOriginal;
+	private Date caducitatOriginal;
 	@Column(name = "proc_codi_notib", length = 9)
-	protected String procedimentCodiNotib;
+	private String procedimentCodiNotib;
 	@Column(name = "grup_codi", length = 64)
-	protected String grupCodi;
+	private String grupCodi;
 	@Column(name = "estat", nullable = false)
-	protected NotificacioEstatEnumDto estat;
+	private NotificacioEstatEnumDto estat;
 	@Column(name = "estat_date")
-	protected Date estatDate;
+	private Date estatDate;
 	@Column(name = "tipus_usuari")
-	protected TipusUsuariEnumDto tipusUsuari;
+	private TipusUsuariEnumDto tipusUsuari;
 	@Column(name = "motiu")
-	protected String motiu;
+	private String motiu;
 	@Column(name = "not_env_data")
 	@Temporal(TemporalType.TIMESTAMP)
-	protected Date notificaEnviamentData;
+	private Date notificaEnviamentData;
 	@Column(name = "not_env_data_notifica")
 	@Temporal(TemporalType.TIMESTAMP)
-	protected Date notificaEnviamentNotificaData;
+	private Date notificaEnviamentNotificaData;
 	@Column(name = "not_env_intent")
-	protected int notificaEnviamentIntent;
+	private int notificaEnviamentIntent;
 	@Column(name = "registre_env_intent")
-	protected int registreEnviamentIntent;
+	private int registreEnviamentIntent;
 	@Column(name = "registre_numero")
-	protected Integer registreNumero;
+	private Integer registreNumero;
 	@Column(name = "registre_numero_formatat", length = 200)
-	protected String registreNumeroFormatat;
+	private String registreNumeroFormatat;
 	@Column(name = "registre_data")
 	@Temporal(TemporalType.TIMESTAMP)
-	protected Date registreData;
+	private Date registreData;
 	@Column(name = "registre_num_expedient", length = 80)
-	protected String numExpedient;
+	private String numExpedient;
 	@Setter
 	@Column(name = "registre_oficina_nom")
 	private String registreOficinaNom;
@@ -119,7 +118,7 @@ public class NotificacioResourceEntity
 		referencedColumnName = "id",
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "organ_entitat_fk"),
 		nullable = false)
-	protected EntitatResourceEntity entitat;
+	private EntitatResourceEntity entitat;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(
@@ -127,21 +126,58 @@ public class NotificacioResourceEntity
 		referencedColumnName = "id",
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "organ_gestor_fk"),
 		nullable = false)
-	protected OrganGestorResourceEntity organGestor;
+	private OrganGestorResourceEntity organGestor;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(
 		name = "procediment_id",
 		referencedColumnName = "id",
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "procediment_not_fk"),
 		nullable = false)
-	protected ProcSerEntity procediment;
+	private ProcedimentResourceEntity procediment;
+
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(
+		name = "document_id",
+		referencedColumnName = "id",
+		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "document_notificacio_fk"),
+		nullable = false)
+	@org.hibernate.annotations.Index(name = BaseConfig.DB_PREFIX + "notif_document_id_index")
+	private DocumentResourceEntity document;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(
+		name = "document2_id",
+		referencedColumnName = "id",
+		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "document2_notificacio_fk"))
+	protected DocumentResourceEntity document2;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(
+		name = "document3_id",
+		referencedColumnName = "id",
+		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "document3_notificacio_fk"))
+	protected DocumentResourceEntity document3;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(
+		name = "document4_id",
+		referencedColumnName = "id",
+		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "document4_notificacio_fk"))
+	protected DocumentResourceEntity document4;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(
+		name = "document5_id",
+		referencedColumnName = "id",
+		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "document5_notificacio_fk"))
+	protected DocumentResourceEntity document5;
 
 	@Builder
 	public NotificacioResourceEntity(
 		NotificacioResource resource,
 		EntitatResourceEntity entitat,
 		OrganGestorResourceEntity organGestor,
-		ProcSerEntity procediment) {
+		ProcedimentResourceEntity procediment) {
 		this.enviamentDataProgramada = resource.getEnviamentDataProgramada();
 		this.concepte = resource.getConcepte();
 		this.descripcio = resource.getDescripcio();
