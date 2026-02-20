@@ -8,6 +8,8 @@ import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.model.FileReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
+import es.caib.notib.logic.intf.base.validation.CustomValidation;
+import es.caib.notib.logic.intf.model.validator.DocumentSourceRequiredFields;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -31,6 +33,9 @@ import javax.validation.constraints.Size;
 		grantedPermissions = {PermissionEnum.READ, PermissionEnum.CREATE}
 	)
 )
+@CustomValidation.List({
+	@CustomValidation(customValidatorType = DocumentSourceRequiredFields.class)
+})
 public class DocumentResource extends BaseResource<Long> {
 
 	@Size(max = 256)

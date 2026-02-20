@@ -482,6 +482,7 @@ export const Form: React.FC<FormProps> = (props) => {
                 payload: revertData,
             });
             setModified(false);
+            setApiFieldErrors(undefined);
         };
         if (unconfirmed) {
             revertFn();

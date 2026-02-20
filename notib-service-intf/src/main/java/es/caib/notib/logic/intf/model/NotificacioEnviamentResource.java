@@ -7,13 +7,16 @@ import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
+import es.caib.notib.logic.intf.base.validation.CustomValidation;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
+import es.caib.notib.logic.intf.model.validator.TitularIncapacitatObligatoriRepresentant;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
@@ -34,6 +37,11 @@ import java.util.List;
 		grantedPermissions = { PermissionEnum.READ, PermissionEnum.CREATE }
 	)
 )
+@CustomValidation.List({
+	@CustomValidation(
+		customValidatorType = TitularIncapacitatObligatoriRepresentant.class,
+		message="{es.caib.notib.validation.TitularIncapacitatObligatoriRepresentant.message}")
+})
 public class NotificacioEnviamentResource extends BaseResource<Long> {
 
 	@NotNull
@@ -130,7 +138,10 @@ public class NotificacioEnviamentResource extends BaseResource<Long> {
 	/*
 	 * Camps per a que el front pugui enviar la informació necessària per a crear la notificació.
 	 */
+	@Valid
+	@NotNull
 	private PersonaResource titularInfo;
+	@Valid
 	private List<PersonaResource> representantsInfo;
 
 }

@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
+import Alert from '@mui/material/Alert';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Icon from '@mui/material/Icon';
@@ -84,11 +85,26 @@ const NotificacioFormEnviamentPersonaFormContent: React.FC<{ interessat?: boolea
     );
 };
 
-const NotificacioFormEnviamentPersona: React.FC<{ indexKey?: number; interessat?: boolean }> = (
-    props
-) => {
-    const { indexKey, interessat } = props;
-    const { data: parentFormData, apiRef: parentFormApiRef } = useFormContext();
+const NotificacioFormEnviamentPersona: React.FC<{
+    index?: number;
+    indexKey?: number;
+    interessat?: boolean;
+}> = (props) => {
+    const { index, indexKey, interessat } = props;
+    const [currentPersonaFieldValidationErrors, setCurrentPersonaFieldValidationErrors] =
+        React.useState<any[]>();
+    const {
+        data: parentFormData,
+        fieldErrors: parentFieldErrors,
+        apiRef: parentFormApiRef,
+    } = useFormContext();
+    React.useEffect(() => {
+        const errorPrefix = interessat ? 'titularInfo' : 'representantsInfo[' + index + ']';
+        const currentPersonaFieldValidationErrors = parentFieldErrors
+            ?.filter((e) => e.field.startsWith(errorPrefix))
+            .map((e) => ({ ...e, field: e.field.substring(errorPrefix.length + 1) }));
+        setCurrentPersonaFieldValidationErrors(currentPersonaFieldValidationErrors);
+    }, [parentFieldErrors]);
     const handleDataChange = (data: any) => {
         if (interessat) {
             parentFormApiRef.current?.setFieldValue('titularInfo', data);
@@ -108,6 +124,7 @@ const NotificacioFormEnviamentPersona: React.FC<{ indexKey?: number; interessat?
         <MuiForm
             resourceName="personaResource"
             onDataChange={handleDataChange}
+            validationErrors={currentPersonaFieldValidationErrors}
             initOnChangeRequest
             hiddenToolbar
             commonFieldComponentProps={{ size: 'small' }}
@@ -126,43 +143,38 @@ const NotificacioFormEnviament: React.FC<{
     const { index, indexKey, handleRemove } = props;
     const { t } = useTranslation();
     const [ambRepresentant, setAmbRepresentant] = React.useState<boolean>(false);
-    const { data: parentFormData, apiRef: parentFormApiRef } = useFormContext();
+    const [currentEnviamentFieldValidationErrors, setCurrentEnviamentFieldValidationErrors] =
+        React.useState<any[]>();
+    const [currentEnviamentGlobalValidationErrors, setCurrentEnviamentGlobalValidationErrors] =
+        React.useState<any[]>();
+    const {
+        data: parentFormData,
+        fieldErrors: parentFieldErrors,
+        apiRef: parentFormApiRef,
+    } = useFormContext();
+    React.useEffect(() => {
+        const errorPrefix = 'enviamentsInfo[' + index + ']';
+        const currentEnviamentFieldValidationErrors = parentFieldErrors
+            ?.filter((e) => e.field.startsWith(errorPrefix) && e.field !== errorPrefix)
+            .map((e) => ({ ...e, field: e.field.substring(errorPrefix.length + 1) }));
+        setCurrentEnviamentFieldValidationErrors(currentEnviamentFieldValidationErrors);
+        const currentEnviamentGlobalValidationErrors = parentFieldErrors
+            ?.filter((e) => e.field === errorPrefix)
+            .map((e) => ({ ...e, field: e.field.substring(errorPrefix.length + 1) }));
+        setCurrentEnviamentGlobalValidationErrors(currentEnviamentGlobalValidationErrors);
+    }, [parentFieldErrors]);
     const handleDataChange = (data: any) => {
         const enviamentsWithData = parentFormData?.enviamentsInfo?.map((e: any) =>
             e.id === indexKey ? { id: indexKey, ...data } : e
         );
         parentFormApiRef.current?.setFieldValue('enviamentsInfo', enviamentsWithData);
     };
-    const formContent = React.useMemo(
-        () => (
-            <Grid container>
-                <Grid size={12}>
-                    <FormField name="serveiTipus" />
-                </Grid>
-                <Grid size={12} sx={{ mt: 1 }}>
-                    <NotificacioFormEnviamentPersona interessat />
-                    {ambRepresentant && <NotificacioFormEnviamentPersona indexKey={indexKey} />}
-                    <Button
-                        variant="contained"
-                        startIcon={<Icon>{ambRepresentant ? 'remove' : 'add'}</Icon>}
-                        onClick={() => setAmbRepresentant((r) => !r)}
-                        size="small"
-                    >
-                        {ambRepresentant
-                            ? t('page.notificacio.form.interessats.remove')
-                            : t('page.notificacio.form.interessats.add')}
-                    </Button>
-                </Grid>
-            </Grid>
-        ),
-        [ambRepresentant]
-    );
     return (
         <Paper sx={{ px: 2, py: 1, mb: 2 }}>
             <Grid container spacing={2}>
                 <Grid size={10}>
                     <Typography variant="h6">
-                        {t('page.notificacio.form.enviaments.title')} {index}
+                        {t('page.notificacio.form.enviaments.title')} {index + 1}
                     </Typography>
                 </Grid>
                 <Grid size={2} sx={{ textAlign: 'right' }}>
@@ -172,15 +184,51 @@ const NotificacioFormEnviament: React.FC<{
                         </Icon>
                     </IconButton>
                 </Grid>
+                {currentEnviamentGlobalValidationErrors?.length ? (
+                    <Grid size={12}>
+                        <Alert severity="error">
+                            {currentEnviamentGlobalValidationErrors.map((e, i) => (
+                                <React.Fragment key={i}>
+                                    {e.message}
+                                    <br />
+                                </React.Fragment>
+                            ))}
+                        </Alert>
+                    </Grid>
+                ) : null}
                 <Grid size={12}>
                     <MuiForm
                         resourceName="notificacioEnviamentResource"
                         onDataChange={handleDataChange}
+                        validationErrors={currentEnviamentFieldValidationErrors}
                         hiddenToolbar
                         componentProps={{ sx: { mb: 2 } }}
                         commonFieldComponentProps={{ size: 'small' }}
                     >
-                        {formContent}
+                        <Grid container>
+                            <Grid size={12}>
+                                <FormField name="serveiTipus" />
+                            </Grid>
+                            <Grid size={12} sx={{ mt: 1 }}>
+                                <NotificacioFormEnviamentPersona interessat />
+                                {ambRepresentant && (
+                                    <NotificacioFormEnviamentPersona
+                                        index={0}
+                                        indexKey={indexKey}
+                                    />
+                                )}
+                                <Button
+                                    variant="contained"
+                                    startIcon={<Icon>{ambRepresentant ? 'remove' : 'add'}</Icon>}
+                                    onClick={() => setAmbRepresentant((r) => !r)}
+                                    size="small"
+                                >
+                                    {ambRepresentant
+                                        ? t('page.notificacio.form.interessats.remove')
+                                        : t('page.notificacio.form.interessats.add')}
+                                </Button>
+                            </Grid>
+                        </Grid>
                     </MuiForm>
                 </Grid>
             </Grid>
@@ -218,7 +266,7 @@ const NotificacioFormEnviaments: React.FC = () => {
             {enviamentsInfo?.map((e: any, i: number) => (
                 <NotificacioFormEnviament
                     key={e.id}
-                    index={i + 1}
+                    index={i}
                     indexKey={e.id}
                     handleRemove={handleRemoveClick}
                 />

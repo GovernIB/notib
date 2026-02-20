@@ -34,6 +34,8 @@ const NotificacioFormDocumentContent: React.FC = () => {
                                   }
                                 : undefined
                         }
+                        accept={data.source === 'ATTACHED' ? '.zip,.pdf' : undefined}
+                        required
                     />
                 )}
             </Grid>
@@ -68,7 +70,20 @@ const NotificacioFormDocument: React.FC<{
 }> = (props) => {
     const { index, indexKey, handleRemove } = props;
     const { t } = useTranslation();
-    const { data: parentFormData, apiRef: parentFormApiRef } = useFormContext();
+    const [currentDocumentFieldValidationErrors, setCurrentDocumentFieldValidationErrors] =
+        React.useState<any[]>();
+    const {
+        data: parentFormData,
+        fieldErrors: parentFieldErrors,
+        apiRef: parentFormApiRef,
+    } = useFormContext();
+    React.useEffect(() => {
+        const errorPrefix = 'documentsInfo[' + index + ']';
+        const currentDocumentFieldValidationErrors = parentFieldErrors
+            ?.filter((e) => e.field.startsWith(errorPrefix))
+            .map((e) => ({ ...e, field: e.field.substring(errorPrefix.length + 1) }));
+        setCurrentDocumentFieldValidationErrors(currentDocumentFieldValidationErrors);
+    }, [parentFieldErrors]);
     const handleDataChange = (data: any) => {
         const documentsWithData = parentFormData?.documentsInfo?.map((e: any) =>
             e.id === indexKey ? { id: indexKey, ...data } : e
@@ -80,7 +95,7 @@ const NotificacioFormDocument: React.FC<{
             <Grid container spacing={2}>
                 <Grid size={10}>
                     <Typography variant="h6">
-                        {t('page.notificacio.form.documents.title')} {index}
+                        {t('page.notificacio.form.documents.title')} {index + 1}
                     </Typography>
                 </Grid>
                 <Grid size={2} sx={{ textAlign: 'right' }}>
@@ -94,6 +109,7 @@ const NotificacioFormDocument: React.FC<{
                     <MuiForm
                         resourceName="documentResource"
                         onDataChange={handleDataChange}
+                        validationErrors={currentDocumentFieldValidationErrors}
                         hiddenToolbar
                         componentProps={{ sx: { mb: 2 } }}
                         commonFieldComponentProps={{ size: 'small' }}
@@ -136,7 +152,7 @@ const NotificacioFormDocuments: React.FC = () => {
             {documentsInfo?.map((e: any, i: number) => (
                 <NotificacioFormDocument
                     key={e.id}
-                    index={i + 1}
+                    index={i}
                     indexKey={e.id}
                     handleRemove={handleRemoveClick}
                 />

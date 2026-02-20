@@ -9,9 +9,12 @@ import {
     useFilterApiRef,
     MuiFilter,
     FilterApi,
+    useMuiDataGridApiRef,
+    MuiDataGridApiRef,
 } from 'reactlib';
 import GridFormField from '../../components/GridFormField';
-import { Icon, IconButton } from '@mui/material';
+import { Box, Icon, IconButton } from '@mui/material';
+import GridToolbarButton from '../../components/GridToolbarButton';
 
 const columns = [
     {
@@ -69,26 +72,36 @@ const EntitatFormTabAplicacionsFormContent: React.FC = () => {
     );
 };
 
-const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (props) => {
-    const { filterApiRef } = props;
+const ContentFilter: React.FC<{
+    filterApiRef: React.RefObject<FilterApi>;
+    gridApiRef: MuiDataGridApiRef;
+}> = (props) => {
+    const { filterApiRef, gridApiRef } = props;
     const { t } = useTranslation();
 
     const handleButtonClick = () => {
         filterApiRef.current.clear();
     };
+
     return (
         <Grid container spacing={2}>
             <GridFormField size={2} name="usuariCodi" />
             <GridFormField size={7.5} name="callbackUrl" />
-            <GridFormField size={1.5} name="activa" />
-            <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
-                <Icon>filter_alt_off</Icon>
-            </IconButton>
+            <GridFormField size={1} name="activa" />
+            <Grid size={1.5}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
+                        <Icon>filter_alt_off</Icon>
+                    </IconButton>
+                    <GridToolbarButton gridApiRef={gridApiRef} />
+                </Box>
+            </Grid>
         </Grid>
     );
 };
 
-const EntitatFormTabAplicacionsFilter: React.FC = () => {
+const EntitatFormTabAplicacionsFilter: React.FC<{ gridApiRef: MuiDataGridApiRef }> = (props) => {
+    const { gridApiRef } = props;
     const filterApiRef = useFilterApiRef();
 
     const springFilterBuilder = (data: any) => {
@@ -105,10 +118,10 @@ const EntitatFormTabAplicacionsFilter: React.FC = () => {
             code="FILTER_APLICACIO"
             apiRef={filterApiRef}
             springFilterBuilder={springFilterBuilder}
-            // componentProps={{ sx: { mb: 2, mt: 0 } }}
+            componentProps={{ sx: { mb: 2, mt: 0 } }}
             commonFieldComponentProps={{ size: 'small' }}
         >
-            <ContentFilter filterApiRef={filterApiRef} />
+            <ContentFilter filterApiRef={filterApiRef} gridApiRef={gridApiRef} />
         </MuiFilter>
     );
 };
@@ -116,11 +129,13 @@ const EntitatFormTabAplicacionsFilter: React.FC = () => {
 const EntitatFormTabAplicacions: React.FC = () => {
     const { t } = useTranslation();
     const { id, apiRef: formApiRef } = useFormContext();
+    const gridApiRef = useMuiDataGridApiRef();
     const handleDataGridRowChanges = () => {
         formApiRef.current?.refresh();
     };
     return (
         <MuiDataGrid
+            apiRef={gridApiRef}
             title=""
             resourceName="aplicacioResource"
             staticFilter={'entitat.id:' + id}
@@ -128,13 +143,8 @@ const EntitatFormTabAplicacions: React.FC = () => {
             columns={columns}
             paginationActive
             toolbarHideQuickFilter
-            toolbarElementsWithPositions={[
-                {
-                    position: 0,
-                    element: <EntitatFormTabAplicacionsFilter />
-                }
-            ]}
-            // toolbarAdditionalRow={<EntitatFormTabAplicacionsFilter />}
+            toolbarHide
+            toolbarAdditionalRow={<EntitatFormTabAplicacionsFilter gridApiRef={gridApiRef} />}
             popupEditActive
             popupEditFormDialogResourceTitle={t('page.entitats.form.resourceNames.aplicacio')}
             popupEditFormContent={<EntitatFormTabAplicacionsFormContent />}

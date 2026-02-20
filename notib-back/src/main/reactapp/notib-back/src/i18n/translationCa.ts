@@ -244,6 +244,12 @@ const translationCa = {
         notificacio: {
             grid: {
                 title: 'Notificacions',
+                new: {
+                    title: 'Nou enviament',
+                    NOTIFICACIO: 'Notificació',
+                    COMUNICACIO: 'Comunicació',
+                    SIR: 'Comunicació SIR',
+                },
             },
             form: {
                 titleCreate: 'Crear notificació',
@@ -267,7 +273,7 @@ const translationCa = {
                         FISICA: 'NIF/NIE/identificador EIDAS',
                         JURIDICA: 'CIF/identificador EIDAS',
                         ADMINISTRACIO: 'NIF',
-                        FISICA_SENSE_NIF: 'Tipus de document',
+                        FISICA_SENSE_NIF: 'Número de document',
                     },
                 },
                 documents: {
@@ -325,6 +331,10 @@ const translationCa = {
                 user: 'Usuari',
                 role: 'Rol',
             },
+        },
+        GridToolbarButton: {
+            add: 'Afegir',
+            refresh: 'Refrescar',
         },
     },
 };

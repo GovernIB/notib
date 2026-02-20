@@ -142,9 +142,6 @@ public class NotificacioResourceEntity
 		EntitatResourceEntity entitat,
 		OrganGestorResourceEntity organGestor,
 		ProcSerEntity procediment) {
-		this.usuariCodi = resource.getUsuariCodi();
-		this.emisorDir3Codi = resource.getEmisorDir3Codi();
-		this.comunicacioTipus = resource.getComunicacioTipus();
 		this.enviamentDataProgramada = resource.getEnviamentDataProgramada();
 		this.concepte = resource.getConcepte();
 		this.descripcio = resource.getDescripcio();
@@ -162,7 +159,7 @@ public class NotificacioResourceEntity
 		this.notificaEnviamentIntent = resource.getNotificaEnviamentIntent();
 		this.registreEnviamentIntent = resource.getRegistreEnviamentIntent();
 		this.registreNumero = resource.getRegistreNumero();
-		this.registreNumeroFormatat = resource.getUsuariCodi();
+		this.registreNumeroFormatat = resource.getRegistreNumeroFormatat();
 		this.registreData = resource.getRegistreData();
 		this.numExpedient = resource.getNumExpedient();
 		this.registreOficinaNom = resource.getRegistreOficinaNom();
