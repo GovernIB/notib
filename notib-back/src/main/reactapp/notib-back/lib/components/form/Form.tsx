@@ -716,7 +716,11 @@ export const Form: React.FC<FormProps> = (props) => {
     React.useEffect(() => {
         if (useBlocker != null && modified) {
             const handleBeforeUnload = (e: Event) => {
+                console.log('>>> ');
                 if (modified) {
+                    // Vols sortir del lloc web?
+                    //És possible que els canvis que heu fet no es desin.
+                    alert('Estas segur que vols sortir sense guardar els canvis?');
                     e.preventDefault();
                 }
             };
@@ -726,7 +730,19 @@ export const Form: React.FC<FormProps> = (props) => {
             };
         }
     }, [modified]);
-    useBlocker?.(modified);
+    useBlocker?.((tx) => {
+        if (isDirty) {
+            const confirmLeave = window.confirm(
+                'Vols sortir del lloc web? És possible que els canvis que heu fet no es desin.'
+            );
+            if (confirmLeave) {
+                tx.retry(); // permet la navegació
+            }
+            // si no, no fem res → bloqueja la navegació
+        } else {
+            tx.retry(); // permet navegació si no hi ha canvis
+        }
+    }, isDirty); // només bloqueja si isDirty és true
     apiRef.current = {
         getData,
         refresh: () => refresh(true),
