@@ -88,6 +88,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.validation.BindException;
 
 import javax.jws.WebService;
@@ -427,6 +429,22 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			}
 			log.debug(">> [ALTA] enviaments creats");
 			notificacioGuardada = notificacioRepository.saveAndFlush(notificacioGuardada);
+			notificacioEntity.getEnviaments().forEach(e -> {
+				var referenciaEnviament = e.getNotificaReferencia();
+				if (TransactionSynchronizationManager.isActualTransactionActive()) {
+					TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+						@Override
+						public void afterCommit() {
+							enviamentSmService.acquireStateMachine(referenciaEnviament);
+							enviamentSmService.altaEnviament(referenciaEnviament);
+						}
+					});
+					return;
+				}
+				log.warn(">> [ALTA] Alta d'enviament REST " + referenciaEnviament + " sense transaccio activa");
+				enviamentSmService.acquireStateMachine(referenciaEnviament);
+				enviamentSmService.altaEnviament(referenciaEnviament);
+			});
 			var respostaAlta = generaResposta(/*info,*/ notificacioGuardada, referencies, avisos);
 			SubsistemesHelper.addSuccessOperation(ARE, System.currentTimeMillis() - start);
 			return respostaAlta;
@@ -1295,7 +1313,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 						titular,
 						destinataris,
 						UUID.randomUUID().toString()).build());
-		enviamentSmService.acquireStateMachine(enviamentSaved.getUuid());
+//		enviamentSmService.acquireStateMachine(enviamentSaved.getUuid());
 		enviamentTableHelper.crearRegistre(enviamentSaved);
 		auditHelper.auditaEnviament(enviamentSaved, AuditService.TipusOperacio.CREATE, "NotificacioServiceWsImplV2.altaV2");
 		log.debug(">> [ALTA] enviament creat");
