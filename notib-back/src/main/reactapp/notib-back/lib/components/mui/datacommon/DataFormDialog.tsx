@@ -21,6 +21,16 @@ export type DataFormDialogProps = React.PropsWithChildren & {
     onClose?: (reason?: string) => boolean;
 };
 
+/**
+ * Hook per a accedir a l'API de MuiDataFormDialog des de fora del context del component.
+ *
+ * @returns referència a l'API del component MuiDataFormDialog.
+ */
+export const useMuiDataFormDialogApiRef: () => React.RefObject<DataFormDialogApi> = () => {
+    const gridApiRef = React.useRef<DataFormDialogApi | any>({});
+    return gridApiRef;
+};
+
 export const DataFormDialog: React.FC<DataFormDialogProps> = (props) => {
     const {
         resourceName,
