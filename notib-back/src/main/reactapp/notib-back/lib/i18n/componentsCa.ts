@@ -41,7 +41,7 @@ const componentsCa = {
                 confirm:
                     'Estau segur que voleu esborrar els {{count}} elements seleccionats (aquesta acció no es pot desfer)?',
                 success: '{{count}} elements esborrats',
-                error: 'No s\'han pogut esborrar {{count}} elements',
+                error: "No s'han pogut esborrar {{count}} elements",
             },
         },
         export: {
@@ -63,7 +63,7 @@ const componentsCa = {
         },
         edit: {
             save: 'Desar',
-            cancel: 'Cancel·lar'
+            cancel: 'Cancel·lar',
         },
         pageInfo: '{{from}} a {{to}} de {{count}}',
         sizeAuto: 'Automàtic',
@@ -125,6 +125,8 @@ const componentsCa = {
             error: 'Error de validació',
             saveErrors: 'Hi ha errors de validació',
         },
+        blocker:
+            "Està segur de que vol sortir d'aquest formulari? És possible que es perdin els canvis que heu fet.",
     },
     actionreport: {
         action: {

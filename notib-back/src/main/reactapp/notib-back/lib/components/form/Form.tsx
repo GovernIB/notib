@@ -713,36 +713,13 @@ export const Form: React.FC<FormProps> = (props) => {
             validateWithValidator(data);
         }
     }, [isReady, data]);
-    React.useEffect(() => {
-        if (useBlocker != null && modified) {
-            const handleBeforeUnload = (e: Event) => {
-                console.log('>>> ');
-                if (modified) {
-                    // Vols sortir del lloc web?
-                    //És possible que els canvis que heu fet no es desin.
-                    alert('Estas segur que vols sortir sense guardar els canvis?');
-                    e.preventDefault();
-                }
-            };
-            window.addEventListener('beforeunload', handleBeforeUnload);
-            return () => {
-                window.removeEventListener('beforeunload', handleBeforeUnload);
-            };
-        }
-    }, [modified]);
-    useBlocker?.((tx) => {
-        if (isDirty) {
-            const confirmLeave = window.confirm(
-                'Vols sortir del lloc web? És possible que els canvis que heu fet no es desin.'
-            );
-            if (confirmLeave) {
-                tx.retry(); // permet la navegació
-            }
-            // si no, no fem res → bloqueja la navegació
+    useBlocker?.(() => {
+        if (modified) {
+            return !confirm(t('form.blocker'));
         } else {
-            tx.retry(); // permet navegació si no hi ha canvis
+            return false;
         }
-    }, isDirty); // només bloqueja si isDirty és true
+    });
     apiRef.current = {
         getData,
         refresh: () => refresh(true),

@@ -62,7 +62,7 @@ const componentsEn = {
         },
         edit: {
             save: 'Save',
-            cancel: 'Cancel'
+            cancel: 'Cancel',
         },
         pageInfo: '{{from}} to {{to}} of {{count}}',
         sizeAuto: 'Automatic',
@@ -122,6 +122,7 @@ const componentsEn = {
             error: 'Validation error',
             saveErrors: 'There are validation errors',
         },
+        blocker: "Are you sure you want to exit this form? You may lose the changes you've made.",
     },
     actionreport: {
         action: {

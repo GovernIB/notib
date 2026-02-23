@@ -44,7 +44,7 @@ export type BaseAppContextType = {
     getLinkComponent: () => any;
     goBack: (fallback?: string) => void;
     navigate: RouterNavigateFunction;
-    useBlocker: ((shouldBlock: boolean) => void) | undefined;
+    useBlocker: ((shouldBlock: boolean | ((args: any) => boolean)) => void) | undefined;
     useLocationPath: () => string;
     anyHistoryEntryExist: () => boolean;
     setMessageDialogShow: (fn: MessageDialogShowFn) => void;
