@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 /**
  * Implementació del servei d'avaluació de permisos.
- * 
+ *
  * @author Límit Tecnologies
  */
 @Slf4j

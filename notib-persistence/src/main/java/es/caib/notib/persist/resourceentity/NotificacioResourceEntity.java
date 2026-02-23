@@ -120,14 +120,14 @@ public class NotificacioResourceEntity
 		nullable = false)
 	private EntitatResourceEntity entitat;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(
 		name = "organ_gestor",
 		referencedColumnName = "id",
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "organ_gestor_fk"),
 		nullable = false)
 	private OrganGestorResourceEntity organGestor;
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(
 		name = "procediment_id",
 		referencedColumnName = "id",

@@ -404,7 +404,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	@Override
 	@GetMapping(value = "/artifacts/{type}/{code}/fields/{fieldName}/enumOptions")
 	@Operation(operationId = "artifactFieldEnumOptionsFind", summary = "Consulta les opcions disponibles per a emplenar un camp enumerat que pertany al formulari d'un artefacte.")
-	@PreAuthorize("!this.forbiddenArtifactLogic() and (this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('OPTIONS')))")
+	@PreAuthorize("!this.forbiddenArtifactLogic() and (this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('ARTIFACT')))")
 	public ResponseEntity<CollectionModel<EntityModel<FieldOption>>> artifactFieldEnumOptionsFind(
 			@PathVariable
 			@Parameter(description = "Tipus de l'artefacte")
@@ -442,7 +442,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	@Override
 	@GetMapping(value = "/artifacts/{type}/{code}/fields/{fieldName}/enumOptions/{value}")
 	@Operation(operationId = "artifactFieldEnumOptionsGetOne", summary = "Consulta una de les opcions disponibles per a emplenar un camp enumerat que pertany al formulari d'un artefacte.")
-	@PreAuthorize("!this.forbiddenArtifactLogic() and (this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('OPTIONS')))")
+	@PreAuthorize("!this.forbiddenArtifactLogic() and (this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('ARTIFACT')))")
 	public ResponseEntity<EntityModel<FieldOption>> artifactFieldEnumOptionsGetOne(
 			@PathVariable
 			@Parameter(description = "Tipus de l'artefacte")

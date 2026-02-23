@@ -7,7 +7,101 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Icon from '@mui/material/Icon';
 import IconButton from '@mui/material/IconButton';
-import { MuiForm, FormField, useFormContext } from 'reactlib';
+import {
+    MuiForm,
+    FormField,
+    useFormContext,
+    MuiDataGridDialog,
+    useMuiDataGridDialogApiRef,
+    MuiFilter,
+} from 'reactlib';
+
+const dir3DialogColumns = [
+    {
+        field: 'codi',
+        flex: 1,
+    },
+    {
+        field: 'denominacio',
+        flex: 4,
+    },
+    {
+        field: 'sir',
+        flex: 1,
+    },
+];
+
+const Dir3SearchFilter: React.FC = () => {
+    const springFilterBuilder = (data: any) => {
+        return '';
+    };
+    return (
+        <MuiFilter
+            resourceName="dir3Resource"
+            code="FILTER_DIR3"
+            springFilterBuilder={springFilterBuilder}
+            commonFieldComponentProps={{ size: 'small' }}
+            componentProps={{ sx: { mb: 2 } }}
+        >
+            <Grid container spacing={2}>
+                <Grid size={6}>
+                    <FormField name="codi" />
+                </Grid>
+                <Grid size={6}>
+                    <FormField name="denominacio" />
+                </Grid>
+                <Grid size={6}>
+                    <FormField name="nivellAdministracio" />
+                </Grid>
+                <Grid size={6}>
+                    <FormField name="comunitatAutonoma" />
+                </Grid>
+                <Grid size={6}>
+                    <FormField name="provincia" />
+                </Grid>
+                <Grid size={6}>
+                    <FormField name="municipi" />
+                </Grid>
+            </Grid>
+        </MuiFilter>
+    );
+};
+
+const Dir3SearchInput: React.FC<{ name: string }> = (props) => {
+    const { name } = props;
+    const gridDialogApiRef = useMuiDataGridDialogApiRef();
+    return (
+        <>
+            <Grid container spacing={2}>
+                <Grid size={11}>
+                    <FormField name={name} disabled />
+                </Grid>
+                <Grid size={1}>
+                    <Button
+                        variant="outlined"
+                        startIcon={<Icon>search</Icon>}
+                        fullWidth
+                        onClick={() => gridDialogApiRef.current.show()}
+                    >
+                        Cercar
+                    </Button>
+                </Grid>
+            </Grid>
+            <MuiDataGridDialog
+                resourceName="dir3Resource"
+                title="Consulta d'administracions públiques a DIR3"
+                columns={dir3DialogColumns}
+                dataGridComponentProps={{
+                    findDisabled: true,
+                    toolbarHide: true,
+                    toolbarAdditionalRow: <Dir3SearchFilter />,
+                }}
+                dialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
+                apiRef={gridDialogApiRef}
+            />
+        </>
+    );
+};
 
 const NotificacioFormEnviamentPersonaFormContent: React.FC<{ interessat?: boolean }> = (props) => {
     const { interessat } = props;
@@ -205,29 +299,38 @@ const NotificacioFormEnviament: React.FC<{
                         componentProps={{ sx: { mb: 2 } }}
                         commonFieldComponentProps={{ size: 'small' }}
                     >
-                        <Grid container>
+                        <Grid container spacing={2}>
                             <Grid size={12}>
                                 <FormField name="serveiTipus" />
                             </Grid>
-                            <Grid size={12} sx={{ mt: 1 }}>
-                                <NotificacioFormEnviamentPersona interessat />
-                                {ambRepresentant && (
-                                    <NotificacioFormEnviamentPersona
-                                        index={0}
-                                        indexKey={indexKey}
-                                    />
-                                )}
-                                <Button
-                                    variant="contained"
-                                    startIcon={<Icon>{ambRepresentant ? 'remove' : 'add'}</Icon>}
-                                    onClick={() => setAmbRepresentant((r) => !r)}
-                                    size="small"
-                                >
-                                    {ambRepresentant
-                                        ? t('page.notificacio.form.interessats.remove')
-                                        : t('page.notificacio.form.interessats.add')}
-                                </Button>
-                            </Grid>
+                            {parentFormData?.enviamentTipus === 'SIR' && (
+                                <Grid size={12}>
+                                    <Dir3SearchInput name="sirTitularDir3Codi" />
+                                </Grid>
+                            )}
+                            {parentFormData?.enviamentTipus !== 'SIR' && (
+                                <Grid size={12} sx={{ mt: 1 }}>
+                                    <NotificacioFormEnviamentPersona interessat />
+                                    {ambRepresentant && (
+                                        <NotificacioFormEnviamentPersona
+                                            index={0}
+                                            indexKey={indexKey}
+                                        />
+                                    )}
+                                    <Button
+                                        variant="contained"
+                                        startIcon={
+                                            <Icon>{ambRepresentant ? 'remove' : 'add'}</Icon>
+                                        }
+                                        onClick={() => setAmbRepresentant((r) => !r)}
+                                        size="small"
+                                    >
+                                        {ambRepresentant
+                                            ? t('page.notificacio.form.interessats.remove')
+                                            : t('page.notificacio.form.interessats.add')}
+                                    </Button>
+                                </Grid>
+                            )}
                         </Grid>
                     </MuiForm>
                 </Grid>
@@ -271,14 +374,16 @@ const NotificacioFormEnviaments: React.FC = () => {
                     handleRemove={handleRemoveClick}
                 />
             ))}
-            <Button
-                variant="contained"
-                startIcon={<Icon>add</Icon>}
-                onClick={handleAddClick}
-                size="small"
-            >
-                {t('page.notificacio.form.enviaments.add')}
-            </Button>
+            {data?.enviamentTipus !== 'SIR' && (
+                <Button
+                    variant="contained"
+                    startIcon={<Icon>add</Icon>}
+                    onClick={handleAddClick}
+                    size="small"
+                >
+                    {t('page.notificacio.form.enviaments.add')}
+                </Button>
+            )}
         </>
     );
 };

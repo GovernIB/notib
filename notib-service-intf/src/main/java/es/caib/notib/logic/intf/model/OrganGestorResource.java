@@ -49,17 +49,17 @@ import java.io.Serializable;
 	accessConstraints = {
 		@ResourceAccessConstraint(
 			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-			roles = { BaseConfig.ROLE_ADMIN},
+			roles = { BaseConfig.ROLE_ADMIN },
 			grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
 		),
 		@ResourceAccessConstraint(
 			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-			roles = { BaseConfig.ROLE_ADMIN_LECTURA},
+			roles = { BaseConfig.ROLE_ADMIN_LECTURA },
 			grantedPermissions = { PermissionEnum.READ }
 		),
 		@ResourceAccessConstraint(
 			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-			roles = { BaseConfig.ROLE_ORGAN},
+			roles = { BaseConfig.ROLE_ORGAN },
 			grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE }
 		)
 	}
@@ -97,6 +97,7 @@ public class OrganGestorResource extends BaseResource<Long> {
 
 	// Camps calculats
 	private String codiNom;
+	private String nomPare;
 	private Integer aclEntryCount;
 
 	@Getter

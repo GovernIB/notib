@@ -21,6 +21,16 @@ export type DataGridDialogProps = {
     apiRef?: React.RefObject<DataGridDialogApi | undefined>;
 };
 
+/**
+ * Hook per a accedir a l'API de MuiDataGridDialog des de fora del context del component.
+ *
+ * @returns referència a l'API del component MuiDataGridDialog.
+ */
+export const useMuiDataGridDialogApiRef: () => React.RefObject<DataGridDialogApi> = () => {
+    const gridApiRef = React.useRef<DataGridDialogApi | any>({});
+    return gridApiRef;
+};
+
 export const DataGridDialog: React.FC<DataGridDialogProps> = (props) => {
     const {
         resourceName,

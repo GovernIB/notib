@@ -115,6 +115,7 @@ public class NotificacioEnviamentResource extends BaseResource<Long> {
 	private Date registreData;
 	private NotificacioRegistreEstatEnumDto registreEstat;
 	private boolean registreEstatFinal;
+	private String sirTitularDir3Codi;
 	private Date sirConsultaData;
 	private int sirConsultaIntent;
 	private boolean sirFiPooling;

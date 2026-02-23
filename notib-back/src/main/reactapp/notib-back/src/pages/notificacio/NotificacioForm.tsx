@@ -5,6 +5,8 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import Icon from '@mui/material/Icon';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { FormPage, MuiForm, FormField, useFormContext } from 'reactlib';
 import NotificacioFormEnviaments from './NotificacioFormEnviaments';
 import NotificacioFormDocuments from './NotificacioFormDocuments';
@@ -16,6 +18,43 @@ const JSonButton: React.FC = () => {
             <Icon>question_mark</Icon>
         </IconButton>
     );
+};
+
+const ProcedimentServeiField: React.FC = () => {
+    const { t } = useTranslation();
+    const { data } = useFormContext();
+    const [type, setType] = React.useState<string>('procediment');
+    if (data.enviamentTipus === 'SIR') {
+        return (
+            <Grid container spacing={2}>
+                <Grid size={3}>
+                    <ToggleButtonGroup
+                        value={type}
+                        exclusive
+                        onChange={(_event, value) => setType(value)}
+                        size="small"
+                        fullWidth
+                    >
+                        <ToggleButton value="procediment">
+                            {t('page.notificacio.form.camps.procediment')}
+                        </ToggleButton>
+                        <ToggleButton value="servei">
+                            {t('page.notificacio.form.camps.servei')}
+                        </ToggleButton>
+                    </ToggleButtonGroup>
+                </Grid>
+                <Grid size={9}>
+                    <FormField
+                        name="procediment"
+                        label={t('page.notificacio.form.camps.' + type)}
+                        filter={"tipus:'" + type.toUpperCase() + "'"}
+                    />
+                </Grid>
+            </Grid>
+        );
+    } else {
+        return <FormField name="procediment" filter={"tipus:'" + type.toUpperCase + "'"} />;
+    }
 };
 
 const NotificacioFormContent: React.FC = () => {
@@ -35,7 +74,7 @@ const NotificacioFormContent: React.FC = () => {
                 <FormField name="organGestor" />
             </Grid>
             <Grid size={6}>
-                <FormField name="procediment" />
+                <ProcedimentServeiField />
             </Grid>
             <Grid size={6}>
                 <FormField name="numExpedient" debounce />
@@ -68,8 +107,8 @@ export const NotificacioForm: React.FC = () => {
                 id={id != null ? parseInt(id) : id}
                 title={
                     id != null
-                        ? t('page.notificacio.form.titleUpdate')
-                        : t('page.notificacio.form.titleCreate')
+                        ? t('page.notificacio.form.title.' + type + '.update')
+                        : t('page.notificacio.form.title.' + type + '.create')
                 }
                 initOnChangeRequest
                 additionalData={type ? { enviamentTipus: type } : undefined}

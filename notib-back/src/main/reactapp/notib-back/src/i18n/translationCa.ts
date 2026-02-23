@@ -14,7 +14,7 @@ const translationCa = {
         pagadorsPostals: 'Operadors postals',
         pagadorsCie: "Centres d'impressió i ensobrat",
         notificacions: 'Notificacions',
-        integracions: 'Integracions'
+        integracions: 'Integracions',
     },
     comu: {
         netejarFiltre: 'Netejar filtre',
@@ -252,8 +252,20 @@ const translationCa = {
                 },
             },
             form: {
-                titleCreate: 'Crear notificació',
-                titleUpdate: 'Modificar notificació',
+                title: {
+                    NOTIFICACIO: {
+                        create: 'Crear notificació',
+                        update: 'Modificar notificació',
+                    },
+                    COMUNICACIO: {
+                        create: 'Crear comunicació',
+                        update: 'Modificar comunicació',
+                    },
+                    SIR: {
+                        create: 'Crear comunicació SIR',
+                        update: 'Modificar comunicació SIR',
+                    },
+                },
                 tabs: {
                     remesa: 'Informació de la remesa',
                     enviaments: 'Enviaments',
@@ -287,12 +299,16 @@ const translationCa = {
                             "Està la primera pàgina del document preparada per l'ensobrat?",
                     },
                 },
+                camps: {
+                    procediment: 'Procediment',
+                    servei: 'Servei',
+                },
             },
         },
         integracions: {
             grid: {
-                title: "Monitor de integraciones"
-            }
+                title: 'Monitor de integraciones',
+            },
         },
         notFound: {
             title: 'Pàgina no trobada',

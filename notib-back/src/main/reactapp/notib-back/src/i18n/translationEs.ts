@@ -14,7 +14,7 @@ const translationEs = {
         pagadorsPostals: 'Operadores postales',
         pagadorsCie: 'Centros de impresión y ensobrado',
         notificacions: 'Notificaciones',
-        integracions: 'Integraciones'
+        integracions: 'Integraciones',
     },
     comu: {
         netejarFiltre: 'Limpiar filtro',
@@ -244,8 +244,20 @@ const translationEs = {
                 },
             },
             form: {
-                titleCreate: 'Crear notificación',
-                titleUpdate: 'Modificar notificación',
+                title: {
+                    NOTIFICACIO: {
+                        create: 'Crear notificación',
+                        update: 'Modificar notificación',
+                    },
+                    COMUNICACIO: {
+                        create: 'Crear comunicación',
+                        update: 'Modificar comunicación',
+                    },
+                    SIR: {
+                        create: 'Crear comunicación SIR',
+                        update: 'Modificar comunicación SIR',
+                    },
+                },
                 tabs: {
                     remesa: 'Información de la remesa',
                     enviaments: 'Envios',
@@ -283,8 +295,8 @@ const translationEs = {
         },
         integracions: {
             grid: {
-                title: "Monitor de integraciones"
-            }
+                title: 'Monitor de integraciones',
+            },
         },
         notFound: {
             title: 'Página no encontrada',

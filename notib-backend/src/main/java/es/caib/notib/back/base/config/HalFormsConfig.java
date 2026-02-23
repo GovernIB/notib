@@ -273,14 +273,10 @@ public class HalFormsConfig {
 			ResourceArtifact artifact,
 			Field resourceField,
 			Set<Class<ReadonlyResourceController>> resourceControllerClasses) {
-		Optional<Class<ReadonlyResourceController>> resourceControllerClass = resourceControllerClasses.stream().
-				filter(rc -> {
-					Class<?> controllerResourceClass = TypeUtil.getArgumentClassFromGenericSuperclass(
-							rc,
-							ReadonlyResourceController.class,
-							0);
-					return controllerResourceClass.equals(resourceClass);
-				}).findFirst();
+		Optional<Class<ReadonlyResourceController>> resourceControllerClass = findResourceControllerClass(
+			resourceClass,
+			false,
+			resourceControllerClasses);
 		if (resourceControllerClass.isPresent()) {
 			Link findLink = getFindLinkWithSelfRel(
 					resourceControllerClass.get(),
@@ -317,18 +313,10 @@ public class HalFormsConfig {
 			ResourceArtifact artifact,
 			Field resourceField,
 			Set<Class<ReadonlyResourceController>> resourceControllerClasses) {
-		Optional<Class<ReadonlyResourceController>> resourceControllerClass = resourceControllerClasses.stream().
-				filter(rc -> {
-					if (MutableResourceController.class.isAssignableFrom(rc)) {
-						Class<?> controllerResourceClass = TypeUtil.getArgumentClassFromGenericSuperclass(
-								rc,
-								MutableResourceController.class,
-								0);
-						return controllerResourceClass.equals(resourceClass);
-					} else {
-						return false;
-					}
-				}).findFirst();
+		Optional<Class<ReadonlyResourceController>> resourceControllerClass = findResourceControllerClass(
+			resourceClass,
+			artifact == null,
+			resourceControllerClasses);
 		if (resourceControllerClass.isPresent()) {
 			if (artifact == null) {
 				Class<MutableResourceController> mutableResourceControllerClass = (Class<MutableResourceController>)((Class<?>)resourceControllerClass.get());
@@ -405,6 +393,21 @@ public class HalFormsConfig {
 		} else {
 			return null;
 		}
+	}
+
+	private Optional<Class<ReadonlyResourceController>> findResourceControllerClass(
+		Class<?> resourceClass,
+		boolean mutable,
+		Set<Class<ReadonlyResourceController>> resourceControllerClasses) {
+		return resourceControllerClasses.stream().
+			filter(rc -> {
+				boolean mutableCheck = !mutable || MutableResourceController.class.isAssignableFrom(rc);
+				Class<?> controllerResourceClass = TypeUtil.getArgumentClassFromGenericSuperclass(
+					rc,
+					mutable ? MutableResourceController.class : ReadonlyResourceController.class,
+					0);
+				return mutableCheck && controllerResourceClass.equals(resourceClass);
+			}).findFirst();
 	}
 
 	private String getRemoteOptionsPromptField(Field field) {
