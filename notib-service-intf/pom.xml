@@ -158,6 +158,11 @@
 			<id>redhatGA</id>
 			<url>https://maven.repository.redhat.com/ga/</url>
 		</repository>
+		<repository>
+			<id>github_governib_maven</id>
+			<name>GitHub GovernIB Maven Repository</name>
+			<url>https://GovernIB.github.io/maven/maven/</url>
+		</repository>
 	</repositories>
 </project>
 
