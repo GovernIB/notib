@@ -12,7 +12,13 @@ import {
     useBaseAppContext,
     useResourceApiService,
     useAuthContext,
+    springFilterBuilder as filterBuilder,
+    useFilterApiRef,
+    MuiFilter,
+    FilterApi,
 } from 'reactlib';
+import GridFormField from '../../components/GridFormField';
+import { Icon, IconButton } from '@mui/material';
 
 const columns = [
     {
@@ -176,6 +182,62 @@ const OrganGridDir3SyncActionButton: React.FC = () => {
     );
 };
 
+const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (props) => {
+    const { filterApiRef } = props;
+    const { t } = useTranslation();
+
+    const handleButtonClick = () => {
+        filterApiRef.current.clear();
+    };
+
+    // TODO: Revisar es camp nomPare i entregaCieActiva/entregaCieDesactivada
+    return (
+        <Grid container spacing={2}>
+            <GridFormField size={1} name="codi" />
+            <GridFormField size={2.5} name="nom" />
+            <GridFormField size={1} name="codiPare" />
+            <GridFormField size={2.25} name="nomPare" />
+            <GridFormField size={1.5} name="llibre" />
+            <GridFormField size={1.25} name="estat" />
+            <GridFormField size={1} name="entregaCieActiva" />
+            <GridFormField size={1} name="permetreSir" />
+            <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
+                <Icon>filter_alt_off</Icon>
+            </IconButton>
+        </Grid>
+    );
+};
+
+const OrganGestorGridFilter: React.FC = () => {
+    const filterApiRef = useFilterApiRef();
+
+    const springFilterBuilder = (data: any) => {
+        return filterBuilder.and(
+            filterBuilder.like('codi', data?.codi),
+            filterBuilder.like('nom', data?.nom),
+            filterBuilder.like('codiPare', data?.codiPare), // TODO: Revisar si aquest camp funciona o no
+            filterBuilder.like('nomPare', data?.nomPare),
+            filterBuilder.like('llibre', data?.llibre),
+            filterBuilder.eq('estat', `'${data?.estat}'`),
+            filterBuilder.eq('entregaCieActiva', `'${data?.entregaCieActiva}'`), // TODO: Revisar si aquest camp funciona o no
+            filterBuilder.eq('permetreSir', `'${data?.permetreSir}'`)
+        );
+    };
+
+    return (
+        <MuiFilter
+            resourceName="organGestorResource"
+            code="FILTER_ORGAN_GESTOR"
+            apiRef={filterApiRef}
+            springFilterBuilder={springFilterBuilder}
+            componentProps={{ sx: { mb: 2, mt: 0 } }}
+            commonFieldComponentProps={{ size: 'small' }}
+        >
+            <ContentFilter filterApiRef={filterApiRef} />
+        </MuiFilter>
+    );
+};
+
 export const OrganGrid = () => {
     const { t } = useTranslation();
     return (
@@ -188,6 +250,8 @@ export const OrganGrid = () => {
                 toolbarCreateLink="form"
                 rowLink="form/{{id}}"
                 rowUpdateLink="form/{{id}}"
+                toolbarAdditionalRow={<OrganGestorGridFilter />}
+                toolbarHideQuickFilter
                 toolbarElementsWithPositions={[
                     {
                         position: 2,

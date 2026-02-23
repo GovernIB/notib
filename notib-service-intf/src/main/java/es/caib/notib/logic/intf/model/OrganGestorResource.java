@@ -40,7 +40,11 @@ import java.io.Serializable;
 				@ResourceAccessConstraint(
 					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
 					roles = { BaseConfig.ROLE_ADMIN })
-			})
+			}),
+		@ResourceArtifact(
+			type = ResourceArtifactType.FILTER,
+			code = OrganGestorResource.FILTER_CODE,
+			formClass = OrganGestorResource.OrganGestorResourceFilter.class)
 	},
 	accessConstraints = {
 		@ResourceAccessConstraint(
@@ -63,6 +67,8 @@ import java.io.Serializable;
 public class OrganGestorResource extends BaseResource<Long> {
 
 	public static final String DIR3_SYNC_ACTION_CODE = "DIR3_SYNC";
+	public static final String FILTER_CODE = "FILTER_ORGAN_GESTOR";
+
 
 	@NotEmpty
 	@Size(max = 64)
@@ -98,6 +104,20 @@ public class OrganGestorResource extends BaseResource<Long> {
 	@NoArgsConstructor
 	public static class OrganGestorDir3SyncForm implements Serializable {
 		private Boolean simular;
+	}
+
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	public static class OrganGestorResourceFilter implements Serializable {
+		private String codi;
+		private String codiPare;
+		private String nom;
+		private OrganGestorEstatEnum estat;
+		private String llibre;
+		private boolean permetreSir;
+		private boolean entregaCieDesactivada;
+		private ResourceReference<EntregaCieResource, Long> entregaCie;
 	}
 
 }
