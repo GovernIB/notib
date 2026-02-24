@@ -14,7 +14,7 @@ import NotificacioFormDocuments from './NotificacioFormDocuments';
 const JSonButton: React.FC = () => {
     const { data } = useFormContext();
     return (
-        <IconButton onClick={() => console.log(data)}>
+        <IconButton onClick={() => console.log(data)} sx={{ visibility: 'hidden' }}>
             <Icon>question_mark</Icon>
         </IconButton>
     );

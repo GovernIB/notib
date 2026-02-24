@@ -708,7 +708,8 @@ export const Form: React.FC<FormProps> = (props) => {
     React.useEffect(() => {
         // Controla l'estat de formulari amb modificacions
         if (isReady) {
-            setModified(!shallowEqual(data, revertData));
+            const modified = !shallowEqual(data, revertData);
+            setModified(modified);
             onDataChange?.(data);
             validateWithValidator(data);
         }

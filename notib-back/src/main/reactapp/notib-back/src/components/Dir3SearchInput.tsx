@@ -88,8 +88,8 @@ const Dir3SearchFilterContent: React.FC = () => {
     );
 };
 
-export const Dir3SearchInput: React.FC<{ name: string }> = (props) => {
-    const { name } = props;
+export const Dir3SearchInput: React.FC<{ name: string; required?: true }> = (props) => {
+    const { name, required } = props;
     const gridDialogApiRef = useMuiDataGridDialogApiRef();
     const springFilterBuilder = (data: any) => {
         return filterBuilder.and(
@@ -105,7 +105,7 @@ export const Dir3SearchInput: React.FC<{ name: string }> = (props) => {
         <>
             <Grid container spacing={2}>
                 <Grid size={11}>
-                    <FormField name={name} disabled />
+                    <FormField name={name} required={required} disabled />
                 </Grid>
                 <Grid size={1}>
                     <Button

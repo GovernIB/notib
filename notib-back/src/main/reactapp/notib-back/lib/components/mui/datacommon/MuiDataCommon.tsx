@@ -182,7 +182,6 @@ export const useApiDataCommon = (
                         })
                         .catch(setError);
                 }
-                setFirstRefresh(false);
                 refresh();
             }
         }

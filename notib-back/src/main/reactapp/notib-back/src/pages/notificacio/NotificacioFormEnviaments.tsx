@@ -212,7 +212,7 @@ const NotificacioFormEnviament: React.FC<{
                             </Grid>
                             {parentFormData?.enviamentTipus === 'SIR' && (
                                 <Grid size={12}>
-                                    <Dir3SearchInput name="sirTitularDir3Codi" />
+                                    <Dir3SearchInput name="sirTitularDir3Codi" required />
                                 </Grid>
                             )}
                             {parentFormData?.enviamentTipus !== 'SIR' && (

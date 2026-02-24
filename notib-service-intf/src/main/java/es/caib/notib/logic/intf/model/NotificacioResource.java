@@ -2,6 +2,7 @@ package es.caib.notib.logic.intf.model;
 
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
+import es.caib.notib.logic.intf.base.validation.CustomValidation;
 import es.caib.notib.logic.intf.dto.explotacio.EnviamentOrigen;
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
@@ -11,7 +12,10 @@ import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
+import es.caib.notib.logic.intf.dto.notificacio.Enviament;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
+import es.caib.notib.logic.intf.model.validator.PrimerEnviamentCodiDir3ObligatoriEnviamentTipusSir;
+import es.caib.notib.logic.intf.model.validator.TitularIncapacitatObligatoriRepresentant;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -48,6 +52,10 @@ import java.util.List;
 		),
 	}
 )
+@CustomValidation.List({
+	@CustomValidation(
+		customValidatorType = PrimerEnviamentCodiDir3ObligatoriEnviamentTipusSir.class)
+})
 public class NotificacioResource extends BaseResource<Long> {
 
 	@NotNull
