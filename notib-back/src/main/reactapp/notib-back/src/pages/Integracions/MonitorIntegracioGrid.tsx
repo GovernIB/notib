@@ -46,6 +46,7 @@ export const MonitorIntegracioGrid = () => {
                 columns={columns}
                 paginationActive
                 toolbarBulkDelete
+                rowLink="detail/{{id}}"
             />
         </GridPage>
     );

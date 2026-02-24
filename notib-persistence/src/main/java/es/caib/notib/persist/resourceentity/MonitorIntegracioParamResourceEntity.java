@@ -24,7 +24,7 @@ import javax.persistence.Table;
 @Getter
 @Setter
 @NoArgsConstructor
-public class MonitorIntegracioParamResourceEntity extends BaseAuditableResourceEntity<MonitorIntegracioParamResource> {
+public class MonitorIntegracioParamResourceEntity extends BaseResourceEntity<MonitorIntegracioParamResource> {
 
 
 	@Column(name = "codi", length = 256, nullable = false)

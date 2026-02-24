@@ -20,6 +20,7 @@ import NotificacioForm from './pages/notificacio/NotificacioForm';
 import NotFoundPage from './pages/NotFound';
 import Propietats from './pages/propietat/Propietats';
 import MonitorIntegracioGrid from './pages/Integracions/MonitorIntegracioGrid';
+import MonitorIntegracioParamDetail from './pages/Integracions/MonitorIntegracioParamDetail';
 
 export const router = createBrowserRouter(
     [
@@ -141,7 +142,13 @@ export const router = createBrowserRouter(
                 },
                 {
                     path: 'integracions',
-                    children: [{ index: true, element: <MonitorIntegracioGrid /> }],
+                    children: [
+                        { index: true, element: <MonitorIntegracioGrid /> },
+                        {
+                            path: 'detail',
+                            children: [ { path: ':id', element: <MonitorIntegracioParamDetail /> }]
+                        }
+                    ],
                 },
                 {
                     path: '*',
