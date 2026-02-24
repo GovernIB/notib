@@ -1,9 +1,9 @@
 package es.caib.notib.plugin;
 
 import com.google.common.base.Strings;
-import es.caib.comanda.model.v1.salut.EstatSalut;
-import es.caib.comanda.model.v1.salut.EstatSalutEnum;
-import es.caib.comanda.model.v1.salut.IntegracioPeticions;
+import es.caib.comanda.model.server.monitoring.EstatSalut;
+import es.caib.comanda.model.server.monitoring.EstatSalutEnum;
+import es.caib.comanda.model.server.monitoring.IntegracioPeticions;
 import es.caib.comanda.ms.salut.helper.EstatHelper;
 import es.caib.notib.plugin.utils.CuaFifoBool;
 import io.micrometer.core.instrument.Counter;
@@ -122,10 +122,7 @@ public class AbstractSalutPlugin implements SalutPlugin {
         final EstatSalutEnum estatCalculat = calculaEstat(totalPeticionsOk, totalPeticionsError);
         darrerEstat = estatCalculat;
 
-        return EstatSalut.builder()
-                .latencia(duradaMitja)
-                .estat(estatCalculat)
-                .build();
+        return new EstatSalut().latencia(duradaMitja).estat(estatCalculat);
         
     }
 
@@ -161,16 +158,14 @@ public class AbstractSalutPlugin implements SalutPlugin {
         Long peticionsOkUltimPeriode = timerOk != null ? timerOk.count() : null;
         Long peticionsErrorUltimPeriode = counterError != null ? (long) counterError.count() : null;
 
-        var integracioPeticions = IntegracioPeticions.builder()
+        var integracioPeticions = new IntegracioPeticions()
                 .totalOk(peticionsOkGlobal)
                 .totalError(peticionsErrorGlobal)
                 .totalTempsMig(tempsMigGlobal)
                 .peticionsOkUltimPeriode(peticionsOkUltimPeriode)
                 .peticionsErrorUltimPeriode(peticionsErrorUltimPeriode)
                 .tempsMigUltimPeriode(tempsMigPeriode)
-                .endpoint(urlPlugin)
-//                .peticionsPerEntorn()
-                .build();
+                .endpoint(urlPlugin);
         resetComptadors();
         return integracioPeticions;
     }

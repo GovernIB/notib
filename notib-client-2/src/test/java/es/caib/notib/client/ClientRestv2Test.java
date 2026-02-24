@@ -1,6 +1,17 @@
 package es.caib.notib.client;
 
-import es.caib.notib.client.domini.*;
+import es.caib.notib.client.domini.AppInfo;
+import es.caib.notib.client.domini.DadesConsulta;
+import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.EnviamentReferenciaV2;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
+import es.caib.notib.client.domini.NotificacioEstatEnum;
+import es.caib.notib.client.domini.NotificacioV2;
+import es.caib.notib.client.domini.RespostaAltaV2;
+import es.caib.notib.client.domini.RespostaConsultaDadesRegistreV2;
+import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
+import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
+import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.Envios;
 import org.junit.Before;

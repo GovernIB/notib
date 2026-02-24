@@ -2,7 +2,7 @@
 package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
-import es.caib.comanda.model.v1.avis.AvisTipus;
+import es.caib.comanda.model.management.AvisTipus;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.RespostaAnulacio;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliacionPlazo;

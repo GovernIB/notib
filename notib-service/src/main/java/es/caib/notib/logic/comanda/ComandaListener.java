@@ -1,8 +1,8 @@
 package es.caib.notib.logic.comanda;
 
-import es.caib.comanda.api.client.v1.ComandaClient;
-import es.caib.comanda.model.v1.avis.Avis;
-import es.caib.comanda.model.v1.avis.AvisTipus;
+import es.caib.comanda.model.management.Avis;
+import es.caib.comanda.model.management.AvisTipus;
+import es.caib.comanda.service.management.AppComandaClient;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
@@ -123,7 +123,7 @@ public class ComandaListener {
             var appBaseUrl = configHelper.getConfig("es.caib.notib.app.base.url");
             var redireccio = appBaseUrl + "/notificacio/" + notificacio.getId() + "/enviament/" + enviament.getId();
 
-            avis = Avis.builder()
+            avis = new Avis()
                     .appCodi(APP_CODI)
                     .entornCodi(entornCodi)
                     .identificador(enviament.getNotificaReferencia())
@@ -136,8 +136,7 @@ public class ComandaListener {
                     .usuarisAmbPermis(permisos.getUsuarisAmbPermis())
                     .grupsAmbPermis(permisos.getRolsAmbPermis())
                     .redireccio(new URL(redireccio))
-                    .grup(notificacio.getGrupCodi())
-                    .build();
+                    .grup(notificacio.getGrupCodi());
         } catch (Exception ex) {
             log.error("[enviarAvisComanda] Error reconstruint l'avis de Comanda", ex);
             return;
@@ -162,7 +161,7 @@ public class ComandaListener {
             var username = configHelper.getConfig("es.caib.notib.plugin.comanda.usuari");
             var password = configHelper.getConfig("es.caib.notib.plugin.comanda.password");
             NotibLogger.getInstance().info("[enviarAvisComanda] Enviant avis a Comanda url " + url, log, LoggingTipus.COMANDA);
-            var comandaClient = new ComandaClient(url, username, password);
+            var comandaClient = new AppComandaClient(url, username, password);
             var resposta = comandaClient.crearAvis(avis);
             NotibLogger.getInstance().info("[enviarAvisCommanda] Resposta: " + resposta, log, LoggingTipus.COMANDA);
             integracioHelper.addAccioOk(info);

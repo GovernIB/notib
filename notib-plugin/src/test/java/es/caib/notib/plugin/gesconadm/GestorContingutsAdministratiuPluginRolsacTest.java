@@ -1,7 +1,7 @@
 package es.caib.notib.plugin.gesconadm;
 
-import es.caib.comanda.model.v1.salut.EstatSalut;
-import es.caib.comanda.model.v1.salut.EstatSalutEnum;
+import es.caib.comanda.model.server.monitoring.EstatSalut;
+import es.caib.comanda.model.server.monitoring.EstatSalutEnum;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +23,7 @@ class GestorContingutsAdministratiuPluginRolsacTest {
         GestorContingutsAdministratiuPluginRolsac plugin = new GestorContingutsAdministratiuPluginRolsac(mockProperties, false);
 
         // Act
-        EstatSalut result = plugin.getEstatPlugin();
+        var result = plugin.getEstatPlugin();
 
         // Assert
         assertNotNull(result);

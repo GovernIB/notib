@@ -1,7 +1,8 @@
 package es.caib.notib.ejb;
 
-import es.caib.comanda.model.v1.log.FitxerContingut;
-import es.caib.comanda.model.v1.log.FitxerInfo;
+import es.caib.comanda.model.server.monitoring.FitxerContingut;
+import es.caib.comanda.model.server.monitoring.FitxerInfo;
+import es.caib.comanda.ms.log.helper.LogFileStream;
 import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.RolesAllowed;
@@ -23,6 +24,12 @@ public class LogService extends AbstractService<es.caib.notib.logic.intf.service
     @RolesAllowed({"NOT_COM"})
     public FitxerContingut getFitxerByNom(String nom) {
         return getDelegateService().getFitxerByNom(nom);
+    }
+
+    @Override
+    @RolesAllowed({"NOT_COM"})
+    public LogFileStream descarregarFitxerDirecte(String nom) {
+        return getDelegateService().descarregarFitxerDirecte(nom);
     }
 
     @Override

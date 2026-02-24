@@ -1,7 +1,6 @@
 package es.caib.notib.plugin.firmaservidor;
 
-import es.caib.comanda.model.v1.salut.EstatSalut;
-import es.caib.comanda.model.v1.salut.EstatSalutEnum;
+import es.caib.comanda.model.server.monitoring.EstatSalutEnum;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +22,7 @@ class FirmaServidorPluginPortafibTest {
         FirmaServidorPluginPortafib firmaServidorPlugin = new FirmaServidorPluginPortafib(properties, false);
 
         // Act
-        EstatSalut estatSalut = firmaServidorPlugin.getEstatPlugin();
+        var estatSalut = firmaServidorPlugin.getEstatPlugin();
 
         // Assert
         assertNotNull(estatSalut);
@@ -40,7 +39,7 @@ class FirmaServidorPluginPortafibTest {
         FirmaServidorPluginPortafib firmaServidorPlugin = new FirmaServidorPluginPortafib(properties, false);
 
         // Act
-        EstatSalut estatSalut = firmaServidorPlugin.getEstatPlugin();
+        var estatSalut = firmaServidorPlugin.getEstatPlugin();
 
         // Assert
         assertNotNull(estatSalut);

@@ -1,12 +1,12 @@
 package es.caib.notib.logic.service;
 
-import es.caib.comanda.model.v1.estadistica.Dimensio;
-import es.caib.comanda.model.v1.estadistica.DimensioDesc;
-import es.caib.comanda.model.v1.estadistica.Fet;
-import es.caib.comanda.model.v1.estadistica.IndicadorDesc;
-import es.caib.comanda.model.v1.estadistica.RegistreEstadistic;
-import es.caib.comanda.model.v1.estadistica.RegistresEstadistics;
-import es.caib.comanda.model.v1.estadistica.Temps;
+
+import es.caib.comanda.model.server.monitoring.Dimensio;
+import es.caib.comanda.model.server.monitoring.DimensioDesc;
+import es.caib.comanda.model.server.monitoring.Fet;
+import es.caib.comanda.model.server.monitoring.IndicadorDesc;
+import es.caib.comanda.model.server.monitoring.RegistreEstadistic;
+import es.caib.comanda.model.server.monitoring.RegistresEstadistics;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.explotacio.DiaSetmanaEnum;
 import es.caib.notib.logic.intf.dto.explotacio.DimEnum;
@@ -45,7 +45,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
@@ -56,9 +58,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import es.caib.comanda.model.server.monitoring.Format;
 
-import static es.caib.comanda.model.v1.estadistica.Format.DECIMAL;
-import static es.caib.comanda.model.v1.estadistica.Format.LONG;
 import static es.caib.notib.logic.intf.dto.explotacio.FetEnum.*;
 
 @Slf4j
@@ -501,8 +502,8 @@ public class EstadisticaServiceImpl implements EstadisticaService {
             // Si no existeixen dades, les generam
             if (!data.isBefore(LocalDate.now())) {
                 //No generar dades estadistiques futures
-                Date dia = Date.from(data.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-                return RegistresEstadistics.builder().temps(Temps.builder().data(dia).build()).fets(List.of()).build();
+                var offSetDataTime = data.atStartOfDay().atOffset(ZoneId.systemDefault().getRules().getOffset(java.time.Instant.now()));
+                return new RegistresEstadistics().temps(offSetDataTime).fets(List.of());
             }
             var firstInfoDate = getFirstInfoDate();
             if (!data.isBefore(firstInfoDate)) {
@@ -519,11 +520,8 @@ public class EstadisticaServiceImpl implements EstadisticaService {
 
         ExplotTempsEntity temps = explotTempsRepository.findFirstByData(data);
         if (temps == null) {
-            Date dia = Date.from(data.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-            return RegistresEstadistics.builder()
-                    .temps(Temps.builder().data(dia).build())
-                    .fets(List.of())
-                    .build();
+            var offSetDataTime = data.atStartOfDay().atOffset(ZoneId.systemDefault().getRules().getOffset(java.time.Instant.now()));
+            return new RegistresEstadistics().temps(offSetDataTime).fets(List.of());
         }
         List<ExplotFetsEntity> fets = explotFetsRepository.findByTemps(temps);
         return toRegistresEstadistics(fets, data);
@@ -589,85 +587,85 @@ public class EstadisticaServiceImpl implements EstadisticaService {
         List<String> origens = Arrays.stream(EnviamentOrigen.values()).map(Enum::name).sorted().collect(Collectors.toList());
 
         return List.of(
-                DimensioDesc.builder().codi(DimEnum.ENT.name()).nom(DimEnum.ENT.getNom()).descripcio(DimEnum.ENT.getDescripcio()).valors(entitatCodis).build(),
-                DimensioDesc.builder().codi(DimEnum.ORG.name()).nom(DimEnum.ORG.getNom()).descripcio(DimEnum.ORG.getDescripcio()).valors(organCodis).build(),
-                DimensioDesc.builder().codi(DimEnum.PRC.name()).nom(DimEnum.PRC.getNom()).descripcio(DimEnum.PRC.getDescripcio()).valors(procedimentCodis).build(),
-                DimensioDesc.builder().codi(DimEnum.USU.name()).nom(DimEnum.USU.getNom()).descripcio(DimEnum.USU.getDescripcio()).valors(usuariCodis).build(),
-                DimensioDesc.builder().codi(DimEnum.TIP.name()).nom(DimEnum.TIP.getNom()).descripcio(DimEnum.TIP.getDescripcio()).valors(tipus).build(),
-                DimensioDesc.builder().codi(DimEnum.ORI.name()).nom(DimEnum.ORI.getNom()).descripcio(DimEnum.ORI.getDescripcio()).valors(origens).build()
+                new DimensioDesc().codi(DimEnum.ENT.name()).nom(DimEnum.ENT.getNom()).descripcio(DimEnum.ENT.getDescripcio()).valors(entitatCodis),
+                new DimensioDesc().codi(DimEnum.ORG.name()).nom(DimEnum.ORG.getNom()).descripcio(DimEnum.ORG.getDescripcio()).valors(organCodis),
+                new DimensioDesc().codi(DimEnum.PRC.name()).nom(DimEnum.PRC.getNom()).descripcio(DimEnum.PRC.getDescripcio()).valors(procedimentCodis),
+                new DimensioDesc().codi(DimEnum.USU.name()).nom(DimEnum.USU.getNom()).descripcio(DimEnum.USU.getDescripcio()).valors(usuariCodis),
+                new DimensioDesc().codi(DimEnum.TIP.name()).nom(DimEnum.TIP.getNom()).descripcio(DimEnum.TIP.getDescripcio()).valors(tipus),
+                new DimensioDesc().codi(DimEnum.ORI.name()).nom(DimEnum.ORI.getNom()).descripcio(DimEnum.ORI.getDescripcio()).valors(origens)
         );
     }
 
     @Override
     public List<IndicadorDesc> getIndicadors() {
         return List.of(
-                IndicadorDesc.builder().codi(PND.name()).nom(PND.getNom()).descripcio(PND.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(REG_ERR.name()).nom(REG_ERR.getNom()).descripcio(REG_ERR.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(REG.name()).nom(REG.getNom()).descripcio(REG.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(SIR_ACC.name()).nom(SIR_ACC.getNom()).descripcio(SIR_ACC.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(SIR_REB.name()).nom(SIR_REB.getNom()).descripcio(SIR_REB.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(NOT_ERR.name()).nom(NOT_ERR.getNom()).descripcio(NOT_ERR.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(NOT_ENV.name()).nom(NOT_ENV.getNom()).descripcio(NOT_ENV.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(NOT_ACC.name()).nom(NOT_ACC.getNom()).descripcio(NOT_ACC.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(NOT_REB.name()).nom(NOT_REB.getNom()).descripcio(NOT_REB.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(NOT_EXP.name()).nom(NOT_EXP.getNom()).descripcio(NOT_EXP.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(CIE_ERR.name()).nom(CIE_ERR.getNom()).descripcio(CIE_ERR.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(CIE_ENV.name()).nom(CIE_ENV.getNom()).descripcio(CIE_ENV.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(CIE_ACC.name()).nom(CIE_ACC.getNom()).descripcio(CIE_ACC.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(CIE_REB.name()).nom(CIE_REB.getNom()).descripcio(CIE_REB.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(CIE_FAL.name()).nom(CIE_FAL.getNom()).descripcio(CIE_FAL.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(PRC.name()).nom(PRC.getNom()).descripcio(PRC.getDescripcio()).format(LONG).build(),
+                new IndicadorDesc().codi(PND.name()).nom(PND.getNom()).descripcio(PND.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(REG_ERR.name()).nom(REG_ERR.getNom()).descripcio(REG_ERR.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(REG.name()).nom(REG.getNom()).descripcio(REG.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(SIR_ACC.name()).nom(SIR_ACC.getNom()).descripcio(SIR_ACC.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(SIR_REB.name()).nom(SIR_REB.getNom()).descripcio(SIR_REB.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(NOT_ERR.name()).nom(NOT_ERR.getNom()).descripcio(NOT_ERR.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(NOT_ENV.name()).nom(NOT_ENV.getNom()).descripcio(NOT_ENV.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(NOT_ACC.name()).nom(NOT_ACC.getNom()).descripcio(NOT_ACC.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(NOT_REB.name()).nom(NOT_REB.getNom()).descripcio(NOT_REB.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(NOT_EXP.name()).nom(NOT_EXP.getNom()).descripcio(NOT_EXP.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(CIE_ERR.name()).nom(CIE_ERR.getNom()).descripcio(CIE_ERR.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(CIE_ENV.name()).nom(CIE_ENV.getNom()).descripcio(CIE_ENV.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(CIE_ACC.name()).nom(CIE_ACC.getNom()).descripcio(CIE_ACC.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(CIE_REB.name()).nom(CIE_REB.getNom()).descripcio(CIE_REB.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(CIE_FAL.name()).nom(CIE_FAL.getNom()).descripcio(CIE_FAL.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(PRC.name()).nom(PRC.getNom()).descripcio(PRC.getDescripcio()).format(Format.LONG),
                 // Transicions
-                IndicadorDesc.builder().codi(TR_CRE.name()).nom(TR_CRE.getNom()).descripcio(TR_CRE.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TR_REG_ERR.name()).nom(TR_REG_ERR.getNom()).descripcio(TR_REG_ERR.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TR_REG.name()).nom(TR_REG.getNom()).descripcio(TR_REG.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TR_SIR_ACC.name()).nom(TR_SIR_ACC.getNom()).descripcio(TR_SIR_ACC.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TR_SIR_REB.name()).nom(TR_SIR_REB.getNom()).descripcio(TR_SIR_REB.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TR_NOT_ERR.name()).nom(TR_NOT_ERR.getNom()).descripcio(TR_NOT_ERR.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TR_NOT_ENV.name()).nom(TR_NOT_ENV.getNom()).descripcio(TR_NOT_ENV.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TR_NOT_ACC.name()).nom(TR_NOT_ACC.getNom()).descripcio(TR_NOT_ACC.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TR_NOT_REB.name()).nom(TR_NOT_REB.getNom()).descripcio(TR_NOT_REB.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TR_NOT_EXP.name()).nom(TR_NOT_EXP.getNom()).descripcio(TR_NOT_EXP.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TR_NOT_FAL.name()).nom(TR_NOT_FAL.getNom()).descripcio(TR_NOT_FAL.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TR_CIE_ERR.name()).nom(TR_CIE_ERR.getNom()).descripcio(TR_CIE_ERR.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TR_CIE_ENV.name()).nom(TR_CIE_ENV.getNom()).descripcio(TR_CIE_ENV.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TR_CIE_ACC.name()).nom(TR_CIE_ACC.getNom()).descripcio(TR_CIE_ACC.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TR_CIE_REB.name()).nom(TR_CIE_REB.getNom()).descripcio(TR_CIE_REB.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TR_CIE_CAN.name()).nom(TR_CIE_CAN.getNom()).descripcio(TR_CIE_CAN.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TR_CIE_FAL.name()).nom(TR_CIE_FAL.getNom()).descripcio(TR_CIE_FAL.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TR_EML_ERR.name()).nom(TR_EML_ERR.getNom()).descripcio(TR_EML_ERR.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TR_EML_ENV.name()).nom(TR_EML_ENV.getNom()).descripcio(TR_EML_ENV.getDescripcio()).format(LONG).build(),
+                new IndicadorDesc().codi(TR_CRE.name()).nom(TR_CRE.getNom()).descripcio(TR_CRE.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TR_REG_ERR.name()).nom(TR_REG_ERR.getNom()).descripcio(TR_REG_ERR.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TR_REG.name()).nom(TR_REG.getNom()).descripcio(TR_REG.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TR_SIR_ACC.name()).nom(TR_SIR_ACC.getNom()).descripcio(TR_SIR_ACC.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TR_SIR_REB.name()).nom(TR_SIR_REB.getNom()).descripcio(TR_SIR_REB.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TR_NOT_ERR.name()).nom(TR_NOT_ERR.getNom()).descripcio(TR_NOT_ERR.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TR_NOT_ENV.name()).nom(TR_NOT_ENV.getNom()).descripcio(TR_NOT_ENV.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TR_NOT_ACC.name()).nom(TR_NOT_ACC.getNom()).descripcio(TR_NOT_ACC.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TR_NOT_REB.name()).nom(TR_NOT_REB.getNom()).descripcio(TR_NOT_REB.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TR_NOT_EXP.name()).nom(TR_NOT_EXP.getNom()).descripcio(TR_NOT_EXP.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TR_NOT_FAL.name()).nom(TR_NOT_FAL.getNom()).descripcio(TR_NOT_FAL.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TR_CIE_ERR.name()).nom(TR_CIE_ERR.getNom()).descripcio(TR_CIE_ERR.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TR_CIE_ENV.name()).nom(TR_CIE_ENV.getNom()).descripcio(TR_CIE_ENV.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TR_CIE_ACC.name()).nom(TR_CIE_ACC.getNom()).descripcio(TR_CIE_ACC.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TR_CIE_REB.name()).nom(TR_CIE_REB.getNom()).descripcio(TR_CIE_REB.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TR_CIE_CAN.name()).nom(TR_CIE_CAN.getNom()).descripcio(TR_CIE_CAN.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TR_CIE_FAL.name()).nom(TR_CIE_FAL.getNom()).descripcio(TR_CIE_FAL.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TR_EML_ERR.name()).nom(TR_EML_ERR.getNom()).descripcio(TR_EML_ERR.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TR_EML_ENV.name()).nom(TR_EML_ENV.getNom()).descripcio(TR_EML_ENV.getDescripcio()).format(Format.LONG),
 
                 // Temps mitjà en estat
-                IndicadorDesc.builder().codi(TMP_PND.name()).nom(TMP_PND.getNom()).descripcio(TMP_PND.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TMP_REG.name()).nom(TMP_REG.getNom()).descripcio(TMP_REG.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TMP_NOT.name()).nom(TMP_NOT.getNom()).descripcio(TMP_NOT.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TMP_CIE.name()).nom(TMP_CIE.getNom()).descripcio(TMP_CIE.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TMP_TOT.name()).nom(TMP_TOT.getNom()).descripcio(TMP_TOT.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TMP_REG_SAC.name()).nom(TMP_REG_SAC.getNom()).descripcio(TMP_REG_SAC.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TMP_REG_SRB.name()).nom(TMP_REG_SRB.getNom()).descripcio(TMP_REG_SRB.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TMP_REG_NOT.name()).nom(TMP_REG_NOT.getNom()).descripcio(TMP_REG_NOT.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TMP_REG_EML.name()).nom(TMP_REG_EML.getNom()).descripcio(TMP_REG_EML.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TMP_NOT_NOT.name()).nom(TMP_NOT_NOT.getNom()).descripcio(TMP_NOT_NOT.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TMP_NOT_REB.name()).nom(TMP_NOT_REB.getNom()).descripcio(TMP_NOT_REB.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TMP_NOT_EXP.name()).nom(TMP_NOT_EXP.getNom()).descripcio(TMP_NOT_EXP.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TMP_NOT_FAL.name()).nom(TMP_NOT_FAL.getNom()).descripcio(TMP_NOT_FAL.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TMP_CIE_NOT.name()).nom(TMP_CIE_NOT.getNom()).descripcio(TMP_CIE_NOT.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TMP_CIE_REB.name()).nom(TMP_CIE_REB.getNom()).descripcio(TMP_CIE_REB.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TMP_CIE_CAN.name()).nom(TMP_CIE_CAN.getNom()).descripcio(TMP_CIE_CAN.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TMP_CIE_FAL.name()).nom(TMP_CIE_FAL.getNom()).descripcio(TMP_CIE_FAL.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TMP_TOT_NAC.name()).nom(TMP_TOT_NAC.getNom()).descripcio(TMP_TOT_NAC.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TMP_TOT_NRB.name()).nom(TMP_TOT_NRB.getNom()).descripcio(TMP_TOT_NRB.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TMP_TOT_NEX.name()).nom(TMP_TOT_NEX.getNom()).descripcio(TMP_TOT_NEX.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TMP_TOT_NFL.name()).nom(TMP_TOT_NFL.getNom()).descripcio(TMP_TOT_NFL.getDescripcio()).format(LONG).build(),
-                IndicadorDesc.builder().codi(TMP_TOT_CAC.name()).nom(TMP_TOT_CAC.getNom()).descripcio(TMP_TOT_CAC.getDescripcio()).format(LONG).build(),
+                new IndicadorDesc().codi(TMP_PND.name()).nom(TMP_PND.getNom()).descripcio(TMP_PND.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TMP_REG.name()).nom(TMP_REG.getNom()).descripcio(TMP_REG.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TMP_NOT.name()).nom(TMP_NOT.getNom()).descripcio(TMP_NOT.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TMP_CIE.name()).nom(TMP_CIE.getNom()).descripcio(TMP_CIE.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TMP_TOT.name()).nom(TMP_TOT.getNom()).descripcio(TMP_TOT.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TMP_REG_SAC.name()).nom(TMP_REG_SAC.getNom()).descripcio(TMP_REG_SAC.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TMP_REG_SRB.name()).nom(TMP_REG_SRB.getNom()).descripcio(TMP_REG_SRB.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TMP_REG_NOT.name()).nom(TMP_REG_NOT.getNom()).descripcio(TMP_REG_NOT.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TMP_REG_EML.name()).nom(TMP_REG_EML.getNom()).descripcio(TMP_REG_EML.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TMP_NOT_NOT.name()).nom(TMP_NOT_NOT.getNom()).descripcio(TMP_NOT_NOT.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TMP_NOT_REB.name()).nom(TMP_NOT_REB.getNom()).descripcio(TMP_NOT_REB.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TMP_NOT_EXP.name()).nom(TMP_NOT_EXP.getNom()).descripcio(TMP_NOT_EXP.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TMP_NOT_FAL.name()).nom(TMP_NOT_FAL.getNom()).descripcio(TMP_NOT_FAL.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TMP_CIE_NOT.name()).nom(TMP_CIE_NOT.getNom()).descripcio(TMP_CIE_NOT.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TMP_CIE_REB.name()).nom(TMP_CIE_REB.getNom()).descripcio(TMP_CIE_REB.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TMP_CIE_CAN.name()).nom(TMP_CIE_CAN.getNom()).descripcio(TMP_CIE_CAN.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TMP_CIE_FAL.name()).nom(TMP_CIE_FAL.getNom()).descripcio(TMP_CIE_FAL.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TMP_TOT_NAC.name()).nom(TMP_TOT_NAC.getNom()).descripcio(TMP_TOT_NAC.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TMP_TOT_NRB.name()).nom(TMP_TOT_NRB.getNom()).descripcio(TMP_TOT_NRB.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TMP_TOT_NEX.name()).nom(TMP_TOT_NEX.getNom()).descripcio(TMP_TOT_NEX.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TMP_TOT_NFL.name()).nom(TMP_TOT_NFL.getNom()).descripcio(TMP_TOT_NFL.getDescripcio()).format(Format.LONG),
+                new IndicadorDesc().codi(TMP_TOT_CAC.name()).nom(TMP_TOT_CAC.getNom()).descripcio(TMP_TOT_CAC.getDescripcio()).format(Format.LONG),
 
                 // Intents
-                IndicadorDesc.builder().codi(INT_REG.name()).nom(INT_REG.getNom()).descripcio(INT_REG.getDescripcio()).format(DECIMAL).build(),
-                IndicadorDesc.builder().codi(INT_SIR.name()).nom(INT_SIR.getNom()).descripcio(INT_SIR.getDescripcio()).format(DECIMAL).build(),
-                IndicadorDesc.builder().codi(INT_NOT.name()).nom(INT_NOT.getNom()).descripcio(INT_NOT.getDescripcio()).format(DECIMAL).build(),
-                IndicadorDesc.builder().codi(INT_CIE.name()).nom(INT_CIE.getNom()).descripcio(INT_CIE.getDescripcio()).format(DECIMAL).build(),
-                IndicadorDesc.builder().codi(INT_EML.name()).nom(INT_EML.getNom()).descripcio(INT_EML.getDescripcio()).format(DECIMAL).build()
+                new IndicadorDesc().codi(INT_REG.name()).nom(INT_REG.getNom()).descripcio(INT_REG.getDescripcio()).format(Format.DECIMAL),
+                new IndicadorDesc().codi(INT_SIR.name()).nom(INT_SIR.getNom()).descripcio(INT_SIR.getDescripcio()).format(Format.DECIMAL),
+                new IndicadorDesc().codi(INT_NOT.name()).nom(INT_NOT.getNom()).descripcio(INT_NOT.getDescripcio()).format(Format.DECIMAL),
+                new IndicadorDesc().codi(INT_CIE.name()).nom(INT_CIE.getNom()).descripcio(INT_CIE.getDescripcio()).format(Format.DECIMAL),
+                new IndicadorDesc().codi(INT_EML.name()).nom(INT_EML.getNom()).descripcio(INT_EML.getDescripcio()).format(Format.DECIMAL)
         );
     }
 
@@ -1019,18 +1017,15 @@ public class EstadisticaServiceImpl implements EstadisticaService {
     }
 
     private RegistresEstadistics toRegistresEstadistics(List<ExplotFetsEntity> fets, LocalDate data) {
-        Date dia = Date.from(data.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-        return RegistresEstadistics.builder()
-                .temps(Temps.builder().data(dia).build())
-                .fets(fets.stream().map(this::toRegistreEstadistic).collect(Collectors.toList()))
-                .build();
+
+        var offSetDataTime = data.atStartOfDay().atOffset(ZoneId.systemDefault().getRules().getOffset(java.time.Instant.now()));
+        return new RegistresEstadistics()
+                .temps(offSetDataTime)
+                .fets(fets.stream().map(this::toRegistreEstadistic).collect(Collectors.toList()));
     }
 
     private RegistreEstadistic toRegistreEstadistic(ExplotFetsEntity fet) {
-        return RegistreEstadistic.builder()
-                .dimensions(toDimensions(fet.getDimensio()))
-                .fets(toFets(fet))
-                .build();
+        return new RegistreEstadistic().dimensions(toDimensions(fet.getDimensio())).fets(toFets(fet));
     }
 
     private List<Dimensio> toDimensions(ExplotDimensioEntity dimensio) {

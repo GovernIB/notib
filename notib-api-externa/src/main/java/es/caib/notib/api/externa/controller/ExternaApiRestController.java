@@ -3,8 +3,8 @@
  */
 package es.caib.notib.api.externa.controller;
 
+import es.caib.comanda.model.server.monitoring.AppInfo;
 import es.caib.notib.api.externa.openapi.model.AppInfoApi;
-import es.caib.notib.client.domini.AppInfo;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.JarFile;
@@ -61,7 +62,8 @@ public class ExternaApiRestController {
 			var version = manifestAtributsMap.get("Implementation-Version");
 			var data = manifestAtributsMap.get("Build-Timestamp");
 			appInfo.setVersio(version != null ? version.toString() : null);
-			appInfo.setData(data != null ? data.toString() : null);
+
+			appInfo.setData(data != null ? OffsetDateTime.parse(data.toString()) : null);
 		}
 		return appInfo;
 	}

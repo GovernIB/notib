@@ -1,6 +1,6 @@
 package es.caib.notib.logic.service;
 
-import es.caib.comanda.model.v1.avis.AvisTipus;
+import es.caib.comanda.model.management.AvisTipus;
 import es.caib.notib.logic.comanda.ComandaListener;
 import es.caib.notib.logic.helper.AuditHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;

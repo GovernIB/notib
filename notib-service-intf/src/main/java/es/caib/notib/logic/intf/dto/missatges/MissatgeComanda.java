@@ -1,6 +1,6 @@
 package es.caib.notib.logic.intf.dto.missatges;
 
-import es.caib.comanda.model.v1.avis.AvisTipus;
+import es.caib.comanda.model.management.AvisTipus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

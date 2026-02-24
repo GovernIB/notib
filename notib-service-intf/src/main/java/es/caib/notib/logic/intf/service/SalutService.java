@@ -1,20 +1,24 @@
 package es.caib.notib.logic.intf.service;
 
 
-import es.caib.comanda.model.v1.salut.ContextInfo;
-import es.caib.comanda.model.v1.salut.IntegracioInfo;
-import es.caib.comanda.model.v1.salut.SalutInfo;
-import es.caib.comanda.model.v1.salut.SubsistemaInfo;
+import es.caib.comanda.model.server.monitoring.ContextInfo;
+import es.caib.comanda.model.server.monitoring.IntegracioInfo;
+import es.caib.comanda.model.server.monitoring.SalutInfo;
+import es.caib.comanda.model.server.monitoring.SubsistemaInfo;
 import org.springframework.boot.actuate.health.Health;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
 public interface SalutService {
 
-    public List<IntegracioInfo> getIntegracions();
-    public List<SubsistemaInfo> getSubsistemes();
-    public List<ContextInfo> getContexts(String baseUrl);
-    public SalutInfo checkSalut(String versio, String performanceUrl);
+    @PreAuthorize("hasRole('NOT_COM')")
+    List<IntegracioInfo> getIntegracions();
+    @PreAuthorize("hasRole('NOT_COM')")
+    List<SubsistemaInfo> getSubsistemes();
+    @PreAuthorize("hasRole('NOT_COM')")
+    List<ContextInfo> getContexts(String baseUrl);
+    SalutInfo checkSalut(String versio, String performanceUrl);
     Health checkHealthIndicator();
 
 }

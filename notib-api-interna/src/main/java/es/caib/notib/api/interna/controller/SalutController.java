@@ -1,7 +1,7 @@
 package es.caib.notib.api.interna.controller;
 
-import es.caib.comanda.model.v1.salut.AppInfo;
-import es.caib.comanda.model.v1.salut.SalutInfo;
+import es.caib.comanda.model.server.monitoring.AppInfo;
+import es.caib.comanda.model.server.monitoring.SalutInfo;
 import es.caib.comanda.ms.salut.helper.MonitorHelper;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.SalutService;
@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.actuate.health.Health;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -38,11 +39,12 @@ public class SalutController {
 
     private ManifestInfo manifestInfo;
 
+    @PreAuthorize("hasRole('NOT_COM')")
     @GetMapping("/info")
     public AppInfo appInfo(HttpServletRequest request) throws IOException {
 
         var manifestInfo = getManifestInfo();
-        return AppInfo.builder()
+        return new AppInfo()
                 .codi("NOT")
                 .nom("Notib")
                 .data(DatesUtils.toOffsetDateTime(manifestInfo.getBuildDate()))
@@ -52,8 +54,7 @@ public class SalutController {
                 .integracions(salutService.getIntegracions())
                 .subsistemes(salutService.getSubsistemes())
                 .contexts(salutService.getContexts(getBaseUrl(request)))
-                .versioJboss(MonitorHelper.getApplicationServerInfo())
-                .build();
+                .versioJboss(MonitorHelper.getApplicationServerInfo());
     }
 
     public String getBaseUrl(HttpServletRequest request) {

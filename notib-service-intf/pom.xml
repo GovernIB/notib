@@ -145,8 +145,13 @@
         </dependency>
 		<dependency>
 			<groupId>es.caib.comanda</groupId>
-			<artifactId>comanda-lib</artifactId>
-			<version>0.1.0.1</version>
+			<artifactId>comanda-api-client-management</artifactId>
+			<version>${comanda.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>es.caib.comanda</groupId>
+			<artifactId>comanda-api-utils</artifactId>
+			<version>${comanda.version}</version>
 		</dependency>
     </dependencies>
 	<repositories>

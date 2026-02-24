@@ -3,7 +3,7 @@
  */
 package es.caib.notib.logic.helper;
 
-import es.caib.comanda.model.v1.avis.AvisTipus;
+import es.caib.comanda.model.management.AvisTipus;
 import es.caib.notib.logic.comanda.ComandaListener;
 import es.caib.notib.logic.email.EmailConstants;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;

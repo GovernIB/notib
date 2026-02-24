@@ -1,12 +1,13 @@
 package es.caib.notib.ejb;
 
-import es.caib.comanda.model.v1.salut.ContextInfo;
-import es.caib.comanda.model.v1.salut.IntegracioInfo;
-import es.caib.comanda.model.v1.salut.SalutInfo;
-import es.caib.comanda.model.v1.salut.SubsistemaInfo;
+import es.caib.comanda.model.server.monitoring.ContextInfo;
+import es.caib.comanda.model.server.monitoring.IntegracioInfo;
+import es.caib.comanda.model.server.monitoring.SalutInfo;
+import es.caib.comanda.model.server.monitoring.SubsistemaInfo;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.context.annotation.Primary;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import java.util.List;
 
@@ -15,16 +16,19 @@ import java.util.List;
 public class SalutService extends AbstractService<es.caib.notib.logic.intf.service.SalutService> implements es.caib.notib.logic.intf.service.SalutService {
 
     @Override
+    @RolesAllowed({"NOT_COM"})
     public List<IntegracioInfo> getIntegracions() {
         return getDelegateService().getIntegracions();
     }
 
     @Override
+    @RolesAllowed({"NOT_COM"})
     public List<SubsistemaInfo> getSubsistemes() {
         return getDelegateService().getSubsistemes();
     }
 
     @Override
+    @RolesAllowed({"NOT_COM"})
     public List<ContextInfo> getContexts(String baseUrl) {
         return getDelegateService().getContexts(baseUrl);
     }

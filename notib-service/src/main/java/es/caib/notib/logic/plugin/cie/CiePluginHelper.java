@@ -1,8 +1,8 @@
 package es.caib.notib.logic.plugin.cie;
 
 import com.google.common.base.Strings;
-import es.caib.comanda.model.v1.avis.AvisTipus;
-import es.caib.comanda.model.v1.salut.IntegracioApp;
+import es.caib.comanda.model.management.AvisTipus;
+import es.caib.comanda.ms.salut.helper.IntegracioApp;
 import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.logic.comanda.ComandaListener;
 import es.caib.notib.logic.helper.CallbackHelper;
@@ -19,7 +19,6 @@ import es.caib.notib.logic.helper.plugin.ArxiuPluginHelper;
 import es.caib.notib.logic.helper.plugin.GestioDocumentalPluginHelper;
 import es.caib.notib.logic.helper.plugin.RegistrePluginHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
-import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;

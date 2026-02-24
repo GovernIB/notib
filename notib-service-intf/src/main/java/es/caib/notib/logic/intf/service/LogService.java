@@ -1,7 +1,8 @@
 package es.caib.notib.logic.intf.service;
 
-import es.caib.comanda.model.v1.log.FitxerContingut;
-import es.caib.comanda.model.v1.log.FitxerInfo;
+import es.caib.comanda.model.server.monitoring.FitxerContingut;
+import es.caib.comanda.model.server.monitoring.FitxerInfo;
+import es.caib.comanda.ms.log.helper.LogFileStream;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
@@ -14,6 +15,9 @@ public interface LogService {
 
     @PreAuthorize("hasRole('NOT_COM')")
     FitxerContingut getFitxerByNom(String nom);
+
+    @PreAuthorize("hasRole('NOT_COM')")
+    LogFileStream descarregarFitxerDirecte(String nom);
 
     @PreAuthorize("hasRole('NOT_COM')")
     void tailLogFile(String filePath);
