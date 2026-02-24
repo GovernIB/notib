@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 /**
  * Mètodes per a la gestió d'integracions.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -60,9 +60,16 @@ public class IntegracioHelper {
 //	@Transactional
 	public void addAccioOk(IntegracioInfo info, boolean obtenirUsuari) {
 
-		var accio = MonitorIntegracioEntity.builder().codi(info.getCodi()).data(new Date()).descripcio(info.getDescripcio()).tipus(info.getTipus())
-				.codiEntitat(info.getCodiEntitat()).tempsResposta(info.getTempsResposta()).estat(IntegracioAccioEstatEnumDto.OK)
-				.aplicacio(info.getAplicacio()).notificacioId(info.getNotificacioId()).build();
+		var accio = MonitorIntegracioEntity.builder().
+			codi(info.getCodi()).
+			data(new Date()).
+			descripcio(info.getDescripcio()).
+			tipus(info.getTipus()).
+			codiEntitat(info.getCodiEntitat()).
+			tempsResposta(info.getTempsResposta()).
+			estat(IntegracioAccioEstatEnumDto.OK).
+			aplicacio(info.getAplicacio()).
+			notificacioId(info.getNotificacioId()).build();
 		assignarAccioAParams(info, accio);
 		addAccio(accio, obtenirUsuari);
 	}
@@ -85,10 +92,17 @@ public class IntegracioHelper {
 //	@Transactional
 	public void addAccioError(IntegracioInfo info, String errorDescripcio, Throwable throwable, boolean obtenirUsuari) {
 
-		var accio = MonitorIntegracioEntity.builder().codi(info.getCodi()).data(new Date()).descripcio(info.getDescripcio()).tipus(info.getTipus())
-				.codiEntitat(info.getCodiEntitat()).tempsResposta(info.getTempsResposta()).estat(IntegracioAccioEstatEnumDto.ERROR).errorDescripcio(errorDescripcio)
-				.aplicacio(info.getAplicacio()).notificacioId(info.getNotificacioId()).build();
-
+		var accio = MonitorIntegracioEntity.builder().
+			codi(info.getCodi()).
+			data(new Date()).
+			descripcio(info.getDescripcio()).
+			tipus(info.getTipus()).
+			codiEntitat(info.getCodiEntitat()).
+			tempsResposta(info.getTempsResposta()).
+			estat(IntegracioAccioEstatEnumDto.ERROR).
+			errorDescripcio(errorDescripcio).
+			aplicacio(info.getAplicacio()).
+			notificacioId(info.getNotificacioId()).build();
 		assignarAccioAParams(info, accio);
 		if (throwable != null) {
 			accio.setExcepcioMessage(ExceptionUtils.getMessage(throwable));
@@ -111,10 +125,16 @@ public class IntegracioHelper {
 
 	public void addAccioWarn(IntegracioInfo info, String errorDescripcio, Throwable throwable, boolean obtenirUsuari) {
 
-		var accio = MonitorIntegracioEntity.builder().codi(info.getCodi()).data(new Date()).descripcio(info.getDescripcio()).tipus(info.getTipus())
-				.codiEntitat(info.getCodiEntitat()).tempsResposta(info.getTempsResposta()).estat(IntegracioAccioEstatEnumDto.WARN).errorDescripcio(errorDescripcio)
-				.aplicacio(info.getAplicacio()).notificacioId(info.getNotificacioId()).build();
-
+		var accio = MonitorIntegracioEntity.builder().
+			codi(info.getCodi()).
+			data(new Date()).
+			descripcio(info.getDescripcio()).
+			tipus(info.getTipus()).
+			codiEntitat(info.getCodiEntitat()).
+			tempsResposta(info.getTempsResposta()).
+			estat(IntegracioAccioEstatEnumDto.WARN).
+			errorDescripcio(errorDescripcio).
+			aplicacio(info.getAplicacio()).notificacioId(info.getNotificacioId()).build();
 		assignarAccioAParams(info, accio);
 		if (throwable != null) {
 			accio.setExcepcioMessage(ExceptionUtils.getMessage(throwable));

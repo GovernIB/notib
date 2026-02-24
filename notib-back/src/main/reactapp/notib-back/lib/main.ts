@@ -30,6 +30,7 @@ export {
     useMuiDataGridApiRef,
     useMuiDataGridApiContext,
 } from './components/mui/datagrid/MuiDataGrid';
+export { useDataGridContext as useMuiDataGridContext } from './components/mui/datagrid/DataGridContext';
 export {
     DataGridDialog as MuiDataGridDialog,
     useMuiDataGridDialogApiRef,

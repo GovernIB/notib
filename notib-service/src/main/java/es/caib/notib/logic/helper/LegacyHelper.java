@@ -5,6 +5,7 @@ import es.caib.notib.logic.intf.base.model.FileReference;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.model.Dir3Resource;
 import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
+import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -44,6 +45,13 @@ public class LegacyHelper {
 			fileReference.getContent());
 	}
 
+	/**
+	 * Consulta una unitat organitzativa al servei DIR3 extern.
+	 *
+	 * @param codi
+	 *            el codi DIR3.
+	 * @return la informació de la unitat organitzativa (si l'ha trobada).
+	 */
 	public Optional<Dir3Resource> dir3FindOne(String codi) {
 		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
 		ConfigHelper.setEntitatCodi(currentEntitat.getCodi());
@@ -59,15 +67,38 @@ public class LegacyHelper {
 		}
 	}
 
+	/**
+	 * Fa una consulta d'unitats organitzatives al servei DIR3 extern en base a una sèrie de paràmetres.
+	 *
+	 * @param codi
+	 *            el codi DIR3.
+	 * @param denominacio
+	 *            la denominació.
+	 * @param nivellAdministracio
+	 *            el nivell de l'administració.
+	 * @param comunitatAutonoma
+	 *            el codi de la comunitat autònoma.
+	 * @param provincia
+	 *            el codi de la província.
+	 * @param municipi
+	 *            el codi del municipi.
+	 * @param ambOficines
+	 *            indica si només s'han de retornar les unitats que tenen oficines.
+	 * @param esUnitatArrel
+	 *            indica si només s'han de retornar les unitats arrel.
+	 * @param pageable
+	 *            la informació de paginació.
+	 * @return la pàgina amb els resultats de la consulta.
+	 */
 	public Page<Dir3Resource> dir3FindMultiple(
 		String codi,
 		String denominacio,
 		Long nivellAdministracio,
 		Long comunitatAutonoma,
-		Boolean ambOficines,
-		Boolean esUnitatArrel,
 		Long provincia,
 		String municipi,
+		Boolean ambOficines,
+		Boolean esUnitatArrel,
 		Pageable pageable) {
 		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
 		ConfigHelper.setEntitatCodi(currentEntitat.getCodi());
@@ -88,6 +119,45 @@ public class LegacyHelper {
 		} else {
 			return Page.empty();
 		}
+
+
+	}
+
+	/**
+	 * Consulta la llista de comunitats autònomes a DIR3.
+	 *
+	 * @return la llista de comunitats autònomes.
+	 */
+	public List<CodiValor> dir3ConsultaComunitatsAutonomes() {
+		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
+		ConfigHelper.setEntitatCodi(currentEntitat.getCodi());
+		return pluginHelper.llistarComunitatsAutonomes();
+	}
+
+	/**
+	 * Consulta la llista de províncies a DIR3.
+	 *
+	 * @param comunitatAutonomaCodi
+	 *            el codi de la comunitat autònoma.
+	 * @return la llista de províncies.
+	 */
+	public List<CodiValor> dir3ConsultaProvincies(String comunitatAutonomaCodi) {
+		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
+		ConfigHelper.setEntitatCodi(currentEntitat.getCodi());
+		return pluginHelper.llistarProvincies();
+	}
+
+	/**
+	 * Consulta la llista de localitats a DIR3.
+	 *
+	 * @param provinciaCodi
+	 *            el codi de la província.
+	 * @return la llista de localitats.
+	 */
+	public List<CodiValor> dir3ConsultaLocalitats(String provinciaCodi) {
+		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
+		ConfigHelper.setEntitatCodi(currentEntitat.getCodi());
+		return pluginHelper.llistarLocalitats(provinciaCodi);
 	}
 
 	private Dir3Resource toDir3Resource(NodeDir3 nodeDir3) {

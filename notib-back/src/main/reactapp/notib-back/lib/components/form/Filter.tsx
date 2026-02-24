@@ -122,7 +122,7 @@ export const Filter: React.FC<FilterProps> = (props) => {
         }
     };
     const clear = (data?: any) => {
-        setNextDataChangeAsUncontrolled(true);
+        setNextDataChangeAsUncontrolled(!buttonControlled);
         formApiRef.current?.reset(data);
     };
     const handleDataChange = (data: any) => {
@@ -178,7 +178,8 @@ export const Filter: React.FC<FilterProps> = (props) => {
                         fieldTypeMap={fieldTypeMap}
                         validationErrors={validationErrors}
                         apiRef={formApiRef}
-                        {...otherFormProps}>
+                        {...otherFormProps}
+                    >
                         {children}
                     </Form>
                 </div>

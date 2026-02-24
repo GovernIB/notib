@@ -112,8 +112,8 @@ export type MuiDataGridProps = {
     columns: MuiDataGridColDef[];
     /** Indica si la graella és de només lectura (no es permeten modificacions) */
     readOnly?: true;
-    /** Desactiva les peticions automàtiques al backend per a obtenir la informació a mostrar a la graella */
-    findDisabled?: boolean;
+    /** Desactiva la primera petició automàtica al backend per a obtenir la informació a mostrar a la graella */
+    autoFindDisabled?: boolean;
     /** Text pel missatge de que no hi ha resultats */
     noRowsText?: string;
     /** Activa la persistència de l'estat (paginació, ordenació, selecció, ...) */
@@ -316,7 +316,8 @@ const rowActionsToGridActionsCellItem = (
     linkTarget?: string,
     onClick?: (event: any) => void,
     showInMenu?: boolean,
-    disabled?: boolean) => {
+    disabled?: boolean
+) => {
     const { getLinkComponent } = useBaseAppContext();
     const additionalProps: any = showInMenu ? { showInMenu: true } : {};
     linkTo && (additionalProps['component'] = getLinkComponent());
@@ -335,7 +336,7 @@ const rowActionsToGridActionsCellItem = (
         />
     );
     return actionCellItem;
-}
+};
 
 const rowActionsToGridActionsCellItems = (
     rowActions: DataCommonAdditionalAction[],
@@ -366,19 +367,18 @@ const rowActionsToGridActionsCellItems = (
             if (rowAction.clickShowCreateDialog) {
                 dataGridApiRef.current?.triggerCreate?.(row);
             } else if (rowAction.clickShowUpdateDialog) {
-                 dataGridApiRef.current?.triggerUpdate?.(id, row);
+                dataGridApiRef.current?.triggerUpdate?.(id, row);
             } else if (rowAction.clickTriggerDelete) {
                 dataGridApiRef.current?.triggerDelete?.(id);
             } else {
                 rowAction.onClick?.(id, row, event);
             }
-        }
+        };
         const label =
             typeof rowAction.label === 'function' ? rowAction.label(row) : rowAction.label;
         const title =
             typeof rowAction.title === 'function' ? rowAction.title(row) : rowAction.title;
-        const icon =
-            typeof rowAction.icon === 'function' ? rowAction.icon(row) : rowAction.icon;
+        const icon = typeof rowAction.icon === 'function' ? rowAction.icon(row) : rowAction.icon;
         const showInMenu =
             typeof rowAction.showInMenu === 'function'
                 ? rowAction.showInMenu(row)
@@ -389,9 +389,7 @@ const rowActionsToGridActionsCellItems = (
                 ? rowAction.disabled(row)
                 : rowAction.disabled);
         const hidden =
-            typeof rowAction.hidden === 'function'
-                ? rowAction.hidden(row)
-                : rowAction.hidden;
+            typeof rowAction.hidden === 'function' ? rowAction.hidden(row) : rowAction.hidden;
         rowLinkShow &&
             rowArtifactShow &&
             !hidden &&
@@ -499,9 +497,7 @@ const useGridColumns = (
                         artifacts,
                         anyRowInEditMode && !currentRowInEditMode
                     );
-                    return <GridActionsCell {...params}>
-                        {actionsCellItems}
-                    </GridActionsCell>;
+                    return <GridActionsCell {...params}>{actionsCellItems}</GridActionsCell>;
                 },
                 ...rowActionsColumnProps,
             };
@@ -554,7 +550,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         resourceFieldName,
         columns,
         readOnly,
-        findDisabled,
+        autoFindDisabled,
         noRowsText,
         persistentState,
         selectionActive,
@@ -711,7 +707,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         resourceType,
         resourceTypeCode,
         resourceFieldName,
-        findDisabled,
+        autoFindDisabled,
         findArgs,
         quickFilterInitialValue,
         quickFilterSetFocus,
@@ -723,7 +719,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     );
     const isUpperToolbarType = toolbarType === 'upper';
     const gridMargins = isUpperToolbarType ? { m: 2 } : null;
-    const canDeleteAnyRow = rows.some(r => r['_actions']?.['delete'] != null);
+    const canDeleteAnyRow = rows.some((r) => r['_actions']?.['delete'] != null);
     React.useEffect(() => {
         onRowsChange?.(rows, pageInfo);
         if (treeDataAdditionalRowsIsFunction) {
@@ -766,12 +762,12 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         formApiRef.current.reset();
         datagridApiRef.current?.startRowEditMode({ id: CREATE_ROW_ID });
         setTimeout(() => formApiRef.current.focus());
-    }
+    };
     const inlineUpdate = (id: any, row?: any) => {
         formApiRef.current.reset(row, id);
         datagridApiRef.current?.startRowEditMode({ id });
         setTimeout(() => formApiRef.current.focus());
-    }
+    };
     const inlineStopRowEditMode = (id: any, ignoreModifications?: boolean) => {
         if (ignoreModifications) {
             datagridApiRef.current?.stopRowEditMode({ id, ignoreModifications });
@@ -786,18 +782,17 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         } else {
             datagridApiRef.current?.stopRowEditMode({ id });
         }
-    }
+    };
     const onRowDelete = (id: any | any[]) => {
-        const ids = Array.isArray(id) ? id : (id != null ? [id] : null);
+        const ids = Array.isArray(id) ? id : id != null ? [id] : null;
         if (ids != null) {
             setRowSelectionModel((prev) => {
-                const newIds = new Set(
-                    [...prev.ids].filter((id) => !ids.includes(id)));
+                const newIds = new Set([...prev.ids].filter((id) => !ids.includes(id)));
                 return { ...prev, ids: newIds };
             });
         }
         onRowDeleteProp?.(id);
-    }
+    };
     const {
         toolbarAddElement,
         rowEditActions,
@@ -811,8 +806,8 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         formAdditionalData,
         toolbarCreateLink,
         anyRowInEditMode,
-        (inlineEditActive || inlineEditCreateActive) ? inlineCreate : undefined,
-        (inlineEditActive || inlineEditUpdateActive) ? inlineUpdate : undefined,
+        inlineEditActive || inlineEditCreateActive ? inlineCreate : undefined,
+        inlineEditActive || inlineEditUpdateActive ? inlineUpdate : undefined,
         rowDetailLink,
         rowUpdateLink,
         rowDisableUpdateButton,
@@ -853,10 +848,13 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     toolbarBulkDelete &&
         toolbarGridElementsWithPositions.push({
             position: toolbarNodesPosition,
-            element: <DataGridBulkDelete
-                rowSelectionModel={rowSelectionModel}
-                disabled={!canDeleteAnyRow}
-                onClick={triggerDelete} />,
+            element: (
+                <DataGridBulkDelete
+                    rowSelectionModel={rowSelectionModel}
+                    disabled={!canDeleteAnyRow}
+                    onClick={triggerDelete}
+                />
+            ),
         });
     const toolbarNumElements =
         toolbarNodesPosition +
@@ -901,16 +899,16 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         (inlineEditActive ?? false) || (inlineEditUpdateActive ?? false),
         fields,
         inlineStopRowEditMode,
-        artifacts,
+        artifacts
     );
     const apiRef = React.useRef<MuiDataGridApi>({
-            refresh,
-            export: gridExport,
-            triggerCreate,
-            triggerUpdate,
-            triggerDelete,
-            setFilter: (filter) => setInternalFilter(filter ?? undefined),
-        });
+        refresh,
+        export: gridExport,
+        triggerCreate,
+        triggerUpdate,
+        triggerDelete,
+        setFilter: (filter) => setInternalFilter(filter ?? undefined),
+    });
     React.useEffect(() => {
         apiRef.current = {
             refresh,
@@ -952,73 +950,77 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
               rowCount: pageInfo?.totalElements ?? 0,
           }
         : null;
-    const selectionProps: any = selectionActive || toolbarBulkDelete
-        ? {
-              checkboxSelection: true,
-              disableRowSelectionOnClick: true,
-              onRowSelectionModelChange: (
-                  rowSelectionModel: GridRowSelectionModel,
-                  details: GridCallbackDetails
-              ) => {
-                  setRowSelectionModel(rowSelectionModel);
-                  onRowSelectionModelChange?.(rowSelectionModel, details);
-              },
-              rowSelectionModel,
-              keepNonExistentRowsSelected: true,
-              checkboxSelectionVisibleOnly: true,
-          }
-        : {
-              disableRowSelectionOnClick: true,
-          };
-    const inlineEditingProps: any = inlineEditActive || inlineEditCreateActive ? {
-        editMode: 'row',
-        onRowModesModelChange: setRowModesModel,
-        onRowEditStart: (params: any) => {
-            formApiRef.current.reset(params.row, params.id);
-            setTimeout(() => formApiRef.current.focus(params.field));
-        },
-        onRowEditStop: (params: any) => {
-            if (params.id === CREATE_ROW_ID) {
-                const previousRowData = params.row._previousRowData;
-                datagridApiRef.current?.updateRows([
-                    { id: CREATE_ROW_ID, _action: 'delete' },
-                ]);
-                if (previousRowData != null) {
-                    datagridApiRef.current?.updateRows([previousRowData]);
-                }
-            }
-        },
-        processRowUpdate: (newRow: any) =>
-            new Promise((resolve, reject) => {
-                formApiRef.current
-                    ?.save()
-                    .then((saved) => {
-                        resolve(
-                            newRow.id === CREATE_ROW_ID
-                                ? { ...saved, id: CREATE_ROW_ID }
-                                : saved
-                        );
-                        if (newRow.id === CREATE_ROW_ID) {
-                            onRowCreate?.(newRow);
-                        } else {
-                            onRowUpdate?.(newRow);
-                        }
-                        refresh();
-                    })
-                    .catch(reject);
-            }),
-        onProcessRowUpdateError: (error: any) => {
-            if (!error.modificationCanceledError && error.status === 422) {
-                const errors = error.errors ?? error.validationErrors;
-                const fieldErrors = errors
-                    ?.filter((e: any) => e.field != null)
-                    .map((e: any) => e.field);
-                if (fieldErrors?.length) {
-                    setTimeout(() => formApiRef.current.focus(fieldErrors[0]));
-                }
-            }
-        },
-    } : null;
+    const selectionProps: any =
+        selectionActive || toolbarBulkDelete
+            ? {
+                  checkboxSelection: true,
+                  disableRowSelectionOnClick: true,
+                  onRowSelectionModelChange: (
+                      rowSelectionModel: GridRowSelectionModel,
+                      details: GridCallbackDetails
+                  ) => {
+                      setRowSelectionModel(rowSelectionModel);
+                      onRowSelectionModelChange?.(rowSelectionModel, details);
+                  },
+                  rowSelectionModel,
+                  keepNonExistentRowsSelected: true,
+                  checkboxSelectionVisibleOnly: true,
+              }
+            : {
+                  disableRowSelectionOnClick: true,
+              };
+    const inlineEditingProps: any =
+        inlineEditActive || inlineEditCreateActive
+            ? {
+                  editMode: 'row',
+                  onRowModesModelChange: setRowModesModel,
+                  onRowEditStart: (params: any) => {
+                      formApiRef.current.reset(params.row, params.id);
+                      setTimeout(() => formApiRef.current.focus(params.field));
+                  },
+                  onRowEditStop: (params: any) => {
+                      if (params.id === CREATE_ROW_ID) {
+                          const previousRowData = params.row._previousRowData;
+                          datagridApiRef.current?.updateRows([
+                              { id: CREATE_ROW_ID, _action: 'delete' },
+                          ]);
+                          if (previousRowData != null) {
+                              datagridApiRef.current?.updateRows([previousRowData]);
+                          }
+                      }
+                  },
+                  processRowUpdate: (newRow: any) =>
+                      new Promise((resolve, reject) => {
+                          formApiRef.current
+                              ?.save()
+                              .then((saved) => {
+                                  resolve(
+                                      newRow.id === CREATE_ROW_ID
+                                          ? { ...saved, id: CREATE_ROW_ID }
+                                          : saved
+                                  );
+                                  if (newRow.id === CREATE_ROW_ID) {
+                                      onRowCreate?.(newRow);
+                                  } else {
+                                      onRowUpdate?.(newRow);
+                                  }
+                                  refresh();
+                              })
+                              .catch(reject);
+                      }),
+                  onProcessRowUpdateError: (error: any) => {
+                      if (!error.modificationCanceledError && error.status === 422) {
+                          const errors = error.errors ?? error.validationErrors;
+                          const fieldErrors = errors
+                              ?.filter((e: any) => e.field != null)
+                              .map((e: any) => e.field);
+                          if (fieldErrors?.length) {
+                              setTimeout(() => formApiRef.current.focus(fieldErrors[0]));
+                          }
+                      }
+                  },
+              }
+            : null;
     const stripedProps: any = striped
         ? {
               getRowClassName: (params: GridRowClassNameParams) =>
@@ -1067,7 +1069,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                         setAutoPageSize: setFooterAutoPageSize,
                     },
                     noRowsOverlay: {
-                        requestPending: findDisabled && !('rows' in otherProps),
+                        requestPending: autoFindDisabled && !('rows' in otherProps),
                         noRowsText: noRowsText,
                     },
                 }}
@@ -1107,14 +1109,20 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                         flexDirection: 'column',
                         height: height ? height : '100%',
                         ...virtualScrollerStyles,
-                    }}>
-                    {inlineEditable ? <Form
-                        resourceName={resourceName}
-                        apiRef={formApiRef}
-                        additionalData={formAdditionalData}
-                        commonFieldComponentProps={{ size: 'small' }}>
-                        {content}
-                    </Form> : content}
+                    }}
+                >
+                    {inlineEditable ? (
+                        <Form
+                            resourceName={resourceName}
+                            apiRef={formApiRef}
+                            additionalData={formAdditionalData}
+                            commonFieldComponentProps={{ size: 'small' }}
+                        >
+                            {content}
+                        </Form>
+                    ) : (
+                        content
+                    )}
                 </Box>
             )}
         </DataGridContext.Provider>

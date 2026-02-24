@@ -4,10 +4,11 @@ import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
 import es.caib.notib.logic.intf.base.annotation.ResourceArtifact;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.annotation.ResourceField;
-import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
+import es.caib.notib.logic.intf.base.validation.CustomValidation;
+import es.caib.notib.logic.intf.model.validator.CodiODenominacioNotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -51,6 +52,12 @@ public class Dir3Resource extends BaseResource<String> {
 	@Setter
 	@FieldNameConstants
 	@NoArgsConstructor
+	@CustomValidation.List({
+		@CustomValidation(
+			customValidatorType = CodiODenominacioNotNull.class,
+			targetFields = { Dir3ResourceFilter.Fields.codi, Dir3ResourceFilter.Fields.denominacio }
+		)
+	})
 	public static class Dir3ResourceFilter implements Serializable {
 		private String codi;
 		private String denominacio;
