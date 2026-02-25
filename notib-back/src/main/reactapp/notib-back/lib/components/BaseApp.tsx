@@ -41,7 +41,7 @@ export type BaseAppProps = React.PropsWithChildren & {
     routerGoBack: (fallback?: string) => void;
     routerNavigate: RouterNavigateFunction;
     routerAnyHistoryEntryExist: () => boolean;
-    routerUseBlocker?: (shouldBlock: boolean) => void;
+    routerUseBlocker?: (shouldBlock: boolean | ((args: any) => boolean)) => void;
     routerUseLocationPath: () => string;
     linkComponent: React.ElementType;
     saveAs?: (data: Blob | string, filename?: string) => void;
@@ -197,20 +197,24 @@ const ContentComponentDefault: React.FC<BaseAppContentComponentProps> = (props) 
                 display: 'flex',
                 flexDirection: 'column',
                 height: mainBoxHeight,
-            }}>
+            }}
+        >
             {appbarComponent}
             <div
                 style={{
                     display: 'flex',
                     flexGrow: 1,
-                }}>
+                    minHeight: 0,
+                }}
+            >
                 <nav>{menuComponent}</nav>
                 <main
                     style={{
                         flexGrow: 1,
                         minWidth: 0,
                         ...(!marginsDisabled ? { margin: '16px 24px' } : null),
-                    }}>
+                    }}
+                >
                     {appReady ? childrenOrOfflineComponent : null}
                 </main>
             </div>
@@ -298,7 +302,8 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
                 appbarComponent={contentComponentSlots.appbar}
                 footerComponent={contentComponentSlots.footer}
                 menuComponent={contentComponentSlots.menu}
-                offlineComponent={contentComponentSlots.offline}>
+                offlineComponent={contentComponentSlots.offline}
+            >
                 {children}
             </ContentComponentDefault>
         </BaseAppContext.Provider>

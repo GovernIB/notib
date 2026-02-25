@@ -284,6 +284,7 @@ export const Form: React.FC<FormProps> = (props) => {
         resourceType == null ? apiActions?.[id != null ? 'update' : 'create'] != null : true;
     const isDeleteActionPresent = id && apiActions?.['delete'] != null;
     const isReady = !isLoading;
+    const anyModified = modified || externalModified;
     const sendOnChangeRequest = React.useCallback(
         (id: any, args: ResourceApiOnChangeArgs): Promise<any> => {
             if (resourceType == null) {
@@ -757,7 +758,7 @@ export const Form: React.FC<FormProps> = (props) => {
             fieldTypeMap,
             inline,
             data,
-            modified: (modified || externalModified) ?? false,
+            modified: anyModified,
             apiRef,
             dataGetFieldValue: (fieldName: string) => dataGetValue((state) => state?.[fieldName]),
             dataDispatchAction,
@@ -787,7 +788,7 @@ export const Form: React.FC<FormProps> = (props) => {
             <div style={divStyle} onKeyDown={handleFormEnterKeyPressed} ref={divRef}>
                 {isReady ? children : null}
             </div>
-            {parentFormContext == null && <FormBlocker modified={modified || externalModified} />}
+            {parentFormContext == null && <FormBlocker modified={anyModified} />}
         </ResourceApiFormContext.Provider>
     );
 };
