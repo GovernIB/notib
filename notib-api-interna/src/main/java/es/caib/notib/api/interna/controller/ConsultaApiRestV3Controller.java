@@ -1,6 +1,6 @@
 package es.caib.notib.api.interna.controller;
 
-import es.caib.notib.api.interna.openapi.interficies.ConsultaApiRestV2Intf;
+import es.caib.notib.api.interna.openapi.interficies.ConsultaApiRestV3Intf;
 import es.caib.notib.api.interna.util.EnhancedBooleanEditor;
 import es.caib.notib.api.interna.util.EnhancedDateEditor;
 import es.caib.notib.client.domini.EnviamentTipus;
@@ -35,7 +35,7 @@ import java.util.Date;
 @RestController
 @Slf4j
 @RequestMapping("/consulta/v3")
-public class ConsultaApiRestV3Controller extends NotificacioApiRestBaseController implements ConsultaApiRestV2Intf {
+public class ConsultaApiRestV3Controller extends NotificacioApiRestBaseController implements ConsultaApiRestV3Intf {
 
 	@Autowired
 	private EnviamentService enviamentService;

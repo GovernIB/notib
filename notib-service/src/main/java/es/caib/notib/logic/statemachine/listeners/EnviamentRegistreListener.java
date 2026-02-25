@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.transaction.Transactional;
 import java.util.concurrent.Semaphore;
 
 @Slf4j
@@ -38,7 +39,6 @@ public class EnviamentRegistreListener {
     private final MessageHelper messageHelper;
 
     private Semaphore semaphore = new Semaphore(5);
-
 
     @JmsListener(destination = SmConstants.CUA_REGISTRE, containerFactory = SmConstants.JMS_FACTORY_ACK)
     public void receiveEnviamentRegistre(@Payload EnviamentRegistreRequest enviamentRegistreRequest, @Headers MessageHeaders headers, Message message) throws JMSException, RegistreNotificaException, InterruptedException {
@@ -55,6 +55,7 @@ public class EnviamentRegistreListener {
             var enviament = enviamentRepository.findByUuid(enviamentUuid);
             if (enviament.isEmpty()) {
                 log.error("[SM] Enviament inexistent " + enviamentUuid);
+                enviamentSmService.registreFailed(enviamentUuid);
                 return;
             }
             var env = enviament.get();
@@ -81,6 +82,9 @@ public class EnviamentRegistreListener {
             //        var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual());
             var missatge = MissatgeWs.builder().ok(success).msg(msg).codiUsuari(enviamentRegistreRequest.getCodiUsuari()).updateInfo(true).notificacioId(env.getNotificacio().getId()).build();
             webSocketJms.enviarMissatge(missatge);
+        } catch (Exception ex) {
+            log.error("[SM] Error inesperat al listener de registre", ex);
+            enviamentSmService.registreFailed(enviamentUuid);
         } finally {
             semaphore.release();
         }

@@ -431,21 +431,16 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			}
 			NotibLogger.getInstance().info(">> [ALTA] enviaments creats", log, LoggingTipus.STATE_MACHINE);
 			notificacioGuardada = notificacioRepository.saveAndFlush(notificacioGuardada);
-			notificacioEntity.getEnviaments().forEach(e -> {
-				var referenciaEnviament = e.getNotificaReferencia();
-				if (TransactionSynchronizationManager.isActualTransactionActive()) {
-					TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-						@Override
-						public void afterCommit() {
-							enviamentSmService.acquireStateMachine(referenciaEnviament);
-							enviamentSmService.altaEnviament(referenciaEnviament);
+				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+					@Override
+					public void afterCommit() {
+						log.info("entro aqui");
+						if (TransactionSynchronizationManager.isActualTransactionActive()) {
+							for (var referencia : referencies) {
+								enviamentSmService.altaEnviament(referencia.getReferencia());
+							}
 						}
-					});
-					return;
-				}
-				log.warn(">> [ALTA] Alta d'enviament REST " + referenciaEnviament + " sense transaccio activa");
-				enviamentSmService.acquireStateMachine(referenciaEnviament);
-				enviamentSmService.altaEnviament(referenciaEnviament);
+					}
 			});
 			var respostaAlta = generaResposta(/*info,*/ notificacioGuardada, referencies, avisos);
 			SubsistemesHelper.addSuccessOperation(ARE, System.currentTimeMillis() - start);
