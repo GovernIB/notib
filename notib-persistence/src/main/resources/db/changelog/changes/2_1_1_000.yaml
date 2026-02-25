@@ -207,20 +207,6 @@ databaseChangeLog:
                                     type: bigint
                 -   sql: "UPDATE ${db_prefix}MON_INT a SET a.entitat = (SELECT b.id FROM ${db_prefix}ENTITAT b WHERE a.codi_entitat = b.codi) WHERE a.CODI_ENTITAT IS NOT NULL;
                         UPDATE ${db_prefix}MON_INT a SET a.aplicacio_id = (SELECT b.id FROM ${db_prefix}APLICACIO b WHERE a.aplicacio = b.usuari_codi AND a.entitat = b.entitat_id) WHERE a.aplicacio IS NOT NULL;"
-    -   changeSet:
-            id: 2_1_1_000-11
-            author: limit
-            changes:
-                -   dropColumn:
-                        tableName: ${db_prefix}MON_INT
-                        columnName: aplicacio
-                -   dropColumn:
-                        tableName: ${db_prefix}MON_INT
-                        columnName: codi_entitat
-                -   renameColumn:
-                        tableName: ${db_prefix}MON_INT
-                        oldColumnName: aplicacio_id
-                        newColumnName: aplicacio
 
     -   changeSet:
             id: 2_1_1_000-12
