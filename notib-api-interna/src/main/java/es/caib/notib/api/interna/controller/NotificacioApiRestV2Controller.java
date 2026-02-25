@@ -54,7 +54,7 @@ public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseContro
 
 		try {
 			var resposta = notificacioServiceWs.altaV2(notificacio);
-			resposta.getReferenciesAsV1().forEach(r -> enviamentSmService.altaEnviament(r.getReferencia()));
+//			resposta.getReferenciesAsV1().forEach(r -> enviamentSmService.altaEnviament(r.getReferencia()));
 			return resposta;
 		} catch (Exception e) {
 			var usr = SecurityContextHolder.getContext().getAuthentication().getName();

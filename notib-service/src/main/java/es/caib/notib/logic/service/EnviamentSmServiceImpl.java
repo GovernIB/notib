@@ -225,7 +225,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> altaEnviament(String enviamentUuid, Long delay) {
 
-		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl altaEnviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl altaEnviament " + enviamentUuid + " delay: " + delay, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		var enviament = enviamentRepository.findByUuid(enviamentUuid).orElseThrow();
 		var variables = sm.getExtendedState().getVariables();
@@ -238,7 +238,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> altaEnviament(String enviamentUuid) {
 
 		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl altaEnviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);

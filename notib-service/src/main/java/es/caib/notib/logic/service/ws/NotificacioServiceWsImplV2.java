@@ -236,7 +236,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
             return RespostaAlta.builder().error(true).errorDescripcio(msg).build();
         }
 		var resposta = altaV2(notificacio);
-		resposta.getReferenciesAsV1().forEach(r -> enviamentSmService.altaEnviament(r.getReferencia()));
+//		resposta.getReferenciesAsV1().forEach(r -> enviamentSmService.altaEnviament(r.getReferencia()));
 		return RespostaAlta.builder().identificador(resposta.getIdentificador()).estat(resposta.getEstat()).referencies(resposta.getReferenciesAsV1())
 				.error(resposta.isError()).errorDescripcio(resposta.getErrorDescripcio()).build();
 	}
