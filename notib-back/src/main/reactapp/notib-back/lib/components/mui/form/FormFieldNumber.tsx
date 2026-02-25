@@ -22,8 +22,8 @@ type FormFieldNumberProps = FormFieldCustomProps & {
     prefix?: string;
     /** Suffix per a valors que representen una divisa (atribut de react-number-format) */
     suffix?: string;
-    /** Indica si s'ha de fer debounce amb els valors del camp */
-    debounce?: true;
+    /** Indica si s'ha de deshabilitar el debounce amb els valors del camp */
+    debounceDisabled?: true;
 };
 
 type CustomProps = {
@@ -148,7 +148,6 @@ const useIsUserTypingRef = (delay: number = 250): [React.RefObject<boolean>, () 
     const timeoutIdRef = React.useRef<any>(null);
     const onUserInput = () => {
         isUserTypingRef.current = true;
-
         if (timeoutIdRef.current != null) {
             clearTimeout(timeoutIdRef.current);
         }
@@ -187,7 +186,7 @@ const InnerFormFieldNumberDebounce: React.FC<FormFieldNumberProps> = (props) => 
 };
 
 export const FormFieldNumber: React.FC<FormFieldNumberProps> = (props) => {
-    if (props.debounce) {
+    if (!props.debounceDisabled) {
         return <InnerFormFieldNumberDebounce {...props} />;
     } else {
         return <InnerFormFieldNumber {...props} />;

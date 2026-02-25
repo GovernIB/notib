@@ -10,8 +10,8 @@ import { FormFieldError } from '../../form/FormContext';
 type FormFieldTextProps = FormFieldCustomProps & {
     /** Indica si aquest camp és de tipus password */
     password?: true;
-    /** Indica si s'ha de fer debounce amb els valors del camp */
-    debounce?: true;
+    /** Indica si s'ha de deshabilitar el debounce amb els valors del camp */
+    debounceDisabled?: true;
 };
 
 export const useFormFieldCommon = (
@@ -134,7 +134,6 @@ const useIsUserTypingRef = (delay: number = 250): [React.RefObject<boolean>, () 
     const timeoutIdRef = React.useRef<any>(null);
     const onUserInput = () => {
         isUserTypingRef.current = true;
-
         if (timeoutIdRef.current != null) {
             clearTimeout(timeoutIdRef.current);
         }
@@ -173,7 +172,7 @@ const InnerFormFieldTextDebounce: React.FC<FormFieldTextProps> = (props) => {
 };
 
 export const FormFieldText: React.FC<FormFieldTextProps> = (props) => {
-    if (props.debounce) {
+    if (!props.debounceDisabled) {
         return <InnerFormFieldTextDebounce {...props} />;
     } else {
         return <InnerFormFieldText {...props} />;

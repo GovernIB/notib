@@ -9,6 +9,7 @@ import {
 import { ResourceType } from '../ResourceApiContext';
 import { useConfirmDialogButtons } from '../AppButtons';
 import { processApiFields } from '../../util/fields';
+import { shallowEqual } from '../../util/equals';
 import useLogConsole from '../../util/useLogConsole';
 import { useReducerWithActionMiddleware } from '../../util/useReducerWithActionMiddleware';
 import ResourceApiFormContext, {
@@ -18,7 +19,9 @@ import ResourceApiFormContext, {
     FormFieldDataAction,
     FormFieldDataActionType,
     useFormContext,
+    useOptionalFormContext,
 } from './FormContext';
+import FormBlocker from './FormBlocker';
 
 const LOG_PREFIX = 'FORM';
 
@@ -122,39 +125,6 @@ const getApiSaveProcessedData = (
         return data;
     }
 };
-
-const shallowEqual = (obj1: any, obj2: any) => {
-    for (let key of Object.keys(obj1)) {
-        const val1 = obj1[key];
-        const val2 = obj2[key];
-        if (Array.isArray(val1) && Array.isArray(val2)) {
-            if (val1.length !== val2.length) return false;
-            continue;
-        }
-        if (Array.isArray(val1) || Array.isArray(val2)) {
-            return false;
-        }
-        if (typeof val1 === 'object' && typeof val2 === 'object') {
-            const bothNull = val1 === null && val2 === null;
-            const bothNotNull = val1 !== null && val2 !== null;
-
-            if (!bothNull && !bothNotNull) return false;
-            continue;
-        }
-        if (val1 !== val2) return false;
-    }
-    return true;
-};
-/*const deepEqual = (a: any, b: any): boolean => {
-    if (a === b) return true;
-    if (typeof a !== 'object' || typeof b !== 'object' || a === null || b === null) {
-        return false;
-    }
-    for (let key of Object.keys(a)) {
-        if (!deepEqual(a[key], b[key])) return false;
-    }
-    return true;
-};*/
 
 const formDataReducer = (state: any, action: FormFieldDataAction): any => {
     const { type, payload } = action;
@@ -273,7 +243,6 @@ export const Form: React.FC<FormProps> = (props) => {
     const {
         goBack,
         navigate,
-        useBlocker,
         useLocationPath,
         temporalMessageShow,
         messageDialogShow,
@@ -737,13 +706,6 @@ export const Form: React.FC<FormProps> = (props) => {
             }
         }
     }, [isReady, data]);
-    useBlocker?.(() => {
-        if (modified || externalModified) {
-            return !confirm(t('form.blocker'));
-        } else {
-            return false;
-        }
-    });
     apiRef.current = {
         getData,
         refresh: () => refresh(true),
@@ -778,6 +740,7 @@ export const Form: React.FC<FormProps> = (props) => {
         ...(validatorFieldErrors ?? []),
         ...(apiFieldErrors ?? []),
     ];
+    const parentFormContext = useOptionalFormContext();
     const context = React.useMemo(
         () => ({
             id,
@@ -824,6 +787,7 @@ export const Form: React.FC<FormProps> = (props) => {
             <div style={divStyle} onKeyDown={handleFormEnterKeyPressed} ref={divRef}>
                 {isReady ? children : null}
             </div>
+            {parentFormContext == null && <FormBlocker modified={modified || externalModified} />}
         </ResourceApiFormContext.Provider>
     );
 };

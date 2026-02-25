@@ -33,10 +33,10 @@ const Dir3SearchFilterContent: React.FC = () => {
     return (
         <Grid container spacing={2}>
             <Grid size={3}>
-                <FormField name="codi" debounce />
+                <FormField name="codi" />
             </Grid>
             <Grid size={6}>
-                <FormField name="denominacio" debounce />
+                <FormField name="denominacio" />
             </Grid>
             <Grid size={3}>
                 <FormField name="nivellAdministracio" />

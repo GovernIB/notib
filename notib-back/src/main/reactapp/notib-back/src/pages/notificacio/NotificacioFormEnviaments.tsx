@@ -38,48 +38,47 @@ const NotificacioFormEnviamentPersonaFormContent: React.FC<{ interessat?: boolea
                             'page.notificacio.form.interessats.nifLabel.' + data.interessatTipus
                         )}
                         required={data.requiredNif}
-                        debounce
                     />
                 </Grid>
             )}
             {data.visibleNom && (
                 <Grid size={6}>
-                    <FormField name="nom" required={data.requiredNom} debounce />
+                    <FormField name="nom" required={data.requiredNom} />
                 </Grid>
             )}
             {data.visibleLlinatge1 && (
                 <Grid size={6}>
-                    <FormField name="llinatge1" required={data.requiredLlinatge1} debounce />
+                    <FormField name="llinatge1" required={data.requiredLlinatge1} />
                 </Grid>
             )}
             {data.visibleLlinatge2 && (
                 <Grid size={6}>
-                    <FormField name="llinatge2" debounce />
+                    <FormField name="llinatge2" />
                 </Grid>
             )}
             {data.visibleRaoSocial && (
                 <Grid size={6}>
-                    <FormField name="raoSocial" required={data.requiredRaoSocial} debounce />
+                    <FormField name="raoSocial" required={data.requiredRaoSocial} />
                 </Grid>
             )}
             {data.visibleDir3Codi && (
                 <Grid size={6}>
-                    <FormField name="dir3Codi" required={data.requiredDir3Codi} debounce />
+                    <FormField name="dir3Codi" required={data.requiredDir3Codi} />
                 </Grid>
             )}
             {data.visibleTelefon && (
                 <Grid size={6}>
-                    <FormField name="telefon" debounce />
+                    <FormField name="telefon" />
                 </Grid>
             )}
             {data.visibleEmail && (
                 <Grid size={6}>
-                    <FormField name="email" required={data.requiredEmail} debounce />
+                    <FormField name="email" required={data.requiredEmail} />
                 </Grid>
             )}
             {data.visibleIncapacitat && (
                 <Grid size={6}>
-                    <FormField name="incapacitat" debounce />
+                    <FormField name="incapacitat" />
                 </Grid>
             )}
         </Grid>

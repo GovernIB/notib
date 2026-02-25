@@ -65,10 +65,10 @@ const NotificacioFormContent: React.FC = () => {
                 <Typography variant="h6" sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}>
                     {t('page.notificacio.form.tabs.remesa')}
                 </Typography>
-                <FormField name="concepte" debounce />
+                <FormField name="concepte" />
             </Grid>
             <Grid size={12}>
-                <FormField name="descripcio" type="textarea" debounce />
+                <FormField name="descripcio" type="textarea" />
             </Grid>
             <Grid size={6}>
                 <FormField name="organGestor" />
@@ -77,7 +77,7 @@ const NotificacioFormContent: React.FC = () => {
                 <ProcedimentServeiField />
             </Grid>
             <Grid size={6}>
-                <FormField name="numExpedient" debounce />
+                <FormField name="numExpedient" />
             </Grid>
             <Grid size={6}>
                 <FormField name="idioma" />
