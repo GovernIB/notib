@@ -57,6 +57,8 @@ import es.caib.notib.logic.intf.util.DatesUtils;
 import es.caib.notib.logic.intf.util.EidasValidator;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2;
+import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.AplicacioEntity;
 import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
@@ -427,7 +429,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 				ref = saveEnviament(entitat, notificacioGuardada, enviament);
 				referencies.add(ref);
 			}
-			log.debug(">> [ALTA] enviaments creats");
+			NotibLogger.getInstance().info(">> [ALTA] enviaments creats", log, LoggingTipus.STATE_MACHINE);
 			notificacioGuardada = notificacioRepository.saveAndFlush(notificacioGuardada);
 			notificacioEntity.getEnviaments().forEach(e -> {
 				var referenciaEnviament = e.getNotificaReferencia();
@@ -1316,7 +1318,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 //		enviamentSmService.acquireStateMachine(enviamentSaved.getUuid());
 		enviamentTableHelper.crearRegistre(enviamentSaved);
 		auditHelper.auditaEnviament(enviamentSaved, AuditService.TipusOperacio.CREATE, "NotificacioServiceWsImplV2.altaV2");
-		log.debug(">> [ALTA] enviament creat");
+		NotibLogger.getInstance().info(">> [ALTA] enviament creat", log, LoggingTipus.STATE_MACHINE);
 
 
 		EnviamentReferenciaV2 enviamentReferencia = new EnviamentReferenciaV2();

@@ -45,11 +45,11 @@ public class EnviamentRegistreListener {
 
         message.acknowledge();
         var enviamentUuid = enviamentRegistreRequest.getEnviamentUuid();
+        NotibLogger.getInstance().info("[SM] Rebut enviament de registre <" + enviamentUuid + ">", log, LoggingTipus.STATE_MACHINE);
         if (enviamentUuid == null) {
             log.error("[SM] Rebut enviament de registre sense Enviament");
             return;
         }
-        log.debug("[SM] Rebut enviament de registre <" + enviamentUuid + ">");
         semaphore.acquire();
         try {
             var enviament = enviamentRepository.findByUuid(enviamentUuid);
