@@ -1,7 +1,16 @@
 import { useTranslation } from 'react-i18next';
 import Chip from '@mui/material/Chip';
-import { GridPage, MuiDataGrid } from 'reactlib';
+import {
+    FilterApi,
+    GridPage,
+    MuiDataGrid,
+    MuiFilter,
+    useFilterApiRef,
+    springFilterBuilder as filterBuilder,
+} from 'reactlib';
 import { useNotibContext } from '../../components/NotibContext';
+import { Grid, Icon, IconButton } from '@mui/material';
+import GridFormField, { GridButtonField } from '../../components/GridFormField';
 
 const columns = [
     {
@@ -10,11 +19,11 @@ const columns = [
     },
     {
         field: 'nom',
-        flex: 4,
+        flex: 2,
     },
     {
         field: 'organGestor',
-        flex: 1,
+        flex: 3,
     },
     {
         field: 'retard',
@@ -72,6 +81,66 @@ const columns = [
     },
 ];
 
+const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (props) => {
+    const { filterApiRef } = props;
+    const { t } = useTranslation();
+
+    const handleButtonClick = () => {
+        filterApiRef.current.clear();
+    };
+    return (
+        <Grid container spacing={2}>
+            <GridFormField size={1} name="codi" />
+            <GridFormField size={3} name="nom" />
+            <GridFormField size={4} name="organGestor" />
+            <GridButtonField size={0.5} name="actiu" icon={'flash_on'} hiddenLabel />
+            <GridButtonField size={0.5} name="comu" icon={'public'} hiddenLabel />
+            <GridButtonField size={0.5} name="entregaCie" icon={'email'} hiddenLabel />
+            <GridButtonField size={0.5} name="manual" icon={'sync'} hiddenLabel />
+            <GridButtonField
+                size={0.5}
+                name="requireDirectPermission"
+                icon={'gpp_good'}
+                hiddenLabel
+            />
+            <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
+                <Icon>filter_alt_off</Icon>
+            </IconButton>
+        </Grid>
+    );
+};
+
+const ProcedimentGridFilter: React.FC = () => {
+    const filterApiRef = useFilterApiRef();
+
+    const springFilterBuilder = (data: any) => {
+        return filterBuilder.and(
+            filterBuilder.like('codi', data.codi),
+            filterBuilder.like('nom', data.nom),
+            filterBuilder.eq('organGestor.id', data.organGestor?.id),
+            data?.actiu && filterBuilder.eq('actiu', `'${data.actiu}'`),
+            data?.comu && filterBuilder.eq('comu', `'${data.comu}'`),
+            data?.entregaCie && filterBuilder.eq('entregaCie', `'${data.entregaCie}'`), // TODO: Revisar aquest camp des backend
+            data?.manual && filterBuilder.eq('manual', `'${data.manual}'`),
+            data?.requireDirectPermission &&
+                filterBuilder.eq('requireDirectPermission', `'${data.requireDirectPermission}'`)
+        );
+    };
+
+    return (
+        <MuiFilter
+            resourceName="procedimentResource"
+            code="FILTER_PROCEDIMENT"
+            apiRef={filterApiRef}
+            springFilterBuilder={springFilterBuilder}
+            componentProps={{ sx: { mb: 2, mt: 0 } }}
+            commonFieldComponentProps={{ size: 'small' }}
+        >
+            <ContentFilter filterApiRef={filterApiRef} />
+        </MuiFilter>
+    );
+};
+
 export const ProcedimentGrid = () => {
     const { t } = useTranslation();
     const { currentEntitatId } = useNotibContext();
@@ -84,6 +153,8 @@ export const ProcedimentGrid = () => {
                 staticFilter={"tipus:'PROCEDIMENT' and entitat.id:" + currentEntitatId}
                 paginationActive
                 toolbarCreateLink="form"
+                toolbarAdditionalRow={<ProcedimentGridFilter />}
+                toolbarHideQuickFilter
                 rowLink="form/{{id}}"
                 rowUpdateLink="form/{{id}}"
             />

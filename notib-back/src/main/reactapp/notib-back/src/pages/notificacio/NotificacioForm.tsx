@@ -7,7 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import Icon from '@mui/material/Icon';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import { FormPage, MuiForm, FormField, useFormContext } from 'reactlib';
+import { FormPage, MuiForm, FormField, useFormContext, useFormApiRef } from 'reactlib';
 import NotificacioFormEnviaments from './NotificacioFormEnviaments';
 import NotificacioFormDocuments from './NotificacioFormDocuments';
 
@@ -53,7 +53,7 @@ const ProcedimentServeiField: React.FC = () => {
             </Grid>
         );
     } else {
-        return <FormField name="procediment" filter={"tipus:'" + type.toUpperCase + "'"} />;
+        return <FormField name="procediment" filter={"tipus:'" + type.toUpperCase() + "'"} />;
     }
 };
 
@@ -65,10 +65,10 @@ const NotificacioFormContent: React.FC = () => {
                 <Typography variant="h6" sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}>
                     {t('page.notificacio.form.tabs.remesa')}
                 </Typography>
-                <FormField name="concepte" debounce />
+                <FormField name="concepte" />
             </Grid>
             <Grid size={12}>
-                <FormField name="descripcio" type="textarea" debounce />
+                <FormField name="descripcio" type="textarea" />
             </Grid>
             <Grid size={6}>
                 <FormField name="organGestor" />
@@ -77,7 +77,7 @@ const NotificacioFormContent: React.FC = () => {
                 <ProcedimentServeiField />
             </Grid>
             <Grid size={6}>
-                <FormField name="numExpedient" debounce />
+                <FormField name="numExpedient" />
             </Grid>
             <Grid size={6}>
                 <FormField name="idioma" />
@@ -100,6 +100,17 @@ export const NotificacioForm: React.FC = () => {
     const { id } = useParams();
     const [searchParams] = useSearchParams();
     const type = searchParams.get('type');
+    const formApiRef = useFormApiRef();
+    const initialData = {
+        enviamentsInfo: [{ id: new Date().valueOf() }],
+        documentsInfo: [{ id: new Date().valueOf() }],
+    };
+    const handleReset = () => {
+        // Feim això perquè, si no refrescam l'id de l'enviament i del document que es crea per defecte, React no detecta que ha
+        // canviat l'atribut key i no refresca la informació dels formularis.
+        formApiRef.current.setFieldValue('enviamentsInfo', [{ id: new Date().valueOf() }]);
+        formApiRef.current.setFieldValue('documentsInfo', [{ id: new Date().valueOf() }]);
+    };
     return (
         <FormPage>
             <MuiForm
@@ -111,9 +122,10 @@ export const NotificacioForm: React.FC = () => {
                         : t('page.notificacio.form.title.' + type + '.create')
                 }
                 initOnChangeRequest
-                additionalData={type ? { enviamentTipus: type } : undefined}
+                additionalData={type ? { enviamentTipus: type, ...initialData } : initialData}
+                onReset={handleReset}
+                apiRef={formApiRef}
                 createLink="./{{id}}"
-                //updateLink="../../"
                 toolbarElementsWithPositions={[{ position: 2, element: <JSonButton /> }]}
                 componentProps={{ style: { height: '100%' } }}
                 commonFieldComponentProps={{ size: 'small' }}

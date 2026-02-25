@@ -7,101 +7,8 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Icon from '@mui/material/Icon';
 import IconButton from '@mui/material/IconButton';
-import {
-    MuiForm,
-    FormField,
-    useFormContext,
-    MuiDataGridDialog,
-    useMuiDataGridDialogApiRef,
-    MuiFilter,
-} from 'reactlib';
-
-const dir3DialogColumns = [
-    {
-        field: 'codi',
-        flex: 1,
-    },
-    {
-        field: 'denominacio',
-        flex: 4,
-    },
-    {
-        field: 'sir',
-        flex: 1,
-    },
-];
-
-const Dir3SearchFilter: React.FC = () => {
-    const springFilterBuilder = (data: any) => {
-        return '';
-    };
-    return (
-        <MuiFilter
-            resourceName="dir3Resource"
-            code="FILTER_DIR3"
-            springFilterBuilder={springFilterBuilder}
-            commonFieldComponentProps={{ size: 'small' }}
-            componentProps={{ sx: { mb: 2 } }}
-        >
-            <Grid container spacing={2}>
-                <Grid size={6}>
-                    <FormField name="codi" />
-                </Grid>
-                <Grid size={6}>
-                    <FormField name="denominacio" />
-                </Grid>
-                <Grid size={6}>
-                    <FormField name="nivellAdministracio" />
-                </Grid>
-                <Grid size={6}>
-                    <FormField name="comunitatAutonoma" />
-                </Grid>
-                <Grid size={6}>
-                    <FormField name="provincia" />
-                </Grid>
-                <Grid size={6}>
-                    <FormField name="municipi" />
-                </Grid>
-            </Grid>
-        </MuiFilter>
-    );
-};
-
-const Dir3SearchInput: React.FC<{ name: string }> = (props) => {
-    const { name } = props;
-    const gridDialogApiRef = useMuiDataGridDialogApiRef();
-    return (
-        <>
-            <Grid container spacing={2}>
-                <Grid size={11}>
-                    <FormField name={name} disabled />
-                </Grid>
-                <Grid size={1}>
-                    <Button
-                        variant="outlined"
-                        startIcon={<Icon>search</Icon>}
-                        fullWidth
-                        onClick={() => gridDialogApiRef.current.show()}
-                    >
-                        Cercar
-                    </Button>
-                </Grid>
-            </Grid>
-            <MuiDataGridDialog
-                resourceName="dir3Resource"
-                title="Consulta d'administracions públiques a DIR3"
-                columns={dir3DialogColumns}
-                dataGridComponentProps={{
-                    findDisabled: true,
-                    toolbarHide: true,
-                    toolbarAdditionalRow: <Dir3SearchFilter />,
-                }}
-                dialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
-                apiRef={gridDialogApiRef}
-            />
-        </>
-    );
-};
+import { MuiForm, FormField, useFormContext } from 'reactlib';
+import Dir3SearchInput from '../../components/Dir3SearchInput';
 
 const NotificacioFormEnviamentPersonaFormContent: React.FC<{ interessat?: boolean }> = (props) => {
     const { interessat } = props;
@@ -131,48 +38,47 @@ const NotificacioFormEnviamentPersonaFormContent: React.FC<{ interessat?: boolea
                             'page.notificacio.form.interessats.nifLabel.' + data.interessatTipus
                         )}
                         required={data.requiredNif}
-                        debounce
                     />
                 </Grid>
             )}
             {data.visibleNom && (
                 <Grid size={6}>
-                    <FormField name="nom" required={data.requiredNom} debounce />
+                    <FormField name="nom" required={data.requiredNom} />
                 </Grid>
             )}
             {data.visibleLlinatge1 && (
                 <Grid size={6}>
-                    <FormField name="llinatge1" required={data.requiredLlinatge1} debounce />
+                    <FormField name="llinatge1" required={data.requiredLlinatge1} />
                 </Grid>
             )}
             {data.visibleLlinatge2 && (
                 <Grid size={6}>
-                    <FormField name="llinatge2" debounce />
+                    <FormField name="llinatge2" />
                 </Grid>
             )}
             {data.visibleRaoSocial && (
                 <Grid size={6}>
-                    <FormField name="raoSocial" required={data.requiredRaoSocial} debounce />
+                    <FormField name="raoSocial" required={data.requiredRaoSocial} />
                 </Grid>
             )}
             {data.visibleDir3Codi && (
                 <Grid size={6}>
-                    <FormField name="dir3Codi" required={data.requiredDir3Codi} debounce />
+                    <FormField name="dir3Codi" required={data.requiredDir3Codi} />
                 </Grid>
             )}
             {data.visibleTelefon && (
                 <Grid size={6}>
-                    <FormField name="telefon" debounce />
+                    <FormField name="telefon" />
                 </Grid>
             )}
             {data.visibleEmail && (
                 <Grid size={6}>
-                    <FormField name="email" required={data.requiredEmail} debounce />
+                    <FormField name="email" required={data.requiredEmail} />
                 </Grid>
             )}
             {data.visibleIncapacitat && (
                 <Grid size={6}>
-                    <FormField name="incapacitat" debounce />
+                    <FormField name="incapacitat" />
                 </Grid>
             )}
         </Grid>
@@ -236,6 +142,7 @@ const NotificacioFormEnviament: React.FC<{
 }> = (props) => {
     const { index, indexKey, handleRemove } = props;
     const { t } = useTranslation();
+    const [titularInitialized, setTitularInitialized] = React.useState<boolean>(false);
     const [ambRepresentant, setAmbRepresentant] = React.useState<boolean>(false);
     const [currentEnviamentFieldValidationErrors, setCurrentEnviamentFieldValidationErrors] =
         React.useState<any[]>();
@@ -257,11 +164,14 @@ const NotificacioFormEnviament: React.FC<{
             .map((e) => ({ ...e, field: e.field.substring(errorPrefix.length + 1) }));
         setCurrentEnviamentGlobalValidationErrors(currentEnviamentGlobalValidationErrors);
     }, [parentFieldErrors]);
-    const handleDataChange = (data: any) => {
+    const handleDataChange = (data: any, initial: boolean) => {
         const enviamentsWithData = parentFormData?.enviamentsInfo?.map((e: any) =>
             e.id === indexKey ? { id: indexKey, ...data } : e
         );
         parentFormApiRef.current?.setFieldValue('enviamentsInfo', enviamentsWithData);
+        !initial && titularInitialized && parentFormApiRef.current?.setModified(true);
+        const currentEnviament = enviamentsWithData.find((e: any) => e.id === indexKey);
+        setTitularInitialized(currentEnviament?.titularInfo != null);
     };
     return (
         <Paper sx={{ px: 2, py: 1, mb: 2 }}>
@@ -305,7 +215,7 @@ const NotificacioFormEnviament: React.FC<{
                             </Grid>
                             {parentFormData?.enviamentTipus === 'SIR' && (
                                 <Grid size={12}>
-                                    <Dir3SearchInput name="sirTitularDir3Codi" />
+                                    <Dir3SearchInput name="sirTitularDir3Codi" required />
                                 </Grid>
                             )}
                             {parentFormData?.enviamentTipus !== 'SIR' && (
@@ -343,12 +253,6 @@ const NotificacioFormEnviaments: React.FC = () => {
     const { t } = useTranslation();
     const { data, apiRef: formApiRef } = useFormContext();
     const enviamentsInfo = data?.enviamentsInfo;
-    React.useEffect(() => {
-        const reset = !enviamentsInfo?.length;
-        if (reset) {
-            formApiRef.current?.setFieldValue('enviamentsInfo', [{ id: new Date().valueOf() }]);
-        }
-    }, [enviamentsInfo]);
     const handleAddClick = () => {
         formApiRef.current?.setFieldValue('enviamentsInfo', [
             ...(enviamentsInfo ?? []),

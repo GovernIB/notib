@@ -1,9 +1,11 @@
 package es.caib.notib.logic.intf.model;
 
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
+import es.caib.notib.logic.intf.base.annotation.ResourceArtifact;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
+import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
@@ -14,6 +16,7 @@ import lombok.experimental.FieldNameConstants;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -32,9 +35,17 @@ import java.util.Date;
 		type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
 		roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_SUPER },
 		grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
-	)
+	),
+	artifacts = {
+		@ResourceArtifact(
+			type = ResourceArtifactType.FILTER,
+			code = ProcedimentResource.FILTER_CODE,
+			formClass = ProcedimentResource.ProcedimentResourceFilter.class)
+	}
 )
 public class ProcedimentResource extends BaseResource<Long> {
+
+	public static final String FILTER_CODE = "FILTER_PROCEDIMENT";
 
 	@NotNull
 	private ProcSerTipusEnum tipus;
@@ -73,5 +84,18 @@ public class ProcedimentResource extends BaseResource<Long> {
 	private boolean entregaCieActiva;
 	private ResourceReference<PagadorCieResource, Long> pagadorCie;
 	private ResourceReference<PagadorPostalResource, Long> pagadorPostal;
+
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	public static class ProcedimentResourceFilter implements Serializable {
+		private String codi;
+		private String nom;
+		private boolean comu;
+		private boolean requireDirectPermission;
+		private boolean manual;
+		private boolean actiu;
+		private ResourceReference<OrganGestorResource, Long> organGestor;
+	}
 
 }

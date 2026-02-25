@@ -29,7 +29,11 @@ export const MuiFilter: React.FC<MuiFilterProps> = (props) => {
     const gridContext = useOptionalDataGridContext();
     const handleSpringFilterChange = (filter: string | undefined) => {
         if (gridContext != null && !detached) {
-            gridContext.apiRef.current?.setFilter(filter);
+            if (gridContext.findArgs?.filter != filter) {
+                gridContext.apiRef.current?.setFilter(filter);
+            } else {
+                gridContext.apiRef.current?.refresh();
+            }
         }
         onSpringFilterChange?.(filter);
     };

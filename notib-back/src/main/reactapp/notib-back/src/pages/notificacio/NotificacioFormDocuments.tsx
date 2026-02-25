@@ -84,11 +84,12 @@ const NotificacioFormDocument: React.FC<{
             .map((e) => ({ ...e, field: e.field.substring(errorPrefix.length + 1) }));
         setCurrentDocumentFieldValidationErrors(currentDocumentFieldValidationErrors);
     }, [parentFieldErrors]);
-    const handleDataChange = (data: any) => {
+    const handleDataChange = (data: any, initial: boolean) => {
         const documentsWithData = parentFormData?.documentsInfo?.map((e: any) =>
             e.id === indexKey ? { id: indexKey, ...data } : e
         );
         parentFormApiRef.current?.setFieldValue('documentsInfo', documentsWithData);
+        !initial && parentFormApiRef.current?.setModified(true);
     };
     return (
         <Paper sx={{ px: 2, py: 1, mb: 2 }}>
@@ -126,12 +127,6 @@ const NotificacioFormDocuments: React.FC = () => {
     const { t } = useTranslation();
     const { data, apiRef: formApiRef } = useFormContext();
     const documentsInfo = data?.documentsInfo;
-    React.useEffect(() => {
-        const reset = !documentsInfo?.length;
-        if (reset) {
-            formApiRef.current?.setFieldValue('documentsInfo', [{ id: new Date().valueOf() }]);
-        }
-    }, [documentsInfo]);
     const handleAddClick = () => {
         formApiRef.current?.setFieldValue('documentsInfo', [
             ...(documentsInfo ?? []),

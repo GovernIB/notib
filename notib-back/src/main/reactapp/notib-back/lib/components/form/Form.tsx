@@ -9,6 +9,7 @@ import {
 import { ResourceType } from '../ResourceApiContext';
 import { useConfirmDialogButtons } from '../AppButtons';
 import { processApiFields } from '../../util/fields';
+import { shallowEqual } from '../../util/equals';
 import useLogConsole from '../../util/useLogConsole';
 import { useReducerWithActionMiddleware } from '../../util/useReducerWithActionMiddleware';
 import ResourceApiFormContext, {
@@ -18,7 +19,9 @@ import ResourceApiFormContext, {
     FormFieldDataAction,
     FormFieldDataActionType,
     useFormContext,
+    useOptionalFormContext,
 } from './FormContext';
+import FormBlocker from './FormBlocker';
 
 const LOG_PREFIX = 'FORM';
 
@@ -65,7 +68,9 @@ export type FormProps = React.PropsWithChildren & {
     /** Event que es llença quan s'han carregat les dades del formulari */
     onReady?: (data: any) => void;
     /** Event que es llença quan es modifica alguna dada del formulari */
-    onDataChange?: (data: any) => void;
+    onDataChange?: (data: any, initial: boolean) => void;
+    /** Event que es llença quan es fa un reset del formulari */
+    onReset?: (data: any) => void;
     /** Event que es llença quan es crea un nou registre */
     onCreateSuccess?: (data: any) => void;
     /** Event que es llença quan es modifica un registre */
@@ -118,19 +123,6 @@ const getApiSaveProcessedData = (
         return onBeforeSaveSuccess(data);
     } else {
         return data;
-    }
-};
-
-const shallowEqual = (obj1: any, obj2: any) => {
-    const keys1 = Object.keys(obj1);
-    const keys2 = Object.keys(obj2);
-    if (keys1.length === keys2.length) {
-        for (let key of keys1) {
-            if (obj1[key] !== obj2[key]) return false;
-        }
-        return true;
-    } else {
-        return false;
     }
 };
 
@@ -231,6 +223,7 @@ export const Form: React.FC<FormProps> = (props) => {
         goBackLink,
         onReady,
         onDataChange,
+        onReset,
         onCreateSuccess,
         onUpdateSuccess,
         onSaveSuccess,
@@ -250,7 +243,6 @@ export const Form: React.FC<FormProps> = (props) => {
     const {
         goBack,
         navigate,
-        useBlocker,
         useLocationPath,
         temporalMessageShow,
         messageDialogShow,
@@ -277,6 +269,7 @@ export const Form: React.FC<FormProps> = (props) => {
     const confirmDialogComponentProps = { maxWidth: 'sm', fullWidth: true };
     const [isLoading, setIsLoading] = React.useState<boolean>(true);
     const [modified, setModified] = React.useState<boolean>(false);
+    const [externalModified, setExternalModified] = React.useState<boolean>(false);
     const [fields, setFields] = React.useState<any[]>();
     const [validatorFieldErrors, setValidatorFieldErrors] = React.useState<FormFieldError[]>();
     const [apiFieldErrors, setApiFieldErrors] = React.useState<FormFieldError[]>();
@@ -424,11 +417,13 @@ export const Form: React.FC<FormProps> = (props) => {
         });
         setIsLoading(false);
         setModified(false);
+        setExternalModified(false);
         setRevertData(data);
         setApiFieldErrors(undefined);
         validateWithValidator(data);
         setIsDataInitialized(true);
         id !== undefined && setInternalId(id);
+        onReset?.(data);
     };
     const externalReset = (data?: any, id?: any) => {
         // Versió de reset per a cridar externament mitjançant l'API
@@ -477,12 +472,7 @@ export const Form: React.FC<FormProps> = (props) => {
         });
     const revert = (unconfirmed?: boolean) => {
         const revertFn = () => {
-            dataDispatchAction({
-                type: FormFieldDataActionType.RESET,
-                payload: revertData,
-            });
-            setModified(false);
-            setApiFieldErrors(undefined);
+            reset(revertData);
         };
         if (unconfirmed) {
             revertFn();
@@ -708,18 +698,14 @@ export const Form: React.FC<FormProps> = (props) => {
     React.useEffect(() => {
         // Controla l'estat de formulari amb modificacions
         if (isReady) {
-            setModified(!shallowEqual(data, revertData));
-            onDataChange?.(data);
-            validateWithValidator(data);
+            const modified = !shallowEqual(data, revertData);
+            setModified(modified);
+            onDataChange?.(data, !modified);
+            if (modified) {
+                validateWithValidator(data);
+            }
         }
     }, [isReady, data]);
-    useBlocker?.(() => {
-        if (modified) {
-            return !confirm(t('form.blocker'));
-        } else {
-            return false;
-        }
-    });
     apiRef.current = {
         getData,
         refresh: () => refresh(true),
@@ -730,6 +716,7 @@ export const Form: React.FC<FormProps> = (props) => {
         delete: delette,
         focus,
         setFieldValue,
+        setModified: setExternalModified,
         handleSubmissionErrors,
     };
     if (apiRefProp) {
@@ -753,6 +740,7 @@ export const Form: React.FC<FormProps> = (props) => {
         ...(validatorFieldErrors ?? []),
         ...(apiFieldErrors ?? []),
     ];
+    const parentFormContext = useOptionalFormContext();
     const context = React.useMemo(
         () => ({
             id,
@@ -769,7 +757,7 @@ export const Form: React.FC<FormProps> = (props) => {
             fieldTypeMap,
             inline,
             data,
-            modified: modified ?? false,
+            modified: (modified || externalModified) ?? false,
             apiRef,
             dataGetFieldValue: (fieldName: string) => dataGetValue((state) => state?.[fieldName]),
             dataDispatchAction,
@@ -799,6 +787,7 @@ export const Form: React.FC<FormProps> = (props) => {
             <div style={divStyle} onKeyDown={handleFormEnterKeyPressed} ref={divRef}>
                 {isReady ? children : null}
             </div>
+            {parentFormContext == null && <FormBlocker modified={modified || externalModified} />}
         </ResourceApiFormContext.Provider>
     );
 };
