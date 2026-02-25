@@ -79,7 +79,7 @@ export const useApiDataCommon = (
         fieldOptionsFind: apiFieldOptionsFind,
     } = useResourceApiService(resourceName);
     const [firstRefresh, setFirstRefresh] = React.useState<boolean>(true);
-    const [loading, setLoading] = React.useState<boolean>(!autoFindDisabled);
+    const [loading, setLoading] = React.useState<boolean>();
     const [fields, setFields] = React.useState<any[]>([]);
     const [rows, setRows] = React.useState<any[]>([]);
     const [pageInfo, setPageInfo] = React.useState<any>();
@@ -203,7 +203,7 @@ export const useApiDataCommon = (
     return {
         loading,
         fields,
-        rows: autoFindDisabled ? [] : rows,
+        rows,
         pageInfo,
         artifacts,
         error,

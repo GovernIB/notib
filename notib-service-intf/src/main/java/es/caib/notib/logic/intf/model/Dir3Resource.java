@@ -47,6 +47,15 @@ public class Dir3Resource extends BaseResource<String> {
 	private String denominacionCooficial;
 	private String estat;
 	private Integer versio;
+	private String cif;
+	private boolean sir;
+	private boolean permetreSir;
+
+	// Camps calculats
+	private boolean selectable;
+	private boolean noCif;
+	private boolean noSir;
+	private boolean viaValib;
 
 	@Getter
 	@Setter

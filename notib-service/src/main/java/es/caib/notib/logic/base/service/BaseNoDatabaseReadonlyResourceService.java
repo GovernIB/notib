@@ -2,6 +2,7 @@ package es.caib.notib.logic.base.service;
 
 import es.caib.notib.logic.intf.base.model.Resource;
 import es.caib.notib.persist.base.entity.NoDatabaseResourceEntity;
+import liquibase.pro.packaged.E;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
@@ -22,6 +23,13 @@ public abstract class BaseNoDatabaseReadonlyResourceService<R extends Resource<I
 	@Override
 	protected boolean isEntityRepositoryOptional() {
 		return true;
+	}
+
+	@Override
+	protected R entityToResource(NoDatabaseResourceEntity<R, ID> entity) {
+		R resource = entity.getResource();
+		resource.setId(entity.getId());
+		return resource;
 	}
 
 }

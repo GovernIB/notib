@@ -65,6 +65,10 @@ const componentsEs = {
             save: 'Guardar',
             cancel: 'Cancelar',
         },
+        row: {
+            single: 'fila',
+            multiple: 'filas',
+        },
         pageInfo: '{{from}} a {{to}} de {{count}}',
         sizeAuto: 'Automático',
         requestPending: 'Pendiente de consultar',

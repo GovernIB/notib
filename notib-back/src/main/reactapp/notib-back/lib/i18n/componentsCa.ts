@@ -65,6 +65,10 @@ const componentsCa = {
             save: 'Desar',
             cancel: 'Cancel·lar',
         },
+        row: {
+            single: 'fila',
+            multiple: 'files',
+        },
         pageInfo: '{{from}} a {{to}} de {{count}}',
         sizeAuto: 'Automàtic',
         requestPending: 'Pendent de consultar',

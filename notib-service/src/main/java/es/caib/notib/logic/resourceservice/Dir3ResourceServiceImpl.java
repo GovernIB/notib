@@ -1,12 +1,16 @@
 package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.logic.base.service.BaseNoDatabaseReadonlyResourceService;
+import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.LegacyHelper;
+import es.caib.notib.logic.helper.UserSessionHelper;
+import es.caib.notib.logic.intf.base.config.PropertyConfig;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.model.FieldOption;
 import es.caib.notib.logic.intf.model.Dir3Resource;
 import es.caib.notib.logic.intf.resourceservice.Dir3ResourceService;
 import es.caib.notib.persist.base.entity.NoDatabaseResourceEntity;
+import es.caib.notib.persist.resourcerepository.OrganGestorResourceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -31,6 +35,9 @@ import java.util.stream.Collectors;
 public class Dir3ResourceServiceImpl extends BaseNoDatabaseReadonlyResourceService<Dir3Resource, String> implements Dir3ResourceService {
 
 	private final LegacyHelper legacyHelper;
+	private final ConfigHelper configHelper;
+	private final UserSessionHelper userSessionHelper;
+	private final OrganGestorResourceRepository organGestorResourceRepository;
 
 	@PostConstruct
 	public void init() {
@@ -56,7 +63,7 @@ public class Dir3ResourceServiceImpl extends BaseNoDatabaseReadonlyResourceServi
 		String comunitatAutonoma = getFieldValueFromFilterTriplets("comunitatAutonoma", ":", filterTriplets);
 		String provincia = getFieldValueFromFilterTriplets("provincia", ":", filterTriplets);
 		String municipi = getFieldValueFromFilterTriplets("municipi", ":", filterTriplets);
-		return legacyHelper.dir3FindMultiple(
+		Page<Dir3Resource> page = legacyHelper.dir3FindMultiple(
 				codi,
 				denominacio,
 				nivellAdministracio != null ? Long.parseLong(nivellAdministracio) : null,
@@ -65,8 +72,9 @@ public class Dir3ResourceServiceImpl extends BaseNoDatabaseReadonlyResourceServi
 				municipi,
 				null,
 				null,
-				pageable).
-			map(this::toResourceEntity);
+				pageable);
+		calcularCampsRecurs(page);
+		return page.map(this::toResourceEntity);
 	}
 
 	private static final Pattern TRIPLET_PATTERN = Pattern.compile(
@@ -100,6 +108,27 @@ public class Dir3ResourceServiceImpl extends BaseNoDatabaseReadonlyResourceServi
 			findFirst().
 			map(t -> t[2]).
 			orElse(null);
+	}
+
+	private void calcularCampsRecurs(Page<Dir3Resource> page) {
+		if (!page.isEmpty()) {
+			// Calcula i emplena els camps que falten del recurs
+			Boolean isPermesComunicacionsSirPropiaEntitat = configHelper.getConfigAsBoolean(PropertyConfig.PROP_COMUNICACIONS_SIR_INTERNES);
+			List<String> codisLocals = organGestorResourceRepository.findCodisByEntitatAndCodiIn(
+				userSessionHelper.getCurrentEntitat(),
+				page.stream().map(Dir3Resource::getCodi).collect(Collectors.toSet()));
+			page.stream().forEach(r -> {
+				if (r.getCif() == null) {
+					r.setNoCif(true);
+				} else if (!r.isSir()) {
+					r.setNoSir(true);
+				} else if (!isPermesComunicacionsSirPropiaEntitat && codisLocals.contains(r.getCodi())) {
+					r.setViaValib(true);
+				} else {
+					r.setSelectable(true);
+				}
+			});
+		}
 	}
 
 	private NoDatabaseResourceEntity<Dir3Resource, String> toResourceEntity(Dir3Resource resource) {

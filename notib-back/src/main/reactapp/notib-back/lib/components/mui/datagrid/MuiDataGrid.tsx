@@ -953,8 +953,8 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     const selectionProps: any =
         selectionActive || toolbarBulkDelete
             ? {
-                  checkboxSelection: true,
-                  disableRowSelectionOnClick: true,
+                  checkboxSelection: otherProps.checkboxSelection ?? true,
+                  disableRowSelectionOnClick: otherProps.disableRowSelectionOnClick ?? true,
                   onRowSelectionModelChange: (
                       rowSelectionModel: GridRowSelectionModel,
                       details: GridCallbackDetails
@@ -964,7 +964,8 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                   },
                   rowSelectionModel,
                   keepNonExistentRowsSelected: true,
-                  checkboxSelectionVisibleOnly: true,
+                  checkboxSelectionVisibleOnly:
+                      (otherProps.checkboxSelection ?? true) ? true : undefined,
               }
             : {
                   disableRowSelectionOnClick: true,
@@ -1069,7 +1070,8 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                         setAutoPageSize: setFooterAutoPageSize,
                     },
                     noRowsOverlay: {
-                        requestPending: autoFindDisabled && !('rows' in otherProps),
+                        requestPending:
+                            loading === undefined && autoFindDisabled && !('rows' in otherProps),
                         noRowsText: noRowsText,
                     },
                 }}
@@ -1091,7 +1093,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     };
     const context = {
         resourceName,
-        loading,
+        loading: loading ?? false,
         findArgs,
         rows: processedRows,
         selection: rowSelectionModel,

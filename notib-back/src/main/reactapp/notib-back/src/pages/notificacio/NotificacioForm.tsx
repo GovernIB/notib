@@ -13,17 +13,26 @@ import NotificacioFormDocuments from './NotificacioFormDocuments';
 
 const JSonButton: React.FC = () => {
     const { data } = useFormContext();
+    const visible = false;
     return (
-        <IconButton onClick={() => console.log(data)}>
-            <Icon>question_mark</Icon>
-        </IconButton>
+        visible && (
+            <IconButton onClick={() => console.log(data)}>
+                <Icon>question_mark</Icon>
+            </IconButton>
+        )
     );
 };
 
 const ProcedimentServeiField: React.FC = () => {
     const { t } = useTranslation();
-    const { data } = useFormContext();
+    const { data, apiRef: formApiRef } = useFormContext();
     const [type, setType] = React.useState<string>('procediment');
+    const handleChange = (value: any) => {
+        setType(value);
+        if (data.procediment != null) {
+            formApiRef.current?.setFieldValue('procediment', null);
+        }
+    };
     if (data.enviamentTipus === 'SIR') {
         return (
             <Grid container spacing={2}>
@@ -31,7 +40,7 @@ const ProcedimentServeiField: React.FC = () => {
                     <ToggleButtonGroup
                         value={type}
                         exclusive
-                        onChange={(_event, value) => setType(value)}
+                        onChange={(_event, value) => handleChange(value)}
                         size="small"
                         fullWidth
                     >

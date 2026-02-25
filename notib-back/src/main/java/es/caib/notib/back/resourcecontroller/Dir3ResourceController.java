@@ -1,6 +1,5 @@
 package es.caib.notib.back.resourcecontroller;
 
-import es.caib.notib.back.base.controller.BaseMutableResourceController;
 import es.caib.notib.back.base.controller.BaseReadonlyResourceController;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.model.Dir3Resource;

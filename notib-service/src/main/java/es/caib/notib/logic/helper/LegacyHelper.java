@@ -1,5 +1,6 @@
 package es.caib.notib.logic.helper;
 
+import es.caib.notib.logic.helper.plugin.GestioDocumentalPluginHelper;
 import es.caib.notib.logic.helper.plugin.UnitatsOrganitzativesPluginHelper;
 import es.caib.notib.logic.intf.base.model.FileReference;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
@@ -27,8 +28,10 @@ import java.util.stream.Collectors;
 public class LegacyHelper {
 
 	private final UserSessionHelper userSessionHelper;
-	private final PluginHelper pluginHelper;
+	private final GestioDocumentalPluginHelper gestioDocumentalPluginHelper;
 	private final UnitatsOrganitzativesPluginHelper unitatsOrganitzativesPluginHelper;
+
+	private final PluginHelper pluginHelper;
 
 	/**
 	 * Crea un document adjunt per una notificació.
@@ -40,7 +43,7 @@ public class LegacyHelper {
 	public String notificacioAdjuntCreate(FileReference fileReference) {
 		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
 		ConfigHelper.setEntitatCodi(currentEntitat.getCodi());
-		return pluginHelper.gestioDocumentalCreate(
+		return gestioDocumentalPluginHelper.gestioDocumentalCreate(
 			PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
 			fileReference.getContent());
 	}
@@ -55,7 +58,7 @@ public class LegacyHelper {
 	public Optional<Dir3Resource> dir3FindOne(String codi) {
 		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
 		ConfigHelper.setEntitatCodi(currentEntitat.getCodi());
-		NodeDir3 nodeDir3 = pluginHelper.unitatOrganitzativaFindByCodi(
+		NodeDir3 nodeDir3 = unitatsOrganitzativesPluginHelper.unitatOrganitzativaFindByCodi(
 			currentEntitat.getCodi(),
 			codi,
 			null,
@@ -119,8 +122,6 @@ public class LegacyHelper {
 		} else {
 			return Page.empty();
 		}
-
-
 	}
 
 	/**
@@ -131,7 +132,7 @@ public class LegacyHelper {
 	public List<CodiValor> dir3ConsultaComunitatsAutonomes() {
 		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
 		ConfigHelper.setEntitatCodi(currentEntitat.getCodi());
-		return pluginHelper.llistarComunitatsAutonomes();
+		return unitatsOrganitzativesPluginHelper.llistarComunitatsAutonomes();
 	}
 
 	/**
@@ -144,7 +145,7 @@ public class LegacyHelper {
 	public List<CodiValor> dir3ConsultaProvincies(String comunitatAutonomaCodi) {
 		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
 		ConfigHelper.setEntitatCodi(currentEntitat.getCodi());
-		return pluginHelper.llistarProvincies();
+		return unitatsOrganitzativesPluginHelper.llistarProvincies();
 	}
 
 	/**
@@ -157,7 +158,7 @@ public class LegacyHelper {
 	public List<CodiValor> dir3ConsultaLocalitats(String provinciaCodi) {
 		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
 		ConfigHelper.setEntitatCodi(currentEntitat.getCodi());
-		return pluginHelper.llistarLocalitats(provinciaCodi);
+		return unitatsOrganitzativesPluginHelper.llistarLocalitats(provinciaCodi);
 	}
 
 	private Dir3Resource toDir3Resource(NodeDir3 nodeDir3) {
@@ -176,6 +177,9 @@ public class LegacyHelper {
 		dir3Resource.setDenominacio(organGestorDto.getNom());
 		dir3Resource.setDenominacionCooficial(organGestorDto.getNomEs());
 		dir3Resource.setEstat(organGestorDto.getEstat().toString());
+		dir3Resource.setCif(organGestorDto.getCif());
+		dir3Resource.setSir(organGestorDto.getSir() != null && organGestorDto.getSir());
+		dir3Resource.setPermetreSir(organGestorDto.isPermetreSir());
 		return dir3Resource;
 	}
 

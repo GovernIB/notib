@@ -64,6 +64,10 @@ const componentsEn = {
             save: 'Save',
             cancel: 'Cancel',
         },
+        row: {
+            single: 'row',
+            multiple: 'rows',
+        },
         pageInfo: '{{from}} to {{to}} of {{count}}',
         sizeAuto: 'Automatic',
         requestPending: 'Searching...',

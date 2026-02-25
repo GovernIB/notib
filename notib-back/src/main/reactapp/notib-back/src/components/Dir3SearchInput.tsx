@@ -15,15 +15,50 @@ import {
 const dir3DialogColumns = [
     {
         field: 'codi',
-        flex: 1,
+        flex: 2,
     },
     {
         field: 'denominacio',
-        flex: 4,
+        flex: 6,
+    },
+    {
+        field: 'cif',
+        flex: 2,
     },
     {
         field: 'sir',
         flex: 1,
+        renderCell: (params: any) => {
+            return params.value ? (
+                <Icon color="success" title={params.value}>
+                    check_circle
+                </Icon>
+            ) : (
+                <Icon color="disabled" title={params.value}>
+                    cancel
+                </Icon>
+            );
+        },
+    },
+    {
+        field: 'selectable',
+        flex: 2,
+        renderCell: (params: any) => {
+            return params.value ? (
+                <Icon color="success" title={params.value}>
+                    check_circle
+                </Icon>
+            ) : (
+                <>
+                    <Icon color="warning" title={params.value} sx={{ mr: 1 }}>
+                        warning
+                    </Icon>
+                    {params.row.noCif && 'Sense CIF'}
+                    {params.row.noSir && 'Sense SIR'}
+                    {params.row.viaValib && 'Via VALIB'}
+                </>
+            );
+        },
     },
 ];
 
@@ -101,6 +136,16 @@ export const Dir3SearchInput: React.FC<{ name: string; required?: true }> = (pro
             filterBuilder.eq('municipi', data?.municipi)
         );
     };
+    const handleSearchClick = () => {
+        gridDialogApiRef.current
+            .show()
+            .then((value) => {
+                console.log('>>> then', value);
+            })
+            .catch((error) => {
+                console.log('>>> error', error);
+            });
+    };
     return (
         <>
             <Grid container spacing={2}>
@@ -112,7 +157,7 @@ export const Dir3SearchInput: React.FC<{ name: string; required?: true }> = (pro
                         variant="outlined"
                         startIcon={<Icon>search</Icon>}
                         fullWidth
-                        onClick={() => gridDialogApiRef.current.show()}
+                        onClick={handleSearchClick}
                     >
                         Cercar
                     </Button>
@@ -123,8 +168,22 @@ export const Dir3SearchInput: React.FC<{ name: string; required?: true }> = (pro
                 title="Consulta d'administracions públiques a DIR3"
                 columns={dir3DialogColumns}
                 dataGridComponentProps={{
+                    readOnly: true,
+                    selectionActive: true,
+                    checkboxSelection: false,
+                    disableRowSelectionOnClick: false,
+                    isRowSelectable: (params: any) => params.row.selectable,
+                    getRowClassName: (params: any) =>
+                        params.row.selectable ? 'selectable-row' : 'no-hover',
+                    sx: {
+                        '& .selectable-row': {
+                            cursor: 'pointer',
+                        },
+                        '& .no-hover:hover': {
+                            backgroundColor: 'transparent',
+                        },
+                    },
                     autoFindDisabled: true,
-                    rows: [],
                     toolbarHide: true,
                     toolbarAdditionalRow: (
                         <MuiFilter
