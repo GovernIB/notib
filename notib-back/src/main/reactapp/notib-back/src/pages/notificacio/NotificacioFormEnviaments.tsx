@@ -143,6 +143,7 @@ const NotificacioFormEnviament: React.FC<{
 }> = (props) => {
     const { index, indexKey, handleRemove } = props;
     const { t } = useTranslation();
+    const [titularInitialized, setTitularInitialized] = React.useState<boolean>(false);
     const [ambRepresentant, setAmbRepresentant] = React.useState<boolean>(false);
     const [currentEnviamentFieldValidationErrors, setCurrentEnviamentFieldValidationErrors] =
         React.useState<any[]>();
@@ -164,11 +165,14 @@ const NotificacioFormEnviament: React.FC<{
             .map((e) => ({ ...e, field: e.field.substring(errorPrefix.length + 1) }));
         setCurrentEnviamentGlobalValidationErrors(currentEnviamentGlobalValidationErrors);
     }, [parentFieldErrors]);
-    const handleDataChange = (data: any) => {
+    const handleDataChange = (data: any, initial: boolean) => {
         const enviamentsWithData = parentFormData?.enviamentsInfo?.map((e: any) =>
             e.id === indexKey ? { id: indexKey, ...data } : e
         );
         parentFormApiRef.current?.setFieldValue('enviamentsInfo', enviamentsWithData);
+        !initial && titularInitialized && parentFormApiRef.current?.setModified(true);
+        const currentEnviament = enviamentsWithData.find((e: any) => e.id === indexKey);
+        setTitularInitialized(currentEnviament?.titularInfo != null);
     };
     return (
         <Paper sx={{ px: 2, py: 1, mb: 2 }}>
@@ -250,12 +254,6 @@ const NotificacioFormEnviaments: React.FC = () => {
     const { t } = useTranslation();
     const { data, apiRef: formApiRef } = useFormContext();
     const enviamentsInfo = data?.enviamentsInfo;
-    React.useEffect(() => {
-        const reset = !enviamentsInfo?.length;
-        if (reset) {
-            formApiRef.current?.setFieldValue('enviamentsInfo', [{ id: new Date().valueOf() }]);
-        }
-    }, [enviamentsInfo]);
     const handleAddClick = () => {
         formApiRef.current?.setFieldValue('enviamentsInfo', [
             ...(enviamentsInfo ?? []),

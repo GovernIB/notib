@@ -174,13 +174,15 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
     const isReady = isFormReady && field !== undefined;
     const value = dataGetFieldValue(name);
     const handleFieldValueChange = React.useCallback(
-        (value: any) => {
-            dataDispatchAction({
-                type: FormFieldDataActionType.FIELD_CHANGE,
-                payload: { fieldName: name, field, value },
-            });
-            onChange?.(value);
-            validationSetFieldErrors(name, validator?.(value) ?? undefined);
+        (changedValue: any) => {
+            if (changedValue !== value) {
+                dataDispatchAction({
+                    type: FormFieldDataActionType.FIELD_CHANGE,
+                    payload: { fieldName: name, field, value: changedValue },
+                });
+                onChange?.(changedValue);
+                validationSetFieldErrors(name, validator?.(changedValue) ?? undefined);
+            }
         },
         [dataDispatchAction, name, field, onChange]
     );

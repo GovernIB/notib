@@ -12,6 +12,7 @@ export type FormApi = {
     delete: () => void;
     focus: (name?: string) => void;
     setFieldValue: (name: string, value: any) => void;
+    setModified: (modified: boolean) => void;
     handleSubmissionErrors: (error: ResourceApiError, temporalMessageTitle?: string) => void;
 };
 
