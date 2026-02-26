@@ -176,6 +176,8 @@ export type MuiDataGridProps = {
     rowDetailLink?: string;
     /** Adreça que s'ha de mostrar al fer clic sobre el botó de modificar una fila */
     rowUpdateLink?: string;
+    /** Funció que indica si l'enllaç d'una determinada fila està activa */
+    isRowLinkActive?: (row: any) => boolean;
     /** Deshabilita el botó d'actualització de cada fila (por ser també una funció que reb la fila i retorna true/false) */
     rowDisableUpdateButton?: boolean | ((row: any) => boolean);
     /** Deshabilita el botó d'esborrar de cada fila (por ser també una funció que reb la fila i retorna true/false) */
@@ -582,6 +584,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         rowLink,
         rowDetailLink,
         rowUpdateLink,
+        isRowLinkActive,
         rowDisableUpdateButton,
         rowDisableDeleteButton,
         rowDisableDetailsButton,
@@ -1057,7 +1060,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                     noRowsOverlay: DataGridNoRowsOverlay,
                 }}
                 slotProps={{
-                    row: { linkTo: rowLink, cursorPointer: onRowClick != null },
+                    row: { linkTo: rowLink, isRowLinkActive },
                     footer: {
                         paginationActive,
                         selectionActive,

@@ -31,13 +31,9 @@ const dir3DialogColumns = [
         flex: 1,
         renderCell: (params: any) => {
             return params.value ? (
-                <Icon color="success" title={params.value}>
-                    check_circle
-                </Icon>
+                <Icon color="success">check_circle</Icon>
             ) : (
-                <Icon color="disabled" title={params.value}>
-                    cancel
-                </Icon>
+                <Icon color="disabled">cancel</Icon>
             );
         },
     },
@@ -46,12 +42,10 @@ const dir3DialogColumns = [
         flex: 2,
         renderCell: (params: any) => {
             return params.value ? (
-                <Icon color="success" title={params.value}>
-                    check_circle
-                </Icon>
+                <Icon color="success">check_circle</Icon>
             ) : (
                 <>
-                    <Icon color="warning" title={params.value} sx={{ mr: 1 }}>
+                    <Icon color="warning" sx={{ mr: 1 }}>
                         warning
                     </Icon>
                     {params.row.noCif && 'Sense CIF'}
@@ -155,7 +149,7 @@ export const Dir3SearchInput: React.FC<{ name: string; required?: true }> = (pro
                     <FormField name={name} required={required} readOnly />
                 </Grid>
                 <Grid size={9}>
-                    <TextField value={dir3Name} disabled size="small" fullWidth />
+                    <TextField value={dir3Name ?? ''} disabled size="small" fullWidth />
                 </Grid>
                 <Grid size={1}>
                     <Button
@@ -174,9 +168,6 @@ export const Dir3SearchInput: React.FC<{ name: string; required?: true }> = (pro
                 columns={dir3DialogColumns}
                 dataGridComponentProps={{
                     readOnly: true,
-                    selectionActive: true,
-                    checkboxSelection: false,
-                    disableRowSelectionOnClick: false,
                     isRowSelectable: (params: any) => params.row.selectable,
                     getRowClassName: (params: any) =>
                         params.row.selectable ? 'selectable-row' : 'no-hover',
@@ -207,7 +198,7 @@ export const Dir3SearchInput: React.FC<{ name: string; required?: true }> = (pro
                 }}
                 dialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
                 apiRef={gridDialogApiRef}
-                onRowClickEnabled
+                onRowClickEnabled={(row) => row.selectable}
             />
         </>
     );
