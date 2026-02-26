@@ -102,16 +102,14 @@ public class CallbackHelper {
 			c.setErrorDesc(errorDesc);
 			c.setEstat(CallbackEstatEnumDto.PENDENT);
 			callbackRepository.saveAndFlush(c);
-			if (TransactionSynchronizationManager.isActualTransactionActive()) {
 				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 					@Override
 					public void afterCommit() {
-						jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId());
+						if (TransactionSynchronizationManager.isActualTransactionActive()) {
+							jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId());
+						}
 					}
 				});
-			} else {
-				jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId());
-			}
 		} catch (NoSuchElementException ex) {
 			log.error("L'enviament " + env.getId() + " i la notificacio " + env.getNotificacio().getId() + " no tenen assignat el createdBy", ex);
 		} catch (Exception ex) {
@@ -147,16 +145,14 @@ public class CallbackHelper {
 		}
 		callback.setData(new Date());
 		callback.setEstat(CallbackEstatEnumDto.PENDENT);
-		if (TransactionSynchronizationManager.isActualTransactionActive()) {
 			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 				@Override
 				public void afterCommit() {
-					jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId());
+					if (TransactionSynchronizationManager.isActualTransactionActive()) {
+						jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId());
+					}
 				}
 			});
-		} else {
-			jmsTemplate.convertAndSend(SmConstants.CUA_CALLBACKS, env.getId());
-		}
 		return callback;
 	}
 

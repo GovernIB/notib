@@ -53,6 +53,10 @@ public class CallbackListener {
         }
         var enviament = enviamentRepository.findById(enviamentId).orElseThrow();
         var aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(callback.getUsuariCodi(), enviament.getNotificacio().getEntitat().getId());
+        if (aplicacio == null) {
+            NotibLogger.getInstance().info("[CallbackListener] Aplicacio " + callback.getUsuariCodi() + "inexistent", log, LoggingTipus.CALLBACK);
+            return;
+        }
         if (!aplicacio.isActiva()) {
             NotibLogger.getInstance().info("[CallbackListener] El callback no s'envia ja que l'aplicacio  amb id " + aplicacio.getId() + " no esta activa ", log, LoggingTipus.CALLBACK);
             return;
