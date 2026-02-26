@@ -169,9 +169,10 @@ const NotificacioFormEnviament: React.FC<{
             e.id === indexKey ? { id: indexKey, ...data } : e
         );
         parentFormApiRef.current?.setFieldValue('enviamentsInfo', enviamentsWithData);
-        !initial && titularInitialized && parentFormApiRef.current?.setModified(true);
-        const currentEnviament = enviamentsWithData.find((e: any) => e.id === indexKey);
-        setTitularInitialized(currentEnviament?.titularInfo != null);
+        if (!initial) {
+            titularInitialized && parentFormApiRef.current?.setModified(true);
+            setTitularInitialized(data.titularInfo != null);
+        }
     };
     return (
         <Paper sx={{ px: 2, py: 1, mb: 2 }}>

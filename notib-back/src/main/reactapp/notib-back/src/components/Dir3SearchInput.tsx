@@ -2,6 +2,7 @@ import React from 'react';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Icon from '@mui/material/Icon';
+import TextField from '@mui/material/TextField';
 import {
     FormField,
     MuiDataGridDialog,
@@ -125,6 +126,8 @@ const Dir3SearchFilterContent: React.FC = () => {
 
 export const Dir3SearchInput: React.FC<{ name: string; required?: true }> = (props) => {
     const { name, required } = props;
+    const [dir3Name, setDir3Name] = React.useState<string>();
+    const { apiRef: formApiRef } = useFormContext();
     const gridDialogApiRef = useMuiDataGridDialogApiRef();
     const springFilterBuilder = (data: any) => {
         return filterBuilder.and(
@@ -140,17 +143,19 @@ export const Dir3SearchInput: React.FC<{ name: string; required?: true }> = (pro
         gridDialogApiRef.current
             .show()
             .then((value) => {
-                console.log('>>> then', value);
+                formApiRef.current?.setFieldValue(name, value.codi);
+                setDir3Name(value.denominacio);
             })
-            .catch((error) => {
-                console.log('>>> error', error);
-            });
+            .catch(() => {});
     };
     return (
         <>
             <Grid container spacing={2}>
-                <Grid size={11}>
-                    <FormField name={name} required={required} disabled />
+                <Grid size={2}>
+                    <FormField name={name} required={required} readOnly />
+                </Grid>
+                <Grid size={9}>
+                    <TextField value={dir3Name} disabled size="small" fullWidth />
                 </Grid>
                 <Grid size={1}>
                     <Button
@@ -202,6 +207,7 @@ export const Dir3SearchInput: React.FC<{ name: string; required?: true }> = (pro
                 }}
                 dialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
                 apiRef={gridDialogApiRef}
+                onRowClickEnabled
             />
         </>
     );
