@@ -129,6 +129,7 @@ const translationCa = {
         propietats: {
             find: 'Cercar a les propietats',
             empty: 'Sense propietats',
+            revert: 'Desfer canvis',
             save: {
                 success: 'Valor modificat correctament',
                 error: 'Error modificant la propietat',

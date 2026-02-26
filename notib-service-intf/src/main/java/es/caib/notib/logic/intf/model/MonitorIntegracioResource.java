@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
+import javax.persistence.Column;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
@@ -45,10 +46,11 @@ public class MonitorIntegracioResource extends BaseResource<Long> {
 	private String excepcioMessage;
 	@Size(max = 2048)
 	private String excepcioStacktrace;
+	@Size(max = 64)
+	private String aplicacio;
+	private String codiEntitat;
+	private Long notificacioId;
+	private String codiUsuari;
 
-	private ResourceReference<AplicacioResource, Long> aplicacio;
-	private ResourceReference<NotificacioResource, Long> notificacio;
-	private ResourceReference<EntitatResource, Long> entitat;
-	private ResourceReference<UsuariResource, String> usuari;
 	private ResourceReference<MonitorIntegracioParamResource, Long> parametres;
 }

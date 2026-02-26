@@ -73,45 +73,24 @@ public class MonitorIntegracioResourceEntity extends BaseResourceEntity<MonitorI
 	@Column(name = "excepcio_stacktrace", length = 2048)
 	private String excepcioStacktrace;
 
+	@Column(name = "aplicacio", length = 64)
+	private String aplicacio;
 
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(
-		name = "aplicacio",
-		referencedColumnName = "id",
-		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "mon_int_aplicacio_fk"),
-		nullable = false)
-	private AplicacioResourceEntity aplicacio;
+	@Column(name = "codi_entitat", length = 64)
+	private String codiEntitat;
 
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(
-		name = "notificacio_id",
-		referencedColumnName = "id",
-		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "mon_int_notificacio_fk"),
-		nullable = false)
-	private NotificacioResourceEntity notificacio;
+	@Column(name = "notificacio_id")
+	private Long notificacioId;
 
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(
-		name = "codi_usuari",
-		referencedColumnName = "codi",
-		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "mon_int_usuari_fk"),
-		nullable = false)
-	private UsuariResourceEntity usuari;
-
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(
-		name = "entitat",
-		referencedColumnName = "id",
-		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "mon_int_entitat_fk"),
-		nullable = false)
-	private EntitatResourceEntity entitat;
+	@Column(name = "codi_usuari", length = 64)
+	private String codiUsuari;
 
 
 	@OneToMany(mappedBy = "monitorIntegracio", fetch = FetchType.LAZY, orphanRemoval = true, cascade={CascadeType.ALL})
 	private List<MonitorIntegracioParamResourceEntity> parametres = new ArrayList<>();
 
 
-	public MonitorIntegracioResourceEntity(MonitorIntegracioResource resource, AplicacioResourceEntity aplicacio, UsuariResourceEntity usuari, EntitatResourceEntity entitat) {
+	public MonitorIntegracioResourceEntity(MonitorIntegracioResource resource, UsuariResourceEntity usuari) {
 
 		codi = resource.getCodi();
 		data = resource.getData();
@@ -122,8 +101,8 @@ public class MonitorIntegracioResourceEntity extends BaseResourceEntity<MonitorI
 		errorDescripcio = resource.getErrorDescripcio();
 		excepcioMessage = resource.getExcepcioMessage();
 		excepcioStacktrace = resource.getExcepcioStacktrace();
-		this.aplicacio = aplicacio;
-		this.usuari = usuari;
-		this.entitat = entitat;
+		aplicacio = resource.getAplicacio();
+		codiEntitat = resource.getCodiEntitat();
+		codiUsuari = resource.getCodiUsuari();
 	}
 }

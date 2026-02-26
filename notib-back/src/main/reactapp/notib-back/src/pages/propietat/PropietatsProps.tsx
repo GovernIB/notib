@@ -16,6 +16,8 @@ import {
     useBaseAppContext,
     useResourceApiService,
     ResourceApiRequestArgs,
+    FormApiRef,
+    useFormContext,
 } from 'reactlib';
 
 type PropsContextType = {
@@ -53,13 +55,16 @@ const PropsListItem: React.FC<{ item: any; highlight?: string }> = (props) => {
     const { t } = useTranslation();
     const { apiPatch } = usePropsContext();
     const { temporalMessageShow } = useBaseAppContext();
+    const { modified } = useFormContext();
     const [changedValue, setChangedValue] = React.useState<any | undefined>(undefined);
     const disabled = item.jbossProperty;
     const password = item.configTypeCode === 'PASSWORD' ? true : undefined;
     const decimalScale = item.configTypeCode === 'INT' ? 0 : undefined;
+
     const handleFieldOnChange = (value: any) => {
         setChangedValue(value);
     };
+
     const handleSaveClick = () => {
         apiPatch(item.id, { data: { value: changedValue } })
             .then(() => {
@@ -70,46 +75,75 @@ const PropsListItem: React.FC<{ item: any; highlight?: string }> = (props) => {
                 temporalMessageShow(t('page.propietats.save.error'), error.message, 'error')
             );
     };
+
     const handleExpandClick = () => {
         console.log('>>> expand (TODO)');
     };
+
     return (
         <Grid container spacing={2} sx={{ width: '100%' }}>
-            <Grid size={6}>
+            <Grid
+                size={6}
+                sx={{
+                    '& p.MuiTypography-root': {
+                        fontSize: '14px',
+                    },
+                }}
+            >
                 <TextHighlight text={item.description} match={highlight} ignoreCase />
             </Grid>
-            <Grid size={5}>
-                <FormField
-                    name={item.key}
-                    inline
-                    password={password}
-                    decimalScale={decimalScale}
-                    disabled={disabled}
-                    onChange={handleFieldOnChange}
-                    componentProps={{ helperText: item.key }}
-                />
-            </Grid>
-            <Grid size={1}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <IconButton
-                        size="small"
-                        onClick={handleSaveClick}
-                        disabled={changedValue === undefined}>
-                        <Icon fontSize="small">save</Icon>
-                    </IconButton>
-                    {item.configurable && (
-                        <IconButton size="small" onClick={handleExpandClick} sx={{ ml: 1 }}>
-                            <Icon fontSize="small">expand_more</Icon>
-                        </IconButton>
-                    )}
+            <Grid size={6}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        gap: 1,
+                    }}
+                >
+                    <FormField
+                        name={item.key}
+                        inline
+                        password={password}
+                        decimalScale={decimalScale}
+                        disabled={disabled}
+                        onChange={handleFieldOnChange}
+                        componentProps={{ helperText: item.key }}
+                    />
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'flex-end',
+                            alignItems: 'flex-start',
+                        }}
+                    >
+                        {modified && changedValue !== undefined && (
+                            <IconButton
+                                color="primary"
+                                onClick={handleSaveClick}
+                                // disabled={changedValue === undefined}
+                            >
+                                <Icon fontSize="small">save</Icon>
+                            </IconButton>
+                        )}
+                        {item.configurable && (
+                            <IconButton size="small" onClick={handleExpandClick} sx={{ ml: 1 }}>
+                                <Icon fontSize="small">expand_more</Icon>
+                            </IconButton>
+                        )}
+                    </Box>
                 </Box>
             </Grid>
         </Grid>
     );
 };
 
-export const PropietatsProps: React.FC<{ quickFilter?: string; group?: any }> = (props) => {
-    const { quickFilter, group } = props;
+export const PropietatsProps: React.FC<{
+    quickFilter?: string;
+    group?: any;
+    formApiRef?: FormApiRef;
+}> = (props) => {
+    const { quickFilter, group, formApiRef } = props;
     const { t } = useTranslation();
     const {
         isReady: apiIsReady,
@@ -164,10 +198,12 @@ export const PropietatsProps: React.FC<{ quickFilter?: string; group?: any }> = 
                     <List component={Paper}>
                         {customFields.length ? (
                             <MuiForm
+                                apiRef={formApiRef}
                                 resourceName="configResource"
                                 customFields={customFields}
                                 hiddenToolbar
-                                commonFieldComponentProps={{ size: 'small' }}>
+                                commonFieldComponentProps={{ size: 'small' }}
+                            >
                                 {configs?.map((c) => (
                                     <ListItem key={c.key} disablePadding>
                                         <ListItemButton disableRipple>
@@ -183,7 +219,8 @@ export const PropietatsProps: React.FC<{ quickFilter?: string; group?: any }> = 
                                     textAlign: 'center',
                                     px: 2,
                                     py: 4,
-                                }}>
+                                }}
+                            >
                                 <Icon fontSize="large" color="disabled">
                                     block
                                 </Icon>
