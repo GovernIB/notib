@@ -12,19 +12,23 @@ export const MonitorIntegracioGrid = () => {
             },
             {
                 field: 'descripcio',
-                flex: 4,
+                flex: 3,
             },
             {
                 field: 'aplicacio',
                 flex: 2,
             },
             {
-                field: 'tipus',
+                field: 'notificacioId',
                 flex: 2,
             },
             {
-                field: 'entitat',
-                flex: 2,
+                field: 'tipus',
+                flex: 1,
+            },
+            {
+                field: 'codiEntitat',
+                flex: 1,
             },
             {
                 field: 'tempsResposta',
