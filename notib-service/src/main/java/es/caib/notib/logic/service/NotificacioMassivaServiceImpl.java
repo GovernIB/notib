@@ -663,24 +663,18 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         if (Strings.isNullOrEmpty(notificacioMassiva.getEmail())) {
             return;
         }
-        if (TransactionSynchronizationManager.isActualTransactionActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
                 public void afterCommit() {
-                    try {
-                        jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_MASSIVA, notificacioMassiva.getId());
-                    } catch (JmsException ex) {
-                        log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar enviar el correu electrònic.", ex);
+                    if (TransactionSynchronizationManager.isActualTransactionActive()) {
+                        try {
+                            jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_MASSIVA, notificacioMassiva.getId());
+                        } catch (JmsException ex) {
+                            log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar enviar el correu electrònic.", ex);
+                        }
                     }
                 }
             });
-        } else {
-            try {
-                jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_MASSIVA, notificacioMassiva.getId());
-            } catch (JmsException ex) {
-                log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar enviar el correu electrònic.", ex);
-            }
-        }
     }
 
     private NotificacioMassivaEntity registrarNotificacioMassiva(EntitatEntity entitat, NotificacioMassivaDto notMassivaDto, int size) {

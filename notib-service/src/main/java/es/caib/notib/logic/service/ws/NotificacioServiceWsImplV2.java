@@ -434,7 +434,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 					@Override
 					public void afterCommit() {
-						log.info("entro aqui");
 						if (TransactionSynchronizationManager.isActualTransactionActive()) {
 							for (var referencia : referencies) {
 								enviamentSmService.altaEnviament(referencia.getReferencia());

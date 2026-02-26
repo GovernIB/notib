@@ -254,7 +254,9 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 			@Override
 			public void afterCommit() {
-				sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_ENVIAR);
+//				if (TransactionSynchronizationManager.isActualTransactionActive()) {
+					sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_ENVIAR);
+//				}
 			}
 		});
 //		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_ENVIAR);
