@@ -3,6 +3,7 @@ package es.caib.notib.logic.intf.model.validator;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.base.util.I18nUtil;
 import es.caib.notib.logic.intf.base.validation.CustomValidator;
+import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 import es.caib.notib.logic.intf.model.NotificacioResource;
 
 import javax.validation.ConstraintValidatorContext;
@@ -16,16 +17,18 @@ public class PrimerEnviamentCodiDir3ObligatoriEnviamentTipusSir implements Custo
 
 	@Override
 	public boolean validate(NotificacioResource value, ConstraintValidatorContext context) {
-		if (EnviamentTipus.SIR.equals(value.getEnviamentTipus())) {
-			String message = I18nUtil.getInstance().getI18nMessage("javax.validation.constraints.NotNull.message");
-			context.buildConstraintViolationWithTemplate(message).
-				addPropertyNode("enviamentsInfo[0].sirTitularDir3Codi").
-				addConstraintViolation();
-			context.disableDefaultConstraintViolation();
-			return false;
-		} else {
-			return true;
+		if (EnviamentTipus.SIR.equals(value.getEnviamentTipus()) && !value.getEnviamentsInfo().isEmpty()) {
+			NotificacioEnviamentResource primerEnviament = value.getEnviamentsInfo().get(0);
+			if (primerEnviament.getSirTitularDir3Codi() == null) {
+				String message = I18nUtil.getInstance().getI18nMessage("javax.validation.constraints.NotNull.message");
+				context.buildConstraintViolationWithTemplate(message).
+					addPropertyNode("enviamentsInfo[0].sirTitularDir3Codi").
+					addConstraintViolation();
+				context.disableDefaultConstraintViolation();
+				return false;
+			}
 		}
+		return true;
 	}
 
 }
