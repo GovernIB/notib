@@ -12,6 +12,7 @@ const PropietatsGroupTreeItems: React.FC<{
         return configGroups?.filter((g) => (parentId ?? null) === (g.parent?.id ?? null));
     };
     const filteredGroups = configGroupsFilterByParentId(parentId);
+
     return filteredGroups?.map((g) => (
         <TreeItem key={g.key} itemId={g.id} label={g.description}>
             {configGroupsFilterByParentId(g.id)?.length ? (
@@ -30,6 +31,7 @@ export const PropietatsGroups: React.FC<{
     const [configGroups, setConfigGroups] = React.useState<any[]>();
     const [selectedGroupId, setSelectedGroupId] = React.useState<number>();
     const [selectedItems, setSelectedItems] = React.useState<string>('');
+
     React.useEffect(() => {
         if (apiIsReady) {
             const args = {
@@ -55,28 +57,38 @@ export const PropietatsGroups: React.FC<{
                         (g) => g.id === selectedGroupId
                     );
                     if (!isSelectedGroupIdInConfigGroups) {
+                        const firstId = String(response.rows[0].id);
                         setSelectedGroupId(response.rows[0].id);
-                        setSelectedItems('' + response.rows[0].id);
+                        setSelectedItems(firstId);
                     }
                 }
             });
         }
     }, [apiIsReady, quickFilter]);
+
     React.useEffect(() => {
         onChange?.(configGroups?.find((g) => g.id == selectedGroupId));
-    }, [selectedGroupId]);
+    }, [configGroups, selectedGroupId]);
+
     return (
         <SimpleTreeView
             selectedItems={selectedItems}
-            onSelectedItemsChange={(_event, ids) =>
-                setSelectedGroupId(ids != null ? Number(ids) : undefined)
-            }
+            onSelectedItemsChange={(_event, ids) => {
+                setSelectedGroupId(ids != null ? Number(ids) : undefined);
+                if (ids) {
+                    setSelectedItems(ids);
+                }
+            }}
             sx={{
                 '& .MuiTreeItem-content': {
                     minHeight: 48,
                     paddingY: 1,
                 },
-            }}>
+                '& .MuiTreeItem-label': {
+                    fontSize: '14px',
+                },
+            }}
+        >
             <PropietatsGroupTreeItems configGroups={configGroups} />
         </SimpleTreeView>
     );

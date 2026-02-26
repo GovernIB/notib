@@ -124,6 +124,7 @@ const translationEs = {
         propietats: {
             find: 'Buscar en las propiedades',
             empty: 'Sin propiedades',
+            revert: 'Deshacer cambios',
             save: {
                 success: 'Valor modificado correctamente',
                 error: 'Error modificando la propiedad',
