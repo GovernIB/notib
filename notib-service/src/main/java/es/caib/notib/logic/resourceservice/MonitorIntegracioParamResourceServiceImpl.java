@@ -18,5 +18,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MonitorIntegracioParamResourceServiceImpl extends BaseMutableResourceService<MonitorIntegracioParamResource, Long, MonitorIntegracioParamResourceEntity> implements MonitorIntegracioParamResourceService {
 
-
+//	@Override
+//	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+//		return super.additionalSpringFilter("monitorIntegracio.id", namedQueries);
+//	}
 }
