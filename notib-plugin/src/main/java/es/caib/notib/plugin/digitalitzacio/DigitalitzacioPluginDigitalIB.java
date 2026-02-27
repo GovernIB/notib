@@ -3,9 +3,8 @@
  */
 package es.caib.notib.plugin.digitalitzacio;
 
-import com.google.common.base.Strings;
-import es.caib.comanda.model.v1.salut.EstatSalut;
-import es.caib.comanda.model.v1.salut.IntegracioPeticions;
+import es.caib.comanda.model.server.monitoring.EstatSalut;
+import es.caib.comanda.model.server.monitoring.IntegracioPeticions;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.dto.escaneig.DigitalitzacioEstat;
 import es.caib.notib.logic.intf.dto.escaneig.DigitalitzacioPerfil;
@@ -252,7 +251,7 @@ public class DigitalitzacioPluginDigitalIB extends AbstractSalutPlugin implement
 
         if (isDebug()) {
 			log.info("Iniciant transacció " + idTransaccio);
-		}		
+		}
 		String urlRedireccio = null;
 		try {
 			var startTransactionInfo = new MassiveScanWebSimpleStartTransactionRequest(idTransaccio, urlReturn);
@@ -269,7 +268,7 @@ public class DigitalitzacioPluginDigitalIB extends AbstractSalutPlugin implement
 		var api = new ApiMassiveScanWebSimpleJersey(apiRestUrl, getUsername(), getPassword());
 		return api;
 	}
-	
+
 	private String getBaseUrl() {
 		return properties.getProperty("es.caib.notib.plugin.digitalitzacio.digitalib.base.url");
 	}

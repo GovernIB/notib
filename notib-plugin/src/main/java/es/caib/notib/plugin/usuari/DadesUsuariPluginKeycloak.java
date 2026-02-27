@@ -1,7 +1,7 @@
 package es.caib.notib.plugin.usuari;
 
-import es.caib.comanda.model.v1.salut.EstatSalut;
-import es.caib.comanda.model.v1.salut.IntegracioPeticions;
+import es.caib.comanda.model.server.monitoring.EstatSalut;
+import es.caib.comanda.model.server.monitoring.IntegracioPeticions;
 import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.utils.NotibLoggerPlugin;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 /**
  * Implementació del plugin de consulta de dades d'usuaris emprant JDBC.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -88,7 +88,7 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 
 	@Override
 	public List<DadesUsuari> consultarAmbGrup(String grupCodi) throws SistemaExternException {
-		
+
 		logger.info("[Keycloak] Consulta dels usuaris del grup (grupCodi=" + grupCodi + ")");
 		try {
             long startTime = System.currentTimeMillis();

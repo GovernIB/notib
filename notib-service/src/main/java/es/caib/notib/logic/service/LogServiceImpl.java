@@ -1,5 +1,7 @@
 package es.caib.notib.logic.service;
 
+import es.caib.comanda.model.server.monitoring.FitxerContingut;
+import es.caib.comanda.ms.log.helper.LogFileStream;
 import es.caib.notib.logic.helper.ConfigHelper;
 import joptsimple.internal.Strings;
 import lombok.extern.slf4j.Slf4j;
@@ -7,9 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import es.caib.comanda.ms.log.helper.LogHelper;
-import es.caib.comanda.model.v1.log.FitxerContingut;
 import es.caib.notib.logic.intf.service.LogService;
-import es.caib.comanda.model.v1.log.FitxerInfo;
+import es.caib.comanda.model.server.monitoring.FitxerInfo;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,20 +42,18 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    public es.caib.comanda.model.v1.log.FitxerContingut getFitxerByNom(String nom) {
+	public FitxerContingut getFitxerByNom(String nom) {
 
+		var directoriPath = configHelper.getConfig("es.caib.notib.plugin.fitxer.logs.path");
+		return LogHelper.getFitxerByNom(directoriPath, nom);
+	}
 
-        try {
-            var directoriPath = configHelper.getConfig("es.caib.notib.plugin.fitxer.logs.path");
-            if (Strings.isNullOrEmpty(directoriPath)) {
-                return es.caib.comanda.model.v1.log.FitxerContingut.builder().build();
-            }
-            return LogHelper.getFitxerByNom(directoriPath, nom);
-        } catch (Exception ex) {
-            log.error("[LogService.getFitxerByNom] Error llegint el fitxer " + nom, ex);
-            return FitxerContingut.builder().build();
-        }
-    }
+	@Override
+	public LogFileStream descarregarFitxerDirecte(String nom) {
+
+		var directoriPath = configHelper.getConfig("es.caib.notib.plugin.fitxer.logs.path");
+		return LogHelper.getFileStreamByNom(directoriPath, nom);
+	}
 
     private long lastPosition = 0;
     private final BlockingQueue<String> queue = new ArrayBlockingQueue<>(100);

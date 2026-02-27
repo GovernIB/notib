@@ -1,8 +1,7 @@
 package es.caib.notib.plugin.registre;
 
-import com.google.common.base.Strings;
-import es.caib.comanda.model.v1.salut.EstatSalut;
-import es.caib.comanda.model.v1.salut.IntegracioPeticions;
+import es.caib.comanda.model.server.monitoring.EstatSalut;
+import es.caib.comanda.model.server.monitoring.IntegracioPeticions;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
 import es.caib.notib.logic.intf.dto.DatosInteresadoWsDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
@@ -26,7 +25,7 @@ import java.util.Scanner;
 /**
  * Implementació del plugin de registre per a la interficie de
  * serveis web del registre de la CAIB.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -79,7 +78,7 @@ public class RegistrePluginMockImpl extends AbstractSalutPlugin implements Regis
 //        resposta.setErrorCodi("OK");
 		return resposta;
 	}
-	
+
 	@Override
 	public RespostaConsultaRegistre obtenerAsientoRegistral(String codiDir3Entitat, String numeroRegistreFormatat, Long tipusOperacio, boolean ambAnnexos) {
 
@@ -310,7 +309,7 @@ public class RegistrePluginMockImpl extends AbstractSalutPlugin implements Regis
 	}
 
 	private Integer[] readRegistreFile(Date data, boolean update) {
-		
+
 		Integer anualitat =  null;
 		Integer numero = null;
 
@@ -326,7 +325,7 @@ public class RegistrePluginMockImpl extends AbstractSalutPlugin implements Regis
 		} catch (IOException e) {
 			log.error("Scanner error ", e);
 		}
-		
+
 		if (update) {
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(data);
@@ -337,7 +336,7 @@ public class RegistrePluginMockImpl extends AbstractSalutPlugin implements Regis
 			} else {
 				numero++;
 			}
-			
+
 			try (PrintStream fs = new PrintStream(file)) {
 				fs.println(anualitat);
 				fs.print(numero);
@@ -345,12 +344,12 @@ public class RegistrePluginMockImpl extends AbstractSalutPlugin implements Regis
 				log.error("PrintStream error ", e);
 			}
 		}
-		
+
 		return new Integer[]{anualitat, numero};
 	}
-	
+
 	private byte[] getJustificant() {
-		
+
 		byte[] fileContent = null;
 		var justificantPath = getJustificantPath();
 		var file = new File(justificantPath);
@@ -361,11 +360,11 @@ public class RegistrePluginMockImpl extends AbstractSalutPlugin implements Regis
 		}
 		return fileContent;
 	}
-	
+
 	public String getSequenciaPath() {
 		return properties.getProperty("es.caib.notib.plugin.regweb.mock.sequencia");
 	}
-	
+
 	public String getJustificantPath() {
 		return properties.getProperty("es.caib.notib.plugin.regweb.mock.justificant");
 	}

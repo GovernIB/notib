@@ -2,7 +2,7 @@ package es.caib.notib.logic.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
-import es.caib.comanda.model.v1.avis.AvisTipus;
+import es.caib.comanda.model.management.AvisTipus;
 import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.comanda.ComandaListener;

@@ -1,11 +1,11 @@
 package es.caib.notib.logic.intf.dto.explotacio;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import es.caib.comanda.model.v1.estadistica.Fet;
+import es.caib.comanda.model.server.monitoring.Fet;
 import lombok.Getter;
 
 @Getter
-public class FetNotib implements Fet {
+public class FetNotib extends Fet {
 
     @JsonIgnore
     private FetEnum tipus;

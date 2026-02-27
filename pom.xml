@@ -28,6 +28,7 @@
 		<itext.pdf.version>5.5.13.1</itext.pdf.version>
 		<docker.image.prefix>280421</docker.image.prefix>
 		<junit.jupiter.version>5.9.3</junit.jupiter.version>
+		<comanda.version>1.0.0</comanda.version>
 		<notib.context>notib</notib.context>
 		<implementation.vendor>Límit Tecnologies</implementation.vendor>
 		<java.compiler.version>11</java.compiler.version>

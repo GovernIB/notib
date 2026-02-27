@@ -1,6 +1,6 @@
 package es.caib.notib.logic.service;
 
-import es.caib.comanda.model.v1.avis.AvisTipus;
+import es.caib.comanda.model.management.AvisTipus;
 import es.caib.notib.logic.comanda.ComandaListener;
 import es.caib.notib.logic.helper.AuditHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
@@ -9,7 +9,6 @@ import es.caib.notib.logic.helper.RegistreHelper;
 import es.caib.notib.logic.helper.RegistreSmHelper;
 import es.caib.notib.logic.helper.SubsistemesHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
-import es.caib.notib.logic.intf.dto.AvisDescripcio;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
@@ -21,9 +20,6 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.service.RegistreService;
-import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
-import es.caib.notib.logic.intf.statemachine.dto.ConsultaSirDto;
-import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaSirRequest;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentRegistreRequest;
 import es.caib.notib.logic.objectes.LoggingTipus;
