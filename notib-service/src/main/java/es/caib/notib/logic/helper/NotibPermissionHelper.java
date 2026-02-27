@@ -37,29 +37,42 @@ public class NotibPermissionHelper {
 	private final ProcedimentResourceRepository procedimentResourceRepository;
 
 	/**
-	 * Crea una expressió Spring Filter per a consultar únicament les entitats sobre les que es tenen permisos d'usuari.
+	 * Crea una expressió Spring Filter per a consultar únicament les entitats sobre les que es tenen permisos.
 	 *
 	 * @param filterProperty
 	 *            la propietat Spring Filter sobre la que s'ha de fer el filtre.
 	 * @return l'expressió Spring Filter a aplicar.
 	 */
 	public String entitatAdditionalSpringFilter(String filterProperty) {
-		// Restringeix la consulta si no es te el rol NOT_SUPER o si no es tenen permisos d'usuari sobre l'entitat del
+		// Restringeix la consulta si no es te el rol NOT_SUPER o si no es tenen permisos sobre l'entitat del
 		// tipus de document.
 		boolean isRoleSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);
 		if (!isRoleSuper) {
-			Set<Long> allowedIds = (Set<Long>)aclHelper.findIdsWithAnyPermission(
-				AclHelper.ENTITAT_CLASS,
-				List.of(ExtendedPermission.PERM0), // Permís d'usuari
-				aclHelper.getCurrentUserSids().toArray(Sid[]::new));
-			String joinedIds = allowedIds.stream()
-				.map(String::valueOf)
-				.collect(Collectors.joining(","));
-			if (!joinedIds.isEmpty()) {
-				return filterProperty + " in (" + joinedIds + ")";
-			} else {
-				return filterProperty + " is null";
+			// Es calcula el permís a comprovar depenent del rol actual
+			boolean isRoleUser = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_USER);
+			boolean isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
+			boolean isRoleAdminLectura = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN_LECTURA);
+			Permission permission = null;
+			if (isRoleUser) {
+				permission = ExtendedPermission.PERM0;
+			} else if (isRoleAdmin) {
+				permission = ExtendedPermission.PERM2;
+			} else if (isRoleAdminLectura) {
+				permission = ExtendedPermission.PERMX;
 			}
+			if (permission != null) {
+				// S'obtenen la llista d'ids d'entitats a les qual l'usuari actual te permisos
+				Set<String> allowedIds = aclHelper.findIdsWithAnyPermission(
+					AclHelper.ENTITAT_CLASS,
+					List.of(permission),
+					aclHelper.getCurrentUserSids().toArray(Sid[]::new));
+				String joinedIds = String.join(",", allowedIds);
+				if (!joinedIds.isEmpty()) {
+					return filterProperty + " in (" + joinedIds + ")";
+				}
+			}
+			// Si no s'ha pogut calcular el permís o no s'ha trobat cap id no dona accés a cap entitat
+			return filterProperty + " is null";
 		} else {
 			return null;
 		}
@@ -118,10 +131,11 @@ public class NotibPermissionHelper {
 	 */
 	public List<Long> organGestorIdsWithPermissionRecursive(Permission permission) {
 		// Obté la llista d'organs gestors amb el permís assignat directament
-		Set<Long> idsWithPermission = (Set<Long>)aclHelper.findIdsWithAnyPermission(
+		Set<Long> idsWithPermission = aclHelper.findIdsWithAnyPermission(
 			AclHelper.ORGAN_GESTOR_CLASS,
 			List.of(permission),
-			aclHelper.getCurrentUserSids().toArray(Sid[]::new));
+			aclHelper.getCurrentUserSids().toArray(Sid[]::new)).
+			stream().map(Long::valueOf).collect(Collectors.toSet());
 		// Retorna la llista d'òrgans gestors amb el permís assignat directament o a algun dels seus pares.
 		// Per a optimitzar la consulta només mira els pares fins a 4 nivells per damunt.
 		return organGestorResourceRepository.findIdsByEntitatIdAndCodisRecursiveL4(
@@ -145,7 +159,8 @@ public class NotibPermissionHelper {
 		Set<Long> idsWithPermission = (Set<Long>)aclHelper.findIdsWithAnyPermission(
 			AclHelper.ORGAN_GESTOR_CLASS,
 			List.of(permission),
-			aclHelper.getCurrentUserSids().toArray(Sid[]::new));
+			aclHelper.getCurrentUserSids().toArray(Sid[]::new)).
+			stream().map(Long::valueOf).collect(Collectors.toSet());
 		// Només retorna els procediments/serveis no comuns que existeixen a la base de dades.
 		return procedimentResourceRepository.findIdsByEntitatIdAndTipusAndIdInAndComuFalse(
 			userSessionHelper.getCurrentEntitatId(),
@@ -169,7 +184,8 @@ public class NotibPermissionHelper {
 		Set<Long> idsWithPermission = (Set<Long>)aclHelper.findIdsWithAnyPermission(
 			AclHelper.ORGAN_GESTOR_CLASS,
 			List.of(ExtendedPermission.PERM3),
-			aclHelper.getCurrentUserSids().toArray(Sid[]::new));
+			aclHelper.getCurrentUserSids().toArray(Sid[]::new)).
+			stream().map(Long::valueOf).collect(Collectors.toSet());
 		if (!idsWithPermission.isEmpty()) {
 			// Si hi ha òrgans gestors amb permís per a procediments/serveis comuns retorna la llista de
 			// procediments/serveis comuns que no requereixen permís directe.

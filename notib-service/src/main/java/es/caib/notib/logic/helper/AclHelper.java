@@ -6,7 +6,6 @@ import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.ProcedimentEntity;
-import es.caib.notib.persist.entity.ServeiEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -229,7 +228,7 @@ public class AclHelper {
 	 *            la llista de SIDs. Si no es passa cap valor s'utilitzaran els SIDs de l'usuari actual.
 	 * @return la llista d'ids.
 	 */
-	public Set<? extends Serializable> findIdsWithAnyPermission(
+	public Set<String> findIdsWithAnyPermission(
 			Class<?> resourceClass,
 			List<Permission> permissions,
 			Sid... sids) {
@@ -264,12 +263,12 @@ public class AclHelper {
 				query,
 				paramsMap,
 				rs -> {
-					Set<Serializable> ids1 = new HashSet<>();
+					Set<String> ids = new HashSet<>();
 					while (rs.next()) {
-						Serializable s = (Serializable) rs.getObject(1);
-						if (s != null) ids1.add(s);
+						String s = rs.getString(1);
+						if (s != null) ids.add(s);
 					}
-					return ids1;
+					return ids;
 				});
 	}
 

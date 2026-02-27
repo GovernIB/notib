@@ -91,6 +91,12 @@ public class EntitatResourceServiceImpl
 			BasePermission.DELETE);
 	}
 
+	/**
+	 * Perspectiva per a emplenar els camps que indiquen els tipus de remeses que es poden crear.
+	 *   - crearNotificacions
+	 *   - crearComunicacions
+	 *   - crearSir
+	 */
 	public class PermisosPerspectiveApplicator implements PerspectiveApplicator<EntitatResourceEntity, EntitatResource> {
 		@Override
 		public void applySingle(
@@ -102,20 +108,20 @@ public class EntitatResourceServiceImpl
 			if (isRoleUser) {
 				resource.setCrearNotificacions(
 					checkPermisRemesa(
-						ExtendedPermission.PERM4,
-						ExtendedPermission.PERM5,
+						ExtendedPermission.PERM4, // Permís de creació de notificacions als òrgans gestors
+						ExtendedPermission.PERM5, // Permís de creació de notificacions als procediments
 						false,
 						false));
 				resource.setCrearComunicacions(
 					checkPermisRemesa(
-						ExtendedPermission.PERM5,
-						ExtendedPermission.PERM8,
+						ExtendedPermission.PERM5, // Permís de creació de comunicacions als òrgans gestors
+						ExtendedPermission.PERM8, // Permís de creació de comunicacions als procediments
 						null,
 						true));
 				resource.setCrearSir(
 					checkPermisRemesa(
-						ExtendedPermission.PERM6,
-						ExtendedPermission.PERM7,
+						ExtendedPermission.PERM6, // Permís de creació de comunicacions SIR als òrgans gestors
+						ExtendedPermission.PERM7, // Permís de creació de comunicacions SIR als procediments
 						null,
 						true));
 			} else {
@@ -150,23 +156,21 @@ public class EntitatResourceServiceImpl
 			}
 			// Si és comunicació, comprovam si té permís per a fer comunicacions sense procediment sobre algun òrgan
 			// gestor.
-			if (isComunicacio) {
-				if (!notibPermissionHelper
-					.organGestorIdsWithPermissionRecursive(ExtendedPermission.PERM7)
-					.isEmpty()) {
-					return true;
-				}
+			if (isComunicacio && !notibPermissionHelper.
+				organGestorIdsWithPermissionRecursive(ExtendedPermission.PERM7).
+				isEmpty()) {
+				return true;
 			}
 			// Comprovam si es tenen permisos sobre procediments/serveis no comuns
-			if (!notibPermissionHelper
-				.procedimentsServeisNoComunsWithPermission(permisProcediments, isServei)
-				.isEmpty()) {
+			if (!notibPermissionHelper.
+				procedimentsServeisNoComunsWithPermission(permisProcediments, isServei).
+				isEmpty()) {
 				return true;
 			}
 			// Comprovam si es tenen permisos sobre procediments/serveis comuns
-			return !notibPermissionHelper
-				.procedimentsServeisComunsWithPermission(permisProcediments, isServei)
-				.isEmpty();
+			return !notibPermissionHelper.
+				procedimentsServeisComunsWithPermission(permisProcediments, isServei).
+				isEmpty();
 		}
 	}
 

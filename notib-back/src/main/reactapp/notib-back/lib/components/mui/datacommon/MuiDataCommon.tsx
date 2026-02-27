@@ -260,21 +260,25 @@ export const useDataCommonEditable = (
     const isPopupEditCreate = popupEditActive || popupEditCreateActive;
     const isPopupEditUpdate = popupEditActive || popupEditUpdateActive;
     const triggerCreate: DataCommonTriggerCreateFn = (row?: any, additionalData?: any) => {
-        const processedAdditionalData = {
-            ...(typeof formAdditionalData === 'function'
-                ? formAdditionalData(row, 'create')
-                : formAdditionalData),
-            ...additionalData,
-        };
-        dataDialogPopupApiRef.current
-            ?.show(undefined, processedAdditionalData)
-            .then((data) => {
-                onCreate?.(data);
-                refresh?.();
-            })
-            .catch(() => {
-                // Feim un catch buit perquè no aparegui a la consola el missatge: Uncaught (in promise)
-            });
+        if (!isInlineEditCreate) {
+            const processedAdditionalData = {
+                ...(typeof formAdditionalData === 'function'
+                    ? formAdditionalData(row, 'create')
+                    : formAdditionalData),
+                ...additionalData,
+            };
+            dataDialogPopupApiRef.current
+                ?.show(undefined, processedAdditionalData)
+                .then((data) => {
+                    onCreate?.(data);
+                    refresh?.();
+                })
+                .catch(() => {
+                    // Feim un catch buit perquè no aparegui a la consola el missatge: Uncaught (in promise)
+                });
+        } else {
+            inlineCreate?.();
+        }
     };
     const triggerUpdate: DataCommonTriggerUpdateFn = (id: any, row?: any, additionalData?: any) => {
         if (!inlineUpdate) {
@@ -394,11 +398,7 @@ export const useDataCommonEditable = (
                   linkState: formAdditionalData
                       ? { additionalData: formAdditionalData }
                       : undefined,
-                  onClick: !toolbarCreateLink
-                      ? isInlineEditCreate
-                          ? inlineCreate
-                          : triggerCreate
-                      : undefined,
+                  onClick: !toolbarCreateLink ? triggerCreate : undefined,
                   disabled: toolbarDisableCreateLinkValue || createLinkConfigError,
               })
             : undefined;

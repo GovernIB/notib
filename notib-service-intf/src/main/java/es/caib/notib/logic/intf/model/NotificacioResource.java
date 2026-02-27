@@ -12,10 +12,8 @@ import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
-import es.caib.notib.logic.intf.dto.notificacio.Enviament;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.model.validator.PrimerEnviamentCodiDir3ObligatoriEnviamentTipusSir;
-import es.caib.notib.logic.intf.model.validator.TitularIncapacitatObligatoriRepresentant;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -48,7 +46,7 @@ import java.util.List;
 		@ResourceAccessConstraint(
 			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
 			roles = { BaseConfig.ROLE_USER },
-			grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE }
+			grantedPermissions = { PermissionEnum.READ, PermissionEnum.CREATE }
 		),
 	}
 )

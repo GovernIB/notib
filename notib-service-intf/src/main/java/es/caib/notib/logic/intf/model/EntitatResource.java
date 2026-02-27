@@ -22,6 +22,11 @@ import java.io.Serializable;
 
 /**
  * Informació d'una entitat.
+ * Permisos:
+ *   - PERM0: usuari
+ *   - PERM2: administrador
+ *   - PERM3: aplicació
+ *   - PERMX: administrador només lectura
  *
  * @author Límit Tecnologies
  */

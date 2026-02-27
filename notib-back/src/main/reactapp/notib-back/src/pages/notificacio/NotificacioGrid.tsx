@@ -6,6 +6,7 @@ import Icon from '@mui/material/Icon';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { GridPage, MuiDataGrid, useResourceApiService } from 'reactlib';
+import { useNotibContext } from '../../components/NotibContext';
 
 const columns = [
     {
@@ -24,6 +25,7 @@ const columns = [
 
 const NotificacioAddButton: React.FC = () => {
     const { t } = useTranslation();
+    const { currentEntitatLoading, currentEntitat } = useNotibContext();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -32,10 +34,16 @@ const NotificacioAddButton: React.FC = () => {
     const handleClose = () => {
         setAnchorEl(null);
     };
+    const crearAny =
+        currentEntitat?.crearNotificacions ||
+        currentEntitat?.crearComunicacions ||
+        currentEntitat?.crearSir;
     return (
         <>
             <Button
                 variant="contained"
+                loading={currentEntitatLoading}
+                disabled={!crearAny}
                 startIcon={<Icon>add</Icon>}
                 onClick={handleClick}
                 sx={{ mr: 1 }}
@@ -43,15 +51,21 @@ const NotificacioAddButton: React.FC = () => {
                 {t('page.notificacio.grid.new.title')}
             </Button>
             <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-                <MenuItem component={Link} to="form?type=NOTIFICACIO" onClick={handleClose}>
-                    {t('page.notificacio.grid.new.NOTIFICACIO')}
-                </MenuItem>
-                <MenuItem component={Link} to="form?type=COMUNICACIO" onClick={handleClose}>
-                    {t('page.notificacio.grid.new.COMUNICACIO')}
-                </MenuItem>
-                <MenuItem component={Link} to="form?type=SIR" onClick={handleClose}>
-                    {t('page.notificacio.grid.new.SIR')}
-                </MenuItem>
+                {currentEntitat?.crearNotificacions && (
+                    <MenuItem component={Link} to="form?type=NOTIFICACIO" onClick={handleClose}>
+                        {t('page.notificacio.grid.new.NOTIFICACIO')}
+                    </MenuItem>
+                )}
+                {currentEntitat?.crearComunicacions && (
+                    <MenuItem component={Link} to="form?type=COMUNICACIO" onClick={handleClose}>
+                        {t('page.notificacio.grid.new.COMUNICACIO')}
+                    </MenuItem>
+                )}
+                {currentEntitat?.crearSir && (
+                    <MenuItem component={Link} to="form?type=SIR" onClick={handleClose}>
+                        {t('page.notificacio.grid.new.SIR')}
+                    </MenuItem>
+                )}
             </Menu>
         </>
     );

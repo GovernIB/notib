@@ -33,45 +33,45 @@ public interface OrganGestorResourceRepository extends BaseRepository<OrganGesto
 
 	// Per millorar el rendiment de la següent consulta es recomana crear els següents índexos:
 	//   CREATE INDEX orgges_entitat_codi_idx ON not_organ_gestor(entitat, codi);
-	//   CREATE INDEX orgges_entitat_pare_idx ON not_organ_gestor(entitat, pare_codi);
+	//   CREATE INDEX orgges_entitat_pare_idx ON not_organ_gestor(entitat, codi_pare);
 	@Query(
-		value = "SELECT DISTINCT e.codi " +
+		value = "SELECT DISTINCT o.id " +
 			"FROM " + BaseConfig.DB_PREFIX + "organ_gestor o " +
 			"WHERE o.entitat = :entitatId " +
 			"AND (" +
 			"    o.codi IN (:codis)" +
 			"    OR " +
-			"        o.pare_codi IN (:codis)" +
-			"    OR o.pare_codi IN (" +
+			"        o.codi_pare IN (:codis)" +
+			"    OR o.codi_pare IN (" +
 			"        SELECT o1.codi" +
 			"        FROM " + BaseConfig.DB_PREFIX + "organ_gestor o1" +
 			"        WHERE o1.entitat = :entitatId" +
-			"        AND o1.pare_codi IN (:codis)" +
+			"        AND o1.codi_pare IN (:codis)" +
 			"    )" +
-			"    OR o.pare_codi IN (" +
+			"    OR o.codi_pare IN (" +
 			"        SELECT o2.codi" +
 			"        FROM " + BaseConfig.DB_PREFIX + "organ_gestor o2" +
 			"        WHERE o2.entitat = :entitatId" +
-			"        AND o2.pare_codi IN (" +
+			"        AND o2.codi_pare IN (" +
 			"            SELECT o1.codi" +
 			"            FROM " + BaseConfig.DB_PREFIX + "organ_gestor o1" +
 			"            WHERE o1.entitat = :entitatId" +
-			"            AND o1.pare_codi IN (:codis)" +
+			"            AND o1.codi_pare IN (:codis)" +
 			"        )" +
 			"    )" +
-			"    OR o.pare_codi IN (" +
+			"    OR o.codi_pare IN (" +
 			"        SELECT o3.codi" +
 			"        FROM " + BaseConfig.DB_PREFIX + "organ_gestor o3" +
 			"        WHERE o3.entitat = :entitatId" +
-			"        AND o3.pare_codi IN (" +
+			"        AND o3.codi_pare IN (" +
 			"            SELECT o2.codi" +
 			"            FROM " + BaseConfig.DB_PREFIX + "organ_gestor o2" +
 			"            WHERE o2.entitat = :entitatId" +
-			"            AND o2.pare_codi IN (" +
+			"            AND o2.codi_pare IN (" +
 			"                SELECT o1.codi" +
 			"                FROM " + BaseConfig.DB_PREFIX + "organ_gestor o1" +
 			"                WHERE o1.entitat = :entitatId" +
-			"                AND o1.pare_codi IN (:codis)" +
+			"                AND o1.codi_pare IN (:codis)" +
 			"            )" +
 			"        )" +
 			"    )" +
