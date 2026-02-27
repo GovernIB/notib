@@ -354,7 +354,7 @@
                 let estatPostal = data[i].estatEntregaPostal;
                 let mostrarIconaError = estatPostal && estatPostal.toString().toLowerCase().includes("error") && data[i].errorEntregaPostal;
                 let iconaError = mostrarIconaError ? '<span class="fa fa-warning text-danger" title="' + data[i].errorEntregaPostal + '"></span>' : "";
-                let isUltimEventCie = data[i].ultimEvent.eventCie;
+				let isUltimEventCie = data[i]?.ultimEvent?.eventCie;
                 let cieEventError = "";
                 if (isUltimEventCie && data[i].ultimEventError && !iconaError) {
                     var errorTitle = '';
