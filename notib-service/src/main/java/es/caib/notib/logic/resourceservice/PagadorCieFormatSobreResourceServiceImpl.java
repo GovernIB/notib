@@ -1,7 +1,7 @@
 package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
-import es.caib.notib.logic.helper.EntitatPermissionHelper;
+import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.model.PagadorCieFormatSobreResource;
 import es.caib.notib.logic.intf.resourceservice.PagadorCieFormatSobreResourceService;
@@ -23,8 +23,8 @@ public class PagadorCieFormatSobreResourceServiceImpl
 	public PagadorCieFormatSobreResourceServiceImpl(
 		UserSessionHelper userSessionHelper,
 		AuthenticationHelper authenticationHelper,
-		EntitatPermissionHelper entitatPermissionHelper) {
-		super(userSessionHelper, authenticationHelper, entitatPermissionHelper);
+		NotibPermissionHelper notibPermissionHelper) {
+		super(userSessionHelper, authenticationHelper, notibPermissionHelper);
 	}
 
 }

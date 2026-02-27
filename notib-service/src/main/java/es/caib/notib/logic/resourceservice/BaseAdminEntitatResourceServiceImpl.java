@@ -2,7 +2,7 @@ package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
-import es.caib.notib.logic.helper.EntitatPermissionHelper;
+import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
@@ -37,7 +37,7 @@ public abstract class BaseAdminEntitatResourceServiceImpl<R extends Resource<Lon
 
 	protected final UserSessionHelper userSessionHelper;
 	protected final AuthenticationHelper authenticationHelper;
-	protected final EntitatPermissionHelper entitatPermissionHelper;
+	protected final NotibPermissionHelper notibPermissionHelper;
 
 	/*
 	 * Si l'usuari actual no és un superadministrador, només es mostren els recursos amb la mateixa entitat que la
@@ -74,7 +74,7 @@ public abstract class BaseAdminEntitatResourceServiceImpl<R extends Resource<Lon
 		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
 		if (currentEntitat != null) {
 			entity.setEntitat(currentEntitat);
-			entitatPermissionHelper.checkEntitatAdminPermission(
+			notibPermissionHelper.entitatCheckAdminPermission(
 				getResourceClass(),
 				null,
 				entity.getEntitat().getId(),
@@ -100,7 +100,7 @@ public abstract class BaseAdminEntitatResourceServiceImpl<R extends Resource<Lon
 		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
 		if (currentEntitat != null) {
 			if (Objects.equals(entity.getEntitat(), currentEntitat)) {
-				entitatPermissionHelper.checkEntitatAdminPermission(
+				notibPermissionHelper.entitatCheckAdminPermission(
 					getResourceClass(),
 					entity.getId(),
 					entity.getEntitat().getId(),
@@ -133,7 +133,7 @@ public abstract class BaseAdminEntitatResourceServiceImpl<R extends Resource<Lon
 		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
 		if (currentEntitat != null) {
 			if (Objects.equals(entity.getEntitat(), currentEntitat)) {
-				entitatPermissionHelper.checkEntitatAdminPermission(
+				notibPermissionHelper.entitatCheckAdminPermission(
 					getResourceClass(),
 					entity.getId(),
 					entity.getEntitat().getId(),

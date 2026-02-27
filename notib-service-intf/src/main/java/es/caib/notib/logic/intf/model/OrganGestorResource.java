@@ -21,6 +21,15 @@ import java.io.Serializable;
 
 /**
  * Informació d'un òrgan gestor.
+ * Permisos:
+ *   - ADMIN, READ: com sempre
+ *   - PERM1: processar
+ *   - PERM2: gestionar
+ *   - PERM3: procediments comuns
+ *   - PERM4: notificacions
+ *   - PERM5: comunicacions
+ *   - PERM6: comunicacions SIR
+ *   - PERM7: comunicacions sense procediment
  *
  * @author Límit Tecnologies
  */
@@ -68,7 +77,10 @@ public class OrganGestorResource extends BaseResource<Long> {
 
 	public static final String DIR3_SYNC_ACTION_CODE = "DIR3_SYNC";
 	public static final String FILTER_CODE = "FILTER_ORGAN_GESTOR";
-
+	public static final String NAMED_QUERY_PERM_READ = "PERM_READ";
+	public static final String NAMED_QUERY_PERM_NOT = "PERM_NOT";
+	public static final String NAMED_QUERY_PERM_COM = "PERM_COM";
+	public static final String NAMED_QUERY_PERM_SIR = "PERM_SIR";
 
 	@NotEmpty
 	@Size(max = 64)

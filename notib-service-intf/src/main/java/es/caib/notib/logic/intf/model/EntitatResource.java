@@ -22,6 +22,11 @@ import java.io.Serializable;
 
 /**
  * Informació d'una entitat.
+ * Permisos:
+ *   - PERM0: usuari
+ *   - PERM2: administrador
+ *   - PERM3: aplicació
+ *   - PERMX: administrador només lectura
  *
  * @author Límit Tecnologies
  */
@@ -53,12 +58,18 @@ import java.io.Serializable;
 			@ResourceArtifact(
 				type = ResourceArtifactType.FILTER,
 				code = EntitatResource.FILTER_CODE,
-				formClass = EntitatResource.EntitatResourceFilter.class)
+				formClass = EntitatResource.EntitatResourceFilter.class
+			),
+			@ResourceArtifact(
+				type = ResourceArtifactType.PERSPECTIVE,
+				code = EntitatResource.PERSPECTIVE_PERMISSIONS
+			),
 		}
 )
 public class EntitatResource extends BaseResource<Long> {
 
 	public static final String FILTER_CODE = "FILTER_ENTITAT";
+	public static final String PERSPECTIVE_PERMISSIONS = "PERMISSIONS";
 
 	@NotNull
 	@Size(max = 64)
@@ -108,9 +119,13 @@ public class EntitatResource extends BaseResource<Long> {
 	private Long operadorPostalId;
 	private Long cieId;
 
+	// Camps calculats
 	private Integer tipusDocCount;
 	private Integer aplicacioCount;
 	private Integer aclEntryCount;
+	private boolean crearNotificacions;
+	private boolean crearComunicacions;
+	private boolean crearSir;
 
 	@Getter
 	@Setter

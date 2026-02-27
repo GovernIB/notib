@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
+import Alert from '@mui/material/Alert';
 import { CssBaseline } from '@mui/material';
 import { ThemeProvider, useTheme, useColorScheme } from '@mui/material/styles';
 import { envVar, OidcAuthProvider, ContainerAuthProvider, ResourceApiProvider } from 'reactlib';
@@ -60,11 +61,12 @@ const version = '0.0.0';
 const InnerApp: React.FC = () => {
     const { t } = useTranslation();
     const { mode } = useColorScheme();
-    const { currentRole } = useNotibContext();
+    const { currentRole, currentEntitatId } = useNotibContext();
+    const currentRoleNoSuperAndNoEntitat = currentRole !== ROLE_SUPER && currentEntitatId == null;
     const menuConfig = [
         {
             id: 'entitats',
-            title: t('menu.entitats'),
+            title: t('app.menu.entitats'),
             to: '/entitats',
             icon: 'layers',
             resourceName: 'entitatResource',
@@ -72,7 +74,7 @@ const InnerApp: React.FC = () => {
         },
         {
             id: 'avisos',
-            title: t('menu.avisos'),
+            title: t('app.menu.avisos'),
             to: '/avisos',
             icon: 'notifications',
             resourceName: 'avisResource',
@@ -80,7 +82,7 @@ const InnerApp: React.FC = () => {
         },
         {
             id: 'propietats',
-            title: t('menu.propietats'),
+            title: t('app.menu.propietats'),
             to: '/propietats',
             icon: 'settings',
             resourceName: 'configGroupResource',
@@ -88,7 +90,7 @@ const InnerApp: React.FC = () => {
         },
         {
             id: 'currentEntitat',
-            title: t('menu.currentEntitat'),
+            title: t('app.menu.currentEntitat'),
             to: '/entitats/current',
             icon: 'my_location',
             resourceName: 'entitatResource',
@@ -96,7 +98,7 @@ const InnerApp: React.FC = () => {
         },
         {
             id: 'organs',
-            title: t('menu.organsGestors'),
+            title: t('app.menu.organsGestors'),
             to: '/organs',
             icon: 'account_tree',
             resourceName: 'organGestorResource',
@@ -104,7 +106,7 @@ const InnerApp: React.FC = () => {
         },
         {
             id: 'procediment',
-            title: t('menu.procediments'),
+            title: t('app.menu.procediments'),
             to: '/procediments',
             icon: 'view_timeline',
             resourceName: 'procedimentResource',
@@ -112,7 +114,7 @@ const InnerApp: React.FC = () => {
         },
         {
             id: 'servei',
-            title: t('menu.serveis'),
+            title: t('app.menu.serveis'),
             to: '/serveis',
             icon: 'miscellaneous_services',
             resourceName: 'procedimentResource',
@@ -120,7 +122,7 @@ const InnerApp: React.FC = () => {
         },
         {
             id: 'grups',
-            title: t('menu.grups'),
+            title: t('app.menu.grups'),
             to: '/grups',
             icon: 'group',
             resourceName: 'grupResource',
@@ -128,7 +130,7 @@ const InnerApp: React.FC = () => {
         },
         {
             id: 'pagadorspostals',
-            title: t('menu.pagadorsPostals'),
+            title: t('app.menu.pagadorsPostals'),
             to: '/pagadorspostals',
             icon: 'markunread_mailbox',
             resourceName: 'pagadorCieResource',
@@ -136,7 +138,7 @@ const InnerApp: React.FC = () => {
         },
         {
             id: 'pagadorscie',
-            title: t('menu.pagadorsCie'),
+            title: t('app.menu.pagadorsCie'),
             to: '/pagadorscie',
             icon: 'mark_as_unread',
             resourceName: 'pagadorPostalResource',
@@ -144,7 +146,7 @@ const InnerApp: React.FC = () => {
         },
         {
             id: 'integracions',
-            title: t('menu.integracions'),
+            title: t('app.menu.integracions'),
             to: '/integracions',
             icon: 'build',
             resourceName: 'monitorIntegracioResource',
@@ -154,19 +156,20 @@ const InnerApp: React.FC = () => {
     const menuEntries = [
         {
             id: 'home',
-            title: t('menu.home'),
+            title: t('app.menu.home'),
             to: 'home',
             icon: 'home',
         },
         {
             id: 'config',
-            title: t('menu.notificacions'),
+            title: t('app.menu.notificacions'),
             to: '/notificacions',
             icon: 'notifications',
+            resourceName: 'notificacioResource',
         },
         {
             id: 'config',
-            title: t('menu.config'),
+            title: t('app.menu.config'),
             icon: 'settings',
             children: menuConfig,
         },
@@ -198,7 +201,7 @@ const InnerApp: React.FC = () => {
                 }
                 version={version}
                 availableLanguages={['ca', 'es']}
-                menuEntries={menuEntries}
+                menuEntries={!currentRoleNoSuperAndNoEntitat ? menuEntries : undefined}
                 appbarBackgroundColor={bgColor}
                 appbarStyle={{ color: textColor }}
                 footer={
@@ -212,7 +215,11 @@ const InnerApp: React.FC = () => {
                 }
                 footerHeight={36}
             >
-                <Outlet />
+                {!currentRoleNoSuperAndNoEntitat ? (
+                    <Outlet />
+                ) : (
+                    <Alert severity="error">{t('app.noEntitat')}</Alert>
+                )}
             </BaseApp>
         )
     );

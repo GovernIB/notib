@@ -1,7 +1,7 @@
 package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
-import es.caib.notib.logic.helper.EntitatPermissionHelper;
+import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
@@ -30,9 +30,9 @@ public class PagadorCieResourceServiceImpl
 	public PagadorCieResourceServiceImpl(
 		UserSessionHelper userSessionHelper,
 		AuthenticationHelper authenticationHelper,
-		EntitatPermissionHelper entitatPermissionHelper,
+		NotibPermissionHelper notibPermissionHelper,
 		OrganGestorResourceRepository organGestorResourceRepository) {
-		super(userSessionHelper, authenticationHelper, entitatPermissionHelper);
+		super(userSessionHelper, authenticationHelper, notibPermissionHelper);
 		this.organGestorResourceRepository = organGestorResourceRepository;
 	}
 

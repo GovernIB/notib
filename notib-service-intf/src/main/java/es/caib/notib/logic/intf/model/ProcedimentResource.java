@@ -21,6 +21,13 @@ import java.util.Date;
 
 /**
  * Informació d'un procediment.
+ * Permisos:
+ *   - READ: consulta
+ *   - PERM4: processar
+ *   - ADMIN: gestionar
+ *   - PERM5: notificacions
+ *   - PERM8: comunicacions
+ *   - PERM7: comunicacions SIR
  *
  * @author Límit Tecnologies
  */

@@ -26,7 +26,8 @@ const EntitatSelector: React.FC = () => {
                     ),
                 },
             }}
-            sx={{ mr: 1 }}>
+            sx={{ mr: 1 }}
+        >
             {entitatsAvailable.map((e) => (
                 <MenuItem key={e.id} value={e.id}>
                     <ListItemText>{e.nom}</ListItemText>

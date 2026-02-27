@@ -114,6 +114,7 @@ public class Dir3ResourceServiceImpl extends BaseNoDatabaseReadonlyResourceServi
 		if (!page.isEmpty()) {
 			// Calcula i emplena els camps que falten del recurs
 			Boolean isPermesComunicacionsSirPropiaEntitat = configHelper.getConfigAsBoolean(PropertyConfig.PROP_COMUNICACIONS_SIR_INTERNES);
+			// Cerca els codis DIR3 locals que coincideixin amb algun dels de la pàgina de resultats
 			List<String> codisLocals = organGestorResourceRepository.findCodisByEntitatAndCodiIn(
 				userSessionHelper.getCurrentEntitat(),
 				page.stream().map(Dir3Resource::getCodi).collect(Collectors.toSet()));

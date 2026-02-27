@@ -65,12 +65,18 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
         getToken: authGetToken,
     } = useAuthContext();
     const { setHttpHeaders: apiSetHttpHeaders, offline: apiOffline } = useResourceApiContext();
-    const { isReady: apiIsReady, find: apiFind } = useResourceApiService('entitatResource');
+    const {
+        isReady: apiIsReady,
+        find: apiFind,
+        getOne: apiGetOne,
+    } = useResourceApiService('entitatResource');
     const [currentUserId, setCurrentUserId] = React.useState<string>();
     const [rolesAvailable, setRolesAvailable] = React.useState<string[]>();
     const [entitatsAvailable, setEntitatsAvailable] = React.useState<any[]>();
     const [currentRole, setCurrentRole] = React.useState<string>();
     const [currentEntitatId, setCurrentEntitatId] = React.useState<number>();
+    const [currentEntitatLoading, setCurrentEntitatLoading] = React.useState<boolean>();
+    const [currentEntitat, setCurrentEntitat] = React.useState<any>();
     const { getValue: roleSessionGetValue, setValue: roleSessionSetValue } = useSessionStorage(
         currentUserId,
         'currentRole'
@@ -86,8 +92,8 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
             const token = authGetToken();
             if (token != null) {
                 const tokenDecoded = decodeJwt(token);
-                const realmRoles = tokenDecoded.realm_access?.roles?.filter((r: string) =>
-                    r.startsWith(ROLE_PREFIX)
+                const realmRoles = tokenDecoded.realm_access?.roles?.filter(
+                    (r: string) => r === ROLE_USER || r.startsWith(ROLE_PREFIX)
                 );
                 const rolesAvailable = ALLOWED_ROLES.filter((a) => realmRoles.includes(a));
                 setRolesAvailable(rolesAvailable);
@@ -154,6 +160,14 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
             }
         }
     }, [currentRole, currentEntitatId]);
+    React.useEffect(() => {
+        if (currentEntitatId != null && apiIsReady) {
+            setCurrentEntitatLoading(true);
+            apiGetOne(currentEntitatId, { perspectives: ['PERMISSIONS'] })
+                .then(setCurrentEntitat)
+                .finally(() => setCurrentEntitatLoading(false));
+        }
+    }, [currentEntitatId]);
     const contextValue = {
         isReady,
         rolesAvailable,
@@ -162,6 +176,8 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
         setCurrentRole,
         currentEntitatId,
         setCurrentEntitatId,
+        currentEntitatLoading,
+        currentEntitat,
     };
     return (
         <NotibContext.Provider value={contextValue}>{isReady && children}</NotibContext.Provider>

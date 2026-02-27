@@ -292,7 +292,7 @@ const rowLinkShowCheck = (rowLink: string | undefined, rowLinks: any[] | undefin
         const isNegative = rowLink != null && rowLink.startsWith('!');
         return isNegative ? found == null : found != null;
     } else {
-        return true;
+        return false;
     }
 };
 const rowArtifactShowCheck = (

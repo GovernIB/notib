@@ -1,23 +1,23 @@
 const translationEs = {
-    menu: {
-        home: 'Inicio',
-        config: 'Configuración',
-        entitats: 'Entidades',
-        avisos: 'Avisos',
-        propietats: 'Propiedades',
-        currentEntitat: 'Entidad actual',
-        organsGestors: 'Órganos gestores',
-        procediments: 'Procediments',
-        serveis: 'Serveis',
-        grups: 'Grupos',
-        enviaments: 'Envios',
-        pagadorsPostals: 'Operadores postales',
-        pagadorsCie: 'Centros de impresión y ensobrado',
-        notificacions: 'Notificaciones',
-        integracions: 'Integraciones',
-    },
-    comu: {
-        netejarFiltre: 'Limpiar filtro',
+    app: {
+        noEntitat: 'Este usuario no tiene acceso a ningún entorno',
+        menu: {
+            home: 'Inicio',
+            config: 'Configuración',
+            entitats: 'Entidades',
+            avisos: 'Avisos',
+            propietats: 'Propiedades',
+            currentEntitat: 'Entidad actual',
+            organsGestors: 'Órganos gestores',
+            procediments: 'Procediments',
+            serveis: 'Serveis',
+            grups: 'Grupos',
+            enviaments: 'Envios',
+            pagadorsPostals: 'Operadores postales',
+            pagadorsCie: 'Centros de impresión y ensobrado',
+            notificacions: 'Remesas',
+            integracions: 'Integraciones',
+        },
     },
     page: {
         home: {
@@ -236,7 +236,7 @@ const translationEs = {
         },
         notificacio: {
             grid: {
-                title: 'Notificaciones',
+                title: 'Remesas',
                 new: {
                     title: 'Nuevo envio',
                     NOTIFICACIO: 'Notificación',
@@ -286,8 +286,10 @@ const translationEs = {
                     add: 'Añadir adjunto',
                     remove: 'Eliminar adjunto',
                     helperText: {
-                        attachment:
-                            'El tamaño máximo del documento es de 10 MB. Los formatos admitidos son PDF y ZIP.',
+                        attachment: {
+                            noSir: 'El tamaño máximo del documento es de 10 MB. Los formatos admitidos son PDF y ZIP.',
+                            sir: 'El tamaño máximo del documento es de 10 MB. Máximo de 15 MB entre todos los documentos. Los formatos admitidos son JPG, JPEG, ODT, ODP, ODS, ODG, DOCX, XLSX, PPTX, PDF, PNG, RTF, SVG, TIFF, TXT, XML y XSIG.',
+                        },
                         normalitzat:
                             'Está la primera página del documento preparada para el ensobrado?',
                     },
@@ -328,6 +330,7 @@ const translationEs = {
             role: {
                 NOT_SUPER: 'Superadministrador',
                 NOT_ADMIN: 'Administrador',
+                tothom: 'Usuario',
             },
         },
         PermissionGrid: {
@@ -341,6 +344,9 @@ const translationEs = {
             add: 'Añadir',
             refresh: 'Refrescar',
         },
+    },
+    comu: {
+        netejarFiltre: 'Limpiar filtro',
     },
 };
 
