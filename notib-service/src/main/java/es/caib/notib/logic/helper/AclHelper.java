@@ -38,7 +38,6 @@ public class AclHelper {
 	public static final Class<?> ENTITAT_CLASS = EntitatEntity.class;
 	public static final Class<?> ORGAN_GESTOR_CLASS = OrganGestorEntity.class;
 	public static final Class<?> PROCEDIMENT_CLASS = ProcedimentEntity.class;
-	public static final Class<?> SERVEI_CLASS = ServeiEntity.class;
 
 	private final AclConfig aclConfig;
 	private final DataSource dataSource;
@@ -230,7 +229,7 @@ public class AclHelper {
 	 *            la llista de SIDs. Si no es passa cap valor s'utilitzaran els SIDs de l'usuari actual.
 	 * @return la llista d'ids.
 	 */
-	public Set<Serializable> findIdsWithAnyPermission(
+	public Set<? extends Serializable> findIdsWithAnyPermission(
 			Class<?> resourceClass,
 			List<Permission> permissions,
 			Sid... sids) {

@@ -2,8 +2,8 @@ package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
-import es.caib.notib.logic.helper.EntitatPermissionHelper;
 import es.caib.notib.logic.helper.LegacyHelper;
+import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
@@ -52,12 +52,12 @@ public class NotificacioResourceServiceImpl
 	public NotificacioResourceServiceImpl(
 		UserSessionHelper userSessionHelper,
 		AuthenticationHelper authenticationHelper,
-		EntitatPermissionHelper entitatPermissionHelper,
+		NotibPermissionHelper notibPermissionHelper,
 		NotificacioEnviamentResourceRepository notificacioEnviamentResourceRepository,
 		DocumentResourceRepository documentResourceRepository,
 		PersonaResourceRepository personaResourceRepository,
 		LegacyHelper legacyHelper) {
-		super(userSessionHelper, authenticationHelper, entitatPermissionHelper);
+		super(userSessionHelper, authenticationHelper, notibPermissionHelper);
 		this.notificacioEnviamentResourceRepository = notificacioEnviamentResourceRepository;
 		this.documentResourceRepository = documentResourceRepository;
 		this.personaResourceRepository = personaResourceRepository;

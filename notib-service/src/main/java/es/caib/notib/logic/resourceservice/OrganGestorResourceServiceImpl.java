@@ -1,12 +1,11 @@
 package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
-import es.caib.notib.logic.helper.AclHelper;
-import es.caib.notib.logic.helper.EntitatPermissionHelper;
-import es.caib.notib.logic.helper.UserSessionHelper;
-import es.caib.notib.logic.helper.OrganGestorSyncHelper;
+import es.caib.notib.logic.helper.*;
+import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.ActionExecutionException;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
+import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
 import es.caib.notib.logic.intf.model.OrganGestorDir3Sync;
 import es.caib.notib.logic.intf.model.OrganGestorResource;
 import es.caib.notib.logic.intf.resourceservice.OrganGestorResourceService;
@@ -14,12 +13,16 @@ import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
 import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
 import es.caib.notib.persist.resourcerepository.EntitatResourceRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Implementació del servei de gestió d'òrgans gestors.
@@ -39,11 +42,11 @@ public class OrganGestorResourceServiceImpl
 	public OrganGestorResourceServiceImpl(
 		UserSessionHelper userSessionHelper,
 		AuthenticationHelper authenticationHelper,
-		EntitatPermissionHelper entitatPermissionHelper,
+		NotibPermissionHelper notibPermissionHelper,
 		AclHelper aclHelper,
 		OrganGestorSyncHelper organGestorSyncHelper,
 		EntitatResourceRepository entitatResourceRepository) {
-		super(userSessionHelper, authenticationHelper, entitatPermissionHelper);
+		super(userSessionHelper, authenticationHelper, notibPermissionHelper);
 		this.aclHelper = aclHelper;
 		this.organGestorSyncHelper = organGestorSyncHelper;
 		this.entitatResourceRepository = entitatResourceRepository;
@@ -52,6 +55,36 @@ public class OrganGestorResourceServiceImpl
 	@PostConstruct
 	public void init() {
 		register(OrganGestorResource.DIR3_SYNC_ACTION_CODE, new Dir3SyncActionExecutor());
+	}
+
+	/*
+	 * Si l'usuari actual no és un superadministrador, només es mostren els recursos amb la mateixa entitat que la
+	 * seleccionada a la sessió.
+	 */
+	@Override
+	protected String additionalSpringFilter(
+		String currentSpringFilter,
+		String[] namedQueries) {
+		String superFilter = super.additionalSpringFilter(currentSpringFilter, namedQueries);
+		boolean isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
+		if (!isRoleAdmin) {
+			String filter = superFilter;
+			if (Arrays.asList(namedQueries).contains(OrganGestorResource.NAMED_QUERY_PERM_READ)) {
+				filter = addIdsWithPermissionFilterExpression(ExtendedPermission.READ, filter);
+			}
+			if (Arrays.asList(namedQueries).contains(OrganGestorResource.NAMED_QUERY_PERM_NOT)) {
+				filter = addIdsWithPermissionFilterExpression(ExtendedPermission.PERM4, filter);
+			}
+			if (Arrays.asList(namedQueries).contains(OrganGestorResource.NAMED_QUERY_PERM_COM)) {
+				filter = addIdsWithPermissionFilterExpression(ExtendedPermission.PERM5, filter);
+			}
+			if (Arrays.asList(namedQueries).contains(OrganGestorResource.NAMED_QUERY_PERM_SIR)) {
+				filter = addIdsWithPermissionFilterExpression(ExtendedPermission.PERM6, filter);
+			}
+			return filter;
+		} else {
+			return superFilter;
+		}
 	}
 
 	@Override
@@ -79,6 +112,27 @@ public class OrganGestorResourceServiceImpl
 		@Override
 		public void onChange(Serializable id, OrganGestorResource.OrganGestorDir3SyncForm previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, OrganGestorResource.OrganGestorDir3SyncForm target) {
 		}
+	}
+
+	private String addIdsWithPermissionFilterExpression(
+		Permission permission,
+		String filter) {
+		List<Long> ids = notibPermissionHelper.organGestorIdsWithPermissionRecursive(permission);
+		if (!ids.isEmpty()) {
+			String joinedIds = ids.stream().
+				map(Object::toString).
+				collect(Collectors.joining(","));
+			return concatenaFiltresAnd(filter, "id in (" + joinedIds + ")");
+		} else {
+			return filter;
+		}
+	}
+
+	private String concatenaFiltresAnd(String... filtres) {
+		return Arrays.stream(filtres).
+			filter(f -> f != null && !f.isEmpty()).
+			map(f -> "(" + f + ")").
+			collect(Collectors.joining(" and "));
 	}
 
 }

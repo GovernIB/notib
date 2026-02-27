@@ -86,8 +86,8 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
             const token = authGetToken();
             if (token != null) {
                 const tokenDecoded = decodeJwt(token);
-                const realmRoles = tokenDecoded.realm_access?.roles?.filter((r: string) =>
-                    r.startsWith(ROLE_PREFIX)
+                const realmRoles = tokenDecoded.realm_access?.roles?.filter(
+                    (r: string) => r === ROLE_USER || r.startsWith(ROLE_PREFIX)
                 );
                 const rolesAvailable = ALLOWED_ROLES.filter((a) => realmRoles.includes(a));
                 setRolesAvailable(rolesAvailable);

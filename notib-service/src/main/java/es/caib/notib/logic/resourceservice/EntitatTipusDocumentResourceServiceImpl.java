@@ -1,7 +1,7 @@
 package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
-import es.caib.notib.logic.helper.EntitatPermissionHelper;
+import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.model.EntitatTipusDocumentResource;
 import es.caib.notib.logic.intf.resourceservice.EntitatTipusDocumentResourceService;
@@ -25,13 +25,13 @@ public class EntitatTipusDocumentResourceServiceImpl
 	extends BaseMutableResourceService<EntitatTipusDocumentResource, Long, EntitatTipusDocumentResourceEntity>
 	implements EntitatTipusDocumentResourceService {
 
-	private final EntitatPermissionHelper entitatPermissionHelper;
+	private final NotibPermissionHelper notibPermissionHelper;
 
 	@Override
 	protected String additionalSpringFilter(
 		String currentSpringFilter,
 		String[] namedQueries) {
-		return entitatPermissionHelper.additionalSpringFilter("entitat.id");
+		return notibPermissionHelper.entitatAdditionalSpringFilter("entitat.id");
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public class EntitatTipusDocumentResourceServiceImpl
 		EntitatTipusDocumentResourceEntity entity,
 		EntitatTipusDocumentResource resource,
 		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		entitatPermissionHelper.checkEntitatAdminPermission(
+		notibPermissionHelper.entitatCheckAdminPermission(
 			getResourceClass(),
 			null,
 			resource.getEntitat().getId(),
@@ -51,7 +51,7 @@ public class EntitatTipusDocumentResourceServiceImpl
 		EntitatTipusDocumentResourceEntity entity,
 		EntitatTipusDocumentResource resource,
 		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		entitatPermissionHelper.checkEntitatAdminPermission(
+		notibPermissionHelper.entitatCheckAdminPermission(
 			getResourceClass(),
 			resource.getId(),
 			resource.getEntitat().getId(),
@@ -62,7 +62,7 @@ public class EntitatTipusDocumentResourceServiceImpl
 	protected void beforeDelete(
 		EntitatTipusDocumentResourceEntity entity,
 		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		entitatPermissionHelper.checkEntitatAdminPermission(
+		notibPermissionHelper.entitatCheckAdminPermission(
 			getResourceClass(),
 			entity.getId(),
 			entity.getEntitat().getId(),

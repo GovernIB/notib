@@ -209,15 +209,6 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 		return authenticationDetailsSource;
 	}
 
-	@Override
-	protected void filterAllowedGrantedAuthorities(Set<GrantedAuthority> grantedAuthorities) {
-		super.filterAllowedGrantedAuthorities(grantedAuthorities);
-		GrantedAuthority userGrantedAuthority = new SimpleGrantedAuthority(BaseConfig.ROLE_USER);
-		if (!grantedAuthorities.contains(userGrantedAuthority)) {
-			grantedAuthorities.add(userGrantedAuthority);
-		}
-	}
-
 	@Getter
 	public static class PreauthWebAuthenticationDetails extends PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails {
 		private final String jwtToken;

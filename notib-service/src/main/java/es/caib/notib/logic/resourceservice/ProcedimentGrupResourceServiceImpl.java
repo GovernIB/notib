@@ -1,7 +1,7 @@
 package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
-import es.caib.notib.logic.helper.EntitatPermissionHelper;
+import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.exception.ResourceNotCreatedException;
@@ -32,8 +32,8 @@ public class ProcedimentGrupResourceServiceImpl
 	public ProcedimentGrupResourceServiceImpl(
 		UserSessionHelper userSessionHelper,
 		AuthenticationHelper authenticationHelper,
-		EntitatPermissionHelper entitatPermissionHelper) {
-		super(userSessionHelper, authenticationHelper, entitatPermissionHelper);
+		NotibPermissionHelper notibPermissionHelper) {
+		super(userSessionHelper, authenticationHelper, notibPermissionHelper);
 	}
 
 	@Override
@@ -48,7 +48,7 @@ public class ProcedimentGrupResourceServiceImpl
 		// Repeteix les mateixes comprovacions per a l'entitat del grup.
 		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
 		if (Objects.equals(entity.getGrup().getEntitat(), currentEntitat)) {
-			entitatPermissionHelper.checkEntitatAdminPermission(
+			notibPermissionHelper.entitatCheckAdminPermission(
 				getResourceClass(),
 				null,
 				entity.getGrup().getEntitat().getId(),
@@ -72,7 +72,7 @@ public class ProcedimentGrupResourceServiceImpl
 		// Repeteix les mateixes comprovacions per a l'entitat del grup.
 		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
 		if (Objects.equals(entity.getGrup().getEntitat(), currentEntitat)) {
-			entitatPermissionHelper.checkEntitatAdminPermission(
+			notibPermissionHelper.entitatCheckAdminPermission(
 				getResourceClass(),
 				entity.getId(),
 				entity.getGrup().getEntitat().getId(),
@@ -95,7 +95,7 @@ public class ProcedimentGrupResourceServiceImpl
 		// Repeteix les mateixes comprovacions per a l'entitat del grup.
 		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
 		if (Objects.equals(entity.getGrup().getEntitat(), currentEntitat)) {
-			entitatPermissionHelper.checkEntitatAdminPermission(
+			notibPermissionHelper.entitatCheckAdminPermission(
 				getResourceClass(),
 				entity.getId(),
 				entity.getGrup().getEntitat().getId(),

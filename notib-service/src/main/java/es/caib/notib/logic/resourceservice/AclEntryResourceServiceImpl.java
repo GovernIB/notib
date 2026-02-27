@@ -411,8 +411,7 @@ public class AclEntryResourceServiceImpl
 			}
 		} else if (
 			Objects.equals(resourceClass, AclHelper.ORGAN_GESTOR_CLASS) ||
-				Objects.equals(resourceClass, AclHelper.PROCEDIMENT_CLASS) ||
-				Objects.equals(resourceClass, AclHelper.SERVEI_CLASS)) {
+				Objects.equals(resourceClass, AclHelper.PROCEDIMENT_CLASS)) {
 			Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
 			boolean permissionGranted = isAclPermissionGrantedForEntitat(currentEntitatId);
 			if (permissionGranted) {

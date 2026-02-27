@@ -8,7 +8,8 @@ import Icon from '@mui/material/Icon';
 import IconButton from '@mui/material/IconButton';
 import { MuiForm, FormField, useFormContext } from 'reactlib';
 
-const NotificacioFormDocumentContent: React.FC = () => {
+const NotificacioFormDocumentContent: React.FC<{ enviamentTipus: string }> = (props) => {
+    const { enviamentTipus } = props;
     const { t } = useTranslation();
     const { data } = useFormContext();
     const sourceFieldNameMapping: any = {
@@ -16,6 +17,10 @@ const NotificacioFormDocumentContent: React.FC = () => {
         UUID: 'uuid',
         ATTACHED: 'attachment',
     };
+    const accept =
+        enviamentTipus === 'SIR'
+            ? '.jpg,.jpeg,.odt,.odp,.ods,.odg,.docx,.xlsx,.pptx,.pdf,.png,.rtf,.svg,.tiff,.txt,.xml,.xsig'
+            : '.zip,.pdf';
     return (
         <Grid container spacing={2}>
             <Grid size={6}>
@@ -29,12 +34,13 @@ const NotificacioFormDocumentContent: React.FC = () => {
                             data.source === 'ATTACHED'
                                 ? {
                                       helperText: t(
-                                          'page.notificacio.form.documents.helperText.attachment'
+                                          'page.notificacio.form.documents.helperText.attachment.' +
+                                              (enviamentTipus === 'SIR' ? 'sir' : 'noSir')
                                       ),
                                   }
                                 : undefined
                         }
-                        accept={data.source === 'ATTACHED' ? '.zip,.pdf' : undefined}
+                        accept={data.source === 'ATTACHED' ? accept : undefined}
                         required
                     />
                 )}
@@ -115,7 +121,9 @@ const NotificacioFormDocument: React.FC<{
                         componentProps={{ sx: { mb: 2 } }}
                         commonFieldComponentProps={{ size: 'small' }}
                     >
-                        <NotificacioFormDocumentContent />
+                        <NotificacioFormDocumentContent
+                            enviamentTipus={parentFormData.enviamentTipus}
+                        />
                     </MuiForm>
                 </Grid>
             </Grid>
@@ -152,14 +160,16 @@ const NotificacioFormDocuments: React.FC = () => {
                     handleRemove={handleRemoveClick}
                 />
             ))}
-            <Button
-                variant="contained"
-                startIcon={<Icon>add</Icon>}
-                onClick={handleAddClick}
-                size="small"
-            >
-                {t('page.notificacio.form.documents.add')}
-            </Button>
+            {data?.enviamentTipus === 'SIR' && documentsInfo.length < 5 && (
+                <Button
+                    variant="contained"
+                    startIcon={<Icon>add</Icon>}
+                    onClick={handleAddClick}
+                    size="small"
+                >
+                    {t('page.notificacio.form.documents.add')}
+                </Button>
+            )}
         </>
     );
 };

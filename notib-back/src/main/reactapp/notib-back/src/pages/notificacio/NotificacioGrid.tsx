@@ -5,7 +5,7 @@ import Button from '@mui/material/Button';
 import Icon from '@mui/material/Icon';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { GridPage, MuiDataGrid } from 'reactlib';
+import { GridPage, MuiDataGrid, useResourceApiService } from 'reactlib';
 
 const columns = [
     {
@@ -59,6 +59,8 @@ const NotificacioAddButton: React.FC = () => {
 
 const NotificacioGrid = () => {
     const { t } = useTranslation();
+    const { currentActions: apiCurrentActions } = useResourceApiService('notificacioResource');
+    const isCreateLinkPresent = apiCurrentActions?.['create'] != null;
     return (
         <GridPage disableMargins={false}>
             <MuiDataGrid
@@ -68,12 +70,16 @@ const NotificacioGrid = () => {
                 paginationActive
                 toolbarHideCreate
                 toolbarCreateLink="form"
-                toolbarElementsWithPositions={[
-                    {
-                        position: 2,
-                        element: <NotificacioAddButton />,
-                    },
-                ]}
+                toolbarElementsWithPositions={
+                    isCreateLinkPresent
+                        ? [
+                              {
+                                  position: 2,
+                                  element: <NotificacioAddButton />,
+                              },
+                          ]
+                        : undefined
+                }
                 rowLink="form/{{id}}"
                 rowUpdateLink="form/{{id}}"
             />

@@ -1,16 +1,21 @@
 package es.caib.notib.logic.resourceservice;
 
+import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.helper.AclHelper;
-import es.caib.notib.logic.helper.EntitatPermissionHelper;
+import es.caib.notib.logic.helper.NotibPermissionHelper;
+import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
+import es.caib.notib.logic.intf.base.exception.PerspectiveApplicationException;
 import es.caib.notib.logic.intf.base.model.FileReference;
+import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
 import es.caib.notib.logic.intf.model.EntitatResource;
 import es.caib.notib.logic.intf.resourceservice.EntitatResourceService;
 import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -29,11 +34,13 @@ public class EntitatResourceServiceImpl
 	implements EntitatResourceService {
 
 	private final AclHelper aclHelper;
-	private final EntitatPermissionHelper entitatPermissionHelper;
+	private final AuthenticationHelper authenticationHelper;
+	private final NotibPermissionHelper notibPermissionHelper;
 
 	@PostConstruct
 	public void init() {
 		register(EntitatResource.Fields.logoCapsalera, new EntitatResourceServiceImpl.LogoCapsaleraFieldFileManager());
+		register(EntitatResource.PERSPECTIVE_PERMISSIONS, new PermisosPerspectiveApplicator());
 	}
 
 	@Override
@@ -46,7 +53,7 @@ public class EntitatResourceServiceImpl
 	protected String additionalSpringFilter(
 		String currentSpringFilter,
 		String[] namedQueries) {
-		return entitatPermissionHelper.additionalSpringFilter("id");
+		return notibPermissionHelper.entitatAdditionalSpringFilter("id");
 	}
 
 	@Override
@@ -54,7 +61,7 @@ public class EntitatResourceServiceImpl
 		EntitatResourceEntity entity,
 		EntitatResource resource,
 		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		entitatPermissionHelper.checkEntitatAdminPermission(
+		notibPermissionHelper.entitatCheckAdminPermission(
 			getResourceClass(),
 			null,
 			null,
@@ -66,7 +73,7 @@ public class EntitatResourceServiceImpl
 		EntitatResourceEntity entity,
 		EntitatResource resource,
 		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		entitatPermissionHelper.checkEntitatAdminPermission(
+		notibPermissionHelper.entitatCheckAdminPermission(
 			getResourceClass(),
 			resource.getId(),
 			resource.getId(),
@@ -77,11 +84,90 @@ public class EntitatResourceServiceImpl
 	protected void beforeDelete(
 		EntitatResourceEntity entity,
 		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		entitatPermissionHelper.checkEntitatAdminPermission(
+		notibPermissionHelper.entitatCheckAdminPermission(
 			getResourceClass(),
 			entity.getId(),
 			entity.getId(),
 			BasePermission.DELETE);
+	}
+
+	public class PermisosPerspectiveApplicator implements PerspectiveApplicator<EntitatResourceEntity, EntitatResource> {
+		@Override
+		public void applySingle(
+			String code,
+			EntitatResourceEntity entity,
+			EntitatResource resource) throws PerspectiveApplicationException {
+			boolean isRoleUser = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_USER);
+			// Només els usuaris normals poden crear remeses
+			if (isRoleUser) {
+				resource.setCrearNotificacions(
+					checkPermisRemesa(
+						ExtendedPermission.PERM4,
+						ExtendedPermission.PERM5,
+						false,
+						false));
+				resource.setCrearComunicacions(
+					checkPermisRemesa(
+						ExtendedPermission.PERM5,
+						ExtendedPermission.PERM8,
+						null,
+						true));
+				resource.setCrearSir(
+					checkPermisRemesa(
+						ExtendedPermission.PERM6,
+						ExtendedPermission.PERM7,
+						null,
+						true));
+			} else {
+				resource.setCrearNotificacions(false);
+				resource.setCrearComunicacions(false);
+				resource.setCrearSir(false);
+			}
+		}
+		/**
+		 * Es mira si es tenen permisos per a crear un tipus de remesa. Bàsicamen es verifica si es te el permís
+		 * corresponent sobre algun òrgan gestor o sobre algun procediment/servei.
+		 *
+		 * @param permisOrgansGestors
+		 *            el permís sobre els òrgans gestors que es vol comprovar.
+		 * @param permisProcediments
+		 *            el permís sobre els procediments/serveis que es vol comprovar.
+		 * @param isServei
+		 *            false si es volen consultar els procediments, true si es volen consultar els serveis o null si és
+		 *            volen consultar tant procediments com serveis.
+		 * @param isComunicacio
+		 *            indica si s'està comprovant una comunicació.
+		 * @return true si es tenen permisos per a crear el tipus de remesa o false en cas contrari.
+		 */
+		private boolean checkPermisRemesa(
+			Permission permisOrgansGestors,
+			Permission permisProcediments,
+			Boolean isServei,
+			boolean isComunicacio) {
+			// Si no té permís sobre cap òrgan gestor → fora
+			if (notibPermissionHelper.organGestorIdsWithPermissionRecursive(permisOrgansGestors).isEmpty()) {
+				return false;
+			}
+			// Si és comunicació, comprovam si té permís per a fer comunicacions sense procediment sobre algun òrgan
+			// gestor.
+			if (isComunicacio) {
+				if (!notibPermissionHelper
+					.organGestorIdsWithPermissionRecursive(ExtendedPermission.PERM7)
+					.isEmpty()) {
+					return true;
+				}
+			}
+			// Comprovam si es tenen permisos sobre procediments/serveis no comuns
+			if (!notibPermissionHelper
+				.procedimentsServeisNoComunsWithPermission(permisProcediments, isServei)
+				.isEmpty()) {
+				return true;
+			}
+			// Comprovam si es tenen permisos sobre procediments/serveis comuns
+			return !notibPermissionHelper
+				.procedimentsServeisComunsWithPermission(permisProcediments, isServei)
+				.isEmpty();
+		}
 	}
 
 	public static class LogoCapsaleraFieldFileManager implements FieldFileManager<EntitatResourceEntity> {

@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 /**
  * Implementació del servei de l'API REST.
- * 
+ *
  * @author Límit Tecnologies
  */
 @Slf4j
