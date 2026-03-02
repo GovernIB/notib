@@ -34,6 +34,12 @@ public class SchedulledService extends AbstractService<es.caib.notib.logic.intf.
 
 	@Override
 	@PermitAll
+	public void enviamentRefrescarEstatEnviats() {
+		getDelegateService().enviamentRefrescarEstatEnviats();
+	}
+	
+	@Override
+	@PermitAll
 	public void enviamentRefrescarEstatDEH() {
 		getDelegateService().enviamentRefrescarEstatDEH();
 	}

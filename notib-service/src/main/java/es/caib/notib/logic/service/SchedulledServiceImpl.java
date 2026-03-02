@@ -46,6 +46,8 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.Principal;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -147,6 +149,47 @@ public class SchedulledServiceImpl implements SchedulledService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
+	
+	// 3. Actualització de l'estat dels enviaments enviats a Notific@ fa més de X dies
+	//////////////////////////////////////////////////////////////////
+	@Override
+	public void enviamentRefrescarEstatEnviats() {
+		var timer = metricsHelper.iniciMetrica();
+		try {
+			if (!isEnviamentActualitzacioEstatActiu() || !notificaHelper.isConnexioNotificaDisponible()) {
+				log.info("[NOTIFIC@] L'actualització de l'estat dels enviaments amb l'estat de Notific@ està deshabilitada");
+				return;
+			}
+
+			var dies = getEnviamentActualitzacioEstatDiesProperty();
+
+			if (dies == 0) {
+				log.info("[NOTIFIC@] L'actualització de l'estat està deshabilitada perquè la propietat 'es.caib.notib.tasca.enviament.actualitzacio.estat.dies.revisio' és 0");
+				return;
+			}
+
+			log.info("[NOTIFIC@] Cercant enviaments pendents de refrescar l'estat de Notific@ creats fa més de {} dies", dies);
+
+			Date dataLimit = Date.from(Instant.now().minus(dies, ChronoUnit.DAYS));
+
+			List<Long> pendents = notificacioService.getNotificacionsPendentsRefrescarEstat(dataLimit);
+			if (pendents == null || pendents.isEmpty()) {
+				log.info("[NOTIFIC@] No hi ha enviaments pendents de refrescar l'estat de Notific@");
+				return;
+			}
+
+			log.info("[NOTIFIC@] Realitzant refresc de l'estat de Notific@ per a {} enviaments", pendents.size());
+
+			for (Long enviament : pendents) {
+				log.info("[NOTIFIC@] >>> Consultant l'estat a Notific@ de l'enviament: [Id: {}]", enviament);
+				var consulta = ConsultaNotificaRequest.builder().id(enviament).build();
+				notificacioService.enviamentRefrescarEstat(consulta);
+			}
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
 
 	//4. Consulta certificació notificacions DEH finalitzades
 	//////////////////////////////////////////////////////////////////
@@ -435,14 +478,11 @@ public class SchedulledServiceImpl implements SchedulledService {
 		SecurityContextHolder.getContext().setAuthentication(auth);
 	}
 
-	private boolean isNotificaEnviamentsActiu() {
-		return configHelper.getConfigAsBoolean("es.caib.notib.tasca.notifica.enviaments.actiu");
-	}
 	private boolean isEnviamentActualitzacioEstatActiu() {
-		return configHelper.getConfigAsBoolean("es.caib.notib.tasca.enviament.actualitzacio.estat.actiu");
+		return configHelper.getConfigAsBoolean(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_ENVIADES_ACTIU);
 	}
-	private boolean isEnviamentActualitzacioEstatRegistreActiu() {
-		return configHelper.getConfigAsBoolean("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.actiu");
+	private int getEnviamentActualitzacioEstatDiesProperty() {
+	    return configHelper.getConfigAsInteger(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_ENVIADES_DIES);
 	}
 	private boolean isActualitzacioProcedimentsActiuProperty() {
 		return configHelper.getConfigAsBoolean("es.caib.notib.actualitzacio.procediments.actiu");

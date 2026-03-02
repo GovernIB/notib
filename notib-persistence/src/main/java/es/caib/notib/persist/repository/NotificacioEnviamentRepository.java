@@ -213,17 +213,15 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	@Query(	"select id " +
 			"  from	NotificacioEnviamentEntity " +
 			" where	(notificaEstatFinal = false " +
-			"   	and notificaEstat != es.caib.notib.client.domini.EnviamentEstat.NOTIB_PENDENT " +
-			"   	and notificaEstat != es.caib.notib.client.domini.EnviamentEstat.REGISTRADA " +
-			"   	and notificaEstat != es.caib.notib.client.domini.EnviamentEstat.FINALITZADA " +
-			"   	and notificaEstat != es.caib.notib.client.domini.EnviamentEstat.PROCESSADA) " +
-			"	or " +
-			" 		(notificaEstatFinal = true " + 
-			"		and notificaEstat = es.caib.notib.client.domini.EnviamentEstat.EXPIRADA " +
-			"		and notificaCertificacioData is null)" +
-			"   and notificaIntentNum < :maxReintents " +
+			"   	and (notificaEstat = es.caib.notib.client.domini.EnviamentEstat.NOTIB_ENVIADA " +
+			"   			or notificaEstat = es.caib.notib.client.domini.EnviamentEstat.ENVIADA) " +
+			"   	and notificaIntentNum < :maxReintents " +
+			"		and notificaEstatData <= :dataLimit) " +
 			" order by notificaEstatDataActualitzacio asc nulls first")
-	List<Long> findByNotificaRefresc(@Param("maxReintents")Integer maxReintents, Pageable pageable);
+	List<Long> findByNotificaRefresc(
+			@Param("maxReintents") Integer maxReintents, 
+			@Param("dataLimit") Date dataLimit,
+			Pageable pageable);
 	
 	@Query(	"select id " +
 			"  from	NotificacioEnviamentEntity " +

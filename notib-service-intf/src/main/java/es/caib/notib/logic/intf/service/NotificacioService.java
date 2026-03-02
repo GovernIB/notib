@@ -378,7 +378,7 @@ public interface NotificacioService {
 	List<Long> getNotificacionsPendentsRegistrar();
 	List<Long> getNotificacionsPendentsEnviar();
 
-	List<Long> getNotificacionsPendentsRefrescarEstat();
+	List<Long> getNotificacionsPendentsRefrescarEstat(Date dataLimit);
 	List<Long> getNotificacionsDEHPendentsRefrescarCert();
 	List<Long> getNotificacionsCIEPendentsRefrescarCert();
 	List<Long> getNotificacionsPendentsRefrescarEstatRegistre();

@@ -120,6 +120,18 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 CALLBACK_CLIENT,
                 PropertiesConstants.PROCESSAR_PENDENTS_INITIAL_DELAY,
                 300000L);
+        
+        // 3. Actualització de l'estat dels enviaments enviats a Notific@ fa més de X dies
+        /////////////////////////////////////////////////////////////////////////
+        registerPeriodicTask(
+                "refrescarEnviades",
+                schedulledServiceSupplier,
+                (Supplier<SchedulledService> s) -> s.get().enviamentRefrescarEstatEnviats(),
+                PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_ENVIADES_RATE,
+                300000L,
+                CALLBACK_CLIENT,
+                PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_ENVIADES_INITIAL_DELAY,
+                300000L);
 
         // 4. Consulta certificació notificacions DEH finalitzades
         /////////////////////////////////////////////////////////////////////////

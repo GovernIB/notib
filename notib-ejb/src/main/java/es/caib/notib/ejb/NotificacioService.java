@@ -249,8 +249,8 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@PermitAll
-	public List<Long> getNotificacionsPendentsRefrescarEstat() {
-		return getDelegateService().getNotificacionsPendentsRefrescarEstat();
+	public List<Long> getNotificacionsPendentsRefrescarEstat(Date dataLimit) {
+		return getDelegateService().getNotificacionsPendentsRefrescarEstat(dataLimit);
 	}
 
 	@Override
