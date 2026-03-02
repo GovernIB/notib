@@ -191,3 +191,14 @@ databaseChangeLog:
                 -   addNotNullConstraint:
                         tableName: ${db_prefix}PAGADOR_POSTAL
                         columnName: facturacio_codi_client
+
+    -   changeSet:
+            id: 2_1_1_000-10
+            author: limit
+            changes:
+                -   modifyDataType:
+                        tableName: NOT_NOTIFICACIO_ENV
+                        columnName: NOTIFICA_DATAT_RECNIF
+                        newDataType: varchar(50 ${varcharUnit})
+
+
