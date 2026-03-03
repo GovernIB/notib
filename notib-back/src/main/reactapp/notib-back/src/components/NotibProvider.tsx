@@ -141,6 +141,7 @@ const useCurrentEntitat = (
         useSessionStorage(currentUserId, 'currentSession');
     React.useEffect(() => {
         if (apiIsReady && currentRoleReady && currentRole != null) {
+            setCurrentEntitatId(undefined);
             if (currentRole !== ROLE_SUPER) {
                 apiFind({ unpaged: true }).then((response) => {
                     const entitatsAvailable = response.rows;
