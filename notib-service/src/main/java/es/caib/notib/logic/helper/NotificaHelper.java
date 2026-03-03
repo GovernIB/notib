@@ -18,13 +18,16 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.logic.intf.ws.adviser.nexea.NexeaAdviserWs;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnvio;
+import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.plugin.cie.CiePluginHelper;
 import es.caib.notib.logic.statemachine.SmConstants;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioEventRepository;
 import es.caib.notib.persist.repository.SincronizarEnvioRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ScheduledMessage;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +54,7 @@ import java.util.Map;
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Component
 public class NotificaHelper {
 
@@ -150,6 +154,9 @@ public class NotificaHelper {
 		} catch (NumberFormatException e) {
 			var objectMapper = new ObjectMapper();
 			sincronizarEnvio = objectMapper.readValue(((ActiveMQTextMessage) payload).getText(), SincronizarEnvio.class);
+		} catch (Exception ex) {
+			NotibLogger.getInstance().info("[Listener CUA_SINCRONIZAR_ENVIO_OE] Error inesperat: " + ex.getMessage() , log, LoggingTipus.ENTREGA_CIE);
+			return;
 		}
 //		if (payload instanceof Long) {
 //			var entity = sincronizarEnvioRepository.findById((Long) payload).orElseThrow();
@@ -165,15 +172,15 @@ public class NotificaHelper {
 		if (NexeaAdviserWs.SYNC_ENVIO_OE_OK.equals(resposta.getCodigoRespuesta()) || "OK".equals(resposta.getDescripcionRespuesta())) {
 			if (id != null) {
 				final var idDelete = id;
-				if (TransactionSynchronizationManager.isActualTransactionActive()) {
-					TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-						@Override
-						public void afterCommit() {
+				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+					@Override
+					public void afterCommit() {
+						if (TransactionSynchronizationManager.isActualTransactionActive()) {
 							var entity = sincronizarEnvioRepository.findById(idDelete);
 							entity.ifPresent(sincronizarEnvioEntity -> sincronizarEnvioRepository.delete(sincronizarEnvioEntity));
 						}
-					});
-				}
+					}
+				});
 			}
 			return;
 		}
@@ -188,15 +195,15 @@ public class NotificaHelper {
 			}
 			if (id != null) {
 				final var idDelete = id;
-				if (TransactionSynchronizationManager.isActualTransactionActive()) {
-					TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-						@Override
-						public void afterCommit() {
+				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+					@Override
+					public void afterCommit() {
+						if (TransactionSynchronizationManager.isActualTransactionActive()) {
 							var entity = sincronizarEnvioRepository.findById(idDelete);
 							entity.ifPresent(sincronizarEnvioEntity -> sincronizarEnvioRepository.delete(sincronizarEnvioEntity));
 						}
-					});
-				}
+					}
+				});
 			}
 			return;
 		}

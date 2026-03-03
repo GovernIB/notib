@@ -27,6 +27,8 @@ import org.springframework.statemachine.support.DefaultStateMachineContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
@@ -35,7 +37,7 @@ import java.util.Date;
 
 /**
  * Implementació del servei de gestió de enviaments.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -225,7 +227,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> altaEnviament(String enviamentUuid, Long delay) {
 
-		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl altaEnviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl altaEnviament " + enviamentUuid + " delay: " + delay, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
 		var enviament = enviamentRepository.findByUuid(enviamentUuid).orElseThrow();
 		var variables = sm.getExtendedState().getVariables();
@@ -242,13 +244,20 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> altaEnviament(String enviamentUuid) {
 
 		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl altaEnviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
-		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
+		var sm = stateMachineService.acquireStateMachine(enviamentUuid, false);
 		var enviament = enviamentRepository.findByUuid(enviamentUuid).orElseThrow();
 		var variables = sm.getExtendedState().getVariables();
 		variables.put(SmConstants.ENVIAMENT_TIPUS, enviament.getNotificacio().getEnviamentTipus().name());
 		variables.put(SmConstants.ENVIAMENT_SENSE_NIF, enviament.isPerEmail());
+		sm.start();
 		// Enviam a registre
-		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_ENVIAR);
+		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+			@Override
+			public void afterCommit() {
+				sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_ENVIAR);
+			}
+		});
+//		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_ENVIAR);
 		return sm;
 	}
 

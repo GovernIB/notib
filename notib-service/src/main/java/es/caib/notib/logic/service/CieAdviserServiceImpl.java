@@ -2,7 +2,7 @@ package es.caib.notib.logic.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
-import es.caib.comanda.model.v1.avis.AvisTipus;
+import es.caib.comanda.model.management.AvisTipus;
 import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.comanda.ComandaListener;
@@ -217,21 +217,19 @@ public class CieAdviserServiceImpl implements CieAdviserService {
 
 		final Long sincEnvioId = sincronizarEnvioId;
 		NotibLogger.getInstance().info("[CIE ADVISER] Enviant a la cua " + NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE + " l'ID " + sincronizarEnvioId, log, LoggingTipus.ENTREGA_CIE);
-		if (TransactionSynchronizationManager.isActualTransactionActive()) {
-			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-				@Override
-				public void afterCommit() {
+		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+			@Override
+			public void afterCommit() {
+				if (!CieEstat.NOTIFICADA.equals(enviament.getEntregaPostal().getCieEstat()) || enviament.isNotificaEstatFinal()) {
+					return;
+				}
+				if (TransactionSynchronizationManager.isActualTransactionActive()) {
 					jmsTemplate.convertAndSend(NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, sincEnvioId, m -> {
 						m.setIntProperty("intents", 0);
 						return m;
 					});
 				}
-			});
-			return;
-		}
-		jmsTemplate.convertAndSend(NotificaHelper.CUA_SINCRONIZAR_ENVIO_OE, sincronizarEnvioId, m -> {
-			m.setIntProperty("intents", 0);
-			return m;
+			}
 		});
 	}
 

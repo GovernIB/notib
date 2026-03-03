@@ -1,7 +1,7 @@
 package es.caib.notib.logic.helper.plugin;
 
 import com.google.common.base.Strings;
-import es.caib.comanda.model.v1.salut.IntegracioApp;
+import es.caib.comanda.ms.salut.helper.IntegracioApp;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.PluginHelper;
@@ -31,7 +31,7 @@ import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.GDO;
 
 /**
  * Helper per a interactuar amb els plugins.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -121,9 +121,9 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 			throw new SistemaExternException(IntegracioCodi.GESDOC.name(), errorDescripcio, ex);
 		}
 	}
-	
+
 	public void gestioDocumentalDelete(String id, String agrupacio) {
-		
+
 		var info = new IntegracioInfo(IntegracioCodi.GESDOC,"Eliminació d'un arxiu", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Id del document", id), new AccioParam("Agrupacio", agrupacio));
 		var codiEntitat = getCodiEntitatActual();
@@ -145,9 +145,9 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 
 		gestioDocumentalGet(id, agrupacio, contingutOut, null);
 	}
-	
+
 	public void gestioDocumentalGet(String id, String agrupacio, OutputStream contingutOut, Boolean isZip) {
-		
+
 		var info = new IntegracioInfo(IntegracioCodi.GESDOC, "Consultant arxiu de la gestió documental", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Id del document", id),
 				new AccioParam("Agrupacio", agrupacio));
@@ -173,7 +173,7 @@ public class GestioDocumentalPluginHelper extends AbstractPluginHelper<GestioDoc
 			throw new SistemaExternException(IntegracioCodi.GESDOC.name(), errorDescripcio, ex);
 		}
 	}
-	
+
 	@Override
 	protected GestioDocumentalPlugin getPlugin() {
 

@@ -1,7 +1,7 @@
 package es.caib.notib.logic.helper.plugin;
 
 import com.google.common.base.Strings;
-import es.caib.comanda.model.v1.salut.IntegracioApp;
+import es.caib.comanda.ms.salut.helper.IntegracioApp;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
@@ -23,7 +23,7 @@ import java.util.Properties;
 
 /**
  * Helper per a interactuar amb els plugins.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -42,7 +42,7 @@ public class GestorDocumentalAdministratiuPluginHelper extends AbstractPluginHel
 
 	// GESTOR CONTINGUTS ADMINISTRATIU (ROLSAC)
 	// /////////////////////////////////////////////////////////////////////////////////////
-	
+
 	public List<ProcSerDto> getProcedimentsGda() {
 
 		var info = new IntegracioInfo(IntegracioCodi.GESCONADM,"Obtenir tots els procediments", IntegracioAccioTipusEnumDto.ENVIAMENT);
@@ -73,7 +73,7 @@ public class GestorDocumentalAdministratiuPluginHelper extends AbstractPluginHel
 			throw new SistemaExternException(IntegracioCodi.GESCONADM.name(), errorDescripcio, ex);
 		}
 	}
-	
+
 	public int getTotalProcediments(String codiDir3Entitat) {
 
 		var info = new IntegracioInfo(IntegracioCodi.GESCONADM,"Recuperant el total de procediments", IntegracioAccioTipusEnumDto.ENVIAMENT);
@@ -157,7 +157,7 @@ public class GestorDocumentalAdministratiuPluginHelper extends AbstractPluginHel
 			throw new SistemaExternException(IntegracioCodi.GESCONADM.name(), errorDescripcio, ex);
 		}
 	}
-	
+
 	public List<ProcSerDto> getProcedimentsGdaByEntitat(String codiDir3, int numPagina) {
 
 		var info = new IntegracioInfo(IntegracioCodi.GESCONADM,"Obtenir procediments per entitat", IntegracioAccioTipusEnumDto.ENVIAMENT);

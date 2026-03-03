@@ -1,6 +1,6 @@
 package es.caib.notib.persist.entity;
 
-import es.caib.comanda.model.v1.tasca.TascaEstat;
+import es.caib.comanda.model.management.TascaEstat;
 import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentTipus;
@@ -36,7 +36,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 /**
  * Classe del model de dades que representa els enviaments d'una
  * notificació.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Builder
@@ -63,7 +63,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@JoinColumn(name = "titular_id")
 	@ForeignKey(name = "not_persona_notificacio_env_fk")
 	protected PersonaEntity titular;
-	
+
 	/* Destinataris */
 	@OneToMany(fetch = FetchType.LAZY, orphanRemoval = true)
 	@ForeignKey(name = "not_persona_not_fk")
@@ -74,13 +74,13 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	/* DEH */
 	@Column(name = "deh_obligat")
 	protected Boolean dehObligat;
-	
+
 	@Column(name = "deh_nif", length = 9)
 	protected String dehNif;
-	
+
 	@Column(name = "deh_proc_codi", length = 64)
 	protected String dehProcedimentCodi;
-	
+
 	/* Altres */
 	@Column(name = "servei_tipus")
 	@Enumerated(EnumType.ORDINAL)
@@ -89,113 +89,113 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	/* Notifica informació */
 	@Column(name = "notifica_ref", length = 36, unique = true)
 	protected String notificaReferencia;
-	
+
 	@Column(name = "notifica_id", length = 20)
 	protected String notificaIdentificador;
-	
+
 	@Column(name = "notifica_datcre")
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date notificaDataCreacio;
-	
+
 	@Column(name = "notifica_datdisp")
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date notificaDataDisposicio;
-	
+
 	@Column(name = "notifica_datcad")
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date notificaDataCaducitat;
 
 	@Column(name = "plazo_ampliado")
 	protected boolean plazoAmpliado;
-	
+
 	@Column(name = "notifica_emi_dir3codi", length = 9)
 	protected String notificaEmisorDir3;
-	
+
 	@Column(name = "notifica_emi_dir3desc", length = 100)
 	protected String notificaEmisorDescripcio;
-	
+
 	@Column(name = "notifica_emi_dir3nif", length = 9)
 	protected String notificaEmisorNif;
-	
+
 	@Column(name = "notifica_arr_dir3codi", length = 9)
 	protected String notificaArrelDir3;
-	
+
 	@Column(name = "notifica_arr_dir3desc", length = 100)
 	protected String notificaArrelDescripcio;
-	
+
 	@Column(name = "notifica_arr_dir3nif", length = 9)
 	protected String notificaArrelNif;
-	
+
 	/* Notifica estat i datat */
 	@Column(name = "notifica_estat", nullable = false)
 	protected EnviamentEstat notificaEstat;
-	
+
 	@Column(name = "notifica_estat_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date notificaEstatData;
-	
+
 	@Column(name = "notifica_estat_dataact")
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date notificaEstatDataActualitzacio;
-	
+
 	@Column(name = "notifica_estat_final")
 	protected boolean notificaEstatFinal;
-	
+
 	@Column(name = "notifica_estat_desc", length = 255)
 	protected String notificaEstatDescripcio;
-	
+
 	@Column(name = "notifica_datat_origen", length = 20)
 	protected String notificaDatatOrigen;
-	
+
 	@Column(name = "notifica_datat_recnif", length = 9)
 	protected String notificaDatatReceptorNif;
-	
+
 	@Column(name = "notifica_datat_recnom", length = 400)
 	protected String notificaDatatReceptorNom;
-	
+
 	@Column(name = "notifica_datat_numseg", length = 50)
 	protected String notificaDatatNumSeguiment;
-	
+
 	@Column(name = "notifica_datat_errdes", length = 255)
 	protected String notificaDatatErrorDescripcio;
-	
+
 	/* Notifica certificació */
 	@Column(name = "notifica_cer_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date notificaCertificacioData;
-	
+
 	@Column(name = "notifica_cer_arxiuid", length = 50)
 	protected String notificaCertificacioArxiuId;
-	
+
 	@Column(name = "notifica_cer_hash", length = 50)
 	protected String notificaCertificacioHash;
-	
+
 	@Column(name = "notifica_cer_origen", length = 20)
 	protected String notificaCertificacioOrigen;
-	
+
 	@Column(name = "notifica_cer_metas", length = 255)
 	protected String notificaCertificacioMetadades;
-	
+
 	@Column(name = "notifica_cer_csv", length = 50)
 	protected String notificaCertificacioCsv;
-	
+
 	@Column(name = "notifica_cer_mime", length = 20)
 	protected String notificaCertificacioMime;
-	
+
 	@Column(name = "notifica_cer_tamany", length = 20)
 	protected Integer notificaCertificacioTamany;
-	
+
 	@Column(name = "notifica_cer_tipus")
 	@Enumerated(EnumType.ORDINAL)
 	protected NotificaCertificacioTipusEnumDto notificaCertificacioTipus;
-	
+
 	@Column(name = "notifica_cer_arxtip")
 	@Enumerated(EnumType.ORDINAL)
 	protected NotificaCertificacioArxiuTipusEnumDto notificaCertificacioArxiuTipus;
-	
+
 	@Column(name = "notifica_cer_numseg", length = 50)
 	protected String notificaCertificacioNumSeguiment;
-	
+
 	/* Notifica error */
 	@Column(name = "notifica_error", nullable = false)
 	protected boolean notificaError;
@@ -220,11 +220,11 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@ForeignKey(name = "NOT_NOTEVENT_ULTIM_EVENT_FK")
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	protected NotificacioEventEntity ultimEvent;
-	
+
 	@Column(name = "notifica_intent_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date notificaIntentData;
-	
+
 	@Column(name = "notifica_intent_num")
 	protected int notificaIntentNum;
 
@@ -236,41 +236,41 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 
 	@Column(name="registre_data")
 	private Date registreData;
-	
+
 	@Column(name="estat_registre")
 	private NotificacioRegistreEstatEnumDto registreEstat;
-	
+
 	@Column(name="registre_estat_final")
 	private boolean registreEstatFinal;
-	
+
 	@Column(name = "sir_con_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date sirConsultaData;
-	
+
 	@Column(name = "sir_con_intent")
 	protected int sirConsultaIntent;
 
 	@Column(name="sir_fi_pooling")
 	private boolean sirFiPooling;
-	
+
 	@Column(name = "sir_rec_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date sirRecepcioData;
-	
+
 	@Column(name = "sir_reg_desti_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date sirRegDestiData;
-	
+
 	@Column(name = "deh_cert_intent_num")
 	protected int dehCertIntentNum;
-	
+
 	@Column(name = "deh_cert_intent_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date dehCertIntentData;
-	
+
 	@Column(name = "cie_cert_intent_num")
 	protected int cieCertIntentNum;
-	
+
 	@Column(name = "cie_cert_intent_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date cieCertIntentData;
@@ -390,7 +390,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.notificaArrelDescripcio = notificaArrelDescripcio;
 		this.notificaArrelNif = notificaArrelNif;
 	}
-	
+
 	public void updateNotificaDatat(
 			EnviamentEstat notificaEstat,
 			Date notificaEstatData,
@@ -432,7 +432,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			this.notificaDatatReceptorNom = notificaDatatReceptorNom;
 		}
 	}
-	
+
 	public void updateNotificaCertificacio(
 			Date notificaCertificacioData,
 			String notificaCertificacioArxiuId,
@@ -458,7 +458,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.notificaCertificacioArxiuTipus = notificaCertificacioArxiuTipus;
 		this.notificaCertificacioNumSeguiment = notificaCertificacioNumSeguiment;
 	}
-	
+
 	public void updateNotificaError(boolean notificaError, NotificacioEventEntity notificaErrorEvent) {
 
 		this.notificaError = notificaError;
@@ -468,46 +468,46 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public void updateNotificaDataRefrescEstat() {
 		this.notificaEstatDataActualitzacio = new Date();
 	}
-	
+
 	public void updateNotificaNovaConsulta(Integer reintentPeriode) {
 		this.notificaIntentNum++;
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.MILLISECOND, reintentPeriode*(2^notificaIntentNum));
 		this.notificaIntentData = cal.getTime();
 	}
-	
+
 	public void refreshNotificaConsulta() {
 		this.notificaIntentNum = 0;
 		this.notificaIntentData = new Date();
 	}
-	
+
 	public void updateSirNovaConsulta(Integer reintentPeriode) {
 		this.sirConsultaIntent++;
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.MILLISECOND, reintentPeriode*(2^sirConsultaIntent));
 		this.sirConsultaData = cal.getTime();
 	}
-	
+
 	public void refreshSirConsulta() {
 		this.sirConsultaIntent = 0;
 		this.sirFiPooling = false;
 		this.sirConsultaData = new Date();
 	}
-	
+
 	public void updateDEHCertNovaConsulta(Integer reintentPeriode) {
 		this.dehCertIntentNum++;
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.MILLISECOND, reintentPeriode*(2^dehCertIntentNum));
 		this.dehCertIntentData = cal.getTime();
 	}
-	
+
 	public void updateCIECertNovaConsulta(Integer reintentPeriode) {
 		this.cieCertIntentNum++;
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.MILLISECOND, reintentPeriode*(2^cieCertIntentNum));
 		this.cieCertIntentData = cal.getTime();
 	}
-	
+
 	public void update(Enviament enviament, boolean isAmbEntregaDeh, ServeiTipus tipusServei, NotificacioEntity notificacioGuardada, PersonaEntity titular) {
 
 		this.serveiTipus = tipusServei;
@@ -525,9 +525,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			this.dehObligat = enviament.getEntregaDeh().isObligat();
 			this.dehProcedimentCodi = notificacioGuardada.getProcedimentCodiNotib();
 		}
-		
+
 		this.titular = titular;
-		
+
 		// Inicialitzam les dates per consulta d'estats
 		Date data = new Date();
 		this.notificaIntentData = data;
@@ -582,10 +582,10 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 				built.dehObligat = enviament.getEntregaDeh().isObligat();
 				built.dehProcedimentCodi = notificacioGuardada.getProcedimentCodiNotib();
 			}
-			
+
 			built.titular = titular;
 			built.destinataris = destinataris;
-			
+
 			// Inicialitzam les dates per consulta d'estats
 			Date data = new Date();
 			built.notificaIntentData = data;
@@ -601,7 +601,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			built.destinataris = destinataris;
 			return this;
 		}
-		
+
 		public NotificacioEnviamentEntity build() {
 			return built;
 		}

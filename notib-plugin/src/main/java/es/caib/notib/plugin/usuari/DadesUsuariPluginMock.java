@@ -1,11 +1,11 @@
 /**
- * 
+ *
  */
 package es.caib.notib.plugin.usuari;
 
-import es.caib.comanda.model.v1.salut.EstatSalut;
-import es.caib.comanda.model.v1.salut.EstatSalutEnum;
-import es.caib.comanda.model.v1.salut.IntegracioPeticions;
+import es.caib.comanda.model.server.monitoring.EstatSalut;
+import es.caib.comanda.model.server.monitoring.EstatSalutEnum;
+import es.caib.comanda.model.server.monitoring.IntegracioPeticions;
 import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.SistemaExternException;
 
@@ -15,7 +15,7 @@ import java.util.Properties;
 
 /**
  * Implementació de test del plugin de consulta de dades d'usuaris.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 public class DadesUsuariPluginMock extends AbstractSalutPlugin implements DadesUsuariPlugin {
@@ -56,14 +56,13 @@ public class DadesUsuariPluginMock extends AbstractSalutPlugin implements DadesU
 
 	@Override
 	public EstatSalut getEstatPlugin() {
-		return EstatSalut.builder()
+		return new EstatSalut()
 				.estat(EstatSalutEnum.UP)
-				.latencia(1)
-				.build();
+				.latencia(1);
 	}
 
 	@Override
 	public IntegracioPeticions getPeticionsPlugin() {
-		return IntegracioPeticions.builder().build();
+		return new IntegracioPeticions();
 	}
 }

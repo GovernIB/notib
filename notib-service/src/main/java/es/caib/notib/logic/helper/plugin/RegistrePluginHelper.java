@@ -1,7 +1,7 @@
 package es.caib.notib.logic.helper.plugin;
 
 import com.google.common.base.Strings;
-import es.caib.comanda.model.v1.salut.IntegracioApp;
+import es.caib.comanda.ms.salut.helper.IntegracioApp;
 import es.caib.notib.client.domini.DocumentTipus;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
@@ -79,7 +79,7 @@ import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.REG;
 
 /**
  * Helper per a interactuar amb els plugins.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -269,7 +269,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 		}
 		return resposta;
 	}
-	
+
 	public RespostaJustificantRecepcio obtenirOficiExtern(String codiDir3Entitat, String numeroRegistreFormatat) {
 
 		long start = System.currentTimeMillis();
@@ -307,7 +307,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 		}
 		return resposta;
 	}
-	
+
 	public List<TipusAssumpte> llistarTipusAssumpte(String codiDir3Entitat) throws SistemaExternException {
 
 		var info = new IntegracioInfo(IntegracioCodi.REGISTRE, "Obtenir llista de tipus d'assumpte", IntegracioAccioTipusEnumDto.ENVIAMENT,
@@ -335,7 +335,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 	}
 
 	public List<CodiAssumpte> llistarCodisAssumpte(String codiDir3Entitat, String tipusAssumpte) throws SistemaExternException {
-		
+
 		var info = new IntegracioInfo(IntegracioCodi.REGISTRE, "Obtenir la llista de codis d'assumpte", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
 				new AccioParam("Tipus d'assumpte", tipusAssumpte));
@@ -360,9 +360,9 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			throw new SistemaExternException(IntegracioCodi.REGISTRE.name(), errorDescripcio, ex);
 		}
 	}
-	
+
 	public OficinaDto llistarOficinaVirtual(String codiDir3Entitat, String nomOficinaVirtual, TipusRegistreRegweb3Enum autoritzacio) throws SistemaExternException {
-		
+
 		var info = new IntegracioInfo(IntegracioCodi.REGISTRE, "Obtenir la oficina virtual", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
 				new AccioParam("Tipus de registre", autoritzacio.name()));
@@ -393,9 +393,9 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			throw new SistemaExternException(IntegracioCodi.REGISTRE.name(), errorDescripcio, ex);
 		}
 	}
-	
+
 	public List<OficinaDto> llistarOficines(String codiDir3Entitat, AutoritzacioRegiWeb3Enum autoritzacio) throws SistemaExternException {
-		
+
 		var info = new IntegracioInfo(IntegracioCodi.REGISTRE, "Obtenir la llista de oficines", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
 				new AccioParam("Tipud de registre", autoritzacio.name()));
@@ -431,9 +431,9 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			throw new SistemaExternException(IntegracioCodi.REGISTRE.name(), errorDescripcio, ex);
 		}
 	}
-	
+
 	public List<LlibreOficina> llistarLlibresOficines(String codiDir3Entitat, String usuariCodi, TipusRegistreRegweb3Enum tipusRegistre) throws SistemaExternException{
-		
+
 		var info = new IntegracioInfo(IntegracioCodi.REGISTRE, "Obtenir la llista de llibre amb oficina", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
 				new AccioParam("Codi de l'usuari", usuariCodi),
@@ -459,9 +459,9 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			throw new SistemaExternException(IntegracioCodi.REGISTRE.name(), errorDescripcio, ex);
 		}
 	}
-	
+
 	public LlibreDto llistarLlibreOrganisme(String codiDir3Entitat, String organismeCodi) throws SistemaExternException {
-		
+
 		var info = new IntegracioInfo(IntegracioCodi.REGISTRE, "Obtenir la llista de llibres per organisme", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
 				new AccioParam("Codi de l'organisme", organismeCodi));
@@ -494,9 +494,9 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			throw new SistemaExternException(IntegracioCodi.REGISTRE.name(), errorDescripcio, ex);
 		}
 	}
-	
+
 	public List<LlibreDto> llistarLlibres(String codiDir3Entitat, String oficina, AutoritzacioRegiWeb3Enum autoritzacio) throws SistemaExternException {
-		
+
 		var info = new IntegracioInfo(IntegracioCodi.REGISTRE, "Obtenir la llista de llibres d'una oficina", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
 				new AccioParam("Oficina", oficina));
@@ -533,9 +533,9 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			throw new SistemaExternException(IntegracioCodi.REGISTRE.name(), errorDescripcio, ex);
 		}
 	}
-	
+
 	public List<Organisme> llistarOrganismes(String codiDir3Entitat) throws SistemaExternException {
-		
+
 		var info = new IntegracioInfo(IntegracioCodi.REGISTRE, "Obtenir llista d'organismes", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat));
 		var entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
@@ -570,7 +570,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 			Path path;
 			var enviarCsv = !isComunicacioSir || (isComunicacioSir && (EnviamentSirTipusDocumentEnviarEnumDto.TOT.equals(getEnviamentSirTipusDocumentEnviar()) ||
 							EnviamentSirTipusDocumentEnviarEnumDto.CSV.equals(getEnviamentSirTipusDocumentEnviar())));
-			
+
 			var enviarContingut = !isComunicacioSir || (isComunicacioSir && (EnviamentSirTipusDocumentEnviarEnumDto.TOT.equals(getEnviamentSirTipusDocumentEnviar()) ||
 							EnviamentSirTipusDocumentEnviarEnumDto.BINARI.equals(getEnviamentSirTipusDocumentEnviar())));
 
@@ -617,14 +617,14 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 						annex.setCsv(document.getCsv());
 					}
 				}
-				
+
 				if (enviarContingut && doc != null) {
 					annex.setFicheroAnexado(doc.getContingut());
 					annex.setNombreFicheroAnexado(doc.getArxiuNom());
 				} else {
 					enviarTipoMIMEFicheroAnexado = Boolean.FALSE;
 				}
-					
+
 				if (docDetall != null && docDetall.getMetadades() != null) {
 					if (docDetall.getMetadades().getTipusDocumental() != null) {
 						annex.setTipoDocumental(docDetall.getMetadades().getTipusDocumental().toString());
@@ -636,7 +636,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 					annex.setValidezDocumento(estatElaboracioToValidesa(docDetall.getMetadades().getEstatElaboracio()));
 					annex.setModoFirma(getModeFirma(docDetall, doc.getArxiuNom()));
 				}
-				
+
 				if (Boolean.TRUE.equals(enviarTipoMIMEFicheroAnexado)) {
 					path = new File(doc.getArxiuNom()).toPath();
 				}
@@ -655,7 +655,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 				annex.setFechaCaptura(toXmlGregorianCalendar(new Date()));
 				path = new File(document.getArxiuNom()).toPath();
 			}
-			
+
 			if (Boolean.TRUE.equals(enviarTipoMIMEFicheroAnexado)) {
 				annex.setTipoMIMEFicheroAnexado(document.getMediaType());
 			}
@@ -715,7 +715,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 		}
 		return personaToRepresentanteEInteresadoWs(enviament.getTitular(), destinatari);
 	}
-	
+
 	private AsientoRegistralBeanDto notificacioToAsientoRegistralBean(NotificacioEntity notificacio, boolean inclou_documents) throws RegistrePluginException {
 		return notificacioToAsientoRegistralBean(notificacio, inclou_documents, false);
 	}
@@ -847,7 +847,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 		}
 		if(destinatari != null && titular != null && titular.isIncapacitat()) {
 			var representantDades = persona2DatosInteresadoWsDto(destinatari);
-			interessat.setRepresentante(representantDades);	
+			interessat.setRepresentante(representantDades);
 		}
 		return interessat;
 	}
@@ -936,7 +936,7 @@ public class RegistrePluginHelper extends AbstractPluginHelper<RegistrePlugin> {
 	}
 
 	private void setLlibre(NotificacioEntity notificacio, DadesOficina dadesOficina, String dir3Codi) throws RegistrePluginException {
-		
+
 		LlibreDto llibreOrganisme = null;
 		if (!notificacio.getEntitat().isLlibreEntitat()) {
 			if (notificacio.getProcediment() != null && notificacio.getProcediment().getOrganGestor().getLlibre() != null) {

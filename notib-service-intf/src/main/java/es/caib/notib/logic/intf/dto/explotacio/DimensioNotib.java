@@ -1,7 +1,7 @@
 package es.caib.notib.logic.intf.dto.explotacio;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import es.caib.comanda.model.v1.estadistica.Dimensio;
+import es.caib.comanda.model.server.monitoring.Dimensio;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DimensioNotib implements Dimensio {
+public class DimensioNotib extends Dimensio {
 
     @JsonIgnore
     private DimEnum tipus;

@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
-import es.caib.comanda.model.v1.salut.EstatSalut;
-import es.caib.comanda.model.v1.salut.IntegracioPeticions;
+import es.caib.comanda.model.server.monitoring.EstatSalut;
+import es.caib.comanda.model.server.monitoring.IntegracioPeticions;
 import es.caib.notib.logic.intf.util.MimeUtils;
 import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.utils.NotibLoggerPlugin;
@@ -39,7 +39,7 @@ import java.util.Properties;
 @Slf4j
 public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements ArxiuPlugin {
 
-	
+
 	public static final String ARXIU_BASE_PROPERTY = "es.caib.notib.plugin.arxiu.";
 
 	private static final String ARXIUCAIB_BASE_PROPERTY = ARXIU_BASE_PROPERTY + "caib.";
@@ -66,7 +66,7 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements ArxiuPlugi
         try {
             long startTime = System.currentTimeMillis();
             Document document = identificador.contains("csv:") ?
-					documentDetallsCsv(identificador, ambContingut) : 
+					documentDetallsCsv(identificador, ambContingut) :
 					documentDetallsUuid(identificador, ambContingut);
 			salutPluginComponent.incrementarOperacioOk(System.currentTimeMillis() - startTime);
 			return document;
@@ -202,8 +202,8 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements ArxiuPlugi
 			throw new ArxiuException("S'ha produit un error generant la versió imprimible del document amb CSV " + identificador, ex);
 		}
 	}
-	
-	
+
+
 	private DocumentContingut documentImprimibleUuid(final String identificador) throws ArxiuException {
 		/*
 		 * Les URLs de consulta son les següents:
@@ -306,7 +306,7 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements ArxiuPlugi
 		}
 		return webResource.get(InputStream.class);
 	}
-	
+
 	private InputStream generarVersioImprimibleUuid(String identificador, String metadada1, String metadada2, String marcaAigua) {
 
 		String url = getPropertyConversioImprimibleUrlUuidConcsv();
@@ -375,7 +375,7 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements ArxiuPlugi
 		}
 		return metadades;
 	}
-	
+
 	private static Date parseDateIso8601(String date) throws ArxiuException {
 		if (date == null) {
 			return null;

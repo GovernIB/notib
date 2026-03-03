@@ -1,10 +1,10 @@
 package es.caib.notib.logic.helper.plugin;
 
 import com.google.common.base.Strings;
-import es.caib.comanda.model.v1.salut.EstatSalut;
-import es.caib.comanda.model.v1.salut.EstatSalutEnum;
-import es.caib.comanda.model.v1.salut.IntegracioApp;
-import es.caib.comanda.model.v1.salut.IntegracioSalut;
+import es.caib.comanda.model.server.monitoring.EstatSalut;
+import es.caib.comanda.model.server.monitoring.EstatSalutEnum;
+import es.caib.comanda.model.server.monitoring.IntegracioSalut;
+import es.caib.comanda.ms.salut.helper.IntegracioApp;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
@@ -28,7 +28,7 @@ import static es.caib.notib.logic.intf.dto.IntegracioCodi.USUARIS;
 
 /**
  * Helper per a interactuar amb els plugins.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -71,9 +71,9 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 			throw new SistemaExternException(USUARIS.name(), errorDescripcio, ex);
 		}
 	}
-	
+
 	public DadesUsuari dadesUsuariConsultarAmbCodi(String usuariCodi) {
-		
+
 		var info = new IntegracioInfo(USUARIS,"Consulta d'usuari amb codi " + usuariCodi, ENVIAMENT,
 				new AccioParam("Codi d'usuari", usuariCodi));
 
@@ -89,9 +89,9 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 			throw new SistemaExternException(USUARIS.name(), errorDescripcio, ex);
 		}
 	}
-	
+
 	public List<DadesUsuari> dadesUsuariConsultarAmbGrup(String grupCodi) {
-		
+
 		var info = new IntegracioInfo(USUARIS,"Consulta d'usuaris d'un grup", ENVIAMENT,
 				new AccioParam("Codi de grup", grupCodi));
 
@@ -176,11 +176,10 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 	// SALUT
 
 	@Override
-	public List<es.caib.comanda.model.v1.salut.IntegracioInfo> getIntegracionsInfo() {
-		return List.of(es.caib.comanda.model.v1.salut.IntegracioInfo.builder()
-				.codi(getCodiApp().name())
-				.nom(getCodiApp().getNom())
-				.build());
+	public List<es.caib.comanda.model.server.monitoring.IntegracioInfo> getIntegracionsInfo() {
+		return List.of(new es.caib.comanda.model.server.monitoring.IntegracioInfo()
+						.codi(getCodiApp().name())
+						.nom(getCodiApp().getNom()));
 	}
 
 	@Override
@@ -188,14 +187,13 @@ public class DadesUsuarisPluginHelper extends AbstractPluginHelper<DadesUsuariPl
 
 		var plugin = pluginMap.get(GLOBAL);
 		if (plugin == null) {
-			return IntegracioSalut.builder().codi(getCodiApp().name()).estat(EstatSalutEnum.UNKNOWN).build();
+			return new IntegracioSalut().codi(getCodiApp().name()).estat(EstatSalutEnum.UNKNOWN);
 		}
 		EstatSalut estatSalut = plugin.getEstatPlugin();
-		return IntegracioSalut.builder()
+		return new IntegracioSalut()
 				.codi(getCodiApp().name())
 				.estat(estatSalut.getEstat())
 				.latencia(estatSalut.getLatencia())
-				.peticions(plugin.getPeticionsPlugin())
-				.build();
+				.peticions(plugin.getPeticionsPlugin());
 	}
 }

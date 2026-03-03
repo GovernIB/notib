@@ -1,10 +1,10 @@
 /**
- * 
+ *
  */
 package es.caib.notib.plugin.usuari;
 
-import es.caib.comanda.model.v1.salut.EstatSalut;
-import es.caib.comanda.model.v1.salut.IntegracioPeticions;
+import es.caib.comanda.model.server.monitoring.EstatSalut;
+import es.caib.comanda.model.server.monitoring.IntegracioPeticions;
 import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.utils.NotibLoggerPlugin;
@@ -20,7 +20,7 @@ import java.util.Properties;
 /**
  * Implementació del plugin de consulta de dades d'usuaris emprant el plugin de LDAP. Les propietats necessàries són les següents a partir
  * de es.caib.distribucio.pluginib.dades.usuari.pluginsib.userinformation.ldap. :
- * 
+ *
  * - serverurl: Url del servidor de keycloak
  * - realm: Realm del keycloak.7
  * - client_id: Client ID del keycloak.
@@ -28,7 +28,7 @@ import java.util.Properties;
  * - password_secret: Secret del client de keycloak.
  * - mapping.administrationID: Mapeig del administrationID de keycloak.
  * - debug: Activar el debug del plugin de keycloak.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -66,7 +66,7 @@ public class DadesUsuariPluginLdapCaib extends LdapUserInformationPlugin impleme
 			throw new SistemaExternException("Error al consultar els rols de l'usuari (usuariCodi=" + usuariCodi + ")", ex);
 		}
 	}
-	
+
 	@Override
 	public DadesUsuari consultarAmbCodi(String usuariCodi) throws SistemaExternException {
 

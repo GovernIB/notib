@@ -2,7 +2,7 @@ package es.caib.notib.logic.helper.plugin;
 
 import com.google.common.base.Strings;
 import com.google.common.net.MediaType;
-import es.caib.comanda.model.v1.salut.IntegracioApp;
+import es.caib.comanda.ms.salut.helper.IntegracioApp;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
@@ -30,7 +30,7 @@ import java.util.Properties;
 
 /**
  * Helper per a interactuar amb els plugins.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j

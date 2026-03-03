@@ -18,5 +18,4 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MonitorIntegracioResourceServiceImpl extends BaseMutableResourceService<MonitorIntegracioResource, Long, MonitorIntegracioResourceEntity> implements MonitorIntegracioResourceService {
 
-
 }

@@ -1,14 +1,15 @@
 package es.caib.notib.logic.service;
 
-import es.caib.comanda.model.v1.salut.ContextInfo;
-import es.caib.comanda.model.v1.salut.EstatSalut;
-import es.caib.comanda.model.v1.salut.EstatSalutEnum;
-import es.caib.comanda.model.v1.salut.IntegracioSalut;
-import es.caib.comanda.model.v1.salut.IntegracioInfo;
-import es.caib.comanda.model.v1.salut.Manual;
-import es.caib.comanda.model.v1.salut.MissatgeSalut;
-import es.caib.comanda.model.v1.salut.SalutInfo;
-import es.caib.comanda.model.v1.salut.SubsistemaInfo;
+
+import es.caib.comanda.model.server.monitoring.ContextInfo;
+import es.caib.comanda.model.server.monitoring.EstatSalut;
+import es.caib.comanda.model.server.monitoring.EstatSalutEnum;
+import es.caib.comanda.model.server.monitoring.IntegracioInfo;
+import es.caib.comanda.model.server.monitoring.IntegracioSalut;
+import es.caib.comanda.model.server.monitoring.Manual;
+import es.caib.comanda.model.server.monitoring.MissatgeSalut;
+import es.caib.comanda.model.server.monitoring.SalutInfo;
+import es.caib.comanda.model.server.monitoring.SubsistemaInfo;
 import es.caib.comanda.ms.salut.helper.MonitorHelper;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.helper.SubsistemesHelper;
@@ -73,36 +74,33 @@ public class SalutServiceImpl implements SalutService {
     @Override
     public List<SubsistemaInfo> getSubsistemes() {
         return Arrays.stream(SubsistemesHelper.SubsistemesEnum.values())
-                .map(subsistema -> SubsistemaInfo.builder().codi(subsistema.name()).nom(subsistema.getNom()).build())
+                .map(subsistema -> new SubsistemaInfo().codi(subsistema.name()).nom(subsistema.getNom()))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<ContextInfo> getContexts(String baseUrl) {
-        return List.of(
-                ContextInfo.builder()
-                        .codi("BACK")
-                        .nom("Backoffice")
-                        .path(baseUrl + "/notibback")
-                        .manuals(List.of(
-                                Manual.builder().nom("Manual d'usuari").path("https://github.com/GovernIB/notib/raw/notib-2.0/doc/pdf/NOTIB_usuari.pdf").build(),
-                                Manual.builder().nom("Manual d'administració").path("https://github.com/GovernIB/notib/raw/notib-2.0/doc/pdf/NOTIB_administracio.pdf").build()))
-                        .build(),
-                ContextInfo.builder()
-                        .codi("INT")
-                        .nom("API interna")
-                        .path(baseUrl + "/notibapi/interna")
-                        .manuals(List.of(Manual.builder().nom("Manual d'integració").path("https://github.com/GovernIB/notib/raw/notib-2.0/doc/pdf/NOTIB_integracio.pdf").build()))
-                        .api(baseUrl + "/notibapi/interna/rest")
-                        .build(),
-                ContextInfo.builder()
-                        .codi("EXT")
-                        .nom("API externa")
-                        .path(baseUrl + "/notibapi/externa")
-                        .api(baseUrl + "/notibapi/externa/rest")
-                        .build()
-        );
-    }
+	public List<ContextInfo> getContexts(String baseUrl) {
+		return List.of(
+			new ContextInfo()
+				.codi("BACK")
+				.nom("Backoffice")
+				.path(baseUrl + "/notibback")
+				.manuals(List.of(
+					new Manual().nom("Manual d'usuari").path("https://github.com/GovernIB/notib/raw/notib-2.0/doc/pdf/NOTIB_usuari.pdf"),
+					new Manual().nom("Manual d'administració").path("https://github.com/GovernIB/notib/raw/notib-2.0/doc/pdf/NOTIB_administracio.pdf"))),
+			new ContextInfo()
+				.codi("INT")
+				.nom("API interna")
+				.path(baseUrl + "/notibapi/interna")
+				.manuals(List.of(new Manual().nom("Manual d'integració").path("https://github.com/GovernIB/notib/raw/notib-2.0/doc/pdf/NOTIB_integracio.pdf")))
+				.api(baseUrl + "/notibapi/interna/rest"),
+			new ContextInfo()
+				.codi("EXT")
+				.nom("API externa")
+				.path(baseUrl + "/notibapi/externa")
+				.api(baseUrl + "/notibapi/externa/rest")
+		);
+	}
 
     @Override
     public SalutInfo checkSalut(String versio, String performanceUrl) {
@@ -115,25 +113,23 @@ public class SalutServiceImpl implements SalutService {
         SubsistemesHelper.SubsistemesInfo subsistemesInfo = SubsistemesHelper.getSubsistemesInfo();
         var subsistemes = subsistemesInfo.getSubsistemesSalut();  // Subsistemes
         var estatGlobalSubsistemes = subsistemesInfo.getEstatGlobal();
-        if (EstatSalutEnum.UP.equals(estatSalut.getEstat()) && !EstatSalutEnum.UP.equals(estatGlobalSubsistemes) && !EstatSalutEnum.UNKNOWN.equals(estatGlobalSubsistemes)) {
-            estatSalut = EstatSalut.builder()
-                    .estat(estatGlobalSubsistemes)
-                    .latencia(estatSalut.getLatencia())
-                    .build();
-        }
+		if (EstatSalutEnum.UP.equals(estatSalut.getEstat()) && !EstatSalutEnum.UP.equals(estatGlobalSubsistemes) && !EstatSalutEnum.UNKNOWN.equals(estatGlobalSubsistemes)) {
+			estatSalut = new EstatSalut()
+				.estat(estatGlobalSubsistemes)
+				.latencia(estatSalut.getLatencia());
+		}
 
-        return SalutInfo.builder()
-                .codi("NOT")
-                .versio(versio)
-                .data(OffsetDateTime.now())
-                .estatGlobal(estatSalut)
-                .estatBaseDeDades(salutDatabase)
-                .integracions(integracions)
-                .subsistemes(subsistemes)
-                .missatges(missatges)
-                .informacioSistema(MonitorHelper.getInfoSistema())
-                .build();
-    }
+		return new SalutInfo()
+			.codi("NOT")
+			.versio(versio)
+			.data(OffsetDateTime.now())
+			.estatGlobal(estatSalut)
+			.estatBaseDeDades(salutDatabase)
+			.integracions(integracions)
+			.subsistemes(subsistemes)
+			.missatges(missatges)
+			.informacioSistema(MonitorHelper.getInfoSistema());
+	}
 
     @Override
     public Health checkHealthIndicator() {
@@ -156,11 +152,9 @@ public class SalutServiceImpl implements SalutService {
                     .mapToDouble(result -> result.getPrimaryResult().getScore())
                     .summaryStatistics();
 
-            return EstatSalut.builder()
-                    .estat(EstatSalutEnum.UP)
-                    .latencia((int) Math.round(stats.getAverage()))
-                    .build();
-        } catch (RunnerException e) {
+			return new EstatSalut().estat(EstatSalutEnum.UP).latencia((int) Math.round(stats.getAverage()));
+
+		} catch (RunnerException e) {
             throw new RuntimeException(e);
         }
 
@@ -187,27 +181,20 @@ public class SalutServiceImpl implements SalutService {
         Instant end = Instant.now();
         Integer latency = (int) Duration.between(start, end).toMillis();
 
-        return EstatSalut.builder()
-                .estat(estat)
-                .latencia(latency)
-                .build();
+		return new EstatSalut().estat(estat).latencia(latency);
     }
 
-    private EstatSalut checkDatabase() {
+	private EstatSalut checkDatabase() {
 
-        try {
-            Instant start = Instant.now();
-            jdbcTemplate.execute("SELECT ID FROM NOT_ENTITAT WHERE ID = 1");
-            Instant end = Instant.now();
-
-            return EstatSalut.builder()
-                    .estat(EstatSalutEnum.UP)
-                    .latencia((int) Duration.between(start, end).toMillis())
-                    .build();
-        } catch (Exception e) {
-            return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
-        }
-    }
+		try {
+			var start = Instant.now();
+			jdbcTemplate.execute("SELECT ID FROM NOT_ENTITAT WHERE ID = 1");
+			var end = Instant.now();
+			return new EstatSalut().estat(EstatSalutEnum.UP).latencia((int) Duration.between(start, end).toMillis());
+		} catch (Exception e) {
+			return new EstatSalut().estat(EstatSalutEnum.DOWN);
+		}
+	}
 
     private List<IntegracioSalut> checkIntegracions() {
 

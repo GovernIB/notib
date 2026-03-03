@@ -1,7 +1,7 @@
 package es.caib.notib.logic.helper.plugin;
 
 import com.google.common.base.Strings;
-import es.caib.comanda.model.v1.salut.IntegracioApp;
+import es.caib.comanda.ms.salut.helper.IntegracioApp;
 import es.caib.notib.logic.exception.DocumentNotFoundException;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
@@ -26,7 +26,7 @@ import java.util.Properties;
 
 /**
  * Helper per a interactuar amb els plugins.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -100,7 +100,7 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<ArxiuPlugin> {
 
 	// ARXIU
 	// /////////////////////////////////////////////////////////////////////////////////////
-	
+
 //	public Document arxiuDocumentConsultar(String arxiuUuid, String versio, boolean isUuid) {
 //		return arxiuDocumentConsultar(arxiuUuid, versio, false, isUuid);
 //	}
@@ -125,9 +125,9 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<ArxiuPlugin> {
 			throw ex1;
 		}
 	}
-	
+
 	public DocumentContingut arxiuGetImprimible(String id, boolean isUuid) {
-		
+
 		var info = new IntegracioInfo(IntegracioCodi.ARXIU, "Obtenir versió imprimible d'un document", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Identificador del document", id),
 				new AccioParam("Tipus d'identificador", isUuid ? "uuid" : "csv"));
@@ -147,7 +147,7 @@ public class ArxiuPluginHelper extends AbstractPluginHelper<ArxiuPlugin> {
 			throw new SistemaExternException(IntegracioCodi.ARXIU.name(), errorDescripcio, ex);
 		}
 	}
-	
+
 	public boolean isArxiuPluginDisponible() {
 
 		var pluginClass = getPluginClassProperty();

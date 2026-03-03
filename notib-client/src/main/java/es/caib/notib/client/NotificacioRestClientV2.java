@@ -1,9 +1,8 @@
 /**
- * 
+ *
  */
 package es.caib.notib.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import es.caib.notib.client.domini.AppInfo;
@@ -22,13 +21,12 @@ import es.caib.notib.client.domini.consulta.Arxiu;
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.ws.rs.core.MediaType;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
  * Client REST v2 per al servei de notificacions de NOTIB.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j

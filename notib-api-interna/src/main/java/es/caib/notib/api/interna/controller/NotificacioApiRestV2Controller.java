@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.api.interna.controller;
 
@@ -36,7 +36,7 @@ import java.util.Date;
 
 /**
  * Controlador del servei REST per a la gestio de notificacions.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Hidden
@@ -54,7 +54,7 @@ public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseContro
 
 		try {
 			var resposta = notificacioServiceWs.altaV2(notificacio);
-			resposta.getReferenciesAsV1().forEach(r -> enviamentSmService.altaEnviament(r.getReferencia()));
+//			resposta.getReferenciesAsV1().forEach(r -> enviamentSmService.altaEnviament(r.getReferencia()));
 			return resposta;
 		} catch (Exception e) {
 			var usr = SecurityContextHolder.getContext().getAuthentication().getName();
