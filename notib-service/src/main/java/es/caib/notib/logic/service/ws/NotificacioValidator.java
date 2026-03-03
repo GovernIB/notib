@@ -170,7 +170,12 @@ public class NotificacioValidator implements Validator {
         if (massiva) {
             return;
         }
-        var usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) {
+            errors.reject(error(APLICACIO_NO_EXIST, locale, "null", notificacio.getEmisorDir3Codi()));
+            return;
+        }
+        var usuariCodi = auth.getName();
         AplicacioEntity aplicacio = null;
         if (entitat != null && usuariCodi != null) {
             aplicacio = aplicacioRepository.findByEntitatIdAndUsuariCodi(entitat.getId(), usuariCodi);

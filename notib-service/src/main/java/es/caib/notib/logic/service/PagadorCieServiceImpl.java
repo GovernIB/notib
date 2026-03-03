@@ -20,8 +20,10 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.service.PagadorCieService;
 import es.caib.notib.logic.intf.service.PermisosService;
+import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.objectes.StringEncriptat;
 import es.caib.notib.logic.utils.EncryptionUtil;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.cie.PagadorCieEntity;
 import es.caib.notib.persist.repository.OrganGestorRepository;
@@ -278,8 +280,13 @@ public class PagadorCieServiceImpl implements PagadorCieService {
 				var pagadorsPare = findOperadorsPare(entitat, o.getCodiPare());
 				pagadors.addAll(pagadorsPare);
 			}
-			var usr = SecurityContextHolder.getContext().getAuthentication().getName();
 			List<PagadorCieEntity> p = new ArrayList<>();
+			var auth = SecurityContextHolder.getContext().getAuthentication();
+			if (auth == null) {
+				NotibLogger.getInstance().info("No hi ha usuari autenticat, auth " + auth, log, LoggingTipus.ENTREGA_CIE);
+				conversioTipusHelper.convertirList(p, IdentificadorTextDto.class);
+			}
+			var usr = auth.getName();
 			for (var pagador : pagadors) {
 				if (isAdminOrgan && !permisosService.hasUsrPermisOrgan(entitat.getId(), usr, pagador.getOrganGestor().getCodi(), PermisEnum.ADMIN)) {
 					continue;
@@ -319,8 +326,13 @@ public class PagadorCieServiceImpl implements PagadorCieService {
 				var pagadorsPare = findOperadorsPareNoCaducats(entitat, o.getCodiPare());
 				pagadors.addAll(pagadorsPare);
 			}
-			var usr = SecurityContextHolder.getContext().getAuthentication().getName();
 			List<PagadorCieEntity> p = new ArrayList<>();
+			var auth = SecurityContextHolder.getContext().getAuthentication();
+			if (auth == null) {
+				NotibLogger.getInstance().info("[PagadorCieServiceImpl.findNoCaducatsByEntitatAndOrgan] Error auth es null", log, LoggingTipus.ENTREGA_CIE);
+				return conversioTipusHelper.convertirList(p, IdentificadorTextDto.class);
+			}
+			var usr = auth.getName();
 			for (var pagador : pagadors) {
 				if (isAdminOrgan && !permisosService.hasUsrPermisOrgan(entitat.getId(), usr, pagador.getOrganGestor().getCodi(), PermisEnum.ADMIN)) {
 					continue;

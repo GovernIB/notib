@@ -95,7 +95,7 @@ public class EstadistiquesAdvice {
 			explotEnvInfoRepository.save(explotEnvInfoEntity);
 		} catch (Exception e) {
 			String uuid = enviamentRegistreRequest != null ? enviamentRegistreRequest.getEnviamentUuid() : null;
-			log.error("[estRegistre] Error generant informació estadística de enviament Uuid: " + uuid, e);
+			log.error("[estRegistre] Error generant informacio estadística de enviament Uuid: " + uuid, e);
 		}
 	}
 

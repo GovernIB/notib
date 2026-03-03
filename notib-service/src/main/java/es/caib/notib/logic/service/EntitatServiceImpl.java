@@ -31,6 +31,8 @@ import es.caib.notib.logic.intf.service.AuditService.TipusEntitat;
 import es.caib.notib.logic.intf.service.AuditService.TipusObjecte;
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
 import es.caib.notib.logic.intf.service.EntitatService;
+import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.EntitatTipusDocEntity;
 import es.caib.notib.persist.entity.cie.EntregaCieEntity;
@@ -399,7 +401,10 @@ public class EntitatServiceImpl implements EntitatService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			var auth = SecurityContextHolder.getContext().getAuthentication();
-			log.debug("Consulta les entitats accessibles per l'usuari actual (usuari=" + auth.getName() + ")");
+			if (auth == null) {
+				return new ArrayList<>();
+			}
+			NotibLogger.getInstance().info("Consulta les entitats accessibles per l'usuari actual (usuari=" + auth.getName() + ")", log, LoggingTipus.USUARIS);
 			return permisosCacheable.findEntitatsAccessiblesUsuari(auth.getName(), rolActual);
 		} finally {
 			metricsHelper.fiMetrica(timer);
