@@ -21,6 +21,12 @@ public interface SchedulledService {
 	 * Mètode d'execució periòdica per a refrescar totes les notificacions expirades
 	 */
 	void refrescarNotificacionsExpirades();
+	
+	/**
+	 * Mètode d'execució periòdica per refrescar l'estat dels enviaments fets a
+	 * Notific@ dels quals no s’ha rebut resposta d'adviser després de X dies.
+	 */
+	void enviamentRefrescarEstatEnviats();
 
 	/**
 	 * Mètode d'execució periòdica per a refrescar totes les notificacions DEH finalitzades sense certificació (cas pooling)

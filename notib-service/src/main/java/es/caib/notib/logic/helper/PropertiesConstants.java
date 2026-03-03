@@ -11,8 +11,10 @@ public class PropertiesConstants {
     public static final String NOTIFICA_ENVIAMENTS_REGISTRATS_INITIAL_DELAY = "es.caib.notib.tasca.notifica.enviaments.retard.inicial";
 
     // 3. Actualització de l'estat dels enviaments amb l'estat de Notific@
-    public static final String ENVIAMENT_REFRESCAR_ESTAT_PENDENTS_RATE = "es.caib.notib.tasca.enviament.actualitzacio.estat.periode";
-    public static final String ENVIAMENT_REFRESCAR_ESTAT_PENDENTS_INITIAL_DELAY = "es.caib.notib.tasca.enviament.actualitzacio.estat.retard.inicial";
+    public static final String ENVIAMENT_REFRESCAR_ESTAT_ENVIADES_ACTIU = "es.caib.notib.tasca.enviament.actualitzacio.estat.actiu";
+    public static final String ENVIAMENT_REFRESCAR_ESTAT_ENVIADES_DIES = "es.caib.notib.tasca.enviament.actualitzacio.estat.dies.revisio";
+    public static final String ENVIAMENT_REFRESCAR_ESTAT_ENVIADES_RATE = "es.caib.notib.tasca.enviament.actualitzacio.estat.periode";
+    public static final String ENVIAMENT_REFRESCAR_ESTAT_ENVIADES_INITIAL_DELAY = "es.caib.notib.tasca.enviament.actualitzacio.estat.retard.inicial";
 
     // 4. Actualització de l'estat dels enviaments amb l'estat de enviat_sir
     public static final String ENVIAMENT_REFRESCAR_ESTAT_ENVIAT_SIR_RATE = "es.caib.notib.tasca.enviament.actualitzacio.estat.registre.periode";

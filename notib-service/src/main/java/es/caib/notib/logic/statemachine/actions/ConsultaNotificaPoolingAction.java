@@ -103,7 +103,7 @@ public class ConsultaNotificaPoolingAction implements Action<EnviamentSmEstat, E
         return configHelper.getConfigAsBoolean("es.caib.notib.adviser.actiu");
     }
     public Long refrescarPeriode() {
-        return configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_PENDENTS_RATE, 7200000L);
+        return configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_ENVIADES_RATE, 7200000L);
     }
 
 }

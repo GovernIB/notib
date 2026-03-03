@@ -1700,12 +1700,15 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<Long> getNotificacionsPendentsRefrescarEstat() {
+	public List<Long> getNotificacionsPendentsRefrescarEstat(Date dataLimit) {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			var maxPendents = getEnviamentActualitzacioEstatProcessarMaxProperty();
-			return notificacioEnviamentRepository.findByNotificaRefresc(pluginHelper.getConsultaReintentsMaxProperty(), PageRequest.of(0, maxPendents));
+			return notificacioEnviamentRepository.findByNotificaRefresc(
+					pluginHelper.getConsultaReintentsMaxProperty(), 
+					dataLimit,
+					PageRequest.of(0, maxPendents));
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

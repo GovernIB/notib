@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1772441086018-1
+      author: limit
+      changes:
+        - sql: "UPDATE NOT_CONFIG_GROUP SET DESCRIPTION = 'Tasca periòdica d''actualització de l''estat dels enviaments amb l''estat de Notific@ que no s''han actualitzat amb adviser després de X dies' WHERE code = 'SCHEDULLED_UPDATE_STATUS_NOTIFICA';
+INSERT INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (5, 'es.caib.notib.tasca.enviament.actualitzacio.estat.dies.revisio', '6','Nombre de dies a esperar abans de consultar l''estat d''enviaments no finalitzats','INT','SCHEDULLED_UPDATE_STATUS_NOTIFICA');"
