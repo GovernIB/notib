@@ -192,9 +192,9 @@ const useCurrentEntitat = (
         currentEntitatId,
         currentEntitatReady: apiIsReady && entitatsAvailable != null,
         currentEntitat,
+        currentEntitatLoading,
         entitatsAvailable,
         setCurrentEntitatId,
-        currentEntitatLoading,
     };
 };
 
@@ -206,9 +206,9 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
         currentEntitatId,
         currentEntitatReady,
         currentEntitat,
+        currentEntitatLoading,
         entitatsAvailable,
         setCurrentEntitatId,
-        currentEntitatLoading,
     } = useCurrentEntitat(currentUserId, currentRole, currentRoleReady);
     const isReady = apiOffline || (currentRoleReady && currentEntitatReady);
     const contextValue = {
@@ -219,8 +219,8 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
         setCurrentRole,
         currentEntitatId,
         setCurrentEntitatId,
-        currentEntitatLoading,
         currentEntitat,
+        currentEntitatLoading,
     };
     return (
         <NotibContext.Provider value={contextValue}>{isReady && children}</NotibContext.Provider>

@@ -1404,6 +1404,10 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
         setCurrentLanguage(currentLanguage);
     };
     const setHttpHeadersInternal = (currentHttpHeaders?: Record<string, string>[]) => {
+        // Només canviam l'estat si les capçaleres que volem establir son diferents
+        if (JSON.stringify(httpHeaders) === JSON.stringify(currentHttpHeaders)) {
+            return;
+        }
         // Si no forçam l'estat d'índex carregant, pot ser que es faci alguna petició a l'API REST amb les capçaleres antigues.
         setIsIndexLoading(true);
         setHttpHeaders(currentHttpHeaders);
