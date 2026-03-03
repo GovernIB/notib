@@ -392,6 +392,7 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl notificaRetry " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
+		var auth = SecurityContextHolder.getContext().getAuthentication();
 		sm.getExtendedState().getVariables().put(SmConstants.CODI_USUARI, auth != null ? auth.getName() : "Usuari null");
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.NT_RETRY);
 		return sm;
