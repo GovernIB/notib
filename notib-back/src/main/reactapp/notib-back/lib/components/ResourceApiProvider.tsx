@@ -1404,6 +1404,8 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
         setCurrentLanguage(currentLanguage);
     };
     const setHttpHeadersInternal = (currentHttpHeaders?: Record<string, string>[]) => {
+        // Si no forçam l'estat d'índex carregant, pot ser que es faci alguna petició a l'API REST amb les capçaleres antigues.
+        setIsIndexLoading(true);
         setHttpHeaders(currentHttpHeaders);
     };
     const isReady = !isIndexLoading && !indexError && !offline;

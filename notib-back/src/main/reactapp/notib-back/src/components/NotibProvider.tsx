@@ -58,34 +58,24 @@ const getSessionValue = (json: string | undefined, field: string) => {
     }
 };
 
-export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
+const useCurrentRole = () => {
     const {
         isReady: authIsReady,
         getUserId: authGetUserId,
         getToken: authGetToken,
     } = useAuthContext();
-    const { setHttpHeaders: apiSetHttpHeaders, offline: apiOffline } = useResourceApiContext();
-    const {
-        isReady: apiIsReady,
-        find: apiFind,
-        getOne: apiGetOne,
-    } = useResourceApiService('entitatResource');
+    const { setHttpHeaders: apiSetHttpHeaders } = useResourceApiContext();
     const [currentUserId, setCurrentUserId] = React.useState<string>();
     const [rolesAvailable, setRolesAvailable] = React.useState<string[]>();
-    const [entitatsAvailable, setEntitatsAvailable] = React.useState<any[]>();
     const [currentRole, setCurrentRole] = React.useState<string>();
-    const [currentEntitatId, setCurrentEntitatId] = React.useState<number>();
-    const [currentEntitatLoading, setCurrentEntitatLoading] = React.useState<boolean>();
-    const [currentEntitat, setCurrentEntitat] = React.useState<any>();
+    const [roleHttpHeaderInitialized, setRoleHttpHeaderInitialized] =
+        React.useState<boolean>(false);
     const { getValue: roleSessionGetValue, setValue: roleSessionSetValue } = useSessionStorage(
         currentUserId,
         'currentRole'
     );
-    const { getValue: sessionSessionGetValue, setValue: sessionSessionSetValue } =
-        useSessionStorage(currentUserId, 'currentSession');
-    const isReady =
-        apiOffline || (apiIsReady && rolesAvailable != null && entitatsAvailable != null);
     React.useEffect(() => {
+        // Obté els rols disponibles del token JWT
         if (authIsReady) {
             const userId = authGetUserId();
             setCurrentUserId(userId);
@@ -101,6 +91,7 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
         }
     }, [authIsReady]);
     React.useEffect(() => {
+        // Configura l'estat amb el rol actual si aquest encara no s'ha inicialitzat i els rols disponibles ja s'han obtingut
         if (rolesAvailable != null && currentRole == null) {
             const sessionValue = roleSessionGetValue();
             const isSessionValueInRolesAvailable =
@@ -113,7 +104,43 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
         }
     }, [rolesAvailable, currentRole]);
     React.useEffect(() => {
-        if (apiIsReady && currentRole != null) {
+        // Configura el session storage i la capçalera HTTP amb el rol actual quan aquest canvia
+        if (currentRole !== undefined) {
+            roleSessionSetValue(currentRole);
+            if (currentRole) {
+                apiSetHttpHeaders([{ 'X-App-Role': currentRole }]);
+                setRoleHttpHeaderInitialized(true);
+            }
+        }
+    }, [currentRole]);
+    return {
+        currentUserId,
+        currentRole,
+        currentRoleReady: roleHttpHeaderInitialized,
+        rolesAvailable,
+        setCurrentRole,
+    };
+};
+
+const useCurrentEntitat = (
+    currentUserId: string | undefined,
+    currentRole: string | undefined,
+    currentRoleReady: boolean
+) => {
+    const { setHttpHeaders: apiSetHttpHeaders } = useResourceApiContext();
+    const {
+        isReady: apiIsReady,
+        find: apiFind,
+        getOne: apiGetOne,
+    } = useResourceApiService('entitatResource');
+    const [entitatsAvailable, setEntitatsAvailable] = React.useState<any[]>();
+    const [currentEntitatId, setCurrentEntitatId] = React.useState<number>();
+    const [currentEntitatLoading, setCurrentEntitatLoading] = React.useState<boolean>();
+    const [currentEntitat, setCurrentEntitat] = React.useState<any>();
+    const { getValue: sessionSessionGetValue, setValue: sessionSessionSetValue } =
+        useSessionStorage(currentUserId, 'currentSession');
+    React.useEffect(() => {
+        if (apiIsReady && currentRoleReady && currentRole != null) {
             if (currentRole !== ROLE_SUPER) {
                 apiFind({ unpaged: true }).then((response) => {
                     const entitatsAvailable = response.rows;
@@ -135,15 +162,7 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
                 setEntitatsAvailable([]);
             }
         }
-    }, [apiIsReady, currentRole]);
-    React.useEffect(() => {
-        if (currentRole !== undefined) {
-            roleSessionSetValue(currentRole);
-            if (currentRole) {
-                apiSetHttpHeaders([{ 'X-App-Role': currentRole }]);
-            }
-        }
-    }, [currentRole]);
+    }, [apiIsReady, currentRoleReady, currentRole]);
     React.useEffect(() => {
         if (currentRole != null && currentRole !== ROLE_SUPER && currentEntitatId != null) {
             const session = createSession(currentEntitatId);
@@ -168,6 +187,29 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
                 .finally(() => setCurrentEntitatLoading(false));
         }
     }, [currentEntitatId]);
+    return {
+        currentEntitatId,
+        currentEntitatReady: apiIsReady && entitatsAvailable != null,
+        currentEntitat,
+        entitatsAvailable,
+        setCurrentEntitatId,
+        currentEntitatLoading,
+    };
+};
+
+export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
+    const { offline: apiOffline } = useResourceApiContext();
+    const { currentUserId, currentRole, currentRoleReady, rolesAvailable, setCurrentRole } =
+        useCurrentRole();
+    const {
+        currentEntitatId,
+        currentEntitatReady,
+        currentEntitat,
+        entitatsAvailable,
+        setCurrentEntitatId,
+        currentEntitatLoading,
+    } = useCurrentEntitat(currentUserId, currentRole, currentRoleReady);
+    const isReady = apiOffline || (currentRoleReady && currentEntitatReady);
     const contextValue = {
         isReady,
         rolesAvailable,
