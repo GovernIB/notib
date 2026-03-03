@@ -28,7 +28,7 @@ import java.util.zip.ZipFile;
 /**
  * Implementació del plugin de gestió documental que emmagatzema els arxius
  * a dins una carpeta del sistema de fitxers.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j

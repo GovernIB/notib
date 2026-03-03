@@ -138,9 +138,11 @@ public class NotibPermissionHelper {
 			stream().map(Long::valueOf).collect(Collectors.toSet());
 		// Retorna la llista d'òrgans gestors amb el permís assignat directament o a algun dels seus pares.
 		// Per a optimitzar la consulta només mira els pares fins a 4 nivells per damunt.
+		Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
+		List<String> codis = organGestorResourceRepository.findCodisByIdsIn(idsWithPermission);
 		return organGestorResourceRepository.findIdsByEntitatIdAndCodisRecursiveL4(
-			userSessionHelper.getCurrentEntitatId(),
-			organGestorResourceRepository.findCodisByIdsIn(idsWithPermission));
+			currentEntitatId,
+			codis);
 	}
 
 	/**
@@ -154,17 +156,19 @@ public class NotibPermissionHelper {
 	 *            volen consultar tant procediments com serveis.
 	 * @return la llista d'ids de procediments/serveis no comuns.
 	 */
-	public List<Long> procedimentsServeisNoComunsWithPermission(Permission permission, Boolean isServei) {
+	public List<Long> procedimentServeiNoComuIdsWithPermission(Permission permission, Boolean isServei) {
 		// Obté la llista de procediments/serveis amb el permís assignat.
-		Set<Long> idsWithPermission = (Set<Long>)aclHelper.findIdsWithAnyPermission(
-			AclHelper.ORGAN_GESTOR_CLASS,
+		Set<Long> idsWithPermission = aclHelper.findIdsWithAnyPermission(
+			AclHelper.PROCEDIMENT_CLASS,
 			List.of(permission),
 			aclHelper.getCurrentUserSids().toArray(Sid[]::new)).
 			stream().map(Long::valueOf).collect(Collectors.toSet());
 		// Només retorna els procediments/serveis no comuns que existeixen a la base de dades.
+		Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
+		ProcSerTipusEnum procSerTipus = getProcSerTipusForQuery(isServei);
 		return procedimentResourceRepository.findIdsByEntitatIdAndTipusAndIdInAndComuFalse(
-			userSessionHelper.getCurrentEntitatId(),
-			getProcSerTipusForQuery(isServei),
+			currentEntitatId,
+			procSerTipus,
 			idsWithPermission);
 	}
 
@@ -179,19 +183,21 @@ public class NotibPermissionHelper {
 	 *            volen consultar tant procediments com serveis.
 	 * @return la llista d'ids de procediments/serveis comuns.
 	 */
-	public List<Long> procedimentsServeisComunsWithPermission(Permission permission, Boolean isServei) {
+	public List<Long> procedimentServeiComuIdsWithPermission(Permission permission, Boolean isServei) {
 		// Mira si hi ha algun òrgan gestor amb permís per a procediments/serveis comuns.
-		Set<Long> idsWithPermission = (Set<Long>)aclHelper.findIdsWithAnyPermission(
-			AclHelper.ORGAN_GESTOR_CLASS,
+		Set<Long> idsWithPermission = aclHelper.findIdsWithAnyPermission(
+			AclHelper.PROCEDIMENT_CLASS,
 			List.of(ExtendedPermission.PERM3),
 			aclHelper.getCurrentUserSids().toArray(Sid[]::new)).
 			stream().map(Long::valueOf).collect(Collectors.toSet());
 		if (!idsWithPermission.isEmpty()) {
 			// Si hi ha òrgans gestors amb permís per a procediments/serveis comuns retorna la llista de
 			// procediments/serveis comuns que no requereixen permís directe.
+			Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
+			ProcSerTipusEnum procSerTipus = getProcSerTipusForQuery(isServei);
 			return procedimentResourceRepository.findIdsByEntitatIdAndTipusAndComuTrueAndPermisDirecteFalse(
-				userSessionHelper.getCurrentEntitatId(),
-				getProcSerTipusForQuery(isServei));
+				currentEntitatId,
+				procSerTipus);
 		} else {
 			return new ArrayList<>();
 		}

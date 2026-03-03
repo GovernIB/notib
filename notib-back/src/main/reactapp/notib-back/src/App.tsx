@@ -62,7 +62,6 @@ const InnerApp: React.FC = () => {
     const { t } = useTranslation();
     const { mode } = useColorScheme();
     const { currentRole, currentEntitatId } = useNotibContext();
-    const currentRoleNoSuperAndNoEntitat = currentRole !== ROLE_SUPER && currentEntitatId == null;
     const menuConfig = [
         {
             id: 'entitats',
@@ -177,6 +176,8 @@ const InnerApp: React.FC = () => {
     const theme = useTheme();
     const bgColor = mode === 'light' ? theme.palette.background.paper : undefined;
     const textColor = bgColor ? theme.palette.getContrastText(bgColor) : undefined;
+    const currentRoleSuperOrEntitatSelected =
+        currentRole === ROLE_SUPER || currentEntitatId != null;
     return (
         mode && (
             <BaseApp
@@ -201,7 +202,7 @@ const InnerApp: React.FC = () => {
                 }
                 version={version}
                 availableLanguages={['ca', 'es']}
-                menuEntries={!currentRoleNoSuperAndNoEntitat ? menuEntries : undefined}
+                menuEntries={currentRoleSuperOrEntitatSelected ? menuEntries : undefined}
                 appbarBackgroundColor={bgColor}
                 appbarStyle={{ color: textColor }}
                 footer={
@@ -215,7 +216,7 @@ const InnerApp: React.FC = () => {
                 }
                 footerHeight={36}
             >
-                {!currentRoleNoSuperAndNoEntitat ? (
+                {currentRoleSuperOrEntitatSelected ? (
                     <Outlet />
                 ) : (
                     <Alert severity="error">{t('app.noEntitat')}</Alert>

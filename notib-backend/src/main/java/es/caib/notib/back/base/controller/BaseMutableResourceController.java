@@ -670,7 +670,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 								withInputAndOutput(getResourceClass()).
 								withName("create"));
 			}
-			if (canWrite) {
+			if (canCreate || canWrite) {
 				configurable = addAffordance(
 						configurable,
 						affordances,

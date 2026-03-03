@@ -2,6 +2,7 @@ import React from 'react';
 import { EventSource } from 'eventsource';
 import { useTranslation } from 'react-i18next';
 import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -52,6 +53,19 @@ const columns = [
     {
         field: 'permetreSir',
         flex: 2,
+    },
+    {
+        field: 'aclEntryCount',
+        flex: 0.6,
+        renderCell: (params: any) => {
+            return (
+                <Chip
+                    label={params.value}
+                    color={params.value ? 'primary' : undefined}
+                    size="small"
+                />
+            );
+        },
     },
 ];
 

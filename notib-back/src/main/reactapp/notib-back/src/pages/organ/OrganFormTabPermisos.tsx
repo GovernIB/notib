@@ -46,7 +46,7 @@ const OrganFormTabPermisos: React.FC = () => {
     ];
     return (
         <PermissionGrid
-            resourceName="procedimentResource"
+            resourceName="organGestorResource"
             id={id}
             permissionEntries={permissionEntries}
         />

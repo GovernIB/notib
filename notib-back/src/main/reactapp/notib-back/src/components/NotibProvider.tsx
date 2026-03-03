@@ -64,12 +64,13 @@ const useCurrentRole = () => {
         getUserId: authGetUserId,
         getToken: authGetToken,
     } = useAuthContext();
-    const { setHttpHeaders: apiSetHttpHeaders } = useResourceApiContext();
+    const { httpHeaders: apiHttpHeaders, setHttpHeaders: apiSetHttpHeaders } =
+        useResourceApiContext();
     const [currentUserId, setCurrentUserId] = React.useState<string>();
     const [rolesAvailable, setRolesAvailable] = React.useState<string[]>();
     const [currentRole, setCurrentRole] = React.useState<string>();
-    const [roleHttpHeaderInitialized, setRoleHttpHeaderInitialized] =
-        React.useState<boolean>(false);
+    /*const [roleHttpHeaderInitialized, setRoleHttpHeaderInitialized] =
+        React.useState<boolean>(false);*/
     const { getValue: roleSessionGetValue, setValue: roleSessionSetValue } = useSessionStorage(
         currentUserId,
         'currentRole'
@@ -109,10 +110,14 @@ const useCurrentRole = () => {
             roleSessionSetValue(currentRole);
             if (currentRole) {
                 apiSetHttpHeaders([{ 'X-App-Role': currentRole }]);
-                setRoleHttpHeaderInitialized(true);
             }
         }
     }, [currentRole]);
+    const currentRoleFromHttpHeader = apiHttpHeaders?.find((h) => 'X-App-Role' in h)?.[
+        'X-App-Role'
+    ];
+    const roleHttpHeaderInitialized =
+        currentRole != null && currentRole === currentRoleFromHttpHeader;
     return {
         currentUserId,
         currentRole,
@@ -127,7 +132,8 @@ const useCurrentEntitat = (
     currentRole: string | undefined,
     currentRoleReady: boolean
 ) => {
-    const { setHttpHeaders: apiSetHttpHeaders } = useResourceApiContext();
+    const { httpHeaders: apiHttpHeaders, setHttpHeaders: apiSetHttpHeaders } =
+        useResourceApiContext();
     const {
         isReady: apiIsReady,
         find: apiFind,
@@ -188,9 +194,21 @@ const useCurrentEntitat = (
                 .finally(() => setCurrentEntitatLoading(false));
         }
     }, [currentEntitatId]);
+    const currentSessionFromHttpHeader = apiHttpHeaders?.find((h) => 'X-App-Session' in h)?.[
+        'X-App-Session'
+    ];
+    const currentEntitatIdFromHttpHeader =
+        currentSessionFromHttpHeader != null
+            ? JSON.parse(currentSessionFromHttpHeader).e
+            : undefined;
+    const entitatIdHttpHeaderInitialized =
+        currentRole === ROLE_SUPER ||
+        (currentEntitatId == null && currentEntitatIdFromHttpHeader == null) ||
+        currentEntitatId === currentEntitatIdFromHttpHeader;
     return {
         currentEntitatId,
-        currentEntitatReady: apiIsReady && entitatsAvailable != null,
+        currentEntitatReady:
+            apiIsReady && entitatsAvailable != null && entitatIdHttpHeaderInitialized,
         currentEntitat,
         currentEntitatLoading,
         entitatsAvailable,

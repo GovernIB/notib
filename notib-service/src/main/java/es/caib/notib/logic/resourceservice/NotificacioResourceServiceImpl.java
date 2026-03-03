@@ -2,9 +2,8 @@ package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
-import es.caib.notib.logic.helper.LegacyHelper;
-import es.caib.notib.logic.helper.NotibPermissionHelper;
-import es.caib.notib.logic.helper.UserSessionHelper;
+import es.caib.notib.logic.base.service.BaseMutableResourceService;
+import es.caib.notib.logic.helper.*;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -13,6 +12,12 @@ import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 import es.caib.notib.logic.intf.model.NotificacioResource;
 import es.caib.notib.logic.intf.model.PersonaResource;
 import es.caib.notib.logic.intf.resourceservice.NotificacioResourceService;
+import es.caib.notib.logic.intf.service.AuditService;
+import es.caib.notib.logic.intf.service.EnviamentSmService;
+import es.caib.notib.persist.entity.NotificacioEntity;
+import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
+import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.persist.resourceentity.DocumentResourceEntity;
 import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
 import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
@@ -20,18 +25,18 @@ import es.caib.notib.persist.resourceentity.PersonaResourceEntity;
 import es.caib.notib.persist.resourcerepository.DocumentResourceRepository;
 import es.caib.notib.persist.resourcerepository.NotificacioEnviamentResourceRepository;
 import es.caib.notib.persist.resourcerepository.PersonaResourceRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -40,29 +45,24 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class NotificacioResourceServiceImpl
-	extends BaseAdminEntitatResourceServiceImpl<NotificacioResource, NotificacioResourceEntity>
+	extends BaseMutableResourceService<NotificacioResource, Long, NotificacioResourceEntity>
 	implements NotificacioResourceService {
 
+	private final UserSessionHelper userSessionHelper;
+	private final AuthenticationHelper authenticationHelper;
 	private final NotificacioEnviamentResourceRepository notificacioEnviamentResourceRepository;
 	private final DocumentResourceRepository documentResourceRepository;
 	private final PersonaResourceRepository personaResourceRepository;
 	private final LegacyHelper legacyHelper;
 
-	public NotificacioResourceServiceImpl(
-		UserSessionHelper userSessionHelper,
-		AuthenticationHelper authenticationHelper,
-		NotibPermissionHelper notibPermissionHelper,
-		NotificacioEnviamentResourceRepository notificacioEnviamentResourceRepository,
-		DocumentResourceRepository documentResourceRepository,
-		PersonaResourceRepository personaResourceRepository,
-		LegacyHelper legacyHelper) {
-		super(userSessionHelper, authenticationHelper, notibPermissionHelper);
-		this.notificacioEnviamentResourceRepository = notificacioEnviamentResourceRepository;
-		this.documentResourceRepository = documentResourceRepository;
-		this.personaResourceRepository = personaResourceRepository;
-		this.legacyHelper = legacyHelper;
-	}
+	private final EnviamentSmService enviamentSmService;
+	private final NotificacioTableHelper notificacioTableHelper;
+	private final EnviamentTableHelper enviamentTableHelper;
+	private final AuditHelper auditHelper;
+	private NotificacioRepository notificacioRepository;
+	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 
 	@PostConstruct
 	public void init() {
@@ -76,11 +76,12 @@ public class NotificacioResourceServiceImpl
 		NotificacioResourceEntity entity,
 		NotificacioResource resource,
 		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		super.beforeCreateSave(entity, resource, answers);
 		entity.setUsuariCodi(authenticationHelper.getCurrentUserName());
+		entity.setEntitat(userSessionHelper.getCurrentEntitat());
 		entity.setEmisorDir3Codi(entity.getEntitat().getDir3Codi());
 		entity.setComunicacioTipus(NotificacioComunicacioTipusEnumDto.ASINCRON);
 		entity.setEstat(NotificacioEstatEnumDto.PENDENT);
+		entity.setReferencia(UUID.randomUUID().toString());
 		if (resource.getDocumentsInfo() != null) {
 			saveDocuments(entity, resource.getDocumentsInfo());
 		}
@@ -95,6 +96,7 @@ public class NotificacioResourceServiceImpl
 		if (resource.getEnviamentsInfo() != null) {
 			saveEnviaments(entity, resource.getEnviamentsInfo());
 		}
+		notificacioLegacy(entity);
 	}
 
 	private void saveEnviaments(
@@ -110,9 +112,11 @@ public class NotificacioResourceServiceImpl
 			NotificacioEnviamentResourceEntity enviamentCreat = notificacioEnviamentResourceRepository.save(enviamentNou);
 			PersonaResourceEntity titular = saveDestinatari(enviamentCreat, e.getTitularInfo());
 			enviamentCreat.setTitular(titular);
+			enviamentCreat.setNotificaReferencia(UUID.randomUUID().toString());
 			if (e.getRepresentantsInfo() != null) {
 				e.getRepresentantsInfo().forEach(r -> saveDestinatari(enviamentCreat, r));
 			}
+			notificacioEnviamentLegacy(enviamentCreat);
 		});
 	}
 
@@ -149,6 +153,46 @@ public class NotificacioResourceServiceImpl
 				resource(destinatari).
 				enviament(enviament).
 				build());
+	}
+
+	private void notificacioLegacy(NotificacioResourceEntity entity) {
+		// Lògica antiga per a les notificacions
+		Optional<NotificacioEntity> notificacioEntity = notificacioRepository.findById(entity.getId());
+		if (notificacioEntity.isPresent()) {
+			// Registra la notificació
+			notificacioTableHelper.crearRegistre(notificacioEntity.get());
+			// Crea la informació d'auditoria
+			auditHelper.auditaNotificacio(
+				notificacioEntity.get(),
+				AuditService.TipusOperacio.CREATE,
+				"NotificacioResourceServiceImpl.afterCreateSave");
+			// Dona d'alta els enviaments a la màqina d'estats al finalitzar la transacció
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+				@Override
+				public void afterCommit() {
+					if (TransactionSynchronizationManager.isActualTransactionActive()) {
+						notificacioEntity.get().getEnviaments().forEach(e -> {
+							enviamentSmService.altaEnviament(e.getNotificaReferencia());
+						});
+					}
+				}
+			});
+		}
+	}
+
+	private void notificacioEnviamentLegacy(NotificacioEnviamentResourceEntity entity) {
+		// Lògica antiga pels enviaments
+		Optional<NotificacioEnviamentEntity> notificacioEnviamentEntity = notificacioEnviamentRepository.findById(
+			entity.getId());
+		if (notificacioEnviamentEntity.isPresent()) {
+			// Registra l'enviament
+			enviamentTableHelper.crearRegistre(notificacioEnviamentEntity.get());
+			// Crea la informació d'auditoria
+			auditHelper.auditaEnviament(
+				notificacioEnviamentEntity.get(),
+				AuditService.TipusOperacio.CREATE,
+				"NotificacioResourceServiceImpl.saveEnviaments");
+		}
 	}
 
 	/*

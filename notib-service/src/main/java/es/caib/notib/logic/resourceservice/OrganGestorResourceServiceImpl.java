@@ -90,7 +90,7 @@ public class OrganGestorResourceServiceImpl
 	@Override
 	protected void afterConversion(OrganGestorResourceEntity entity, OrganGestorResource resource) {
 		resource.setAclEntryCount(
-			aclHelper.count(AclHelper.ENTITAT_CLASS, entity.getId(), null));
+			aclHelper.count(AclHelper.ORGAN_GESTOR_CLASS, entity.getId(), null));
 	}
 
 	public class Dir3SyncActionExecutor implements ActionExecutor<OrganGestorResourceEntity, OrganGestorResource.OrganGestorDir3SyncForm, OrganGestorDir3Sync> {

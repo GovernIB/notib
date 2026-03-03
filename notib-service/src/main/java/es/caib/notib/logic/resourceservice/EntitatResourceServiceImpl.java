@@ -4,6 +4,7 @@ import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.helper.AclHelper;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
+import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.exception.PerspectiveApplicationException;
@@ -34,6 +35,7 @@ public class EntitatResourceServiceImpl
 	implements EntitatResourceService {
 
 	private final AclHelper aclHelper;
+	private final UserSessionHelper userSessionHelper;
 	private final AuthenticationHelper authenticationHelper;
 	private final NotibPermissionHelper notibPermissionHelper;
 
@@ -104,8 +106,9 @@ public class EntitatResourceServiceImpl
 			EntitatResourceEntity entity,
 			EntitatResource resource) throws PerspectiveApplicationException {
 			boolean isRoleUser = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_USER);
+			Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
 			// Només els usuaris normals poden crear remeses
-			if (isRoleUser) {
+			if (isRoleUser && currentEntitatId != null) {
 				resource.setCrearNotificacions(
 					checkPermisRemesa(
 						ExtendedPermission.PERM4, // Permís de creació de notificacions als òrgans gestors
@@ -163,13 +166,13 @@ public class EntitatResourceServiceImpl
 			}
 			// Comprovam si es tenen permisos sobre procediments/serveis no comuns
 			if (!notibPermissionHelper.
-				procedimentsServeisNoComunsWithPermission(permisProcediments, isServei).
+				procedimentServeiNoComuIdsWithPermission(permisProcediments, isServei).
 				isEmpty()) {
 				return true;
 			}
 			// Comprovam si es tenen permisos sobre procediments/serveis comuns
 			return !notibPermissionHelper.
-				procedimentsServeisComunsWithPermission(permisProcediments, isServei).
+				procedimentServeiComuIdsWithPermission(permisProcediments, isServei).
 				isEmpty();
 		}
 	}

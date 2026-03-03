@@ -15,7 +15,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Helper per a la comprovació de permisos.
@@ -199,12 +202,13 @@ public abstract class BasePermissionHelper {
 	}
 
 	protected boolean isAnyPermissionGranted(
-			Permission[] permissions,
-			PermissionEnum[] accessConstraintGrantedPermissions) {
-		PermissionEnum firstPermissionGranted = Arrays.stream(accessConstraintGrantedPermissions).
-				filter(p -> Arrays.asList(permissions).contains(PermissionEnum.toPermission(p))).
-				findFirst().orElse(null);
-		return firstPermissionGranted != null;
+		Permission[] permissions, // Els permisos a comprovar
+		PermissionEnum[] accessConstraintGrantedPermissions) { // La llista de permisos atorgats
+		List<Permission> grantedPermissions = Arrays.stream(accessConstraintGrantedPermissions).
+			map(PermissionEnum::toPermission).collect(Collectors.toList());
+		return !Collections.disjoint(
+			Arrays.asList(permissions),
+			grantedPermissions);
 	}
 
 	protected abstract boolean checkCustomResourceAccessConstraint(
