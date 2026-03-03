@@ -77,7 +77,11 @@ public class NotificacioBackHelper {
 
 		List<CodiValorEstatDto> organsDisponibles = new ArrayList<>();
 		var entitatId = entitatActual.getId();
-		var usuari = SecurityContextHolder.getContext().getAuthentication().getName();
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth == null)  {
+			return;
+		}
+		var usuari = auth.getName();
 		var rol = RolEnumDto.valueOf(sessionScopedContext.getRolActual());
 		var organ = organGestorActual != null ? organGestorActual.getCodi() : null;
 		if (RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual())) {

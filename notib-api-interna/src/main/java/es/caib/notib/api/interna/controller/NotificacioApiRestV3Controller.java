@@ -58,8 +58,12 @@ public class NotificacioApiRestV3Controller extends NotificacioApiRestBaseContro
 //			resposta.getReferenciesAsV1().forEach(r -> enviamentSmService.altaEnviament(r.getReferencia()));
 			return resposta;
 		} catch (Exception e) {
-			var usr = SecurityContextHolder.getContext().getAuthentication().getName();
-			var rols = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+			var auth = SecurityContextHolder.getContext().getAuthentication();
+			if (auth == null) {
+				return RespostaAltaV2.builder().error(true).errorDescripcio(getErrorDescripcio(e)).errorData(new Date()).build();
+			}
+			var usr = auth.getName();
+			var rols = auth.getAuthorities();
 			log.error("Error donant d'alta la notificació usuari: " + usr + " rols : " + rols, e);
 			return RespostaAltaV2.builder().error(true).errorDescripcio(getErrorDescripcio(e)).errorData(new Date()).build();
 		}

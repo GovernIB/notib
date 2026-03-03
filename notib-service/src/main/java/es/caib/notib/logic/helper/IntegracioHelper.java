@@ -191,7 +191,12 @@ public class IntegracioHelper {
 
 	public void addAplicacioAccioParam(IntegracioInfo info, Long entitatId) {
 
-		var usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth == null) {
+			log.error("[IntegracioHelper.addAplicacioAccioParam] Error auth es null");
+			return;
+		}
+		var usuariCodi = auth.getName();
 		info.setAplicacio(usuariCodi);
 		if (entitatId == null) {
 			log.error("La entitat no pot ser null. Afegit el codi d'usari loguejat com a codi d'aplicació");

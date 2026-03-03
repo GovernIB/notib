@@ -1445,7 +1445,11 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			var user = SecurityContextHolder.getContext().getAuthentication().getName();
+			var auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null) {
+				return false;
+			}
+			var user = auth.getName();
 			var codis = permisosService.getOrgansAmbPermis(entitatId, user, permis);
 			for (var c : codis) {
 				if (c.getCodi().equals(organCodi)) {
