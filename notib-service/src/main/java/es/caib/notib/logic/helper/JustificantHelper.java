@@ -7,6 +7,7 @@ import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
 import es.caib.notib.logic.intf.dto.ProgresDescarregaDto;
 import es.caib.notib.logic.intf.exception.JustificantException;
+import es.caib.notib.persist.repository.EntitatRepository;
 import joptsimple.internal.Strings;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,8 @@ public abstract class JustificantHelper<T> {
     protected MessageHelper messageHelper;
     @Autowired
     protected ConfigHelper configHelper;
+    @Autowired
+    private EntitatRepository entitatRepository;
 
     public abstract byte[] generarJustificant(T notificacio, ProgresDescarregaDto progres) throws JustificantException, IOException;
 
@@ -222,7 +225,8 @@ public abstract class JustificantHelper<T> {
                 if (!Strings.isNullOrEmpty(logo)) {
                     logoCapsalera = Image.getInstance(logo);
                 } else {
-                    byte[] logoBytes = IOUtils.toByteArray(getCapsaleraDefaultLogo());
+                    var entitat = entitatRepository.findByCodi(entitatCodi);
+                    byte[] logoBytes = entitat.getLogoCapBytes() != null ? entitat.getLogoCapBytes() : IOUtils.toByteArray(getCapsaleraDefaultLogo());
                     logoCapsalera = Image.getInstance(logoBytes);
                 }
                 if (logoCapsalera != null) {
