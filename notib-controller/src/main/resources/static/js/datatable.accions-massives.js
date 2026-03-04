@@ -178,7 +178,7 @@ function initEvents($table, url_prefix, eventMessages) {
         $('#updateEstat').on('click', function() {
 
             let count = Number($(".seleccioCount").html());
-            if (count == 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
+            if (count === 0 || count > 100 && !confirm(eventMessages["confirm-accio-massiva"])) {
                 return;
             }
             if(confirm(eventMessages['confirm-update-estat'])){
