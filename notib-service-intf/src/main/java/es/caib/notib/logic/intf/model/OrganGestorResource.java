@@ -16,6 +16,7 @@ import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
@@ -82,16 +83,17 @@ public class OrganGestorResource extends BaseResource<Long> {
 	public static final String NAMED_QUERY_PERM_COM = "PERM_COM";
 	public static final String NAMED_QUERY_PERM_SIR = "PERM_SIR";
 
-	@NotEmpty
+	@NotNull
 	@Size(max = 64)
 	private String codi;
 	@Size(max = 64)
 	private String codiPare;
-	@NotEmpty
+	@NotNull
 	@Size(max = 1000)
 	private String nom;
 	@Size(max = 1000)
 	private String nomEs;
+	@NotNull
 	private OrganGestorEstatEnum estat;
 	private String llibre;
 	private String llibreNom;

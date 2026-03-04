@@ -46,11 +46,10 @@ public class PagadorCieResourceServiceImpl
 	}
 
 	@Override
-	protected void beforeUpdateEntity(
+	protected void beforeUpdateSave(
 		PagadorCieResourceEntity entity,
 		PagadorCieResource resource,
 		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		super.beforeUpdateEntity(entity, resource, answers);
 		updateOrgansGestors(entity, resource);
 	}
 

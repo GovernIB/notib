@@ -40,27 +40,35 @@ const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void
         <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1, 2]}>
             <MuiFormTabContent index={0} showOnCreate>
                 <Grid container spacing={2}>
-                    <Grid size={4}>
+                    <Grid size={3}>
                         <FormField name="codi" />
                     </Grid>
-                    <Grid size={8}>
+                    <Grid size={9}>
                         <FormField name="nom" />
                     </Grid>
-                    <Grid size={4}>
-                        <FormField name="organGestor" />
-                    </Grid>
-                    <Grid size={4}>
+                    <Grid size={6}>
                         <FormField name="retard" />
                     </Grid>
-                    <Grid size={4}>
-                        <FormField name="caducitat" />
+                    <Grid size={6}>
+                        <FormField
+                            name="caducitat"
+                            componentProps={{ helperText: 'En dies naturals' }}
+                        />
+                    </Grid>
+                    <Grid size={9}>
+                        <FormField name="organGestor" disabled={data?.fieldOrganGestorDisabled} />
                     </Grid>
                     <Grid size={3}>
                         <FormField name="comu" />
                     </Grid>
-                    <Grid size={3}>
-                        <FormField name="entregaCie" />
-                    </Grid>
+                    {!data?.fieldEntregaCieHidden && (
+                        <>
+                            <Grid size={6}>
+                                <FormField name="entregaCie" />
+                            </Grid>
+                            <Grid size={6} />
+                        </>
+                    )}
                     <Grid size={3}>
                         <FormField name="agrupar" />
                     </Grid>
@@ -99,7 +107,8 @@ export const ProcedimentForm: React.FC = () => {
                 }
                 toolbarSubtitle={id != null ? subtitle : undefined}
                 componentProps={{ style: { height: '100%' } }}
-                commonFieldComponentProps={{ size: 'small' }}>
+                commonFieldComponentProps={{ size: 'small' }}
+            >
                 <ProcedimentFormContent setSubtitle={setSubtitle} />
             </MuiForm>
         </FormPage>

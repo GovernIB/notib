@@ -25,7 +25,7 @@ public class PagadorCieResourceEntity
 	@EqualsAndHashCode.Include
 	@Column(name = "dir3_codi", length = 9, nullable = false)
 	private String organismePagadorCodi; // Organ gestor pagador
-	@Column(name = "nom", length = 256)
+	@Column(name = "nom", length = 256, nullable = false)
 	private String nom;
 	@Column(name = "api_key")
 	private String apiKey;

@@ -276,6 +276,7 @@ export const Form: React.FC<FormProps> = (props) => {
     const [revertData, setRevertData] = React.useState<any>(undefined);
     const [isDataInitialized, setIsDataInitialized] = React.useState<boolean>(false);
     const [apiActions, setApiActions] = React.useState<any>(undefined);
+    const [navigateToLink, setNavigateToLink] = React.useState<string>();
     const apiRef = React.useRef<FormApi>(undefined);
     const { id, setInternalId } = useControlledId(idProp);
     const location = useLocation();
@@ -411,7 +412,12 @@ export const Form: React.FC<FormProps> = (props) => {
         }
         reject?.(error);
     };
-    const reset = (data: any, id?: any) => {
+    const reset = (
+        data: any,
+        newId?: any,
+        navigateToLink?: boolean,
+        isDataInitialized?: boolean
+    ) => {
         dataDispatchAction({
             type: FormFieldDataActionType.RESET,
             payload: data,
@@ -422,8 +428,19 @@ export const Form: React.FC<FormProps> = (props) => {
         setRevertData(data);
         setApiFieldErrors(undefined);
         validateWithValidator(data);
-        setIsDataInitialized(true);
-        id !== undefined && setInternalId(id);
+        setIsDataInitialized(isDataInitialized != null ? isDataInitialized : true);
+        if (navigateToLink) {
+            if (id == null) {
+                const link =
+                    createLink != null || saveLink != null ? (createLink ?? saveLink) : undefined;
+                setNavigateToLink(link);
+            } else {
+                const link =
+                    updateLink != null || saveLink != null ? (updateLink ?? saveLink) : undefined;
+                setNavigateToLink(link);
+            }
+        }
+        newId !== undefined && setInternalId(newId);
         onReset?.(data);
     };
     const externalReset = (data?: any, id?: any) => {
@@ -563,22 +580,16 @@ export const Form: React.FC<FormProps> = (props) => {
                                           data: savedData,
                                       });
                             temporalMessageShow(null, message, 'success');
-                            reset(savedData, id == null ? savedData.id : undefined);
                             if (id != null) {
                                 onUpdateSuccess != null
                                     ? onUpdateSuccess(savedData)
                                     : onSaveSuccess?.(data);
-                                if (updateLink != null || saveLink != null) {
-                                    navigateToSaveLink(updateLink ?? saveLink, savedData.id);
-                                }
                             } else {
                                 onCreateSuccess != null
                                     ? onCreateSuccess(savedData)
                                     : onSaveSuccess?.(data);
-                                if (createLink || saveLink) {
-                                    navigateToSaveLink(createLink ?? saveLink, savedData.id, true);
-                                }
                             }
+                            reset(savedData, id == null ? savedData.id : undefined, true, false);
                             resolve(savedData);
                         })
                         .catch((error: ResourceApiError) => {
@@ -707,6 +718,12 @@ export const Form: React.FC<FormProps> = (props) => {
             }
         }
     }, [isReady, data]);
+    React.useEffect(() => {
+        // Navega cap al link que s'ha guardat a l'estat
+        if (navigateToLink) {
+            navigateToSaveLink(navigateToLink, id, true);
+        }
+    }, [navigateToLink]);
     apiRef.current = {
         getData,
         refresh: () => refresh(true),

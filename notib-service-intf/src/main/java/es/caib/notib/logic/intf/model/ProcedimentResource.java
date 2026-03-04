@@ -3,6 +3,7 @@ package es.caib.notib.logic.intf.model;
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
 import es.caib.notib.logic.intf.base.annotation.ResourceArtifact;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
+import es.caib.notib.logic.intf.base.annotation.ResourceField;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
@@ -73,6 +74,7 @@ public class ProcedimentResource extends BaseResource<Long> {
 	@Size(max = 255)
 	private String codiAssumpteNom;
 	private boolean agrupar;
+	@ResourceField(onChangeActive = true)
 	private boolean comu;
 	private boolean requireDirectPermission;
 	private boolean manual;
@@ -84,8 +86,11 @@ public class ProcedimentResource extends BaseResource<Long> {
 	private ResourceReference<OrganGestorResource, Long> organGestor;
 	private ResourceReference<EntregaCieResource, Long> entregaCie;
 
+	// Camps calculats
 	private Integer grupCount;
 	private Integer aclEntryCount;
+	private boolean fieldOrganGestorDisabled;
+	private boolean fieldEntregaCieHidden;
 
 	/* Els següents camps només es fan servir per a crear o modificar la referència entregaCie */
 	private boolean entregaCieActiva;

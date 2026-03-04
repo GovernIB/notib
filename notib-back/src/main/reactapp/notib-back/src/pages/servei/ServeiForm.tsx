@@ -40,35 +40,42 @@ const ServeiFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> =
         <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1, 2]}>
             <MuiFormTabContent index={0} showOnCreate>
                 <Grid container spacing={2}>
-                    <Grid size={4}>
+                    <Grid size={3}>
                         <FormField name="codi" />
                     </Grid>
-                    <Grid size={8} />
-                    <Grid size={12}>
+                    <Grid size={9}>
                         <FormField name="nom" />
                     </Grid>
                     <Grid size={6}>
                         <FormField name="retard" />
                     </Grid>
                     <Grid size={6}>
-                        <FormField name="caducitat" />
+                        <FormField
+                            name="caducitat"
+                            componentProps={{ helperText: 'En dies naturals' }}
+                        />
                     </Grid>
-                    <Grid size={10}>
-                        <FormField name="organGestor" />
+                    <Grid size={9}>
+                        <FormField name="organGestor" disabled={data?.fieldOrganGestorDisabled} />
                     </Grid>
-                    <Grid size={2}>
+                    <Grid size={3}>
                         <FormField name="comu" />
                     </Grid>
-                    <Grid size={12}>
-                        <FormField name="entregaCie" />
-                    </Grid>
-                    <Grid size={4}>
+                    {!data?.fieldEntregaCieHidden && (
+                        <>
+                            <Grid size={6}>
+                                <FormField name="entregaCie" />
+                            </Grid>
+                            <Grid size={6} />
+                        </>
+                    )}
+                    <Grid size={3}>
                         <FormField name="agrupar" />
                     </Grid>
-                    <Grid size={4}>
+                    <Grid size={12}>
                         <FormField name="requireDirectPermission" />
                     </Grid>
-                    <Grid size={4}>
+                    <Grid size={12}>
                         <FormField name="manual" />
                     </Grid>
                 </Grid>
@@ -100,7 +107,8 @@ export const ServeiForm: React.FC = () => {
                 }
                 toolbarSubtitle={id != null ? subtitle : undefined}
                 componentProps={{ style: { height: '100%' } }}
-                commonFieldComponentProps={{ size: 'small' }}>
+                commonFieldComponentProps={{ size: 'small' }}
+            >
                 <ServeiFormContent setSubtitle={setSubtitle} />
             </MuiForm>
         </FormPage>

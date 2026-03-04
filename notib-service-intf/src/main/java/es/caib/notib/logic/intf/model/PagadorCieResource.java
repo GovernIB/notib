@@ -46,6 +46,7 @@ public class PagadorCieResource extends BaseResource<Long> {
 
 	public static final String FILTER_CODE = "FILTER_PAGADOR_CIE";
 
+	@NotNull
 	@Size(max = 256)
 	private String nom;
 	@Size(max = 255)
