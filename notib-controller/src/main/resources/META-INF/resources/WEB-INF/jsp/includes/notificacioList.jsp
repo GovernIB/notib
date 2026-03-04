@@ -518,6 +518,10 @@
         });
 
         $("#filtrar").click(() => {
+
+            let valor = $($(".filtreMevesSimple")[0]).hasClass("active") && $($(".filtreMevesSimple")[0]).is(":visible")
+                        || $($(".filtreMevesAvancat")[0]).hasClass("active") && $($(".filtreMevesAvancat")[0]).is(":visible");
+            $("#nomesLesMeves").val(valor)
             deselecciona()
         });
 
@@ -616,6 +620,8 @@
             e.preventDefault();
             $(".filtreOcult").toggle();
             $(".filtreMeves").toggle();
+            // $($(".filtreMevesSimple")[0]).toggle();
+            // $($(".filtreMevesSimple")[0]).val($($(".filtreMevesAvancat")[0]).val());
             $("#filtreAvancat").hide();
             $("#filtreSimple").show();
             $("#filtreSimpleActiu").val(false);
@@ -629,6 +635,8 @@
             e.preventDefault();
             $(".filtreOcult").toggle();
             $(".filtreMeves").toggle();
+            // $($(".filtreMevesAvancat")[0]).toggle();
+            // $($(".filtreMevesAvancat")[0]).val($($(".filtreMevesSimple")[0]).val());
             $("#filtreAvancat").show();
             $("#filtreSimple").hide();
             $("#filtreSimpleActiu").val(true);
@@ -773,7 +781,7 @@
             <not:inputDate name="dataFi" placeholderKey="notificacio.list.filtre.camp.datafi" inline="true" required="false" />
         </div>
         <div id="botons-filtre-simple" class="col-md-2 pull-right form-buttons"  style="text-align: right;">
-            <button id="nomesLesMevesBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesLesMeves"/>" class="btn btn-default pull-left filtreMeves <c:if test="${nomesLesMeves}">active</c:if>" data-toggle="button"><span class="fa fa-user"></span></button>
+            <button id="nomesLesMevesBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesLesMeves"/>" class="btn btn-default pull-left filtreMeves filtreMevesSimple <c:if test="${nomesLesMeves}">active</c:if>" data-toggle="button"><span class="fa fa-user"></span></button>
 <%--            <not:inputHidden name="nomesLesMeves"/>--%>
             <button id="btn-netejar-filtre" type="submit" name="netejar" value="netejar" class="btn btn-default" style="padding: 6px 9px; margin-right:5px;" title="<spring:message code="comu.boto.netejar"/>"><span class="fa fa-eraser icona_ocultable" style="padding: 2px 0px;"></span><span class="text_ocultable"><spring:message code="comu.boto.netejar"/></span></button>
             <button id="filtrar" type="submit" name="accio" value="filtrar" class="btn btn-primary" title="<spring:message code="comu.boto.filtrar"/>"><span class="fa fa-filter" id="botoFiltrar"></span><span class="text_ocultable"><spring:message code="comu.boto.filtrar"/></span></button>
@@ -838,7 +846,7 @@
             <not:inputDate name="dataCaducitatFi" placeholderKey="notificacio.list.filtre.camp.data.caducitat.fi" inline="true" required="false" />
         </div>
         <div id="botons-filtre-avancat" class="col-md-3 pull-right form-buttons"  style="text-align: right;">
-            <button id="nomesLesMevesBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesLesMeves"/>" class="btn btn-default pull-left <c:if test="${nomesLesMeves}">active</c:if>" data-toggle="button"><span class="fa fa-user"></span></button>
+            <button id="nomesLesMevesBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesLesMeves"/>" class="btn btn-default pull-left filtreMevesAvancat <c:if test="${nomesLesMeves}">active</c:if>" data-toggle="button"><span class="fa fa-user"></span></button>
             <not:inputHidden name="nomesLesMeves"/>
             <button id="nomesAmbEntregaPostalBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesAmbEntregaPostal"/>" class="btn btn-default pull-left <c:if test="${nomesAmbEntregaPostal}">active</c:if>" data-toggle="button"><span class="fa fa-envelope"></span></button>
             <not:inputHidden name="nomesAmbEntregaPostal"/>
