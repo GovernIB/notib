@@ -61,8 +61,8 @@ public class NotificacioResourceServiceImpl
 	private final NotificacioTableHelper notificacioTableHelper;
 	private final EnviamentTableHelper enviamentTableHelper;
 	private final AuditHelper auditHelper;
-	private NotificacioRepository notificacioRepository;
-	private NotificacioEnviamentRepository notificacioEnviamentRepository;
+	private final NotificacioRepository notificacioRepository;
+	private final NotificacioEnviamentRepository notificacioEnviamentRepository;
 
 	@PostConstruct
 	public void init() {
