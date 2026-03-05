@@ -14,8 +14,10 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -41,11 +43,14 @@ public class MonitorIntegracioResourceServiceImpl extends BaseMutableResourceSer
 			String code,
 			MonitorIntegracioResourceEntity entity,
 			Serializable params) throws ReportGenerationException {
-			List<Object[]> agrupacions = monitorIntegracioResourceRepository.countByCodi();
-			return agrupacions.stream().map(a -> new MonitorIntegracioResource.MonitorIntegracioAgrupacioItem(
-				(IntegracioCodi)a[0],
-				(Long)a[1]
-			)).collect(Collectors.toList());
+			List<Object[]> agrupacioCounts = monitorIntegracioResourceRepository.countByCodi();
+			return Arrays.stream(IntegracioCodi.values()).map(c -> {
+				Long agrupacioCount = agrupacioCounts.stream().
+					filter(a -> c.equals(a[0])).
+					map(a -> (Long)a[1]).
+					findFirst().orElse(0L);
+				return new MonitorIntegracioResource.MonitorIntegracioAgrupacioItem(c, agrupacioCount);
+			}).collect(Collectors.toList());
 		}
 		@Override
 		public void onChange(
