@@ -475,6 +475,9 @@ const useGridColumns = (
             const actionsColumn = {
                 field: ' ',
                 type: 'actions',
+                sortable: false,
+                hideable: false,
+                exportable: false,
                 renderCell: (params: GridRenderCellParams) => {
                     const gridApiRef = useGridApiContext();
                     const rowModesModel = useGridSelector(gridApiRef, gridEditRowsStateSelector);

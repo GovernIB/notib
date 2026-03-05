@@ -169,6 +169,7 @@ const InnerFormFieldNumberDebounce: React.FC<FormFieldNumberProps> = (props) => 
         }
     }, [value]);
     React.useEffect(() => {
+        console.log('>>> onChange', changedValue);
         onChange?.(changedValue);
     }, [changedValue]);
     return (

@@ -32,7 +32,8 @@ public class NotificacioEnviamentResourceServiceImpl
 	protected String additionalSpringFilter(
 		String currentSpringFilter,
 		String[] namedQueries) {
-		return "id is null";
+		//return "id is null";
+		return null;
 	}
 
 	/*

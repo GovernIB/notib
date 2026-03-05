@@ -22,6 +22,7 @@ import lombok.experimental.FieldNameConstants;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -128,5 +129,12 @@ public class NotificacioResource extends BaseResource<Long> {
 	// El següent camp s'utilitza per a fer el càlcul de la data de caducitat especificant els dies naturals
 	@ResourceField(onChangeActive = true)
 	private Integer caducitatDiesNaturals = 10;
+
+	// Camps calculats
+	private LocalDateTime createdDate;
+
+	// Camps provinents de NotificacioTable
+	private Date enviadaDate;
+	private String estatString;
 
 }

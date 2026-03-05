@@ -226,13 +226,42 @@ public class NotificacioResourceServiceImpl
 			String[] previousFieldNames,
 			NotificacioResource target) {
 			if (NotificacioResource.Fields.caducitat.equals(fieldName)) {
-				Date date = (Date)fieldValue;
-				caducitatOnChange(date, previous, target);
+				boolean isCaducitatDiesNaturalsInPreviousFieldNames =
+					previousFieldNames != null &&
+					previousFieldNames.length > 0 &&
+					NotificacioResource.Fields.caducitatDiesNaturals.equals(previousFieldNames[0]);
+				if (!isCaducitatDiesNaturalsInPreviousFieldNames) {
+					Date date = (Date) fieldValue;
+					caducitatOnChange(date, previous, target);
+				}
 			} else if (NotificacioResource.Fields.caducitatDiesNaturals.equals(fieldName)) {
-				Integer caducitatDiesNaturals = (Integer)fieldValue;
-				caducitatOnChange(caducitatDiesNaturals, previous, target);
+				boolean isCaducitatInPreviousFieldNames =
+					previousFieldNames != null &&
+						previousFieldNames.length > 0 &&
+						NotificacioResource.Fields.caducitat.equals(previousFieldNames[0]);
+				if (!isCaducitatInPreviousFieldNames) {
+					Integer caducitatDiesNaturals = (Integer) fieldValue;
+					caducitatOnChange(caducitatDiesNaturals, previous, target);
+				}
 			}
 		}
+	}
+
+	private static void caducitatOnChange(
+		Date caducitat,
+		NotificacioResource previous,
+		NotificacioResource target) {
+		Integer numDiesNaturals = null;
+		if (caducitat != null) {
+			LocalDate dataConvertida = caducitat.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+			numDiesNaturals = (int)ChronoUnit.DAYS.between(LocalDate.now(), dataConvertida);
+		}
+		target.setCaducitatDiesNaturals(numDiesNaturals);
+		/*// Només feim el canvi si el nombre de dies naturals és diferent a la que ja hi havia per a evitar bucle
+		// infinit d'onChange.
+		if (!Objects.equals(numDiesNaturals, previous.getCaducitatDiesNaturals())) {
+			target.setCaducitatDiesNaturals(numDiesNaturals);
+		}*/
 	}
 
 	private static void caducitatOnChange(
@@ -247,25 +276,11 @@ public class NotificacioResourceServiceImpl
 					atStartOfDay(ZoneId.systemDefault()).
 					toInstant());
 		}
-		// Només feim el canvi si la caducitat és diferent a la que ja hi havia per a evitar bucle infinit d'onChange.
+		target.setCaducitat(caducitat);
+		/*// Només feim el canvi si la caducitat és diferent a la que ja hi havia per a evitar bucle infinit d'onChange.
 		if (!Objects.equals(caducitat, previous.getCaducitat())) {
 			target.setCaducitat(caducitat);
-		}
-	}
-	private static void caducitatOnChange(
-		Date caducitat,
-		NotificacioResource previous,
-		NotificacioResource target) {
-		Integer numDiesNaturals = null;
-		if (caducitat != null) {
-			LocalDate dataConvertida = caducitat.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-			numDiesNaturals = (int)ChronoUnit.DAYS.between(LocalDate.now(), dataConvertida);
-		}
-		// Només feim el canvi si el nombre de dies naturals és diferent a la que ja hi havia per a evitar bucle
-		// infinit d'onChange.
-		if (!Objects.equals(numDiesNaturals, previous.getCaducitatDiesNaturals())) {
-			target.setCaducitatDiesNaturals(numDiesNaturals);
-		}
+		}*/
 	}
 
 }

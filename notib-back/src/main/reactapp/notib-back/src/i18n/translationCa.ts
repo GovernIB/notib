@@ -251,6 +251,17 @@ const translationCa = {
                     COMUNICACIO: 'Comunicació',
                     SIR: 'Comunicació SIR',
                 },
+                enviament: {
+                    column: {
+                        interessat: 'Interessat',
+                        representant: 'Representant',
+                        estatPostal: "Estat d'entrega postal",
+                        estatTelematica: "Estat d'entrega telemàtica",
+                    },
+                    detalls: 'Detalls',
+                },
+                procediment: 'Procediment',
+                servei: 'Servei',
             },
             form: {
                 title: {
@@ -308,7 +319,12 @@ const translationCa = {
                 },
             },
         },
-        integracions: {
+        enviament: {
+            grid: {
+                title: 'Enviaments',
+            },
+        },
+        integracio: {
             grid: {
                 title: 'Monitor de integraciones',
             },
