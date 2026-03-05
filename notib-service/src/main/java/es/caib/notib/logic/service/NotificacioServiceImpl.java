@@ -250,18 +250,19 @@ public class NotificacioServiceImpl implements NotificacioService {
 			auditHelper.auditaNotificacio(notificacioEntity, AuditService.TipusOperacio.CREATE, "NotificacioServiceImpl.create");
 //			notificacioEntity.getEnviaments().forEach(e -> enviamentSmService.acquireStateMachine(e.getNotificaReferencia()));
 
+
 			notificacioEntity.getEnviaments().forEach(e -> {
 				var ref = e.getNotificaReferencia();
-				if (TransactionSynchronizationManager.isActualTransactionActive()) {
-					TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-						@Override
-						public void afterCommit() {
+				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+					@Override
+					public void afterCommit() {
+						if (TransactionSynchronizationManager.isActualTransactionActive()) {
 							enviamentSmService.acquireStateMachine(ref);
 						}
-					});
-					return;
-				}
-				enviamentSmService.acquireStateMachine(ref);
+					}
+				});
+				return;
+//				enviamentSmService.acquireStateMachine(ref);
 			});
 
 			SubsistemesHelper.addSuccessOperation(AWE, System.currentTimeMillis() - start);

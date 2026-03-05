@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.ejb;
 
@@ -17,7 +17,7 @@ import javax.ejb.Stateless;
 /**
  * Implementació de EnviamentService com a EJB que empra una clase
  * delegada per accedir a la funcionalitat del servei.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Primary
@@ -77,6 +77,14 @@ public class EnviamentSmService extends AbstractService<es.caib.notib.logic.intf
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> altaEnviament(String enviamentUuid) {
 		return getDelegateService().altaEnviament(enviamentUuid);
 	}
+
+
+	@Override
+	@RolesAllowed("**")
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> altaEnviamentWeb(String enviamentUuid) {
+		return getDelegateService().altaEnviamentWeb(enviamentUuid);
+	}
+
 
 	@Override
 	@RolesAllowed("**")
