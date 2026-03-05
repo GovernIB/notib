@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.back.helper;
 
@@ -28,7 +28,7 @@ import java.util.List;
 
 /**
  * Helper per a convertir entre diferents formats de documents.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Component
@@ -48,7 +48,7 @@ public class NotificacioBackHelper {
 	public NotificacioFiltreCommand getFiltreCommand(HttpServletRequest request, String keyAttr) {
 
 		NotificacioFiltreCommand notificacioFiltreCommand = (NotificacioFiltreCommand) request.getSession().getAttribute(keyAttr);
-		
+
 		if (notificacioFiltreCommand != null) {
 //			notificacioFiltreCommand.setDefaultFiltreData();
 			return notificacioFiltreCommand;
@@ -78,7 +78,11 @@ public class NotificacioBackHelper {
 
 		List<CodiValorEstatDto> organsDisponibles = new ArrayList<>();
 		var entitatId = entitatActual.getId();
-		var usuari = SecurityContextHolder.getContext().getAuthentication().getName();
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth == null)  {
+			return;
+		}
+		var usuari = auth.getName();
 		var rol = RolEnumDto.valueOf(sessionScopedContext.getRolActual());
 		var organ = organGestorActual != null ? organGestorActual.getCodi() : null;
 		if (RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual())) {

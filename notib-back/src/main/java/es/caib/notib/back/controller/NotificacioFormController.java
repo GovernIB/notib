@@ -48,7 +48,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/notificacio")
 public class NotificacioFormController extends BaseUserController {
-    
+
     @Autowired
     private AplicacioService aplicacioService;
     @Autowired
@@ -280,11 +280,11 @@ public class NotificacioFormController extends BaseUserController {
                 notificacioService.update(entitatActual.getId(), notificacio, RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual()));
             } else if (notificacio.isSir() && notificacio.docMidaMaximaSuperada()) {
                 var nots = notificacioService.crearSirDividida(entitatActual.getId(), notificacio);
-                nots.get(0).getEnviaments().forEach(e -> enviamentSmService.altaEnviament(e.getNotificaReferencia()));
+                nots.get(0).getEnviaments().forEach(e -> enviamentSmService.altaEnviamentWeb(e.getNotificaReferencia()));
             } else {
                 var not = notificacioService.create(entitatActual.getId(), notificacioCommand.asNotificacioV2());
                 // SM
-                not.getEnviaments().forEach(e -> enviamentSmService.altaEnviament(e.getNotificaReferencia()));
+                not.getEnviaments().forEach(e -> enviamentSmService.altaEnviamentWeb(e.getNotificaReferencia()));
 
             }
         } catch (Exception ex) {
@@ -723,9 +723,12 @@ public class NotificacioFormController extends BaseUserController {
             var organGestorActual = getOrganGestorActual(request);
             organsGestors = organGestorService.findDescencentsByCodi(entitatActual.getId(), organGestorActual.getCodi());
         } else { // Rol usuari o altres
-            var permis = tipusEnviament.equals(EnviamentTipus.SIR) ? PermisEnum.COMUNICACIO_SIR :
-                                tipusEnviament.equals(EnviamentTipus.COMUNICACIO) ? PermisEnum.COMUNICACIO : PermisEnum.NOTIFICACIO;
-            codisValor = permisosService.getOrgansAmbPermis(entitatActual.getId(), SecurityContextHolder.getContext().getAuthentication().getName(), permis);
+			var permis = tipusEnviament.equals(EnviamentTipus.SIR) ? PermisEnum.COMUNICACIO_SIR :
+				tipusEnviament.equals(EnviamentTipus.COMUNICACIO) ? PermisEnum.COMUNICACIO : PermisEnum.NOTIFICACIO;
+			var auth = SecurityContextHolder.getContext().getAuthentication();
+			if (auth != null) {
+				codisValor = permisosService.getOrgansAmbPermis(entitatActual.getId(), auth.getName(), permis);
+			}
         }
         if (procSerDisponibles.isEmpty() && !procedimentService.hasProcedimentsComunsAndNotificacioPermission(entitatActual.getId(), tipusEnviament)) {
             MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.procediments"));

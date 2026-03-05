@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.logic.intf.service;
 
@@ -14,7 +14,7 @@ import org.springframework.statemachine.state.State;
 /**
  * Declaració dels mètodes per a la consulta de notificacions i dels
  * destinataris i events associats.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface EnviamentSmService {
@@ -45,6 +45,9 @@ public interface EnviamentSmService {
 
 	@PreAuthorize("isAuthenticated()")
 	StateMachine<EnviamentSmEstat, EnviamentSmEvent> altaEnviament(String enviamentUuid);
+
+	@PreAuthorize("isAuthenticated()")
+	StateMachine<EnviamentSmEstat, EnviamentSmEvent> altaEnviamentWeb(String enviamentUuid);
 
 	@PreAuthorize("isAuthenticated()")
 	StateMachine<EnviamentSmEstat, EnviamentSmEvent> altaEnviament(String enviamentUuid, Long delay);

@@ -263,6 +263,30 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 	@Override
 	@Transactional
+	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> altaEnviamentWeb(String enviamentUuid) {
+
+		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl altaEnviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
+		var sm = stateMachineService.acquireStateMachine(enviamentUuid, false);
+		var enviament = enviamentRepository.findByUuid(enviamentUuid).orElseThrow();
+		var variables = sm.getExtendedState().getVariables();
+		variables.put(SmConstants.ENVIAMENT_TIPUS, enviament.getNotificacio().getEnviamentTipus().name());
+		variables.put(SmConstants.ENVIAMENT_SENSE_NIF, enviament.isPerEmail());
+		sm.start();
+		// Enviam a registre
+		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+			@Override
+			public void afterCommit() {
+				if (TransactionSynchronizationManager.isActualTransactionActive()) {
+					sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_ENVIAR);
+				}
+			}
+		});
+//		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_ENVIAR);
+		return sm;
+	}
+
+	@Override
+	@Transactional
 	public StateMachine<EnviamentSmEstat, EnviamentSmEvent> registreEnviament(String enviamentUuid, boolean retry) {
 
 		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl registreEnviament " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
@@ -316,7 +340,8 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl registreRetry " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
-		sm.getExtendedState().getVariables().put(SmConstants.CODI_USUARI, SecurityContextHolder.getContext().getAuthentication().getName());
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		sm.getExtendedState().getVariables().put(SmConstants.CODI_USUARI, auth != null ? auth.getName() : "Usuari null");
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_RETRY);
 		return sm;
 	}
@@ -389,7 +414,8 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 
 		NotibLogger.getInstance().info("[SM] EnviamentSmServiceImpl notificaRetry " + enviamentUuid, log, LoggingTipus.STATE_MACHINE);
 		var sm = stateMachineService.acquireStateMachine(enviamentUuid, true);
-		sm.getExtendedState().getVariables().put(SmConstants.CODI_USUARI, SecurityContextHolder.getContext().getAuthentication().getName());
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		sm.getExtendedState().getVariables().put(SmConstants.CODI_USUARI, auth != null ? auth.getName() : "Usuari null");
 		sendEvent(enviamentUuid, sm, EnviamentSmEvent.NT_RETRY);
 		return sm;
 	}

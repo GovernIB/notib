@@ -224,21 +224,26 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	@Override
 	public RespostaAlta alta(Notificacio notificacio) throws NotificacioServiceWsException {
 
-        EntitatEntity entitat = null;
-        try {
-            entitat = entitatRepository.findByDir3Codi(notificacio.getEmisorDir3Codi());
-        } catch (Exception ex) {
-            log.error("Error entitat no trobada a la bdd " + notificacio.getEmisorDir3Codi(), ex);
-        }
-        var usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
-        var msg = limitadorEnviamentsHelper.checkLimitEnviamentsAplicacioSuperat(usuariCodi, entitat.getId());
-        if (!Strings.isNullOrEmpty(msg)) {
-            return RespostaAlta.builder().error(true).errorDescripcio(msg).build();
-        }
+		EntitatEntity entitat = null;
+		try {
+			entitat = entitatRepository.findByDir3Codi(notificacio.getEmisorDir3Codi());
+		} catch (Exception ex) {
+			log.error("Error entitat no trobada a la bdd " + notificacio.getEmisorDir3Codi(), ex);
+		}
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth == null) {
+			log.error("[NotificacioServiceWsImplV2.alta] Error auth es null");
+			return RespostaAlta.builder().error(true).errorDescripcio("Usuari inexistent").build();
+		}
+		var usuariCodi = auth.getName();
+		var msg = limitadorEnviamentsHelper.checkLimitEnviamentsAplicacioSuperat(usuariCodi, entitat.getId());
+		if (!Strings.isNullOrEmpty(msg)) {
+			return RespostaAlta.builder().error(true).errorDescripcio(msg).build();
+		}
 		var resposta = altaV2(notificacio);
 //		resposta.getReferenciesAsV1().forEach(r -> enviamentSmService.altaEnviament(r.getReferencia()));
 		return RespostaAlta.builder().identificador(resposta.getIdentificador()).estat(resposta.getEstat()).referencies(resposta.getReferenciesAsV1())
-				.error(resposta.isError()).errorDescripcio(resposta.getErrorDescripcio()).build();
+			.error(resposta.isError()).errorDescripcio(resposta.getErrorDescripcio()).build();
 	}
 
 	@Transactional
@@ -257,7 +262,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 //		var info = generateInfoAlta(notificacio, entitat != null ? entitat.getId() : null);
 		try {
 			log.debug("[ALTA] Alta de notificació: " + notificacio.toString());
-            var usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
+			var auth = SecurityContextHolder.getContext().getAuthentication();
+			if (auth == null) {
+				log.error("[NotificacioServiceWsImplV2.altaV2] Error auth es null");
+				return RespostaAltaV2.builder().error(true).errorData(new Date()).errorDescripcio("Usuari inexistent").build();
+			}
+			var usuariCodi = auth.getName();
             var msg = limitadorEnviamentsHelper.checkLimitEnviamentsAplicacioSuperat(usuariCodi, entitat.getId());
             if (!Strings.isNullOrEmpty(msg)) {
 			    return RespostaAltaV2.builder().error(true).errorData(new Date()).errorDescripcio(msg).build();

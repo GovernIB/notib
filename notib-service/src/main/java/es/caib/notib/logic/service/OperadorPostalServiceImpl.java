@@ -19,6 +19,8 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.service.OperadorPostalService;
 import es.caib.notib.logic.intf.service.PermisosService;
+import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
 import es.caib.notib.persist.repository.OrganGestorRepository;
@@ -38,7 +40,7 @@ import java.util.Map;
 
 /**
  * Implementació del servei de gestió de pagadors postals.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -63,7 +65,7 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 	private PermisosService permisosService;
 
 	private static final String LOG_MSG = "Consulta de tots els pagadors postals";
-	
+
 	@Override
 	@Transactional
 	public OperadorPostalDto upsert(Long entitatId, OperadorPostalDataDto postal) {
@@ -258,8 +260,13 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 				var pagadorsPare = findOperadorsPareNoCaducats(entitat, o.getCodiPare());
 				pagadors.addAll(pagadorsPare);
 			}
-			var usr = SecurityContextHolder.getContext().getAuthentication().getName();
 			List<PagadorPostalEntity> p = new ArrayList<>();
+			var auth = SecurityContextHolder.getContext().getAuthentication();
+			if (auth == null) {
+				NotibLogger.getInstance().info("[OperadorPostalServiceIMpl.findNoCaducatsByEntitatAndOrgan] Error auth es null", log, LoggingTipus.ENTREGA_CIE);
+				return conversioTipusHelper.convertirList(p, IdentificadorTextDto.class);
+			}
+			var usr = auth.getName();
 			for (var pagador : pagadors) {
 				if (isAdminOrgan && !permisosService.hasUsrPermisOrgan(entitat.getId(), usr, pagador.getOrganGestor().getCodi(), PermisEnum.ADMIN)) {
 					continue;
@@ -298,8 +305,13 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 				var pagadorsPare = findOperadorsPare(entitat, o.getCodiPare());
 				pagadors.addAll(pagadorsPare);
 			}
-			var usr = SecurityContextHolder.getContext().getAuthentication().getName();
 			List<PagadorPostalEntity> p = new ArrayList<>();
+			var auth = SecurityContextHolder.getContext().getAuthentication();
+			if (auth == null) {
+				NotibLogger.getInstance().info("[OperadorPostalServiceIMpl.findNoCaducatsByEntitatAndOrgan] Error auth es null", log, LoggingTipus.ENTREGA_CIE);
+				return conversioTipusHelper.convertirList(p, IdentificadorTextDto.class);
+			}
+			var usr = auth.getName();
 			for (var pagador : pagadors) {
 				if (isAdminOrgan && !permisosService.hasUsrPermisOrgan(entitat.getId(), usr, pagador.getOrganGestor().getCodi(), PermisEnum.ADMIN)) {
 					continue;
@@ -359,6 +371,6 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 	public PaginaDto<OperadorPostalDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
 		return null;
 	}
-	
+
 
 }
