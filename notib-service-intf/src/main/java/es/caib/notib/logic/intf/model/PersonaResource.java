@@ -30,7 +30,7 @@ import java.util.List;
 @NoArgsConstructor
 @FieldNameConstants
 @ResourceConfig(
-	descriptionField = PersonaResource.Fields.nom,
+	descriptionField = PersonaResource.Fields.nomSencerNif,
 	accessConstraints = {
 		@ResourceAccessConstraint(
 			type = ResourceAccessConstraint.ResourceAccessConstraintType.AUTHENTICATED,
@@ -89,5 +89,8 @@ public class PersonaResource extends BaseResource<Long> {
 	private boolean requiredEmail;
 	private boolean requiredRaoSocial;
 	private boolean requiredDir3Codi;
+
+	// Camps calculats
+	private String nomSencerNif;
 
 }

@@ -12,6 +12,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -171,6 +172,11 @@ public class NotificacioResourceEntity
 		referencedColumnName = "id",
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "document5_notificacio_fk"))
 	protected DocumentResourceEntity document5;
+
+	@Formula("(select ntb.enviada_date from " + BaseConfig.DB_PREFIX + "notificacio_table ntb where ntb.id = id)")
+	private Date enviadaDate;
+	@Formula("(select ntb.estat_string from " + BaseConfig.DB_PREFIX + "notificacio_table ntb where ntb.id = id)")
+	private String estatString;
 
 	@Builder
 	public NotificacioResourceEntity(

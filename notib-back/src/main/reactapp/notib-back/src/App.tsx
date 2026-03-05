@@ -163,8 +163,15 @@ const InnerApp: React.FC = () => {
             id: 'config',
             title: t('app.menu.notificacions'),
             to: '/notificacions',
-            icon: 'notifications',
+            icon: 'mail',
             resourceName: 'notificacioResource',
+        },
+        {
+            id: 'config',
+            title: t('app.menu.enviaments'),
+            to: '/enviaments',
+            icon: 'send',
+            resourceName: 'notificacioEnviamentResource',
         },
         {
             id: 'config',

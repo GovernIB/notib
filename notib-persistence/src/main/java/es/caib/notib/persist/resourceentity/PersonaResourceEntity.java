@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 
@@ -56,6 +57,9 @@ public class PersonaResourceEntity
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "persona_not_fk"),
 		nullable = false)
 	private NotificacioEnviamentResourceEntity enviament;
+
+	@Formula("(nom || ' ' || COALESCE(llinatge1 || ' ', '') || COALESCE(llinatge2 || ' ', '') || '(' || nif || ')')")
+	private String nomSencerNif;
 
 	@Builder
 	public PersonaResourceEntity(
