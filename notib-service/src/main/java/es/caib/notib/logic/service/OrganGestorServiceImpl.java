@@ -93,7 +93,7 @@ import java.util.stream.Collectors;
 
 /**
  * Implementació del servei de gestió de òrgans gestors.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 
@@ -203,7 +203,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public boolean organGestorEnUs(Long organId) {
@@ -469,7 +469,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		var pageContent = contingut.subList(start, end);
 		return new PageImpl<>(pageContent, pageable, contingut.size());
 	}
-	
+
 	public boolean isUpdatingOrgans(EntitatDto entitatDto) {
 
 		var progres = progresActualitzacio.get(entitatDto.getDir3Codi());
@@ -1174,7 +1174,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	@Transactional
 	public void permisDelete(Long entitatId, Long id, Long permisId) {
@@ -1202,7 +1202,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<OrganismeDto> findOrganismes(EntitatDto entitat) {
@@ -1220,7 +1220,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<OrganismeDto> findOrganismes(EntitatDto entitat, OrganGestorDto organGestor) {
@@ -1445,7 +1445,11 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			var user = SecurityContextHolder.getContext().getAuthentication().getName();
+			var auth = SecurityContextHolder.getContext().getAuthentication();
+			if (auth == null) {
+				return false;
+			}
+			var user = auth.getName();
 			var codis = permisosService.getOrgansAmbPermis(entitatId, user, permis);
 			for (var c : codis) {
 				if (c.getCodi().equals(organCodi)) {

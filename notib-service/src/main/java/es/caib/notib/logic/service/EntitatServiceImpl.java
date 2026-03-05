@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.logic.service;
 
@@ -31,6 +31,8 @@ import es.caib.notib.logic.intf.service.AuditService.TipusEntitat;
 import es.caib.notib.logic.intf.service.AuditService.TipusObjecte;
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
 import es.caib.notib.logic.intf.service.EntitatService;
+import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.EntitatTipusDocEntity;
 import es.caib.notib.persist.entity.cie.EntregaCieEntity;
@@ -60,7 +62,7 @@ import java.util.Map;
 
 /**
  * Implementació del servei de gestió d'entitats.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -180,7 +182,7 @@ public class EntitatServiceImpl implements EntitatService {
 				assert tipusDocsEntity != null;
 				entitatTipusDocRepository.deleteAll(tipusDocsEntity);
 			}
-			
+
 			if ((entitat.getTipusDoc() != null && entitat.getTipusDoc().size() > 1) || tipusDocsEntity != null && tipusDocsEntity.isEmpty() && entitat.getTipusDoc() != null) {
 				EntitatTipusDocEntity tipusDocumentActual;
 				EntitatTipusDocEntity tipusDocEntity;
@@ -231,7 +233,7 @@ public class EntitatServiceImpl implements EntitatService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Audita(entityType = TipusEntitat.ENTITAT, operationType = TipusOperacio.UPDATE, returnType = TipusObjecte.DTO)
 	@Transactional
 	@Override
@@ -279,7 +281,7 @@ public class EntitatServiceImpl implements EntitatService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	public List<TipusDocumentDto> findTipusDocumentByEntitat(Long entitatId) {
 
@@ -299,7 +301,7 @@ public class EntitatServiceImpl implements EntitatService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	public TipusDocumentEnumDto findTipusDocumentDefaultByEntitat(Long entitatId) {
 
@@ -399,7 +401,10 @@ public class EntitatServiceImpl implements EntitatService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			var auth = SecurityContextHolder.getContext().getAuthentication();
-			log.debug("Consulta les entitats accessibles per l'usuari actual (usuari=" + auth.getName() + ")");
+			if (auth == null) {
+				return new ArrayList<>();
+			}
+			NotibLogger.getInstance().info("Consulta les entitats accessibles per l'usuari actual (usuari=" + auth.getName() + ")", log, LoggingTipus.USUARIS);
 			return permisosCacheable.findEntitatsAccessiblesUsuari(auth.getName(), rolActual);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -418,7 +423,7 @@ public class EntitatServiceImpl implements EntitatService {
         }
         return enttitatsCodiValor;
     }
-	
+
 	@Transactional
 	@Override
 	public List<PermisDto> permisFindByEntitatId(Long entitatId, PaginacioParamsDto paginacioParams) {
@@ -521,7 +526,7 @@ public class EntitatServiceImpl implements EntitatService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	public Map<RolEnumDto, Boolean> getPermisosEntitatsUsuariActual() {
 
@@ -546,7 +551,7 @@ public class EntitatServiceImpl implements EntitatService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<OficinaDto> findOficinesEntitat(String dir3codi) {
@@ -561,12 +566,12 @@ public class EntitatServiceImpl implements EntitatService {
 				var errorMessage = "No s'han pogut recuperar les oficines de l'entitat amb codi: " + dir3codi;
 				log.error(errorMessage, e.getMessage());
 			}
-			return oficines;	
+			return oficines;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Transactional
 	@Override
 	public byte[] getCapLogo() throws IOException{
@@ -580,7 +585,7 @@ public class EntitatServiceImpl implements EntitatService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Transactional
 	@Override
 	public byte[] getPeuLogo() throws IOException{
@@ -594,7 +599,7 @@ public class EntitatServiceImpl implements EntitatService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public LlibreDto getLlibreEntitat(String dir3Codi) {
