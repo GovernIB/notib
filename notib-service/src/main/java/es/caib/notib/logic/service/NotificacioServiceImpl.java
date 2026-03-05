@@ -257,7 +257,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 					@Override
 					public void afterCommit() {
 						if (TransactionSynchronizationManager.isActualTransactionActive()) {
-							enviamentSmService.acquireStateMachine(ref);
+//							enviamentSmService.acquireStateMachine(ref);
+							enviamentSmService.altaEnviament(ref);
 						}
 					}
 				});
