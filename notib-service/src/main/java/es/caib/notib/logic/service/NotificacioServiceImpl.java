@@ -253,16 +253,16 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 			notificacioEntity.getEnviaments().forEach(e -> {
 				var ref = e.getNotificaReferencia();
-				if (TransactionSynchronizationManager.isActualTransactionActive()) {
 					TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 						@Override
 						public void afterCommit() {
-							enviamentSmService.acquireStateMachine(ref);
+							if (TransactionSynchronizationManager.isActualTransactionActive()) {
+								enviamentSmService.acquireStateMachine(ref);
+							}
 						}
 					});
 					return;
-				}
-				enviamentSmService.acquireStateMachine(ref);
+//				enviamentSmService.acquireStateMachine(ref);
 			});
 
 			SubsistemesHelper.addSuccessOperation(AWE, System.currentTimeMillis() - start);

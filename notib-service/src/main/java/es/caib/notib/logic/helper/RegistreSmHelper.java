@@ -92,8 +92,8 @@ public class RegistreSmHelper {
 		}
 
 		double elapsedTime = (System.nanoTime() - startTime) / 10e6;
-		log.info(" [REG] Creació assentament registral per notificació [Id: " + enviament.getId() + "]: " + elapsedTime + " ms");
-		log.info(" [REG] Fi procés de registrr [Id: " + enviament.getId() + ", Estat: " + notificacio.getEstat() + "]");
+		log.info(" [REG] Creacio assentament registral per notificacio [Id: " + enviament.getId() + "]: " + elapsedTime + " ms");
+		log.info(" [REG] Fi procés de registrar [Id: " + enviament.getId() + ", Estat: " + notificacio.getEstat() + "]");
 
 		integracioHelper.addAccioOk(info);
 		return success;
