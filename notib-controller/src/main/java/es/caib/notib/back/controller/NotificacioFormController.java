@@ -336,11 +336,11 @@ public class NotificacioFormController extends BaseUserController {
                 notificacioService.update(entitatActual.getId(), notificacio, RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual()));
             } else if (notificacio.isSir() && notificacio.docMidaMaximaSuperada()) {
                 var nots = notificacioService.crearSirDividida(entitatActual.getId(), notificacio);
-                nots.get(0).getEnviaments().forEach(e -> enviamentSmService.altaEnviament(e.getNotificaReferencia()));
+                nots.get(0).getEnviaments().forEach(e -> enviamentSmService.altaEnviamentWeb(e.getNotificaReferencia()));
             } else {
                 var not = notificacioService.create(entitatActual.getId(), notificacioCommand.asNotificacioV2());
                 // SM
-                not.getEnviaments().forEach(e -> enviamentSmService.altaEnviament(e.getNotificaReferencia()));
+                not.getEnviaments().forEach(e -> enviamentSmService.altaEnviamentWeb(e.getNotificaReferencia()));
 
             }
         } catch (Exception ex) {
