@@ -6,90 +6,10 @@ import Icon from '@mui/material/Icon';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Chip from '@mui/material/Chip';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
 import { GRID_DETAIL_PANEL_TOGGLE_COL_DEF } from '@mui/x-data-grid-pro';
 import { GridPage, MuiDataGrid, useResourceApiService, MuiDataGridColDef } from 'reactlib';
 import { useNotibContext } from '../../components/NotibContext';
-
-const NotificacioDetailPanel: React.FC<{ id: any }> = (props) => {
-    const { id } = props;
-    const { t } = useTranslation();
-    const { isReady: apiIsReady, find: apiFind } = useResourceApiService(
-        'notificacioEnviamentResource'
-    );
-    const [enviaments, setEnviaments] = React.useState<any[]>();
-    React.useEffect(() => {
-        if (apiIsReady) {
-            const args = {
-                filter: 'notificacio.id:' + id,
-                unpaged: true,
-            };
-            apiFind(args).then((response) => {
-                setEnviaments(response.rows);
-            });
-        }
-    }, [apiIsReady]);
-    return (
-        enviaments != null && (
-            <TableContainer
-                component={Paper}
-                elevation={2}
-                sx={{
-                    mx: 2,
-                    my: 2,
-                    width: 'calc(100% - 32px)',
-                }}
-            >
-                <Table size="small" aria-label="simple table">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>
-                                {t('page.notificacio.grid.enviament.column.interessat')}
-                            </TableCell>
-                            <TableCell>
-                                {t('page.notificacio.grid.enviament.column.representant')}
-                            </TableCell>
-                            <TableCell>
-                                {t('page.notificacio.grid.enviament.column.estatPostal')}
-                            </TableCell>
-                            <TableCell>
-                                {t('page.notificacio.grid.enviament.column.estatTelematica')}
-                            </TableCell>
-                            <TableCell></TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {enviaments.map((e) => (
-                            <TableRow key={e.id}>
-                                <TableCell component="th" scope="row">
-                                    {e.titular.description}
-                                </TableCell>
-                                <TableCell component="th" scope="row"></TableCell>
-                                <TableCell component="th" scope="row"></TableCell>
-                                <TableCell component="th" scope="row"></TableCell>
-                                <TableCell component="th" scope="row" sx={{ width: '1px' }}>
-                                    <Button
-                                        variant="outlined"
-                                        size="small"
-                                        startIcon={<Icon>info</Icon>}
-                                    >
-                                        Detalls
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        )
-    );
-};
+import NotificacioGridEnviaments from './NotificacioGridEnviaments';
 
 const NotificacioAddButton: React.FC = () => {
     const { t } = useTranslation();
@@ -237,7 +157,7 @@ const NotificacioGrid = () => {
                 rowUpdateLink="form/{{id}}"
                 readOnly
                 selectionActive
-                getDetailPanelContent={({ row }) => <NotificacioDetailPanel id={row.id} />}
+                getDetailPanelContent={({ row }) => <NotificacioGridEnviaments id={row.id} />}
                 getDetailPanelHeight={() => 'auto'}
             />
         </GridPage>
