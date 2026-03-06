@@ -261,6 +261,10 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 	List<Long> findNotificacionsEnProgres(@Param("data") String data);
 
 	@Modifying
+	@Query(value = "UPDATE NOT_NOTIFICACIO SET USUARI_CODI = :codiNou WHERE USUARI_CODI = :codiAntic", nativeQuery = true)
+	int updateUsuariCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+
+	@Modifying
 	@Query(value = "UPDATE NOT_NOTIFICACIO SET CREATEDBY_CODI = :codiNou WHERE CREATEDBY_CODI = :codiAntic", nativeQuery = true)
 	int updateCreatedByCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 
