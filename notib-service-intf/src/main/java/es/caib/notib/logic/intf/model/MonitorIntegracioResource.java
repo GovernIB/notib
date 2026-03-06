@@ -69,7 +69,12 @@ public class MonitorIntegracioResource extends BaseResource<Long> {
 	@AllArgsConstructor
 	public static class MonitorIntegracioAgrupacioItem implements Serializable {
 		private IntegracioCodi grup;
-		private Long count;
+		private long countOk;
+		private long countWarn;
+		private long countError;
+		public long getCountTotal() {
+			return countOk + countWarn + countError;
+		}
 	}
 
 }

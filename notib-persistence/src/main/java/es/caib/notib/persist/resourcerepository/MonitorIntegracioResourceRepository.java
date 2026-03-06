@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface MonitorIntegracioResourceRepository extends BaseRepository<MonitorIntegracioResourceEntity, Long>  {
 
-	@Query("SELECT mi.codi, COUNT(mi) FROM MonitorIntegracioResourceEntity mi GROUP BY mi.codi")
-	List<Object[]> countByCodi();
+	@Query("SELECT mi.codi, mi.estat, COUNT(mi) FROM MonitorIntegracioResourceEntity mi GROUP BY mi.codi, mi.estat")
+	List<Object[]> countByCodiAndEstat();
 
 }

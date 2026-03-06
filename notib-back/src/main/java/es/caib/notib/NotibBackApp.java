@@ -3,6 +3,7 @@ package es.caib.notib;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.actuate.autoconfigure.metrics.jersey.JerseyServerMetricsAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWarDeployment;
 import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
@@ -28,7 +29,7 @@ import java.util.jar.Manifest;
 
 /**
  * Classe principal del backoffice de NOTIB per a executar amb el WAR.
- * 
+ *
  * @author Límit Tecnologies
  */
 @Slf4j
@@ -42,7 +43,8 @@ import java.util.jar.Manifest;
 		TransactionAutoConfiguration.class,
 		LiquibaseAutoConfiguration.class,
 		FreeMarkerAutoConfiguration.class,
-		WebSocketServletAutoConfiguration.class
+		WebSocketServletAutoConfiguration.class,
+	JerseyServerMetricsAutoConfiguration.class
 })
 @ComponentScan(
 		basePackages = { BaseConfig.BASE_PACKAGE },

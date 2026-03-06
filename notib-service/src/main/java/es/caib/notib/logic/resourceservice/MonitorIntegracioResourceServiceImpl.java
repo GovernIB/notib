@@ -3,6 +3,7 @@ package es.caib.notib.logic.resourceservice;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.exception.ReportGenerationException;
+import es.caib.notib.logic.intf.dto.IntegracioAccioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.model.MonitorIntegracioResource;
 import es.caib.notib.logic.intf.resourceservice.MonitorIntegracioResourceService;
@@ -17,7 +18,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -43,13 +43,32 @@ public class MonitorIntegracioResourceServiceImpl extends BaseMutableResourceSer
 			String code,
 			MonitorIntegracioResourceEntity entity,
 			Serializable params) throws ReportGenerationException {
-			List<Object[]> agrupacioCounts = monitorIntegracioResourceRepository.countByCodi();
+			List<Object[]> agrupacioCounts = monitorIntegracioResourceRepository.countByCodiAndEstat();
 			return Arrays.stream(IntegracioCodi.values()).map(c -> {
-				Long agrupacioCount = agrupacioCounts.stream().
+				List<Object[]> agrupacionsAmbCodi = agrupacioCounts.stream().
 					filter(a -> c.equals(a[0])).
-					map(a -> (Long)a[1]).
-					findFirst().orElse(0L);
-				return new MonitorIntegracioResource.MonitorIntegracioAgrupacioItem(c, agrupacioCount);
+					collect(Collectors.toList());
+				if (!agrupacionsAmbCodi.isEmpty()) {
+					Long estatOkCount = agrupacionsAmbCodi.stream().
+						filter(a -> IntegracioAccioEstatEnumDto.OK.equals(a[1])).
+						map(a -> (Long) a[2]).
+						findFirst().orElse(0L);
+					Long estatWarnCount = agrupacionsAmbCodi.stream().
+						filter(a -> IntegracioAccioEstatEnumDto.WARN.equals(a[1])).
+						map(a -> (Long) a[2]).
+						findFirst().orElse(0L);
+					Long estatErrorCount = agrupacionsAmbCodi.stream().
+						filter(a -> IntegracioAccioEstatEnumDto.ERROR.equals(a[1])).
+						map(a -> (Long) a[2]).
+						findFirst().orElse(0L);
+					return new MonitorIntegracioResource.MonitorIntegracioAgrupacioItem(
+						c,
+						estatOkCount,
+						estatWarnCount,
+						estatErrorCount);
+				} else {
+					return new MonitorIntegracioResource.MonitorIntegracioAgrupacioItem(c, 0, 0, 0);
+				}
 			}).collect(Collectors.toList());
 		}
 		@Override
