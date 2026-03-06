@@ -200,6 +200,10 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 	Page<NotificacioTableEntity> findAmbFiltre(FiltreNotificacio filtre, Pageable paginacio);
 
 	@Modifying
+	@Query(value = "UPDATE NOT_NOTIFICACIO_TABLE SET USUARI_CODI = :codiNou WHERE USUARI_CODI = :codiAntic", nativeQuery = true)
+	int updateUsuariCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+
+	@Modifying
 	@Query(value = "UPDATE NOT_NOTIFICACIO_TABLE SET CREATEDBY_CODI = :codiNou WHERE CREATEDBY_CODI = :codiAntic", nativeQuery = true)
 	int updateCreatedByCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 
