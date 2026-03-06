@@ -91,5 +91,9 @@ public interface AplicacioRepository extends JpaRepository<AplicacioEntity, Long
 			nativeQuery = true)
 	int updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 
+	@Modifying
+	@Query(value = "UPDATE NOT_APLICACIO SET USUARI_CODI = :codiNou WHERE USUARI_CODI = :codiAntic", nativeQuery = true)
+	int updateUsuariCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+
 
 }
