@@ -41,7 +41,7 @@ import java.util.Locale;
  */
 @Configuration
 @Order
-public class WebMvcConfig extends BaseWebMvcConfig implements WebMvcConfigurer {
+public class WebMvcConfig extends BaseWebMvcConfig {
 
 	@Value("${" + BaseConfig.PROP_USER_SESSION_HTTP_HEADER + ":X-App-Session}")
 	private String userSessionHttpHeader;
@@ -76,7 +76,7 @@ public class WebMvcConfig extends BaseWebMvcConfig implements WebMvcConfigurer {
 
 	@Override
 	protected boolean isJsAppResourceHandlerEnabled() {
-	    return false;
+	    return true;
 	}
 
 	@Override
