@@ -17,7 +17,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
-import javax.persistence.Column;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
@@ -34,14 +33,22 @@ import java.util.Date;
 		roles = { BaseConfig.ROLE_SUPER},
 		grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
 	),
-	artifacts = @ResourceArtifact(
-		type = ResourceArtifactType.REPORT,
-		code = MonitorIntegracioResource.REPORT_AGRUPACIONS
-	)
+	artifacts = {
+		@ResourceArtifact(
+			type = ResourceArtifactType.FILTER,
+			code = MonitorIntegracioResource.FILTER_CODE,
+			formClass = MonitorIntegracioResource.MonitorIntegracioResourceFilter.class
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.REPORT,
+			code = MonitorIntegracioResource.REPORT_AGRUPACIONS
+		)
+	}
 )
 public class MonitorIntegracioResource extends BaseResource<Long> {
 
 	public static final String REPORT_AGRUPACIONS = "AGRUPACIONS";
+	public static final String FILTER_CODE = "FILTER_MONITOR_INTEGRACIO";
 
 	private IntegracioCodi codi;
 	private Date data;
@@ -75,6 +82,19 @@ public class MonitorIntegracioResource extends BaseResource<Long> {
 		public long getCountTotal() {
 			return countOk + countWarn + countError;
 		}
+	}
+
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	public static class MonitorIntegracioResourceFilter implements Serializable {
+		private String codiEntitat;
+		private IntegracioAccioEstatEnumDto estat;
+		private IntegracioAccioTipusEnumDto tipus;
+		private String descripcio;
+		private Date dataInici;
+		private Date dataFi;
+		private String aplicacio;
 	}
 
 }
