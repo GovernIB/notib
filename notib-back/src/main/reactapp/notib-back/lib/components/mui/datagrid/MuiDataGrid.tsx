@@ -287,12 +287,16 @@ const rowLinkFind = (rowLink: string | undefined, rowLinks: any[] | undefined) =
     }
 };
 const rowLinkShowCheck = (rowLink: string | undefined, rowLinks: any[] | undefined) => {
-    const found = rowLinkFind(rowLink, rowLinks);
-    if (found) {
-        const isNegative = rowLink != null && rowLink.startsWith('!');
-        return isNegative ? found == null : found != null;
+    if (rowLink != null) {
+        const found = rowLinkFind(rowLink, rowLinks);
+        if (found) {
+            const isNegative = rowLink != null && rowLink.startsWith('!');
+            return isNegative ? found == null : found != null;
+        } else {
+            return false;
+        }
     } else {
-        return false;
+        return true;
     }
 };
 const rowArtifactShowCheck = (

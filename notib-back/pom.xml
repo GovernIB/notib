@@ -314,7 +314,53 @@
 		</profile>
 		<profile>
 			<id>front</id>
-
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.github.eirslett</groupId>
+						<artifactId>frontend-maven-plugin</artifactId>
+						<version>1.15.4</version>
+						<configuration>
+							<nodeVersion>${node.version}</nodeVersion>
+							<installDirectory>target</installDirectory>
+							<workingDirectory>${frontend.app.path}</workingDirectory>
+							<skip>${frontend.skip}</skip>
+							<environmentVariables>
+								<VITE_APP_VERSION>${project.version}</VITE_APP_VERSION>
+							</environmentVariables>
+						</configuration>
+						<executions>
+							<execution>
+								<id>install-npm</id>
+								<phase>initialize</phase>
+								<goals>
+									<goal>install-node-and-npm</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>npm-install</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>npm</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>npm-build</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>npm</goal>
+								</goals>
+								<configuration>
+									<arguments>run build-jboss</arguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 	</profiles>
 	<build>
@@ -336,46 +382,7 @@
 			</resource>
 		</resources>
 		<plugins>
-			<plugin>
-				<groupId>com.github.eirslett</groupId>
-				<artifactId>frontend-maven-plugin</artifactId>
-				<version>1.15.4</version>
-				<configuration>
-					<nodeVersion>${node.version}</nodeVersion>
-					<installDirectory>target</installDirectory>
-					<workingDirectory>${frontend.app.path}</workingDirectory>
-					<skip>${frontend.skip}</skip>
-					<environmentVariables>
-						<VITE_APP_VERSION>${project.version}</VITE_APP_VERSION>
-					</environmentVariables>
-				</configuration>
-				<executions>
-					<execution>
-						<id>install-npm</id>
-						<phase>initialize</phase>
-						<goals>
-							<goal>install-node-and-npm</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>npm-install</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>npm</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>npm-build</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>npm</goal>
-						</goals>
-						<configuration>
-							<arguments>run build-jboss</arguments>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
