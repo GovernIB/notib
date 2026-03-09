@@ -16,7 +16,6 @@ import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.authority.mapping.SimpleAttributes2GrantedAuthoritiesMapper;
 import org.springframework.security.core.authority.mapping.SimpleMappableAttributesRetriever;
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
@@ -55,34 +54,35 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 	@Value("${" + BaseConfig.PROP_SECURITY_NAME_ATTRIBUTE_KEY + ":preferred_username}")
 	private String nameAttributeKey;
 
-	@Autowired
+	@Autowired(required = false)
 	private ClientRegistrationRepository clientRegistrationRepository;
 
 	@Override
 	protected void customHttpSecurityConfiguration(HttpSecurity http) throws Exception {
-		LogoutHandler deleteCookiesLogoutHandler = (request, response, authentication) -> {
-			try {
-				log.info("Logout called");
-				Cookie[] cookies = request.getCookies();
-				if (cookies != null) {
-					for (Cookie cookie: cookies) {
-						Cookie deletedCookie = new Cookie(cookie.getName(), "");
-						deletedCookie.setPath(cookie.getPath() != null ? cookie.getPath() : "/");
-						deletedCookie.setMaxAge(0);
-						deletedCookie.setHttpOnly(cookie.isHttpOnly());
-						deletedCookie.setSecure(cookie.getSecure());
-						response.addCookie(deletedCookie);
+		if (!isJboss()) {
+			LogoutHandler deleteCookiesLogoutHandler = (request, response, authentication) -> {
+				try {
+					log.info("Logout called");
+					Cookie[] cookies = request.getCookies();
+					if (cookies != null) {
+						for (Cookie cookie : cookies) {
+							Cookie deletedCookie = new Cookie(cookie.getName(), "");
+							deletedCookie.setPath(cookie.getPath() != null ? cookie.getPath() : "/");
+							deletedCookie.setMaxAge(0);
+							deletedCookie.setHttpOnly(cookie.isHttpOnly());
+							deletedCookie.setSecure(cookie.getSecure());
+							response.addCookie(deletedCookie);
+						}
 					}
+					request.logout();
+				} catch (ServletException ex) {
+					log.error("Error en el logout", ex);
 				}
-				request.logout();
-			} catch (ServletException ex) {
-				log.error("Error en el logout", ex);
-			}
-		};
-		OidcClientInitiatedLogoutSuccessHandler oidcLogoutSuccessHandler = new OidcClientInitiatedLogoutSuccessHandler(
+			};
+			OidcClientInitiatedLogoutSuccessHandler oidcLogoutSuccessHandler = new OidcClientInitiatedLogoutSuccessHandler(
 				clientRegistrationRepository);
-		oidcLogoutSuccessHandler.setPostLogoutRedirectUri("{baseUrl}/");
-		http.logout(lo -> lo.
+			oidcLogoutSuccessHandler.setPostLogoutRedirectUri("{baseUrl}/");
+			http.logout(lo -> lo.
 				addLogoutHandler(deleteCookiesLogoutHandler).
 				logoutRequestMatcher(new AntPathRequestMatcher(LOGOUT_URL)).
 				invalidateHttpSession(true).
@@ -90,6 +90,7 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 				deleteCookies("OAuth_Token_Request_State", "JSESSIONID").
 				logoutSuccessHandler(oidcLogoutSuccessHandler).
 				logoutSuccessUrl("/"));
+		}
 		http.authorizeHttpRequests().
 				requestMatchers(publicRequestMatchers()).permitAll();
 		if (!isJboss()) {

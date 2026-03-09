@@ -1,17 +1,15 @@
 /**
- * 
+ *
  */
 package es.caib.notib.back.command;
 
 import es.caib.notib.back.helper.ConversioTipusHelper;
 import es.caib.notib.back.validation.EntitatValorsNoRepetits;
 import es.caib.notib.logic.intf.dto.*;
-import es.caib.notib.logic.intf.util.MimeUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotEmpty;
@@ -19,12 +17,11 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 /**
  * Command per al manteniment d'entitats.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -39,7 +36,7 @@ EntitatCommand {
 	private String codi;
 	@NotEmpty @Size(max=256)
 	private String nom;
-	@NotNull 
+	@NotNull
 	private EntitatTipusEnumDto tipus;
 	@NotEmpty
 	@Size(max=9)
@@ -71,7 +68,7 @@ EntitatCommand {
 	private boolean llibreEntitat;
 	private String llibre;
 	private String llibreNom;
-	
+
 	private boolean oficinaEntitat;
 	private String oficina;
 	private String nomOficinaVirtual;
@@ -91,7 +88,7 @@ EntitatCommand {
 			this.llibreNom = llibreCodiNom.substring(div + 3);
 		}
 	}
-	
+
 	public static List<EntitatCommand> toEntitatCommands(List<EntitatDto> dtos) {
 
 		List<EntitatCommand> commands = new ArrayList<>();

@@ -36,14 +36,14 @@ import java.util.jar.Manifest;
 @ConditionalOnWarDeployment
 @EnableAsync
 @SpringBootApplication(exclude = {
-		DataSourceAutoConfiguration.class,
-		DataSourceTransactionManagerAutoConfiguration.class,
-		JpaRepositoriesAutoConfiguration.class,
-		HibernateJpaAutoConfiguration.class,
-		TransactionAutoConfiguration.class,
-		LiquibaseAutoConfiguration.class,
-		FreeMarkerAutoConfiguration.class,
-		WebSocketServletAutoConfiguration.class,
+	DataSourceAutoConfiguration.class,
+	DataSourceTransactionManagerAutoConfiguration.class,
+	JpaRepositoriesAutoConfiguration.class,
+	HibernateJpaAutoConfiguration.class,
+	TransactionAutoConfiguration.class,
+	LiquibaseAutoConfiguration.class,
+	FreeMarkerAutoConfiguration.class,
+	WebSocketServletAutoConfiguration.class,
 	JerseyServerMetricsAutoConfiguration.class
 })
 @ComponentScan(
