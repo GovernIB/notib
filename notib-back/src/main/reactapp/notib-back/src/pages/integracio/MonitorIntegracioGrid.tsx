@@ -11,13 +11,11 @@ import {
     useCloseDialogButtons,
 } from 'reactlib';
 import GridFormField from '../../components/GridFormField';
-import { Badge, Box, Chip, Grid, Icon, IconButton, Tab, Tabs } from '@mui/material';
+import { Badge, Box, Grid, Icon, IconButton, Tab, Tabs } from '@mui/material';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
-import ErrorIcon from '@mui/icons-material/Error';
 import { useContentDialog } from '../../../lib/components/mui/Dialog';
 import MonitorIntegracioParamDetail from './MonitorIntegracioParamDetail';
+import ChipEstat from '../../components/ChipEstat';
 
 // INTERFACES
 interface MonitorProps {
@@ -188,11 +186,11 @@ export const MonitorIntegracioGrid = () => {
     const columns = [
         {
             field: 'data',
-            flex: 2,
+            flex: 1.75,
         },
         {
             field: 'descripcio',
-            flex: 3,
+            flex: 4,
         },
         {
             field: 'aplicacio',
@@ -218,35 +216,23 @@ export const MonitorIntegracioGrid = () => {
             field: 'estat',
             flex: 1.5,
             renderCell: (params: any) => {
-                const getColor = () => {
-                    if (params.value === 'ERROR') return 'error';
-                    if (params.value === 'WARN') return 'warning';
-                    if (params.value === 'OK') {
-                        return 'success';
-                    }
-                };
-                const getIcon = () => {
-                    if (params.value === 'ERROR') return <CancelIcon />;
-                    if (params.value === 'WARN') return <ErrorIcon />;
-                    if (params.value === 'OK') return <CheckCircleIcon />;
-                };
-                return (
-                    <Chip
-                        label={params.formattedValue}
-                        color={getColor()}
-                        size="small"
-                        icon={getIcon()}
-                        sx={{ px: 0.5 }}
-                    />
-                );
+                return <ChipEstat estat={params?.value} label={params.formattedValue} />;
             },
         },
     ];
     const buttons = useCloseDialogButtons();
     const [showDialog, dialog] = useContentDialog(buttons);
 
-    const openDialog = () => {
-        showDialog('Titol del Dialeg', <MonitorIntegracioParamDetail />);
+    const openDialog = (id: string) => {
+        showDialog(
+            t('page.integracio.detall.title'),
+            <MonitorIntegracioParamDetail id={id} />,
+            undefined,
+            {
+                maxWidth: 'lg',
+                fullWidth: true,
+            }
+        );
     };
 
     // Filtre estàtic basat en la pestanya seleccionada
@@ -277,16 +263,6 @@ export const MonitorIntegracioGrid = () => {
         }
     }, [apiCurrentFields]);
 
-    const rowAdditionalActions = [
-        {
-            label: 'Label',
-            title: 'Tooltip',
-            icon: 'visibility',
-            showInMenu: false,
-            onClick: openDialog,
-        },
-    ];
-
     return (
         <GridPage disableMargins={false}>
             <MuiDataGrid
@@ -297,7 +273,6 @@ export const MonitorIntegracioGrid = () => {
                 paginationActive
                 toolbarHideQuickFilter
                 readOnly
-                rowAdditionalActions={rowAdditionalActions} // TODO: NO FUNCIONA ...
                 toolbarAdditionalRow={
                     <MonitorIntegracioGridFilter
                         options={options}
@@ -306,7 +281,8 @@ export const MonitorIntegracioGrid = () => {
                         onTabChange={setSelectedTab}
                     />
                 }
-                rowLink="detail/{{id}}"
+                onRowClick={(params: any) => openDialog(params.id)}
+                sx={{ '& .MuiDataGrid-row': { cursor: 'pointer' } }}
             />
             {dialog}
         </GridPage>
