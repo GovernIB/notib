@@ -328,6 +328,31 @@ const translationCa = {
             grid: {
                 title: 'Monitor de integraciones',
             },
+            detall: {
+                title: 'Detall del monitor d\'integració',
+                descripcio: 'Descripció:',
+                data: 'Data:',
+                tipus: 'Tipus:',
+                tipusEnum: {
+                    enviament: 'Enviament',
+                    recepcio: 'Recepció',
+                    processar: 'Processar',
+                },
+                estat: 'Estat:',
+                estatEnum: {
+                    ok: 'Correcte',
+                    warn: 'Alerta',
+                    error: 'Error',
+                },
+                parametres: 'Paràmetres',
+                tooltipCopiarParametres: 'Copiar paràmetres',
+                tooltipCopiarError: 'Copiar error',
+                tooltipCopiat: 'Copiat',
+                error: 'Error',
+                errorDescripcio: 'Descripció de l\'error:',
+                excepcioMessage: 'Missatge d\'excepció:',
+                excepcioStacktrace: 'Stacktrace',
+            },
         },
         notFound: {
             title: 'Pàgina no trobada',

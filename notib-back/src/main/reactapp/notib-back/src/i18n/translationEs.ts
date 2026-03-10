@@ -316,6 +316,31 @@ const translationEs = {
             grid: {
                 title: 'Monitor de integraciones',
             },
+            detall: {
+                title: 'Detalle del monitor de integración',
+                descripcio: 'Descripción:',
+                data: 'Fecha:',
+                tipus: 'Tipo:',
+                tipusEnum: {
+                    enviament: 'Envío',
+                    recepcio: 'Recepción',
+                    processar: 'Procesar',
+                },
+                estat: 'Estado:',
+                estatEnum: {
+                    ok: 'Correcto',
+                    warn: 'Alerta',
+                    error: 'Error',
+                },
+                parametres: 'Parámetros',
+                tootlipCopiarParametres: 'Copiar parámetros',
+                tootlipCopiarError: 'Copiar error',
+                tooltipCopiat: 'Copiado',
+                error: 'Error',
+                errorDescripcio: 'Descripción del error:',
+                excepcioMessage: 'Mensaje de excepción:',
+                excepcioStacktrace: 'Stacktrace',
+            },
         },
         notFound: {
             title: 'Página no encontrada',
