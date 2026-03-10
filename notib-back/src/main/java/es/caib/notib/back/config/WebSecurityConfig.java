@@ -4,6 +4,7 @@ import es.caib.notib.back.base.config.BaseWebSecurityConfig;
 import es.caib.notib.back.base.config.MethodSecurityConfig;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.util.HttpRequestUtil;
+import es.caib.notib.logic.intf.model.auth.NotibAuthenticationDetails;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.KeycloakPrincipal;
@@ -211,7 +212,9 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 	}
 
 	@Getter
-	public static class PreauthWebAuthenticationDetails extends PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails {
+	public static class PreauthWebAuthenticationDetails
+		extends PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails
+		implements NotibAuthenticationDetails {
 		private final String jwtToken;
 		private final String preferredUsername;
 		private final String name;

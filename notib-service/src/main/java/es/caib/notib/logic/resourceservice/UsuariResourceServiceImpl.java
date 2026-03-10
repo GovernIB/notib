@@ -3,6 +3,7 @@ package es.caib.notib.logic.resourceservice;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.intf.model.UsuariResource;
+import es.caib.notib.logic.intf.model.auth.NotibAuthenticationDetails;
 import es.caib.notib.logic.intf.resourceservice.UsuariResourceService;
 import es.caib.notib.persist.resourceentity.UsuariResourceEntity;
 import es.caib.notib.persist.resourcerepository.UsuariResourceRepository;
@@ -11,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
@@ -57,7 +57,7 @@ public class UsuariResourceServiceImpl
 
 	private UsuariResource getUsuariResourceFromAuth() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication.getPrincipal() != null) {
+		if (authentication != null && authentication.getPrincipal() != null) {
 			if (authentication.getPrincipal() instanceof Jwt) {
 				// Authenticació provinent de Spring Boot
 				UsuariResource usuariResource = new UsuariResource();
@@ -70,13 +70,12 @@ public class UsuariResourceServiceImpl
 				return usuariResource;
 			} else if (authentication.getPrincipal() instanceof User) {
 				UsuariResource usuariResource = new UsuariResource();
-				UserDetails userDetails = (UserDetails)authentication.getPrincipal();
-				/*WebSecurityConfig.PreauthWebAuthenticationDetails authDetails = (WebSecurityConfig.PreauthWebAuthenticationDetails)authentication.getDetails();
-				usuari.setCodi(authDetails.getPreferredUsername());
-				usuari.setNom(authDetails.getName());
-				usuari.setNif(authDetails.getNif());
-				usuari.setEmail(authDetails.getEmail());
-				usuari.setRols(authDetails.getOriginalRoles());*/
+				NotibAuthenticationDetails details = (NotibAuthenticationDetails)authentication.getDetails();
+				usuariResource.setCodi(authentication.getName());
+				usuariResource.setNomSencer(details.getName());
+				usuariResource.setNif(details.getNif());
+				usuariResource.setEmail(details.getEmail());
+				usuariResource.setIdioma("ca");
 				return usuariResource;
 			}
 		}

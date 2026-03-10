@@ -38,7 +38,7 @@ const CustomTabs = ({ options, report, selectedTab, onTabChange }: MonitorProps)
     const keys = Object.keys(options);
     const currentIndex = selectedTab ? keys.indexOf(selectedTab) : 0;
 
-    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
         const keySeleccionada = keys[newValue];
         onTabChange(keySeleccionada);
     };
