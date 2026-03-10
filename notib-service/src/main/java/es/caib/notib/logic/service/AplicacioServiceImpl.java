@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.logic.service;
 
@@ -66,7 +66,7 @@ import java.util.stream.Collectors;
 
 /**
  * Implementació dels mètodes per a gestionar la versió de l'aplicació.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -508,11 +508,10 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public Integer getNumElementsPaginaDefecte() {
 		try {
-
 			var auth = SecurityContextHolder.getContext().getAuthentication();
 			return NumElementsPaginaDefecte.valueOf(usuariRepository.getNumElementsPaginaDefecte(auth.getName())).getElements();
 		} catch (Exception ex) {
-			log.error("Error obtinguent el número d'elements per pàgina per defecte");
+			//log.error("Error obtinguent el número d'elements per pàgina per defecte");
 			return 10;
 		}
 	}

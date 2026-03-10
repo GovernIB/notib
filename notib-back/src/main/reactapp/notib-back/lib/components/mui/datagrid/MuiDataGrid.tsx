@@ -2,7 +2,6 @@ import React from 'react';
 import {
     DataGridProProps as DataGridProps,
     GridRowsProp,
-    GridRowParams,
     GridRenderCellParams,
     GridRowClassNameParams,
     GridColDef,
@@ -19,7 +18,6 @@ import {
     GridInitialState,
     GridActionsCell,
     GridActionsCellItem,
-    MuiEvent,
     useGridApiRef as useMuiDatagridApiRef,
     useGridApiContext,
     useGridSelector,
@@ -226,8 +224,6 @@ export type MuiDataGridProps = {
     popupEditFormComponentProps?: any;
     /** Claus de traducció personalitzades pel component Form de la finestra emergent */
     popupEditFormI18nKeys?: FormI18nKeys;
-    /** Event que es llença quan es fa clic sobre una fila de la graella */
-    onRowClick?: (params: GridRowParams, event: MuiEvent, details: GridCallbackDetails) => void;
     /** Event que es llença quan hi ha canvis en les files que mostra la graella */
     onRowsChange?: (rows: GridRowsProp, pageInfo: any) => void;
     /** Event que es llença quan hi ha canvis en l'ordenació de la graella */
@@ -616,7 +612,6 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         popupEditFormDialogOnClose,
         popupEditFormComponentProps,
         popupEditFormI18nKeys,
-        onRowClick,
         onRowsChange,
         onRowOrderChange,
         onRowSelectionModelChange,
@@ -1051,7 +1046,6 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                 loading={otherProps?.loading ?? loading}
                 rows={otherProps?.rows ?? processedRows}
                 columns={processedColumns}
-                onRowClick={onRowClick}
                 onRowOrderChange={onRowOrderChange}
                 initialState={persistentState && initialState ? initialState : undefined}
                 apiRef={datagridApiRef}

@@ -32,6 +32,7 @@ public class BaseConfig {
 	public static final String SYSENV_PATH = "/sysenv";
 	public static final String MANIFEST_PATH = "/manifest";
 	public static final String AUTH_TOKEN_PATH = "/authToken";
+	public static final String AUTH_ROLES_PATH = "/authRoles";
 	public static final String REACT_APP_PATH="/reactapp";
 
 	public static final String PROP_FILES = PROPERTY_PREFIX + "fitxers";

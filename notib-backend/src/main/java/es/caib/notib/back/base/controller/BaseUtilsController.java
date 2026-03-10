@@ -9,6 +9,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,16 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 
 /**
  * Controlador per a verificar si l'aplicació està funcionant
- * 
+ *
  * @author Limit Tecnologies
  */
 @Hidden
@@ -49,13 +49,37 @@ public abstract class BaseUtilsController {
 		if (authToken != null) {
 			response = "window.__AUTH_TOKEN__ = '" + authToken + "'";
 		}
-		return ResponseEntity.ok(response);
+		return ResponseEntity.
+			ok().
+			contentType(MediaType.valueOf("text/javascript")).
+			body(response);
+	}
+
+	@GetMapping(BaseConfig.AUTH_ROLES_PATH)
+	public ResponseEntity<String> authRoles() {
+		String[] authRoles = getAuthRoles();
+		String response = null;
+		if (authRoles != null) {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			if (auth != null && auth.getAuthorities() != null) {
+				String[] requestRoles = Arrays.stream(authRoles).
+					filter(r -> auth.getAuthorities().stream().
+						anyMatch(a -> a.getAuthority().equals(r))).
+					toArray(String[]::new);
+				response = "window.__AUTH_ROLES__ = " + Arrays.stream(requestRoles).
+					map(s -> "\"" + s + "\"").
+					collect(Collectors.joining(",", "[", "]"));
+			}
+		}
+		return ResponseEntity.
+			ok().
+			contentType(MediaType.valueOf("text/javascript")).
+			body(response);
 	}
 
 	@GetMapping(BaseConfig.MANIFEST_PATH)
 	public ResponseEntity<String> manifest() throws IOException {
 		Map<String, Object> manifestProps = getManifestProperties();
-		MediaType contentType = MediaType.valueOf("text/javascript"); // MediaType.TEXT_PLAIN;
 		String json = manifestProps.entrySet().stream().
 				filter(e -> !e.getKey().equalsIgnoreCase("Class-Path")).
 				map(e -> "\"" + e.getKey() + "\":\"" + e.getValue() + "\",").
@@ -63,7 +87,7 @@ public abstract class BaseUtilsController {
 		String response = "window.__MANIFEST__ = {\n" + json + "\n}";
 		return ResponseEntity.
 				ok().
-				contentType(contentType).
+				contentType(MediaType.valueOf("text/javascript")).
 				body(response);
 	}
 
@@ -134,6 +158,10 @@ public abstract class BaseUtilsController {
 	}
 
 	protected String getAuthToken() {
+		return null;
+	}
+
+	protected String[] getAuthRoles() {
 		return null;
 	}
 
