@@ -21,7 +21,6 @@ import EnviamentGrid from './pages/enviament/EnviamentGrid';
 import NotFoundPage from './pages/NotFound';
 import Propietats from './pages/propietat/Propietats';
 import MonitorIntegracioGrid from './pages/integracio/MonitorIntegracioGrid';
-import MonitorIntegracioParamDetail from './pages/integracio/MonitorIntegracioParamDetail';
 
 export const router = createBrowserRouter(
     [
@@ -149,10 +148,10 @@ export const router = createBrowserRouter(
                     path: 'integracions',
                     children: [
                         { index: true, element: <MonitorIntegracioGrid /> },
-                        {
+                        /*{
                             path: 'detail',
                             children: [{ path: ':id', element: <MonitorIntegracioParamDetail /> }],
-                        },
+                        },*/
                     ],
                 },
                 {

@@ -28,11 +28,11 @@ import java.util.Objects;
 
 /**
  * Tractament global de les excepcions en els controladors.
- * 
+ *
  * @author Límit Tecnologies
  */
 @Slf4j
-@ControllerAdvice
+@ControllerAdvice(basePackages = BaseConfig.BASE_PACKAGE + ".back.resourcecontroller")
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 	public static final String REQUEST_PARAM_TRACE = "trace";
