@@ -104,6 +104,7 @@ public class OrganGestorResource extends BaseResource<Long> {
 	private TipusTransicioEnumDto tipusTransicio;
 	private Boolean noVigent;
 	private boolean entregaCieDesactivada;
+	private boolean entregaCieActiva;
 	private boolean sobrescriureCieOrganEmisor;
 
 	private ResourceReference<EntitatResource, Long> entitat;
@@ -113,6 +114,10 @@ public class OrganGestorResource extends BaseResource<Long> {
 	private String codiNom;
 	private String nomPare;
 	private Integer aclEntryCount;
+
+	public boolean isEntregaCieActiva() {
+		return entregaCie != null;
+	}
 
 	@Getter
 	@Setter
@@ -125,6 +130,7 @@ public class OrganGestorResource extends BaseResource<Long> {
 	@Setter
 	@NoArgsConstructor
 	public static class OrganGestorResourceFilter implements Serializable {
+
 		private String codi;
 		private String codiPare;
 		private String nom;

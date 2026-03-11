@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import Badge from '@mui/material/Badge';
-import { FormPage, MuiForm, MuiFormTabs, MuiFormTabContent, useFormContext } from 'reactlib';
+import {FormPage, MuiForm, MuiFormTabs, MuiFormTabContent, useFormContext, useResourceApiService} from 'reactlib';
 import OrganFormTabPermisos from './OrganFormTabPermisos';
 import GridFormField from '../../components/GridFormField';
 
@@ -11,14 +11,35 @@ const OrganFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = 
     const { setSubtitle } = props;
     const { t } = useTranslation();
     const { data } = useFormContext();
+    const entregCieId = data?.entregaCie?.id;
+    const { getOne: apiGetOne } = useResourceApiService('entregaCieResource');
+    const { isReady: apiIsReady, find: apiFind } = useResourceApiService('entregaCieResource');
     React.useEffect(() => {
         setSubtitle(data?.codi + ', ' + data?.nom);
-    }, [data]);
+        const fetchParams = async () => {
+            if (!apiIsReady || !entregCieId) {
+                return;
+            }
+            try {
+                const args = { filter: `id:${entregCieId}`, unpaged: true };
+                const paramResponse = await apiFind(args);
+                if (paramResponse?.rows.length > 0) {
+                    const entregaCie = await apiGetOne(entregCieId);
+                    console.log(entregaCie);
+                }
+            } catch (error) {
+                console.error('Error fetching params:', error);
+            }
+        };
+        fetchParams();
+
+    }, [data, apiIsReady, apiFind, apiGetOne]);
     const permisosTabLabel = (
         <Badge badgeContent={data.aclEntryCount} color="primary">
             {t('page.organs.form.tabs.permisos')}
         </Badge>
     );
+
     const tabs = [t('page.organs.form.tabs.dades'), { label: permisosTabLabel }];
     return (
         <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1]}>
@@ -32,7 +53,8 @@ const OrganFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = 
                     <GridFormField size={3} name="activa" />
                     <GridFormField size={3} name="permetreSir" />
                     <GridFormField size={3} name="cieOrgan" />
-                    <GridFormField size={3} name="desactivarCie" />
+                    <GridFormField size={3} name="entregaCieDesactivada" />
+                    <GridFormField size={3} name="entregaCieActiva" />
                 </Grid>
             </MuiFormTabContent>
             <MuiFormTabContent index={1}>

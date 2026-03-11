@@ -44,20 +44,14 @@ public abstract class BaseAdminEntitatResourceServiceImpl<R extends Resource<Lon
 	 * seleccionada a la sessió.
 	 */
 	@Override
-	protected String additionalSpringFilter(
-		String currentSpringFilter,
-		String[] namedQueries) {
-		boolean isRoleSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);
-		if (!isRoleSuper) {
-			Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
-			if (currentEntitatId != null) {
-				return "entitat.id:" + currentEntitatId;
-			} else {
-				return "entitat.id is null";
-			}
-		} else {
+	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+
+		var isRoleSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);
+		if (isRoleSuper) {
 			return null;
 		}
+		var currentEntitatId = userSessionHelper.getCurrentEntitatId();
+		return currentEntitatId != null ? "entitat.id:" + currentEntitatId : "entitat.id is null";
 	}
 
 	/*
@@ -67,23 +61,14 @@ public abstract class BaseAdminEntitatResourceServiceImpl<R extends Resource<Lon
 	 *   - L'usuari actual te permisos d'administració sobre l'entitat seleccionada a la sessió.
 	 */
 	@Override
-	protected void beforeCreateSave(
-		E entity,
-		R resource,
-		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
-		if (currentEntitat != null) {
-			entity.setEntitat(currentEntitat);
-			notibPermissionHelper.entitatCheckAdminPermission(
-				getResourceClass(),
-				null,
-				entity.getEntitat().getId(),
-				BasePermission.CREATE);
-		} else {
-			throw new ResourceNotCreatedException(
-				getResourceClass(),
-				"Not allowed to create a " + getResourceClass() + " without any entitat selected in session");
+	protected void beforeCreateSave(E entity, R resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+
+		var currentEntitatResource = userSessionHelper.getCurrentEntitat();
+		if (currentEntitatResource == null) {
+			throw new ResourceNotCreatedException(getResourceClass(), "Not allowed to create a " + getResourceClass() + " without any entitat selected in session");
 		}
+		entity.setEntitat(currentEntitatResource);
+		notibPermissionHelper.entitatCheckAdminPermission(getResourceClass(), null, entity.getEntitat().getId(), BasePermission.CREATE);
 	}
 
 	/*
@@ -93,31 +78,17 @@ public abstract class BaseAdminEntitatResourceServiceImpl<R extends Resource<Lon
 	 *   - L'usuari actual te permisos d'administració sobre l'entitat seleccionada a la sessió.
 	 */
 	@Override
-	protected void beforeUpdateEntity(
-		E entity,
-		R resource,
-		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
-		if (currentEntitat != null) {
-			if (Objects.equals(entity.getEntitat(), currentEntitat)) {
-				notibPermissionHelper.entitatCheckAdminPermission(
-					getResourceClass(),
-					entity.getId(),
-					entity.getEntitat().getId(),
-					BasePermission.WRITE);
-			} else {
-				throw new ResourceNotUpdatedException(
-					getResourceClass(),
-					"" + entity.getId(),
-					"Not allowed to update a " + getResourceClass() + " belonging to a different entitat than the " +
-						"one selected in the session (sessionEntitatId=" + currentEntitat.getId() + ")");
-			}
-		} else {
-			throw new ResourceNotUpdatedException(
-				getResourceClass(),
-				"" + entity.getId(),
-				"Not allowed to update a " + getResourceClass() + " without any entitat selected in session");
+	protected void beforeUpdateEntity(E entity, R resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+
+		var currentEntitatResource = userSessionHelper.getCurrentEntitat();
+		if (currentEntitatResource == null) {
+			throw new ResourceNotUpdatedException(getResourceClass(), entity.getId() + "", "Not allowed to update a " + getResourceClass() + " without any entitat selected in session");
 		}
+		if (!Objects.equals(entity.getEntitat(), currentEntitatResource)) {
+			var msg = "Not allowed to update a " + getResourceClass() + " belonging to a different entitat than the one selected in the session (sessionEntitatId=" + currentEntitatResource.getId() + ")";
+			throw new ResourceNotUpdatedException(getResourceClass(), "" + entity.getId(), msg);
+		}
+		notibPermissionHelper.entitatCheckAdminPermission(getResourceClass(), entity.getId(), entity.getEntitat().getId(), BasePermission.WRITE);
 	}
 
 	/*
@@ -127,30 +98,17 @@ public abstract class BaseAdminEntitatResourceServiceImpl<R extends Resource<Lon
 	 *   - L'usuari actual te permisos d'administració sobre l'entitat seleccionada a la sessió.
 	 */
 	@Override
-	protected void beforeDelete(
-		E entity,
-		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
-		if (currentEntitat != null) {
-			if (Objects.equals(entity.getEntitat(), currentEntitat)) {
-				notibPermissionHelper.entitatCheckAdminPermission(
-					getResourceClass(),
-					entity.getId(),
-					entity.getEntitat().getId(),
-					BasePermission.DELETE);
-			} else {
-				throw new ResourceNotDeletedException(
-					getResourceClass(),
-					"" + entity.getId(),
-					"Not allowed to update a " + getResourceClass() + " belonging to a different entitat than the " +
-						"one selected in the session (sessionEntitatId=" + currentEntitat.getId() + ")");
-			}
-		} else {
-			throw new ResourceNotDeletedException(
-				getResourceClass(),
-				"" + entity.getId(),
-				"Not allowed to delete a " + getResourceClass() + " entity without any entitat selected in session");
+	protected void beforeDelete(E entity, Map<String, AnswerRequiredException.AnswerValue> answers) {
+
+		var currentEntitatResource = userSessionHelper.getCurrentEntitat();
+		if (currentEntitatResource == null) {
+			throw new ResourceNotDeletedException(getResourceClass(), entity.getId() + "", "Not allowed to delete a " + getResourceClass() + " entity without any entitat selected in session");
 		}
+		if (!Objects.equals(entity.getEntitat(), currentEntitatResource)) {
+			var msg = "Not allowed to update a " + getResourceClass() + " belonging to a different entitat than the one selected in the session (sessionEntitatId=" + currentEntitatResource.getId() + ")";
+			throw new ResourceNotDeletedException(getResourceClass(), "" + entity.getId(), msg);
+		}
+		notibPermissionHelper.entitatCheckAdminPermission(getResourceClass(), entity.getId(), entity.getEntitat().getId(), BasePermission.DELETE);
 	}
 
 }

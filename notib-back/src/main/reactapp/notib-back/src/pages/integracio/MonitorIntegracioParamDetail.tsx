@@ -21,9 +21,7 @@ const useGetTipusLabel = () => {
 export const MonitorIntegracioParamDetail: React.FC<{ id: string }> = ({ id }) => {
     const { t } = useTranslation();
     const getTipusLabel = useGetTipusLabel();
-    const { isReady: apiIsReady, find: apiFind } = useResourceApiService(
-        'monitorIntegracioParamResource'
-    );
+    const { isReady: apiIsReady, find: apiFind } = useResourceApiService('monitorIntegracioParamResource');
     const { getOne: apiGetOne } = useResourceApiService('monitorIntegracioResource');
     const [params, setParams] = React.useState<any[]>([]);
     const [integracio, setIntegracio] = React.useState<any>(null);

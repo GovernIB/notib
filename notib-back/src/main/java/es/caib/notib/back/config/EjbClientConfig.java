@@ -110,6 +110,10 @@ public class EjbClientConfig {
 		return getLocalEjbFactoyBean(PagadorCieResourceService.class, true);
 	}
 	@Bean
+	public LocalStatelessSessionProxyFactoryBean entregaCieResourceService() {
+		return getLocalEjbFactoyBean(EntregaCieResourceService.class, true);
+	}
+	@Bean
 	public LocalStatelessSessionProxyFactoryBean pagadorPostalResourceService() {
 		return getLocalEjbFactoyBean(PagadorPostalResourceService.class, true);
 	}

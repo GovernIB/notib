@@ -28,7 +28,7 @@ import java.util.Date;
 @NoArgsConstructor
 @FieldNameConstants
 @ResourceConfig(
-	descriptionField = PagadorPostalResource.Fields.nom,
+	descriptionField = PagadorPostalResource.Fields.nomContracteNum,
 	quickFilterFields = {PagadorPostalResource.Fields.nom},
 	accessConstraints = {
 		@ResourceAccessConstraint(
@@ -67,6 +67,9 @@ public class PagadorPostalResource extends BaseResource<Long> {
 	private ResourceReference<EntitatResource, Long> entitat;
 	@NotNull
 	private ResourceReference<OrganGestorResource, Long> organGestor;
+
+	// Camps calculats
+	private String nomContracteNum;
 
 	@Getter
 	@Setter

@@ -38,10 +38,8 @@ public class EntregaCieResourceEntity extends BaseAuditableResourceEntity<Entreg
 	protected PagadorPostalResourceEntity pagadorPostal;
 
 	@Builder
-	public EntregaCieResourceEntity(
-		EntregaCieResource resource,
-		PagadorCieResourceEntity pagadorCie,
-		PagadorPostalResourceEntity pagadorPostal) {
+	public EntregaCieResourceEntity(EntregaCieResource resource, PagadorCieResourceEntity pagadorCie, PagadorPostalResourceEntity pagadorPostal) {
+
 		this.pagadorCie = pagadorCie;
 		this.pagadorPostal = pagadorPostal;
 	}

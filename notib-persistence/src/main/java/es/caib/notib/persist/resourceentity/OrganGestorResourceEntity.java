@@ -76,7 +76,7 @@ public class OrganGestorResourceEntity
 		name = "entrega_cie_id",
 		referencedColumnName = "id",
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "organ_entrega_cie_fk"))
-	private EntregaCieEntity entregaCie;
+	private EntregaCieResourceEntity entregaCie;
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "not_og_sinc_rel",
@@ -93,10 +93,8 @@ public class OrganGestorResourceEntity
 	private String nomPare;
 
 	@Builder
-	public OrganGestorResourceEntity(
-		OrganGestorResource resource,
-		EntitatResourceEntity entitat,
-		EntregaCieEntity entregaCie) {
+	public OrganGestorResourceEntity(OrganGestorResource resource, EntitatResourceEntity entitat, EntregaCieResourceEntity entregaCie) {
+
 		this.codi = resource.getCodi();
 		this.codiPare = resource.getCodiPare();
 		this.nom = resource.getNom();

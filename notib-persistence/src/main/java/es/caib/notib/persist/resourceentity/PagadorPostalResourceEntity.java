@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -52,6 +53,9 @@ public class PagadorPostalResourceEntity
 		referencedColumnName = "id",
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "pagpostal_organ_fk"))
 	private OrganGestorResourceEntity organGestor;
+
+	@Formula("(nom||' - '||contracte_num)")
+	private String nomContracteNum;
 
 	@Builder
 	public PagadorPostalResourceEntity(
