@@ -52,6 +52,7 @@ import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.dto.organisme.UnitatOrganitzativaDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerOrganDto;
+import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnvio;
 import es.caib.notib.persist.entity.AccioMassivaEntity;
 import es.caib.notib.persist.entity.AplicacioEntity;
@@ -152,9 +153,13 @@ public class ConversioTipusHelper {
 				.customize(new CustomMapper<>() {
 					@Override
 					public void mapAtoB(NotificacioEntity a, NotificacioInfoDto b, MappingContext context) {
-						DadesUsuari d = cacheBridge.findUsuariAmbCodi(a.getUsuariCodi());
-						if (d != null) {
-							b.setUsuariNom(d.getNomSencer());
+						try {
+							DadesUsuari d = cacheBridge.findUsuariAmbCodi(a.getUsuariCodi());
+							if (d != null) {
+								b.setUsuariNom(d.getNomSencer());
+							}
+						} catch (NotFoundException ex) {
+							b.setUsuariNom(a.getUsuariCodi());
 						}
 						var usuari = a.getCreatedBy().orElse(null);
 						if (usuari != null) {
