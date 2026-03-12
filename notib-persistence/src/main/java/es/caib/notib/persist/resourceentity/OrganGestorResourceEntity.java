@@ -92,6 +92,9 @@ public class OrganGestorResourceEntity
 	@Formula("(select og2.nom from " + BaseConfig.DB_PREFIX + "organ_gestor og2 where og2.entitat = entitat and og2.codi = codi_pare)")
 	private String nomPare;
 
+	@Formula("(case when entrega_cie_id is not null then 1 else 0 end)")
+	private boolean entregaCieActiva;
+
 	@Builder
 	public OrganGestorResourceEntity(OrganGestorResource resource, EntitatResourceEntity entitat, EntregaCieResourceEntity entregaCie) {
 

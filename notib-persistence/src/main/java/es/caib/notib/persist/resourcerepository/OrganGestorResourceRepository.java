@@ -23,13 +23,10 @@ public interface OrganGestorResourceRepository extends BaseRepository<OrganGesto
 	Optional<OrganGestorResourceEntity> findByEntitatAndCodi(EntitatResourceEntity entitat, String codi);
 
 	@Query("SELECT og.codi FROM OrganGestorResourceEntity og WHERE og.entitat = :entitat AND og.codi IN :codis")
-	List<String> findCodisByEntitatAndCodiIn(
-		@Param("entitat") EntitatResourceEntity entitat,
-		@Param("codis") Set<String> codis);
+	List<String> findCodisByEntitatAndCodiIn(@Param("entitat") EntitatResourceEntity entitat, @Param("codis") Set<String> codis);
 
 	@Query("SELECT og.codi FROM OrganGestorResourceEntity og WHERE og.id IN :ids")
-	List<String> findCodisByIdsIn(
-		@Param("ids") Set<Long> ids);
+	List<String> findCodisByIdsIn(@Param("ids") Set<Long> ids);
 
 	// Per millorar el rendiment de la següent consulta es recomana crear els següents índexos:
 	//   CREATE INDEX orgges_entitat_codi_idx ON not_organ_gestor(entitat, codi);
@@ -77,8 +74,6 @@ public interface OrganGestorResourceRepository extends BaseRepository<OrganGesto
 			"    )" +
 			")",
 		nativeQuery = true)
-	List<Long> findIdsByEntitatIdAndCodisRecursiveL4(
-		@Param("entitatId") Long entitatId,
-		@Param("codis") List<String> codis);
+	List<Long> findIdsByEntitatIdAndCodisRecursiveL4(@Param("entitatId") Long entitatId, @Param("codis") List<String> codis);
 
 }

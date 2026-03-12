@@ -233,7 +233,7 @@ const OrganGestorGridFilter: React.FC = () => {
             filterBuilder.like('nomPare', data?.nomPare),
             filterBuilder.like('llibre', data?.llibre),
             filterBuilder.eq('estat', `'${data?.estat}'`),
-            filterBuilder.eq('entregaCieActiva', `'${data?.entregaCieActiva}'`), // TODO: Revisar si aquest camp funciona o no
+            data?.entregaCieActiva === 'true' ? filterBuilder.neq('entregaCie', null) : filterBuilder.eq('entregaCie', null),
             filterBuilder.eq('permetreSir', `'${data?.permetreSir}'`)
         );
     };

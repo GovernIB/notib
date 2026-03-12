@@ -35,3 +35,5 @@ public class EntregaCieResource extends BaseResource<Long> {
 	private ResourceReference<PagadorPostalResource, Long> pagadorPostal;
 
 }
+
+

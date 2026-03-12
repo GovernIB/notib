@@ -115,8 +115,12 @@ public class OrganGestorResource extends BaseResource<Long> {
 	private String nomPare;
 	private Integer aclEntryCount;
 
+	// Camps per emplenar els valors del formulari referent a la entrega CIE
+	private ResourceReference<PagadorCieResource, Long> entregaCiePagadorCie;
+	private ResourceReference<PagadorPostalResource, Long> entregaCiePagadorPostal;
+
 	public boolean isEntregaCieActiva() {
-		return entregaCie != null;
+		return entregaCieActiva || entregaCie != null;
 	}
 
 	@Getter
@@ -137,8 +141,7 @@ public class OrganGestorResource extends BaseResource<Long> {
 		private OrganGestorEstatEnum estat;
 		private String llibre;
 		private boolean permetreSir;
-		private boolean entregaCieDesactivada;
-		private ResourceReference<EntregaCieResource, Long> entregaCie;
+		private boolean entregaCieActiva;
 	}
 
 }
