@@ -7,6 +7,7 @@ import es.caib.comanda.model.server.monitoring.SubsistemaInfo;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.context.annotation.Primary;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import java.util.List;
@@ -34,11 +35,13 @@ public class SalutService extends AbstractService<es.caib.notib.logic.intf.servi
     }
 
     @Override
+    @PermitAll
     public SalutInfo checkSalut(String versio, String performanceUrl) {
         return getDelegateService().checkSalut(versio, performanceUrl);
     }
 
     @Override
+    @PermitAll
     public Health checkHealthIndicator() {
         return getDelegateService().checkHealthIndicator();
     }
