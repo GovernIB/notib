@@ -124,7 +124,7 @@ public class OrganGestorResourceServiceImpl
 		var entregaCie = entity.getEntregaCie();
 		var pagadorPostal = pagadorPostalResourceRepository.findById(resource.getEntregaCiePagadorPostal().getId());
 		var pagadorCie = pagadorCieResourceRepository.findById(resource.getEntregaCiePagadorCie().getId());
-		if (!pagadorPostal.isPresent() || pagadorCie.isPresent()) {
+		if (pagadorPostal.isEmpty() || pagadorCie.isEmpty()) {
 			return;
 		}
 		if (entregaCie == null) {

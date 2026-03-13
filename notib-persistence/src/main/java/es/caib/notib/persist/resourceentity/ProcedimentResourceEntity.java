@@ -79,17 +79,17 @@ public class ProcedimentResourceEntity
 		name = "entrega_cie_id",
 		referencedColumnName = "id",
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "procediment_entrega_cie_fk"))
-	private EntregaCieEntity entregaCie;
+	private EntregaCieResourceEntity entregaCie;
 
 	@Formula("(select count(*) from " + BaseConfig.DB_PREFIX + "pro_grup pgr where pgr.procediment = id)")
 	private Integer grupCount;
 
+	@Formula("(case when entrega_cie_id is not null then 1 else 0 end)")
+	private boolean entregaCieActiva;
+
 	@Builder
-	public ProcedimentResourceEntity(
-		ProcedimentResource resource,
-		EntitatResourceEntity entitat,
-		OrganGestorResourceEntity organGestor,
-		EntregaCieEntity entregaCie) {
+	public ProcedimentResourceEntity(ProcedimentResource resource, EntitatResourceEntity entitat, OrganGestorResourceEntity organGestor, EntregaCieResourceEntity entregaCie) {
+
 		this.tipus = resource.getTipus();
 		this.codi = resource.getCodi();
 		this.nom = resource.getNom();

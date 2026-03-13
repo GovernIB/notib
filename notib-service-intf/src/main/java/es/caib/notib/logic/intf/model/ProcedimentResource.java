@@ -81,10 +81,12 @@ public class ProcedimentResource extends BaseResource<Long> {
 	private boolean organNoSincronitzat;
 	private boolean actiu;
 	private Date ultimaActualitzacio;
+	private boolean entregaCieActiva;
 
 	private ResourceReference<EntitatResource, Long> entitat;
 	private ResourceReference<OrganGestorResource, Long> organGestor;
 	private ResourceReference<EntregaCieResource, Long> entregaCie;
+
 
 	// Camps calculats
 	private Integer grupCount;
@@ -92,10 +94,13 @@ public class ProcedimentResource extends BaseResource<Long> {
 	private boolean fieldOrganGestorDisabled;
 	private boolean fieldEntregaCieHidden;
 
-	/* Els següents camps només es fan servir per a crear o modificar la referència entregaCie */
-	private boolean entregaCieActiva;
-	private ResourceReference<PagadorCieResource, Long> pagadorCie;
-	private ResourceReference<PagadorPostalResource, Long> pagadorPostal;
+	// Camps per emplenar els valors del formulari referent a la entrega CIE
+	private ResourceReference<PagadorCieResource, Long> entregaCiePagadorCie;
+	private ResourceReference<PagadorPostalResource, Long> entregaCiePagadorPostal;
+
+	public boolean isEntregaCieActiva() {
+		return entregaCieActiva || entregaCie != null;
+	}
 
 	@Getter
 	@Setter
@@ -108,6 +113,7 @@ public class ProcedimentResource extends BaseResource<Long> {
 		private boolean manual;
 		private boolean actiu;
 		private ResourceReference<OrganGestorResource, Long> organGestor;
+		private boolean entregaCieActiva;
 	}
 
 }

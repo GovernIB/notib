@@ -34,7 +34,7 @@ const columns = [
         flex: 0.6,
     },
     {
-        field: 'cie',
+        field: 'entregaCie',
         flex: 0.6,
     },
     {
