@@ -19,6 +19,7 @@ import lombok.Setter;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -133,6 +134,7 @@ public class NotificacioEnviamentResource extends BaseResource<Long> {
 
 	private ResourceReference<NotificacioResource, Long> notificacio;
 	private ResourceReference<PersonaResource, Long> titular;
+	private ResourceReference<PersonaResource, Long> representant;
 	//private ResourceReference<NotificacioEventResource, Long> ultimaEvent;
 	//private ResourceReference<EntregaPostalResource, Long> entregaPostal;
 
@@ -144,5 +146,11 @@ public class NotificacioEnviamentResource extends BaseResource<Long> {
 	private PersonaResource titularInfo;
 	@Valid
 	private List<PersonaResource> representantsInfo;
+
+	// Camps calculats
+	private String notificacioConcepte;
+	private ResourceReference<OrganGestorResource, Long> notificacioOrganGestor;
+	private ResourceReference<ProcedimentResource, Long> notificacioProcediment;
+	private LocalDateTime enviatDate;
 
 }

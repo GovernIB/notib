@@ -1,61 +1,61 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Chip from '@mui/material/Chip';
+import Button from '@mui/material/Button';
+import Icon from '@mui/material/Icon';
 import { GridPage, MuiDataGrid, MuiDataGridColDef } from 'reactlib';
+import { useEnviamentDetailDialog } from './EnviamentDetailDialog';
 
 const EnviamentGrid = () => {
     const { t } = useTranslation();
+    const { dialogComponent, onDetailClick } = useEnviamentDetailDialog();
     const columns: MuiDataGridColDef[] = React.useMemo(
         () => [
             {
-                field: 'enviamentTipus',
-                headerName: '',
-                flex: 0.4,
-                renderCell: (params: any) => {
-                    const letter = params.value?.substring(0, 1);
-                    return <Chip label={letter} size="small" title={params.formattedValue} />;
-                },
+                field: 'enviatDate',
             },
             {
-                field: 'createdDate',
-                flex: 1.4,
-            },
-            {
-                field: 'enviadaDate',
-                flex: 1.4,
-            },
-            {
-                field: 'organGestor',
+                field: 'notificacioOrganGestor',
                 flex: 2,
             },
             {
-                field: 'procediment',
+                field: 'notificacioProcediment',
                 flex: 2,
+            },
+            {
+                field: 'notificacioConcepte',
+                flex: 2,
+            },
+            {
+                field: 'titular',
+                flex: 2,
+            },
+            {
+                field: 'representant',
+                flex: 2,
+            },
+            {
+                field: 'notificaEstat',
+                flex: 2,
+            },
+            {
+                field: ' ',
+                flex: 1.2,
+                sortable: false,
+                hideable: false,
+                exportable: false,
+                pinnable: false,
                 renderCell: (params: any) => {
-                    const letter = params.row.procediment != null ? 'P' : 'S';
-                    const title =
-                        letter === 'P'
-                            ? t('page.notificacio.grid.procediment')
-                            : t('page.notificacio.grid.servei');
                     return (
-                        <>
-                            <Chip label={letter} size="small" title={title} sx={{ mr: 1 }} />
-                            {params.formattedValue}
-                        </>
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            startIcon={<Icon>info</Icon>}
+                            onClick={() => onDetailClick(params.id)}
+                        >
+                            {t('page.enviament.grid.detalls')}
+                        </Button>
                     );
                 },
-            },
-            {
-                field: 'numExpedient',
-                flex: 1,
-            },
-            {
-                field: 'concepte',
-                flex: 3,
-            },
-            {
-                field: 'estat',
-                flex: 1,
             },
         ],
         []
@@ -68,11 +68,9 @@ const EnviamentGrid = () => {
                 columns={columns}
                 paginationActive
                 toolbarHideCreate
-                toolbarCreateLink="form"
-                rowLink="form/{{id}}"
-                rowUpdateLink="form/{{id}}"
                 readOnly
             />
+            {dialogComponent}
         </GridPage>
     );
 };

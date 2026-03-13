@@ -3,9 +3,12 @@ package es.caib.notib.logic.resourceservice;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.exception.ResourceNotCreatedException;
+import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 import es.caib.notib.logic.intf.resourceservice.NotificacioEnviamentResourceService;
 import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
+import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
+import es.caib.notib.persist.resourceentity.ProcedimentResourceEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +49,22 @@ public class NotificacioEnviamentResourceServiceImpl
 		NotificacioEnviamentResource resource,
 		Map<String, AnswerRequiredException.AnswerValue> answers) {
 		throw new ResourceNotCreatedException(getResourceClass(), "Create is not allowed");
+	}
+
+	@Override
+	protected void afterConversion(
+		NotificacioEnviamentResourceEntity entity,
+		NotificacioEnviamentResource resource) {
+		OrganGestorResourceEntity organGestor = entity.getNotificacio().getOrganGestor();
+		ProcedimentResourceEntity procediment = entity.getNotificacio().getProcediment();
+		resource.setNotificacioOrganGestor(ResourceReference.toResourceReference(
+			organGestor.getId(),
+			organGestor.getCodiNom()));
+		resource.setNotificacioProcediment(
+			ResourceReference.toResourceReference(
+				procediment.getId(),
+				procediment.getNom())
+		);
 	}
 
 }

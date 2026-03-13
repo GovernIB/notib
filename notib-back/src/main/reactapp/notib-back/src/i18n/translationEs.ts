@@ -252,6 +252,10 @@ const translationEs = {
                     },
                     detalls: 'Detalles',
                 },
+                column: {
+                    detalls: 'Detalles',
+                    desplegar: 'Desplegar envios',
+                },
                 procediment: 'Procedimiento',
                 servei: 'Servicio',
             },
@@ -306,10 +310,35 @@ const translationEs = {
                     },
                 },
             },
+            detail: {
+                title: {
+                    notificacio: 'Detalles de la notificación',
+                    comunicacio: 'Detalles de la comunicación',
+                    sir: 'Detalles de la comunicación SIR',
+                },
+                tab: {
+                    dades: 'Datos',
+                    enviaments: 'Envios',
+                    documents: 'Documentos',
+                    registreEsdev: 'Registro de acontecimientos',
+                    accions: 'Acciones',
+                    historic: 'Histórico',
+                },
+            },
         },
         enviament: {
             grid: {
-                title: 'Enviaments',
+                title: 'Envios',
+                detalls: 'Detalles',
+            },
+            detail: {
+                title: 'Detalles del envio',
+                tab: {
+                    dades: 'Datos',
+                    notifica: 'Notific@',
+                    registre: 'Registro',
+                    registreEsdev: 'Registro de acontecimientos',
+                },
             },
         },
         integracio: {

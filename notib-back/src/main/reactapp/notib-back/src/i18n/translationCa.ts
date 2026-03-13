@@ -260,6 +260,10 @@ const translationCa = {
                     },
                     detalls: 'Detalls',
                 },
+                column: {
+                    detalls: 'Detalls',
+                    desplegar: 'Desplegar enviaments',
+                },
                 procediment: 'Procediment',
                 servei: 'Servei',
             },
@@ -318,10 +322,35 @@ const translationCa = {
                     servei: 'Servei',
                 },
             },
+            detail: {
+                title: {
+                    notificacio: 'Detalls de la notificació',
+                    comunicacio: 'Detalls de la comunicació',
+                    sir: 'Detalls de la comunicació SIR',
+                },
+                tab: {
+                    dades: 'Dades',
+                    enviaments: 'Enviaments',
+                    documents: 'Documents',
+                    registreEsdev: "Registre d'esdeveniments",
+                    accions: 'Accions',
+                    historic: 'Històric',
+                },
+            },
         },
         enviament: {
             grid: {
                 title: 'Enviaments',
+                detalls: 'Detalls',
+            },
+            detail: {
+                title: "Detalls de l'enviament",
+                tab: {
+                    dades: 'Dades',
+                    notifica: 'Notific@',
+                    registre: 'Registre',
+                    registreEsdev: "Registre d'esdeveniments",
+                },
             },
         },
         integracio: {
@@ -329,7 +358,7 @@ const translationCa = {
                 title: 'Monitor de integraciones',
             },
             detall: {
-                title: 'Detall del monitor d\'integració',
+                title: "Detall del monitor d'integració",
                 descripcio: 'Descripció:',
                 data: 'Data:',
                 tipus: 'Tipus:',
@@ -349,8 +378,8 @@ const translationCa = {
                 tooltipCopiarError: 'Copiar error',
                 tooltipCopiat: 'Copiat',
                 error: 'Error',
-                errorDescripcio: 'Descripció de l\'error:',
-                excepcioMessage: 'Missatge d\'excepció:',
+                errorDescripcio: "Descripció de l'error:",
+                excepcioMessage: "Missatge d'excepció:",
                 excepcioStacktrace: 'Stacktrace',
             },
         },

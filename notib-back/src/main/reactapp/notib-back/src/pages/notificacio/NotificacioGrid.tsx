@@ -10,6 +10,7 @@ import { GRID_DETAIL_PANEL_TOGGLE_COL_DEF } from '@mui/x-data-grid-pro';
 import { GridPage, MuiDataGrid, useResourceApiService, MuiDataGridColDef } from 'reactlib';
 import { useNotibContext } from '../../components/NotibContext';
 import NotificacioGridEnviaments from './NotificacioGridEnviaments';
+import { useNotificacioDetailDialog } from './NotificacioDetailDialog';
 
 const NotificacioAddButton: React.FC = () => {
     const { t } = useTranslation();
@@ -61,14 +62,15 @@ const NotificacioAddButton: React.FC = () => {
 
 const NotificacioGrid = () => {
     const { t } = useTranslation();
+    const { dialogComponent, onDetailClick } = useNotificacioDetailDialog();
     const { currentActions: apiCurrentActions } = useResourceApiService('notificacioResource');
     const isCreateLinkPresent = apiCurrentActions?.['create'] != null;
     const columns: MuiDataGridColDef[] = React.useMemo(
         () => [
             {
                 field: 'enviamentTipus',
-                headerName: '',
                 flex: 0.4,
+                renderHeader: () => null,
                 renderCell: (params: any) => {
                     const letter = params.value?.substring(0, 1);
                     return <Chip label={letter} size="small" title={params.formattedValue} />;
@@ -117,20 +119,31 @@ const NotificacioGrid = () => {
             },
             {
                 field: ' ',
+                headerName: t('page.notificacio.grid.column.detalls'),
                 flex: 1.2,
                 sortable: false,
-                hideable: false,
                 exportable: false,
                 pinnable: false,
-                renderCell: (_params: any) => {
+                hideable: false,
+                renderHeader: () => null,
+                renderCell: (params: any) => {
                     return (
-                        <Button variant="outlined" size="small" startIcon={<Icon>info</Icon>}>
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            startIcon={<Icon>info</Icon>}
+                            onClick={() => onDetailClick(params.id)}
+                        >
                             {t('page.notificacio.grid.enviament.detalls')}
                         </Button>
                     );
                 },
             },
-            GRID_DETAIL_PANEL_TOGGLE_COL_DEF,
+            {
+                ...GRID_DETAIL_PANEL_TOGGLE_COL_DEF,
+                headerName: t('page.notificacio.grid.column.desplegar'),
+                hideable: false,
+            },
         ],
         []
     );
@@ -160,6 +173,7 @@ const NotificacioGrid = () => {
                 getDetailPanelContent={({ row }) => <NotificacioGridEnviaments id={row.id} />}
                 getDetailPanelHeight={() => 'auto'}
             />
+            {dialogComponent}
         </GridPage>
     );
 };

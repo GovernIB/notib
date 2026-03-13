@@ -11,7 +11,7 @@ import notibLogoDark from './assets/notib_logo_dark.png';
 import { BaseApp } from './components/BaseApp';
 import DrassanaFooter from './components/DrassanaFooter';
 import NotibProvider from './components/NotibProvider';
-import { useNotibContext, ROLE_SUPER, ROLE_ADMIN } from './components/NotibContext';
+import { useNotibContext, ROLE_SUPER, ROLE_ADMIN, ROLE_USER } from './components/NotibContext';
 import theme from './theme';
 
 export const envVars = {
@@ -178,6 +178,7 @@ const InnerApp: React.FC = () => {
             title: t('app.menu.config'),
             icon: 'settings',
             children: menuConfig,
+            hidden: currentRole === ROLE_USER,
         },
     ];
     const theme = useTheme();

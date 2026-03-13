@@ -12,6 +12,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -176,25 +177,8 @@ public class NotificacioEnviamentResourceEntity extends BaseAuditableResourceEnt
 		nullable = false)
 	private PersonaResourceEntity titular;
 
-	/*
-	@ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH})
-	@JoinColumn(name = "ultim_event")
-	@org.hibernate.annotations.ForeignKey(name = "NOT_NOTEVENT_ULTIM_EVENT_FK")
-	@OnDelete(action = OnDeleteAction.CASCADE)
-	private NotificacioEventEntity ultimEvent;
-
-	@OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-	@JoinColumn(name = "ENTREGA_POSTAL_ID")
-	@org.hibernate.annotations.ForeignKey(name = "NOT_NOTIFICACIO_ENV_DOM_FK")
-	@OnDelete(action = OnDeleteAction.CASCADE)
-	private EntregaPostalEntity entregaPostal;
-
-	@OneToMany(fetch = FetchType.LAZY, orphanRemoval = true)
-	@org.hibernate.annotations.ForeignKey(name = "not_persona_not_fk")
-	@JoinColumn(name = "notificacio_env_id") // we need to duplicate the physical information
-	@NotFound(action = NotFoundAction.IGNORE)
-	private List<PersonaEntity> destinataris = new ArrayList<PersonaEntity>();
-	*/
+	@Formula("(select ntf.concepte from " + BaseConfig.DB_PREFIX + "notificacio ntf where ntf.id = notificacio_id)")
+	private String notificacioConcepte;
 
 	@Builder
 	public NotificacioEnviamentResourceEntity(
