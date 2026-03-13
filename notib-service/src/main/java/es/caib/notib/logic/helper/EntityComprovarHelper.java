@@ -410,6 +410,9 @@ public class EntityComprovarHelper {
 	 */
 	public boolean hasPermisOrganGestor(OrganGestorEntity organGestorEntity, PermisEnum permis) {
 
+		if (organGestorEntity == null) {
+			return false;
+		}
 		var auth = SecurityContextHolder.getContext().getAuthentication();
 		var entitat = organGestorEntity.getEntitat();
 		Permission[] permisos = getPermissionsFromName(permis);

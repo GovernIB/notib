@@ -816,6 +816,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var rols = aplicacioService.findRolsUsuariActual();
 			filtre.setOrganGestor(organGestorCodi);
 			var f = notificacioListHelper.getFiltre(filtre, entitatId, rol, usuariCodi, rols);
+			if (!Strings.isNullOrEmpty(f.getIdentificador())) {
+				var enviament = notificacioEnviamentRepository.findByNotificaIdentificador(f.getIdentificador());
+				f.setReferencia(enviament.getNotificacio().getReferencia());
+				f.setIdentificadorNull(true);
+				f.setIdentificador(null);
+				f.setReferenciaNull(false);
+			}
 			var notificacions = notificacioTableViewRepository.findAmbFiltre(f, pageable);
 			if (notificacions.getTotalPages() < paginacioParams.getPaginaNum()) {
 				paginacioParams.setPaginaNum(0);
