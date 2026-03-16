@@ -1,5 +1,6 @@
 package es.caib.notib.logic.resourceservice;
 
+import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.intf.model.UsuariResource;
@@ -66,7 +67,7 @@ public class UsuariResourceServiceImpl
 				usuariResource.setNomSencer(jwt.getClaimAsString("name"));
 				usuariResource.setNif(jwt.getClaimAsString("nif"));
 				usuariResource.setEmail(jwt.getClaimAsString("email"));
-				usuariResource.setIdioma("ca");
+				usuariResource.setIdioma(Idioma.CA);
 				return usuariResource;
 			} else if (authentication.getPrincipal() instanceof User) {
 				UsuariResource usuariResource = new UsuariResource();
@@ -75,7 +76,7 @@ public class UsuariResourceServiceImpl
 				usuariResource.setNomSencer(details.getName());
 				usuariResource.setNif(details.getNif());
 				usuariResource.setEmail(details.getEmail());
-				usuariResource.setIdioma("ca");
+				usuariResource.setIdioma(Idioma.CA);
 				return usuariResource;
 			}
 		}

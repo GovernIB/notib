@@ -9,11 +9,26 @@ import {
 import i18n from '../i18n/i18n';
 import { useTranslation } from 'react-i18next';
 import Box from '@mui/material/Box';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import Icon from '@mui/material/Icon';
+import Grid from '@mui/material/Grid';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/ca';
 import 'dayjs/locale/es';
-import { MuiBaseApp, type MenuEntry, useBaseAppContext, useResourceApiContext } from 'reactlib';
+import {
+    MuiBaseApp,
+    type MenuEntry,
+    MuiFormDialog,
+    MuiDataFormDialogApi,
+    useAuthContext,
+    useBaseAppContext,
+    useResourceApiContext,
+    useMuiDataFormDialogApiRef,
+    FormField,
+} from 'reactlib';
 import { useNotibContext, ROLE_SUPER } from './NotibContext';
 import HeaderThemeModeSelector from './HeaderThemeModeSelector';
 import HeaderLanguageSelector from './HeaderLanguageSelector';
@@ -115,6 +130,57 @@ const CustomLocalizationProvider = ({ children }: React.PropsWithChildren) => {
     );
 };
 
+const UserProfileFormDialog: React.FC<{
+    formDialogApiRef: React.RefObject<MuiDataFormDialogApi>;
+}> = (props) => {
+    const { formDialogApiRef } = props;
+    return (
+        <MuiFormDialog
+            resourceName="usuariResource"
+            title="Perfil de l'usuari"
+            apiRef={formDialogApiRef}
+            dialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
+            formComponentProps={{ commonFieldComponentProps: { size: 'small' } }}
+        >
+            <Grid container spacing={2}>
+                <Grid size={3}>
+                    <FormField name="codi" disabled />
+                </Grid>
+                <Grid size={9}>
+                    <FormField name="nomSencer" disabled />
+                </Grid>
+                <Grid size={6}>
+                    <FormField name="email" disabled />
+                </Grid>
+                <Grid size={6}>
+                    <FormField name="emailAlt" />
+                </Grid>
+                <Grid size={6}>
+                    <FormField name="rebreEmailsNotificacio" />
+                </Grid>
+                <Grid size={6}>
+                    <FormField name="rebreEmailsNotificacioCreats" />
+                </Grid>
+                <Grid size={6}>
+                    <FormField name="idioma" />
+                </Grid>
+                <Grid size={6}>
+                    <FormField name="tema" />
+                </Grid>
+                <Grid size={12}>
+                    <FormField name="entitatDefecte" />
+                </Grid>
+                <Grid size={12}>
+                    <FormField name="organDefecte" />
+                </Grid>
+                <Grid size={12}>
+                    <FormField name="procedimentDefecte" />
+                </Grid>
+            </Grid>
+        </MuiFormDialog>
+    );
+};
+
 export const BaseApp: React.FC<BaseAppProps> = (props) => {
     const {
         code,
@@ -134,7 +200,9 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { currentRole } = useNotibContext();
+    const { isReady: authIsReady, getUserId: authGetUserId } = useAuthContext();
     const baseAppMenuEntries = useBaseAppMenuEntries(menuEntries);
+    const formDialogApiRef = useMuiDataFormDialogApiRef();
     const i18nHandleLanguageChange = (language?: string) => {
         i18n.changeLanguage(language);
     };
@@ -142,6 +210,12 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         i18n.addResourceBundle(language, namespace, bundle);
     };
     const anyHistoryEntryExist = () => location.key !== 'default';
+    const showUserProfileDialog = () => {
+        formDialogApiRef.current
+            .show(authGetUserId())
+            .then((data) => console.log('>>> data', data))
+            .catch(() => null);
+    };
     const goBack = (fallback?: string) => {
         if (anyHistoryEntryExist()) {
             navigate(-1);
@@ -168,6 +242,21 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
                 ...(currentRole !== ROLE_SUPER ? [<EntitatSelector key="entitat_selector" />] : []),
             ]}
             headerAdditionalAuthComponents={[
+                authIsReady ? (
+                    <Box
+                        key="user_profile"
+                        sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}
+                    >
+                        <MenuItem onClick={() => showUserProfileDialog()} sx={{ width: '100%' }}>
+                            <ListItemIcon>
+                                <Icon fontSize="small">account_circle</Icon>
+                            </ListItemIcon>
+                            <ListItemText>Perfil de l'usuari</ListItemText>
+                        </MenuItem>
+                    </Box>
+                ) : (
+                    <></>
+                ),
                 <Box
                     key="sel_lang"
                     sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 2 }}
@@ -194,7 +283,10 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             linkComponent={Link}
             menuEntries={baseAppMenuEntries}
         >
-            <CustomLocalizationProvider>{children}</CustomLocalizationProvider>
+            <CustomLocalizationProvider>
+                <UserProfileFormDialog formDialogApiRef={formDialogApiRef} />
+                {children}
+            </CustomLocalizationProvider>
         </MuiBaseApp>
     );
 };

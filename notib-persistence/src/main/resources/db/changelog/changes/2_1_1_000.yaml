@@ -201,4 +201,13 @@ databaseChangeLog:
                         columnName: NOTIFICA_DATAT_RECNIF
                         newDataType: varchar(50 ${varcharUnit})
 
-
+    -   changeSet:
+            id: 2_1_1_000-11
+            author: limit
+            changes:
+                -   addColumn:
+                        tableName: ${db_prefix}USUARI
+                        columns:
+                            -   column:
+                                    name: tema
+                                    type: varchar(10 ${varcharUnit})

@@ -76,7 +76,8 @@ const useCurrentRole = () => {
         'currentRole'
     );
     React.useEffect(() => {
-        // Obté els rols disponibles del token JWT
+        // Obté els rols disponibles del token JWT o de __AUTH_ROLES__
+        console.log('>>> authIsReady', authIsReady);
         if (authIsReady) {
             const userId = authGetUserId();
             setCurrentUserId(userId);

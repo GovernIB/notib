@@ -1,8 +1,11 @@
 package es.caib.notib.logic.intf.model;
 
+import es.caib.notib.client.domini.Idioma;
+import es.caib.notib.client.domini.Tema;
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
+import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import lombok.*;
 import lombok.experimental.FieldNameConstants;
@@ -24,7 +27,7 @@ import javax.validation.constraints.Size;
 	quickFilterFields = { UsuariResource.Fields.codi, UsuariResource.Fields.nom },
 	accessConstraints = @ResourceAccessConstraint(
 		type = ResourceAccessConstraint.ResourceAccessConstraintType.AUTHENTICATED,
-		grantedPermissions = { PermissionEnum.READ }
+		grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE }
 	)
 )
 public class UsuariResource extends BaseResource<String> {
@@ -49,13 +52,13 @@ public class UsuariResource extends BaseResource<String> {
 	@Size(max = 40)
 	private String ultimRol;
 	private Long ultimaEntitat;
-	@Size(max = 2)
-	private String idioma;
+	private Idioma idioma;
+	private Tema tema;
 	@Size(max = 3)
 	private String numElementsPaginaDefecte;
-	protected Long entitatDefecte;
-	protected Long organDefecte;
-	protected Long procedimentDefecte;
+	protected ResourceReference<EntitatResource, Long> entitatDefecte;
+	protected ResourceReference<OrganGestorResource, Long> organDefecte;
+	protected ResourceReference<ProcedimentResource, Long> procedimentDefecte;
 
 	public String getId() {
 		return codi;
