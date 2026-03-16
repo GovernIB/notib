@@ -68,7 +68,7 @@
 		data-url="<c:url value="/entitat/${entitat.id}/aplicacio/datatable"/>"
 		data-search-enabled="false"
 		data-selection-enabled="false"
-		data-default-order="0" 
+		data-default-order="0"
 		data-default-dir="asc"
 		data-botons-template="#botonsTemplate"
 		class="table table-bordered table-striped"
@@ -81,6 +81,12 @@
 					<spring:message code="aplicacio.list.columna.activa"/>
 					<script id="cellActivaTemplate" type="text/x-jsrender">
 						{{if activa}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+				<th data-col-name="aplicarLimitEnviaments" data-template="#cellLimitEnviamentsActiu">
+					<spring:message code="aplicacio.list.columna.aplicar.limit.enviaments"/>
+					<script id="cellLimitEnviamentsActiu" type="text/x-jsrender">
+						{{if aplicarLimitEnviaments}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
 				<th data-col-name="headerCsrf" data-template="#cellHeaderCsrfTemplate">
