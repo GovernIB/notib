@@ -22,6 +22,7 @@ import es.caib.notib.logic.intf.dto.IntegracioFiltreDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
+import es.caib.notib.logic.intf.service.DigitalitzacioService;
 import es.caib.notib.logic.intf.service.EstadisticaService;
 import es.caib.notib.logic.intf.service.MonitorIntegracioService;
 import es.caib.notib.logic.intf.service.UsuariAplicacioService;
@@ -93,6 +94,8 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
     private EstadisticaService estadisticaService;
 	@Autowired
 	private ComandaListener comandaListener;
+	@Autowired
+	private DigitalitzacioService digitalitzacioService;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -274,6 +277,15 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 					} catch (Exception e) {
 						diagnostic.setCorrecte(false);
 						diagnostic.setErrMsg(e.getMessage());
+					}
+					break;
+				case DIGITALITZACIO:
+					try {
+						var perfils = digitalitzacioService.getPerfilsDisponibles();
+						diagnostic.setCorrecte(true);
+					} catch (Exception ex) {
+						diagnostic.setCorrecte(false);
+						diagnostic.setErrMsg(ex.getMessage());
 					}
 					break;
 			}
