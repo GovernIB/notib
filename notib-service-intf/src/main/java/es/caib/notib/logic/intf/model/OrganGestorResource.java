@@ -109,6 +109,7 @@ public class OrganGestorResource extends BaseResource<Long> {
 
 	private ResourceReference<EntitatResource, Long> entitat;
 	private ResourceReference<EntregaCieResource, Long> entregaCie;
+	private ResourceReference<OrganGestorResource, Long> pare;
 
 	// Camps calculats
 	private String codiNom;
@@ -137,6 +138,7 @@ public class OrganGestorResource extends BaseResource<Long> {
 
 		private String codi;
 		private String codiPare;
+		private ResourceReference<OrganGestorResource, Long> pare;
 		private String nom;
 		private OrganGestorEstatEnum estat;
 		private String llibre;

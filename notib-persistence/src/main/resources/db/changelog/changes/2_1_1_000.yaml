@@ -201,4 +201,27 @@ databaseChangeLog:
                         columnName: NOTIFICA_DATAT_RECNIF
                         newDataType: varchar(50 ${varcharUnit})
 
+    -   changeSet:
+            id: 2_1_1_000-11
+            author: limit
+            changes:
+                -   addColumn:
+                        tableName: ${db_prefix}ORGAN_GESTOR
+                        columns:
+                            -   column:
+                                    name: organ_pare
+                                    type: bigint
+                - sql: "UPDATE ${db_prefix}organ_gestor a SET organ_pare = (select b.id from ${db_prefix}organ_gestor b where b.entitat = a.entitat and b.codi = a.codi_pare);"
+
+    -   changeSet:
+            id: 2_1_1_000-12
+            author: limit
+            changes:
+                -   addForeignKeyConstraint:
+                        baseTableName: ${db_prefix}ORGAN_GESTOR
+                        baseColumnNames: organ_pare
+                        referencedTableName: ${db_prefix}ORGAN_GESTOR
+                        referencedColumnNames: ID
+                        constraintName: ${db_prefix}ORGAN_PARE_FK
+
 
