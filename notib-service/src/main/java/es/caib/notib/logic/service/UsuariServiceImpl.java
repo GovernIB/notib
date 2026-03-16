@@ -348,14 +348,16 @@ public class UsuariServiceImpl implements UsuariService {
         log.info("> NOT_PERSONA: " + (System.currentTimeMillis() - t0) + " ms");
         //		NOT_NOTIFICACIO
         t0 = System.currentTimeMillis();
-        // Dividim l'update en 2, i cream indexos a la taula per les columnes de createdby i lastmodifiedby
-        registresModificats += notificacioRepository.updateCreatedByCodi(codiAntic, codiNou);
+        // Dividim l'update en 3, i cream indexos a la taula per les columnes de createdby i lastmodifiedby
+		registresModificats += notificacioRepository.updateUsuariCodi(codiAntic, codiNou);
+		registresModificats += notificacioRepository.updateCreatedByCodi(codiAntic, codiNou);
         registresModificats += notificacioRepository.updateLastModifiedByCodi(codiAntic, codiNou);
         log.info("> NOT_NOTIFICACIO: " + (System.currentTimeMillis() - t0) + " ms");
         //		NOT_NOTIFICACIO_TABLE
         t0 = System.currentTimeMillis();
         // Dividim l'update en 2, i cream indexos a la taula per les columnes de createdby i lastmodifiedby
-        registresModificats += notificacioTableViewRepository.updateCreatedByCodi(codiAntic, codiNou);
+		registresModificats += notificacioTableViewRepository.updateUsuariCodi(codiAntic, codiNou);
+		registresModificats += notificacioTableViewRepository.updateCreatedByCodi(codiAntic, codiNou);
         registresModificats += notificacioTableViewRepository.updateLastModifiedByCodi(codiAntic, codiNou);
         log.info("> NOT_NOTIFICACIO_TABLE: " + (System.currentTimeMillis() - t0) + " ms");
         //		NOT_NOTIFICACIO_MASSIVA
@@ -413,6 +415,7 @@ public class UsuariServiceImpl implements UsuariService {
 //		NOT_APLICACIO
         t0 = System.currentTimeMillis();
         registresModificats += aplicacioRepository.updateUsuariAuditoria(codiAntic, codiNou);
+		registresModificats += aplicacioRepository.updateUsuariCodi(codiAntic, codiNou);
         log.info("> NOT_APLICACIO: " + (System.currentTimeMillis() - t0) + " ms");
 
         return registresModificats;

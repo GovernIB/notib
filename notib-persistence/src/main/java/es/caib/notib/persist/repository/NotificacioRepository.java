@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.persist.repository;
 
@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
  * de dades del tipus notificacio.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface NotificacioRepository extends JpaRepository<NotificacioEntity, Long> {
@@ -36,9 +36,9 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 //	NotificacioEntity findById(Long id);
 
 	NotificacioEntity findTopByEntitatAndDocumentUuidNotNull(EntitatEntity entitat);
-	
+
 	List<NotificacioEntity> findByTipusUsuari(TipusUsuariEnumDto tipusUsuari);
-	
+
 	List<NotificacioEntity> findByProcedimentId(Long id);
 
 	List<NotificacioEntity> findByEntitatId(Long entitatId);
@@ -53,7 +53,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 
 	@Query(	"from " +
 			"    NotificacioEntity n " +
-			"where " + 
+			"where " +
 			"	 (:isCodiProcedimentNull = true or lower(n.procedimentCodiNotib) like lower('%'||:codiProcediment||'%')) " +
 			"and (:isGrupNull = true or lower(n.grupCodi) like lower('%'||:grup||'%')) " +
 			"and (:isConcepteNull = true or lower(n.concepte) like lower('%'||:concepte||'%')) " +
@@ -90,7 +90,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estat") int estat,
 			@Param("entitat") EntitatEntity entitat);
-	
+
 	List<NotificacioEntity> findByEstatOrderByCreatedDateAsc(
 			NotificacioEstatEnumDto estat,
 			Pageable pageable);
@@ -118,7 +118,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"where " +
 			"estat in (es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.PENDENT," +
 			"es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.REGISTRADA) " +
-			"and procediment = :procediment " + 
+			"and procediment = :procediment " +
 			"order by " +
 			"    notificaEnviamentData ASC")
 	List<NotificacioEntity> findNotificacionsPendentsDeNotificarByProcediment(
@@ -138,7 +138,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			" where n.tipusUsuari = es.caib.notib.logic.intf.dto.TipusUsuariEnumDto.APLICACIO " +
 			"   and n.errorLastCallback = true")
 	Page<NotificacioEntity> findNotificacioLastEventAmbError(Pageable pageable);
-	
+
 	@Query(    "  from NotificacioEntity n " +
 		       " where n.tipusUsuari = es.caib.notib.logic.intf.dto.TipusUsuariEnumDto.APLICACIO " +
 			   "   and n.errorLastCallback = true " +
@@ -162,32 +162,32 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 	Page<NotificacioEntity> findNotificacioLastEventAmbErrorAmbFiltre(
 			@Param("isProcedimentNull") boolean isProcedimentNull,
 			@Param("procediment") ProcedimentEntity procediment,
-			@Param("isDataIniciNull") boolean isDataIniciNull, 
-			@Param("dataInici") Date dataInici, 
-			@Param("isDataFiNull") boolean isDataFiNull, 
-			@Param("dataFi") Date dataFi, 
-			@Param("isConcepteNull") boolean isConcepteNull, 
+			@Param("isDataIniciNull") boolean isDataIniciNull,
+			@Param("dataInici") Date dataInici,
+			@Param("isDataFiNull") boolean isDataFiNull,
+			@Param("dataFi") Date dataFi,
+			@Param("isConcepteNull") boolean isConcepteNull,
 			@Param("concepte") String concepte,
-			@Param("isEstatNull") boolean isEstatNull, 
+			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estat") NotificacioEstatEnumDto estat,
 //			@Param("notificaEstat") EnviamentEstat notificaEstat,
-			@Param("isUsuariNull") boolean isUsuariNull, 
-			@Param("usuariCodi") String usuariCodi, 
+			@Param("isUsuariNull") boolean isUsuariNull,
+			@Param("usuariCodi") String usuariCodi,
 			Pageable springDataPageable);
 
 	@Query("select c.estat from NotificacioEntity c where c.id = :id")
 	NotificacioEstatEnumDto getEstatNotificacio(@Param("id") Long id);
-	
+
 	@Query("from NotificacioEntity n " +
 			" where " +
 			"    n.entitat.id = :entitatId " +
 			"   and n.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.PENDENT " +
 			"   and n.registreEnviamentIntent >= :maxReintents ")
 	Page<NotificacioEntity> findByNotificaEstatPendentSenseReintentsDisponibles(
-			@Param("entitatId")Long entitatId, 
-			@Param("maxReintents")Integer maxReintents, 
+			@Param("entitatId")Long entitatId,
+			@Param("maxReintents")Integer maxReintents,
 			Pageable pageable);
-	
+
 	@Query(    "  from NotificacioEntity n " +
 		       " where " +
 		       "    n.entitat.id = :entitatId " +
@@ -199,29 +199,29 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 		       "   and (:isConcepteNull = true or lower(n.concepte) like concat('%', lower(:concepte), '%')) " +
 			   "   and (:isUsuariNull = true or n.createdBy.codi = :usuariCodi)")
 	Page<NotificacioEntity> findByNotificaEstatPendentSenseReintentsDisponiblesAmbFiltre(
-			@Param("entitatId")Long entitatId, 
+			@Param("entitatId")Long entitatId,
 			@Param("isProcedimentNull") boolean isProcedimentNull,
-			@Param("procediment") ProcedimentEntity procediment, 
-			@Param("isDataIniciNull") boolean isDataIniciNull, 
-			@Param("dataInici") Date dataInici, 
-			@Param("isDataFiNull") boolean isDataFiNull, 
-			@Param("dataFi") Date dataFi, 
-			@Param("isConcepteNull") boolean isConcepteNull, 
+			@Param("procediment") ProcedimentEntity procediment,
+			@Param("isDataIniciNull") boolean isDataIniciNull,
+			@Param("dataInici") Date dataInici,
+			@Param("isDataFiNull") boolean isDataFiNull,
+			@Param("dataFi") Date dataFi,
+			@Param("isConcepteNull") boolean isConcepteNull,
 			@Param("concepte") String concepte,
-			@Param("isUsuariNull") boolean isUsuariNull, 
-			@Param("usuariCodi") String usuariCodi, 
-			@Param("maxReintents")Integer maxReintents, 
+			@Param("isUsuariNull") boolean isUsuariNull,
+			@Param("usuariCodi") String usuariCodi,
+			@Param("maxReintents")Integer maxReintents,
 			Pageable springDataPageable);
-	
+
 	@Query("select n.id from NotificacioEntity n " +
 			" where " +
 			"    n.entitat.id = :entitatId " +
 			"   and n.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.PENDENT " +
 			"   and n.registreEnviamentIntent >= :maxReintents ")
 	List<Long> findIdsByNotificaEstatPendentSenseReintentsDisponibles(
-			@Param("entitatId")Long entitatId, 
+			@Param("entitatId")Long entitatId,
 			@Param("maxReintents")Integer maxReintents);
-	
+
 	@Query(" select n.id from NotificacioEntity n " +
 		    " where " +
 		    "    n.entitat.id = :entitatId " +
@@ -233,24 +233,24 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 		    "   and (:isConcepteNull = true or lower(n.concepte) like concat('%', lower(:concepte), '%')) " +
 			"   and (:isUsuariNull = true or n.createdBy.codi = :usuariCodi)")
 	List<Long> findIdsByNotificaEstatPendentSenseReintentsDisponiblesAmbFiltre(
-			@Param("entitatId")Long entitatId, 
+			@Param("entitatId")Long entitatId,
 			@Param("isProcedimentNull") boolean isProcedimentNull,
-			@Param("procediment") ProcedimentEntity procediment, 
-			@Param("isDataIniciNull") boolean isDataIniciNull, 
-			@Param("dataInici") Date dataInici, 
-			@Param("isDataFiNull") boolean isDataFiNull, 
-			@Param("dataFi") Date dataFi, 
-			@Param("isConcepteNull") boolean isConcepteNull, 
+			@Param("procediment") ProcedimentEntity procediment,
+			@Param("isDataIniciNull") boolean isDataIniciNull,
+			@Param("dataInici") Date dataInici,
+			@Param("isDataFiNull") boolean isDataFiNull,
+			@Param("dataFi") Date dataFi,
+			@Param("isConcepteNull") boolean isConcepteNull,
 			@Param("concepte") String concepte,
-			@Param("isUsuariNull") boolean isUsuariNull, 
-			@Param("usuariCodi") String usuariCodi, 
+			@Param("isUsuariNull") boolean isUsuariNull,
+			@Param("usuariCodi") String usuariCodi,
 			@Param("maxReintents")Integer maxReintents);
 
 	NotificacioEntity findByReferencia(String identificador);
-	
+
 	@Query("SELECT n FROM NotificacioEntity n LEFT JOIN FETCH n.enviaments e LEFT JOIN FETCH e.entregaPostal WHERE n.referencia = :referencia")
 	NotificacioEntity findByReferenciaWithEnviaments(@Param("referencia") String referencia);
-	
+
 	@Query("SELECT n FROM NotificacioEntity n LEFT JOIN FETCH n.enviaments WHERE n.id = :id")
 	NotificacioEntity findByIdWithEnviaments(@Param("id") Long id);
 
@@ -259,6 +259,10 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 
 	@Query(value = "select nn.id FROM NOT_NOTIFICACIO nn WHERE nn.ESTAT  IN (0, 1, 2, 28) AND  nn.CREATEDDATE > TO_DATE(:data, 'dd/MM/yyyy')", nativeQuery = true)
 	List<Long> findNotificacionsEnProgres(@Param("data") String data);
+
+	@Modifying
+	@Query(value = "UPDATE NOT_NOTIFICACIO SET USUARI_CODI = :codiNou WHERE USUARI_CODI = :codiAntic", nativeQuery = true)
+	int updateUsuariCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 
 	@Modifying
 	@Query(value = "UPDATE NOT_NOTIFICACIO SET CREATEDBY_CODI = :codiNou WHERE CREATEDBY_CODI = :codiAntic", nativeQuery = true)

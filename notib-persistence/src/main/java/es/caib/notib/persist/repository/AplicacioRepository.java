@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.persist.repository;
 
@@ -19,7 +19,7 @@ import java.util.Optional;
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
  * de dades del tipus entitat.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface AplicacioRepository extends JpaRepository<AplicacioEntity, Long> {
@@ -37,12 +37,12 @@ public interface AplicacioRepository extends JpaRepository<AplicacioEntity, Long
 	AplicacioEntity findByEntitatIdAndId(Long entitatId, Long id);
 
 	AplicacioEntity findByEntitatIdAndUsuariCodi(Long entitatId, String usuariCodi);
-	
+
 	@Query(	  "FROM AplicacioEntity a "
 			+ "WHERE lower(a.usuariCodi) like concat('%', lower(:filtre), '%') "
 			+ "   OR lower(a.callbackUrl) like concat('%', lower(:filtre), '%')")
 	Page<AplicacioEntity> findAllFiltrat(@Param("filtre") String filtre, Pageable paginacio);
-	
+
 	@Query(	  "FROM AplicacioEntity a "
 			+ "WHERE a.entitat.id = :entitatId "
 			+ "  AND (lower(a.usuariCodi) like concat('%', lower(:filtre), '%') "
@@ -70,10 +70,10 @@ public interface AplicacioRepository extends JpaRepository<AplicacioEntity, Long
 			@Param("callbackUrl") String callbackUrl,
 			@Param("activa") boolean activa,
 			Pageable paginacio);
-	
+
 	@Query("SELECT count(a) FROM AplicacioEntity a WHERE a.entitat.id = :entitatId")
 	Long countByEntitatId(@Param("entitatId") Long entitatId);
-	
+
 	@Query(  "FROM AplicacioEntity a "
 			+ "WHERE a.entitat.id = :entitatId"
 			+ "		AND lower(a.usuariCodi) like concat('%', lower(:text), '%') "
@@ -90,6 +90,10 @@ public interface AplicacioRepository extends JpaRepository<AplicacioEntity, Long
 			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
 			nativeQuery = true)
 	int updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+
+	@Modifying
+	@Query(value = "UPDATE NOT_APLICACIO SET USUARI_CODI = :codiNou WHERE USUARI_CODI = :codiAntic", nativeQuery = true)
+	int updateUsuariCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 
 
 }
