@@ -204,7 +204,7 @@ const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (p
         filterApiRef.current.clear();
     };
 
-    // TODO: Revisar es camp nomPare i entregaCieActiva/entregaCieDesactivada
+    // TODO: Convertir codiPare i nomPare en un unic filtre
     return (
         <Grid container spacing={2}>
             <GridFormField size={1} name="codi" />
@@ -229,11 +229,15 @@ const OrganGestorGridFilter: React.FC = () => {
         return filterBuilder.and(
             filterBuilder.like('codi', data?.codi),
             filterBuilder.like('nom', data?.nom),
-            filterBuilder.like('codiPare', data?.codiPare), // TODO: Revisar si aquest camp funciona o no
-            filterBuilder.like('nomPare', data?.nomPare),
+            filterBuilder.like('codiPare', data?.codiPare), // TODO: Convertir codiPare i nomPare en un unic filtre
+            filterBuilder.like('nomPare', data?.nomPare), // TODO: Convertir codiPare i nomPare en un unic filtre
             filterBuilder.like('llibre', data?.llibre),
             filterBuilder.eq('estat', `'${data?.estat}'`),
-            data?.entregaCieActiva === 'true' ? filterBuilder.neq('entregaCie', null) : filterBuilder.eq('entregaCie', null),
+            data?.entregaCieActiva === 'true'
+                ? filterBuilder.neq('entregaCie', null)
+                : data?.entregaCieActiva === 'false'
+                  ? filterBuilder.eq('entregaCie', null)
+                  : null,
             filterBuilder.eq('permetreSir', `'${data?.permetreSir}'`)
         );
     };

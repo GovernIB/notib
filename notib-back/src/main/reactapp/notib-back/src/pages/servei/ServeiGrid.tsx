@@ -34,7 +34,7 @@ const columns = [
         flex: 0.6,
     },
     {
-        field: 'entregaCie',
+        field: 'entregaCieActiva',
         flex: 0.6,
     },
     {
@@ -95,7 +95,7 @@ const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (p
             <GridFormField size={4} name="organGestor" />
             <GridButtonField size={0.5} name="actiu" icon={'flash_on'} hiddenLabel />
             <GridButtonField size={0.5} name="comu" icon={'public'} hiddenLabel />
-            <GridButtonField size={0.5} name="entregaCie" icon={'email'} hiddenLabel />
+            <GridButtonField size={0.5} name="entregaCieActiva" icon={'email'} hiddenLabel />
             <GridButtonField size={0.5} name="manual" icon={'sync'} hiddenLabel />
             <GridButtonField
                 size={0.5}
@@ -120,7 +120,7 @@ const ProcedimentGridFilter: React.FC = () => {
             filterBuilder.eq('organGestor.id', data.organGestor?.id),
             data?.actiu && filterBuilder.eq('actiu', `'${data.actiu}'`),
             data?.comu && filterBuilder.eq('comu', `'${data.comu}'`),
-            data?.entregaCie && filterBuilder.eq('entregaCie', `'${data.entregaCie}'`), // TODO: Revisar aquest camp des backend
+            data?.entregaCieActiva ? filterBuilder.neq('entregaCie', null) : undefined,
             data?.manual && filterBuilder.eq('manual', `'${data.manual}'`),
             data?.requireDirectPermission &&
                 filterBuilder.eq('requireDirectPermission', `'${data.requireDirectPermission}'`)
