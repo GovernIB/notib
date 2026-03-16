@@ -45,7 +45,7 @@ public class NotificacioTableHelper {
         try {
             // Camps calcaulats a partir de valors dels enviaments
             StringBuilder titular = new StringBuilder();
-            var notificaIds = "";
+//            var notificaIds = "";
             Integer estatMask;
             var entregaPostal = true;
             if (notificacio.getEnviaments() != null) {
@@ -92,7 +92,7 @@ public class NotificacioTableHelper {
                     .enviadaDate(getEnviadaDate(notificacio))
                     .referencia(notificacio.getReferencia())
                     .titular(titular.toString())
-                    .notificaIds(notificaIds)
+//                    .notificaIds(notificaIds)
                     .registreNums("")
                     .estatMask(estatMask)
                     .entregaPostal(entregaPostal)
@@ -207,7 +207,7 @@ public class NotificacioTableHelper {
 
             // Camps calcaulats a partir de valors dels enviaments
             var titular = new StringBuilder();
-            var notificaIds = new StringBuilder();
+//            var notificaIds = new StringBuilder();
             var registreNums = new StringBuilder();
             Integer estatMask = 0;
             List<NotificacioEventEntity> eventsError = new ArrayList<>();
@@ -222,9 +222,9 @@ public class NotificacioTableHelper {
                     if (e.getTitular() != null) {
                         titular.append(e.getTitular().getNomFormatted()).append(", ");
                     }
-                    if (e.getNotificaIdentificador() != null) {
-                        notificaIds.append(e.getNotificaIdentificador()).append(", ");
-                    }
+//                    if (e.getNotificaIdentificador() != null) {
+//                        notificaIds.append(e.getNotificaIdentificador()).append(", ");
+//                    }
                     if (!Strings.isNullOrEmpty(e.getRegistreNumeroFormatat())) {
                         registreNums.append(e.getRegistreNumeroFormatat()).append(", ");
                     }
@@ -254,9 +254,9 @@ public class NotificacioTableHelper {
                 if (titular.length() > 2) {
                     titular = new StringBuilder(titular.substring(0, titular.length() - 2));
                 }
-                if (notificaIds.length() > 2) {
-                    notificaIds = new StringBuilder(notificaIds.substring(0, notificaIds.length() - 2));
-                }
+//                if (notificaIds.length() > 2) {
+//                    notificaIds = new StringBuilder(notificaIds.substring(0, notificaIds.length() - 2));
+//                }
             }
             if (ignoreNotificaError(notificacio)) {
                 tableViewItem.setNotificaErrorData(null);
@@ -296,7 +296,7 @@ public class NotificacioTableHelper {
             tableViewItem.setRegistreEnviamentIntent(notificacio.getRegistreEnviamentIntent());
             tableViewItem.setEnviadaDate(getEnviadaDate(notificacio));
             tableViewItem.setTitular(titular.toString());
-            tableViewItem.setNotificaIds(notificaIds.toString());
+//            tableViewItem.setNotificaIds(notificaIds.toString());
             tableViewItem.setEntregaPostal(entregaPostal);
             tableViewItem.setEntregaPostalError(entregaPostalError);
             var rNums = !Strings.isNullOrEmpty(registreNums.toString()) ? registreNums.substring(0, registreNums.length()-2) : "";

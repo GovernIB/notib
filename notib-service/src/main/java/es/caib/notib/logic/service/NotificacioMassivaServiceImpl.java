@@ -63,6 +63,7 @@ import es.caib.notib.persist.repository.AplicacioRepository;
 import es.caib.notib.persist.repository.DocumentRepository;
 import es.caib.notib.persist.repository.GrupProcSerRepository;
 import es.caib.notib.persist.repository.GrupRepository;
+import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioEventRepository;
 import es.caib.notib.persist.repository.NotificacioMassivaRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
@@ -178,6 +179,8 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     private OrganGestorService organGestorService;
     @Autowired
     private CacheBridge cacheBridge;
+	@Autowired
+	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 
     @Override
     public NotificacioMassivaDataDto findById(Long entitatId, Long id) {
@@ -338,17 +341,24 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     @Override
     public PaginaDto<NotificacioTableItemDto> findNotificacions(Long entitatId, Long notificacioMassivaId, NotificacioFiltreDto filtre, PaginacioParamsDto paginacioParams) {
 
-        var entitatActual = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
-        var pageable = notificacioListHelper.getMappeigPropietats(paginacioParams);
-        var f = notificacioListHelper.getFiltre(filtre, entitatId, null, null, null);
-        f.setNotificacioMassiva(notificacioMassivaRepository.findById(notificacioMassivaId).orElse(null));
-        var notificacions = notificacioTableViewRepository.findAmbFiltreByNotificacioMassiva(f, pageable);
-        var auth = SecurityContextHolder.getContext().getAuthentication();
-        var dtos = notificacioTableMapper.toNotificacionsTableItemDto(
-                notificacions.getContent(),
-                notificacioListHelper.getCodisProcedimentsAndOrgansAmpPermisProcessar(entitatId, auth.getName()),
-                cacheHelper.findOrganigramaNodeByEntitat(f.getEntitat().getDir3Codi()));
-        return paginacioHelper.toPaginaDto(dtos, notificacions);
+		var entitatActual = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
+		var pageable = notificacioListHelper.getMappeigPropietats(paginacioParams);
+		var f = notificacioListHelper.getFiltre(filtre, entitatId, null, null, null);
+		f.setNotificacioMassiva(notificacioMassivaRepository.findById(notificacioMassivaId).orElse(null));
+		if (!Strings.isNullOrEmpty(f.getIdentificador())) {
+			var enviament = notificacioEnviamentRepository.findByNotificaIdentificador(f.getIdentificador());
+			f.setReferencia(enviament.getNotificacio().getReferencia());
+			f.setIdentificadorNull(true);
+			f.setIdentificador(null);
+			f.setReferenciaNull(false);
+		}
+		var notificacions = notificacioTableViewRepository.findAmbFiltreByNotificacioMassiva(f, pageable);
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		var dtos = notificacioTableMapper.toNotificacionsTableItemDto(
+			notificacions.getContent(),
+			notificacioListHelper.getCodisProcedimentsAndOrgansAmpPermisProcessar(entitatId, auth.getName()),
+			cacheHelper.findOrganigramaNodeByEntitat(f.getEntitat().getDir3Codi()));
+		return paginacioHelper.toPaginaDto(dtos, notificacions);
     }
 
     @Override
