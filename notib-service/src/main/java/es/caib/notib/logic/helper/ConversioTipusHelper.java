@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.logic.helper;
 
@@ -9,6 +9,7 @@ import es.caib.notib.client.domini.ampliarPlazo.AmpliacionPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliacionesPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.Envios;
+import es.caib.notib.logic.cacheable.CacheBridge;
 import es.caib.notib.logic.intf.dto.AplicacioDto;
 import es.caib.notib.logic.intf.dto.CallbackEstatEnumDto;
 import es.caib.notib.logic.intf.dto.CodiValorDto;
@@ -51,6 +52,7 @@ import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.dto.organisme.UnitatOrganitzativaDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerOrganDto;
+import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.ws.adviser.nexea.sincronizarenvio.SincronizarEnvio;
 import es.caib.notib.persist.entity.AccioMassivaEntity;
 import es.caib.notib.persist.entity.AplicacioEntity;
@@ -105,7 +107,7 @@ import java.util.Set;
 
 /**
  * Helper per a convertir entre diferents formats de documents.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -127,6 +129,8 @@ public class ConversioTipusHelper {
     private ConfigHelper configHelper;
 	@Autowired
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
+	@Autowired
+	private CacheBridge cacheBridge;
 
 	public ConversioTipusHelper() {
 		MappingContext.Factory mappingContextFactory = new MappingContext.Factory();
@@ -148,6 +152,14 @@ public class ConversioTipusHelper {
 				.customize(new CustomMapper<>() {
 					@Override
 					public void mapAtoB(NotificacioEntity a, NotificacioInfoDto b, MappingContext context) {
+						try {
+							DadesUsuari d = cacheBridge.findUsuariAmbCodi(a.getUsuariCodi());
+							if (d != null) {
+								b.setUsuariNom(d.getNomSencer());
+							}
+						} catch (NotFoundException ex) {
+							b.setUsuariNom(a.getUsuariCodi());
+						}
 						var usuari = a.getCreatedBy().orElse(null);
 						if (usuari != null) {
 							var createdBy = convertir(usuari, UsuariDto.class);
@@ -664,7 +676,7 @@ public class ConversioTipusHelper {
 			}
 			var maxIntents = configHelper.getConfigAsInteger("es.caib.notib.tasca.callback.pendents.notifica.events.intents.max");
 			dto.setMaxIntents(maxIntents);
-			
+
 		}
 	}
 
