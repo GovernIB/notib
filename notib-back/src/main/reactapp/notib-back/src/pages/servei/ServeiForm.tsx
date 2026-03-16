@@ -3,16 +3,10 @@ import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import Badge from '@mui/material/Badge';
-import {
-    FormPage,
-    MuiForm,
-    FormField,
-    MuiFormTabs,
-    MuiFormTabContent,
-    useFormContext,
-} from 'reactlib';
+import { FormPage, MuiForm, MuiFormTabs, MuiFormTabContent, useFormContext } from 'reactlib';
 import ServeiFormTabGrups from './ServeiFormTabGrups.tsx';
 import ServeiFormTabPermisos from './ServeiFormTabPermisos';
+import GridFormField from '../../components/GridFormField.tsx';
 
 const ServeiFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
     const { setSubtitle } = props;
@@ -40,44 +34,35 @@ const ServeiFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> =
         <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1, 2]}>
             <MuiFormTabContent index={0} showOnCreate>
                 <Grid container spacing={2}>
-                    <Grid size={3}>
-                        <FormField name="codi" />
-                    </Grid>
-                    <Grid size={9}>
-                        <FormField name="nom" />
-                    </Grid>
-                    <Grid size={6}>
-                        <FormField name="retard" />
-                    </Grid>
-                    <Grid size={6}>
-                        <FormField
-                            name="caducitat"
-                            componentProps={{ helperText: 'En dies naturals' }}
-                        />
-                    </Grid>
-                    <Grid size={9}>
-                        <FormField name="organGestor" disabled={data?.fieldOrganGestorDisabled} />
-                    </Grid>
-                    <Grid size={3}>
-                        <FormField name="comu" />
-                    </Grid>
+                    <GridFormField size={3} name="codi" />
+                    <GridFormField size={9} name="nom" />
+                    <GridFormField size={6} name="retard" />
+                    <GridFormField
+                        size={6}
+                        name="caducitat"
+                        componentProps={{ helperText: 'En dies naturals' }}
+                    />
+                    <GridFormField
+                        size={9}
+                        name="organGestor"
+                        disabled={data?.fieldOrganGestorDisabled}
+                    />
+                    <GridFormField size={3} name="comu" />
                     {!data?.fieldEntregaCieHidden && (
                         <>
-                            <Grid size={6}>
-                                <FormField name="entregaCie" />
-                            </Grid>
-                            <Grid size={6} />
+                            <GridFormField size={2} name="entregaCieActiva" />
+                            {data?.entregaCieActiva && (
+                                <>
+                                    <GridFormField size={4} name="entregaCiePagadorPostal" />
+                                    <GridFormField size={4} name="entregaCiePagadorCie" />
+                                    <Grid size={2} />
+                                </>
+                            )}
                         </>
                     )}
-                    <Grid size={3}>
-                        <FormField name="agrupar" />
-                    </Grid>
-                    <Grid size={12}>
-                        <FormField name="requireDirectPermission" />
-                    </Grid>
-                    <Grid size={12}>
-                        <FormField name="manual" />
-                    </Grid>
+                    <GridFormField size={2} name="agrupar" />
+                    <GridFormField size={3} name="requireDirectPermission" />
+                    <GridFormField size={2} name="manual" />
                 </Grid>
             </MuiFormTabContent>
             <MuiFormTabContent index={1}>
