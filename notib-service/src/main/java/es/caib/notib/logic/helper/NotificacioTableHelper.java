@@ -208,7 +208,7 @@ public class NotificacioTableHelper {
             // Camps calcaulats a partir de valors dels enviaments
             var titular = new StringBuilder();
 //            var notificaIds = new StringBuilder();
-            var registreNums = new StringBuilder();
+//            var registreNums = new StringBuilder();
             Integer estatMask = 0;
             List<NotificacioEventEntity> eventsError = new ArrayList<>();
             var entregaPostal = false;
@@ -225,9 +225,9 @@ public class NotificacioTableHelper {
 //                    if (e.getNotificaIdentificador() != null) {
 //                        notificaIds.append(e.getNotificaIdentificador()).append(", ");
 //                    }
-                    if (!Strings.isNullOrEmpty(e.getRegistreNumeroFormatat())) {
-                        registreNums.append(e.getRegistreNumeroFormatat()).append(", ");
-                    }
+//                    if (!Strings.isNullOrEmpty(e.getRegistreNumeroFormatat())) {
+//                        registreNums.append(e.getRegistreNumeroFormatat()).append(", ");
+//                    }
                     // Estat de la notificacio
                     if ((estatMask & e.getNotificacio().getEstat().getMask()) == 0) {
                         estatMask += e.getNotificacio().getEstat().getMask();
@@ -299,11 +299,11 @@ public class NotificacioTableHelper {
 //            tableViewItem.setNotificaIds(notificaIds.toString());
             tableViewItem.setEntregaPostal(entregaPostal);
             tableViewItem.setEntregaPostalError(entregaPostalError);
-            var rNums = !Strings.isNullOrEmpty(registreNums.toString()) ? registreNums.substring(0, registreNums.length()-2) : "";
-            if (rNums.length() > 2000) {
-                rNums = rNums.substring(0, 2000) + "...";
-            }
-            tableViewItem.setRegistreNums(rNums);
+//            var rNums = !Strings.isNullOrEmpty(registreNums.toString()) ? registreNums.substring(0, registreNums.length()-2) : "";
+//            if (rNums.length() > 2000) {
+//                rNums = rNums.substring(0, 2000) + "...";
+//            }
+//            tableViewItem.setRegistreNums(rNums);
             tableViewItem.setEstatMask(estatMask);
             tableViewItem.setPerActualitzar(true);
             notificacioTableViewRepository.saveAndFlush(tableViewItem);

@@ -347,10 +347,17 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 		f.setNotificacioMassiva(notificacioMassivaRepository.findById(notificacioMassivaId).orElse(null));
 		if (!Strings.isNullOrEmpty(f.getIdentificador())) {
 			var enviament = notificacioEnviamentRepository.findByNotificaIdentificador(f.getIdentificador());
-			f.setReferencia(enviament.getNotificacio().getReferencia());
+			f.setReferencia(enviament != null ? enviament.getNotificacio().getReferencia() : "noReferencia");
 			f.setIdentificadorNull(true);
 			f.setIdentificador(null);
 			f.setReferenciaNull(false);
+		}
+		if (!Strings.isNullOrEmpty(f.getRegistreNum())) {
+			var enviament = notificacioEnviamentRepository.findByRegistreNumeroFormatat(f.getRegistreNum());
+			f.setRegistreNumNull(true);
+			f.setRegistreNum(null);
+			f.setReferenciaNull(false);
+			f.setReferencia(enviament.isPresent() ? enviament.get().getNotificacio().getReferencia() : "noReferencia");
 		}
 		var notificacions = notificacioTableViewRepository.findAmbFiltreByNotificacioMassiva(f, pageable);
 		var auth = SecurityContextHolder.getContext().getAuthentication();
