@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.logic.helper;
 
@@ -51,7 +51,7 @@ import java.util.Optional;
 
 /**
  * Helper per a la comprovació de l'existencia d'entitats de base de dades.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -103,7 +103,7 @@ public class EntityComprovarHelper {
 		}
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		var tePermis = !(comprovarPermisUsuari || comprovarPermisAdminEntitat || comprovarPermisAplicacio);
-		
+
 		if (comprovarPermisSuper) {
 			for (var ga: auth.getAuthorities()) {
 				if (ga.toString().equals("NOT_SUPER")) {
@@ -114,7 +114,7 @@ public class EntityComprovarHelper {
 		}
 		if (comprovarPermisUsuari && (permisosHelper.isGrantedAll(entitatId, EntitatEntity.class, new Permission[] {ExtendedPermission.USUARI}, auth))) {
 				tePermis = true;
-		}	
+		}
 		if (comprovarPermisAdminEntitat && (permisosHelper.isGrantedAll(entitatId, EntitatEntity.class, new Permission[] {ExtendedPermission.ADMINISTRADORENTITAT}, auth))) {
 			tePermis = true;
 		}
@@ -130,7 +130,7 @@ public class EntityComprovarHelper {
 		}
 		return entitat;
 	}
-	
+
 	public void comprovarPermisos(Long entitatId, boolean comprovarSuper, boolean comprovarAdmin, boolean comprovarUser, boolean comprovarAdminLectura) {
 
 		var auth = SecurityContextHolder.getContext().getAuthentication();
@@ -169,7 +169,7 @@ public class EntityComprovarHelper {
 				}
 			}
 		}
-		
+
 		// Comprovarem que es compleixi algun dels permisos demanats
 		if (!tePermis) {
 			var tipus = comprovarUser ? "USUARI" : comprovarAdmin ? "ADMINISTRATION" : "SUPERUSUARI";
@@ -209,7 +209,7 @@ public class EntityComprovarHelper {
 		}
 		return notificacioEnviament.getNotificacio();
 	}
-	
+
 	public PagadorPostalEntity comprovarPagadorPostal(Long pagadorPostalId) {
 
 		var pagadorPostal = pagadorPostalRepository.findById(pagadorPostalId).orElse(null);
@@ -218,7 +218,7 @@ public class EntityComprovarHelper {
 		}
 		return pagadorPostal;
 	}
-	
+
 	public PagadorCieEntity comprovarPagadorCie(Long pagadorCieId) {
 
 		var pagadorCie = pagadorCieRepository.findById(pagadorCieId).orElse(null);
@@ -227,7 +227,7 @@ public class EntityComprovarHelper {
 		}
 		return pagadorCie;
 	}
-	
+
 	public PagadorCieFormatFullaEntity comprovarPagadorCieFormatFulla(Long formatFullaId) {
 
 		var pagadorCieFormatFulla = pagadorCieFormatFullaRepository.findById(formatFullaId).orElse(null);
@@ -236,7 +236,7 @@ public class EntityComprovarHelper {
 		}
 		return pagadorCieFormatFulla;
 	}
-	
+
 	public PagadorCieFormatSobreEntity comprovarPagadorCieFormatSobre(Long formatSobreId) {
 
 		var pagadorCieFormatSobre = pagadorCieFormatSobreRepository.findById(formatSobreId).orElse(null);
@@ -245,7 +245,7 @@ public class EntityComprovarHelper {
 		}
 		return pagadorCieFormatSobre;
 	}
-	
+
 	public GrupProcSerEntity comprovarGrupProcediment(Long grupProcedimentId) {
 
 		var grupProcediment = grupProcedimentRepository.findById(grupProcedimentId).orElse(null);
@@ -254,11 +254,11 @@ public class EntityComprovarHelper {
 		}
 		return grupProcediment;
 	}
-	
+
 	public ProcSerEntity comprovarProcediment(EntitatEntity entitat, Long id) {
 		return comprovarProcediment(entitat.getId(), id);
 	}
-	
+
 	public ProcSerEntity comprovarProcediment(Long entitatId, Long id) {
 
 		var procediment = procSerRepository.findById(id).orElse(null);
@@ -270,7 +270,7 @@ public class EntityComprovarHelper {
 		}
 		return procediment;
 	}
-	
+
 	public void comprovarPermisAdminEntitatOAdminOrgan(Long entitatId, Long organGestorId) {
 
 		var auth = SecurityContextHolder.getContext().getAuthentication();
@@ -286,7 +286,7 @@ public class EntityComprovarHelper {
 			throw new PermissionDeniedException(entitatId, EntitatEntity.class, auth.getName(), "ADMINISTRADORENTITAT");
 		}
 	}
-	
+
 	public void comprovarPermisosOrganGestor(EntitatEntity entitat, String organCodiDir3) {
 
 		var auth = SecurityContextHolder.getContext().getAuthentication();
@@ -296,9 +296,9 @@ public class EntityComprovarHelper {
 			throw new PermissionDeniedException(organGestorEntity.getId(), OrganGestorEntity.class, auth.getName(), "ADMINISTRADOR");
 		}
 	}
-	
+
 	public OrganGestorEntity comprovarOrganGestor(EntitatEntity entitat, Long id) {
-		
+
 		var organGestor = organGestorRepository.findById(id).orElse(null);
 		if (organGestor == null) {
 			throw new NotFoundException(id, OrganGestorEntity.class);
@@ -309,7 +309,7 @@ public class EntityComprovarHelper {
 		return organGestor;
 	}
 	public OrganGestorEntity comprovarOrganGestor(EntitatEntity entitat, String codi) {
-		
+
 		var organGestor = organGestorRepository.findByEntitatAndCodi(entitat, codi);
 		if (organGestor == null) {
 			throw new NotFoundException(codi, OrganGestorEntity.class);
@@ -321,7 +321,7 @@ public class EntityComprovarHelper {
 	}
 
 	public NotificacioEntity comprovarNotificacio(EntitatEntity entitat, Long id) {
-		
+
 		var notificacio = notificacioRepository.findById(id).orElse(null);
 		if (notificacio == null) {
 			throw new NotFoundException(id, NotificacioEntity.class);
@@ -331,13 +331,13 @@ public class EntityComprovarHelper {
 		}
 		return notificacio;
 	}
-	
+
 	public ProcSerEntity comprovarProcediment(Long entitatId, Long procedimentId, boolean comprovarPermisConsulta, boolean comprovarPermisProcessar, boolean comprovarPermisNotificacio, boolean comprovarPermisGestio, boolean comprovarPermisComunicacioSir) {
 
 		var entitatEntity = comprovarEntitat(entitatId);
 		return comprovarProcediment(entitatEntity, procedimentId, comprovarPermisConsulta, comprovarPermisProcessar, comprovarPermisNotificacio, comprovarPermisGestio, comprovarPermisComunicacioSir);
 	}
-	
+
 	public ProcSerEntity comprovarProcediment(EntitatEntity entitat, Long procedimentId, boolean comprovarPermisConsulta, boolean comprovarPermisProcessar, boolean comprovarPermisNotificacio, boolean comprovarPermisGestio, boolean comprovarPermisComunicacioSir) {
 
 		var procediment = comprovarProcediment(entitat, procedimentId);
@@ -367,7 +367,7 @@ public class EntityComprovarHelper {
 			throw new PermissionDeniedException(procediment.getId(), ProcedimentEntity.class, auth.getName(), getPermissionName(permis));
 		}
 	}
-	
+
 	public ProcSerEntity comprovarProcedimentOrgan(EntitatEntity entitat, Long procedimentId, ProcSerOrganEntity procedimentOrgan, boolean comprovarPermisConsulta, boolean comprovarPermisProcessar, boolean comprovarPermisNotificacio, boolean comprovarPermisGestio, boolean comprovarPermisComunicacioSir) {
 
 		var procediment = comprovarProcediment(entitat, procedimentId);
@@ -410,6 +410,9 @@ public class EntityComprovarHelper {
 	 */
 	public boolean hasPermisOrganGestor(OrganGestorEntity organGestorEntity, PermisEnum permis) {
 
+		if (organGestorEntity == null) {
+			return false;
+		}
 		var auth = SecurityContextHolder.getContext().getAuthentication();
 		var entitat = organGestorEntity.getEntitat();
 		Permission[] permisos = getPermissionsFromName(permis);
@@ -447,7 +450,7 @@ public class EntityComprovarHelper {
 		// 2. Comprovam si l'òrgan del procediment o algun organ pare té el permis
 		return hasPermisOrganGestor(procediment.getOrganGestor(), permis);
 	}
-	
+
 	public boolean hasPermisProcedimentOrgan(Long procedimentOrganId, PermisEnum permis) {
 
 		var procedimentOrgan = procedimentOrganRepository.findById(procedimentOrganId).orElseThrow();
@@ -465,7 +468,7 @@ public class EntityComprovarHelper {
 			permisosHelper.filterGrantedAny(procedimentOrgans, (ObjectIdentifierExtractor<ProcSerOrganEntity>) AbstractPersistable::getId, ProcSerOrganEntity.class, permisos, auth);
 		return !procedimentOrgans.isEmpty();
 	}
-	
+
 	public Permission[] getPermissionsFromName(PermisEnum permis) {
 
 		var perm = getPermissionFromName(permis);
@@ -477,7 +480,7 @@ public class EntityComprovarHelper {
 		var perm = getPermissionFromName(permis);
 		return perm == null ? new Permission[] {perm} : null;
 	}
-	
+
 	public Permission getPermissionFromName(PermisEnum permis) {
 
 		switch (permis) {
@@ -507,7 +510,7 @@ public class EntityComprovarHelper {
 			default: return null;
 		}
 	}
-	
+
 	public String getPermissionName(PermisEnum permis) {
 
 		switch (permis) {
@@ -521,7 +524,7 @@ public class EntityComprovarHelper {
 			default: return null;
 		}
 	}
-	
+
 	public GrupEntity comprovarGrup(Long grupId) {
 
 		var grup = grupRepository.findById(grupId).orElse(null);
@@ -530,9 +533,9 @@ public class EntityComprovarHelper {
 		}
 		return grup;
 	}
-	
+
 	public List<GrupEntity> comprovarGrups(List<GrupDto> grups) {
-		
+
 		List<GrupEntity> grupsEntity = new ArrayList<>();
 
 		Optional<GrupEntity> opt;
