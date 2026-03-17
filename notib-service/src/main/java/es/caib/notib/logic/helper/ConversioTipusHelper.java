@@ -97,6 +97,7 @@ import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.Type;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.time.ZoneId;
@@ -129,8 +130,9 @@ public class ConversioTipusHelper {
     private ConfigHelper configHelper;
 //	@Autowired
 //	private NotificacioEnviamentRepository notificacioEnviamentRepository;
-//	@Autowired
-//	private CacheBridge cacheBridge;
+	@Lazy
+	@Autowired
+	private CacheHelper cacheHelper;
 
 	public ConversioTipusHelper() {
 		MappingContext.Factory mappingContextFactory = new MappingContext.Factory();
@@ -152,14 +154,14 @@ public class ConversioTipusHelper {
 				.customize(new CustomMapper<>() {
 					@Override
 					public void mapAtoB(NotificacioEntity a, NotificacioInfoDto b, MappingContext context) {
-//						try {
-//							DadesUsuari d = cacheBridge.findUsuariAmbCodi(a.getUsuariCodi());
-//							if (d != null) {
-//								b.setUsuariNom(d.getNomSencer());
-//							}
-//						} catch (NotFoundException ex) {
-//							b.setUsuariNom(a.getUsuariCodi());
-//						}
+						try {
+							DadesUsuari d = cacheHelper.findUsuariAmbCodi(a.getUsuariCodi());
+							if (d != null) {
+								b.setUsuariNom(d.getNomSencer());
+							}
+						} catch (NotFoundException ex) {
+							b.setUsuariNom(a.getUsuariCodi());
+						}
 						var usuari = a.getCreatedBy().orElse(null);
 						if (usuari != null) {
 							var createdBy = convertir(usuari, UsuariDto.class);

@@ -31,28 +31,24 @@ const columns = [
         flex: 6,
     },
     {
-        field: 'codiPare',
-        flex: 2,
-    },
-    {
-        field: 'nomPare',
+        field: 'pare',
         flex: 6,
     },
     {
         field: 'llibre',
-        flex: 4,
+        flex: 1,
     },
     {
         field: 'estat',
-        flex: 2,
+        flex: 1.5,
     },
     {
         field: 'entregaCieActiva',
-        flex: 2,
+        flex: 1,
     },
     {
         field: 'permetreSir',
-        flex: 2,
+        flex: 1.5,
     },
     {
         field: 'aclEntryCount',
@@ -208,10 +204,9 @@ const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (p
     return (
         <Grid container spacing={2}>
             <GridFormField size={1} name="codi" />
-            <GridFormField size={2.5} name="nom" />
-            <GridFormField size={1} name="codiPare" />
-            <GridFormField size={2.25} name="nomPare" />
-            <GridFormField size={1.5} name="llibre" />
+            <GridFormField size={2} name="nom" />
+            <GridFormField size={4} name="pare" />
+            <GridFormField size={1} name="llibre" />
             <GridFormField size={1.25} name="estat" />
             <GridFormField size={1} name="entregaCieActiva" />
             <GridFormField size={1} name="permetreSir" />
@@ -229,8 +224,9 @@ const OrganGestorGridFilter: React.FC = () => {
         return filterBuilder.and(
             filterBuilder.like('codi', data?.codi),
             filterBuilder.like('nom', data?.nom),
-            filterBuilder.like('codiPare', data?.codiPare), // TODO: Convertir codiPare i nomPare en un unic filtre
-            filterBuilder.like('nomPare', data?.nomPare), // TODO: Convertir codiPare i nomPare en un unic filtre
+            // filterBuilder.like('codiPare', data?.codiPare), // TODO: Convertir codiPare i nomPare en un unic filtre
+            // filterBuilder.like('nomPare', data?.nomPare), // TODO: Convertir codiPare i nomPare en un unic filtre
+            filterBuilder.eq('pare.id', data.pare?.id),
             filterBuilder.like('llibre', data?.llibre),
             filterBuilder.eq('estat', `'${data?.estat}'`),
             data?.entregaCieActiva === 'true'
