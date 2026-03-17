@@ -19,7 +19,7 @@ export const CacheGrid = () => {
                 flex: 4,
             },
             {
-                field: 'mida',
+                field: 'localHeapSize',
                 flex: 1,
             }
         ],

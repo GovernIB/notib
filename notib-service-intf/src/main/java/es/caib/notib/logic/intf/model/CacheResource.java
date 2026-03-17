@@ -24,5 +24,5 @@ public class CacheResource extends BaseResource<String> {
 
 	private String codi;
 	private String descripcio;
-	private Long mida;
+	private long localHeapSize;
 }
