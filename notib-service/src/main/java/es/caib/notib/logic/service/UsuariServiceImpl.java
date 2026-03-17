@@ -240,6 +240,9 @@ public class UsuariServiceImpl implements UsuariService {
                 var permisos = procedimentService.permisFind(entitat.getId(), false, procediment.getId(), procediment.getOrganGestor(), procediment.getOrganGestor(), null, null);
                 if (permisos.isEmpty()) {
                     var organ = organGestorService.findByCodi(entitat.getId(), procediment.getOrganGestor());
+					if (organ == null) {
+						continue;
+					}
                     var permisosOrgan = organGestorService.permisFind(entitat.getId(), organ.getId());
                     if (permisosOrgan.isEmpty()) {
                         var organFill = organsAmbPermis.stream().filter(x -> x.getCodi().equals(organ.getId()+"")).collect(Collectors.toList());
