@@ -414,6 +414,9 @@ const translationEs = {
             add: 'Añadir',
             refresh: 'Refrescar',
         },
+        UserProfileFormDialog: {
+            perfil: 'Perfil del usuario',
+        },
     },
     comu: {
         netejarFiltre: 'Limpiar filtro',

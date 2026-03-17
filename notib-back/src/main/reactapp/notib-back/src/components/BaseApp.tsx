@@ -9,34 +9,22 @@ import {
 import i18n from '../i18n/i18n';
 import { useTranslation } from 'react-i18next';
 import Box from '@mui/material/Box';
-import MenuItem from '@mui/material/MenuItem';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import Icon from '@mui/material/Icon';
-import Grid from '@mui/material/Grid';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { useColorScheme } from '@mui/material/styles';
 import 'dayjs/locale/ca';
 import 'dayjs/locale/es';
 import {
     MuiBaseApp,
     type MenuEntry,
-    MuiFormDialog,
-    MuiDataFormDialogApi,
-    useAuthContext,
     useBaseAppContext,
     useResourceApiContext,
     useMuiDataFormDialogApiRef,
-    FormField,
 } from 'reactlib';
 import { useNotibContext, ROLE_SUPER } from './NotibContext';
-import HeaderThemeModeSelector from './HeaderThemeModeSelector';
-import HeaderLanguageSelector from './HeaderLanguageSelector';
 import Offline from './Offline';
 import RoleSelector from './RoleSelector';
 import EntitatSelector from './EntitatSelector';
-import { Divider } from '@mui/material';
+import { UserProfileMenu, UserProfileFormDialog } from './UserProfile';
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
@@ -132,76 +120,6 @@ const CustomLocalizationProvider = ({ children }: React.PropsWithChildren) => {
     );
 };
 
-const UserProfileFormDialog: React.FC<{
-    formDialogApiRef: React.RefObject<MuiDataFormDialogApi>;
-}> = (props) => {
-    const { formDialogApiRef } = props;
-    const { mode, setMode } = useColorScheme();
-    const { currentLanguage, setCurrentLanguage } = useBaseAppContext();
-    const { currentUser } = useNotibContext();
-    const handleSaveSuccess = (data: any) => {
-        const profileLanguage = data?.idioma.toLowerCase();
-        if (profileLanguage != null && currentLanguage !== profileLanguage) {
-            setCurrentLanguage(profileLanguage);
-        }
-        const profileMode = data?.tema?.toLowerCase() ?? 'system';
-        if (mode !== profileMode) {
-            setMode(profileMode);
-        }
-    };
-    React.useEffect(() => {
-        handleSaveSuccess(currentUser);
-    }, [currentUser]);
-    return (
-        <MuiFormDialog
-            resourceName="usuariResource"
-            title="Perfil de l'usuari"
-            apiRef={formDialogApiRef}
-            dialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
-            formComponentProps={{
-                commonFieldComponentProps: { size: 'small' },
-                onSaveSuccess: handleSaveSuccess,
-            }}
-        >
-            <Grid container spacing={2}>
-                <Grid size={3}>
-                    <FormField name="codi" disabled />
-                </Grid>
-                <Grid size={9}>
-                    <FormField name="nomSencer" disabled />
-                </Grid>
-                <Grid size={6}>
-                    <FormField name="email" disabled />
-                </Grid>
-                <Grid size={6}>
-                    <FormField name="emailAlt" />
-                </Grid>
-                <Grid size={6}>
-                    <FormField name="rebreEmailsNotificacio" />
-                </Grid>
-                <Grid size={6}>
-                    <FormField name="rebreEmailsNotificacioCreats" />
-                </Grid>
-                <Grid size={6}>
-                    <FormField name="idioma" />
-                </Grid>
-                <Grid size={6}>
-                    <FormField name="tema" />
-                </Grid>
-                <Grid size={12}>
-                    <FormField name="entitatDefecte" />
-                </Grid>
-                <Grid size={12}>
-                    <FormField name="organDefecte" />
-                </Grid>
-                <Grid size={12}>
-                    <FormField name="procedimentDefecte" />
-                </Grid>
-            </Grid>
-        </MuiFormDialog>
-    );
-};
-
 export const BaseApp: React.FC<BaseAppProps> = (props) => {
     const {
         code,
@@ -209,7 +127,6 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         logoStyle,
         title,
         version,
-        availableLanguages,
         menuEntries,
         appbarBackgroundColor,
         appbarBackgroundImg,
@@ -221,7 +138,6 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { currentRole } = useNotibContext();
-    const { isReady: authIsReady, getUserId: authGetUserId } = useAuthContext();
     const baseAppMenuEntries = useBaseAppMenuEntries(menuEntries);
     const formDialogApiRef = useMuiDataFormDialogApiRef();
     const i18nHandleLanguageChange = (language?: string) => {
@@ -231,9 +147,6 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         i18n.addResourceBundle(language, namespace, bundle);
     };
     const anyHistoryEntryExist = () => location.key !== 'default';
-    const showUserProfileDialog = () => {
-        formDialogApiRef.current.show(authGetUserId()).catch(() => null);
-    };
     const goBack = (fallback?: string) => {
         if (anyHistoryEntryExist()) {
             navigate(-1);
@@ -260,30 +173,9 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
                 ...(currentRole !== ROLE_SUPER ? [<EntitatSelector key="entitat_selector" />] : []),
             ]}
             headerAdditionalAuthComponents={[
-                <Box
-                    key="sel_lang"
-                    sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 2 }}
-                >
-                    <HeaderLanguageSelector languages={availableLanguages} />
+                <Box key="user_profile" sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
+                    <UserProfileMenu formDialogApiRef={formDialogApiRef} />
                 </Box>,
-                <Box key="sel_theme_mode" sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                    <HeaderThemeModeSelector />
-                </Box>,
-                authIsReady ? (
-                    <Box
-                        key="user_profile"
-                        sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}
-                    >
-                        <MenuItem onClick={() => showUserProfileDialog()} sx={{ width: '100%' }}>
-                            <ListItemIcon>
-                                <Icon fontSize="small">account_circle</Icon>
-                            </ListItemIcon>
-                            <ListItemText>Perfil de l'usuari</ListItemText>
-                        </MenuItem>
-                    </Box>
-                ) : (
-                    <></>
-                ),
             ]}
             offline={<Offline />}
             footer={footer}
