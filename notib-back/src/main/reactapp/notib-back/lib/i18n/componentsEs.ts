@@ -69,8 +69,11 @@ const componentsEs = {
             single: 'fila',
             multiple: 'filas',
         },
-        pageInfo: '{{from}} a {{to}} de {{count}}',
-        sizeAuto: 'Automático',
+        footer: {
+            pageInfo: '{{from}} a {{to}} de {{count}}',
+            sizeAuto: 'Automático',
+            pageSizeTitle: 'Número de elementos por página',
+        },
         requestPending: 'Pendiente de consultar',
     },
     form: {

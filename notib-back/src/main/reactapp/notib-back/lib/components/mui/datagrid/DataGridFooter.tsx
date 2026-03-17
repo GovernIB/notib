@@ -97,6 +97,7 @@ const GridFooterPagination: React.FC<DataGridFooterPaginationProps> = (props) =>
                         <FormControl size="small">
                             <Select
                                 value={!autoPageSize ? currentPageSize : -1}
+                                title={t('grid.footer.pageSizeTitle')}
                                 onChange={(event) => {
                                     if (event.target.value === -1) {
                                         setAutoPageSize(true);
@@ -110,7 +111,7 @@ const GridFooterPagination: React.FC<DataGridFooterPaginationProps> = (props) =>
                                 }}
                             >
                                 {enableAutoPageSizeOption && (
-                                    <MenuItem value={-1}>{t('grid.sizeAuto')}</MenuItem>
+                                    <MenuItem value={-1}>{t('grid.footer.sizeAuto')}</MenuItem>
                                 )}
                                 {pageSizeOptions.map((o: number) => (
                                     <MenuItem value={o}>{o}</MenuItem>
@@ -121,7 +122,7 @@ const GridFooterPagination: React.FC<DataGridFooterPaginationProps> = (props) =>
                 )}
                 <Box>
                     {pageInfo != null
-                        ? t('grid.pageInfo', {
+                        ? t('grid.footer.pageInfo', {
                               from: firstElementIndex,
                               to: lastElement,
                               count: pageInfo.totalElements,

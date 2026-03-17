@@ -97,7 +97,7 @@ public class UsuariResourceEntity extends es.caib.notib.persist.base.entity.Base
 		return id;
 	}
 
-	@Converter(autoApply = false)
+	@Converter
 	public static class IdiomaConverter implements AttributeConverter<Idioma, String> {
 		@Override
 		public String convertToDatabaseColumn(Idioma idioma) {

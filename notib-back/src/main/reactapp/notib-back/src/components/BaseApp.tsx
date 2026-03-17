@@ -16,6 +16,7 @@ import Icon from '@mui/material/Icon';
 import Grid from '@mui/material/Grid';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { useColorScheme } from '@mui/material/styles';
 import 'dayjs/locale/ca';
 import 'dayjs/locale/es';
 import {
@@ -35,6 +36,7 @@ import HeaderLanguageSelector from './HeaderLanguageSelector';
 import Offline from './Offline';
 import RoleSelector from './RoleSelector';
 import EntitatSelector from './EntitatSelector';
+import { Divider } from '@mui/material';
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
@@ -134,13 +136,32 @@ const UserProfileFormDialog: React.FC<{
     formDialogApiRef: React.RefObject<MuiDataFormDialogApi>;
 }> = (props) => {
     const { formDialogApiRef } = props;
+    const { mode, setMode } = useColorScheme();
+    const { currentLanguage, setCurrentLanguage } = useBaseAppContext();
+    const { currentUser } = useNotibContext();
+    const handleSaveSuccess = (data: any) => {
+        const profileLanguage = data?.idioma.toLowerCase();
+        if (profileLanguage != null && currentLanguage !== profileLanguage) {
+            setCurrentLanguage(profileLanguage);
+        }
+        const profileMode = data?.tema?.toLowerCase() ?? 'system';
+        if (mode !== profileMode) {
+            setMode(profileMode);
+        }
+    };
+    React.useEffect(() => {
+        handleSaveSuccess(currentUser);
+    }, [currentUser]);
     return (
         <MuiFormDialog
             resourceName="usuariResource"
             title="Perfil de l'usuari"
             apiRef={formDialogApiRef}
             dialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
-            formComponentProps={{ commonFieldComponentProps: { size: 'small' } }}
+            formComponentProps={{
+                commonFieldComponentProps: { size: 'small' },
+                onSaveSuccess: handleSaveSuccess,
+            }}
         >
             <Grid container spacing={2}>
                 <Grid size={3}>
@@ -211,10 +232,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
     };
     const anyHistoryEntryExist = () => location.key !== 'default';
     const showUserProfileDialog = () => {
-        formDialogApiRef.current
-            .show(authGetUserId())
-            .then((data) => console.log('>>> data', data))
-            .catch(() => null);
+        formDialogApiRef.current.show(authGetUserId()).catch(() => null);
     };
     const goBack = (fallback?: string) => {
         if (anyHistoryEntryExist()) {
@@ -242,6 +260,15 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
                 ...(currentRole !== ROLE_SUPER ? [<EntitatSelector key="entitat_selector" />] : []),
             ]}
             headerAdditionalAuthComponents={[
+                <Box
+                    key="sel_lang"
+                    sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 2 }}
+                >
+                    <HeaderLanguageSelector languages={availableLanguages} />
+                </Box>,
+                <Box key="sel_theme_mode" sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                    <HeaderThemeModeSelector />
+                </Box>,
                 authIsReady ? (
                     <Box
                         key="user_profile"
@@ -257,15 +284,6 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
                 ) : (
                     <></>
                 ),
-                <Box
-                    key="sel_lang"
-                    sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 2 }}
-                >
-                    <HeaderLanguageSelector languages={availableLanguages} />
-                </Box>,
-                <Box key="sel_theme_mode" sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                    <HeaderThemeModeSelector />
-                </Box>,
             ]}
             offline={<Offline />}
             footer={footer}

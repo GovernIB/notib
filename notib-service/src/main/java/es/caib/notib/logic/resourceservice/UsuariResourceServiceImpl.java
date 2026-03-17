@@ -56,6 +56,13 @@ public class UsuariResourceServiceImpl
 		}
 	}
 
+	@Override
+	protected String additionalSpringFilter(
+		String currentSpringFilter,
+		String[] namedQueries) {
+		return "id:'" + authenticationHelper.getCurrentUserName() + "'";
+	}
+
 	private UsuariResource getUsuariResourceFromAuth() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication != null && authentication.getPrincipal() != null) {

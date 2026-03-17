@@ -68,8 +68,11 @@ const componentsEn = {
             single: 'row',
             multiple: 'rows',
         },
-        pageInfo: '{{from}} to {{to}} of {{count}}',
-        sizeAuto: 'Automatic',
+        footer: {
+            pageInfo: '{{from}} to {{to}} of {{count}}',
+            sizeAuto: 'Automatic',
+            pageSizeTitle: 'Number of items per page',
+        },
         requestPending: 'Searching...',
     },
     form: {
