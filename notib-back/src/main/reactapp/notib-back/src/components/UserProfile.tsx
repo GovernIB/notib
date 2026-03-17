@@ -45,7 +45,7 @@ export const UserProfileFormDialog: React.FC<{
     const { currentLanguage, setCurrentLanguage } = useBaseAppContext();
     const { currentUser } = useNotibContext();
     const handleSaveSuccess = (data: any) => {
-        const profileLanguage = data?.idioma.toLowerCase();
+        const profileLanguage = data?.idioma?.toLowerCase();
         if (profileLanguage != null && currentLanguage !== profileLanguage) {
             setCurrentLanguage(profileLanguage);
         }
