@@ -24,4 +24,11 @@ public abstract class BaseNoDatabaseMutableResourceService<R extends Resource<ID
 		return true;
 	}
 
+	@Override
+	protected R entityToResource(NoDatabaseResourceEntity<R, ID> entity) {
+		R resource = entity.getResource();
+		resource.setId(entity.getId());
+		return resource;
+	}
+
 }

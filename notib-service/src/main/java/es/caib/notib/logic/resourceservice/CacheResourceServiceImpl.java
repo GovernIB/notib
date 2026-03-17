@@ -1,10 +1,9 @@
 package es.caib.notib.logic.resourceservice;
 
-import es.caib.notib.logic.base.service.BaseNoDatabaseReadonlyResourceService;
+import es.caib.notib.logic.base.service.BaseNoDatabaseMutableResourceService;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
-import es.caib.notib.logic.intf.dto.CacheDto;
 import es.caib.notib.logic.intf.model.CacheResource;
 import es.caib.notib.logic.intf.resourceservice.CacheResourceService;
 import es.caib.notib.persist.base.entity.NoDatabaseResourceEntity;
@@ -12,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +18,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 /**
  * Implementació del servei de consulta de caches de l'aplciació
@@ -30,7 +27,7 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CacheResourceServiceImpl extends BaseNoDatabaseReadonlyResourceService<CacheResource, String> implements CacheResourceService {
+public class CacheResourceServiceImpl extends BaseNoDatabaseMutableResourceService<CacheResource, String> implements CacheResourceService {
 
 	private final MetricsHelper metricsHelper;
 	private final CacheHelper cacheHelper;
@@ -75,9 +72,7 @@ public class CacheResourceServiceImpl extends BaseNoDatabaseReadonlyResourceServ
 		return new NoDatabaseResourceEntity<>(resource.getCodi(), resource);
 	}
 
-
 	private static final Map<String, Integer> ordreCaches;
-
 	static {
 		ordreCaches = new HashMap<>();
 		ordreCaches.put("aclCache", 0);
@@ -114,4 +109,5 @@ public class CacheResourceServiceImpl extends BaseNoDatabaseReadonlyResourceServ
 		ordreCaches.put("findUsuariByCodi", 31);
 		ordreCaches.put("findEntitatByCodi", 32);
 	}
+
 }
