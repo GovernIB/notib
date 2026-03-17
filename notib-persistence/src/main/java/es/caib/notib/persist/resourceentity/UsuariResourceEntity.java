@@ -1,5 +1,7 @@
 package es.caib.notib.persist.resourceentity;
 
+import es.caib.notib.client.domini.Idioma;
+import es.caib.notib.client.domini.Tema;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.model.UsuariResource;
 import lombok.*;
@@ -20,7 +22,7 @@ public class UsuariResourceEntity extends es.caib.notib.persist.base.entity.Base
 
 	@Id
 	@Column(name = "codi", length = 64, nullable = false)
-	private String codi;
+	private String id;
 	@Column(name = "nom", length = 100)
 	private String nom;
 	@Column(name = "nif", length = 40)
@@ -41,23 +43,40 @@ public class UsuariResourceEntity extends es.caib.notib.persist.base.entity.Base
 	private String ultimRol;
 	@Column(name = "ultima_entitat")
 	private Long ultimaEntitat;
+	@Convert(converter = IdiomaConverter.class)
 	@Column(name = "idioma", length = 2)
-	private String idioma;
+	private Idioma idioma;
+	@Column(name = "tema", length = 10)
+	private Tema tema;
 	@Column(name = "num_elements_pagina_defecte", length = 3)
 	private String numElementsPaginaDefecte;
-	@Column(name = "entitat_defecte")
-	protected Long entitatDefecte;
-	@Column(name = "organ_defecte")
-	protected Long organDefecte;
-	@Column(name = "procediment_defecte")
-	protected Long procedimentDefecte;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(
+		name = "entitat_defecte",
+		referencedColumnName = "id")
+	protected EntitatResourceEntity entitatDefecte;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(
+		name = "organ_defecte",
+		referencedColumnName = "id")
+	protected OrganGestorResourceEntity organDefecte;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(
+		name = "procediment_defecte",
+		referencedColumnName = "id")
+	protected ProcedimentResourceEntity procedimentDefecte;
 
 	@Version
 	private long version = 0;
 
 	@Builder
-	public UsuariResourceEntity(UsuariResource resource) {
-		this.codi = resource.getCodi();
+	public UsuariResourceEntity(
+		UsuariResource resource,
+		EntitatResourceEntity entitatDefecte,
+		OrganGestorResourceEntity organDefecte,
+		ProcedimentResourceEntity procedimentDefecte) {
+		this.id = resource.getCodi();
 		this.nom = resource.getNom();
 		this.nif = resource.getNif();
 		this.llinatges = resource.getLlinatges();
@@ -69,19 +88,27 @@ public class UsuariResourceEntity extends es.caib.notib.persist.base.entity.Base
 		this.ultimRol = resource.getUltimRol();
 		this.ultimaEntitat = resource.getUltimaEntitat();
 		this.numElementsPaginaDefecte = resource.getNumElementsPaginaDefecte();
-		this.entitatDefecte = resource.getEntitatDefecte();
-		this.organDefecte = resource.getOrganDefecte();
-		this.procedimentDefecte = resource.getProcedimentDefecte();
+		this.entitatDefecte = entitatDefecte;
+		this.organDefecte = organDefecte;
+		this.procedimentDefecte = procedimentDefecte;
 	}
 
-	@Override
-	public String getId() {
-		return codi;
+	public String getCodi() {
+		return id;
 	}
 
-	@Override
-	public void setId(String id) {
-		this.codi = id;
+	@Converter
+	public static class IdiomaConverter implements AttributeConverter<Idioma, String> {
+		@Override
+		public String convertToDatabaseColumn(Idioma idioma) {
+			if (idioma == null) return null;
+			return idioma.name().toLowerCase();
+		}
+		@Override
+		public Idioma convertToEntityAttribute(String dbData) {
+			if (dbData == null) return null;
+			return Idioma.valueOf(dbData.toUpperCase());
+		}
 	}
 
 }

@@ -244,7 +244,6 @@ const InnerApp: React.FC = () => {
 
 export const App = () => {
     const authConfig = getAuthConfig();
-    console.log('>>> App', import.meta.env.BASE_URL, isAuthUrlPresent, authConfig);
     return (
         <AuthProvider
             appBaseUrl={import.meta.env.BASE_URL}

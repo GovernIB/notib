@@ -224,4 +224,13 @@ databaseChangeLog:
                         referencedColumnNames: ID
                         constraintName: ${db_prefix}ORGAN_PARE_FK
 
-
+    -   changeSet:
+            id: 2_1_1_000-13
+            author: limit
+            changes:
+                -   addColumn:
+                        tableName: ${db_prefix}USUARI
+                        columns:
+                            -   column:
+                                    name: tema
+                                    type: varchar(10 ${varcharUnit})

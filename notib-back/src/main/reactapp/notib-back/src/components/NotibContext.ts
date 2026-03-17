@@ -9,6 +9,7 @@ export const ROLE_USER = 'tothom';
 
 export type NotibContextType = {
     isReady: boolean;
+    currentUser: any;
     rolesAvailable?: string[];
     entitatsAvailable?: any[];
     currentRole?: string;

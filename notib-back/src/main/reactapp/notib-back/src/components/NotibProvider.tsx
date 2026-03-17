@@ -58,6 +58,21 @@ const getSessionValue = (json: string | undefined, field: string) => {
     }
 };
 
+const useCurrentUser = () => {
+    const { isReady: apiIsReady, find: apiFind } = useResourceApiService('usuariResource');
+    const [currentUser, setCurrentUser] = React.useState<string>();
+    React.useEffect(() => {
+        if (apiIsReady) {
+            apiFind({ unpaged: true }).then((response) => {
+                if (response.rows.length) {
+                    setCurrentUser(response.rows[0]);
+                }
+            });
+        }
+    }, [apiIsReady]);
+    return { currentUser };
+};
+
 const useCurrentRole = () => {
     const {
         isReady: authIsReady,
@@ -69,14 +84,13 @@ const useCurrentRole = () => {
     const [currentUserId, setCurrentUserId] = React.useState<string>();
     const [rolesAvailable, setRolesAvailable] = React.useState<string[]>();
     const [currentRole, setCurrentRole] = React.useState<string>();
-    /*const [roleHttpHeaderInitialized, setRoleHttpHeaderInitialized] =
-        React.useState<boolean>(false);*/
     const { getValue: roleSessionGetValue, setValue: roleSessionSetValue } = useSessionStorage(
         currentUserId,
         'currentRole'
     );
     React.useEffect(() => {
-        // Obté els rols disponibles del token JWT
+        // Obté els rols disponibles del token JWT o de __AUTH_ROLES__
+        console.log('>>> authIsReady', authIsReady);
         if (authIsReady) {
             const userId = authGetUserId();
             setCurrentUserId(userId);
@@ -227,6 +241,7 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
     const { offline: apiOffline } = useResourceApiContext();
     const { currentUserId, currentRole, currentRoleReady, rolesAvailable, setCurrentRole } =
         useCurrentRole();
+    const { currentUser } = useCurrentUser();
     const {
         currentEntitatId,
         currentEntitatReady,
@@ -235,9 +250,10 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
         entitatsAvailable,
         setCurrentEntitatId,
     } = useCurrentEntitat(currentUserId, currentRole, currentRoleReady);
-    const isReady = apiOffline || (currentRoleReady && currentEntitatReady);
+    const isReady = apiOffline || (currentRoleReady && currentEntitatReady && currentUser != null);
     const contextValue = {
         isReady,
+        currentUser,
         rolesAvailable,
         entitatsAvailable,
         currentRole,

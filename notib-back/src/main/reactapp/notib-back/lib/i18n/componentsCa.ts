@@ -69,8 +69,11 @@ const componentsCa = {
             single: 'fila',
             multiple: 'files',
         },
-        pageInfo: '{{from}} a {{to}} de {{count}}',
-        sizeAuto: 'Automàtic',
+        footer: {
+            pageInfo: '{{from}} a {{to}} de {{count}}',
+            sizeAuto: 'Automàtic',
+            pageSizeTitle: "Nombre d'elements per pàgina",
+        },
         requestPending: 'Pendent de consultar',
     },
     form: {

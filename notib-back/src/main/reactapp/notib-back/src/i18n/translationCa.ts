@@ -432,6 +432,9 @@ const translationCa = {
             add: 'Afegir',
             refresh: 'Refrescar',
         },
+        UserProfileFormDialog: {
+            perfil: "Perfil de l'usuari",
+        },
     },
     comu: {
         netejarFiltre: 'Netejar filtre',

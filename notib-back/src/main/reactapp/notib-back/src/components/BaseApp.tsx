@@ -13,13 +13,18 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/ca';
 import 'dayjs/locale/es';
-import { MuiBaseApp, type MenuEntry, useBaseAppContext, useResourceApiContext } from 'reactlib';
+import {
+    MuiBaseApp,
+    type MenuEntry,
+    useBaseAppContext,
+    useResourceApiContext,
+    useMuiDataFormDialogApiRef,
+} from 'reactlib';
 import { useNotibContext, ROLE_SUPER } from './NotibContext';
-import HeaderThemeModeSelector from './HeaderThemeModeSelector';
-import HeaderLanguageSelector from './HeaderLanguageSelector';
 import Offline from './Offline';
 import RoleSelector from './RoleSelector';
 import EntitatSelector from './EntitatSelector';
+import { UserProfileMenu, UserProfileFormDialog } from './UserProfile';
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
@@ -122,7 +127,6 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         logoStyle,
         title,
         version,
-        availableLanguages,
         menuEntries,
         appbarBackgroundColor,
         appbarBackgroundImg,
@@ -135,6 +139,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
     const location = useLocation();
     const { currentRole } = useNotibContext();
     const baseAppMenuEntries = useBaseAppMenuEntries(menuEntries);
+    const formDialogApiRef = useMuiDataFormDialogApiRef();
     const i18nHandleLanguageChange = (language?: string) => {
         i18n.changeLanguage(language);
     };
@@ -168,14 +173,8 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
                 ...(currentRole !== ROLE_SUPER ? [<EntitatSelector key="entitat_selector" />] : []),
             ]}
             headerAdditionalAuthComponents={[
-                <Box
-                    key="sel_lang"
-                    sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 2 }}
-                >
-                    <HeaderLanguageSelector languages={availableLanguages} />
-                </Box>,
-                <Box key="sel_theme_mode" sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                    <HeaderThemeModeSelector />
+                <Box key="user_profile" sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
+                    <UserProfileMenu formDialogApiRef={formDialogApiRef} />
                 </Box>,
             ]}
             offline={<Offline />}
@@ -194,7 +193,10 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             linkComponent={Link}
             menuEntries={baseAppMenuEntries}
         >
-            <CustomLocalizationProvider>{children}</CustomLocalizationProvider>
+            <CustomLocalizationProvider>
+                <UserProfileFormDialog formDialogApiRef={formDialogApiRef} />
+                {children}
+            </CustomLocalizationProvider>
         </MuiBaseApp>
     );
 };
