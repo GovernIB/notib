@@ -21,6 +21,7 @@ import EnviamentGrid from './pages/enviament/EnviamentGrid';
 import NotFoundPage from './pages/NotFound';
 import Propietats from './pages/propietat/Propietats';
 import MonitorIntegracioGrid from './pages/integracio/MonitorIntegracioGrid';
+import CacheGrid from './pages/cache/CacheGrid';
 
 export const router = createBrowserRouter(
     [
@@ -148,6 +149,16 @@ export const router = createBrowserRouter(
                     path: 'integracions',
                     children: [
                         { index: true, element: <MonitorIntegracioGrid /> },
+                        /*{
+                            path: 'detail',
+                            children: [{ path: ':id', element: <MonitorIntegracioParamDetail /> }],
+                        },*/
+                    ],
+                },
+                {
+                    path: 'caches',
+                    children: [
+                        { index: true, element: <CacheGrid /> },
                         /*{
                             path: 'detail',
                             children: [{ path: ':id', element: <MonitorIntegracioParamDetail /> }],

@@ -17,6 +17,7 @@ const translationCa = {
             pagadorsCie: "Centres d'impressió i ensobrat",
             notificacions: 'Remeses',
             integracions: 'Integracions',
+            cache: "Cache d'aplicacions",
         },
     },
     page: {
@@ -381,6 +382,11 @@ const translationCa = {
                 errorDescripcio: "Descripció de l'error:",
                 excepcioMessage: "Missatge d'excepció:",
                 excepcioStacktrace: 'Stacktrace',
+            },
+        },
+        cache: {
+            grid: {
+                title: "Cache d'aplicacions"
             },
         },
         notFound: {

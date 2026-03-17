@@ -265,7 +265,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			var auth = SecurityContextHolder.getContext().getAuthentication();
-			log.debug("Obtenint usuari actual");
+			log.debug("Error buscant l'usuarObtenint usuari actual");
 			return auth != null ? usuariRepository.getIdiomaUsuari(auth.getName()) : null;
 		} finally {
 			metricsHelper.fiMetrica(timer);

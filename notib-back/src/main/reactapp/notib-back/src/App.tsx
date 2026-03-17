@@ -151,6 +151,14 @@ const InnerApp: React.FC = () => {
             resourceName: 'monitorIntegracioResource',
             hidden: currentRole !== ROLE_SUPER,
         },
+        {
+            id: 'caches',
+            title: t('app.menu.cache'),
+            to: '/caches',
+            icon: 'sd_storage',
+            resourceName: 'cacheResource',
+            hidden: currentRole !== ROLE_SUPER,
+        },
     ];
     const menuEntries = [
         {
