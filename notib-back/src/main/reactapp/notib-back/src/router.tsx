@@ -22,6 +22,7 @@ import NotFoundPage from './pages/NotFound';
 import Propietats from './pages/propietat/Propietats';
 import MonitorIntegracioGrid from './pages/integracio/MonitorIntegracioGrid';
 import CacheGrid from './pages/cache/CacheGrid';
+import ActiveMqGrid from './pages/activeMq/ActiveMqGrid';
 
 export const router = createBrowserRouter(
     [
@@ -159,10 +160,12 @@ export const router = createBrowserRouter(
                     path: 'caches',
                     children: [
                         { index: true, element: <CacheGrid /> },
-                        /*{
-                            path: 'detail',
-                            children: [{ path: ':id', element: <MonitorIntegracioParamDetail /> }],
-                        },*/
+                    ],
+                },
+                {
+                    path: 'activemq',
+                    children: [
+                        { index: true, element: <ActiveMqGrid /> },
                     ],
                 },
                 {

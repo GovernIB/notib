@@ -18,6 +18,7 @@ const translationCa = {
             notificacions: 'Remeses',
             integracions: 'Integracions',
             cache: "Cache d'aplicacions",
+            activemq: "Monitor ActiveMQ",
         },
     },
     page: {
@@ -387,6 +388,11 @@ const translationCa = {
         cache: {
             grid: {
                 title: "Cache d'aplicacions"
+            },
+        },
+        activeMq: {
+            grid: {
+                title: "Monitor ActiveMQ"
             },
         },
         notFound: {

@@ -159,6 +159,14 @@ const InnerApp: React.FC = () => {
             resourceName: 'cacheResource',
             hidden: currentRole !== ROLE_SUPER,
         },
+        {
+            id: 'activemq',
+            title: t('app.menu.activemq'),
+            to: '/activemq',
+            icon: 'subscriptions',
+            resourceName: 'ActiveMqResource',
+            hidden: currentRole !== ROLE_SUPER,
+        },
     ];
     const menuEntries = [
         {
