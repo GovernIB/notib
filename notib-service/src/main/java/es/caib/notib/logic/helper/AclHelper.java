@@ -308,20 +308,6 @@ public class AclHelper {
 		return acl;
 	}
 
-	private boolean isPermissionGranted(
-			Acl acl,
-			Permission permission,
-			Sid... sids) {
-		try {
-			return acl.isGranted(
-					Collections.singletonList(permission),
-					Arrays.asList(sids),
-					true);
-		} catch (NotFoundException ex) {
-			return false;
-		}
-	}
-
 	private Sid getSid(
 			String name,
 			boolean grantedAuthority) {

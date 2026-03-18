@@ -71,7 +71,7 @@ public class MassivaFileTest {
         NotificacioMassivaDto notificacioMassiva = NotificacioMassivaDto.builder()
                 .ficheroCsvNom("testm1.csv")
                 .ficheroZipNom("test1.zip")
-                .ficheroCsvBytes(getResourceFileAsBytes("/es/caib/notib/logic/massiu/test.csv"))
+                .ficheroCsvBytes(getResourceFileAsBytes("/es/caib/notib/logic/massiu/test1.csv"))
                 .ficheroZipBytes(getResourceFileAsBytes("/es/caib/notib/logic/massiu/test1.zip"))
                 .caducitat(new Date())
                 .build();

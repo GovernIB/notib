@@ -41,8 +41,13 @@ public class EntitatResourceServiceImpl
 
 	@PostConstruct
 	public void init() {
-		register(EntitatResource.Fields.logoCapsalera, new EntitatResourceServiceImpl.LogoCapsaleraFieldFileManager());
-		register(EntitatResource.PERSPECTIVE_PERMISSIONS, new PermisosPerspectiveApplicator());
+		register(EntitatResource.Fields.logoCapsalera, new EntitatResourceLogoCapsaleraFieldFileManager());
+		register(
+			EntitatResource.PERSPECTIVE_PERMISSIONS,
+			new EntitatResourcePermisosPerspectiveApplicator(
+				authenticationHelper,
+				userSessionHelper,
+				notibPermissionHelper));
 	}
 
 	@Override
@@ -99,7 +104,11 @@ public class EntitatResourceServiceImpl
 	 *   - crearComunicacions
 	 *   - crearSir
 	 */
-	public class PermisosPerspectiveApplicator implements PerspectiveApplicator<EntitatResourceEntity, EntitatResource> {
+	@RequiredArgsConstructor
+	public static class EntitatResourcePermisosPerspectiveApplicator implements PerspectiveApplicator<EntitatResourceEntity, EntitatResource> {
+		private final AuthenticationHelper authenticationHelper;
+		private final UserSessionHelper userSessionHelper;
+		private final NotibPermissionHelper notibPermissionHelper;
 		@Override
 		public void applySingle(
 			String code,
@@ -177,7 +186,10 @@ public class EntitatResourceServiceImpl
 		}
 	}
 
-	public static class LogoCapsaleraFieldFileManager implements FieldFileManager<EntitatResourceEntity> {
+	/**
+	 * FieldFileManager pel camp de logo de la capçalera.
+	 */
+	public static class EntitatResourceLogoCapsaleraFieldFileManager implements FieldFileManager<EntitatResourceEntity> {
 		@Override
 		public FileReference read(
 				EntitatResourceEntity entity,
