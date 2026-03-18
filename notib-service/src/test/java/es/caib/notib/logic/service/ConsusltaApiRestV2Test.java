@@ -7,6 +7,7 @@ import es.caib.notib.logic.intf.dto.ApiConsulta;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.persist.entity.DocumentEntity;
+import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.logic.helper.DocumentHelper;
@@ -102,9 +103,10 @@ public class ConsusltaApiRestV2Test {
     public void getDocumentArxiu() {
 
         var doc = new DocumentEntity();
-        var not = NotificacioEntity.builder().document(doc).build();
+		var entitat = new EntitatEntity();
+        var not = NotificacioEntity.builder().entitat(entitat).document(doc).build();
         var arxiu = ArxiuDto.builder().build();
-        Mockito.when(notificacioRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(not));
+        Mockito.when(notificacioRepository.findById(1L)).thenReturn(Optional.of(not));
         Mockito.when(documentHelper.documentToArxiuDto(Mockito.anyString(), Mockito.any(DocumentEntity.class))).thenReturn(arxiu);
         var d = notificacioService.getDocumentArxiu(1L);
         assertNotNull(d);

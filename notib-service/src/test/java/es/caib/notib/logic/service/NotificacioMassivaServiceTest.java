@@ -153,7 +153,8 @@ public class NotificacioMassivaServiceTest {
 
 	private static String csvNom = "test1.csv";
 	private static String zipNom = "test1.zip";
-	private static String email = "test@limit.com";
+//	private static String email = "test@limit.com";
+	private static String email = "";
 	private static String codiUsuari = "CODI_USER";
 
 	private static DocumentValidDto document;
@@ -266,7 +267,7 @@ public class NotificacioMassivaServiceTest {
 				.ficheroCsvBytes(test1Data.getCsvContent())
 				.ficheroZipBytes(test1Data.getZipContent())
 				.caducitat(new Date())
-				.email("test@email.com")
+//				.email("test@email.com")
 				.build();
 
 		// When
@@ -296,7 +297,7 @@ public class NotificacioMassivaServiceTest {
 				.ficheroCsvBytes(test1Data.getCsvContent())
 				.ficheroZipBytes(test1Data.getZipContent())
 				.caducitat(new Date())
-				.email("test@email.com")
+//				.email("test@email.com")
 				.build();
 
 		// When
