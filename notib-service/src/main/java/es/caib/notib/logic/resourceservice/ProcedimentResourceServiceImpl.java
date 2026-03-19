@@ -6,12 +6,9 @@ import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
-import es.caib.notib.logic.intf.model.OrganGestorResource;
 import es.caib.notib.logic.intf.model.ProcedimentResource;
 import es.caib.notib.logic.intf.resourceservice.ProcedimentResourceService;
-import es.caib.notib.logic.service.AvisServiceImpl;
 import es.caib.notib.persist.resourceentity.EntregaCieResourceEntity;
-import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
 import es.caib.notib.persist.resourceentity.ProcedimentResourceEntity;
 import es.caib.notib.persist.resourcerepository.EntregaCieResourceRepository;
 import es.caib.notib.persist.resourcerepository.PagadorCieResourceRepository;
@@ -101,7 +98,7 @@ public class ProcedimentResourceServiceImpl
 	/*
 	 * Lògica onChange pel camp comu. Segons el valor d'aquest camp canvien els camps visibles / habilitats.
 	 */
-	private static class ComuOnChangeLogicProcessor implements OnChangeLogicProcessor<ProcedimentResource> {
+	public static class ComuOnChangeLogicProcessor implements OnChangeLogicProcessor<ProcedimentResource> {
 		@Override
 		public void onChange(
 			Serializable id,

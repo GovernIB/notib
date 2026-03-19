@@ -38,7 +38,8 @@ public interface SseEventService {
 	void removeListener(SseQueue queue);
 
 	enum SseQueue {
-		PROGRESS
+		PROGRESS,
+		TEST
 	}
 
 }

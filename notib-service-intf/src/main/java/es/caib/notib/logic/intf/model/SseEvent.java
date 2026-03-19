@@ -14,8 +14,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SseEvent {
 
-	public static final String EVENT_NAME_DIR3_SYNC = "DIR3_SYNC";
-
 	private SseEventName eventName;
 	private int percent;
 	private SseEventStatus status;

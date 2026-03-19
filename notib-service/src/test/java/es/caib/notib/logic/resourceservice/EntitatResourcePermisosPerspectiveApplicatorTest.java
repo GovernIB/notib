@@ -16,8 +16,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+/**
+ * Test unitari per a EntitatResourcePermisosPerspectiveApplicator.
+ *
+ * Comprova el cas en que l'usuari te permisos per a crear algun tipus de notificació i el cas
+ * en que l'usuari no te permisos.
+ */
 @ExtendWith(MockitoExtension.class)
 public class EntitatResourcePermisosPerspectiveApplicatorTest {
 
@@ -38,15 +46,15 @@ public class EntitatResourcePermisosPerspectiveApplicatorTest {
 			notibPermissionHelper);
 	}
 
-	/*@Test
+	@Test
 	void shouldSetAllFalseIfNotRoleUser() throws PerspectiveApplicationException {
 		EntitatResourceEntity entity = new EntitatResourceEntity();
 		EntitatResource resource = new EntitatResource();
 		when(authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_USER)).thenReturn(false);
 		applicator.applySingle("code", entity, resource);
-		assertFalse(resource.getCrearNotificacions());
-		assertFalse(resource.getCrearComunicacions());
-		assertFalse(resource.getCrearSir());
+		assertFalse(resource.isCrearNotificacions());
+		assertFalse(resource.isCrearComunicacions());
+		assertFalse(resource.isCrearSir());
 	}
 
 	@Test
@@ -60,12 +68,10 @@ public class EntitatResourcePermisosPerspectiveApplicatorTest {
 			.thenReturn(List.of(1L));
 		when(notibPermissionHelper.procedimentServeiNoComuIdsWithPermission(any(), any()))
 			.thenReturn(List.of(1L));
-		when(notibPermissionHelper.procedimentServeiComuIdsWithPermission(any(), any()))
-			.thenReturn(List.of());
 		applicator.applySingle("code", entity, resource);
-		assertTrue(resource.getCrearNotificacions());
-		assertTrue(resource.getCrearComunicacions());
-		assertTrue(resource.getCrearSir());
-	}*/
+		assertTrue(resource.isCrearNotificacions());
+		assertTrue(resource.isCrearComunicacions());
+		assertTrue(resource.isCrearSir());
+	}
 
 }

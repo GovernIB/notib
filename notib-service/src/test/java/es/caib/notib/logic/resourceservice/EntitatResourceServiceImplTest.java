@@ -20,6 +20,12 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Test unitari per a EntitatResourceServiceImpl.
+ * <p>
+ * Comprova els mètodes afterConversion, beforeCreate, beforeUpdate, beforeDelete i
+ * additionalSpringFilter.
+ */
 @ExtendWith(MockitoExtension.class)
 public class EntitatResourceServiceImplTest {
 
