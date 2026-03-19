@@ -62,11 +62,6 @@ es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.serverurl=h
 es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.realm=GOIB
 es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.client_id=goib-ws
 es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.password_secret=KXbtEBU3kMpiekjvktZSmnpk5cGsnJNY
-
-logging.level.org.springframework.web=DEBUG
-logging.level.org.springframework.security=DEBUG
-#logging.level.org.hibernate.SQL=DEBUG
-#logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE
 ```
 
 > Nota: Revisa credencials/URLs segons el teu entorn abans d'usar-les en producció.
