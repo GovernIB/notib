@@ -68,10 +68,10 @@ public class ProcedimentServiceTest {
 	private ProcSerOrganRepository procedimentOrganRepository;
 	@Mock
 	private ConfigHelper configHelper;
-
+	
 	@InjectMocks
 	ProcedimentService procedimentService = new ProcedimentServiceImpl();
-
+	
 	@Before
 	public void setUp() {
 		Mockito.doNothing().when(metricsHelper).fiMetrica(Mockito.nullable(Timer.Context.class));
@@ -89,15 +89,16 @@ public class ProcedimentServiceTest {
 		Mockito.reset(grupService);
 	}
 
+	//
 	@Test
 	public void whenFindAmbFiltrePaginatAdminEntitatWithFiltre_thenReturn() {
-
-		// Given
+		
+		// Given	
 		Long entitatId = 1L;
 		Page<ProcedimentFormEntity> procediments = null;
-
+		
 		PaginaDto<ProcSerFormDto> procedimentsPage = initProcedimentsPage();
-
+		
 		List<EntitatEntity> entitatEntityList = new ArrayList<EntitatEntity>();
 		List<PermisDto> permisos = new ArrayList<PermisDto>();
 		Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
@@ -108,9 +109,9 @@ public class ProcedimentServiceTest {
 		filtre.setNom(null);
 		filtre.setOrganGestor(null);
 		filtre.setComu(false);
-
+		
 		PaginacioParamsDto paginacioParams = new PaginacioParamsDto();
-
+		
 		List<ProcSerOrganEntity> procedimentOrgans = new ArrayList<ProcSerOrganEntity>();
 		EntitatEntity entitat = EntitatEntity.getBuilder("codi",
 						"nom",
@@ -150,50 +151,51 @@ public class ProcedimentServiceTest {
 		OrganGestorEntity organGestor = OrganGestorEntity.builder().entitat(entitat).build();
 		ProcSerOrganEntity procedimentOrgan = ProcSerOrganEntity.getBuilder(procediment, organGestor).build();
 		procedimentOrgans.add(procedimentOrgan);
-
+		
+		
 		Mockito.when(entityComprovarHelper.comprovarEntitat(Mockito.anyLong(), Mockito.eq(false), Mockito.eq(false), Mockito.eq(false), Mockito.eq(false))).thenReturn(entitatEntityMock);
 		Mockito.when(entityComprovarHelper.comprovarEntitat(Mockito.anyLong())).thenReturn(entitatEntityMock);
-		Mockito.when(entitatRepository.findByActiva(Mockito.anyBoolean())).thenReturn(entitatEntityList);
-		Mockito.when(paginacioHelper.toSpringDataPageable(Mockito.any(PaginacioParamsDto.class), Mockito.eq(mapeigPropietatsOrdenacio))).thenReturn(pageableMock);
+		Mockito.when(entitatRepository.findByActiva(Mockito.anyBoolean())).thenReturn(entitatEntityList);		
+		Mockito.when(paginacioHelper.toSpringDataPageable(Mockito.any(PaginacioParamsDto.class), Mockito.eq(mapeigPropietatsOrdenacio))).thenReturn(pageableMock);	
 //		Mockito.when(organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(Mockito.anyString(), Mockito.anyString())).thenReturn(organsFills);
 //		Mockito.when(procedimentFormRepository.findAmbEntitatActual(Mockito.anyLong(), Mockito.any(Pageable.class))).thenReturn(procediments);
 //		Mockito.when(procedimentFormRepository.findAmbEntitatActiva(Mockito.anyListOf(Long.class), Mockito.any(Pageable.class))).thenReturn(procediments);
 //		Mockito.when(procedimentFormRepository.findAmbOrganGestorActualOrComu(Mockito.anyLong(), Mockito.anyListOf(String.class), Mockito.any(Pageable.class))).thenReturn(procediments);
-		Mockito.when(procedimentFormRepository.findAmbEntitatAndFiltre(Mockito.nullable(Long.class), Mockito.nullable(Boolean.class), Mockito.nullable(String.class),
+		Mockito.when(procedimentFormRepository.findAmbEntitatAndFiltre(Mockito.nullable(Long.class), Mockito.nullable(Boolean.class), Mockito.nullable(String.class), 
 				Mockito.nullable(Boolean.class), Mockito.nullable(String.class), Mockito.nullable(Boolean.class), Mockito.nullable(String.class),
 				Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class),
 				Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class), Mockito.nullable(Pageable.class)))
 			.thenReturn(procediments);
-//		Mockito.when(procedimentFormRepository.findAmbFiltre(Mockito.anyBoolean(), Mockito.anyString(), Mockito.anyBoolean(),
+//		Mockito.when(procedimentFormRepository.findAmbFiltre(Mockito.anyBoolean(), Mockito.anyString(), Mockito.anyBoolean(), 
 //				Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString(), Mockito.anyBoolean(), Mockito.any(Pageable.class))).thenReturn(procediments);
-//		Mockito.when(procedimentFormRepository.findAmbOrganGestorOrComuAndFiltre(Mockito.anyLong(), Mockito.anyBoolean(), Mockito.anyString(), Mockito.anyBoolean(),
+//		Mockito.when(procedimentFormRepository.findAmbOrganGestorOrComuAndFiltre(Mockito.anyLong(), Mockito.anyBoolean(), Mockito.anyString(), Mockito.anyBoolean(), 
 //				Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString(), Mockito.anyListOf(String.class), Mockito.anyBoolean(), Mockito.any(Pageable.class))).thenReturn(procediments);
 		Mockito.when(permisosHelper.findPermisos(Mockito.anyLong(), Mockito.eq(ProcedimentEntity.class))).thenReturn(permisos);
 		Mockito.when(grupService.findGrupsByProcSer(Mockito.anyLong())).thenReturn(grup);
 		Mockito.when(paginacioHelper.toPaginaDto(Mockito.eq(procediments), Mockito.eq(ProcSerFormDto.class))).thenReturn(procedimentsPage);
 		Mockito.when(procedimentOrganRepository.findByProcSerId(Mockito.anyLong())).thenReturn(procedimentOrgans);
-//		Mockito.when(organigramaHelper.getCodisOrgansGestorsFillsByOrgan(Mockito.anyString(), Mockito.anyString())).thenReturn(organsFills);
-
-		// When
+//		Mockito.when(organigramaHelper.getCodisOrgansGestorsFillsByOrgan(Mockito.anyString(), Mockito.anyString())).thenReturn(organsFills);		
+		
+		// When	
 		PaginaDto<ProcSerFormDto> pagina = procedimentService.findAmbFiltrePaginat(entitatId, false, true, false, null, filtre, paginacioParams);
-
+		
 		// Then
 		assertNotNull(pagina);
 		//verifica que se ha llamado 1 vez a este método
-		Mockito.verify(procedimentFormRepository).findAmbEntitatAndFiltre(Mockito.nullable(Long.class), Mockito.nullable(Boolean.class), Mockito.nullable(String.class),
+		Mockito.verify(procedimentFormRepository).findAmbEntitatAndFiltre(Mockito.nullable(Long.class), Mockito.nullable(Boolean.class), Mockito.nullable(String.class), 
 				Mockito.nullable(Boolean.class), Mockito.nullable(String.class), Mockito.nullable(Boolean.class), Mockito.nullable(String.class),
 				Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class),
 				Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class), Mockito.nullable(Pageable.class));
 	}
-
+	
 	// TODO: Falta generar más casos de test para admin d'organ y para superusuari con sus listas de permisos, etc. También sin filtre.
 	// Los Mocks comentados en el test anterior no han sido borrados porque servirán para estos casos de pruebas futuros.
 
 	private PaginaDto<ProcSerFormDto> initProcedimentsPage() {
-
+		
 		PaginaDto<ProcSerFormDto> procedimentsPage = new PaginaDto<ProcSerFormDto>();
 		List<ProcSerFormDto> procList = new ArrayList<ProcSerFormDto>();
-
+		
 		ProcSerFormDto proc1 = new ProcSerFormDto();
 		proc1.setAgrupar(false);
 		proc1.setCodi("962793");
@@ -212,7 +214,7 @@ public class ProcedimentServiceTest {
 //		proc1.setPagadorpostal(null);
 		proc1.setPermisos(null);
 		proc1.setRetard(0);
-
+		
 		ProcSerFormDto proc2 = new ProcSerFormDto();
 		proc2.setAgrupar(false);
 		proc2.setCodi("879427");
@@ -236,7 +238,7 @@ public class ProcedimentServiceTest {
 			procList.add(proc2);
 		}
 		procedimentsPage.setContingut(procList);
-
+		
 		procedimentsPage.setDarrera(false);
 		procedimentsPage.setElementsTotal(1169);
 		procedimentsPage.setNumero(0);
@@ -244,7 +246,7 @@ public class ProcedimentServiceTest {
 		procedimentsPage.setPrimera(true);
 		procedimentsPage.setTamany(10);
 		procedimentsPage.setTotal(117);
-
+		
 		return procedimentsPage;
 	}
 }
