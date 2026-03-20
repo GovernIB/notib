@@ -24,7 +24,6 @@ import goibLogoLight from '../../assets/goib_logo_light.svg';
 import notibLogoLight from '../../assets/notib_logo_light.png';
 import { useNotibContext } from '../../components/NotibContext';
 import GridFormField from '../../components/GridFormField';
-import { useTabParam } from '../../hooks/useSearchParams';
 
 const useEntitatId = () => {
     const { id: paramId } = useParams();
@@ -144,7 +143,6 @@ const EntitatFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> 
     const { setSubtitle } = props;
     const { t } = useTranslation();
     const { data } = useFormContext();
-    const initialTab = useTabParam();
 
     React.useEffect(() => {
         setSubtitle(data?.codi + ', ' + data?.nom);
@@ -177,7 +175,8 @@ const EntitatFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> 
     ];
 
     return (
-        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[2, 3, 4]} initialIndex={initialTab}>
+        // TODO: Controlar initialIndex amb estats
+        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[2, 3, 4]} initialIndex={0}>
             <MuiFormTabContent index={0} showOnCreate>
                 <EntitatFormTabDades />
             </MuiFormTabContent>
