@@ -11,7 +11,6 @@ import {
 import { useNotibContext } from '../../components/NotibContext';
 import GridFormField, { GridButtonField } from '../../components/GridFormField';
 import { Grid, Icon, IconButton } from '@mui/material';
-import LinkToTab from '../../components/LinkToTab';
 
 const columns = [
     {
@@ -59,13 +58,11 @@ const columns = [
         flex: 0.6,
         renderCell: (params: any) => {
             return (
-                <LinkToTab id={params.id} tab={1}>
-                    <Chip
-                        label={params.value}
-                        color={params.value ? 'primary' : undefined}
-                        size="small"
-                    />
-                </LinkToTab>
+                <Chip
+                    label={params.value}
+                    color={params.value ? 'primary' : undefined}
+                    size="small"
+                />
             );
         },
     },
@@ -74,13 +71,11 @@ const columns = [
         flex: 0.6,
         renderCell: (params: any) => {
             return (
-                <LinkToTab id={params.id} tab={2}>
-                    <Chip
-                        label={params.value}
-                        color={params.value ? 'primary' : undefined}
-                        size="small"
-                    />
-                </LinkToTab>
+                <Chip
+                    label={params.value}
+                    color={params.value ? 'primary' : undefined}
+                    size="small"
+                />
             );
         },
     },

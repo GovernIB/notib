@@ -20,7 +20,6 @@ import {
 } from 'reactlib';
 import GridFormField from '../../components/GridFormField';
 import { Icon, IconButton } from '@mui/material';
-import LinkToTab from '../../components/LinkToTab';
 
 const columns = [
     {
@@ -53,16 +52,14 @@ const columns = [
     },
     {
         field: 'aclEntryCount',
-        flex: 1,
+        flex: 0.6,
         renderCell: (params: any) => {
             return (
-                <LinkToTab id={params.id} tab={1}>
-                    <Chip
-                        label={params.value}
-                        color={params.value ? 'primary' : undefined}
-                        size="small"
-                    />
-                </LinkToTab>
+                <Chip
+                    label={params.value}
+                    color={params.value ? 'primary' : undefined}
+                    size="small"
+                />
             );
         },
     },
@@ -203,6 +200,7 @@ const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (p
         filterApiRef.current.clear();
     };
 
+    // TODO: Convertir codiPare i nomPare en un unic filtre
     return (
         <Grid container spacing={2}>
             <GridFormField size={1} name="codi" />
@@ -226,6 +224,8 @@ const OrganGestorGridFilter: React.FC = () => {
         return filterBuilder.and(
             filterBuilder.like('codi', data?.codi),
             filterBuilder.like('nom', data?.nom),
+            // filterBuilder.like('codiPare', data?.codiPare), // TODO: Convertir codiPare i nomPare en un unic filtre
+            // filterBuilder.like('nomPare', data?.nomPare), // TODO: Convertir codiPare i nomPare en un unic filtre
             filterBuilder.eq('pare.id', data.pare?.id),
             filterBuilder.like('llibre', data?.llibre),
             filterBuilder.eq('estat', `'${data?.estat}'`),
