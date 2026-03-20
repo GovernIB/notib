@@ -254,12 +254,13 @@ public class EntitatResourceServiceImplTest {
 		assertNull(captor.getValue().getLogoCapsalera());
 	}
 
-	/*@Test
+	@Test
 	void logoCapsaleraFieldFileManagerDelete_always_setsContentToNull() {
-		EntitatResourceEntity entity = new EntitatResourceEntity();
-		entity.setLogoCapsalera("something".getBytes());
+		EntitatResourceEntity saved = new EntitatResourceEntity();
+		saved.setLogoCapsalera("something".getBytes());
+		when(entitatResourceRepository.findOne(any(Specification.class))).thenReturn(Optional.of(saved));
 		service.delete(1L, null);
-		assertNull(entity.getLogoCapsalera());
-	}*/
+		assertNull(saved.getLogoCapsalera());
+	}
 
 }
