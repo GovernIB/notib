@@ -30,7 +30,6 @@ public class CallbackServiceImplTest {
     @InjectMocks
     private CallbackServiceImpl callbackService;
 
-
     private Map<Long, NotificacioEventEntity> eventsMap;
 
 //    @Before
