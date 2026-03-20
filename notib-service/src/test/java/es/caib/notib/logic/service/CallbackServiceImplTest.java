@@ -97,7 +97,6 @@ public class CallbackServiceImplTest {
 //        Mockito.verify(callbackHelper, Mockito.times(2))
 //                .marcarEventNoProcessable(Mockito.any(Long.class), Mockito.nullable(String.class), Mockito.nullable(String.class)
 //        );
-//
 //    }
 
 }
