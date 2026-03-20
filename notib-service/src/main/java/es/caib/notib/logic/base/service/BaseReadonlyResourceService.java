@@ -90,7 +90,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 				throw new IllegalStateException("Couldn't find BaseRepository<" + entityClass + ", " + pkClass + ">");
 			}
 		} else {
-			entityRepository = (BaseRepository<E, ID>) applicationContext.getBean(beanNames[0]);
+			entityRepository = (BaseRepository<E, ID>)applicationContext.getBean(beanNames[0]);
 		}
 	}
 

@@ -33,7 +33,6 @@ class AplicacioResourceServiceImplTest {
 
 	@Mock
 	private NotibPermissionHelper notibPermissionHelper;
-
 	@InjectMocks
 	private AplicacioResourceServiceImpl service;
 
