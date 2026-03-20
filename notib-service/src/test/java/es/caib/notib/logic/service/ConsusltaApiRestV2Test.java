@@ -157,5 +157,4 @@ public class ConsusltaApiRestV2Test {
         Mockito.when(notificacioEnviamentRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(env));
         return resposta;
     }
-
 }

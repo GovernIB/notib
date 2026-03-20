@@ -82,17 +82,11 @@ public abstract class BaseAdminEntitatResourceServiceImpl<R extends Resource<Lon
 
 		var currentEntitatResource = userSessionHelper.getCurrentEntitat();
 		if (currentEntitatResource == null) {
-			throw new ResourceNotUpdatedException(
-				getResourceClass(),
-				"" + entity.getId(),
-				"Not allowed to update a " + getResourceClass() + " without any entitat selected in session");
+			throw new ResourceNotUpdatedException(getResourceClass(), entity.getId() + "", "Not allowed to update a " + getResourceClass() + " without any entitat selected in session");
 		}
 		if (!Objects.equals(entity.getEntitat(), currentEntitatResource)) {
-			throw new ResourceNotUpdatedException(
-				getResourceClass(),
-				"" + entity.getId(),
-				"Not allowed to update a " + getResourceClass() + " belonging to a different entitat than the one selected in the session (" +
-					"sessionEntitatId=" + currentEntitatResource.getId() + ")");
+			var msg = "Not allowed to update a " + getResourceClass() + " belonging to a different entitat than the one selected in the session (sessionEntitatId=" + currentEntitatResource.getId() + ")";
+			throw new ResourceNotUpdatedException(getResourceClass(), "" + entity.getId(), msg);
 		}
 		notibPermissionHelper.entitatCheckAdminPermission(getResourceClass(), entity.getId(), entity.getEntitat().getId(), BasePermission.WRITE);
 	}
