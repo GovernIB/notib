@@ -44,8 +44,10 @@ public class MassivaFileTest {
 
     @Mock
     private ConfigHelper configHelper;
+
     @Mock
     private MessageHelper messageHelper;
+
     @Mock
     private PluginHelper pluginHelper;
 
@@ -304,5 +306,4 @@ public class MassivaFileTest {
     private byte[] getResourceFileAsBytes(String fileName) throws IOException {
         return Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getResource(fileName)).getFile()));
     }
-
 }
