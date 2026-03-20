@@ -40,8 +40,6 @@ public class ConfigServiceTest {
     @InjectMocks
     private ConfigServiceImpl configService;
 
-
-
     @Before
     public void setUp() throws Exception { }
 
