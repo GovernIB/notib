@@ -24,7 +24,6 @@ import java.util.Set;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConfigHelperTest {
-
     @Mock
     private ConfigRepository configRepository;
     @Mock

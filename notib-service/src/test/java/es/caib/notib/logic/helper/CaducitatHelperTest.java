@@ -17,6 +17,7 @@ public class CaducitatHelperTest {
 
     @Before
     public void setUp() throws Exception {
+
     }
 
     @Test
@@ -70,5 +71,4 @@ public class CaducitatHelperTest {
         // Then
         Assert.assertEquals("16/02/2022", df.format(fi));
     }
-
 }
