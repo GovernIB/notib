@@ -248,7 +248,7 @@ public class EntitatResourceServiceImplTest {
 		when(resourceEntityMappingHelper.entityToResource(any(), any())).thenReturn(new EntitatResource());
 		when(entitatResourceRepository.merge(any())).thenReturn(saved);
 		EntitatResource resource = new EntitatResource();
-		EntitatResource updated = service.update(1L, resource, null);
+		service.update(1L, resource, null);
 		ArgumentCaptor<EntitatResourceEntity> captor = ArgumentCaptor.forClass(EntitatResourceEntity.class);
 		verify(entitatResourceRepository).detach(captor.capture());
 		assertNull(captor.getValue().getLogoCapsalera());
