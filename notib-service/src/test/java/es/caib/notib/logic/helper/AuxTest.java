@@ -4,7 +4,6 @@ import org.apache.commons.lang3.SystemUtils;
 import org.junit.Test;
 
 public class AuxTest {
-
     @Test
     public void deleteFilesOlderThanOneDay() {
 
@@ -20,5 +19,4 @@ public class AuxTest {
             ex.printStackTrace();
         }
     }
-
 }
