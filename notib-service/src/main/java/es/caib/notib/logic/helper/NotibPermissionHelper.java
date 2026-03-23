@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Helper per a la comprovació de permisos propis de NOTIB.
@@ -124,9 +123,7 @@ public class NotibPermissionHelper {
 
 	/**
 	 * Retorna la llista d'ids d'òrgans gestors de l'entitat actual sobre els que l'usuari actual te el permís
-	 * especificat. Aquesta llista s'emplena de forma recursiva perquè si es tenen permisos sobre un òrgan gestor
-	 * pare també es tenen permisos sobre els seus fills. Aquesta recursivitat no és infinita, només es revisen
-	 * els fills amb 4 nivells de profunditat.
+	 * especificat.
 	 *
 	 * @param permission
 	 *            el permís que es vol comprovar.
@@ -187,49 +184,23 @@ public class NotibPermissionHelper {
 	 * @return la llista d'ids de procediments/serveis comuns.
 	 */
 	public List<Long> procedimentServeiComuIdsWithPermission(Permission permission, Boolean isServei) {
-		// Obté els òrgans gestors sobre els que es tenen permísos per a procediments/serveis comuns.
+		// Mira si hi ha algun òrgan gestor amb permís per a procediments/serveis comuns.
 		Set<Long> idsWithPermission = aclHelper.findIdsWithAnyPermission(
-			AclHelper.ORGAN_GESTOR_CLASS,
-			List.of(ExtendedPermission.PERM3), // Permís de procediments/serveis comuns
+			AclHelper.PROCEDIMENT_CLASS,
+			List.of(ExtendedPermission.PERM3),
 			aclHelper.getCurrentUserSids().toArray(Sid[]::new)).
 			stream().map(Long::valueOf).collect(Collectors.toSet());
 		if (!idsWithPermission.isEmpty()) {
-			// Si hi ha algún òrgan gestor amb permís per a procediments/serveis comuns retorna la llista de
+			// Si hi ha òrgans gestors amb permís per a procediments/serveis comuns retorna la llista de
 			// procediments/serveis comuns que no requereixen permís directe.
 			Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
 			ProcSerTipusEnum procSerTipus = getProcSerTipusForQuery(isServei);
-			List<Long> idsWithNoDirectPermission = procedimentResourceRepository.findIdsByEntitatIdAndTipusAndComuTrueAndPermisDirecte(
+			return procedimentResourceRepository.findIdsByEntitatIdAndTipusAndComuTrueAndPermisDirecteFalse(
 				currentEntitatId,
-				procSerTipus,
-				false);
-			List<Long> idsWithDirectPermission = procedimentServeiComuIdsAmbPermisDirecte(
-				ExtendedPermission.PERM3,
-				isServei);
-			return Stream.concat(idsWithNoDirectPermission.stream(), idsWithDirectPermission.stream()).
-				distinct().collect(Collectors.toList());
+				procSerTipus);
 		} else {
 			return new ArrayList<>();
 		}
-	}
-
-	private List<Long> procedimentServeiComuIdsAmbPermisDirecte(Permission permission, Boolean isServei) {
-		Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
-		// Obté la llista de procediments/serveis amb el permís assignat.
-		Set<Long> idsWithPermission = aclHelper.findIdsWithAnyPermission(
-				AclHelper.PROCEDIMENT_CLASS,
-				List.of(permission),
-				aclHelper.getCurrentUserSids().toArray(Sid[]::new)).
-			stream().map(Long::valueOf).collect(Collectors.toSet());
-		ProcSerTipusEnum procSerTipus = getProcSerTipusForQuery(isServei);
-		// Obté la llista de procediments/serveis de l'entitat que requereixen permis directe
-		List<Long> idsWithDirectPermission = procedimentResourceRepository.findIdsByEntitatIdAndTipusAndComuTrueAndPermisDirecte(
-			currentEntitatId,
-			procSerTipus,
-			false);
-		// Retorna els elements comuns de les dues llistes
-		return idsWithPermission.stream().
-			filter(idsWithDirectPermission::contains).
-			collect(Collectors.toList());
 	}
 
 	private ProcSerTipusEnum getProcSerTipusForQuery(Boolean isServei) {
