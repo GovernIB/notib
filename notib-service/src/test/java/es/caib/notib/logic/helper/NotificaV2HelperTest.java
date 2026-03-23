@@ -37,6 +37,7 @@ import java.util.Optional;
 @Disabled
 @ExtendWith({MockitoExtension.class})
 public class NotificaV2HelperTest {
+
     @Mock
     private NotificacioEnviamentRepository notificacioEnviamentRepository;
     @Mock
