@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(BaseConfig.API_PATH + "/activemq")
 public class ActiveMqResourceController extends BaseMutableResourceController<ActiveMqResource, String> {
 
-	@Override
-	public ResponseEntity<CacheResource> delete(String id) {
-
-		return null;
-	}
+//	@Override
+//	public ResponseEntity<CacheResource> delete(String id) {
+//
+//		return null;
+//	}
 }
