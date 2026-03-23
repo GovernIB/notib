@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration(locations = {"/es/caib/notib/logic/application-context-test.xml"})
 @Transactional
 public class CallbackHelperIT extends BaseServiceTestV2 {
+
     @Autowired
     NotificacioRepository notificacioRepository;
     @Autowired
