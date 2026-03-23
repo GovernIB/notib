@@ -376,13 +376,8 @@
 				</includes>
 				<filtering>true</filtering>
 			</resource>
-			<resource>
-				<directory>${frontend.app.path}/dist</directory>
-				<targetPath>static/reactapp</targetPath>
-			</resource>
 		</resources>
 		<plugins>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
