@@ -13,7 +13,6 @@ import {
 } from 'reactlib';
 import GridFormField from '../../components/GridFormField';
 import { Icon, IconButton } from '@mui/material';
-import LinkToTab from '../../components/LinkToTab';
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -31,7 +30,6 @@ const columns: MuiDataGridColDef[] = [
     {
         field: 'activa',
         flex: 0.6,
-        type: 'boolean',
     },
     {
         field: 'tipusDocCount',
@@ -39,13 +37,11 @@ const columns: MuiDataGridColDef[] = [
         align: 'center',
         renderCell: (params: any) => {
             return (
-                <LinkToTab id={params.id} tab={2}>
-                    <Chip
-                        label={params.value}
-                        color={params.value ? 'primary' : undefined}
-                        size="small"
-                    />
-                </LinkToTab>
+                <Chip
+                    label={params.value}
+                    color={params.value ? 'primary' : undefined}
+                    size="small"
+                />
             );
         },
     },
@@ -55,13 +51,11 @@ const columns: MuiDataGridColDef[] = [
         align: 'center',
         renderCell: (params: any) => {
             return (
-                <LinkToTab id={params.id} tab={3}>
-                    <Chip
-                        label={params.value}
-                        color={params.value ? 'primary' : undefined}
-                        size="small"
-                    />
-                </LinkToTab>
+                <Chip
+                    label={params.value}
+                    color={params.value ? 'primary' : undefined}
+                    size="small"
+                />
             );
         },
     },
@@ -71,13 +65,11 @@ const columns: MuiDataGridColDef[] = [
         align: 'center',
         renderCell: (params: any) => {
             return (
-                <LinkToTab id={params.id} tab={4}>
-                    <Chip
-                        label={params.value}
-                        color={params.value ? 'primary' : undefined}
-                        size="small"
-                    />
-                </LinkToTab>
+                <Chip
+                    label={params.value}
+                    color={params.value ? 'primary' : undefined}
+                    size="small"
+                />
             );
         },
     },
