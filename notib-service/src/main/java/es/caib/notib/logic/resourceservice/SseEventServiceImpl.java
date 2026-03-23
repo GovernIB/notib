@@ -24,7 +24,6 @@ public class SseEventServiceImpl implements SseEventService {
 
 	@Override
 	public void addListener(SseQueue queue, Consumer<SseEvent> listener) {
-		log.debug("SSE listener add: " + queue.name());
 		consumers.put(queue.name(), listener);
 	}
 
@@ -32,16 +31,12 @@ public class SseEventServiceImpl implements SseEventService {
 	public void publishEvent(SseQueue queue, SseEvent event) {
 		Consumer<SseEvent> listener = consumers.get(queue.name());
 		if (listener != null) {
-			log.debug("SSE listener accept: " + queue.name() + ", " + event.getMessage() + ", " + event.getPercent());
 			listener.accept(event);
-		} else {
-			log.debug("SSE listener discard: " + queue.name() + ", " + event.getMessage() + ", " + event.getPercent());
 		}
 	}
 
 	@Override
 	public void removeListener(SseQueue queue) {
-		log.debug("SSE listener remove: " + queue.name());
 		consumers.remove(queue.name());
 	}
 

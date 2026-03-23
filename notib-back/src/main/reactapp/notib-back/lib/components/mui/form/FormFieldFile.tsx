@@ -31,6 +31,7 @@ export const FormFieldFile: React.FC<FormFieldFileProps> = (props) => {
         accept,
         onFileDownload,
     } = props;
+    const [fileName, setFileName] = React.useState<string | undefined>(value?.name);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const { helperText, title, startAdornment } = useFormFieldCommon(
         field,
@@ -52,9 +53,11 @@ export const FormFieldFile: React.FC<FormFieldFileProps> = (props) => {
                     contentLength: currentFile.size,
                 };
                 onChange(fileValue);
+                setFileName(currentFile?.name);
             });
         } else {
             onChange(null);
+            setFileName(undefined);
         }
     };
     const handleClearButtonClick = (event: any) => {
@@ -64,6 +67,7 @@ export const FormFieldFile: React.FC<FormFieldFileProps> = (props) => {
             fileInputRef.current.value = '';
         }
         onChange(null);
+        setFileName(undefined);
     };
     const handleDownloadButtonClick = (event: any) => {
         event.stopPropagation();
@@ -116,7 +120,7 @@ export const FormFieldFile: React.FC<FormFieldFileProps> = (props) => {
                 name={name}
                 label={!inline ? label : undefined}
                 placeholder={componentProps?.placeholder ?? (inline ? label : undefined)}
-                value={value?.name ?? ''}
+                value={fileName ?? ''}
                 required={required ?? field?.required}
                 disabled={disabled}
                 error={fieldError != null}
