@@ -13,18 +13,14 @@ import {
 } from 'reactlib';
 import PagadorCieFormTabFulles from './PagadorCieFormTabFulles';
 import PagadorCieFormTabSobres from './PagadorCieFormTabSobres';
-import { useTabParam } from '../../hooks/useSearchParams';
 
 const PagadorCieFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
     const { setSubtitle } = props;
     const { t } = useTranslation();
     const { data } = useFormContext();
-    const initialTab = useTabParam();
-
     React.useEffect(() => {
         setSubtitle(data?.nom);
     }, [data]);
-
     const fullesTabLabel = (
         <Badge badgeContent={data.fullaCount} color="primary">
             {t('page.pagadorCie.form.tabs.fulles')}
@@ -40,9 +36,8 @@ const PagadorCieFormContent: React.FC<{ setSubtitle: (subtitle: string) => void 
         { label: fullesTabLabel },
         { label: sobresTabLabel },
     ];
-
     return (
-        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1, 2]} initialIndex={initialTab}>
+        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1, 2]}>
             <MuiFormTabContent index={0} showOnCreate>
                 <Grid container spacing={2}>
                     <Grid size={6}>
@@ -94,8 +89,7 @@ export const PagadorCieForm: React.FC = () => {
                 createLink="./{{id}}"
                 //updateLink="../../"
                 componentProps={{ style: { height: '100%' } }}
-                commonFieldComponentProps={{ size: 'small' }}
-            >
+                commonFieldComponentProps={{ size: 'small' }}>
                 <PagadorCieFormContent setSubtitle={setSubtitle} />
             </MuiForm>
         </FormPage>
