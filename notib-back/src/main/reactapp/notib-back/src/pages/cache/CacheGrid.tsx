@@ -32,7 +32,7 @@ export const CacheGrid = () => {
                 title={t('page.cache.grid.title')}
                 resourceName="cacheResource"
                 columns={columns}
-                paginationActive
+                // paginationActive
                 toolbarBulkDelete
                 toolbarHideQuickFilter
             />
