@@ -62,7 +62,6 @@ const InnerApp: React.FC = () => {
     const { t } = useTranslation();
     const { mode } = useColorScheme();
     const { currentRole, currentEntitatId } = useNotibContext();
-
     const menuConfig = [
         {
             id: 'entitats',
@@ -165,24 +164,7 @@ const InnerApp: React.FC = () => {
             title: t('app.menu.activemq'),
             to: '/activemq',
             icon: 'subscriptions',
-            resourceName: 'activeMqResource',
-            hidden: currentRole !== ROLE_SUPER,
-        },
-        // {
-        //     id: 'callbacksError',
-        //     title: t('app.menu.callbacksError'),
-        //     to: '/notificacions',
-        //     icon: 'running_with_errors',
-        //     resourceName: 'notificacioResource',
-        //     hidden: currentRole !== ROLE_SUPER,
-        // },
-        {
-            id: 'monitorSistema',
-            title: t('app.menu.monitorSistema'),
-            to: '/monitorSistema',
-            icon: 'monitor_heart',
-            // resourceName: 'threadInfoResource',
-            // resourceName: 'integracioResource',
+            resourceName: 'ActiveMqResource',
             hidden: currentRole !== ROLE_SUPER,
         },
     ];

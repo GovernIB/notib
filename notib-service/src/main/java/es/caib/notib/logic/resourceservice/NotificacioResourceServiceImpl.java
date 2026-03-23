@@ -12,15 +12,24 @@ import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 import es.caib.notib.logic.intf.model.NotificacioResource;
 import es.caib.notib.logic.intf.model.PersonaResource;
 import es.caib.notib.logic.intf.resourceservice.NotificacioResourceService;
-import es.caib.notib.persist.resourceentity.*;
+import es.caib.notib.logic.intf.service.AuditService;
+import es.caib.notib.logic.intf.service.EnviamentSmService;
+import es.caib.notib.persist.entity.NotificacioEntity;
+import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
+import es.caib.notib.persist.repository.NotificacioRepository;
+import es.caib.notib.persist.resourceentity.DocumentResourceEntity;
+import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
+import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
+import es.caib.notib.persist.resourceentity.PersonaResourceEntity;
 import es.caib.notib.persist.resourcerepository.DocumentResourceRepository;
 import es.caib.notib.persist.resourcerepository.NotificacioEnviamentResourceRepository;
 import es.caib.notib.persist.resourcerepository.PersonaResourceRepository;
-import es.caib.notib.persist.resourcerepository.ProcedimentOrganGestorResourceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
@@ -28,7 +37,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -44,53 +52,23 @@ public class NotificacioResourceServiceImpl
 
 	private final UserSessionHelper userSessionHelper;
 	private final AuthenticationHelper authenticationHelper;
-	private final LegacyHelper legacyHelper;
-	private final NotibPermissionHelper notibPermissionHelper;
 	private final NotificacioEnviamentResourceRepository notificacioEnviamentResourceRepository;
 	private final DocumentResourceRepository documentResourceRepository;
 	private final PersonaResourceRepository personaResourceRepository;
-	private final ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository;
+	private final LegacyHelper legacyHelper;
+
+	private final EnviamentSmService enviamentSmService;
+	private final NotificacioTableHelper notificacioTableHelper;
+	private final EnviamentTableHelper enviamentTableHelper;
+	private final AuditHelper auditHelper;
+	private final NotificacioRepository notificacioRepository;
+	private final NotificacioEnviamentRepository notificacioEnviamentRepository;
 
 	@PostConstruct
 	public void init() {
 		register(null, new NotificacioResourceServiceImpl.InitOnChangeLogicProcessor());
 		register(NotificacioResource.Fields.caducitat, new NotificacioResourceServiceImpl.CaducitatOnChangeLogicProcessor());
 		register(NotificacioResource.Fields.caducitatDiesNaturals, new NotificacioResourceServiceImpl.CaducitatOnChangeLogicProcessor());
-	}
-
-	@Override
-	protected String additionalSpringFilter(
-		String currentSpringFilter,
-		String[] namedQueries) {
-		List<String> andConditions = new ArrayList<>();
-		// Condició per a mostrar només les notificacions de l'entitat actual
-		andConditions.add("entitat.id:" + userSessionHelper.getCurrentEntitatId());
-		// Condició per a mostrar només les notificacions sobre les que es tenen permisos. Les notificacions es poden
-		// veure si es compleix algun de les següents condicions:
-		//   - L'usuari te permisos de lectura sobre l'òrgan gestor de la notificació.
-		//   - L'usuari te permisos de lectura sobre el procediment no comú de la notificació.
-		//   - L'usuari te permisos de lectura sobre el procediment comú de la notificació i sobre el seu òrgan gestor.
-		List<String> permissionOrConditions = new ArrayList<>();
-		String readableOrganGestorIds = notibPermissionHelper.
-			organGestorIdsWithPermissionRecursive(BasePermission.READ).
-			stream().map(String::valueOf).collect(Collectors.joining(","));
-		if (!readableOrganGestorIds.isEmpty()) {
-			permissionOrConditions.add("organGestor.id in (" + readableOrganGestorIds + ")");
-		}
-		String readableProcedimentNoComuIds = notibPermissionHelper.
-			procedimentServeiNoComuIdsWithPermission(BasePermission.READ, null).
-			stream().map(String::valueOf).collect(Collectors.joining(","));
-		if (!readableProcedimentNoComuIds.isEmpty()) {
-			permissionOrConditions.add("procediment.id in (" + readableProcedimentNoComuIds + ")");
-		}
-		String readableProcedimentComuIds = notibPermissionHelper.
-			procedimentServeiComuIdsWithPermission(BasePermission.READ, null).
-			stream().map(String::valueOf).collect(Collectors.joining(","));
-		if (!readableProcedimentComuIds.isEmpty()) {
-			permissionOrConditions.add("procediment.id in (" + readableProcedimentComuIds + ")");
-		}
-		andConditions.add("(" + String.join(" or ", permissionOrConditions) + ")");
-		return String.join(" and ", andConditions);
 	}
 
 	@Override
@@ -104,8 +82,6 @@ public class NotificacioResourceServiceImpl
 		entity.setComunicacioTipus(NotificacioComunicacioTipusEnumDto.ASINCRON);
 		entity.setEstat(NotificacioEstatEnumDto.PENDENT);
 		entity.setReferencia(UUID.randomUUID().toString());
-		entity.setProcedimentCodiNotib(entity.getProcediment().getCodi());
-		emplenarProcedimentOrganGestor(entity);
 		if (resource.getDocumentsInfo() != null) {
 			saveDocuments(entity, resource.getDocumentsInfo());
 		}
@@ -117,34 +93,31 @@ public class NotificacioResourceServiceImpl
 		NotificacioResource resource,
 		Map<String, AnswerRequiredException.AnswerValue> answers,
 		boolean anyOrderChanged) {
-		List<Long> enviamentsIds = new ArrayList<>();
 		if (resource.getEnviamentsInfo() != null) {
-			resource.getEnviamentsInfo().forEach(e -> {
-				Long enviamentId = saveEnviament(entity, e);
-				enviamentsIds.add(enviamentId);
-			});
+			saveEnviaments(entity, resource.getEnviamentsInfo());
 		}
-		legacyHelper.altaNotificacio(entity.getId(), enviamentsIds);
+		notificacioLegacy(entity);
 	}
 
-	private Long saveEnviament(
+	private void saveEnviaments(
 		NotificacioResourceEntity notificacio,
-		NotificacioEnviamentResource enviament) {
-		String uuid = UUID.randomUUID().toString();
-		NotificacioEnviamentResourceEntity enviamentNou = NotificacioEnviamentResourceEntity.builder().
-			resource(enviament).
-			notificacio(notificacio).
-			build();
-		enviamentNou.setNotificaReferencia(uuid);
-		enviamentNou.setNotificaEstat(EnviamentEstat.PENDENT);
-		NotificacioEnviamentResourceEntity enviamentCreat = notificacioEnviamentResourceRepository.saveAndFlush(enviamentNou);
-		PersonaResourceEntity titular = saveDestinatari(enviamentCreat, enviament.getTitularInfo());
-		enviamentCreat.setTitular(titular);
-		enviamentCreat.setNotificaReferencia(uuid);
-		if (enviament.getRepresentantsInfo() != null) {
-			enviament.getRepresentantsInfo().forEach(r -> saveDestinatari(enviamentCreat, r));
-		}
-		return enviamentCreat.getId();
+		List<NotificacioEnviamentResource> enviaments) {
+		// Crea els enviaments associats amb la notificació a la base de dades.
+		enviaments.forEach(e -> {
+			NotificacioEnviamentResourceEntity enviamentNou = NotificacioEnviamentResourceEntity.builder().
+				resource(e).
+				notificacio(notificacio).
+				build();
+			enviamentNou.setNotificaEstat(EnviamentEstat.PENDENT);
+			NotificacioEnviamentResourceEntity enviamentCreat = notificacioEnviamentResourceRepository.save(enviamentNou);
+			PersonaResourceEntity titular = saveDestinatari(enviamentCreat, e.getTitularInfo());
+			enviamentCreat.setTitular(titular);
+			enviamentCreat.setNotificaReferencia(UUID.randomUUID().toString());
+			if (e.getRepresentantsInfo() != null) {
+				e.getRepresentantsInfo().forEach(r -> saveDestinatari(enviamentCreat, r));
+			}
+			notificacioEnviamentLegacy(enviamentCreat);
+		});
 	}
 
 	private void saveDocuments(
@@ -182,19 +155,50 @@ public class NotificacioResourceServiceImpl
 				build());
 	}
 
-	private void emplenarProcedimentOrganGestor(NotificacioResourceEntity entity) {
-		if (entity.getProcediment() != null && entity.getProcediment().isComu() && entity.getOrganGestor() != null) {
-			Optional<ProcedimentOrganGestorResourceEntity> procedimentOrganGestor = procedimentOrganGestorResourceRepository.findByProcedimentAndOrganGestor(
-				entity.getProcediment(),
-				entity.getOrganGestor());
-			procedimentOrganGestor.ifPresent(entity::setProcedimentOrganGestor);
+	private void notificacioLegacy(NotificacioResourceEntity entity) {
+		// Lògica antiga per a les notificacions
+		Optional<NotificacioEntity> notificacioEntity = notificacioRepository.findById(entity.getId());
+		if (notificacioEntity.isPresent()) {
+			// Registra la notificació
+			notificacioTableHelper.crearRegistre(notificacioEntity.get());
+			// Crea la informació d'auditoria
+			auditHelper.auditaNotificacio(
+				notificacioEntity.get(),
+				AuditService.TipusOperacio.CREATE,
+				"NotificacioResourceServiceImpl.afterCreateSave");
+			// Dona d'alta els enviaments a la màqina d'estats al finalitzar la transacció
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+				@Override
+				public void afterCommit() {
+					if (TransactionSynchronizationManager.isActualTransactionActive()) {
+						notificacioEntity.get().getEnviaments().forEach(e -> {
+							enviamentSmService.altaEnviament(e.getNotificaReferencia());
+						});
+					}
+				}
+			});
+		}
+	}
+
+	private void notificacioEnviamentLegacy(NotificacioEnviamentResourceEntity entity) {
+		// Lògica antiga pels enviaments
+		Optional<NotificacioEnviamentEntity> notificacioEnviamentEntity = notificacioEnviamentRepository.findById(
+			entity.getId());
+		if (notificacioEnviamentEntity.isPresent()) {
+			// Registra l'enviament
+			enviamentTableHelper.crearRegistre(notificacioEnviamentEntity.get());
+			// Crea la informació d'auditoria
+			auditHelper.auditaEnviament(
+				notificacioEnviamentEntity.get(),
+				AuditService.TipusOperacio.CREATE,
+				"NotificacioResourceServiceImpl.saveEnviaments");
 		}
 	}
 
 	/*
 	 * Lògica onChange que s'executa al carregar el formulari.
 	 */
-	static class InitOnChangeLogicProcessor implements OnChangeLogicProcessor<NotificacioResource> {
+	private static class InitOnChangeLogicProcessor implements OnChangeLogicProcessor<NotificacioResource> {
 		@Override
 		public void onChange(
 			Serializable id,
@@ -211,7 +215,7 @@ public class NotificacioResourceServiceImpl
 	/*
 	 * Lògica onChange pel camp interessatTipus. Segons el valor d'aquest camp canvien els camps visibles / obligatoris.
 	 */
-	static class CaducitatOnChangeLogicProcessor implements OnChangeLogicProcessor<NotificacioResource> {
+	private static class CaducitatOnChangeLogicProcessor implements OnChangeLogicProcessor<NotificacioResource> {
 		@Override
 		public void onChange(
 			Serializable id,

@@ -3,7 +3,6 @@ package es.caib.notib.logic.intf.model;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.logic.intf.base.validation.CustomValidation;
-import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.explotacio.EnviamentOrigen;
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
@@ -111,12 +110,12 @@ public class NotificacioResource extends BaseResource<Long> {
 	private ResourceReference<OrganGestorResource, Long> organGestor;
 	@NotNull
 	private ResourceReference<ProcedimentResource, Long> procediment;
-	private ResourceReference<DocumentResource, Long> document;
+	/*private ResourceReference<ProcedimentOrganResource, Long> procedimentOrgan;
+	private ResourceReference<DocumentResource, Long> document1;
 	private ResourceReference<DocumentResource, Long> document2;
 	private ResourceReference<DocumentResource, Long> document3;
 	private ResourceReference<DocumentResource, Long> document4;
-	private ResourceReference<DocumentResource, Long> document5;
-	/*private ResourceReference<ProcedimentOrganResource, Long> procedimentOrgan;*/
+	private ResourceReference<DocumentResource, Long> document5;*/
 
 	@NotNull
 	@Size(min = 1)
@@ -133,8 +132,6 @@ public class NotificacioResource extends BaseResource<Long> {
 
 	// Camps calculats
 	private LocalDateTime createdDate;
-	private String createdBy;
-	private ProcSerTipusEnum procedimentTipus;
 
 	// Camps provinents de NotificacioTable
 	private Date enviadaDate;
