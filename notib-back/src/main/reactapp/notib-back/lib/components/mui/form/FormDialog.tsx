@@ -206,9 +206,8 @@ export const useFormDialog: UseFormDialogFn = (
             formI18nKeys={formI18nKeys}
             noForm={submitReturnedContent != null}
             closeIcon={closeIcon}>
-            {loading
-                ? (loadingComponent ?? <FormDialogLoading />)
-                : (submitReturnedContent ?? formContent)}
+            {submitReturnedContent ??
+                (loading ? (loadingComponent ?? <FormDialogLoading />) : formContent)}
         </FormDialog>
     );
     return [show, dialogComponent, close];

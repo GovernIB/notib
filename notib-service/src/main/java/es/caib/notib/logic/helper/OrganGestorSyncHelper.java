@@ -203,22 +203,12 @@ public class OrganGestorSyncHelper {
 		OrganGestorResourceEntity updated;
 		// Actualitza l'òrgan gestor si ja existeix a la BD o el crea si no existeix
 		if (organGestor != null) {
-			log.debug("Actualitzant òrgan gestor (" +
-				"entitatId=" + entitat.getId() + ", " +
-				"organCodiDir3=" + dir3SyncNode.getCodi() + ", " +
-				"organNom=" + getOrganGestorNomFromDir3Node(dir3SyncNode) + ", " +
-				"organEstat=" + OrganGestorEstatEnum.valueOf(dir3SyncNode.getEstat()) + ")");
 			organGestor.setNom(getOrganGestorNomFromDir3Node(dir3SyncNode));
 			organGestor.setNomEs(dir3SyncNode.getDenominacio());
 			organGestor.setCodiPare(dir3SyncNode.getSuperior());
 			organGestor.setEstat(OrganGestorEstatEnum.valueOf(dir3SyncNode.getEstat()));
 			updated = organGestor;
 		} else {
-			log.debug("Creant òrgan gestor (" +
-				"entitatId=" + entitat.getId() + ", " +
-				"organCodiDir3=" + dir3SyncNode.getCodi() + ", " +
-				"organNom=" + getOrganGestorNomFromDir3Node(dir3SyncNode) + ", " +
-				"organEstat=" + OrganGestorEstatEnum.valueOf(dir3SyncNode.getEstat()) + ")");
 			OrganGestorResource organGestorResource = new OrganGestorResource();
 			organGestorResource.setCodi(dir3SyncNode.getCodi());
 			organGestorResource.setNom(getOrganGestorNomFromDir3Node(dir3SyncNode));
@@ -233,6 +223,7 @@ public class OrganGestorSyncHelper {
 		}
 		organGestorLlibreOficinaHelper.updateLlibre(updated);
 		organGestorLlibreOficinaHelper.updateOficina(updated, null);
+		organGestorResourceRepository.delete(updated);
 	}
 
 	private NodeDir3[] getDir3SyncNodesExistentsDarreraVersioExtincio(
