@@ -37,7 +37,7 @@ public class MonitorIntegracioResourceServiceImpl extends BaseMutableResourceSer
 		register(MonitorIntegracioResource.REPORT_AGRUPACIONS, new MonitorIntegracioResourceServiceImpl.AgrupacioReportGenerator());
 	}
 
-	class AgrupacioReportGenerator implements ReportGenerator<MonitorIntegracioResourceEntity, Serializable, MonitorIntegracioResource.MonitorIntegracioAgrupacioItem> {
+	private class AgrupacioReportGenerator implements ReportGenerator<MonitorIntegracioResourceEntity, Serializable, MonitorIntegracioResource.MonitorIntegracioAgrupacioItem> {
 		@Override
 		public List<MonitorIntegracioResource.MonitorIntegracioAgrupacioItem> generateData(
 			String code,

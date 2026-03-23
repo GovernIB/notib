@@ -249,7 +249,7 @@ export type MuiDataGridProps = {
      * Indica si l'alçada del component s'ha d'ajustar al nombre de files que s'han de mostrar
      * @warning Canviar aquest valor dinàmicament fa que el DataGrid de MUI es torni a montar de nou (l'estat intern i subscripcions a events es perden).
      */
-    autoHeight?: boolean;
+    autoHeight?: true;
     /** Indica que les files parells s'han de mostrar d'un color més oscur per a facilitar la seva lectura */
     striped?: true;
     /** Indica que només s'han de mostrar les vores horitzontals de la graella */

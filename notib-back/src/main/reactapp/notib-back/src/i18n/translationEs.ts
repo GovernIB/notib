@@ -1,6 +1,5 @@
 const translationEs = {
     app: {
-        loading: 'Iniciando NOTIB',
         noEntitat: 'Este usuario no tiene acceso a ningún entorno',
         menu: {
             home: 'Inicio',
@@ -20,7 +19,6 @@ const translationEs = {
             integracions: 'Integraciones',
             cache: "Cache de aplicaciones",
             activemq: "Monitor ActiveMQ",
-            callbacksError: "Notificaciones callback erroneas",
         },
     },
     page: {
@@ -113,29 +111,15 @@ const translationEs = {
                     permis: 'permiso',
                 },
                 permisos: {
-                    tipus: 'Tipos',
-                    grantedAuthority: {
-                        user: 'Usuario',
-                        role: 'Rol',
-                    },
                     administrador: 'Administrador',
-                    administradorTooltip: 'Asigna el perfil de administrador de órgano.',
                     consulta: 'Consulta',
-                    consultaTooltip: 'Da permiso para consultar las notificaciones y comunicaciones (SIR y no SIR creadas con este órgano o un órgano hijo como órgano emisor).',
                     processar: 'Procesar',
-                    processarTooltip: 'Permite marcar las notificaciones y comunicaciones (SIR y no SIR creadas con este órgano o un órgano hijo como órgano emisor) en un estado final como procesadas, siempre que hayan sido creadas desde la misma aplicación, y no vía API REST.',
                     gestio: 'Gestión',
-                    gestioTooltip: 'Da acceso a la pestaña de acciones del detalle de las notificaciones y comunicaciones (SIR y no SIR creadas con este órgano o un órgano hijo como órgano).',
-                    comuns: 'Procedimientos y servicios comunes',
-                    comunsTooltip: 'Permite realizar notificaciones y comunicaciones (SIR y no SIR) sobre todos los procedimientos y servicios comunes con este órgano o un órgano hijo como órgano emisor, siempre que el procedimiento o servicio no requiera permiso directo.',
+                    comuns: 'ProcSer comunes',
                     notificacions: 'Notificaciones',
-                    notificacionsTooltip: 'Permite realizar notificaciones sobre todos los procedimientos y servicios que pertenecen a este órgano o un órgano hijo, siempre que el procedimiento o servicio no requiera permiso directo.',
                     comunicacions: 'Comunicaciones',
-                    comunicacionsTooltip: 'Permite realizar comunicaciones sobre todos los procedimientos y servicios que pertenecen a este órgano o un órgano hijo, siempre que el procedimiento o servicio no requiera permiso directo.',
                     sir: 'Comunicaciones SIR',
-                    sirTooltip: 'Permite realizar comunicaciones SIR sobre todos los procedimientos y servicios que pertenecen a este órgano o un órgano hijo, siempre que el procedimiento o servicio no requiera permiso directo.',
                     comSenseProc: 'Comunicaciones sin procedimiento',
-                    comSenseProcTooltip: 'Permite realizar comunicaciones (SIR y no SIR) sin procedimiento ni servicio con este órgano o un órgano hijo como órgano emisor, siempre que el procedimiento o servicio no requiera permiso directo.',
                 },
             },
         },
@@ -185,17 +169,11 @@ const translationEs = {
                 },
                 permisos: {
                     consultaAllowed: 'Consulta',
-                    consultaAllowedTooltip: 'Da permiso para consultar las notificaciones y comunicaciones (SIR y no SIR creadas con este procedimiento o servicio).',
-                    procesAllowed: 'Procesar',
-                    procesAllowedTooltip: 'Permite marcar las notificaciones y comunicaciones (SIR y no SIR creadas con este procedimiento o servicio) en un estado final como procesadas, siempre que hayan sido creadas de la misma aplicación y no vía API RREST.',
+                    procesAllowed: 'Proceso',
                     gestioAllowed: 'Gestión',
-                    gestioAllowedTooltip: 'Da acceso a la pestaña de acciones del detalle de las notificaciones y comunicaciones (SIR y no SIR con este procedimiento o servicio).',
-                    notificacioAllowed: 'Notificaciones',
-                    notificacioAllowedTooltip: 'Permite realizar notificaciones con este procedimiento o servicio.',
-                    comunicacioAllowed: 'Comunicaciones',
-                    comunicacioAllowedTooltip: 'Permite realizar comunicaciones con este procedimiento o servicio.',
-                    comunicacioSirAllowed: 'Comunicaciones SIR',
-                    comunicacioSirAllowedTooltip: 'Permite realizar comunicaciones SIR con este procedimiento o servicio.',
+                    notificacioAllowed: 'Notificación',
+                    comunicacioAllowed: 'Comunicación',
+                    comunicacioSirAllowed: 'Comunicación SIR',
                 },
             },
         },
@@ -230,17 +208,11 @@ const translationEs = {
                 },
                 permisos: {
                     consultaAllowed: 'Consulta',
-                    consultaAllowedTooltip: 'Da permiso para consultar las notificaciones y comunicaciones (SIR y no SIR creadas con este procedimiento o servicio).',
-                    procesAllowed: 'Procesar',
-                    procesAllowedTooltip: 'Permite marcar las notificaciones y comunicaciones (SIR y no SIR creadas con este procedimiento o servicio) en un estado final como procesadas, siempre que hayan sido creadas de la misma aplicación y no vía API RREST.',
+                    procesAllowed: 'Proceso',
                     gestioAllowed: 'Gestión',
-                    gestioAllowedTooltip: 'Da acceso a la pestaña de acciones del detalle de las notificaciones y comunicaciones (SIR y no SIR con este procedimiento o servicio).',
-                    notificacioAllowed: 'Notificaciones',
-                    notificacioAllowedTooltip: 'Permite realizar notificaciones con este procedimiento o servicio.',
-                    comunicacioAllowed: 'Comunicaciones',
-                    comunicacioAllowedTooltip: 'Permite realizar comunicaciones con este procedimiento o servicio.',
-                    comunicacioSirAllowed: 'Comunicaciones SIR',
-                    comunicacioSirAllowedTooltip: 'Permite realizar comunicaciones SIR con este procedimiento o servicio.',
+                    notificacioAllowed: 'Notificación',
+                    comunicacioAllowed: 'Comunicación',
+                    comunicacioSirAllowed: 'Comunicación SIR',
                 },
             },
         },
@@ -354,10 +326,6 @@ const translationEs = {
                     accions: 'Acciones',
                     historic: 'Histórico',
                 },
-                dades: {
-                    title: 'Datos de la notificación',
-                    justificant: 'Justificante',
-                },
             },
         },
         enviament: {
@@ -403,7 +371,6 @@ const translationEs = {
                 errorDescripcio: 'Descripción del error:',
                 excepcioMessage: 'Mensaje de excepción:',
                 excepcioStacktrace: 'Stacktrace',
-                monitorSistema: "Monitor de sistema"
             },
         },
         cache: {
@@ -411,40 +378,10 @@ const translationEs = {
                 title: "Cache de aplicaciones"
             },
         },
-        activemq: {
+        activeMq: {
             grid: {
                 title: "Monitor ActiveMQ"
             },
-        },
-        callbacksError: {
-            grid: {
-                title: "Notificaciones con error en el último callback "
-            },
-        },
-        monitorSistema :{
-            tab : {
-                sistema: {
-                    title: "Sistema",
-                    sistemaOperatiu: "Sistema operativo",
-                    arquitectura: "Arquitectura",
-                    processadors: "Procesadores",
-                    jbossVersion: "Versión de Jboss",
-                    applicationServerInfo: "Información del servidor de aplicaciones",
-                    tempsFuncionant: "Tiempo funcionando",
-                    jvmMemory: "Máquina virtual de Java",
-                    disksUsage: "Disco y CPU",
-                },
-                fils: {
-                    title: "Hilos de ejecución",
-                },
-                tasques: {
-                    title: "Tareas en segundo plano",
-                    restart: "Reiniciar",
-                    restartOk: "Reiniciado correctamente",
-                    restartSelect: "Reiniciar seleccionadas",
-                    restartSelectOk: "Reiniciadas correctamente",
-                },
-            }
         },
         notFound: {
             title: 'Página no encontrada',
@@ -479,7 +416,6 @@ const translationEs = {
             },
         },
         PermissionGrid: {
-            popupTitle: 'Permiso',
             tipus: 'Tipo',
             grantedAuthority: {
                 user: 'Usuario',
@@ -492,11 +428,6 @@ const translationEs = {
         },
         UserProfileFormDialog: {
             perfil: 'Perfil del usuario',
-        },
-        FormDropzoneField: {
-            arrosegar:  "Arrastra el fichero aquí",
-            amollar: "Suelta el fichero ahora ...",
-            validacio: "El archivo no es válido",
         },
     },
     comu: {

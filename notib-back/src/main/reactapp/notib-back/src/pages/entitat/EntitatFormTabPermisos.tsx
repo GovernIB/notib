@@ -13,57 +13,6 @@ import PermissionGrid from '../../components/PermissionGrid';
 import { Box, Grid, Icon, IconButton } from '@mui/material';
 import GridFormField from '../../components/GridFormField';
 import GridToolbarButton from '../../components/GridToolbarButton';
-import PermissionGridSwitch from '../../components/PermissionGridSwitch';
-
-const PermissionForm: React.FC = () => {
-    const { t } = useTranslation();
-
-    const sidGrantedAuthorityEnumOptions = [
-        {
-            value: false,
-            description: t('component.PermissionGrid.grantedAuthority.user'),
-        },
-        {
-            value: true,
-            description: t('component.PermissionGrid.grantedAuthority.role'),
-        },
-    ];
-
-    return (
-        <Grid container spacing={2}>
-            <GridFormField
-                name="sidGrantedAuthority"
-                type="enum"
-                label={t('component.PermissionGrid.tipus')}
-                options={sidGrantedAuthorityEnumOptions}
-                required
-                size={3}
-            />
-            <GridFormField size={9} name="sidName" />
-
-            <PermissionGridSwitch
-                name="perm0Allowed"
-                label={t('page.entitats.form.permisos.usuariAllowed')}
-                size={12}
-            />
-            <PermissionGridSwitch
-                name="perm2Allowed"
-                label={t('page.entitats.form.permisos.admEntitatAllowed')}
-                size={12}
-            />
-            <PermissionGridSwitch
-                name="permXAllowed"
-                label={t('page.entitats.form.permisos.admLecturaAllowed')}
-                size={12}
-            />
-            <PermissionGridSwitch
-                name="perm3Allowed"
-                label={t('page.entitats.form.permisos.aplicacioAllowed')}
-                size={12}
-            />
-        </Grid>
-    );
-};
 
 const ContentFilter: React.FC<{
     filterApiRef: React.RefObject<FilterApi>;
@@ -167,22 +116,18 @@ const EntitatFormTabPermisos: React.FC = () => {
         {
             headerName: t('page.entitats.form.permisos.usuariAllowed'),
             field: 'perm0Allowed',
-            type: 'boolean',
         },
         {
             headerName: t('page.entitats.form.permisos.admEntitatAllowed'),
             field: 'perm2Allowed',
-            type: 'boolean',
         },
         {
             headerName: t('page.entitats.form.permisos.admLecturaAllowed'),
             field: 'permXAllowed',
-            type: 'boolean',
         },
         {
             headerName: t('page.entitats.form.permisos.aplicacioAllowed'),
             field: 'perm3Allowed',
-            type: 'boolean',
         },
     ];
 
@@ -192,7 +137,6 @@ const EntitatFormTabPermisos: React.FC = () => {
             resourceName="entitatResource"
             id={id}
             permissionEntries={permissionEntries}
-            permissionForm={<PermissionForm />}
             toolbarHide
             toolbarAdditionalRow={<EntitatGridFilter gridApiRef={gridApiRef} />}
         />

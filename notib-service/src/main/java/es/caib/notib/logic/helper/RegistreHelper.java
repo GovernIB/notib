@@ -11,10 +11,8 @@ import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.exception.ValidationException;
-import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaSirRequest;
-import es.caib.notib.logic.intf.statemachine.events.EnviamentRegistreRequest;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.EntitatEntity;
@@ -27,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -61,8 +58,6 @@ public class RegistreHelper {
     private AccioMassivaHelper accioMassivaHelper;
     @Autowired
     private ComandaListener comandaListener;
-	@Autowired
-	private RegistreSmHelper registreSmHelper;
 
 
     public NotificacioEnviamentEntity enviamentRefrescarEstatRegistre(ConsultaSirRequest consulta) {
@@ -190,71 +185,4 @@ public class RegistreHelper {
 		}
 		NotibLogger.getInstance().info("L'estat de la comunicació SIR s'ha actualitzat correctament.", log, LoggingTipus.SIR);
 	}
-
-	@Transactional
-	public boolean enviarRegistre(EnviamentRegistreRequest enviamentRegistreRequest) {
-		var enviamentUuid = enviamentRegistreRequest.getEnviamentUuid();
-		try {
-			var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElseThrow();
-			var notificacio = enviament.getNotificacio();
-			var numIntent = enviamentRegistreRequest.getNumIntent();
-			notificacio.setRegistreEnviamentIntent(numIntent);
-			NotibLogger.getInstance().info("[REGISTRE] Enviament de registre <" + enviamentUuid + "> registrant ", log, LoggingTipus.REGISTRE);
-			// Registrar enviament
-			boolean registreSuccess = registreSmHelper.registrarEnviament(enviament, numIntent);
-			NotibLogger.getInstance().info("[REGISTRE] Enviament de registre <" + enviamentUuid + "> registrat ", log, LoggingTipus.REGISTRE);
-			// Actualitzar notificació
-			if (notificacioEnviamentRepository.areEnviamentsRegistrats(notificacio.getId()) == 1) {
-				NotibLogger.getInstance().info("[REGISTRE] Enviament de registre <" + enviamentUuid + "> actualitzant notificacio", log, LoggingTipus.REGISTRE);
-				var isSir = notificacio.isComunicacioSir();
-				notificacio.updateEstat(isSir ? NotificacioEstatEnumDto.ENVIAT_SIR : NotificacioEstatEnumDto.REGISTRADA);
-				// És possible que el registre ja retorni estats finals al registrar SIR?
-				if (isSir && notificacio.getEnviaments().stream().allMatch(e -> e.isRegistreEstatFinal())) {
-					var nouEstat = NotificacioEstatEnumDto.FINALITZADA;
-					//Marcar com a processada si la notificació s'ha fet des de una aplicació
-					if (enviament.getNotificacio() != null && enviament.getNotificacio().getTipusUsuari() == TipusUsuariEnumDto.APLICACIO) {
-						nouEstat = NotificacioEstatEnumDto.PROCESSADA;
-					}
-					notificacio.updateEstat(nouEstat);
-					notificacio.updateMotiu(enviament.getRegistreEstat().name());
-					notificacio.updateEstatDate(new Date());
-					comandaListener.enviarAvis(enviament, AvisTipus.INFO);
-				}
-			}
-			NotibLogger.getInstance().info("[REGISTRE] Enviament de registre <" + enviamentUuid + "> actualitzant registre", log, LoggingTipus.REGISTRE);
-			notificacioTableHelper.actualitzarRegistre(notificacio);
-			NotibLogger.getInstance().info("[REGISTRE] Enviament de registre <" + enviamentUuid + "> audita notificacio", log, LoggingTipus.REGISTRE);
-			auditHelper.auditaNotificacio(notificacio, AuditService.TipusOperacio.UPDATE, "RegistreSmHelper.registrarEnviament");
-			//            TEST
-			//            var registreSuccess = new Random().nextBoolean();
-			//            if (registreSuccess) {
-			//                enviament.setRegistreData(new Date());
-			//                notificacioEnviamentRepository.save(enviament);
-			//            }
-			NotibLogger.getInstance().info("[REGISTRE] Enviament de registre <" + enviamentUuid + "> is success " + registreSuccess, log, LoggingTipus.REGISTRE);
-			return registreSuccess;
-		} catch (Exception ex) {
-			NotibLogger.getInstance().info("[REGISTRE] Enviament de registre <" + enviamentUuid + "> error ", ex, log, LoggingTipus.REGISTRE);
-			var enviament = notificacioEnviamentRepository.findByUuid(enviamentUuid).orElse(null);
-			if (enviament != null) {
-				comandaListener.enviarAvis(enviament, AvisTipus.ERROR);
-			}
-			return false;
-		}
-	}
-
-	@Transactional
-	public boolean consultaSir(ConsultaSirRequest consultaSirRequest) {
-		try {
-			// Consultar enviament a SIR
-			// notificacioService.enviamentRefrescarEstatRegistre(consultaSirRequest);
-			enviamentRefrescarEstatRegistre(consultaSirRequest);
-			var enviamentEntity = notificacioEnviamentRepository.findByUuid(consultaSirRequest.getEnviamentUuid()).orElseThrow();
-			return enviamentEntity.getSirConsultaIntent() == 0;
-		} catch (Exception ex) {
-			log.error("Error a la consulta SIR per l'enviament " + consultaSirRequest.getEnviamentUuid());
-			return false;
-		}
-	}
-
 }
