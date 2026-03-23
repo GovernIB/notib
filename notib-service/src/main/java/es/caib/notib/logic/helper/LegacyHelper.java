@@ -5,14 +5,7 @@ import es.caib.notib.logic.helper.plugin.UnitatsOrganitzativesPluginHelper;
 import es.caib.notib.logic.intf.base.model.FileReference;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.model.Dir3Resource;
-import es.caib.notib.logic.intf.service.AuditService;
-import es.caib.notib.logic.intf.service.EnviamentSmService;
-import es.caib.notib.persist.entity.NotificacioEntity;
-import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
-import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
-import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
-import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,12 +30,6 @@ public class LegacyHelper {
 	private final UserSessionHelper userSessionHelper;
 	private final GestioDocumentalPluginHelper gestioDocumentalPluginHelper;
 	private final UnitatsOrganitzativesPluginHelper unitatsOrganitzativesPluginHelper;
-	private final NotificacioRepository notificacioRepository;
-	private final NotificacioEnviamentRepository notificacioEnviamentRepository;
-	private final NotificacioTableHelper notificacioTableHelper;
-	private final EnviamentTableHelper enviamentTableHelper;
-	private final AuditHelper auditHelper;
-	private final EnviamentSmService enviamentSmService;
 
 	private final PluginHelper pluginHelper;
 
@@ -174,47 +159,6 @@ public class LegacyHelper {
 		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
 		ConfigHelper.setEntitatCodi(currentEntitat.getCodi());
 		return unitatsOrganitzativesPluginHelper.llistarLocalitats(provinciaCodi);
-	}
-	/**
-	 * Lògica antiga per a les notificacions:
-	 * <p>
-	 *   - Creació del registre a notificacio_table.
-	 *   - Creació de l'auditoria.
-	 *   - Alta dels enviaments la màquina d'estats (SM) al finalitzar la transacció.
-	 * @param entity
-	 *            l'entitat de la notificació
-	 * @param enviamentsIds
-	 *            la llista d'ids dels enviaments associats a la notificació
-	 */
-	public void altaNotificacio(NotificacioResourceEntity entity, List<Long> enviamentsIds) {
-		// Lògica antiga pels enviaments
-		for (Long enviamentId: enviamentsIds) {
-			Optional<NotificacioEnviamentEntity> notificacioEnviamentEntity = notificacioEnviamentRepository.findById(enviamentId);
-			if (notificacioEnviamentEntity.isPresent()) {
-				// Crea el registre a notificacio_env_table
-				enviamentTableHelper.crearRegistre(notificacioEnviamentEntity.get());
-				// Crea la informació d'auditoria
-				auditHelper.auditaEnviament(
-					notificacioEnviamentEntity.get(),
-					AuditService.TipusOperacio.CREATE,
-					"NotificacioResourceServiceImpl.saveEnviaments");
-			}
-		}
-		// Lògica antiga per a les notificacions
-		Optional<NotificacioEntity> notificacioEntity = notificacioRepository.findById(entity.getId());
-		if (notificacioEntity.isPresent()) {
-			// Crea el registre a notificacio_table
-			notificacioTableHelper.crearRegistre(notificacioEntity.get());
-			// Crea la informació d'auditoria
-			auditHelper.auditaNotificacio(
-				notificacioEntity.get(),
-				AuditService.TipusOperacio.CREATE,
-				"NotificacioResourceServiceImpl.afterCreateSave");
-			// Dona d'alta els enviaments a la màqina d'estats al finalitzar la transacció
-			notificacioEntity.get().getEnviaments().forEach(e -> {
-				enviamentSmService.altaEnviament(e.getNotificaReferencia());
-			});
-		}
 	}
 
 	private Dir3Resource toDir3Resource(NodeDir3 nodeDir3) {

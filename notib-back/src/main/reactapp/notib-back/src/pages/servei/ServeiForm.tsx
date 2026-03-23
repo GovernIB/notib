@@ -7,18 +7,14 @@ import { FormPage, MuiForm, MuiFormTabs, MuiFormTabContent, useFormContext } fro
 import ServeiFormTabGrups from './ServeiFormTabGrups.tsx';
 import ServeiFormTabPermisos from './ServeiFormTabPermisos';
 import GridFormField from '../../components/GridFormField.tsx';
-import { useTabParam } from '../../hooks/useSearchParams.tsx';
 
 const ServeiFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
     const { setSubtitle } = props;
     const { t } = useTranslation();
     const { data } = useFormContext();
-    const initialTab = useTabParam();
-
     React.useEffect(() => {
         setSubtitle(data?.codi + ', ' + data?.nom);
     }, [data]);
-
     const grupsTabLabel = (
         <Badge badgeContent={data.grupCount} color="primary">
             {t('page.serveis.form.tabs.grups')}
@@ -34,9 +30,8 @@ const ServeiFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> =
         { label: grupsTabLabel },
         { label: permisosTabLabel },
     ];
-
     return (
-        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1, 2]} initialIndex={initialTab}>
+        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1, 2]}>
             <MuiFormTabContent index={0} showOnCreate>
                 <Grid container spacing={2}>
                     <GridFormField size={3} name="codi" />
