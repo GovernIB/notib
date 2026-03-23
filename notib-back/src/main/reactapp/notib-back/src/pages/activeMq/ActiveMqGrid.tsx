@@ -11,13 +11,41 @@ export const ActiveMqGrid = () => {
     const columns: MuiDataGridColDef[] = React.useMemo(
         () => [
             {
-                field: 'codi',
-                flex: 2,
+                field: 'nom',
+                flex: 1.5
             },
             {
                 field: 'descripcio',
                 flex: 4,
             },
+            {
+                field: 'mida',
+                flex: 1,
+            },
+            {
+                field: 'enqueueCount',
+                flex: 1,
+            },
+            {
+                field: 'dequeueCount',
+                flex: 1,
+            },
+            {
+                field: 'forwardCount',
+                flex: 1,
+            },
+            {
+                field: 'inFlightCount',
+                flex: 1,
+            },
+            {
+                field: 'expiredCount',
+                flex: 1,
+            },
+            {
+                field: 'storeMessageSize',
+                flex: 1,
+            }
 
         ],
         []
@@ -27,9 +55,9 @@ export const ActiveMqGrid = () => {
         <GridPage disableMargins={false}>
             <MuiDataGrid
                 title={t('page.cache.grid.title')}
-                resourceName="ActiveMqResource"
+                resourceName="activeMqResource"
                 columns={columns}
-                paginationActive
+                // paginationActive
                 toolbarBulkDelete
                 toolbarHideQuickFilter
             />
