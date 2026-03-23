@@ -102,11 +102,11 @@ export const useFormDialog: UseFormDialogFn = (
     const buttonCallback = (value: any) => {
         if (value) {
             const isCustomSubmit = customSubmit != null;
-            const submitPromise = isCustomSubmit
+            const result = isCustomSubmit
                 ? customSubmit(formApiRef.current.getId(), formApiRef.current.getData())
                 : formApiRef.current.save();
             setLoading(true);
-            submitPromise
+            result
                 .then((value: any) => {
                     if (isCustomSubmit) {
                         // S'ha fet click al botó executar/generar i s'ha executat/generat correctament
@@ -206,9 +206,8 @@ export const useFormDialog: UseFormDialogFn = (
             formI18nKeys={formI18nKeys}
             noForm={submitReturnedContent != null}
             closeIcon={closeIcon}>
-            {loading
-                ? (loadingComponent ?? <FormDialogLoading />)
-                : (submitReturnedContent ?? formContent)}
+            {submitReturnedContent ??
+                (loading ? (loadingComponent ?? <FormDialogLoading />) : formContent)}
         </FormDialog>
     );
     return [show, dialogComponent, close];

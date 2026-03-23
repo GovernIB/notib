@@ -70,5 +70,4 @@ public class CaducitatHelperTest {
         // Then
         Assert.assertEquals("16/02/2022", df.format(fi));
     }
-
 }

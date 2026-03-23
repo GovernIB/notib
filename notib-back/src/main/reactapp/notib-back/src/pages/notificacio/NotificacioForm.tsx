@@ -134,7 +134,7 @@ export const NotificacioForm: React.FC = () => {
                 additionalData={type ? { enviamentTipus: type, ...initialData } : initialData}
                 onReset={handleReset}
                 apiRef={formApiRef}
-                createLink="../"
+                createLink="./{{id}}"
                 toolbarElementsWithPositions={[{ position: 2, element: <JSonButton /> }]}
                 componentProps={{ style: { height: '100%' } }}
                 commonFieldComponentProps={{ size: 'small' }}
