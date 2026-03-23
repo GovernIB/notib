@@ -9,7 +9,9 @@ import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
 import es.caib.notib.logic.intf.model.OrganGestorDir3Sync;
 import es.caib.notib.logic.intf.model.OrganGestorResource;
+import es.caib.notib.logic.intf.model.PagadorPostalResource;
 import es.caib.notib.logic.intf.resourceservice.OrganGestorResourceService;
+import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
 import es.caib.notib.persist.resourceentity.EntregaCieResourceEntity;
 import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
 import es.caib.notib.persist.resourcerepository.EntitatResourceRepository;
@@ -23,7 +25,9 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -50,10 +54,8 @@ public class OrganGestorResourceServiceImpl
 		NotibPermissionHelper notibPermissionHelper,
 		AclHelper aclHelper,
 		OrganGestorSyncHelper organGestorSyncHelper,
-		EntitatResourceRepository entitatResourceRepository,
-		PagadorPostalResourceRepository pagadorPostalResourceRepository,
-		PagadorCieResourceRepository pagadorCieResourceRepository,
-		EntregaCieResourceRepository entregaCieResourceRepository) {
+		EntitatResourceRepository entitatResourceRepository, PagadorPostalResourceRepository pagadorPostalResourceRepository, PagadorCieResourceRepository pagadorCieResourceRepository, EntregaCieResourceRepository entregaCieResourceRepository) {
+
 		super(userSessionHelper, authenticationHelper, notibPermissionHelper);
 		this.aclHelper = aclHelper;
 		this.organGestorSyncHelper = organGestorSyncHelper;
@@ -140,20 +142,10 @@ public class OrganGestorResourceServiceImpl
 		public OrganGestorDir3Sync exec(String code, OrganGestorResourceEntity entity, OrganGestorResource.OrganGestorDir3SyncForm params) throws ActionExecutionException {
 
 			var entitat = entitatResourceRepository.findById(userSessionHelper.getCurrentEntitatId());
-			if (entitat.isEmpty()) {
+			if (!entitat.isPresent()) {
 				throw new ActionExecutionException(OrganGestorResource.class, null, code, "Couldn't find current entitat in user session");
 			}
-			try {
-				return organGestorSyncHelper.sincronitzar(entitat.get(), params.getSimular() != null && params.getSimular());
-			} catch (Exception ex) {
-				log.error("Error al sincronitzar les unitats DIR3", ex);
-				throw new ActionExecutionException(
-					getResourceClass(),
-					entity != null ? entity.getId() : null,
-					code,
-					"Error al sincronitzar les unitats DIR3: " + ex.getMessage(),
-					ex);
-			}
+			return organGestorSyncHelper.sincronitzar(entitat.get(), params.getSimular() != null && params.getSimular());
 		}
 
 		@Override

@@ -143,9 +143,8 @@ public class EntitatResourceServiceImpl
 			}
 		}
 		/**
-		 * Es mira si es tenen permisos per a crear un tipus de remesa.Es verifica si es te el permís corresponent
-		 * sobre algun òrgan gestor, sobre algun procediment/servei o sobre alguna combinació procediment/servei -
-		 * òrgan gestor.
+		 * Es mira si es tenen permisos per a crear un tipus de remesa. Bàsicamen es verifica si es te el permís
+		 * corresponent sobre algun òrgan gestor o sobre algun procediment/servei.
 		 *
 		 * @param permisOrgansGestors
 		 *            el permís sobre els òrgans gestors que es vol comprovar.
@@ -174,15 +173,15 @@ public class EntitatResourceServiceImpl
 				isEmpty()) {
 				return true;
 			}
-			// Comprovam si es tenen permisos sobre algun procediment/servei no comú
+			// Comprovam si es tenen permisos sobre procediments/serveis no comuns
 			if (!notibPermissionHelper.
 				procedimentServeiNoComuIdsWithPermission(permisProcediments, isServei).
 				isEmpty()) {
 				return true;
 			}
-			// Comprovam si es tenen permisos sobre algun procediment/servei comú
+			// Comprovam si es tenen permisos sobre procediments/serveis comuns
 			return !notibPermissionHelper.
-				procedimentServeiComuOrganGestorIdsWithPermission(permisProcediments, isServei).
+				procedimentServeiComuIdsWithPermission(permisProcediments, isServei).
 				isEmpty();
 		}
 	}

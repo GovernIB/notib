@@ -6,13 +6,11 @@ import Badge from '@mui/material/Badge';
 import { FormPage, MuiForm, MuiFormTabs, MuiFormTabContent, useFormContext } from 'reactlib';
 import OrganFormTabPermisos from './OrganFormTabPermisos';
 import GridFormField from '../../components/GridFormField';
-import { useTabParam } from '../../hooks/useSearchParams';
 
 const OrganFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
     const { setSubtitle } = props;
     const { t } = useTranslation();
     const { data } = useFormContext();
-    const initialTab = useTabParam();
 
     React.useEffect(() => {
         setSubtitle(data?.codi + ', ' + data?.nom);
@@ -25,9 +23,8 @@ const OrganFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = 
     );
 
     const tabs = [t('page.organs.form.tabs.dades'), { label: permisosTabLabel }];
-
     return (
-        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1]} initialIndex={initialTab}>
+        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1]}>
             <MuiFormTabContent index={0} showOnCreate>
                 <Grid container spacing={2}>
                     <GridFormField size={4} name="codi" />
