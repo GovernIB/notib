@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
  * additionalSpringFilter.
  */
 @ExtendWith(MockitoExtension.class)
-class EntitatResourceServiceImplTest {
+public class EntitatResourceServiceImplTest {
 
 	@Mock
 	private AclHelper aclHelper;

@@ -12,6 +12,12 @@ import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 import es.caib.notib.logic.intf.model.NotificacioResource;
 import es.caib.notib.logic.intf.model.PersonaResource;
 import es.caib.notib.logic.intf.resourceservice.NotificacioResourceService;
+import es.caib.notib.logic.intf.service.AuditService;
+import es.caib.notib.logic.intf.service.EnviamentSmService;
+import es.caib.notib.persist.entity.NotificacioEntity;
+import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
+import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.persist.resourceentity.DocumentResourceEntity;
 import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
 import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
@@ -22,6 +28,8 @@ import es.caib.notib.persist.resourcerepository.PersonaResourceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
@@ -48,6 +56,13 @@ public class NotificacioResourceServiceImpl
 	private final DocumentResourceRepository documentResourceRepository;
 	private final PersonaResourceRepository personaResourceRepository;
 	private final LegacyHelper legacyHelper;
+
+	private final EnviamentSmService enviamentSmService;
+	private final NotificacioTableHelper notificacioTableHelper;
+	private final EnviamentTableHelper enviamentTableHelper;
+	private final AuditHelper auditHelper;
+	private final NotificacioRepository notificacioRepository;
+	private final NotificacioEnviamentRepository notificacioEnviamentRepository;
 
 	@PostConstruct
 	public void init() {
@@ -78,34 +93,31 @@ public class NotificacioResourceServiceImpl
 		NotificacioResource resource,
 		Map<String, AnswerRequiredException.AnswerValue> answers,
 		boolean anyOrderChanged) {
-		List<Long> enviamentsIds = new ArrayList<>();
 		if (resource.getEnviamentsInfo() != null) {
-			resource.getEnviamentsInfo().forEach(e -> {
-				Long enviamentId = saveEnviament(entity, e);
-				enviamentsIds.add(enviamentId);
-			});
+			saveEnviaments(entity, resource.getEnviamentsInfo());
 		}
-		legacyHelper.altaNotificacio(entity.getId(), enviamentsIds);
+		notificacioLegacy(entity);
 	}
 
-	private Long saveEnviament(
+	private void saveEnviaments(
 		NotificacioResourceEntity notificacio,
-		NotificacioEnviamentResource enviament) {
-		String uuid = UUID.randomUUID().toString();
-		NotificacioEnviamentResourceEntity enviamentNou = NotificacioEnviamentResourceEntity.builder().
-			resource(enviament).
-			notificacio(notificacio).
-			build();
-		enviamentNou.setNotificaReferencia(uuid);
-		enviamentNou.setNotificaEstat(EnviamentEstat.PENDENT);
-		NotificacioEnviamentResourceEntity enviamentCreat = notificacioEnviamentResourceRepository.saveAndFlush(enviamentNou);
-		PersonaResourceEntity titular = saveDestinatari(enviamentCreat, enviament.getTitularInfo());
-		enviamentCreat.setTitular(titular);
-		enviamentCreat.setNotificaReferencia(uuid);
-		if (enviament.getRepresentantsInfo() != null) {
-			enviament.getRepresentantsInfo().forEach(r -> saveDestinatari(enviamentCreat, r));
-		}
-		return enviamentCreat.getId();
+		List<NotificacioEnviamentResource> enviaments) {
+		// Crea els enviaments associats amb la notificació a la base de dades.
+		enviaments.forEach(e -> {
+			NotificacioEnviamentResourceEntity enviamentNou = NotificacioEnviamentResourceEntity.builder().
+				resource(e).
+				notificacio(notificacio).
+				build();
+			enviamentNou.setNotificaEstat(EnviamentEstat.PENDENT);
+			NotificacioEnviamentResourceEntity enviamentCreat = notificacioEnviamentResourceRepository.save(enviamentNou);
+			PersonaResourceEntity titular = saveDestinatari(enviamentCreat, e.getTitularInfo());
+			enviamentCreat.setTitular(titular);
+			enviamentCreat.setNotificaReferencia(UUID.randomUUID().toString());
+			if (e.getRepresentantsInfo() != null) {
+				e.getRepresentantsInfo().forEach(r -> saveDestinatari(enviamentCreat, r));
+			}
+			notificacioEnviamentLegacy(enviamentCreat);
+		});
 	}
 
 	private void saveDocuments(
@@ -143,10 +155,50 @@ public class NotificacioResourceServiceImpl
 				build());
 	}
 
+	private void notificacioLegacy(NotificacioResourceEntity entity) {
+		// Lògica antiga per a les notificacions
+		Optional<NotificacioEntity> notificacioEntity = notificacioRepository.findById(entity.getId());
+		if (notificacioEntity.isPresent()) {
+			// Registra la notificació
+			notificacioTableHelper.crearRegistre(notificacioEntity.get());
+			// Crea la informació d'auditoria
+			auditHelper.auditaNotificacio(
+				notificacioEntity.get(),
+				AuditService.TipusOperacio.CREATE,
+				"NotificacioResourceServiceImpl.afterCreateSave");
+			// Dona d'alta els enviaments a la màqina d'estats al finalitzar la transacció
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+				@Override
+				public void afterCommit() {
+					if (TransactionSynchronizationManager.isActualTransactionActive()) {
+						notificacioEntity.get().getEnviaments().forEach(e -> {
+							enviamentSmService.altaEnviament(e.getNotificaReferencia());
+						});
+					}
+				}
+			});
+		}
+	}
+
+	private void notificacioEnviamentLegacy(NotificacioEnviamentResourceEntity entity) {
+		// Lògica antiga pels enviaments
+		Optional<NotificacioEnviamentEntity> notificacioEnviamentEntity = notificacioEnviamentRepository.findById(
+			entity.getId());
+		if (notificacioEnviamentEntity.isPresent()) {
+			// Registra l'enviament
+			enviamentTableHelper.crearRegistre(notificacioEnviamentEntity.get());
+			// Crea la informació d'auditoria
+			auditHelper.auditaEnviament(
+				notificacioEnviamentEntity.get(),
+				AuditService.TipusOperacio.CREATE,
+				"NotificacioResourceServiceImpl.saveEnviaments");
+		}
+	}
+
 	/*
 	 * Lògica onChange que s'executa al carregar el formulari.
 	 */
-	static class InitOnChangeLogicProcessor implements OnChangeLogicProcessor<NotificacioResource> {
+	private static class InitOnChangeLogicProcessor implements OnChangeLogicProcessor<NotificacioResource> {
 		@Override
 		public void onChange(
 			Serializable id,
@@ -163,7 +215,7 @@ public class NotificacioResourceServiceImpl
 	/*
 	 * Lògica onChange pel camp interessatTipus. Segons el valor d'aquest camp canvien els camps visibles / obligatoris.
 	 */
-	static class CaducitatOnChangeLogicProcessor implements OnChangeLogicProcessor<NotificacioResource> {
+	private static class CaducitatOnChangeLogicProcessor implements OnChangeLogicProcessor<NotificacioResource> {
 		@Override
 		public void onChange(
 			Serializable id,
