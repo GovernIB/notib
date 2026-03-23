@@ -1,15 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FormField, MuiDataGrid, MuiDataGridApiRef, useFormContext } from 'reactlib';
-import { GridColumnHeaderParams } from '@mui/x-data-grid';
 
 export type PermissionGridEntry = {
     headerName: string;
     field: string;
-    renderHeader?: (params: GridColumnHeaderParams) => React.ReactNode;
-    description?: string;
-    flex?: number;
-    type?: string;
 };
 
 const PermissionGrid: React.FC<{
@@ -17,21 +12,10 @@ const PermissionGrid: React.FC<{
     id: any;
     apiRef?: MuiDataGridApiRef;
     permissionEntries: PermissionGridEntry[];
-    permissionForm: React.ReactElement | undefined;
-    toolbarAdditionalRow?:
-        | React.ReactElement<unknown, string | React.JSXElementConstructor<any>>
-        | undefined;
+    toolbarAdditionalRow?: React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | undefined;
     toolbarHide?: true | undefined;
 }> = (props) => {
-    const {
-        resourceName,
-        id,
-        permissionEntries,
-        permissionForm,
-        toolbarAdditionalRow,
-        apiRef,
-        toolbarHide,
-    } = props;
+    const { resourceName, id, permissionEntries, toolbarAdditionalRow, apiRef, toolbarHide } = props;
     const { t } = useTranslation();
     const { apiRef: formApiRef } = useFormContext();
     const sidGrantedAuthorityEnumOptions = [
@@ -90,11 +74,8 @@ const PermissionGrid: React.FC<{
             ...permissionEntries.map((e) => ({
                 headerName: e.headerName,
                 field: e.field,
-                type: e.type,
                 sortable: false,
-                flex: e.flex ?? 1,
-                description: e.description,
-                renderHeader: e.renderHeader,
+                flex: 1,
             }))
         );
         return columns;
@@ -119,10 +100,7 @@ const PermissionGrid: React.FC<{
             toolbarHide={toolbarHide}
             toolbarHideQuickFilter
             toolbarAdditionalRow={toolbarAdditionalRow}
-            popupEditActive
-            popupEditFormDialogTitle={t('component.PermissionGrid.popupTitle')}
-            popupEditFormContent={permissionForm}
-            popupEditFormDialogComponentProps={{ maxWidth: 'sm' }}
+            inlineEditActive
             onRowCreate={handleDataGridRowChanges}
             onRowDelete={handleDataGridRowChanges}
         />

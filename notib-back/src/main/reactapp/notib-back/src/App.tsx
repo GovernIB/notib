@@ -164,7 +164,7 @@ const InnerApp: React.FC = () => {
             title: t('app.menu.activemq'),
             to: '/activemq',
             icon: 'subscriptions',
-            resourceName: 'activeMqResource',
+            resourceName: 'ActiveMqResource',
             hidden: currentRole !== ROLE_SUPER,
         },
     ];
