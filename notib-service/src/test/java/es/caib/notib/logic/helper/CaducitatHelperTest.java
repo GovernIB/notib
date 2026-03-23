@@ -17,7 +17,6 @@ public class CaducitatHelperTest {
 
     @Before
     public void setUp() throws Exception {
-
     }
 
     @Test
