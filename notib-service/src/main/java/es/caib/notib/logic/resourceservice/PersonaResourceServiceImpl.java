@@ -72,7 +72,7 @@ public class PersonaResourceServiceImpl
 	/*
 	 * Lògica onChange que s'executa al carregar el formulari.
 	 */
-	private static class InitOnChangeLogicProcessor implements OnChangeLogicProcessor<PersonaResource> {
+	static class InitOnChangeLogicProcessor implements OnChangeLogicProcessor<PersonaResource> {
 		@Override
 		public void onChange(
 			Serializable id,
@@ -89,7 +89,7 @@ public class PersonaResourceServiceImpl
 	/*
 	 * Lògica onChange pel camp interessatTipus. Segons el valor d'aquest camp canvien els camps visibles / obligatoris.
 	 */
-	private static class InteressatTipusOnChangeLogicProcessor implements OnChangeLogicProcessor<PersonaResource> {
+	static class InteressatTipusOnChangeLogicProcessor implements OnChangeLogicProcessor<PersonaResource> {
 		@Override
 		public void onChange(
 			Serializable id,
@@ -103,7 +103,7 @@ public class PersonaResourceServiceImpl
 		}
 	}
 
-	private static void interessatTipusOnChange(
+	static void interessatTipusOnChange(
 		InteressatTipus interessatTipus,
 		PersonaResource target) {
 		// En funció del tipus d'interessat configura:
