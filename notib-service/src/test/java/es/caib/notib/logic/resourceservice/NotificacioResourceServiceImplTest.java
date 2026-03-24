@@ -9,7 +9,10 @@ import es.caib.notib.logic.intf.model.DocumentResource;
 import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 import es.caib.notib.logic.intf.model.NotificacioResource;
 import es.caib.notib.logic.intf.model.PersonaResource;
-import es.caib.notib.persist.resourceentity.*;
+import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
+import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
+import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
+import es.caib.notib.persist.resourceentity.PersonaResourceEntity;
 import es.caib.notib.persist.resourcerepository.DocumentResourceRepository;
 import es.caib.notib.persist.resourcerepository.NotificacioEnviamentResourceRepository;
 import es.caib.notib.persist.resourcerepository.PersonaResourceRepository;
@@ -43,6 +46,7 @@ class NotificacioResourceServiceImplTest {
 	@Mock private DocumentResourceRepository documentRepo;
 	@Mock private PersonaResourceRepository personaRepo;
 	@Mock private LegacyHelper legacyHelper;
+	@Mock private NotificacioEnviamentResourceRepository notificacioEnviamentResourceRepository;
 
 	@InjectMocks
 	private NotificacioResourceServiceImpl service;
@@ -53,7 +57,6 @@ class NotificacioResourceServiceImplTest {
 	@BeforeEach
 	void setUp() {
 		entity = new NotificacioResourceEntity();
-		entity.setProcediment(new ProcedimentResourceEntity());
 		resource = new NotificacioResource();
 	}
 
@@ -103,10 +106,10 @@ class NotificacioResourceServiceImplTest {
 		enviament.setTitularInfo(new PersonaResource());
 		resource.setEnviamentsInfo(List.of(enviament));
 		NotificacioEnviamentResourceEntity saved = new NotificacioEnviamentResourceEntity();
-		when(enviamentRepo.saveAndFlush(any())).thenReturn(saved);
+		when(enviamentRepo.save(any())).thenReturn(saved);
 		when(personaRepo.save(any())).thenReturn(new PersonaResourceEntity());
 		service.afterCreateSave(entity, resource, Map.of(), false);
-		verify(enviamentRepo).saveAndFlush(any());
+		verify(enviamentRepo).save(any());
 	}
 
 	@Test
@@ -120,11 +123,10 @@ class NotificacioResourceServiceImplTest {
 		enviament.setTitularInfo(titular);
 		resource.setEnviamentsInfo(List.of(enviament));
 		NotificacioEnviamentResourceEntity saved = new NotificacioEnviamentResourceEntity();
-		saved.setId(11L);
-		when(enviamentRepo.saveAndFlush(any())).thenReturn(saved);
+		when(enviamentRepo.save(any())).thenReturn(saved);
 		service.afterCreateSave(entity, resource, answers, false);
 		// Comprovem que s’ha cridat el legacyHelper amb la mateixa entitat
-		verify(legacyHelper).altaNotificacio(entity.getId(), List.of(11L));
+		verify(legacyHelper).altaNotificacio(entity);
 	}
 
 	// =====================================================
