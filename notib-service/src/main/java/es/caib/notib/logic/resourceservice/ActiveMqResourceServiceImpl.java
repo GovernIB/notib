@@ -1,15 +1,10 @@
 package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.logic.base.service.BaseNoDatabaseMutableResourceService;
-import es.caib.notib.logic.base.service.BaseNoDatabaseReadonlyResourceService;
-import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
-import es.caib.notib.logic.intf.dto.ActiveMqInfo;
 import es.caib.notib.logic.intf.model.ActiveMqResource;
-import es.caib.notib.logic.intf.model.CacheResource;
 import es.caib.notib.logic.intf.resourceservice.ActiveMqResourceService;
-import es.caib.notib.logic.intf.resourceservice.CacheResourceService;
 import es.caib.notib.persist.base.entity.NoDatabaseResourceEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +37,6 @@ import java.util.Map;
 public class ActiveMqResourceServiceImpl extends BaseNoDatabaseMutableResourceService<ActiveMqResource, String> implements ActiveMqResourceService {
 
 	private final MetricsHelper metricsHelper;
-	private final CacheHelper cacheHelper;
 	private final MessageHelper messageHelper;
 
 	@Override
@@ -128,7 +122,6 @@ public class ActiveMqResourceServiceImpl extends BaseNoDatabaseMutableResourceSe
 		return new NoDatabaseResourceEntity<>(resource.getNom(), resource);
 	}
 
-
 	private static final Map<String, Integer> ordreCaches;
 
 	static {
@@ -167,4 +160,5 @@ public class ActiveMqResourceServiceImpl extends BaseNoDatabaseMutableResourceSe
 		ordreCaches.put("findUsuariByCodi", 31);
 		ordreCaches.put("findEntitatByCodi", 32);
 	}
+
 }
