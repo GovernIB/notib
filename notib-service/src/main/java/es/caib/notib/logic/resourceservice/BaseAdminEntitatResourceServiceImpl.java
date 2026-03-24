@@ -11,7 +11,6 @@ import es.caib.notib.logic.intf.base.exception.ResourceNotDeletedException;
 import es.caib.notib.logic.intf.base.exception.ResourceNotUpdatedException;
 import es.caib.notib.logic.intf.base.model.Resource;
 import es.caib.notib.persist.resourceentity.AdminEntitatResourceEntity;
-import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.acls.domain.BasePermission;
