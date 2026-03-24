@@ -1,27 +1,26 @@
 package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.helper.*;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
-import es.caib.notib.logic.intf.base.exception.ResourceNotCreatedException;
-import es.caib.notib.logic.intf.base.model.ResourceReference;
-import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
-import es.caib.notib.logic.intf.model.*;
+import es.caib.notib.logic.intf.model.DocumentResource;
+import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
+import es.caib.notib.logic.intf.model.NotificacioResource;
+import es.caib.notib.logic.intf.model.PersonaResource;
 import es.caib.notib.logic.intf.resourceservice.NotificacioResourceService;
-import es.caib.notib.persist.resourceentity.*;
+import es.caib.notib.persist.resourceentity.DocumentResourceEntity;
+import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
+import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
+import es.caib.notib.persist.resourceentity.PersonaResourceEntity;
 import es.caib.notib.persist.resourcerepository.DocumentResourceRepository;
 import es.caib.notib.persist.resourcerepository.NotificacioEnviamentResourceRepository;
 import es.caib.notib.persist.resourcerepository.PersonaResourceRepository;
-import es.caib.notib.persist.resourcerepository.ProcedimentOrganGestorResourceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.acls.domain.BasePermission;
-import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -30,7 +29,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -46,34 +44,16 @@ public class NotificacioResourceServiceImpl
 
 	private final UserSessionHelper userSessionHelper;
 	private final AuthenticationHelper authenticationHelper;
-	private final LegacyHelper legacyHelper;
-	private final NotibPermissionHelper notibPermissionHelper;
 	private final NotificacioEnviamentResourceRepository notificacioEnviamentResourceRepository;
 	private final DocumentResourceRepository documentResourceRepository;
 	private final PersonaResourceRepository personaResourceRepository;
-	private final ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository;
+	private final LegacyHelper legacyHelper;
 
 	@PostConstruct
 	public void init() {
 		register(null, new NotificacioResourceServiceImpl.InitOnChangeLogicProcessor());
-		register(NotificacioResource.Fields.organGestor, new NotificacioResourceServiceImpl.OrganGestorOnChangeLogicProcessor());
 		register(NotificacioResource.Fields.caducitat, new NotificacioResourceServiceImpl.CaducitatOnChangeLogicProcessor());
 		register(NotificacioResource.Fields.caducitatDiesNaturals, new NotificacioResourceServiceImpl.CaducitatOnChangeLogicProcessor());
-	}
-
-	@Override
-	protected String additionalSpringFilter(
-		String currentSpringFilter,
-		String[] namedQueries) {
-		List<String> andConditions = new ArrayList<>();
-		// Condició per a mostrar només les notificacions de l'entitat actual
-		andConditions.add("entitat.id:" + userSessionHelper.getCurrentEntitatId());
-		// Condició per a mostrar només les notificacions amb permís de lectura
-		String permissionFilter = springFilterWithReadPermission();
-		if (!permissionFilter.isEmpty()) {
-			andConditions.add("(" + permissionFilter + ")");
-		}
-		return String.join(" and ", andConditions);
 	}
 
 	@Override
@@ -87,9 +67,6 @@ public class NotificacioResourceServiceImpl
 		entity.setComunicacioTipus(NotificacioComunicacioTipusEnumDto.ASINCRON);
 		entity.setEstat(NotificacioEstatEnumDto.PENDENT);
 		entity.setReferencia(UUID.randomUUID().toString());
-		entity.setProcedimentCodiNotib(entity.getProcediment().getCodi());
-		emplenarProcedimentOrganGestor(entity);
-		checkCreatePermission(entity);
 		if (resource.getDocumentsInfo() != null) {
 			saveDocuments(entity, resource.getDocumentsInfo());
 		}
@@ -101,34 +78,31 @@ public class NotificacioResourceServiceImpl
 		NotificacioResource resource,
 		Map<String, AnswerRequiredException.AnswerValue> answers,
 		boolean anyOrderChanged) {
-		List<Long> enviamentsIds = new ArrayList<>();
 		if (resource.getEnviamentsInfo() != null) {
-			resource.getEnviamentsInfo().forEach(e -> {
-				Long enviamentId = saveEnviament(entity, e);
-				enviamentsIds.add(enviamentId);
-			});
+			saveEnviaments(entity, resource.getEnviamentsInfo());
 		}
-		legacyHelper.altaNotificacio(entity.getId(), enviamentsIds);
+		legacyHelper.altaNotificacio(entity);
 	}
 
-	private Long saveEnviament(
+	private void saveEnviaments(
 		NotificacioResourceEntity notificacio,
-		NotificacioEnviamentResource enviament) {
-		String uuid = UUID.randomUUID().toString();
-		NotificacioEnviamentResourceEntity enviamentNou = NotificacioEnviamentResourceEntity.builder().
-			resource(enviament).
-			notificacio(notificacio).
-			build();
-		enviamentNou.setNotificaReferencia(uuid);
-		enviamentNou.setNotificaEstat(EnviamentEstat.PENDENT);
-		NotificacioEnviamentResourceEntity enviamentCreat = notificacioEnviamentResourceRepository.saveAndFlush(enviamentNou);
-		PersonaResourceEntity titular = saveDestinatari(enviamentCreat, enviament.getTitularInfo());
-		enviamentCreat.setTitular(titular);
-		enviamentCreat.setNotificaReferencia(uuid);
-		if (enviament.getRepresentantsInfo() != null) {
-			enviament.getRepresentantsInfo().forEach(r -> saveDestinatari(enviamentCreat, r));
-		}
-		return enviamentCreat.getId();
+		List<NotificacioEnviamentResource> enviaments) {
+		// Crea els enviaments associats amb la notificació a la base de dades.
+		enviaments.forEach(e -> {
+			NotificacioEnviamentResourceEntity enviamentNou = NotificacioEnviamentResourceEntity.builder().
+				resource(e).
+				notificacio(notificacio).
+				build();
+			enviamentNou.setNotificaEstat(EnviamentEstat.PENDENT);
+			NotificacioEnviamentResourceEntity enviamentCreat = notificacioEnviamentResourceRepository.save(enviamentNou);
+			PersonaResourceEntity titular = saveDestinatari(enviamentCreat, e.getTitularInfo());
+			enviamentCreat.setTitular(titular);
+			enviamentCreat.setNotificaReferencia(UUID.randomUUID().toString());
+			if (e.getRepresentantsInfo() != null) {
+				e.getRepresentantsInfo().forEach(r -> saveDestinatari(enviamentCreat, r));
+			}
+			legacyHelper.altaEnviament(enviamentCreat);
+		});
 	}
 
 	private void saveDocuments(
@@ -166,84 +140,7 @@ public class NotificacioResourceServiceImpl
 				build());
 	}
 
-	private void emplenarProcedimentOrganGestor(NotificacioResourceEntity entity) {
-		if (entity.getProcediment() != null && entity.getProcediment().isComu() && entity.getOrganGestor() != null) {
-			Optional<ProcedimentOrganGestorResourceEntity> procedimentOrganGestor = procedimentOrganGestorResourceRepository.findByProcedimentAndOrganGestor(
-				entity.getProcediment(),
-				entity.getOrganGestor());
-			procedimentOrganGestor.ifPresent(entity::setProcedimentOrganGestor);
-		}
-	}
 
-	/*
-	 * Condició en format Spring Filter per a mostrar només les notificacions sobre les que es tenen permisos. Les
-	 * notificacions es poden veure si es compleix alguna de les següents condicions:
-	 *   a) L'usuari te permís sobre l'òrgan gestor de la notificació.
-	 *   b) La notificació te un procediment no comú i l'usuari te permís sobre aquest procediment.
-	 *   c) La notificació te un procediment comú amb "requereix permisos directes" i l'usuari te permís
-	 *      sobre la combinació organ gestor - procediment de la notificació.
-	 *   d) La notificació te un procediment comú sense "requereix permisos directes",
-	 *      l'usuari te permís sobre la combinació organ gestor - procediment de la notificació i les combinacions
-	 *      òrgan gestor - procediment son únicament dels òrgans gestors amb permís de procediments comuns.
-	 */
-	private String springFilterWithReadPermission() {
-		List<Long> organGestorIds = notibPermissionHelper.organGestorIdsWithPermissionRecursive(BasePermission.READ);
-		List<Long> procedimentNoComuIds = notibPermissionHelper.procedimentServeiNoComuIdsWithPermission(
-			BasePermission.READ,
-			null);
-		List<Long> procedimentComuOrganGestorIds = notibPermissionHelper.procedimentServeiComuOrganGestorIdsWithPermission(
-			BasePermission.READ,
-			null);
-		List<String> permissionOrConditions = new ArrayList<>();
-		// a)
-		String joinedOrganGestorIds = organGestorIds.stream().
-			map(String::valueOf).collect(Collectors.joining(","));
-		if (!joinedOrganGestorIds.isEmpty()) {
-			permissionOrConditions.add("organGestor.id in (" + joinedOrganGestorIds + ")");
-		}
-		// b)
-		String joinedProcedimentNoComuIds = procedimentNoComuIds.stream().
-			map(String::valueOf).collect(Collectors.joining(","));
-		if (!joinedProcedimentNoComuIds.isEmpty()) {
-			permissionOrConditions.add("procediment.id in (" + joinedProcedimentNoComuIds + ")");
-		}
-		// c) o d)
-		String joinedProcedimentComuOrganGestorIds = procedimentComuOrganGestorIds.stream().
-			map(String::valueOf).collect(Collectors.joining(","));
-		if (!joinedProcedimentComuOrganGestorIds.isEmpty()) {
-			permissionOrConditions.add("procedimentOrganGestor.id in (" + joinedProcedimentComuOrganGestorIds + ")");
-		}
-		return String.join(" or ", permissionOrConditions);
-	}
-
-	/*
-	 * Es verifica si es tenen permisos per a crear la notificació. Les condicions que es verifiquen son les mateixes
-	 * del mètode springFilterWithReadPermission().
-	 */
-	private void checkCreatePermission(NotificacioResourceEntity entity) {
-		Permission organGestorPermission = notibPermissionHelper.getOrganGestorNotificacioCreatePermission(
-			entity.getEnviamentTipus());
-		Permission procedimentPermission = notibPermissionHelper.getProcedimentNotificacioCreatePermission(
-			entity.getEnviamentTipus());
-		List<Long> organGestorIds = notibPermissionHelper.organGestorIdsWithPermissionRecursive(organGestorPermission);
-		List<Long> procedimentNoComuIds = notibPermissionHelper.procedimentServeiNoComuIdsWithPermission(
-			procedimentPermission,
-			null);
-		List<Long> procedimentComuOrganGestorIds = notibPermissionHelper.procedimentServeiComuOrganGestorIdsWithPermission(
-			procedimentPermission,
-			null);
-		Long organGestorId = entity.getOrganGestor().getId();
-		Long procedimentId = entity.getProcediment().getId();
-		Long procedimentOrganGestorId = entity.getProcedimentOrganGestor().getId();
-		boolean permissionGranted = (organGestorId != null && organGestorIds.contains(organGestorId)) || // a)
-			(procedimentId != null && procedimentNoComuIds.contains(procedimentId)) || // b)
-			(procedimentOrganGestorId != null && procedimentComuOrganGestorIds.contains(procedimentOrganGestorId)); // c) o d)
-		if (!permissionGranted) {
-			throw new ResourceNotCreatedException(
-				NotificacioResource.class,
-				"Not allowed to create notificació. Permission check failed.");
-		}
-	}
 
 	/*
 	 * Lògica onChange que s'executa al carregar el formulari.
@@ -259,35 +156,6 @@ public class NotificacioResourceServiceImpl
 			String[] previousFieldNames,
 			NotificacioResource target) {
 			caducitatOnChange(previous.getCaducitatDiesNaturals(), previous, target);
-		}
-	}
-
-	/*
-	 * Lògica onChange pel camp organGestor. Si l'usuari te permís "comunicacions sense procediment" sobre l'òrgan
-	 * gestor i la notificació és una comunicació s'ha de posar el camp procedimentRequired a false.
-	 */
-	class OrganGestorOnChangeLogicProcessor implements OnChangeLogicProcessor<NotificacioResource> {
-		@Override
-		public void onChange(
-			Serializable id,
-			NotificacioResource previous,
-			String fieldName,
-			Object fieldValue,
-			Map<String, AnswerRequiredException.AnswerValue> answers,
-			String[] previousFieldNames,
-			NotificacioResource target) {
-			ResourceReference<OrganGestorResource, Long> organGestor = (ResourceReference)fieldValue;
-			boolean isComunicacio = previous.getEnviamentTipus() != null &&
-				(EnviamentTipus.COMUNICACIO.equals(previous.getEnviamentTipus()) || EnviamentTipus.SIR.equals(previous.getEnviamentTipus()));
-			if (organGestor != null && isComunicacio) {
-				List<Long> organGestorIdsWithPermission = notibPermissionHelper.organGestorIdsWithPermissionRecursive(
-					ExtendedPermission.PERM7);
-				boolean hasComunicacionsSenseProcedimentPermission = organGestorIdsWithPermission.contains(
-					organGestor.getId());
-				target.setProcedimentRequired(!hasComunicacionsSenseProcedimentPermission);
-			} else {
-				target.setProcedimentRequired(true);
-			}
 		}
 	}
 

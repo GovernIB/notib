@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import {
     MuiDataGrid,
+    FormField,
     useFormContext,
     springFilterBuilder as filterBuilder,
     useFilterApiRef,
@@ -10,13 +11,12 @@ import {
     FilterApi,
     useMuiDataGridApiRef,
     MuiDataGridApiRef,
-    MuiDataGridColDef,
 } from 'reactlib';
 import GridFormField from '../../components/GridFormField';
 import { Box, Icon, IconButton } from '@mui/material';
 import GridToolbarButton from '../../components/GridToolbarButton';
 
-const columns: MuiDataGridColDef[] = [
+const columns = [
     {
         field: 'usuariCodi',
         sortable: false,
@@ -31,24 +31,43 @@ const columns: MuiDataGridColDef[] = [
         field: 'activa',
         sortable: false,
         flex: 1,
-        type: 'boolean',
     },
 ];
 
 const EntitatFormTabAplicacionsFormContent: React.FC = () => {
     return (
         <Grid container spacing={2}>
-            <GridFormField size={4} name="usuariCodi" />
+            <Grid size={4}>
+                <FormField name="usuariCodi" />
+            </Grid>
             <Grid size={8} />
-            <GridFormField size={12} name="callbackUrl" />
-            <GridFormField size={6} name="activa" />
-            <GridFormField size={6} name="headerCsrf" />
-            <GridFormField size={6} name="horariLaboralInici" />
-            <GridFormField size={6} name="horariLaboralFi" />
-            <GridFormField size={6} name="maxEnviamentsMinutLaboral" />
-            <GridFormField size={6} name="maxEnviamentsMinutNoLaboral" />
-            <GridFormField size={6} name="maxEnviamentsDiaLaboral" />
-            <GridFormField size={6} name="maxEnviamentsDiaNoLaboral" />
+            <Grid size={12}>
+                <FormField name="callbackUrl" />
+            </Grid>
+            <Grid size={6}>
+                <FormField name="activa" />
+            </Grid>
+            <Grid size={6}>
+                <FormField name="headerCsrf" />
+            </Grid>
+            <Grid size={6}>
+                <FormField name="horariLaboralInici" />
+            </Grid>
+            <Grid size={6}>
+                <FormField name="horariLaboralFi" />
+            </Grid>
+            <Grid size={6}>
+                <FormField name="maxEnviamentsMinutLaboral" />
+            </Grid>
+            <Grid size={6}>
+                <FormField name="maxEnviamentsMinutNoLaboral" />
+            </Grid>
+            <Grid size={6}>
+                <FormField name="maxEnviamentsDiaLaboral" />
+            </Grid>
+            <Grid size={6}>
+                <FormField name="maxEnviamentsDiaNoLaboral" />
+            </Grid>
         </Grid>
     );
 };
