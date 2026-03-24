@@ -9,11 +9,13 @@ import es.caib.notib.logic.intf.model.DocumentResource;
 import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 import es.caib.notib.logic.intf.model.NotificacioResource;
 import es.caib.notib.logic.intf.model.PersonaResource;
-import es.caib.notib.persist.resourceentity.*;
+import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
+import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
+import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
+import es.caib.notib.persist.resourceentity.PersonaResourceEntity;
 import es.caib.notib.persist.resourcerepository.DocumentResourceRepository;
 import es.caib.notib.persist.resourcerepository.NotificacioEnviamentResourceRepository;
 import es.caib.notib.persist.resourcerepository.PersonaResourceRepository;
-import liquibase.pro.packaged.M;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,7 +46,7 @@ class NotificacioResourceServiceImplTest {
 	@Mock private DocumentResourceRepository documentRepo;
 	@Mock private PersonaResourceRepository personaRepo;
 	@Mock private LegacyHelper legacyHelper;
-	@Mock private NotibPermissionHelper notibPermissionHelper;
+	@Mock private NotificacioEnviamentResourceRepository notificacioEnviamentResourceRepository;
 
 	@InjectMocks
 	private NotificacioResourceServiceImpl service;
@@ -55,11 +57,6 @@ class NotificacioResourceServiceImplTest {
 	@BeforeEach
 	void setUp() {
 		entity = new NotificacioResourceEntity();
-		OrganGestorResourceEntity organGestor = new OrganGestorResourceEntity();
-		organGestor.setId(1L);
-		entity.setOrganGestor(organGestor);
-		entity.setProcediment(new ProcedimentResourceEntity());
-		entity.setProcedimentOrganGestor(new ProcedimentOrganGestorResourceEntity());
 		resource = new NotificacioResource();
 	}
 
@@ -73,7 +70,6 @@ class NotificacioResourceServiceImplTest {
 		EntitatResourceEntity entitat = new EntitatResourceEntity();
 		entitat.setDir3Codi("DIR3");
 		when(userSessionHelper.getCurrentEntitat()).thenReturn(entitat);
-		when(notibPermissionHelper.organGestorIdsWithPermissionRecursive(any())).thenReturn(List.of(1L));
 		service.beforeCreateSave(entity, resource, Map.of());
 		assertEquals("user", entity.getUsuariCodi());
 		assertEquals(entitat, entity.getEntitat());
@@ -96,7 +92,6 @@ class NotificacioResourceServiceImplTest {
 		resource.setDocumentsInfo(List.of(doc));
 		when(legacyHelper.notificacioAdjuntCreate(any())).thenReturn("fileId");
 		when(documentRepo.save(any())).thenAnswer(i -> i.getArgument(0));
-		when(notibPermissionHelper.organGestorIdsWithPermissionRecursive(any())).thenReturn(List.of(1L));
 		service.beforeCreateSave(entity, resource, Map.of());
 		assertNotNull(entity.getDocument());
 	}
@@ -111,10 +106,10 @@ class NotificacioResourceServiceImplTest {
 		enviament.setTitularInfo(new PersonaResource());
 		resource.setEnviamentsInfo(List.of(enviament));
 		NotificacioEnviamentResourceEntity saved = new NotificacioEnviamentResourceEntity();
-		when(enviamentRepo.saveAndFlush(any())).thenReturn(saved);
+		when(enviamentRepo.save(any())).thenReturn(saved);
 		when(personaRepo.save(any())).thenReturn(new PersonaResourceEntity());
 		service.afterCreateSave(entity, resource, Map.of(), false);
-		verify(enviamentRepo).saveAndFlush(any());
+		verify(enviamentRepo).save(any());
 	}
 
 	@Test
@@ -128,11 +123,10 @@ class NotificacioResourceServiceImplTest {
 		enviament.setTitularInfo(titular);
 		resource.setEnviamentsInfo(List.of(enviament));
 		NotificacioEnviamentResourceEntity saved = new NotificacioEnviamentResourceEntity();
-		saved.setId(11L);
-		when(enviamentRepo.saveAndFlush(any())).thenReturn(saved);
+		when(enviamentRepo.save(any())).thenReturn(saved);
 		service.afterCreateSave(entity, resource, answers, false);
 		// Comprovem que s’ha cridat el legacyHelper amb la mateixa entitat
-		verify(legacyHelper).altaNotificacio(entity.getId(), List.of(11L));
+		verify(legacyHelper).altaNotificacio(entity);
 	}
 
 	// =====================================================
