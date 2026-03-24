@@ -46,6 +46,7 @@ class NotificacioResourceServiceImplTest {
 	@Mock private DocumentResourceRepository documentRepo;
 	@Mock private PersonaResourceRepository personaRepo;
 	@Mock private LegacyHelper legacyHelper;
+	@Mock private NotificacioEnviamentResourceRepository notificacioEnviamentResourceRepository;
 
 	@InjectMocks
 	private NotificacioResourceServiceImpl service;
@@ -105,10 +106,10 @@ class NotificacioResourceServiceImplTest {
 		enviament.setTitularInfo(new PersonaResource());
 		resource.setEnviamentsInfo(List.of(enviament));
 		NotificacioEnviamentResourceEntity saved = new NotificacioEnviamentResourceEntity();
-		when(enviamentRepo.saveAndFlush(any())).thenReturn(saved);
+		when(enviamentRepo.save(any())).thenReturn(saved);
 		when(personaRepo.save(any())).thenReturn(new PersonaResourceEntity());
 		service.afterCreateSave(entity, resource, Map.of(), false);
-		verify(enviamentRepo).saveAndFlush(any());
+		verify(enviamentRepo).save(any());
 	}
 
 	@Test
@@ -122,11 +123,10 @@ class NotificacioResourceServiceImplTest {
 		enviament.setTitularInfo(titular);
 		resource.setEnviamentsInfo(List.of(enviament));
 		NotificacioEnviamentResourceEntity saved = new NotificacioEnviamentResourceEntity();
-		saved.setId(11L);
-		when(enviamentRepo.saveAndFlush(any())).thenReturn(saved);
+		when(enviamentRepo.save(any())).thenReturn(saved);
 		service.afterCreateSave(entity, resource, answers, false);
 		// Comprovem que s’ha cridat el legacyHelper amb la mateixa entitat
-		verify(legacyHelper).altaNotificacio(entity, List.of(11L));
+		verify(legacyHelper).altaNotificacio(entity);
 	}
 
 	// =====================================================
