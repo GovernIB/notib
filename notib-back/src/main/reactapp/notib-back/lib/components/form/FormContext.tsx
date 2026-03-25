@@ -3,6 +3,7 @@ import { ResourceType } from '../ResourceApiContext';
 import { ResourceApiError } from '../ResourceApiProvider';
 
 export type FormApi = {
+    getId: () => any;
     getData: () => any;
     refresh: () => void;
     reset: (data?: any, id?: any) => void;
