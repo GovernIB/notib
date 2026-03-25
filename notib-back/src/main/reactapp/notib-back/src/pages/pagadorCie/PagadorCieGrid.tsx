@@ -11,6 +11,7 @@ import {
 import GridFormField from '../../components/GridFormField';
 import { Grid, Icon, IconButton } from '@mui/material';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
+import LinkToTab from '../../components/LinkToTab';
 
 const columns = [
     {
@@ -33,11 +34,13 @@ const columns = [
         field: 'fullaCount',
         renderCell: (params: any) => {
             return (
-                <Chip
-                    label={params.value}
-                    color={params.value ? 'primary' : undefined}
-                    size="small"
-                />
+                <LinkToTab id={params.id} tab={1}>
+                    <Chip
+                        label={params.value}
+                        color={params.value ? 'primary' : undefined}
+                        size="small"
+                    />
+                </LinkToTab>
             );
         },
         flex: 1,
@@ -46,11 +49,13 @@ const columns = [
         field: 'sobreCount',
         renderCell: (params: any) => {
             return (
-                <Chip
-                    label={params.value}
-                    color={params.value ? 'primary' : undefined}
-                    size="small"
-                />
+                <LinkToTab id={params.id} tab={2}>
+                    <Chip
+                        label={params.value}
+                        color={params.value ? 'primary' : undefined}
+                        size="small"
+                    />
+                </LinkToTab>
             );
         },
         flex: 1,
