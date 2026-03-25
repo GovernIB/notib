@@ -94,6 +94,7 @@ export const AuthProvider = (props: AuthProviderProps) => {
                                 );
                             processUser(user);
                         } catch (error: any) {
+                            debug && logConsole.debug('La renovació silenciosa ha fallat');
                             const isLoginRequired = error.error === 'login_required';
                             if (mandatory && isLoginRequired) {
                                 debug &&
