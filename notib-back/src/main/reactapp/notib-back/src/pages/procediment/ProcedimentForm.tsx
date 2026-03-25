@@ -7,11 +7,13 @@ import { FormPage, MuiForm, MuiFormTabs, MuiFormTabContent, useFormContext } fro
 import ProcedimentFormTabGrups from './ProcedimentFormTabGrups.tsx';
 import ProcedimentFormTabPermisos from './ProcedimentFormTabPermisos';
 import GridFormField from '../../components/GridFormField.tsx';
+import { useTabParam } from '../../hooks/useSearchParams.tsx';
 
 const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
     const { setSubtitle } = props;
     const { t } = useTranslation();
     const { data } = useFormContext();
+    const initialTab = useTabParam();
 
     React.useEffect(() => {
         setSubtitle(data?.codi + ', ' + data?.nom);
@@ -35,7 +37,7 @@ const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void
         { label: permisosTabLabel },
     ];
     return (
-        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1, 2]}>
+        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1, 2]} initialIndex={initialTab}>
             <MuiFormTabContent index={0} showOnCreate>
                 <Grid container spacing={2}>
                     <GridFormField size={3} name="codi" />
