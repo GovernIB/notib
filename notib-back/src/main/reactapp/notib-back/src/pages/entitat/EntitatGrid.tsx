@@ -13,6 +13,7 @@ import {
 } from 'reactlib';
 import GridFormField from '../../components/GridFormField';
 import { Icon, IconButton } from '@mui/material';
+import LinkToTab from '../../components/LinkToTab';
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -37,11 +38,13 @@ const columns: MuiDataGridColDef[] = [
         align: 'center',
         renderCell: (params: any) => {
             return (
-                <Chip
-                    label={params.value}
-                    color={params.value ? 'primary' : undefined}
-                    size="small"
-                />
+                <LinkToTab id={params.id} tab={2}>
+                    <Chip
+                        label={params.value}
+                        color={params.value ? 'primary' : undefined}
+                        size="small"
+                    />
+                </LinkToTab>
             );
         },
     },
@@ -51,11 +54,13 @@ const columns: MuiDataGridColDef[] = [
         align: 'center',
         renderCell: (params: any) => {
             return (
-                <Chip
-                    label={params.value}
-                    color={params.value ? 'primary' : undefined}
-                    size="small"
-                />
+                <LinkToTab id={params.id} tab={3}>
+                    <Chip
+                        label={params.value}
+                        color={params.value ? 'primary' : undefined}
+                        size="small"
+                    />
+                </LinkToTab>
             );
         },
     },
@@ -65,11 +70,13 @@ const columns: MuiDataGridColDef[] = [
         align: 'center',
         renderCell: (params: any) => {
             return (
-                <Chip
-                    label={params.value}
-                    color={params.value ? 'primary' : undefined}
-                    size="small"
-                />
+                <LinkToTab id={params.id} tab={4}>
+                    <Chip
+                        label={params.value}
+                        color={params.value ? 'primary' : undefined}
+                        size="small"
+                    />
+                </LinkToTab>
             );
         },
     },
