@@ -1,5 +1,5 @@
 /**
- *
+ * 
  */
 package es.caib.notib.persist.entity;
 
@@ -10,7 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.util.ObjectUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -21,7 +20,7 @@ import java.io.Serializable;
 
 /**
  * Classe de model de dades que conté la informació d'un usuari.
- *
+ * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Entity
@@ -85,19 +84,19 @@ public class UsuariEntity implements Serializable {
 		this.nif = nif;
 		this.email = email;
 	}
-
+	
 	public void update(UsuariEntity usuari) {
 
 		rebreEmailsNotificacio = usuari.isRebreEmailsNotificacio();
 		rebreEmailsNotificacioCreats = usuari.isRebreEmailsNotificacioCreats();
-		idioma = ObjectUtils.isEmpty(usuari.getIdioma()) ? "ca" : usuari.getIdioma();
+		idioma = usuari.getIdioma();
 		emailAlt = usuari.getEmailAlt();
 		numElementsPaginaDefecte = usuari.numElementsPaginaDefecte;
         entitatDefecte = usuari.getEntitatDefecte();
         organDefecte = usuari.getOrganDefecte();
         procedimentDefecte = usuari.getProcedimentDefecte();
 	}
-
+	
 	public void updateUltimRol(String ultimRol) {
 		this.ultimRol = ultimRol;
 	}

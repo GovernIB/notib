@@ -9,7 +9,6 @@ export type PermissionGridEntry = {
     renderHeader?: (params: GridColumnHeaderParams) => React.ReactNode;
     description?: string;
     flex?: number;
-    type?: string;
 };
 
 const PermissionGrid: React.FC<{
@@ -21,8 +20,7 @@ const PermissionGrid: React.FC<{
     toolbarAdditionalRow?:
         | React.ReactElement<unknown, string | React.JSXElementConstructor<any>>
         | undefined;
-    toolbarHide?: true;
-    withOrganGestor?: boolean;
+    toolbarHide?: true | undefined;
 }> = (props) => {
     const {
         resourceName,
@@ -32,7 +30,6 @@ const PermissionGrid: React.FC<{
         toolbarAdditionalRow,
         apiRef,
         toolbarHide,
-        withOrganGestor,
     } = props;
     const { t } = useTranslation();
     const { apiRef: formApiRef } = useFormContext();
@@ -88,16 +85,10 @@ const PermissionGrid: React.FC<{
                 },
             }
         );
-        withOrganGestor && columns.push({
-            field: 'organGestor',
-            sortable: false,
-            flex: 1,
-        });
         columns.push(
             ...permissionEntries.map((e) => ({
                 headerName: e.headerName,
                 field: e.field,
-                type: e.type,
                 sortable: false,
                 flex: e.flex ?? 1,
                 description: e.description,

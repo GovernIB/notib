@@ -167,22 +167,18 @@ const EntitatFormTabPermisos: React.FC = () => {
         {
             headerName: t('page.entitats.form.permisos.usuariAllowed'),
             field: 'perm0Allowed',
-            type: 'boolean',
         },
         {
             headerName: t('page.entitats.form.permisos.admEntitatAllowed'),
             field: 'perm2Allowed',
-            type: 'boolean',
         },
         {
             headerName: t('page.entitats.form.permisos.admLecturaAllowed'),
             field: 'permXAllowed',
-            type: 'boolean',
         },
         {
             headerName: t('page.entitats.form.permisos.aplicacioAllowed'),
             field: 'perm3Allowed',
-            type: 'boolean',
         },
     ];
 

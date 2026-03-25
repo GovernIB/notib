@@ -23,7 +23,6 @@ import Propietats from './pages/propietat/Propietats';
 import MonitorIntegracioGrid from './pages/integracio/MonitorIntegracioGrid';
 import CacheGrid from './pages/cache/CacheGrid';
 import ActiveMqGrid from './pages/activeMq/ActiveMqGrid';
-import MonitorSistema from './pages/monitorSistema/MonitorSistema.tsx';
 
 export const router = createBrowserRouter(
     [
@@ -167,18 +166,6 @@ export const router = createBrowserRouter(
                     path: 'activemq',
                     children: [
                         { index: true, element: <ActiveMqGrid /> },
-                    ],
-                },
-                // {
-                //     path: 'callbacksError',
-                //     children: [
-                //         { index: true, element: <NotificacioGrid /> },
-                //     ],
-                // },
-                {
-                    path: 'monitorSistema',
-                    children: [
-                        { index: true, element: <MonitorSistema/> },
                     ],
                 },
                 {

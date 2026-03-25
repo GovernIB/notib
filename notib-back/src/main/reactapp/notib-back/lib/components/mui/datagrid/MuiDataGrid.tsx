@@ -23,7 +23,6 @@ import {
     useGridSelector,
     gridEditRowsStateSelector,
 } from '@mui/x-data-grid-pro';
-import { caES, esES, enUS } from '@mui/x-data-grid/locales';
 import Box from '@mui/material/Box';
 import Icon from '@mui/material/Icon';
 import { capitalize } from '../../../util/text';
@@ -250,7 +249,7 @@ export type MuiDataGridProps = {
      * Indica si l'alçada del component s'ha d'ajustar al nombre de files que s'han de mostrar
      * @warning Canviar aquest valor dinàmicament fa que el DataGrid de MUI es torni a montar de nou (l'estat intern i subscripcions a events es perden).
      */
-    autoHeight?: boolean;
+    autoHeight?: true;
     /** Indica que les files parells s'han de mostrar d'un color més oscur per a facilitar la seva lectura */
     striped?: true;
     /** Indica que només s'han de mostrar les vores horitzontals de la graella */
@@ -516,17 +515,6 @@ const useGridColumns = (
         return processedColumns;
     }, [columns, fields, artifacts]);
     return processedColumns;
-};
-
-const useLocaleText = () => {
-    const { currentLanguage } = useBaseAppContext();
-    if (currentLanguage === 'ca') {
-        return caES.components.MuiDataGrid.defaultProps.localeText;
-    } else if (currentLanguage === 'es') {
-        return esES.components.MuiDataGrid.defaultProps.localeText;
-    } else {
-        return enUS.components.MuiDataGrid.defaultProps.localeText;
-    }
 };
 
 /**
@@ -1046,7 +1034,6 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
           }
         : null;
     const processedRows = React.useMemo(() => [...additionalRows, ...rows], [additionalRows, rows]);
-    const localeText = useLocaleText();
     const content = (
         <>
             {!toolbarHide && toolbar}
@@ -1094,7 +1081,6 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                 }}
                 semiBordered={semiBordered}
                 autoHeight={autoHeight}
-                localeText={localeText}
                 sx={{
                     height: autoHeight ? 'auto' : undefined,
                     ...gridMargins,

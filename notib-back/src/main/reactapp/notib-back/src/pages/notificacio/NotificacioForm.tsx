@@ -57,19 +57,12 @@ const ProcedimentServeiField: React.FC = () => {
                         name="procediment"
                         label={t('page.notificacio.form.camps.' + type)}
                         filter={"tipus:'" + type.toUpperCase() + "'"}
-                        required={data.procedimentRequired}
                     />
                 </Grid>
             </Grid>
         );
     } else {
-        return (
-            <FormField
-                name="procediment"
-                filter={"tipus:'" + type.toUpperCase() + "'"}
-                required={data.procedimentRequired}
-            />
-        );
+        return <FormField name="procediment" filter={"tipus:'" + type.toUpperCase() + "'"} />;
     }
 };
 
@@ -141,7 +134,7 @@ export const NotificacioForm: React.FC = () => {
                 additionalData={type ? { enviamentTipus: type, ...initialData } : initialData}
                 onReset={handleReset}
                 apiRef={formApiRef}
-                createLink="../"
+                createLink="./{{id}}"
                 toolbarElementsWithPositions={[{ position: 2, element: <JSonButton /> }]}
                 componentProps={{ style: { height: '100%' } }}
                 commonFieldComponentProps={{ size: 'small' }}

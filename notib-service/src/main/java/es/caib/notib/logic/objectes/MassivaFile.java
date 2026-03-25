@@ -666,22 +666,16 @@ public class MassivaFile {
                 return;
             }
         }
-        var header = headerColumns.get(MassivaColumnsEnum.FITXER_UUID);
-        if (header != null) {
-            var documentUuid = enviamentCsv.get(header);
-            if (!Strings.isNullOrEmpty(documentUuid)) {
-                totalDocuments = setDocuments(notificacio, totalDocuments, documentUuid);
-                if (totalDocuments == 5) {
-                    return;
-                }
+        var documentUuid = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.FITXER_UUID));
+        if (!Strings.isNullOrEmpty(documentUuid)) {
+            totalDocuments = setDocuments(notificacio, totalDocuments, documentUuid);
+            if (totalDocuments == 5) {
+                return;
             }
         }
-        header = headerColumns.get(MassivaColumnsEnum.FITXER_CSV);
-        if (header != null) {
-            var documentCsv = enviamentCsv.get(header);
-            if (!Strings.isNullOrEmpty(documentCsv)) {
-                setDocuments(notificacio, totalDocuments, documentCsv);
-            }
+        var documentCsv = enviamentCsv.get(headerColumns.get(MassivaColumnsEnum.FITXER_CSV));
+        if (!Strings.isNullOrEmpty(documentCsv)) {
+            setDocuments(notificacio, totalDocuments, documentCsv);
         }
     }
 
