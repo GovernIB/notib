@@ -7,6 +7,7 @@ import es.caib.notib.logic.intf.resourceservice.SseEventService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
  *
  * @author Límit Tecnologies
  */
+@Slf4j
 @RestController("apiSseController")
 @RequestMapping(BaseConfig.API_PATH + "/sse")
 @RequiredArgsConstructor
@@ -72,9 +74,18 @@ public class SseController extends BaseController {
 					sseEventService.removeListener(queue.get());
 				}
 			});
-			emitter.onCompletion(() -> sseEventService.removeListener(queue.get()));
-			emitter.onTimeout(() -> sseEventService.removeListener(queue.get()));
-			emitter.onError(e -> sseEventService.removeListener(queue.get()));
+			emitter.onCompletion(() -> {
+				log.debug("Emitter onCompletion");
+				sseEventService.removeListener(queue.get());
+			});
+			emitter.onTimeout(() -> {
+				log.debug("Emitter onTimeout");
+				sseEventService.removeListener(queue.get());
+			});
+			emitter.onError(e -> {
+				log.debug("Emitter onError", e);
+				sseEventService.removeListener(queue.get());
+			});
 			return ResponseEntity.ok(emitter);
 		} else {
 			return ResponseEntity.notFound().build();
