@@ -337,6 +337,7 @@ export const Form: React.FC<FormProps> = (props) => {
         onChangeActionMiddleware,
         (error: any) => temporalMessageShow(t('form.onChange.error'), error.message, 'error')
     );
+    const getId = () => id;
     const getData = () => data;
     const dataGetValue = (callback: (state: any) => any) => callback(data);
     const getInitialData = React.useCallback(
@@ -725,6 +726,7 @@ export const Form: React.FC<FormProps> = (props) => {
         }
     }, [navigateToLink]);
     apiRef.current = {
+        getId,
         getData,
         refresh: () => refresh(true),
         reset: externalReset,
@@ -739,6 +741,7 @@ export const Form: React.FC<FormProps> = (props) => {
     };
     if (apiRefProp) {
         if (apiRefProp.current) {
+            apiRefProp.current.getId = getId;
             apiRefProp.current.getData = getData;
             apiRefProp.current.refresh = () => refresh(true);
             apiRefProp.current.reset = externalReset;
