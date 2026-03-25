@@ -143,7 +143,17 @@ public class OrganGestorResourceServiceImpl
 			if (entitat.isEmpty()) {
 				throw new ActionExecutionException(OrganGestorResource.class, null, code, "Couldn't find current entitat in user session");
 			}
-			return organGestorSyncHelper.sincronitzar(entitat.get(), params.getSimular() != null && params.getSimular());
+			try {
+				return organGestorSyncHelper.sincronitzar(entitat.get(), params.getSimular() != null && params.getSimular());
+			} catch (Exception ex) {
+				log.error("Error al sincronitzar les unitats DIR3", ex);
+				throw new ActionExecutionException(
+					getResourceClass(),
+					entity != null ? entity.getId() : null,
+					code,
+					"Error al sincronitzar les unitats DIR3: " + ex.getMessage(),
+					ex);
+			}
 		}
 
 		@Override
