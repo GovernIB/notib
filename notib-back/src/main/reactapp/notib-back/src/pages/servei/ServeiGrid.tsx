@@ -7,14 +7,13 @@ import {
     MuiFilter,
     useFilterApiRef,
     springFilterBuilder as filterBuilder,
-    MuiDataGridColDef,
 } from 'reactlib';
 import { useNotibContext } from '../../components/NotibContext';
 import GridFormField, { GridButtonField } from '../../components/GridFormField';
 import { Grid, Icon, IconButton } from '@mui/material';
 import LinkToTab from '../../components/LinkToTab';
 
-const columns: MuiDataGridColDef[] = [
+const columns = [
     {
         field: 'codi',
         flex: 1,
@@ -38,27 +37,22 @@ const columns: MuiDataGridColDef[] = [
     {
         field: 'entregaCieActiva',
         flex: 0.6,
-        type: 'boolean',
     },
     {
         field: 'comu',
         flex: 0.6,
-        type: 'boolean',
     },
     {
         field: 'requireDirectPermission',
         flex: 0.6,
-        type: 'boolean',
     },
     {
         field: 'manual',
         flex: 0.6,
-        type: 'boolean',
     },
     {
         field: 'actiu',
         flex: 0.6,
-        type: 'boolean',
     },
     {
         field: 'grupCount',

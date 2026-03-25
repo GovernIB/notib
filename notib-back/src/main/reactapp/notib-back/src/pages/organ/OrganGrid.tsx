@@ -9,23 +9,20 @@ import CircularProgress from '@mui/material/CircularProgress';
 import {
     GridPage,
     MuiDataGrid,
-    MuiDataGridApi,
     MuiActionReportButton,
     useBaseAppContext,
     useResourceApiService,
     useAuthContext,
-    useMuiDataGridApiRef,
     springFilterBuilder as filterBuilder,
     useFilterApiRef,
     MuiFilter,
     FilterApi,
-    MuiDataGridColDef,
 } from 'reactlib';
 import GridFormField from '../../components/GridFormField';
 import { Icon, IconButton } from '@mui/material';
 import LinkToTab from '../../components/LinkToTab';
 
-const columns: MuiDataGridColDef[] = [
+const columns = [
     {
         field: 'codi',
         flex: 2,
@@ -49,12 +46,10 @@ const columns: MuiDataGridColDef[] = [
     {
         field: 'entregaCieActiva',
         flex: 1,
-        type: 'boolean',
     },
     {
         field: 'permetreSir',
         flex: 1.5,
-        type: 'boolean',
     },
     {
         field: 'aclEntryCount',
@@ -73,7 +68,7 @@ const columns: MuiDataGridColDef[] = [
     },
 ];
 
-const useSse = (queueId: string, eventName: string, onEvent: (event: any) => void, closeOnError?: boolean) => {
+const useSse = (queueId: string, eventName: string, onEvent: (event: any) => void) => {
     const { getToken } = useAuthContext();
     const { isReady: apiIsReady, currentLinks } = useResourceApiService('sse');
     React.useEffect(() => {
@@ -95,7 +90,7 @@ const useSse = (queueId: string, eventName: string, onEvent: (event: any) => voi
                 onEvent?.(data);
             });
             eventSource.onerror = () => {
-                closeOnError && eventSource.close();
+                eventSource.close();
             };
             return () => {
                 eventSource.close();
@@ -104,8 +99,13 @@ const useSse = (queueId: string, eventName: string, onEvent: (event: any) => voi
     }, [apiIsReady]);
 };
 
-const OrganGridDir3SyncLoading: React.FC<{ percent?: number; message?: string }> = (props) => {
-    const { percent, message } = props;
+const OrganGridDir3SyncLoading: React.FC = () => {
+    const [percent, setPercent] = React.useState<number>();
+    const [message, setMessage] = React.useState<string>();
+    useSse('PROGRESS', 'DIR3_SYNC', (event: any) => {
+        setPercent(event.percent);
+        setMessage(event.message);
+    });
     return (
         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
             <Box sx={{ textAlign: 'center', my: 4 }}>
@@ -139,18 +139,11 @@ const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
     );
 };
 
-const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: React.RefObject<MuiDataGridApi> }> = (props) => {
-    const { dataGridApiRef } = props;
+const OrganGridDir3SyncActionButton: React.FC = () => {
     const { t } = useTranslation();
     const { temporalMessageShow } = useBaseAppContext();
     const [simular, setSimular] = React.useState<boolean>(true);
     const [senseCanvis, setSenseCanvis] = React.useState<boolean>();
-    const [percent, setPercent] = React.useState<number>();
-    const [message, setMessage] = React.useState<string>();
-    useSse('PROGRESS', 'DIR3_SYNC', (event: any) => {
-        setPercent(event.percent);
-        setMessage(event.message);
-    });
     const resultProcessor = (result: any) => {
         setSenseCanvis(result.senseCanvis);
         if (result.simulat) {
@@ -162,7 +155,6 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: React.RefObject<
     };
     const handleSuccess = (result?: any) => {
         if (!result.simulat) {
-            dataGridApiRef.current.refresh();
             temporalMessageShow(null, t('page.organs.grid.sync.success'), 'success');
         }
     };
@@ -190,7 +182,7 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: React.RefObject<
             formAdditionalData={{ simular }}
             formDialogTitle={t('page.organs.grid.sync.dialogTitle')}
             formDialogButtons={formDialogButtons}
-            formDialogLoading={<OrganGridDir3SyncLoading percent={percent} message={message}/>}
+            formDialogLoading={<OrganGridDir3SyncLoading />}
             formDialogResultProcessor={resultProcessor}
             buttonComponentProps={{ variant: 'contained' }}
             onSuccess={handleSuccess}
@@ -262,7 +254,6 @@ const OrganGestorGridFilter: React.FC = () => {
 
 export const OrganGrid = () => {
     const { t } = useTranslation();
-    const dataGridApiRef = useMuiDataGridApiRef();
     return (
         <GridPage disableMargins={false}>
             <MuiDataGrid
@@ -278,10 +269,9 @@ export const OrganGrid = () => {
                 toolbarElementsWithPositions={[
                     {
                         position: 2,
-                        element: <OrganGridDir3SyncActionButton dataGridApiRef={dataGridApiRef} />,
+                        element: <OrganGridDir3SyncActionButton />,
                     },
                 ]}
-                apiRef={dataGridApiRef}
             />
         </GridPage>
     );

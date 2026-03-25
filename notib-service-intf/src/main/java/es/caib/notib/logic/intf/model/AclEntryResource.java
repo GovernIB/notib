@@ -6,15 +6,11 @@ import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
-import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
-import es.caib.notib.logic.intf.base.validation.CustomValidation;
-import es.caib.notib.logic.intf.model.validator.OrganGestorNotNullEnProcedimentComu;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.FieldNameConstants;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -30,7 +26,6 @@ import java.util.Base64;
 @Getter
 @Setter
 @NoArgsConstructor
-@FieldNameConstants
 @ResourceConfig(
 		accessConstraints = {
 				@ResourceAccessConstraint(
@@ -46,12 +41,6 @@ import java.util.Base64;
 				formClass = AclEntryResource.PermisosResourceFilter.class)
 		}
 )
-@CustomValidation.List({
-	@CustomValidation(
-		customValidatorType = OrganGestorNotNullEnProcedimentComu.class,
-		targetFields = AclEntryResource.Fields.organGestor,
-		springBean = true)
-})
 public class AclEntryResource extends BaseResource<String> {
 
 	public static final String FILTER_CODE = "FILTER_PERMISOS";
@@ -64,7 +53,6 @@ public class AclEntryResource extends BaseResource<String> {
 	private String resourceName;
 	@NotNull
 	private Serializable resourceId;
-	private ResourceReference<OrganGestorResource, Long> organGestor;
 	private boolean readAllowed;
 	private boolean writeAllowed;
 	private boolean createAllowed;
@@ -81,6 +69,8 @@ public class AclEntryResource extends BaseResource<String> {
 	private boolean perm8Allowed;
 	private boolean perm9Allowed;
 	private boolean permXAllowed;
+
+	private String subjectName;
 
 	@Getter
 	@RequiredArgsConstructor

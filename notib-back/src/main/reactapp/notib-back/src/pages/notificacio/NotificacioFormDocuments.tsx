@@ -7,14 +7,11 @@ import Button from '@mui/material/Button';
 import Icon from '@mui/material/Icon';
 import IconButton from '@mui/material/IconButton';
 import { MuiForm, FormField, useFormContext } from 'reactlib';
-import GridFormField from '../../components/GridFormField';
-import { FormDropzoneField } from '../../components/FormDropzoneField';
 
 const NotificacioFormDocumentContent: React.FC<{ enviamentTipus: string }> = (props) => {
     const { enviamentTipus } = props;
     const { t } = useTranslation();
     const { data } = useFormContext();
-
     const sourceFieldNameMapping: any = {
         CSV: 'csv',
         UUID: 'uuid',
@@ -24,50 +21,51 @@ const NotificacioFormDocumentContent: React.FC<{ enviamentTipus: string }> = (pr
         enviamentTipus === 'SIR'
             ? '.jpg,.jpeg,.odt,.odp,.ods,.odg,.docx,.xlsx,.pptx,.pdf,.png,.rtf,.svg,.tiff,.txt,.xml,.xsig'
             : '.zip,.pdf';
-
     return (
-        <FormDropzoneField
-            name={sourceFieldNameMapping[data?.source]}
-            accept={accept}
-            textValidacio={t(
-                'page.notificacio.form.documents.helperText.attachment.' +
-                    (enviamentTipus === 'SIR' ? 'sir' : 'noSir')
-            )}
-        >
-            <Grid container spacing={2}>
-                <GridFormField size={6} name="source" />
-                <Grid size={6}>
-                    {data?.source != null && (
-                        <FormField
-                            name={sourceFieldNameMapping[data.source]}
-                            componentProps={
-                                data.source === 'ATTACHED'
-                                    ? {
-                                          helperText: t(
-                                              'page.notificacio.form.documents.helperText.attachment.' +
-                                                  (enviamentTipus === 'SIR' ? 'sir' : 'noSir')
-                                          ),
-                                      }
-                                    : undefined
-                            }
-                            accept={data.source === 'ATTACHED' ? accept : undefined}
-                            required
-                        />
-                    )}
-                </Grid>
-                <GridFormField size={6} name="origen" />
-                <GridFormField size={6} name="validesa" />
-                <GridFormField size={6} name="tipoDocumental" />
-                <GridFormField size={6} name="modoFirma" />
-                <GridFormField
-                    size={6}
+        <Grid container spacing={2}>
+            <Grid size={6}>
+                <FormField name="source" />
+            </Grid>
+            <Grid size={6}>
+                {data?.source != null && (
+                    <FormField
+                        name={sourceFieldNameMapping[data.source]}
+                        componentProps={
+                            data.source === 'ATTACHED'
+                                ? {
+                                      helperText: t(
+                                          'page.notificacio.form.documents.helperText.attachment.' +
+                                              (enviamentTipus === 'SIR' ? 'sir' : 'noSir')
+                                      ),
+                                  }
+                                : undefined
+                        }
+                        accept={data.source === 'ATTACHED' ? accept : undefined}
+                        required
+                    />
+                )}
+            </Grid>
+            <Grid size={6}>
+                <FormField name="origen" />
+            </Grid>
+            <Grid size={6}>
+                <FormField name="validesa" />
+            </Grid>
+            <Grid size={6}>
+                <FormField name="tipoDocumental" />
+            </Grid>
+            <Grid size={6}>
+                <FormField name="modoFirma" />
+            </Grid>
+            <Grid size={6}>
+                <FormField
                     name="normalitzat"
                     componentProps={{
                         helperText: t('page.notificacio.form.documents.helperText.normalitzat'),
                     }}
                 />
             </Grid>
-        </FormDropzoneField>
+        </Grid>
     );
 };
 
