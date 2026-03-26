@@ -12,7 +12,6 @@ import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
-import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
 import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.NodeDir3;
@@ -184,8 +183,23 @@ public class LegacyHelper {
 	 *   - Alta dels enviaments la màquina d'estats (SM) al finalitzar la transacció.
 	 * @param entity
 	 *            l'entitat de la notificació
+	 * @param enviamentsIds
+	 *            la llista d'ids dels enviaments associats a la notificació
 	 */
-	public void altaNotificacio(NotificacioResourceEntity entity) {
+	public void altaNotificacio(NotificacioResourceEntity entity, List<Long> enviamentsIds) {
+		// Lògica antiga pels enviaments
+		for (Long enviamentId: enviamentsIds) {
+			Optional<NotificacioEnviamentEntity> notificacioEnviamentEntity = notificacioEnviamentRepository.findById(enviamentId);
+			if (notificacioEnviamentEntity.isPresent()) {
+				// Crea el registre a notificacio_env_table
+				enviamentTableHelper.crearRegistre(notificacioEnviamentEntity.get());
+				// Crea la informació d'auditoria
+				auditHelper.auditaEnviament(
+					notificacioEnviamentEntity.get(),
+					AuditService.TipusOperacio.CREATE,
+					"NotificacioResourceServiceImpl.saveEnviaments");
+			}
+		}
 		// Lògica antiga per a les notificacions
 		Optional<NotificacioEntity> notificacioEntity = notificacioRepository.findById(entity.getId());
 		if (notificacioEntity.isPresent()) {
@@ -207,29 +221,6 @@ public class LegacyHelper {
 					}
 				}
 			});
-		}
-	}
-
-	/**
-	 * Lògica antiga pels enviaments:
-	 * <p>
-	 *   - Creació del registre a notificacio_env_table.
-	 *   - Creació de l'auditoria.
-	 * @param entity
-	 *            l'entitat de l'enviament
-	 */
-	public void altaEnviament(NotificacioEnviamentResourceEntity entity) {
-		// Lògica antiga pels enviaments
-		Optional<NotificacioEnviamentEntity> notificacioEnviamentEntity = notificacioEnviamentRepository.findById(
-			entity.getId());
-		if (notificacioEnviamentEntity.isPresent()) {
-			// Crea el registre a notificacio_env_table
-			enviamentTableHelper.crearRegistre(notificacioEnviamentEntity.get());
-			// Crea la informació d'auditoria
-			auditHelper.auditaEnviament(
-				notificacioEnviamentEntity.get(),
-				AuditService.TipusOperacio.CREATE,
-				"NotificacioResourceServiceImpl.saveEnviaments");
 		}
 	}
 
