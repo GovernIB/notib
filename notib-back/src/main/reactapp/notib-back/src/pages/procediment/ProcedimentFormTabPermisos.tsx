@@ -138,6 +138,7 @@ const ProcedimentFormTabPermisos: React.FC = () => {
                 </Tooltip>
             ),
             flex: 0.5,
+            type: 'boolean',
         },
         {
             headerName: t('page.procediments.form.permisos.procesAllowed'),
@@ -152,6 +153,7 @@ const ProcedimentFormTabPermisos: React.FC = () => {
                 </Tooltip>
             ),
             flex: 0.5,
+            type: 'boolean',
         },
         {
             headerName: t('page.procediments.form.permisos.gestioAllowed'),
@@ -166,6 +168,7 @@ const ProcedimentFormTabPermisos: React.FC = () => {
                 </Tooltip>
             ),
             flex: 0.5,
+            type: 'boolean',
         },
         {
             headerName: t('page.procediments.form.permisos.notificacioAllowed'),
@@ -180,6 +183,7 @@ const ProcedimentFormTabPermisos: React.FC = () => {
                 </Tooltip>
             ),
             flex: 0.5,
+            type: 'boolean',
         },
         {
             headerName: t('page.procediments.form.permisos.comunicacioAllowed'),
@@ -194,6 +198,7 @@ const ProcedimentFormTabPermisos: React.FC = () => {
                 </Tooltip>
             ),
             flex: 0.5,
+            type: 'boolean',
         },
         {
             headerName: t('page.procediments.form.permisos.comunicacioSirAllowed'),
@@ -208,6 +213,7 @@ const ProcedimentFormTabPermisos: React.FC = () => {
                 </Tooltip>
             ),
             flex: 0.5,
+            type: 'boolean',
         },
     ];
     return (
