@@ -166,6 +166,7 @@ const OrganFormTabPermisos: React.FC = () => {
                 </Tooltip>
             ),
             flex: 0.5,
+            type: 'boolean',
         },
         {
             headerName: t('page.organs.form.permisos.consulta'),
@@ -180,6 +181,7 @@ const OrganFormTabPermisos: React.FC = () => {
                 </Tooltip>
             ),
             flex: 0.5,
+            type: 'boolean',
         },
         {
             headerName: t('page.organs.form.permisos.processar'),
@@ -194,6 +196,7 @@ const OrganFormTabPermisos: React.FC = () => {
                 </Tooltip>
             ),
             flex: 0.5,
+            type: 'boolean',
         },
         {
             headerName: t('page.organs.form.permisos.gestio'),
@@ -204,6 +207,7 @@ const OrganFormTabPermisos: React.FC = () => {
                 </Tooltip>
             ),
             flex: 0.5,
+            type: 'boolean',
         },
         {
             headerName: t('page.organs.form.permisos.comuns'),
@@ -214,6 +218,7 @@ const OrganFormTabPermisos: React.FC = () => {
                 </Tooltip>
             ),
             flex: 0.5,
+            type: 'boolean',
         },
         {
             headerName: t('page.organs.form.permisos.notificacions'),
@@ -228,6 +233,7 @@ const OrganFormTabPermisos: React.FC = () => {
                 </Tooltip>
             ),
             flex: 0.5,
+            type: 'boolean',
         },
         {
             headerName: t('page.organs.form.permisos.comunicacions'),
@@ -242,6 +248,7 @@ const OrganFormTabPermisos: React.FC = () => {
                 </Tooltip>
             ),
             flex: 0.5,
+            type: 'boolean',
         },
         {
             headerName: t('page.organs.form.permisos.sir'),
@@ -252,6 +259,7 @@ const OrganFormTabPermisos: React.FC = () => {
                 </Tooltip>
             ),
             flex: 0.5,
+            type: 'boolean',
         },
         {
             headerName: t('page.organs.form.permisos.comSenseProc'),
@@ -266,6 +274,7 @@ const OrganFormTabPermisos: React.FC = () => {
                 </Tooltip>
             ),
             flex: 0.5,
+            type: 'boolean',
         },
     ];
     return (
