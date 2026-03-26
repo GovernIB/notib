@@ -92,6 +92,7 @@ export const AvisGrid = () => {
             {
                 field: 'actiu',
                 flex: 0.6,
+                type: 'boolean',
             },
         ],
         []

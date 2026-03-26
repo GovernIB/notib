@@ -136,6 +136,7 @@ const ServeiFormTabPermisos: React.FC = () => {
                 </Tooltip>
             ),
             flex: 0.5,
+            type: 'boolean',
         },
         {
             headerName: t('page.serveis.form.permisos.procesAllowed'),
@@ -150,6 +151,7 @@ const ServeiFormTabPermisos: React.FC = () => {
                 </Tooltip>
             ),
             flex: 0.5,
+            type: 'boolean',
         },
         {
             headerName: t('page.serveis.form.permisos.gestioAllowed'),
@@ -164,6 +166,7 @@ const ServeiFormTabPermisos: React.FC = () => {
                 </Tooltip>
             ),
             flex: 0.5,
+            type: 'boolean',
         },
         {
             headerName: t('page.serveis.form.permisos.notificacioAllowed'),
@@ -178,6 +181,7 @@ const ServeiFormTabPermisos: React.FC = () => {
                 </Tooltip>
             ),
             flex: 0.5,
+            type: 'boolean',
         },
         {
             headerName: t('page.serveis.form.permisos.comunicacioAllowed'),
@@ -192,6 +196,7 @@ const ServeiFormTabPermisos: React.FC = () => {
                 </Tooltip>
             ),
             flex: 0.5,
+            type: 'boolean',
         },
         {
             headerName: t('page.serveis.form.permisos.comunicacioSirAllowed'),
@@ -206,6 +211,7 @@ const ServeiFormTabPermisos: React.FC = () => {
                 </Tooltip>
             ),
             flex: 0.5,
+            type: 'boolean',
         },
     ];
     return (
