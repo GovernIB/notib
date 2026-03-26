@@ -21,8 +21,7 @@ const PermissionGrid: React.FC<{
     toolbarAdditionalRow?:
         | React.ReactElement<unknown, string | React.JSXElementConstructor<any>>
         | undefined;
-    toolbarHide?: true;
-    withOrganGestor?: boolean;
+    toolbarHide?: true | undefined;
 }> = (props) => {
     const {
         resourceName,
@@ -32,7 +31,6 @@ const PermissionGrid: React.FC<{
         toolbarAdditionalRow,
         apiRef,
         toolbarHide,
-        withOrganGestor,
     } = props;
     const { t } = useTranslation();
     const { apiRef: formApiRef } = useFormContext();
@@ -88,11 +86,6 @@ const PermissionGrid: React.FC<{
                 },
             }
         );
-        withOrganGestor && columns.push({
-            field: 'organGestor',
-            sortable: false,
-            flex: 1,
-        });
         columns.push(
             ...permissionEntries.map((e) => ({
                 headerName: e.headerName,

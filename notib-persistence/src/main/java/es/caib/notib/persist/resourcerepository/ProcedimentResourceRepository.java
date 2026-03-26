@@ -22,11 +22,10 @@ public interface ProcedimentResourceRepository extends BaseRepository<Procedimen
 		"    p.entitat.id = :entitatId " +
 		"AND (:tipus IS NULL OR p.tipus = :tipus) " +
 		"AND p.comu = true " +
-		"AND p.requireDirectPermission = :requireDirectPermission")
-	List<Long> findIdsByEntitatIdAndTipusAndComuTrueAndPermisDirecte(
+		"AND p.requireDirectPermission = false")
+	List<Long> findIdsByEntitatIdAndTipusAndComuTrueAndPermisDirecteFalse(
 		@Param("entitatId") Long entitatId,
-		@Param("tipus") ProcSerTipusEnum tipus,
-		@Param("requireDirectPermission") boolean requireDirectPermission);
+		@Param("tipus") ProcSerTipusEnum tipus);
 
 	@Query("SELECT p.id " +
 		"FROM ProcedimentResourceEntity p " +
@@ -34,9 +33,8 @@ public interface ProcedimentResourceRepository extends BaseRepository<Procedimen
 		"    p.entitat.id = :entitatId " +
 		"AND (:tipus IS NULL OR p.tipus = :tipus) " +
 		"AND p.id IN (:ids) " +
-		"AND p.comu = false " +
-		"AND p.actiu = true ")
-	List<Long> findIdsByEntitatIdAndTipusAndIdInAndComuFalseAndActiuTrue(
+		"AND p.comu = false")
+	List<Long> findIdsByEntitatIdAndTipusAndIdInAndComuFalse(
 		@Param("entitatId") Long entitatId,
 		@Param("tipus") ProcSerTipusEnum tipus,
 		@Param("ids") Set<Long> ids);

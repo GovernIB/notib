@@ -5,12 +5,13 @@ import PermissionGrid from '../../components/PermissionGrid';
 import { Grid, Icon, Tooltip } from '@mui/material';
 import PermissionGridSwitch from '../../components/PermissionGridSwitch';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import { FormFieldDataActionType } from '../../../lib/components/form/FormContext';
 import GridFormField from '../../components/GridFormField';
 
-const PermissionForm: React.FC<{ comu: boolean }> = (props) => {
-    const { comu } = props;
+const PermissionForm: React.FC = () => {
     const { t } = useTranslation();
-    const { apiRef } = useFormContext();
+    const { dataDispatchAction, fields } = useFormContext();
+
     const doFieldChange = (targetValue: boolean) => {
         const permisos = [
             'readAllowed',
@@ -22,9 +23,17 @@ const PermissionForm: React.FC<{ comu: boolean }> = (props) => {
         ];
 
         permisos.forEach((nomPermis) => {
-            apiRef?.current?.setFieldValue?.(nomPermis, targetValue);
+            dataDispatchAction({
+                type: FormFieldDataActionType.FIELD_CHANGE,
+                payload: {
+                    fieldName: nomPermis,
+                    value: targetValue,
+                    field: fields?.find((f) => f.name === nomPermis),
+                },
+            });
         });
     };
+
     const sidGrantedAuthorityEnumOptions = [
         {
             value: false,
@@ -35,6 +44,7 @@ const PermissionForm: React.FC<{ comu: boolean }> = (props) => {
             description: t('component.PermissionGrid.grantedAuthority.role'),
         },
     ];
+
     return (
         <Grid container spacing={2}>
             <GridFormField
@@ -46,7 +56,7 @@ const PermissionForm: React.FC<{ comu: boolean }> = (props) => {
                 size={3}
             />
             <GridFormField size={9} name="sidName" />
-            {comu && <GridFormField name="organGestor" required size={12} />}
+
             <PermissionGridSwitch
                 name="selectAll"
                 label={'Seleccionar tots'}
@@ -70,6 +80,7 @@ const PermissionForm: React.FC<{ comu: boolean }> = (props) => {
                 icon={<Icon>check_box</Icon>}
                 size={11}
             />
+
             <Grid size={1} />
             <PermissionGridSwitch
                 name="adminAllowed"
@@ -78,6 +89,7 @@ const PermissionForm: React.FC<{ comu: boolean }> = (props) => {
                 icon={<Icon>settings</Icon>}
                 size={11}
             />
+
             <Grid size={1} />
             <PermissionGridSwitch
                 name="perm5Allowed"
@@ -86,6 +98,7 @@ const PermissionForm: React.FC<{ comu: boolean }> = (props) => {
                 icon={<Icon>gavel</Icon>}
                 size={11}
             />
+
             <Grid size={1} />
             <PermissionGridSwitch
                 name="perm8Allowed"
@@ -94,6 +107,7 @@ const PermissionForm: React.FC<{ comu: boolean }> = (props) => {
                 icon={<MailOutlineIcon />}
                 size={11}
             />
+
             <Grid size={1} />
             <PermissionGridSwitch
                 name="perm7Allowed"
@@ -108,7 +122,8 @@ const PermissionForm: React.FC<{ comu: boolean }> = (props) => {
 
 const ProcedimentFormTabPermisos: React.FC = () => {
     const { t } = useTranslation();
-    const { id, data } = useFormContext();
+    const { id } = useFormContext();
+
     const permissionEntries = [
         {
             headerName: t('page.procediments.form.permisos.consultaAllowed'),
@@ -206,8 +221,7 @@ const ProcedimentFormTabPermisos: React.FC = () => {
             resourceName="procedimentResource"
             id={id}
             permissionEntries={permissionEntries}
-            permissionForm={<PermissionForm comu={data.comu} />}
-            withOrganGestor={data.comu}
+            permissionForm={<PermissionForm />}
         />
     );
 };

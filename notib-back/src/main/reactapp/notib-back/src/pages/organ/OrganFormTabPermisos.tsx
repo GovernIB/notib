@@ -4,12 +4,13 @@ import { useFormContext } from 'reactlib';
 import PermissionGrid from '../../components/PermissionGrid';
 import { Icon, Tooltip, Grid } from '@mui/material';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import { FormFieldDataActionType } from '../../../lib/components/form/FormContext';
 import GridFormField from '../../components/GridFormField';
 import PermissionGridSwitch from '../../components/PermissionGridSwitch';
 
 const PermissionForm: React.FC = () => {
     const { t } = useTranslation();
-    const { apiRef } = useFormContext();
+    const { dataDispatchAction, fields } = useFormContext();
 
     const doFieldChange = (targetValue: boolean) => {
         const permisos = [
@@ -24,7 +25,14 @@ const PermissionForm: React.FC = () => {
         ];
 
         permisos.forEach((nomPermis) => {
-            apiRef?.current?.setFieldValue?.(nomPermis, targetValue);
+            dataDispatchAction({
+                type: FormFieldDataActionType.FIELD_CHANGE,
+                payload: {
+                    fieldName: nomPermis,
+                    value: targetValue,
+                    field: fields?.find((f) => f.name === nomPermis),
+                },
+            });
         });
     };
 
