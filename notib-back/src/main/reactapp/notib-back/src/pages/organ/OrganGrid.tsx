@@ -19,12 +19,13 @@ import {
     useFilterApiRef,
     MuiFilter,
     FilterApi,
+    MuiDataGridColDef,
 } from 'reactlib';
 import GridFormField from '../../components/GridFormField';
 import { Icon, IconButton } from '@mui/material';
 import LinkToTab from '../../components/LinkToTab';
 
-const columns = [
+const columns: MuiDataGridColDef[] = [
     {
         field: 'codi',
         flex: 2,
@@ -48,10 +49,12 @@ const columns = [
     {
         field: 'entregaCieActiva',
         flex: 1,
+        type: 'boolean',
     },
     {
         field: 'permetreSir',
         flex: 1.5,
+        type: 'boolean',
     },
     {
         field: 'aclEntryCount',
