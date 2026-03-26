@@ -93,6 +93,7 @@ export const InnerFormFieldNumber: React.FC<
         decimalSeparator,
         thousandSeparator,
         valueIsNumericString,
+        overrideTextFieldProps,
         prefix,
         suffix,
     } = props;
@@ -139,6 +140,7 @@ export const InnerFormFieldNumber: React.FC<
                 input: inputProps,
                 htmlInput: htmlInputProps,
             }}
+            {...overrideTextFieldProps}
         />
     );
 };
@@ -169,7 +171,6 @@ const InnerFormFieldNumberDebounce: React.FC<FormFieldNumberProps> = (props) => 
         }
     }, [value]);
     React.useEffect(() => {
-        console.log('>>> onChange', changedValue);
         onChange?.(changedValue);
     }, [changedValue]);
     return (
