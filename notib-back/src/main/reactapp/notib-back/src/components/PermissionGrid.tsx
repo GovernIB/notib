@@ -9,6 +9,7 @@ export type PermissionGridEntry = {
     renderHeader?: (params: GridColumnHeaderParams) => React.ReactNode;
     description?: string;
     flex?: number;
+    type?: string;
 };
 
 const PermissionGrid: React.FC<{
@@ -89,6 +90,7 @@ const PermissionGrid: React.FC<{
             ...permissionEntries.map((e) => ({
                 headerName: e.headerName,
                 field: e.field,
+                type: e.type,
                 sortable: false,
                 flex: e.flex ?? 1,
                 description: e.description,
