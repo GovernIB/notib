@@ -31,6 +31,7 @@ const columns: MuiDataGridColDef[] = [
     {
         field: 'activa',
         flex: 0.6,
+        type: 'boolean',
     },
     {
         field: 'tipusDocCount',
