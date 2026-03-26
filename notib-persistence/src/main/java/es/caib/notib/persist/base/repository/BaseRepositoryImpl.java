@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 /**
  * Implementació del repositori base.
- * 
+ *
  * @author Límit Tecnologies
  */
 @NoRepositoryBean
@@ -37,6 +37,11 @@ public class BaseRepositoryImpl<E, PK extends Serializable> extends SimpleJpaRep
 	@Override
 	public E merge(E entity) {
 		return entityManager.merge(entity);
+	}
+
+	@Override
+	public void clear() {
+		entityManager.clear();
 	}
 
 }
