@@ -78,31 +78,32 @@ public class NotificacioResourceServiceImpl
 		NotificacioResource resource,
 		Map<String, AnswerRequiredException.AnswerValue> answers,
 		boolean anyOrderChanged) {
+		List<Long> enviamentsIds = new ArrayList<>();
 		if (resource.getEnviamentsInfo() != null) {
-			saveEnviaments(entity, resource.getEnviamentsInfo());
+			resource.getEnviamentsInfo().forEach(e -> {
+				Long enviamentId = saveEnviament(entity, e);
+				enviamentsIds.add(enviamentId);
+			});
 		}
-		legacyHelper.altaNotificacio(entity);
+		legacyHelper.altaNotificacio(entity, enviamentsIds);
 	}
 
-	private void saveEnviaments(
+	private Long saveEnviament(
 		NotificacioResourceEntity notificacio,
-		List<NotificacioEnviamentResource> enviaments) {
-		// Crea els enviaments associats amb la notificació a la base de dades.
-		enviaments.forEach(e -> {
-			NotificacioEnviamentResourceEntity enviamentNou = NotificacioEnviamentResourceEntity.builder().
-				resource(e).
-				notificacio(notificacio).
-				build();
-			enviamentNou.setNotificaEstat(EnviamentEstat.PENDENT);
-			NotificacioEnviamentResourceEntity enviamentCreat = notificacioEnviamentResourceRepository.save(enviamentNou);
-			PersonaResourceEntity titular = saveDestinatari(enviamentCreat, e.getTitularInfo());
-			enviamentCreat.setTitular(titular);
-			enviamentCreat.setNotificaReferencia(UUID.randomUUID().toString());
-			if (e.getRepresentantsInfo() != null) {
-				e.getRepresentantsInfo().forEach(r -> saveDestinatari(enviamentCreat, r));
-			}
-			legacyHelper.altaEnviament(enviamentCreat);
-		});
+		NotificacioEnviamentResource enviament) {
+		NotificacioEnviamentResourceEntity enviamentNou = NotificacioEnviamentResourceEntity.builder().
+			resource(enviament).
+			notificacio(notificacio).
+			build();
+		enviamentNou.setNotificaEstat(EnviamentEstat.PENDENT);
+		NotificacioEnviamentResourceEntity enviamentCreat = notificacioEnviamentResourceRepository.saveAndFlush(enviamentNou);
+		PersonaResourceEntity titular = saveDestinatari(enviamentCreat, enviament.getTitularInfo());
+		enviamentCreat.setTitular(titular);
+		enviamentCreat.setNotificaReferencia(UUID.randomUUID().toString());
+		if (enviament.getRepresentantsInfo() != null) {
+			enviament.getRepresentantsInfo().forEach(r -> saveDestinatari(enviamentCreat, r));
+		}
+		return enviamentCreat.getId();
 	}
 
 	private void saveDocuments(
