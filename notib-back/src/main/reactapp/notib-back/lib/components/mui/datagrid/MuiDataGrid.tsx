@@ -5,7 +5,6 @@ import {
     GridRenderCellParams,
     GridRowClassNameParams,
     GridColDef,
-    GridColumnResizeParams,
     GridFilterModel,
     GridSortModel,
     GridSortDirection,
@@ -16,21 +15,20 @@ import {
     GridApiPro,
     GridEventListener,
     GridCallbackDetails,
+    GridInitialState,
     GridActionsCell,
     GridActionsCellItem,
     useGridApiRef as useMuiDatagridApiRef,
     useGridApiContext,
     useGridSelector,
-    gridColumnFieldsSelector,
     gridEditRowsStateSelector,
 } from '@mui/x-data-grid-pro';
-import { caES, esES, enUS } from '@mui/x-data-grid/locales';
 import Box from '@mui/material/Box';
 import Icon from '@mui/material/Icon';
 import { capitalize } from '../../../util/text';
 import useLogConsole from '../../../util/useLogConsole';
 import { formattedFieldValue, isFieldNumericType } from '../../../util/fields';
-import * as springFilterBuilder from '../../../util/springFilterBuilder';
+import { useSessionComponentPersistentState } from '../../../util/useComponentPersistentState';
 import {
     ReactElementWithPosition,
     joinReactElementsWithPositionWithReactElementsWithPositions,
@@ -44,7 +42,6 @@ import { useResourceApiContext, ResourceType, ExportFileType } from '../../Resou
 import {
     useApiDataCommon,
     useDataCommonEditable,
-    DataCommonFindArgs,
     DataCommonAdditionalAction,
 } from '../datacommon/MuiDataCommon';
 import { useDataToolbar, DataToolbarType } from '../datacommon/DataToolbar';
@@ -117,26 +114,28 @@ export type MuiDataGridProps = {
     autoFindDisabled?: boolean;
     /** Text pel missatge de que no hi ha resultats */
     noRowsText?: string;
+    /** Activa la persistència de l'estat (paginació, ordenació, selecció, ...) */
+    persistentState?: true;
     /** Activa la selecció de files */
     selectionActive?: true;
     /** Activa la paginació */
     paginationActive?: true;
-    /** Model d'ordenació que s'afegirà sempre abans que els altres criteris d'ordenació */
-    fixedSortModel?: GridSortModel;
+    /** Model de paginació inicial */
+    paginationModel?: GridPaginationModel;
     /** Model d'ordenació inicial */
-    defaultSortModel?: GridSortModel;
-    /** Model de paginació inicial (un valor a pageSize de -1 indica que la mida de la pàgina s'ajusta a l'alçada del component) */
-    defaultPaginationModel?: GridPaginationModel;
-    /** Filtre en format Spring Filter que s'enviarà en les consultes d'informació al backend */
-    filter?: string;
-    /** Filtre en format Spring Filter que s'afegirà sempre a filter amb and */
-    fixedFilter?: string;
+    sortModel?: GridSortModel;
+    /** Model d'ordenació que s'aplicarà sempre (ignorant el valor de sortModel) */
+    staticSortModel?: GridSortModel;
     /** Valor inicial pel filtre ràpid */
     quickFilterInitialValue?: string;
     /** Indica si el camp de filtre ràpid ha de tenir el focus quan es crei el component */
     quickFilterSetFocus?: true;
     /** Indica si el camp de filtre ràpid ha d'ocupar el 100% de l'espai horitzontal disponible */
     quickFilterFullWidth?: true;
+    /** Filtre en format Spring Filter que s'enviarà en les consultes d'informació al backend */
+    filter?: string;
+    /** Filtre en format Spring Filter que s'aplicarà sempre en les consultes d'informació al backend (deshabilita filter) */
+    staticFilter?: string;
     /** Consultes per nom que s'enviaran en les consultes d'informació al backend */
     namedQueries?: string[];
     /** Perspectives que s'enviaran en les consultes d'informació al backend */
@@ -225,12 +224,6 @@ export type MuiDataGridProps = {
     popupEditFormComponentProps?: any;
     /** Claus de traducció personalitzades pel component Form de la finestra emergent */
     popupEditFormI18nKeys?: FormI18nKeys;
-    /** Indica si la persistència de l'estat està activa */
-    persistentStateActive?: true;
-    /** La clau amb la que es desarà l'estat (s'utilitzarà el valor de resourceName si no s'especifica) */
-    persistentStateKey?: string;
-    /** El magatzem del navegador que s'utilitzarà per a persistir l'estat (LocalStorage per defecte) */
-    persistentStateStorage?: 'local' | 'session';
     /** Event que es llença quan hi ha canvis en les files que mostra la graella */
     onRowsChange?: (rows: GridRowsProp, pageInfo: any) => void;
     /** Event que es llença quan hi ha canvis en l'ordenació de la graella */
@@ -256,7 +249,7 @@ export type MuiDataGridProps = {
      * Indica si l'alçada del component s'ha d'ajustar al nombre de files que s'han de mostrar
      * @warning Canviar aquest valor dinàmicament fa que el DataGrid de MUI es torni a montar de nou (l'estat intern i subscripcions a events es perden).
      */
-    autoHeight?: boolean;
+    autoHeight?: true;
     /** Indica que les files parells s'han de mostrar d'un color més oscur per a facilitar la seva lectura */
     striped?: true;
     /** Indica que només s'han de mostrar les vores horitzontals de la graella */
@@ -267,13 +260,9 @@ export type MuiDataGridProps = {
     debug?: true;
 } & Omit<DataGridProps, 'apiRef'>;
 
-const processFindSortModel = (
-    fixedSortModel: GridSortModel | undefined,
-    sortModel: GridSortModel | undefined,
-    columns: MuiDataGridColDef[]
-) => {
+const processFindSortModel = (sortModel: GridSortModel, columns: MuiDataGridColDef[]) => {
     const result: any[] = [];
-    [...(fixedSortModel ?? []), ...(sortModel ?? [])].forEach(({ field, sort }) => {
+    sortModel.forEach(({ field, sort }) => {
         const columnForCurrentField = columns.find((c) => c.field === field);
         const mappedFields = columnForCurrentField?.sortProcessor
             ? columnForCurrentField.sortProcessor(field, sort)
@@ -528,160 +517,6 @@ const useGridColumns = (
     return processedColumns;
 };
 
-const usePersistentState = (
-    active: boolean,
-    columns: GridColDef[],
-    sortModelProp: GridSortModel | undefined,
-    defaultSortModel: GridSortModel | undefined,
-    paginationModelProp: GridPaginationModel | undefined,
-    defaultPaginationModel: GridPaginationModel | undefined,
-    apiRef: React.RefObject<GridApiPro | null>,
-    key: string,
-    storeInLocalStorage?: boolean
-) => {
-    const { code } = useBaseAppContext();
-    const storageKey = code + '_DG_' + key.toUpperCase();
-    const loadInitialState = () => {
-        try {
-            const storage = storeInLocalStorage ? localStorage : sessionStorage;
-            const raw = storage.getItem(storageKey);
-            return raw ? JSON.parse(raw) : null;
-        } catch {
-            return null;
-        }
-    };
-    const saveState = (state: any) => {
-        try {
-            const storage = storeInLocalStorage ? localStorage : sessionStorage;
-            storage.setItem(storageKey, JSON.stringify(state));
-        } catch {}
-    };
-    const initialState = active ? loadInitialState() : undefined;
-    const [widths, setWidths] = React.useState<Record<string, number>>(initialState?.widths || {});
-    const [orderedFields, setOrderedFields] = React.useState<string[]>(
-        initialState?.orderedFields || columns.map((c) => c.field)
-    );
-    const [columnVisibilityModel, setColumnVisibilityModel] = React.useState(
-        initialState?.columnVisibilityModel || {}
-    );
-    const [pinnedColumns, setPinnedColumns] = React.useState(initialState?.pinnedColumns || {});
-    const [sortModel, setSortModel] = React.useState<GridSortModel>(
-        initialState?.sortModel || (defaultSortModel ?? [])
-    );
-    const [paginationModel, setPaginationModel] = React.useState<GridPaginationModel>(
-        initialState?.paginationModel || (defaultPaginationModel ?? { page: 0, pageSize: -1 })
-    );
-    const [autoPageSize, setAutoPageSize] = React.useState<boolean>(
-        initialState?.autoPageSize || defaultPaginationModel?.pageSize === -1
-    );
-    React.useEffect(() => {
-        sortModelProp !== undefined && setSortModel(sortModelProp);
-    }, [sortModelProp]);
-    React.useEffect(() => {
-        paginationModelProp !== undefined && setPaginationModel(paginationModelProp);
-    }, [paginationModelProp]);
-    React.useEffect(() => {
-        active &&
-            saveState({
-                widths,
-                orderedFields,
-                columnVisibilityModel,
-                pinnedColumns,
-                sortModel,
-                paginationModel,
-                autoPageSize,
-            });
-    }, [
-        widths,
-        orderedFields,
-        columnVisibilityModel,
-        pinnedColumns,
-        sortModel,
-        paginationModel,
-        autoPageSize,
-    ]);
-    const onColumnWidthChange = React.useCallback(
-        (params: GridColumnResizeParams) => {
-            const { colDef, width } = params;
-            setWidths((prev) => ({ ...prev, [colDef.field]: width }));
-        },
-        [setWidths]
-    );
-    const onColumnOrderChange = React.useCallback(() => {
-        setOrderedFields(gridColumnFieldsSelector(apiRef));
-    }, [apiRef, setOrderedFields]);
-    const onColumnVisibilityModelChange = React.useCallback((model: any) => {
-        setColumnVisibilityModel(model);
-    }, []);
-    const onPinnedColumnsChange = React.useCallback((model: any) => {
-        setPinnedColumns(model);
-    }, []);
-    const onSortModelChange = React.useCallback((model: any) => {
-        setSortModel(model);
-    }, []);
-    const onPaginationModelChange = React.useCallback((model: any) => {
-        setPaginationModel(model);
-    }, []);
-    const persistentStateColumns = React.useMemo(
-        () =>
-            active
-                ? orderedFields.reduce<GridColDef[]>((acc, field) => {
-                      const column = columns.find((col) => col.field === field);
-                      if (!column) {
-                          return acc;
-                      }
-                      if (widths[field]) {
-                          acc.push({
-                              ...column,
-                              flex: 0,
-                              width: widths[field],
-                          });
-                          return acc;
-                      }
-                      acc.push(column);
-                      return acc;
-                  }, [])
-                : columns,
-        [columns, widths, orderedFields]
-    );
-    return {
-        persistentStateColumns,
-        persistentStateProps: active
-            ? {
-                  onColumnWidthChange,
-                  onColumnOrderChange,
-                  onColumnVisibilityModelChange,
-                  onPinnedColumnsChange,
-                  onSortModelChange,
-                  onPaginationModelChange,
-                  columnVisibilityModel,
-                  pinnedColumns,
-                  sortModel,
-                  paginationModel,
-                  autoPageSize,
-              }
-            : {
-                  onSortModelChange,
-                  onPaginationModelChange,
-                  sortModel,
-                  paginationModel,
-                  autoPageSize,
-              },
-        setAutoPageSize,
-    };
-};
-
-const useLocaleText = () => {
-    const { currentLanguage } = useBaseAppContext();
-    if (currentLanguage === 'ca') {
-        return caES.components.MuiDataGrid.defaultProps.localeText;
-    } else if (currentLanguage === 'es') {
-        return esES.components.MuiDataGrid.defaultProps.localeText;
-    } else {
-        return enUS.components.MuiDataGrid.defaultProps.localeText;
-    }
-};
-
 /**
  * Hook per a accedir a l'API de MuiDataGrid des de fora del context del component.
  *
@@ -722,18 +557,17 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         readOnly,
         autoFindDisabled,
         noRowsText,
+        persistentState,
         selectionActive,
         paginationActive,
-        sortModel: sortModelProp,
-        fixedSortModel,
-        defaultSortModel,
         paginationModel: paginationModelProp,
-        defaultPaginationModel,
-        filter: filterProp,
-        fixedFilter,
+        sortModel,
+        staticSortModel,
         quickFilterInitialValue,
         quickFilterSetFocus,
         quickFilterFullWidth,
+        filter: filterProp,
+        staticFilter,
         namedQueries,
         perspectives,
         exportFileType = 'PDF',
@@ -778,9 +612,6 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         popupEditFormDialogOnClose,
         popupEditFormComponentProps,
         popupEditFormI18nKeys,
-        persistentStateActive,
-        persistentStateKey,
-        persistentStateStorage,
         onRowsChange,
         onRowOrderChange,
         onRowSelectionModelChange,
@@ -806,16 +637,116 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     const treeDataAdditionalRowsIsFunction = treeDataAdditionalRows
         ? typeof treeDataAdditionalRows === 'function'
         : false;
-    const [filter, setFilter] = React.useState<string | undefined>(filterProp);
     const [_filterModel, setFilterModel] = React.useState<GridFilterModel>();
+    const [internalSortModel, setInternalSortModel] = React.useState<GridSortModel>(
+        sortModel ?? []
+    );
+    const [internalFilter, setInternalFilter] = React.useState<string | undefined>(filterProp);
+    const [paginationModel, setPaginationModel] = React.useState<GridPaginationModel | undefined>(
+        paginationModelProp
+    );
+    const [footerAutoPageSize, setFooterAutoPageSize] = React.useState<boolean>(
+        !(otherProps.pageSizeOptions != null && paginationModelProp != null)
+    );
     const [rowSelectionModel, setRowSelectionModel] =
         React.useState<GridRowSelectionModel>(rowSelectionModelProp);
     const [additionalRows, setAdditionalRows] = React.useState<any[]>(
         !treeDataAdditionalRowsIsFunction ? [] : (treeDataAdditionalRows as any[])
     );
+    const [initialState, setInitialState] = React.useState<GridInitialState | null>();
     const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
-    const [findArgs, setFindArgs] = React.useState<DataCommonFindArgs>();
     const anyRowInEditMode = Object.keys(rowModesModel).length > 0;
+    const {
+        currentActions: apiCurrentActions,
+        currentError: apiCurrentError,
+        delete: apiDelete,
+        bulkDelete: apiBulkDelete,
+    } = useResourceApiService(resourceName);
+    const findArgs = React.useMemo(() => {
+        const filter = staticFilter
+            ? internalFilter
+                ? '(' + staticFilter + ') and (' + internalFilter + ')'
+                : staticFilter
+            : internalFilter;
+        const findSortModel = staticSortModel ?? internalSortModel;
+        const processedFindSortModel = processFindSortModel(findSortModel, columns);
+        const sorts = processedFindSortModel?.length
+            ? processedFindSortModel.map(({ field, sort }) => `${field},${sort}`)
+            : undefined;
+        const paginationArgs = paginationActive
+            ? {
+                  page: paginationModel?.page,
+                  size: paginationModel?.pageSize,
+              }
+            : { unpaged: true };
+        return {
+            ...paginationArgs,
+            sorts,
+            filter,
+            namedQueries,
+            perspectives,
+        };
+    }, [
+        paginationActive,
+        paginationModel,
+        staticSortModel,
+        internalSortModel,
+        internalFilter,
+        staticFilter,
+        namedQueries,
+        perspectives,
+        columns,
+    ]);
+    const {
+        loading,
+        fields,
+        rows,
+        pageInfo,
+        artifacts,
+        error: apiDataCommonError,
+        refresh,
+        export: exportt,
+        quickFilterComponent,
+    } = useApiDataCommon(
+        resourceName,
+        resourceType,
+        resourceTypeCode,
+        resourceFieldName,
+        autoFindDisabled,
+        findArgs,
+        quickFilterInitialValue,
+        quickFilterSetFocus,
+        {
+            fullWidth: quickFilterFullWidth,
+            sx: { ml: quickFilterFullWidth ? 0 : 1 },
+        },
+        anyArtifactRowAction
+    );
+    const isUpperToolbarType = toolbarType === 'upper';
+    const gridMargins = isUpperToolbarType ? { m: 2 } : null;
+    const canDeleteAnyRow = rows.some((r) => r['_actions']?.['delete'] != null);
+    React.useEffect(() => {
+        onRowsChange?.(rows, pageInfo);
+        if (treeDataAdditionalRowsIsFunction) {
+            setAdditionalRows((treeDataAdditionalRows as (rows: any[]) => any[])(rows));
+        }
+    }, [rows]);
+    React.useEffect(() => {
+        setInternalFilter(filterProp);
+    }, [filterProp]);
+    const { state, isReady: stateIsReady } = persistentState
+        ? useSessionComponentPersistentState('mui_datagrid_state', resourceName, () =>
+              datagridApiRef.current?.exportState()
+          )
+        : { isReady: false };
+    React.useEffect(() => {
+        if (stateIsReady) {
+            setInitialState(state);
+            if (state?.pagination?.paginationModel) {
+                setPaginationModel(state.pagination.paginationModel);
+            }
+        }
+    }, [state, stateIsReady]);
     const inlineCreate = () => {
         const sortedRowIds = datagridApiRef.current?.getSortedRowIds();
         const page = datagridApiRef.current?.state.pagination.paginationModel.page ?? 0;
@@ -868,37 +799,6 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         onRowDeleteProp?.(id);
     };
     const {
-        currentActions: apiCurrentActions,
-        currentError: apiCurrentError,
-        delete: apiDelete,
-        bulkDelete: apiBulkDelete,
-    } = useResourceApiService(resourceName);
-    const {
-        loading,
-        fields,
-        rows,
-        pageInfo,
-        artifacts,
-        error: apiDataCommonError,
-        refresh,
-        export: exportt,
-        quickFilterComponent,
-    } = useApiDataCommon(
-        resourceName,
-        resourceType,
-        resourceTypeCode,
-        resourceFieldName,
-        autoFindDisabled,
-        findArgs,
-        quickFilterInitialValue,
-        quickFilterSetFocus,
-        {
-            fullWidth: quickFilterFullWidth,
-            sx: { ml: quickFilterFullWidth ? 0 : 1 },
-        },
-        anyArtifactRowAction
-    );
-    const {
         toolbarAddElement,
         rowEditActions,
         formDialogComponent,
@@ -943,70 +843,6 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         onRowUpdate,
         onRowDelete
     );
-    const processedColumns = useGridColumns(
-        columns,
-        rowActionsColumnIndex,
-        rowActionsColumnProps,
-        [...rowAdditionalActions, ...rowEditActions],
-        (inlineEditActive ?? false) || (inlineEditUpdateActive ?? false),
-        fields,
-        inlineStopRowEditMode,
-        artifacts
-    );
-    const { persistentStateColumns, persistentStateProps, setAutoPageSize } = usePersistentState(
-        persistentStateActive ?? false,
-        processedColumns,
-        sortModelProp,
-        defaultSortModel,
-        paginationModelProp,
-        defaultPaginationModel,
-        datagridApiRef,
-        persistentStateKey ?? resourceName,
-        persistentStateStorage === 'local'
-    );
-    const { sortModel, paginationModel, autoPageSize, ...otherPersistentStateProps } =
-        persistentStateProps;
-    const isUpperToolbarType = toolbarType === 'upper';
-    const gridMargins = isUpperToolbarType ? { m: 2 } : null;
-    const canDeleteAnyRow = rows.some((r) => r['_actions']?.['delete'] != null);
-    React.useEffect(() => {
-        const processedFindSortModel = processFindSortModel(fixedSortModel, sortModel, columns);
-        const sorts = processedFindSortModel?.length
-            ? processedFindSortModel.map(({ field, sort }) => `${field},${sort}`)
-            : undefined;
-        const paginationArgs = paginationActive
-            ? {
-                  page: paginationModel?.page,
-                  size: paginationModel?.pageSize,
-              }
-            : { unpaged: true };
-        setFindArgs({
-            ...paginationArgs,
-            sorts,
-            filter: springFilterBuilder.and(fixedFilter, filter),
-            namedQueries,
-            perspectives,
-        });
-    }, [
-        paginationActive,
-        fixedSortModel,
-        sortModel,
-        paginationModel,
-        filter,
-        fixedFilter,
-        namedQueries,
-        perspectives,
-        columns,
-    ]);
-    React.useEffect(() => {
-        onRowsChange?.(rows, pageInfo);
-        if (treeDataAdditionalRowsIsFunction) {
-            setAdditionalRows((treeDataAdditionalRows as (rows: any[]) => any[])(rows));
-        }
-    }, [rows]);
-    React.useEffect(() => {
-        setFilter(filterProp);
-    }, [filterProp]);
     const toolbarNodesPosition = 2;
     const toolbarGridElementsWithPositions: ReactElementWithPosition[] = [];
     toolbarAddElement != null &&
@@ -1060,13 +896,23 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         toolbarHideQuickFilter,
         joinedToolbarElementsWithPositions
     );
+    const processedColumns = useGridColumns(
+        columns,
+        rowActionsColumnIndex,
+        rowActionsColumnProps,
+        [...rowAdditionalActions, ...rowEditActions],
+        (inlineEditActive ?? false) || (inlineEditUpdateActive ?? false),
+        fields,
+        inlineStopRowEditMode,
+        artifacts
+    );
     const apiRef = React.useRef<MuiDataGridApi>({
         refresh,
         export: gridExport,
         triggerCreate,
         triggerUpdate,
         triggerDelete,
-        setFilter,
+        setFilter: (filter) => setInternalFilter(filter ?? undefined),
     });
     React.useEffect(() => {
         apiRef.current = {
@@ -1075,16 +921,16 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
             triggerCreate,
             triggerUpdate,
             triggerDelete,
-            setFilter,
+            setFilter: (filter) => setInternalFilter(filter ?? undefined),
         };
-    }, [refresh, gridExport, triggerCreate, triggerUpdate, triggerDelete, setFilter]);
+    }, [refresh, gridExport, triggerCreate, triggerUpdate, triggerDelete, setInternalFilter]);
     if (apiRefProp) {
         if (apiRefProp.current) {
             apiRefProp.current.refresh = refresh;
             apiRefProp.current.export = gridExport;
             apiRefProp.current.triggerCreate = triggerCreate;
             apiRefProp.current.triggerUpdate = triggerUpdate;
-            apiRefProp.current.setFilter = setFilter;
+            apiRefProp.current.setFilter = (filter) => setInternalFilter(filter ?? undefined);
         } else {
             logConsole.warn('apiRef prop must be initialized with an empty object');
         }
@@ -1096,14 +942,16 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     };
     const sortingProps: any = {
         sortingMode: 'server',
-        sortModel,
+        sortModel: staticSortModel ?? internalSortModel,
+        onSortModelChange: setInternalSortModel,
     };
     const paginationProps: any = paginationActive
         ? {
               paginationMode: 'server',
               pagination: true,
-              paginationModel,
-              autoPageSize: !autoHeight && autoPageSize,
+              autoPageSize: !autoHeight && footerAutoPageSize,
+              paginationModel: paginationModel,
+              onPaginationModelChange: setPaginationModel,
               rowCount: pageInfo?.totalElements ?? 0,
           }
         : null;
@@ -1186,7 +1034,6 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
           }
         : null;
     const processedRows = React.useMemo(() => [...additionalRows, ...rows], [additionalRows, rows]);
-    const localeText = useLocaleText();
     const content = (
         <>
             {!toolbarHide && toolbar}
@@ -1198,15 +1045,15 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                 {...otherProps}
                 loading={otherProps?.loading ?? loading}
                 rows={otherProps?.rows ?? processedRows}
-                columns={persistentStateColumns}
+                columns={processedColumns}
                 onRowOrderChange={onRowOrderChange}
+                initialState={persistentState && initialState ? initialState : undefined}
                 apiRef={datagridApiRef}
                 {...filteringProps}
                 {...sortingProps}
                 {...paginationProps}
                 {...selectionProps}
                 {...inlineEditingProps}
-                {...otherPersistentStateProps}
                 {...stripedProps}
                 slots={{
                     row: DataGridRow as GridSlots['row'],
@@ -1223,8 +1070,8 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                         setRowSelectionModel,
                         pageSizeOptions: otherProps?.pageSizeOptions,
                         enableAutoPageSizeOption: !autoHeight,
-                        autoPageSize,
-                        setAutoPageSize,
+                        autoPageSize: footerAutoPageSize,
+                        setAutoPageSize: setFooterAutoPageSize,
                     },
                     noRowsOverlay: {
                         requestPending:
@@ -1234,7 +1081,6 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                 }}
                 semiBordered={semiBordered}
                 autoHeight={autoHeight}
-                localeText={localeText}
                 sx={{
                     height: autoHeight ? 'auto' : undefined,
                     ...gridMargins,

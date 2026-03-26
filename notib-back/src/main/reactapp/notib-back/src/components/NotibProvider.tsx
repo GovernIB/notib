@@ -1,8 +1,4 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import CircularProgress from '@mui/material/CircularProgress';
 import { useAuthContext, useResourceApiContext, useResourceApiService } from 'reactlib';
 import {
     NotibContext,
@@ -63,14 +59,8 @@ const getSessionValue = (json: string | undefined, field: string) => {
 };
 
 const useCurrentUser = () => {
-    const {
-        isReady: apiIsReady,
-        find: apiFind,
-        currentFields: apiFields,
-    } = useResourceApiService('usuariResource');
+    const { isReady: apiIsReady, find: apiFind } = useResourceApiService('usuariResource');
     const [currentUser, setCurrentUser] = React.useState<string>();
-    const [currentUserGridPageSizeOptions, setCurrentUserGridPageSizeOptions] =
-        React.useState<number[]>();
     React.useEffect(() => {
         if (apiIsReady) {
             apiFind({ unpaged: true }).then((response) => {
@@ -78,17 +68,9 @@ const useCurrentUser = () => {
                     setCurrentUser(response.rows[0]);
                 }
             });
-            const gridPageSizeOptionsField = apiFields?.find(
-                (f) => f.name === 'numElementsPaginaDefecte'
-            );
-            const gridPageSizeOptions =
-                gridPageSizeOptionsField != null
-                    ? Object.values(gridPageSizeOptionsField?.options).map((v: any) => parseInt(v))
-                    : [10, 20, 50, 100];
-            setCurrentUserGridPageSizeOptions(gridPageSizeOptions);
         }
     }, [apiIsReady]);
-    return { currentUser, setCurrentUser, currentUserGridPageSizeOptions };
+    return { currentUser };
 };
 
 const useCurrentRole = () => {
@@ -108,6 +90,7 @@ const useCurrentRole = () => {
     );
     React.useEffect(() => {
         // Obté els rols disponibles del token JWT o de __AUTH_ROLES__
+        console.log('>>> authIsReady', authIsReady);
         if (authIsReady) {
             const userId = authGetUserId();
             setCurrentUserId(userId);
@@ -243,11 +226,10 @@ const useCurrentEntitat = (
         currentRole === ROLE_SUPER ||
         (currentEntitatId == null && currentEntitatIdFromHttpHeader == null) ||
         currentEntitatId === currentEntitatIdFromHttpHeader;
-    const currentEntitatReady =
-        apiIsReady && entitatsAvailable != null && entitatIdHttpHeaderInitialized;
     return {
         currentEntitatId,
-        currentEntitatReady,
+        currentEntitatReady:
+            apiIsReady && entitatsAvailable != null && entitatIdHttpHeaderInitialized,
         currentEntitat,
         currentEntitatLoading,
         entitatsAvailable,
@@ -255,29 +237,11 @@ const useCurrentEntitat = (
     };
 };
 
-const NotibProviderLoading: React.FC = () => {
-    const { t } = useTranslation();
-    return (
-        <Box
-            sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100vh',
-            }}
-        >
-            <CircularProgress size={70} />
-            <Typography sx={{ mt: 1 }}>{t('app.loading')}</Typography>
-        </Box>
-    );
-};
-
 export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const { offline: apiOffline } = useResourceApiContext();
     const { currentUserId, currentRole, currentRoleReady, rolesAvailable, setCurrentRole } =
         useCurrentRole();
-    const { currentUser, setCurrentUser, currentUserGridPageSizeOptions } = useCurrentUser();
+    const { currentUser } = useCurrentUser();
     const {
         currentEntitatId,
         currentEntitatReady,
@@ -290,8 +254,6 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
     const contextValue = {
         isReady,
         currentUser,
-        setCurrentUser,
-        currentUserGridPageSizeOptions,
         rolesAvailable,
         entitatsAvailable,
         currentRole,
@@ -302,9 +264,7 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
         currentEntitatLoading,
     };
     return (
-        <NotibContext.Provider value={contextValue}>
-            {isReady ? children : <NotibProviderLoading />}
-        </NotibContext.Provider>
+        <NotibContext.Provider value={contextValue}>{isReady && children}</NotibContext.Provider>
     );
 };
 

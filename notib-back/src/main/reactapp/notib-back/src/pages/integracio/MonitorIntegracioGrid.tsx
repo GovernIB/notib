@@ -269,7 +269,7 @@ export const MonitorIntegracioGrid = () => {
                 title={t('page.integracio.grid.title')}
                 resourceName="monitorIntegracioResource"
                 columns={columns}
-                fixedFilter={staticFilter}
+                staticFilter={staticFilter}
                 paginationActive
                 toolbarHideQuickFilter
                 readOnly

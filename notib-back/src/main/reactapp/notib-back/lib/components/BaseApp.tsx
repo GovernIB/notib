@@ -267,7 +267,6 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         i18nAddResourceBundleCallback
     );
     const context = {
-        code,
         getFormFieldComponent,
         getDetailFieldComponent,
         setMarginsDisabled: marginsDisabledProp == null ? setMarginsDisabled : emptyFunction,

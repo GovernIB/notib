@@ -2,7 +2,6 @@ package es.caib.notib.persist.resourceentity;
 
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
-import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.explotacio.EnviamentOrigen;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
@@ -129,7 +128,6 @@ public class NotificacioResourceEntity
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "organ_gestor_fk"),
 		nullable = false)
 	private OrganGestorResourceEntity organGestor;
-
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(
 		name = "procediment_id",
@@ -175,17 +173,6 @@ public class NotificacioResourceEntity
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "document5_notificacio_fk"))
 	protected DocumentResourceEntity document5;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(
-		name = "procediment_organ_id",
-		referencedColumnName = "id",
-		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "procorgan_not_fk"))
-	private ProcedimentOrganGestorResourceEntity procedimentOrganGestor;
-
-	@Enumerated(EnumType.STRING)
-	@Formula("(select prc.tipus from " + BaseConfig.DB_PREFIX + "procediment prc where prc.id = procediment_id)")
-	private ProcSerTipusEnum procedimentTipus;
-
 	@Formula("(select ntb.enviada_date from " + BaseConfig.DB_PREFIX + "notificacio_table ntb where ntb.id = id)")
 	private Date enviadaDate;
 	@Formula("(select ntb.estat_string from " + BaseConfig.DB_PREFIX + "notificacio_table ntb where ntb.id = id)")
@@ -196,8 +183,7 @@ public class NotificacioResourceEntity
 		NotificacioResource resource,
 		EntitatResourceEntity entitat,
 		OrganGestorResourceEntity organGestor,
-		ProcedimentResourceEntity procediment,
-		ProcedimentOrganGestorResourceEntity procedimentOrganGestor) {
+		ProcedimentResourceEntity procediment) {
 		this.enviamentDataProgramada = resource.getEnviamentDataProgramada();
 		this.concepte = resource.getConcepte();
 		this.descripcio = resource.getDescripcio();
@@ -232,7 +218,6 @@ public class NotificacioResourceEntity
 		this.entitat = entitat;
 		this.organGestor = organGestor;
 		this.procediment = procediment;
-		this.procedimentOrganGestor = procedimentOrganGestor;
 	}
 
 }

@@ -1,6 +1,5 @@
 const translationCa = {
     app: {
-        loading: 'Iniciant NOTIB',
         noEntitat: 'Aquest usuari no te accés a cap entorn',
         menu: {
             home: 'Inici',
@@ -20,8 +19,6 @@ const translationCa = {
             integracions: 'Integracions',
             cache: "Cache d'aplicacions",
             activemq: "Monitor ActiveMQ",
-            callbacksError: "Notificacions callback erronies",
-            monitorSistema: "Monitor de sistema"
         },
     },
     page: {
@@ -362,16 +359,6 @@ const translationCa = {
                     accions: 'Accions',
                     historic: 'Històric',
                 },
-                dades: {
-                    title: 'Dades de la notificació',
-                    justificant: 'Justificant',
-                },
-                enviaments: {
-                    title: 'Enviament',
-                },
-                documents: {
-                    title: 'Document',
-                },
             },
         },
         enviament: {
@@ -424,40 +411,10 @@ const translationCa = {
                 title: "Cache d'aplicacions"
             },
         },
-        activemq: {
+        activeMq: {
             grid: {
                 title: "Monitor ActiveMQ"
             },
-        },
-        callbacksError: {
-            grid: {
-                title: "Notificacions amb error a l'últim callback"
-            },
-        },
-        monitorSistema :{
-            tab : {
-                sistema: {
-                    title: "Sistema",
-                    sistemaOperatiu: "Sistema operatiu",
-                    arquitectura: "Arquitectura",
-                    processadors: "Processadors",
-                    jbossVersion: "Versió de Jboss",
-                    applicationServerInfo: "Informació del servidor d'aplicacions",
-                    tempsFuncionant: "Temps funcionant",
-                    jvmMemory: "Màquina virtual de Java",
-                    disksUsage: "Disc i CPU",
-                },
-                fils: {
-                    title: "Fils d'execució",
-                },
-                tasques: {
-                    title: "Tasques en segon pla",
-                    restart: "Reiniciar",
-                    restartOk: "Reiniciat correctament",
-                    restartSelect: "Reiniciar seleccionades",
-                    restartSelectOk: "Reiniciades correctament",
-                }
-            }
         },
         notFound: {
             title: 'Pàgina no trobada',
@@ -503,14 +460,8 @@ const translationCa = {
             add: 'Afegir',
             refresh: 'Refrescar',
         },
-        UserProfile: {
+        UserProfileFormDialog: {
             perfil: "Perfil de l'usuari",
-            auto: "Automàtic",
-        },
-        FormDropzoneField: {
-            arrosegar:  "Arrossega el fitxer aquí",
-            amollar: "Amolla el fitxer ara ...",
-            validacio: "L'arxiu no és vàlid",
         },
     },
     comu: {

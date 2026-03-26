@@ -4,10 +4,12 @@
 package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
+import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliacionPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliacionesPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.Envios;
+import es.caib.notib.logic.cacheable.CacheBridge;
 import es.caib.notib.logic.intf.dto.AplicacioDto;
 import es.caib.notib.logic.intf.dto.CallbackEstatEnumDto;
 import es.caib.notib.logic.intf.dto.CodiValorDto;
@@ -33,7 +35,6 @@ import es.caib.notib.logic.intf.dto.cie.CieTableItemDto;
 import es.caib.notib.logic.intf.dto.cie.EntregaPostalDto;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalDto;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalTableItemDto;
-import es.caib.notib.logic.intf.dto.config.ConfigDto;
 import es.caib.notib.logic.intf.dto.notenviament.EnviamentInfo;
 import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
@@ -77,7 +78,6 @@ import es.caib.notib.persist.entity.cie.PagadorCieEntity;
 import es.caib.notib.persist.entity.cie.PagadorCieFormatFullaEntity;
 import es.caib.notib.persist.entity.cie.PagadorCieFormatSobreEntity;
 import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
-import es.caib.notib.persist.entity.config.ConfigEntity;
 import es.caib.notib.persist.repository.AplicacioRepository;
 import es.caib.notib.persist.repository.CallbackRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
@@ -215,13 +215,13 @@ public class ConversioTipusHelper {
 				}).register();
 
 		mapperFactory.classMap(NotificacioMassivaEntity.class, NotificacioMassivaTableItemDto.class)
-                    .customize(new CustomMapper<>() {
-                        @Override
-                        public void mapAtoB(NotificacioMassivaEntity a, NotificacioMassivaTableItemDto b, MappingContext context) {
-                            a.getCreatedDate().ifPresent(createdDate -> b.setCreatedDate(Date.from(createdDate.atZone(ZoneId.systemDefault()).toInstant())));
+				.customize(new CustomMapper<>() {
+					@Override
+					public void mapAtoB(NotificacioMassivaEntity a, NotificacioMassivaTableItemDto b, MappingContext context) {
+						a.getCreatedDate().ifPresent(createdDate -> b.setCreatedDate(Date.from(createdDate.atZone(ZoneId.systemDefault()).toInstant())));
 
-                        }
-                    }).byDefault().register();
+					}
+				}).byDefault().register();
 
 
 		mapperFactory.classMap(NotificacioMassivaEntity.class, NotificacioMassivaDataDto.class).byDefault().
@@ -279,11 +279,11 @@ public class ConversioTipusHelper {
 						var data = entity.getCreatedDate().orElseThrow();
 						Date date = Date.from(data.atZone(ZoneId.systemDefault()).toInstant());
 						dto.setCreatedDate(date);
-                        if (entity.getNumErrors() == entity.getElements().size()) {
-                            dto.setNumOk(0);
-                            dto.setNumPendent(0);
-                            return;
-                        }
+						if (entity.getNumErrors() > 0) {
+							dto.setNumOk(0);
+							dto.setNumPendent(0);
+							return;
+						}
 						var numErrors = 0;
 						var numOk = 0;
 						var numPendent = 0;
@@ -333,7 +333,7 @@ public class ConversioTipusHelper {
 
 		mapperFactory.classMap(ProcedimentEntity.class, ProcSerDto.class)
                 .field("organGestor.codi", "organGestor")
-                .field("organGestor.id", "organGestorId")
+				.field("organGestor.id", "organGestorId")
 				.field("organGestor.nom", "organGestorNom")
 				.customize(new CustomMapper<>() {
 					@Override
@@ -349,7 +349,7 @@ public class ConversioTipusHelper {
 
 		mapperFactory.classMap(ServeiEntity.class, ProcSerDto.class).
 				field("organGestor.codi", "organGestor")
-                .field("organGestor.id", "organGestorId")
+				.field("organGestor.id", "organGestorId")
 				.field("organGestor.nom", "organGestorNom")
 				.customize(new CustomMapper<>() {
 					@Override
@@ -505,12 +505,6 @@ public class ConversioTipusHelper {
 						});
 					}}).byDefault().register();
 
-		mapperFactory.classMap(ConfigEntity.class, ConfigDto.class)
-				.customize(new CustomMapper<>() {
-					@Override
-					public void mapAtoB(ConfigEntity entity, ConfigDto dto, MappingContext context) {
-					}}).byDefault().register();
-
 		defineConverters();
 	}
 
@@ -560,10 +554,10 @@ public class ConversioTipusHelper {
 				entitatDto.setOperadorPostalId(entitatEntity.getEntregaCie().getOperadorPostalId());
 				entitatDto.setCieId(entitatEntity.getEntregaCie().getCieId());
 			}
-//            entitatDto.setLogoCap(configHelper.getConfigByEntitat(entitatEntity.getCodi(), "es.caib.notib.capsalera.logo"));
-//            entitatDto.setLogoPeu(configHelper.getConfigByEntitat(entitatEntity.getCodi(), "es.caib.notib.peu.logo"));
-//            entitatDto.setColorFons(configHelper.getConfigByEntitat(entitatEntity.getCodi(), "es.caib.notib.capsalera.color.fons"));
-//            entitatDto.setColorLletra(configHelper.getConfigByEntitat(entitatEntity.getCodi(), "es.caib.notib.capsalera.color.lletra"));
+//			entitatDto.setLogoCap(configHelper.getConfigByEntitat(entitatEntity.getCodi(), "es.caib.notib.capsalera.logo"));
+//			entitatDto.setLogoPeu(configHelper.getConfigByEntitat(entitatEntity.getCodi(), "es.caib.notib.peu.logo"));
+//			entitatDto.setColorFons(configHelper.getConfigByEntitat(entitatEntity.getCodi(), "es.caib.notib.capsalera.color.fons"));
+//			entitatDto.setColorLletra(configHelper.getConfigByEntitat(entitatEntity.getCodi(), "es.caib.notib.capsalera.color.lletra"));
 		}
 	}
 
@@ -696,9 +690,9 @@ public class ConversioTipusHelper {
 			notEnviamentTableItemDto.setEnviadaDate(notificacioTableHelper.getEnviadaDate(enviamentTableEntity.getNotificacio()));
 			notEnviamentTableItemDto.setProcedimentNom(enviamentTableEntity.getNotificacio().getProcediment().getNom());
 			notEnviamentTableItemDto.setOrganNom(enviamentTableEntity.getNotificacio().getOrganGestor().getNom());
-//            var enviament = notificacioEnviamentRepository.findById(enviamentTableEntity.getId()).orElseThrow();
-//            notEnviamentTableItemDto.setEntregaPostal(enviament.getEntregaPostal() != null);
-//		    notEnviamentTableItemDto.setAnulable(isAnulable(enviament));
+//			var enviament = notificacioEnviamentRepository.findById(enviamentTableEntity.getId()).orElseThrow();
+//			notEnviamentTableItemDto.setEntregaPostal(enviament.getEntregaPostal() != null);
+//			notEnviamentTableItemDto.setAnulable(isAnulable(enviament));
 			if (enviamentTableEntity.getDestinataris() == null || enviamentTableEntity.getDestinataris().isEmpty()) {
 				return;
 			}
@@ -715,9 +709,7 @@ public class ConversioTipusHelper {
 			}
 			enviamentTableEntity.setDestinataris(destinatarisFormat.toString());
 			notEnviamentTableItemDto.setDestinataris(destinatarisFormat.toString());
-        }
-
-
+		}
 
 		private String getNomLlinatgeNif(String destinatari) {
 

@@ -162,7 +162,7 @@ export const ProcedimentGrid = () => {
                 title={t('page.procediments.grid.title')}
                 resourceName="procedimentResource"
                 columns={columns}
-                fixedFilter={"tipus:'PROCEDIMENT' and entitat.id:" + currentEntitatId}
+                staticFilter={"tipus:'PROCEDIMENT' and entitat.id:" + currentEntitatId}
                 paginationActive
                 toolbarCreateLink="form"
                 toolbarAdditionalRow={<ProcedimentGridFilter />}
