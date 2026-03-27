@@ -211,15 +211,8 @@ public class LegacyHelper {
 				AuditService.TipusOperacio.CREATE,
 				"NotificacioResourceServiceImpl.afterCreateSave");
 			// Dona d'alta els enviaments a la màqina d'estats al finalitzar la transacció
-			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-				@Override
-				public void afterCommit() {
-					if (TransactionSynchronizationManager.isActualTransactionActive()) {
-						notificacioEntity.get().getEnviaments().forEach(e -> {
-							enviamentSmService.altaEnviament(e.getNotificaReferencia());
-						});
-					}
-				}
+			notificacioEntity.get().getEnviaments().forEach(e -> {
+				enviamentSmService.altaEnviament(e.getNotificaReferencia());
 			});
 		}
 	}
