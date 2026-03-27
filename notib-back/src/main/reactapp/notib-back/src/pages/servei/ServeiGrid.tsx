@@ -95,6 +95,7 @@ const columns: MuiDataGridColDef[] = [
 const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (props) => {
     const { filterApiRef } = props;
     const { t } = useTranslation();
+
     const handleButtonClick = () => {
         filterApiRef.current.clear();
     };
@@ -122,6 +123,7 @@ const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (p
 
 const ProcedimentGridFilter: React.FC = () => {
     const filterApiRef = useFilterApiRef();
+
     const springFilterBuilder = (data: any) => {
         return filterBuilder.and(
             filterBuilder.like('codi', data.codi),
@@ -135,6 +137,7 @@ const ProcedimentGridFilter: React.FC = () => {
                 filterBuilder.eq('requireDirectPermission', `'${data.requireDirectPermission}'`)
         );
     };
+
     return (
         <MuiFilter
             resourceName="procedimentResource"
@@ -158,7 +161,7 @@ export const ProcedimentGrid = () => {
                 title={t('page.serveis.grid.title')}
                 resourceName="procedimentResource"
                 columns={columns}
-                fixedFilter={"tipus:'SERVEI' and entitat.id:" + currentEntitatId}
+                staticFilter={"tipus:'SERVEI' and entitat.id:" + currentEntitatId}
                 paginationActive
                 toolbarAdditionalRow={<ProcedimentGridFilter />}
                 toolbarHideQuickFilter

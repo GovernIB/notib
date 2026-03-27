@@ -91,9 +91,9 @@ export const useApiDataCommon = (
         quickFilterProps
     );
     const refresh = () => {
-        if (apiIsReady && findArgs != null) {
+        if (apiIsReady) {
             const processedFindArgs = {
-                ...findArgs,
+                ...(findArgs ?? {}),
                 quickFilter: quickFilterValue?.length ? quickFilterValue : undefined,
                 includeLinksInRows: true,
             };

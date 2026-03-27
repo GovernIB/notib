@@ -97,7 +97,6 @@ public class AccioMassivaElementEntity extends AbstractPersistable<Long>  {
             dataExecucio = new Date();
             if (!StringUtils.isEmpty(errorDesc)) {
                 errorDescripcio = formatErrorDescripcio(errorDesc);
-                accioMassiva.setNumErrors(accioMassiva.getNumErrors()+1);
             }
             if (!StringUtils.isEmpty(errorStackTrace)) {
                 excepcioStackTrace = formatExcepcioStacktrace(errorStackTrace);

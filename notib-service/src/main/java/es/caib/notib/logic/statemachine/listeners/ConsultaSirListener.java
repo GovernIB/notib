@@ -1,8 +1,8 @@
 package es.caib.notib.logic.statemachine.listeners;
 
 import es.caib.notib.logic.helper.AccioMassivaHelper;
-import es.caib.notib.logic.helper.RegistreHelper;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
+import es.caib.notib.logic.intf.service.RegistreService;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaSirRequest;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.statemachine.SmConstants;
@@ -25,7 +25,8 @@ import java.util.concurrent.Semaphore;
 @Component
 public class ConsultaSirListener {
 
-    private final RegistreHelper registreHelper;
+
+    private final RegistreService registreService;
     private final EnviamentSmService enviamentSmService;
     private final NotificacioEnviamentRepository notificacioEnviamentRepository;
     private final AccioMassivaHelper accioMassivaHelper;
@@ -58,7 +59,7 @@ public class ConsultaSirListener {
 		}
 		semaphore.acquire();
 		try {
-			var success = registreHelper.consultaSir(consultaSirRequest);
+			var success = registreService.consultaSir(consultaSirRequest);
 			if (success) {
 				enviamentSmService.sirSuccess(enviamentUuid);
 			} else {

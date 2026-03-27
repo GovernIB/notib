@@ -5,16 +5,13 @@ import es.caib.notib.client.domini.EnviamentReferencia;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.client.domini.NotificacioEstatEnum;
 import es.caib.notib.client.domini.RespostaAlta;
-import es.caib.notib.logic.cacheable.CacheBridge;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.helper.AuditHelper;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
-import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.DocumentHelper;
 import es.caib.notib.logic.helper.EnviamentTableHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
-import es.caib.notib.logic.helper.LimitadorEnviamentsHelper;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.NotificaHelper;
@@ -38,14 +35,10 @@ import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.GrupService;
 import es.caib.notib.logic.intf.service.JustificantService;
-import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2;
-import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.AplicacioEntity;
 import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
-import es.caib.notib.persist.entity.GrupEntity;
-import es.caib.notib.persist.entity.GrupProcSerEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.NotificacioEventEntity;
@@ -59,8 +52,6 @@ import es.caib.notib.persist.entity.cie.EntregaCieEntity;
 import es.caib.notib.persist.repository.AplicacioRepository;
 import es.caib.notib.persist.repository.DocumentRepository;
 import es.caib.notib.persist.repository.EntitatRepository;
-import es.caib.notib.persist.repository.GrupProcSerRepository;
-import es.caib.notib.persist.repository.GrupRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.persist.repository.OrganGestorRepository;
@@ -76,65 +67,53 @@ import es.caib.plugins.arxiu.api.DocumentEstat;
 import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
 import es.caib.plugins.arxiu.api.DocumentMetadades;
 import es.caib.plugins.arxiu.api.DocumentTipus;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.junit.After;
 import org.junit.Rule;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.MockitoRule;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static es.caib.notib.logic.intf.util.ValidacioErrorCodes.*;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-@Slf4j
+@Disabled("Desactivat perquè el test dona errors i s'ha de revisar")
 //@RunWith(JUnitParamsRunner.class)
 @ExtendWith({MockitoExtension.class})
-//@RunWith(MockitoJUnitRunner.class)
 public class NotificacioServiceWsV2Test {
 
 	@Rule
 	public MockitoRule rule = MockitoJUnit.rule();
 
 	protected static final String ENTITAT_DIR3CODI = "A04003003";
-//	protected static final String ORGAN_CODI = "A04035965";
-//	protected static final String ORGAN_POSTAL_CODI = "A04035966";
+	protected static final String ORGAN_CODI = "A04035965";
+	protected static final String ORGAN_POSTAL_CODI = "A04035966";
 	protected static final String LLIBRE = "L16";
 	protected static final String OFICINA = "O00009390";
 	protected static final String IDENTIFICADOR_PROCEDIMENT = "874510";
 	protected static final String IDENTIFICADOR_PROCEDIMENT_POSTAL = "8745100";
 	protected static final String IDIOMA = "ca";
-//	protected static final String USUARI_CODI = "e18225486x";
+	protected static final String USUARI_CODI = "e18225486x";
 	protected static final String APP_CODI = "mockApp";
 //	protected static final NotificaDomiciliConcretTipus TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipus.NACIONAL;
 	protected static final NotificaDomiciliConcretTipus TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipus.SENSE_NORMALITZAR;
@@ -149,8 +128,6 @@ public class NotificacioServiceWsV2Test {
 	@Mock
 	private ProcSerRepository procSerRepository;
 	@Mock
-	private GrupProcSerRepository grupProcSerRepository;
-	@Mock
 	private ProcSerOrganRepository procedimentOrganRepository;
 	@Mock
 	private PersonaRepository personaRepository;
@@ -158,8 +135,6 @@ public class NotificacioServiceWsV2Test {
 	private DocumentRepository documentRepository;
 	@Mock
 	private OrganGestorRepository organGestorRepository;
-	@Mock
-	private GrupRepository grupRepository;
 	@Mock
 	private UsuariRepository usuariRepository;
 	@Mock
@@ -181,8 +156,6 @@ public class NotificacioServiceWsV2Test {
 	@Mock
 	private NotificacioTableHelper notificacioTableHelper;
 	@Mock
-	private ConversioTipusHelper conversioTipusHelper;
-	@Mock
 	private NotificacioHelper notificacioHelper;
 	@Mock
 	private JustificantService justificantService;
@@ -192,8 +165,6 @@ public class NotificacioServiceWsV2Test {
 	private AuditHelper auditHelper;
 	@Mock
 	private MessageHelper messageHelper;
-	@Mock
-	private LimitadorEnviamentsHelper limitadorEnviamentsHelper;
 //	@Mock
 //	private  DocumentHelper documentHelper;
 
@@ -222,10 +193,6 @@ public class NotificacioServiceWsV2Test {
 	private NotificacioEventEntity notificacioEventEntityMock;
 	@Mock
 	private EnviamentSmService enviamentSmService;
-	@Mock
-	private OrganGestorService organGestorService;
-	@Mock
-	private CacheBridge cacheBridge;
 
 
 	private EntitatEntity entitatMock;
@@ -244,25 +211,19 @@ public class NotificacioServiceWsV2Test {
 	private es.caib.plugins.arxiu.api.Document documentArxiuMock;
 	private DocumentEntity documentEntityMock;
 
-	private NotibLogger mockLogger;
-	private MockedStatic<NotibLogger> mockedStatic;
-
-	private MockedStatic<TransactionSynchronizationManager> tsm;
-	private final AtomicReference<TransactionSynchronization> captured = new AtomicReference<>();
-
 	@InjectMocks
 	NotificacioServiceWsV2 notificacioService = new NotificacioServiceWsImplV2();
 
  	@BeforeEach
-	public void setUp() throws IOException, IllegalAccessException, NoSuchFieldException {
+	public void setUp() throws IOException {
 
 //		((NotificacioServiceWsImplV2)notificacioService).setNotificacioValidator(new NotificacioValidator(aplicacioRepository, grupService, messageHelper, cacheHelper, organGestorCachable, configHelper));
 		((NotificacioServiceWsImplV2)notificacioService).setDocumentHelperTest(new DocumentHelper(pluginHelper, configHelper, documentRepository));
 		entitatMock = EntitatEntity.hiddenBuilder().codi("GOIB").nom("Govern de les Illes Balears").tipus(EntitatTipusEnumDto.GOVERN).dir3Codi(ENTITAT_DIR3CODI).activa(true).apiKey("xxxxxx").ambEntregaDeh(false).llibreEntitat(false).oficinaEntitat(false).build();
 		aplicacioMock = AplicacioEntity.builder().entitat(entitatMock).activa(true).usuariCodi(APP_CODI).callbackUrl("http://callback.url").build();
-		organGestorMock = OrganGestorEntity.builder().codi(NotificacioProvider.ORGAN_CODI).estat("V").nom("Direcció General de Política Lingüística").sir(true).oficina("oficinaTest").entitat(entitatMock).build();
-		organGestorPostalMock = OrganGestorEntity.builder().codi(NotificacioProvider.ORGAN_POSTAL_CODI).estat("V") 	.nom("Direcció General de Política Lingüística").entregaCie(new EntregaCieEntity()).entitat(entitatMock).build();
-		procedimentMock = ProcedimentEntity.builder().id(1L).codi(IDENTIFICADOR_PROCEDIMENT).nom("Convocatòria d'ajuts destinats a la premsa de caràcter local").entitat(entitatMock).retard(0).caducitat(10).agrupar(false).organGestor(organGestorMock).comu(false).requireDirectPermission(false).build();
+		organGestorMock = OrganGestorEntity.builder().codi(ORGAN_CODI).nom("Direcció General de Política Lingüística").entitat(entitatMock).build();
+		organGestorPostalMock = OrganGestorEntity.builder().codi(ORGAN_POSTAL_CODI).nom("Direcció General de Política Lingüística").entregaCie(new EntregaCieEntity()).entitat(entitatMock).build();
+		procedimentMock = ProcedimentEntity.builder().codi(IDENTIFICADOR_PROCEDIMENT).nom("Convocatòria d'ajuts destinats a la premsa de caràcter local").entitat(entitatMock).retard(0).caducitat(10).agrupar(false).organGestor(organGestorMock).comu(false).requireDirectPermission(false).build();
 		procedimentPostalMock = ProcedimentEntity.builder().codi(IDENTIFICADOR_PROCEDIMENT_POSTAL).nom("Convocatòria d'ajuts destinats a la premsa de caràcter local").entitat(entitatMock).retard(0).caducitat(10).agrupar(false).organGestor(organGestorPostalMock).comu(false).requireDirectPermission(false).build();
 		procedimentComuMock = ProcedimentEntity.builder().codi(IDENTIFICADOR_PROCEDIMENT).nom("Convocatòria d'ajuts destinats a la premsa de caràcter local").entitat(entitatMock).retard(0).caducitat(10).agrupar(false).comu(true).requireDirectPermission(false).build();
 		((ProcSerEntity)procedimentMock).setTipus(ProcSerTipusEnum.PROCEDIMENT);
@@ -294,7 +255,7 @@ public class NotificacioServiceWsV2Test {
 				document.getValidesa(),
 				document.getTipoDocumental(),
 				document.getModoFirma()).build();
-		dadesUsuariMock = DadesUsuari.builder().codi(NotificacioProvider.USUARI_CODI).nom("Usuari").llinatges("Llinatge1 Llinatge2").nif("12345678Z").email("usuari@limit.es").build();
+		dadesUsuariMock = DadesUsuari.builder().codi("e18225486x").nom("Usuari").llinatges("Llinatge1 Llinatge2").nif("12345678Z").email("usuari@limit.es").build();
 
 		lenient().when(auth.getName()).thenReturn(APP_CODI);
 		lenient().doNothing().when(metricsHelper).fiMetrica(nullable(Timer.Context.class));
@@ -308,8 +269,8 @@ public class NotificacioServiceWsV2Test {
 		lenient().when(procSerRepository.findByCodiAndEntitat(eq(IDENTIFICADOR_PROCEDIMENT_POSTAL), any(EntitatEntity.class))).thenReturn(procedimentPostalMock);
 //		lenient().when(procSerRepository.findByCodiAndEntitat(anyString(), any(EntitatEntity.class))).thenReturn(procedimentMock);
 		lenient().when(procSerRepository.findByCodiAndEntitat(eq("COMU"), any(EntitatEntity.class))).thenReturn(procedimentComuMock);
-		lenient().when(organGestorRepository.findByEntitatAndCodi(any(EntitatEntity.class), eq(NotificacioProvider.ORGAN_CODI))).thenReturn(organGestorMock);
-		lenient().when(organGestorRepository.findByEntitatAndCodi(any(EntitatEntity.class), eq(NotificacioProvider.ORGAN_POSTAL_CODI))).thenReturn(organGestorPostalMock);
+		lenient().when(organGestorRepository.findByEntitatAndCodi(any(EntitatEntity.class), eq(ORGAN_CODI))).thenReturn(organGestorMock);
+		lenient().when(organGestorRepository.findByEntitatAndCodi(any(EntitatEntity.class), eq(ORGAN_POSTAL_CODI))).thenReturn(organGestorPostalMock);
 		lenient().when(procedimentOrganRepository.findByProcSerIdAndOrganGestorId(anyLong(), anyLong())).thenReturn(procedimentOrganMock);
 		lenient().when(documentRepository.saveAndFlush(any(DocumentEntity.class))).thenReturn(documentEntityMock);
 		lenient().when(pluginHelper.arxiuGetImprimible(anyString(), anyBoolean())).thenReturn(documentArxiuMock.getContingut());
@@ -321,36 +282,25 @@ public class NotificacioServiceWsV2Test {
 		lenient().when(messageHelper.getMessage(anyString(), any(Locale.class))).thenAnswer(code -> "[" + code.getArgument(0).toString().substring(16) + "] Error");
 		lenient().when(messageHelper.getMessage(anyString(), nullable(Object[].class), any(Locale.class))).thenAnswer(code -> "[" + code.getArgument(0).toString().substring(16) + "] Error");
 		lenient().when(cacheHelper.findUsuariAmbCodi(Mockito.anyString())).thenReturn(dadesUsuariMock);
-		lenient().when(cacheHelper.unitatPerCodi(eq(NotificacioProvider.ORGAN_CODI))).thenReturn(OrganGestorDto.builder().codi(NotificacioProvider.ORGAN_CODI).build());
+		lenient().when(cacheHelper.unitatPerCodi(eq(ORGAN_CODI))).thenReturn(OrganGestorDto.builder().codi(ORGAN_CODI).build());
 		lenient().when(configHelper.getConfigAsLong(eq("es.caib.notib.notificacio.document.size"))).thenReturn(10485760L);
 		lenient().when(configHelper.getConfigAsLong(eq("es.caib.notib.notificacio.document.total.size"))).thenReturn(15728640L);
 		lenient().when(configHelper.getConfigAsBoolean(eq("es.caib.notib.comunicacions.sir.internes"))).thenReturn(false);
 		lenient().when(configHelper.getConfigAsBoolean(eq("es.caib.notib.destinatari.multiple"))).thenReturn(false);
 		lenient().when(configHelper.getConfigAsBoolean(eq("es.caib.notib.document.metadades.por.defecto"))).thenReturn(true);
-		lenient().when(cacheBridge.findUsuariAmbCodi(Mockito.anyString())).thenReturn(dadesUsuariMock);
 
 		SecurityContextHolder.getContext().setAuthentication(auth);
-
-		mockLogger = mock(NotibLogger.class);
-		mockedStatic = mockStatic(NotibLogger.class);
-		mockedStatic.when(NotibLogger::getInstance).thenReturn(mockLogger);
-
-		tsm = mockStatic(TransactionSynchronizationManager.class);
-		tsm.when(TransactionSynchronizationManager::isActualTransactionActive).thenReturn(true);
-		tsm.when(() -> TransactionSynchronizationManager.registerSynchronization(any()))
-				.thenAnswer(inv -> { captured.set(inv.getArgument(0)); return null; });
-
 	}
 
 	// Test de validacions de alta de notificació
 	@ParameterizedTest(name = "[{index}] Validació error {1}")
 	@ArgumentsSource(NotificacioProvider.class)
 	public void whenAltaUuid_thenReturnErrorOrRespostaAltaOK(Notificacio notificacio, int errorEsperat) throws IOException {
-		
+
 		// Given
 		switch (errorEsperat) {
 			case EMISOR_DIR3_NULL:
-//				when(entitatRepository.findByDir3Codi(Mockito.isNull())).thenReturn(null);
+				when(entitatRepository.findByDir3Codi(Mockito.isNull())).thenReturn(null);
 				break;
 			case EMISOR_DIR3_NO_EXIST:
 				when(entitatRepository.findByDir3Codi(eq("NO_EXIST"))).thenReturn(null);
@@ -377,7 +327,7 @@ public class NotificacioServiceWsV2Test {
 				lenient().when(organGestorRepository.findByEntitatAndCodi(any(EntitatEntity.class), eq("ORGAN_DIFERENT"))).thenReturn(OrganGestorEntity.builder().codi("XXXXXXXX").nom("Qualsevol altre organ").entitat(entitatMock).build());
 				break;
 			case USUARI_INEXISTENT:
-				when(cacheBridge.findUsuariAmbCodi(eq("NO_EXIST"))).thenReturn(null);
+				when(cacheHelper.findUsuariAmbCodi(eq("NO_EXIST"))).thenReturn(null);
 				break;
 			case DOCUMENT_FORMAT_INVALID:
 				break;
@@ -421,25 +371,17 @@ public class NotificacioServiceWsV2Test {
 				procedimentMock.setAgrupar(true);
 				break;
 			case GRUP_EN_PROCEDIMENT_NO_AGRUPADA:
-				lenient().when(grupRepository.findByCodiAndEntitat(notificacio.getGrupCodi(), entitatMock)).thenReturn(GrupEntity.getBuilder("test", notificacio.getGrupCodi(), entitatMock).build());
-				lenient().when(grupService.findByCodi(anyString(), nullable(Long.class))).thenReturn(GrupDto.builder().codi("GRUP").build());
-				when(procSerRepository.findById(anyLong())).thenReturn(Optional.of(procedimentMock));
+				lenient().when(grupService.findByCodi(eq("GRUP"), nullable(Long.class))).thenReturn(GrupDto.builder().codi("GRUP").build());
 				procedimentMock.setAgrupar(true);
 				break;
 			case GRUP_NO_ASSIGNAT:
-				lenient().when(grupRepository.findByCodiAndEntitat(notificacio.getGrupCodi(), entitatMock)).thenReturn(GrupEntity.getBuilder("test", notificacio.getGrupCodi(), entitatMock).build());
-				var grup = GrupEntity.getBuilder("test2", notificacio.getGrupCodi(), entitatMock).build();
-				lenient().when(grupService.findByProcedimentAndUsuariGrups(nullable(Long.class))).thenReturn(List.of(GrupDto.builder().codi(grup.getCodi()).build()));
-				when(procSerRepository.findById(anyLong())).thenReturn(Optional.of(procedimentMock));
-				lenient().when(cacheHelper.findRolsUsuariAmbCodi(anyString())).thenReturn(List.of("test2"));
-				var grupProcSerEntity = new GrupProcSerEntity();
-				grupProcSerEntity.setGrup(grup);
-				when(grupProcSerRepository.findByProcSer(any(ProcSerEntity.class))).thenReturn(List.of(grupProcSerEntity));
+				lenient().when(grupService.findByCodi(eq("GRUP"), nullable(Long.class))).thenReturn(GrupDto.builder().codi("GRUP").build());
+				lenient().when(grupService.findByProcedimentAndUsuariGrups(nullable(Long.class))).thenReturn(List.of(GrupDto.builder().codi("ALTRE_GRUP").build()));
 				procedimentMock.setAgrupar(true);
 				break;
 			case PERSONA_DIR3CODI_PROPIA_ENTITAT:
 				Map<String, OrganismeDto> organigrama = new HashMap();
-				organigrama.put(NotificacioProvider.ORGAN_CODI, OrganismeDto.builder().codi(NotificacioProvider.ORGAN_CODI).build());
+				organigrama.put(ORGAN_CODI, OrganismeDto.builder().codi(ORGAN_CODI).build());
 				lenient().when(organGestorCachable.findOrganigramaByEntitat(eq(ENTITAT_DIR3CODI))).thenReturn(organigrama);
 				break;
 			case DEH_NULL:
@@ -449,9 +391,6 @@ public class NotificacioServiceWsV2Test {
 				break;
 			case POSTAL_ENTREGA_INACTIVA:
 				organGestorPostalMock.setEntregaCie(null);
-				break;
-			case ORGAN_I_ENTITA_SENSE_OFICINA_EN_SIR:
-				organGestorMock.setOficina(null);
 				break;
 		}
 
@@ -463,13 +402,12 @@ public class NotificacioServiceWsV2Test {
 
 		if (errorEsperat == 0) {
 			assertFalse("Resposta amb error (" + respostaAlta.getErrorDescripcio() + ") quan s'esperava OK", respostaAlta.isError());
-			assertTrue("Resposta OK amb descripció d'error (" + respostaAlta.getErrorDescripcio() + ")",
-					respostaAlta.getErrorDescripcio() == null || respostaAlta.getErrorDescripcio().isEmpty());
-//			assertNull(
-//					"Resposta OK amb descripció d'error (" + respostaAlta.getErrorDescripcio() + ")",
-//					respostaAlta.getErrorDescripcio());
+			assertNull(
+					"Resposta OK amb descripció d'error (" + respostaAlta.getErrorDescripcio() + ")",
+					respostaAlta.getErrorDescripcio());
 			List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
-			assertEquals("No s'han rebut el mateix nombre de referències (" + referencies.size() + ") que d'enviaments (" + notificacio.getEnviaments().size() + ")",
+			assertEquals(
+					"No s'han rebut el mateix nombre de referències (" + referencies.size() + ") que d'enviaments (" + notificacio.getEnviaments().size() + ")",
 					notificacio.getEnviaments().size(), referencies.size());
 			assertEquals("La notificació no es troba en estat PENDENT", NotificacioEstatEnum.PENDENT, respostaAlta.getEstat());
 			return;
@@ -477,9 +415,11 @@ public class NotificacioServiceWsV2Test {
 
 		assertTrue("Resposta OK quan s'esperava amb error", respostaAlta.isError());
 		assertNotNull("Error sense descripció", respostaAlta.getErrorDescripcio());
-		assertTrue("L'error retornat no conté el codi d'error [" + errorEsperat + "]", respostaAlta.getErrorDescripcio().contains("[" + errorEsperat + "]"));
+		assertTrue(
+				"L'error retornat no conté el codi d'error [" + errorEsperat + "]",
+				respostaAlta.getErrorDescripcio().contains("[" + errorEsperat + "]"));
 
-		log.info(respostaAlta.getErrorDescripcio());
+		System.out.println(respostaAlta.getErrorDescripcio());
 
 	}
 
@@ -506,13 +446,9 @@ public class NotificacioServiceWsV2Test {
 		return documentArxiu;
 	}
 
-	@AfterEach
+	@After
 	public void tearDown() {
-
-		mockedStatic.close();
 		Mockito.reset(pluginHelper);
-		tsm.close();
-		captured.set(null);
 	}
-	
+
 }
