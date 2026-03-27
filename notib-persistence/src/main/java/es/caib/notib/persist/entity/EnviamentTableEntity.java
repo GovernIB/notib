@@ -167,7 +167,7 @@ public class EnviamentTableEntity extends NotibAuditable<Long> {
 	// REGISTRE
 	// //
 	@Column(name = "registre_numero", length = 19)
-	protected Integer registreNumero;
+	protected String registreNumero;
 
 	@Column(name = "registre_data")
 	@Temporal(TemporalType.DATE)
