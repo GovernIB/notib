@@ -91,15 +91,17 @@ public class NotificacioResourceServiceImpl
 	private Long saveEnviament(
 		NotificacioResourceEntity notificacio,
 		NotificacioEnviamentResource enviament) {
+		String uuid = UUID.randomUUID().toString();
 		NotificacioEnviamentResourceEntity enviamentNou = NotificacioEnviamentResourceEntity.builder().
 			resource(enviament).
 			notificacio(notificacio).
 			build();
+		enviamentNou.setNotificaReferencia(uuid);
 		enviamentNou.setNotificaEstat(EnviamentEstat.PENDENT);
 		NotificacioEnviamentResourceEntity enviamentCreat = notificacioEnviamentResourceRepository.saveAndFlush(enviamentNou);
 		PersonaResourceEntity titular = saveDestinatari(enviamentCreat, enviament.getTitularInfo());
 		enviamentCreat.setTitular(titular);
-		enviamentCreat.setNotificaReferencia(UUID.randomUUID().toString());
+		enviamentCreat.setNotificaReferencia(uuid);
 		if (enviament.getRepresentantsInfo() != null) {
 			enviament.getRepresentantsInfo().forEach(r -> saveDestinatari(enviamentCreat, r));
 		}
