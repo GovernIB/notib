@@ -257,7 +257,6 @@ public class EnviamentSmServiceImpl implements EnviamentSmService {
 				sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_ENVIAR);
 			}
 		});
-//		sendEvent(enviamentUuid, sm, EnviamentSmEvent.RG_ENVIAR);
 		return sm;
 	}
 
