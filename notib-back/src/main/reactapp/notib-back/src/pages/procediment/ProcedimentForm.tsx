@@ -14,19 +14,23 @@ const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void
     const { t } = useTranslation();
     const { data } = useFormContext();
     const initialTab = useTabParam();
+
     React.useEffect(() => {
         setSubtitle(data?.codi + ', ' + data?.nom);
     }, [data]);
+
     const grupsTabLabel = (
         <Badge badgeContent={data.grupCount} color="primary">
             {t('page.procediments.form.tabs.grups')}
         </Badge>
     );
+
     const permisosTabLabel = (
         <Badge badgeContent={data.aclEntryCount} color="primary">
             {t('page.procediments.form.tabs.permisos')}
         </Badge>
     );
+
     const tabs = [
         t('page.procediments.form.tabs.dades'),
         { label: grupsTabLabel },

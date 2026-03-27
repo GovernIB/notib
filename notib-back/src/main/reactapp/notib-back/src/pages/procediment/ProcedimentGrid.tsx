@@ -95,6 +95,7 @@ const columns: MuiDataGridColDef[] = [
 const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (props) => {
     const { filterApiRef } = props;
     const { t } = useTranslation();
+
     const handleButtonClick = () => {
         filterApiRef.current.clear();
     };
@@ -122,6 +123,7 @@ const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (p
 
 const ProcedimentGridFilter: React.FC = () => {
     const filterApiRef = useFilterApiRef();
+
     const springFilterBuilder = (data: any) => {
         return filterBuilder.and(
             filterBuilder.like('codi', data.codi),
@@ -135,12 +137,12 @@ const ProcedimentGridFilter: React.FC = () => {
                 filterBuilder.eq('requireDirectPermission', `'${data.requireDirectPermission}'`)
         );
     };
+
     return (
         <MuiFilter
             resourceName="procedimentResource"
             code="FILTER_PROCEDIMENT"
             apiRef={filterApiRef}
-            persistentStateActive
             springFilterBuilder={springFilterBuilder}
             componentProps={{ sx: { mb: 2, mt: 0 } }}
             commonFieldComponentProps={{ size: 'small' }}
@@ -153,16 +155,15 @@ const ProcedimentGridFilter: React.FC = () => {
 export const ProcedimentGrid = () => {
     const { t } = useTranslation();
     const { currentEntitatId } = useNotibContext();
+
     return (
         <GridPage disableMargins={false}>
             <MuiDataGrid
                 title={t('page.procediments.grid.title')}
                 resourceName="procedimentResource"
                 columns={columns}
-                fixedFilter={"tipus:'PROCEDIMENT' and entitat.id:" + currentEntitatId}
-                autoFindDisabled
+                staticFilter={"tipus:'PROCEDIMENT' and entitat.id:" + currentEntitatId}
                 paginationActive
-                persistentStateActive
                 toolbarCreateLink="form"
                 toolbarAdditionalRow={<ProcedimentGridFilter />}
                 toolbarHideQuickFilter

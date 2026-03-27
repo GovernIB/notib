@@ -12,6 +12,7 @@ import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
+import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 import java.util.Optional;
@@ -175,33 +178,31 @@ public class LegacyHelper {
 	/**
 	 * Lògica antiga per a les notificacions:
 	 * <p>
-	 *   - Creació del registre a notificacio_env_table per a cada enviament.
-	 *   - Creació de l'auditoria per a cada enviament.
 	 *   - Creació del registre a notificacio_table.
 	 *   - Creació de l'auditoria.
-	 *   - Alta de cada enviament a la màquina d'estats (SM) al finalitzar la transacció.
-	 * @param notificacioId
-	 *            l'identificador de la notificació
+	 *   - Alta dels enviaments la màquina d'estats (SM) al finalitzar la transacció.
+	 * @param entity
+	 *            l'entitat de la notificació
 	 * @param enviamentsIds
 	 *            la llista d'ids dels enviaments associats a la notificació
 	 */
-	public void altaNotificacio(Long notificacioId, List<Long> enviamentsIds) {
-		// Lògica antiga per a les notificacions
-		Optional<NotificacioEntity> notificacioEntity = notificacioRepository.findById(notificacioId);
-		if (notificacioEntity.isPresent()) {
-			// Lògica antiga per a cada enviament
-			for (Long enviamentId: enviamentsIds) {
-				Optional<NotificacioEnviamentEntity> notificacioEnviamentEntity = notificacioEnviamentRepository.findById(enviamentId);
-				if (notificacioEnviamentEntity.isPresent()) {
-					// Crea el registre a notificacio_env_table
-					enviamentTableHelper.crearRegistre(notificacioEnviamentEntity.get());
-					// Crea la informació d'auditoria
-					auditHelper.auditaEnviament(
-						notificacioEnviamentEntity.get(),
-						AuditService.TipusOperacio.CREATE,
-						"NotificacioResourceServiceImpl.saveEnviaments");
-				}
+	public void altaNotificacio(NotificacioResourceEntity entity, List<Long> enviamentsIds) {
+		// Lògica antiga pels enviaments
+		for (Long enviamentId: enviamentsIds) {
+			Optional<NotificacioEnviamentEntity> notificacioEnviamentEntity = notificacioEnviamentRepository.findById(enviamentId);
+			if (notificacioEnviamentEntity.isPresent()) {
+				// Crea el registre a notificacio_env_table
+				enviamentTableHelper.crearRegistre(notificacioEnviamentEntity.get());
+				// Crea la informació d'auditoria
+				auditHelper.auditaEnviament(
+					notificacioEnviamentEntity.get(),
+					AuditService.TipusOperacio.CREATE,
+					"NotificacioResourceServiceImpl.saveEnviaments");
 			}
+		}
+		// Lògica antiga per a les notificacions
+		Optional<NotificacioEntity> notificacioEntity = notificacioRepository.findById(entity.getId());
+		if (notificacioEntity.isPresent()) {
 			// Crea el registre a notificacio_table
 			notificacioTableHelper.crearRegistre(notificacioEntity.get());
 			// Crea la informació d'auditoria
@@ -210,8 +211,15 @@ public class LegacyHelper {
 				AuditService.TipusOperacio.CREATE,
 				"NotificacioResourceServiceImpl.afterCreateSave");
 			// Dona d'alta els enviaments a la màqina d'estats al finalitzar la transacció
-			notificacioEntity.get().getEnviaments().forEach(e -> {
-				enviamentSmService.altaEnviament(e.getNotificaReferencia());
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+				@Override
+				public void afterCommit() {
+					if (TransactionSynchronizationManager.isActualTransactionActive()) {
+						notificacioEntity.get().getEnviaments().forEach(e -> {
+							enviamentSmService.altaEnviament(e.getNotificaReferencia());
+						});
+					}
+				}
 			});
 		}
 	}

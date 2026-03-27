@@ -61,9 +61,4 @@ public class MonitorTasquesService extends AbstractService<es.caib.notib.logic.i
         getDelegateService().error(codiTasca);
     }
 
-	@Override
-	public void reiniciarTasquesEnSegonPla(String codiTasca) {
-		getDelegateService().reiniciarTasquesEnSegonPla(codiTasca);
-	}
-
 }

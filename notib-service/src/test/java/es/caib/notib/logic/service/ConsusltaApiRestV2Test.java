@@ -103,10 +103,10 @@ public class ConsusltaApiRestV2Test {
     public void getDocumentArxiu() {
 
         var doc = new DocumentEntity();
-        var entitat = new EntitatEntity();
+		var entitat = new EntitatEntity();
         var not = NotificacioEntity.builder().entitat(entitat).document(doc).build();
         var arxiu = ArxiuDto.builder().build();
-        Mockito.when(notificacioRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(not));
+        Mockito.when(notificacioRepository.findById(1L)).thenReturn(Optional.of(not));
         Mockito.when(documentHelper.documentToArxiuDto(Mockito.anyString(), Mockito.any(DocumentEntity.class))).thenReturn(arxiu);
         var d = notificacioService.getDocumentArxiu(1L);
         assertNotNull(d);
@@ -117,10 +117,8 @@ public class ConsusltaApiRestV2Test {
     public void enviamentGetCertificacioArxiu() throws Exception {
 
         byte [] c = new byte[0];
-        var entitat = new EntitatEntity();
-        var not = NotificacioEntity.builder().entitat(entitat).build();
         var arxiu = ArxiuDto.builder().nom("certificacio_" + foo + ".pdf").contingut(c).build();
-        var env = NotificacioEnviamentEntity.builder().notificacio(not).notificaIdentificador(foo).notificaCertificacioArxiuId(foo).build();
+        var env = NotificacioEnviamentEntity.builder().notificaIdentificador(foo).notificaCertificacioArxiuId(foo).build();
         Mockito.when(notificacioEnviamentRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(env));
         var a = notificacioService.enviamentGetCertificacioArxiu(1L);
         assertNotNull(a);
@@ -151,8 +149,7 @@ public class ConsusltaApiRestV2Test {
 
         var resposta = new RespostaJustificantRecepcio();
         resposta.setJustificant(justificant.getBytes());
-        var entitat = new EntitatEntity();
-        var not = NotificacioEntity.builder().entitat(entitat).emisorDir3Codi(justificant).build();
+        var not = NotificacioEntity.builder().emisorDir3Codi(justificant).build();
         var env = NotificacioEnviamentEntity.builder().notificacio(not).registreNumeroFormatat(justificant).build();
         if (oficiExtern) {
             env.setRegistreEstat(NotificacioRegistreEstatEnumDto.OFICI_EXTERN);
@@ -160,4 +157,5 @@ public class ConsusltaApiRestV2Test {
         Mockito.when(notificacioEnviamentRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(env));
         return resposta;
     }
+
 }

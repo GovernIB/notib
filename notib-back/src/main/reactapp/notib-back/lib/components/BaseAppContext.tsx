@@ -36,7 +36,6 @@ export type DialogButton = {
 };
 
 export type BaseAppContextType = {
-    code: string;
     getFormFieldComponent: (type?: string) => React.FC<FormFieldCustomProps> | undefined;
     getDetailFieldComponent: (type?: string) => React.FC<DetailFieldCustomProps> | undefined;
     setMarginsDisabled: (marginsDisabled: boolean) => void;

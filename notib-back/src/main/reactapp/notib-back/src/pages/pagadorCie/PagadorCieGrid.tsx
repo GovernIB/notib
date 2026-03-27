@@ -65,6 +65,7 @@ const columns = [
 const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (props) => {
     const { filterApiRef } = props;
     const { t } = useTranslation();
+
     const handleButtonClick = () => {
         filterApiRef.current.clear();
     };
@@ -86,6 +87,7 @@ const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (p
 
 const AvisGridFilter: React.FC = () => {
     const filterApiRef = useFilterApiRef();
+
     const springFilterBuilder = (data: any) => {
         return filterBuilder.and(
             filterBuilder.like('nom', data.nom),
@@ -103,6 +105,7 @@ const AvisGridFilter: React.FC = () => {
                 )
         );
     };
+
     return (
         <MuiFilter
             resourceName="pagadorCieResource"
