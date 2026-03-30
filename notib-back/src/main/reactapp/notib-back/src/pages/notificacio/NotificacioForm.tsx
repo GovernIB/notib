@@ -57,19 +57,12 @@ const ProcedimentServeiField: React.FC = () => {
                         name="procediment"
                         label={t('page.notificacio.form.camps.' + type)}
                         filter={"tipus:'" + type.toUpperCase() + "'"}
-                        required={data.procedimentRequired}
                     />
                 </Grid>
             </Grid>
         );
     } else {
-        return (
-            <FormField
-                name="procediment"
-                filter={"tipus:'" + type.toUpperCase() + "'"}
-                required={data.procedimentRequired}
-            />
-        );
+        return <FormField name="procediment" filter={"tipus:'" + type.toUpperCase() + "'"} />;
     }
 };
 

@@ -9,7 +9,6 @@ import Chip from '@mui/material/Chip';
 import { GRID_DETAIL_PANEL_TOGGLE_COL_DEF } from '@mui/x-data-grid-pro';
 import { GridPage, MuiDataGrid, useResourceApiService, MuiDataGridColDef } from 'reactlib';
 import { useNotibContext } from '../../components/NotibContext';
-import { useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 import NotificacioGridEnviaments from './NotificacioGridEnviaments';
 import { useNotificacioDetailDialog } from './NotificacioDetailDialog';
 
@@ -148,14 +147,13 @@ const NotificacioGrid = () => {
         ],
         []
     );
-    const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
         <GridPage disableMargins={false}>
             <MuiDataGrid
                 title={t('page.notificacio.grid.title')}
                 resourceName="notificacioResource"
                 columns={columns}
-                defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
+                sortModel={[{ field: 'createdDate', sort: 'desc' }]}
                 paginationActive
                 toolbarHideCreate
                 toolbarCreateLink="form"
@@ -171,11 +169,8 @@ const NotificacioGrid = () => {
                 }
                 readOnly
                 selectionActive
-                persistentStateActive
-                persistentStateClearPageSortPropsOnTopLevelRouteChange
                 getDetailPanelContent={({ row }) => <NotificacioGridEnviaments id={row.id} />}
                 getDetailPanelHeight={() => 'auto'}
-                {...pageSizeOptionsDataGridProps}
             />
             {dialogComponent}
         </GridPage>
