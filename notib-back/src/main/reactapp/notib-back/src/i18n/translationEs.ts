@@ -456,6 +456,11 @@ const translationEs = {
         UserProfileFormDialog: {
             perfil: 'Perfil del usuario',
         },
+        FormDropzoneField: {
+            arrosegar:  "Arrastra el fichero aquí",
+            amollar: "Suelta el fichero ahora ...",
+            validacio: "El archivo no es válido",
+        },
     },
     comu: {
         netejarFiltre: 'Limpiar filtro',
