@@ -1,4 +1,8 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
 import { useAuthContext, useResourceApiContext, useResourceApiService } from 'reactlib';
 import {
     NotibContext,
@@ -90,7 +94,6 @@ const useCurrentRole = () => {
     );
     React.useEffect(() => {
         // Obté els rols disponibles del token JWT o de __AUTH_ROLES__
-        console.log('>>> authIsReady', authIsReady);
         if (authIsReady) {
             const userId = authGetUserId();
             setCurrentUserId(userId);
@@ -226,15 +229,34 @@ const useCurrentEntitat = (
         currentRole === ROLE_SUPER ||
         (currentEntitatId == null && currentEntitatIdFromHttpHeader == null) ||
         currentEntitatId === currentEntitatIdFromHttpHeader;
+    const currentEntitatReady =
+        apiIsReady && entitatsAvailable != null && entitatIdHttpHeaderInitialized;
     return {
         currentEntitatId,
-        currentEntitatReady:
-            apiIsReady && entitatsAvailable != null && entitatIdHttpHeaderInitialized,
+        currentEntitatReady,
         currentEntitat,
         currentEntitatLoading,
         entitatsAvailable,
         setCurrentEntitatId,
     };
+};
+
+const NotibProviderLoading: React.FC = () => {
+    const { t } = useTranslation();
+    return (
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh',
+            }}
+        >
+            <CircularProgress size={70} />
+            <Typography sx={{ mt: 1 }}>{t('app.loading')}</Typography>
+        </Box>
+    );
 };
 
 export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
@@ -264,7 +286,9 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
         currentEntitatLoading,
     };
     return (
-        <NotibContext.Provider value={contextValue}>{isReady && children}</NotibContext.Provider>
+        <NotibContext.Provider value={contextValue}>
+            {isReady ? children : <NotibProviderLoading />}
+        </NotibContext.Provider>
     );
 };
 
