@@ -15,29 +15,12 @@ import javax.ejb.Stateless;
 /**
  * Implementació de RegistreService com a EJB que empra una clase
  * delegada per accedir a la funcionalitat del servei.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Primary
 @Stateless
 public class RegistreService extends AbstractService<es.caib.notib.logic.intf.service.RegistreService> implements es.caib.notib.logic.intf.service.RegistreService {
-
-	@Override
-	@RolesAllowed("**")
-	public void registrarSortida(RegistreAnotacioDto registreAnotacio) {
-		getDelegateService().registrarSortida(registreAnotacio);
-	}
-
-	@Override
-	@RolesAllowed("**")
-	public boolean enviarRegistre(EnviamentRegistreRequest enviamentRegistreRequest) {
-		return getDelegateService().enviarRegistre(enviamentRegistreRequest);
-	}
-
-	@Override
-	public boolean consultaSir(ConsultaSirRequest consulta) {
-		return getDelegateService().consultaSir(consulta);
-	}
 
 	@Override
 	@PermitAll
