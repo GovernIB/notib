@@ -3,11 +3,10 @@ package es.caib.notib.logic.statemachine.listeners;
 import com.google.common.base.Strings;
 
 import es.caib.notib.logic.helper.MessageHelper;
+import es.caib.notib.logic.helper.RegistreHelper;
 import es.caib.notib.logic.intf.dto.missatges.MissatgeWs;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
-import es.caib.notib.logic.intf.service.NotificacioService;
-import es.caib.notib.logic.intf.service.RegistreService;
 import es.caib.notib.logic.intf.statemachine.events.EnviamentRegistreRequest;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.statemachine.SmConstants;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Component;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.transaction.Transactional;
 import java.util.concurrent.Semaphore;
 
 @Slf4j
@@ -32,14 +30,13 @@ import java.util.concurrent.Semaphore;
 @Component
 public class EnviamentRegistreListener {
 
-    private final RegistreService registreService;
+    private final RegistreHelper registreHelper;
     private final EnviamentSmService enviamentSmService;
     private final NotificacioEnviamentRepository enviamentRepository;
     private final WebSocketJms webSocketJms;
     private final MessageHelper messageHelper;
 
     private Semaphore semaphore = new Semaphore(5);
-
 
     @JmsListener(destination = SmConstants.CUA_REGISTRE, containerFactory = SmConstants.JMS_FACTORY_ACK)
     public void receiveEnviamentRegistre(@Payload EnviamentRegistreRequest enviamentRegistreRequest, @Headers MessageHeaders headers, Message message) throws JMSException, RegistreNotificaException, InterruptedException {
@@ -68,7 +65,7 @@ public class EnviamentRegistreListener {
                 log.error("[SM] L'enviament ja te numero de registre " + enviamentUuid);
                 return;
             }
-            var success = registreService.enviarRegistre(enviamentRegistreRequest);
+            var success = registreHelper.enviarRegistre(enviamentRegistreRequest);
             var msg = "";
             if (success) {
                 NotibLogger.getInstance().info("[SM] Enviament de registre <" + enviamentUuid + "> success ", log, LoggingTipus.STATE_MACHINE);
