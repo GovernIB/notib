@@ -126,7 +126,7 @@ class NotificacioResourceServiceImplTest {
 		when(enviamentRepo.saveAndFlush(any())).thenReturn(saved);
 		service.afterCreateSave(entity, resource, answers, false);
 		// Comprovem que s’ha cridat el legacyHelper amb la mateixa entitat
-		verify(legacyHelper).altaNotificacio(entity, List.of(11L));
+		verify(legacyHelper).altaNotificacio(entity.getId(), List.of(11L));
 	}
 
 	// =====================================================
