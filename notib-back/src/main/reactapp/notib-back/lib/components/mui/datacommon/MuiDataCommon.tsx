@@ -5,6 +5,7 @@ import { FormI18nKeys } from '../../form/Form';
 import { useBaseAppContext, DialogButton } from '../../BaseAppContext';
 import { useConfirmDialogButtons } from '../../AppButtons';
 import { toToolbarIcon } from '../ToolbarIcon';
+import { useDataQuickFilter } from './DataQuickFilter';
 import DataFormDialog, { DataFormDialogApi } from './DataFormDialog';
 
 export type DataCommonFindArgs = ResourceApiFindCommonArgs;
@@ -60,6 +61,9 @@ export const useApiDataCommon = (
     resourceFieldName?: string,
     autoFindDisabled?: boolean,
     findArgs?: DataCommonFindArgs,
+    quickFilterInitialValue?: string,
+    quickFilterSetFocus?: true,
+    quickFilterProps?: any,
     getArtifacts?: boolean
 ) => {
     const { saveAs } = useBaseAppContext();
@@ -81,10 +85,16 @@ export const useApiDataCommon = (
     const [pageInfo, setPageInfo] = React.useState<any>();
     const [artifacts, setArtifacts] = React.useState<any[]>();
     const [error, setError] = React.useState<any>();
+    const { value: quickFilterValue, component: quickFilterComponent } = useDataQuickFilter(
+        quickFilterInitialValue,
+        quickFilterSetFocus,
+        quickFilterProps
+    );
     const refresh = () => {
-        if (apiIsReady && findArgs != null) {
+        if (apiIsReady) {
             const processedFindArgs = {
-                ...findArgs,
+                ...(findArgs ?? {}),
+                quickFilter: quickFilterValue?.length ? quickFilterValue : undefined,
                 includeLinksInRows: true,
             };
             setLoading(true);
@@ -132,6 +142,7 @@ export const useApiDataCommon = (
     ) => {
         const args = {
             ...(findArgs ?? {}),
+            quickFilter: quickFilterValue?.length ? quickFilterValue : undefined,
             fields,
             fileType,
         };
@@ -174,7 +185,7 @@ export const useApiDataCommon = (
                 refresh();
             }
         }
-    }, [apiIsReady, autoFindDisabled, findArgs]);
+    }, [apiIsReady, quickFilterValue, autoFindDisabled, findArgs]);
     React.useEffect(() => {
         if (getArtifacts) {
             if (apiIsReady) {
@@ -198,6 +209,7 @@ export const useApiDataCommon = (
         error,
         refresh,
         export: exportt,
+        quickFilterComponent,
     };
 };
 

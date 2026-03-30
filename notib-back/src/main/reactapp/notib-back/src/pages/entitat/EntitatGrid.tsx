@@ -86,6 +86,7 @@ const columns: MuiDataGridColDef[] = [
 const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (props) => {
     const { filterApiRef } = props;
     const { t } = useTranslation();
+
     const handleButtonClick = () => {
         filterApiRef.current.clear();
     };
@@ -105,6 +106,7 @@ const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (p
 
 const EntitatGridFilter: React.FC = () => {
     const filterApiRef = useFilterApiRef();
+
     const springFilterBuilder = (data: any) => {
         return filterBuilder.and(
             filterBuilder.like('codi', data.codi),
@@ -114,6 +116,7 @@ const EntitatGridFilter: React.FC = () => {
             filterBuilder.eq('activa', `'${data?.activa}'`)
         );
     };
+
     return (
         <MuiFilter
             resourceName="entitatResource"
@@ -130,6 +133,7 @@ const EntitatGridFilter: React.FC = () => {
 
 export const EntitatGrid: React.FC = () => {
     const { t } = useTranslation();
+
     return (
         <GridPage disableMargins={false}>
             <MuiDataGrid

@@ -26,11 +26,11 @@ import java.io.Serializable;
 @NoArgsConstructor
 @FieldNameConstants
 @ResourceConfig(
-	descriptionField = Dir3Resource.Fields.denominacio,
-	accessConstraints = @ResourceAccessConstraint(
-		type = ResourceAccessConstraint.ResourceAccessConstraintType.AUTHENTICATED,
-		grantedPermissions = { PermissionEnum.READ }
-	),
+		descriptionField = Dir3Resource.Fields.denominacio,
+		accessConstraints = @ResourceAccessConstraint(
+			type = ResourceAccessConstraint.ResourceAccessConstraintType.AUTHENTICATED,
+			grantedPermissions = { PermissionEnum.READ }
+		),
 	artifacts = {
 		@ResourceArtifact(
 			type = ResourceArtifactType.FILTER,

@@ -36,7 +36,6 @@ export const Grups: React.FC = () => {
                 resourceName="grupResource"
                 columns={columns}
                 paginationActive
-                persistentStateActive
                 popupEditActive
                 popupEditFormContent={<GrupForm />}
                 popupEditFormDialogResourceTitle={t('page.grups.grid.popupResourceTitle')}

@@ -72,7 +72,6 @@ export { CopyToClipboard } from './components/mui/CopyToClipboard';
 export { useAuthButtonContext } from './components/mui/AuthButton';
 
 export { envVar } from './util/envVars';
-export { formattedFieldValue } from './util/fields';
 export { numberFormat, numberFormatCurrency } from './util/numberFormat';
 export {
     dateFormatLocale,

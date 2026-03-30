@@ -12,17 +12,6 @@ import { useNotibContext } from '../../components/NotibContext';
 import NotificacioGridEnviaments from './NotificacioGridEnviaments';
 import { useNotificacioDetailDialog } from './NotificacioDetailDialog';
 
-const useDatagridPageSizeOptionsProps = () => {
-    const { currentUser, currentUserGridPageSizeOptions } = useNotibContext();
-    return {
-        defaultPaginationModel: {
-            page: 0,
-            pageSize: currentUser.numElementsPaginaDefecteAsInt ?? -1,
-        },
-        pageSizeOptions: currentUserGridPageSizeOptions,
-    };
-};
-
 const NotificacioAddButton: React.FC = () => {
     const { t } = useTranslation();
     const { currentEntitatLoading, currentEntitat } = useNotibContext();
@@ -158,14 +147,13 @@ const NotificacioGrid = () => {
         ],
         []
     );
-    const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
         <GridPage disableMargins={false}>
             <MuiDataGrid
                 title={t('page.notificacio.grid.title')}
                 resourceName="notificacioResource"
                 columns={columns}
-                defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
+                sortModel={[{ field: 'createdDate', sort: 'desc' }]}
                 paginationActive
                 toolbarHideCreate
                 toolbarCreateLink="form"
@@ -181,11 +169,8 @@ const NotificacioGrid = () => {
                 }
                 readOnly
                 selectionActive
-                persistentStateActive
-                persistentStateClearPageSortPropsOnTopLevelRouteChange
                 getDetailPanelContent={({ row }) => <NotificacioGridEnviaments id={row.id} />}
                 getDetailPanelHeight={() => 'auto'}
-                {...pageSizeOptionsDataGridProps}
             />
             {dialogComponent}
         </GridPage>
