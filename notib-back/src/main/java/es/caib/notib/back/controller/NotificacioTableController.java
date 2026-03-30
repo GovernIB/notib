@@ -875,9 +875,6 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             if (justificant == null) {
                 throw new ValidationException("Existeix un altre procés iniciat. Esperau que finalitzi la descàrrega del document.");
             }
-            if (justificant.getContingut() == null) {
-                throw new javax.validation.ValidationException(justificant.getNom());
-            }
             response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
             writeFileToResponse(justificant.getNom(), justificant.getContingut(), response);
         } catch (Exception ex) {

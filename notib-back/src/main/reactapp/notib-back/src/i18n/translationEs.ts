@@ -1,6 +1,5 @@
 const translationEs = {
     app: {
-        loading: 'Iniciando NOTIB',
         noEntitat: 'Este usuario no tiene acceso a ningún entorno',
         menu: {
             home: 'Inicio',
@@ -20,7 +19,6 @@ const translationEs = {
             integracions: 'Integraciones',
             cache: "Cache de aplicaciones",
             activemq: "Monitor ActiveMQ",
-            callbacksError: "Notificaciones callback erroneas",
         },
     },
     page: {
@@ -354,10 +352,6 @@ const translationEs = {
                     accions: 'Acciones',
                     historic: 'Histórico',
                 },
-                dades: {
-                    title: 'Datos de la notificación',
-                    justificant: 'Justificante',
-                },
             },
         },
         enviament: {
@@ -403,7 +397,6 @@ const translationEs = {
                 errorDescripcio: 'Descripción del error:',
                 excepcioMessage: 'Mensaje de excepción:',
                 excepcioStacktrace: 'Stacktrace',
-                monitorSistema: "Monitor de sistema"
             },
         },
         cache: {
@@ -411,40 +404,10 @@ const translationEs = {
                 title: "Cache de aplicaciones"
             },
         },
-        activemq: {
+        activeMq: {
             grid: {
                 title: "Monitor ActiveMQ"
             },
-        },
-        callbacksError: {
-            grid: {
-                title: "Notificaciones con error en el último callback "
-            },
-        },
-        monitorSistema :{
-            tab : {
-                sistema: {
-                    title: "Sistema",
-                    sistemaOperatiu: "Sistema operativo",
-                    arquitectura: "Arquitectura",
-                    processadors: "Procesadores",
-                    jbossVersion: "Versión de Jboss",
-                    applicationServerInfo: "Información del servidor de aplicaciones",
-                    tempsFuncionant: "Tiempo funcionando",
-                    jvmMemory: "Máquina virtual de Java",
-                    disksUsage: "Disco y CPU",
-                },
-                fils: {
-                    title: "Hilos de ejecución",
-                },
-                tasques: {
-                    title: "Tareas en segundo plano",
-                    restart: "Reiniciar",
-                    restartOk: "Reiniciado correctamente",
-                    restartSelect: "Reiniciar seleccionadas",
-                    restartSelectOk: "Reiniciadas correctamente",
-                },
-            }
         },
         notFound: {
             title: 'Página no encontrada',
@@ -490,9 +453,8 @@ const translationEs = {
             add: 'Añadir',
             refresh: 'Refrescar',
         },
-        UserProfile: {
-            perfil: "Perfil del usuario",
-            auto: "Automático",
+        UserProfileFormDialog: {
+            perfil: 'Perfil del usuario',
         },
         FormDropzoneField: {
             arrosegar:  "Arrastra el fichero aquí",
