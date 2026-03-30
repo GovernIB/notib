@@ -85,7 +85,7 @@ public class NotificacioResourceServiceImpl
 				enviamentsIds.add(enviamentId);
 			});
 		}
-		legacyHelper.altaNotificacio(entity, enviamentsIds);
+		legacyHelper.altaNotificacio(entity.getId(), enviamentsIds);
 	}
 
 	private Long saveEnviament(
@@ -142,8 +142,6 @@ public class NotificacioResourceServiceImpl
 				enviament(enviament).
 				build());
 	}
-
-
 
 	/*
 	 * Lògica onChange que s'executa al carregar el formulari.
