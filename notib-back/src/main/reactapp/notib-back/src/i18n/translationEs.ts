@@ -1,5 +1,6 @@
 const translationEs = {
     app: {
+        loading: 'Iniciando NOTIB',
         noEntitat: 'Este usuario no tiene acceso a ningún entorno',
         menu: {
             home: 'Inicio',
