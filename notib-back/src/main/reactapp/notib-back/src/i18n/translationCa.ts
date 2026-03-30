@@ -463,6 +463,11 @@ const translationCa = {
         UserProfileFormDialog: {
             perfil: "Perfil de l'usuari",
         },
+        FormDropzoneField: {
+            arrosegar:  "Arrossega el fitxer aquí",
+            amollar: "Amolla el fitxer ara ...",
+            validacio: "L'arxiu no és vàlid",
+        },
     },
     comu: {
         netejarFiltre: 'Netejar filtre',
