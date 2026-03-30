@@ -153,6 +153,7 @@ const NotificacioGrid = () => {
                 title={t('page.notificacio.grid.title')}
                 resourceName="notificacioResource"
                 columns={columns}
+                sortModel={[{ field: 'createdDate', sort: 'desc' }]}
                 paginationActive
                 toolbarHideCreate
                 toolbarCreateLink="form"
@@ -166,8 +167,6 @@ const NotificacioGrid = () => {
                           ]
                         : undefined
                 }
-                rowLink="form/{{id}}"
-                rowUpdateLink="form/{{id}}"
                 readOnly
                 selectionActive
                 getDetailPanelContent={({ row }) => <NotificacioGridEnviaments id={row.id} />}
