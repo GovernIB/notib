@@ -1,59 +1,189 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import Icon from '@mui/material/Icon';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import { useResourceApiService, useMuiContentDialog } from 'reactlib';
 import CustomTabs from '../../components/CustomTabs';
-import DataCard from '../../components/DataCard';
-
-const toDataItem = (label: string, value: string) => {
-    const item: Record<string, string> = {};
-    item[label] = value;
-    return item;
-};
+import { FieldsDataCard } from '../../components/DataCard';
+import { Typography } from '@mui/material';
 
 const NotificacioDetailDialogTabDades: React.FC<{ id: any }> = (props) => {
     const { id } = props;
+    const { t } = useTranslation();
     const {
         isReady: apiIsReady,
         getOne: apiGetOne,
         currentFields: apiCurrentFields,
-    } = useResourceApiService('notificacioEnviamentResource');
-    const [enviament, setEnviament] = React.useState<any>();
+    } = useResourceApiService('notificacioResource');
+    const [notificacio, setNotificacio] = React.useState<any>();
     React.useEffect(() => {
         if (apiIsReady) {
-            apiGetOne(id).then(setEnviament);
+            apiGetOne(id).then(setNotificacio);
         }
     }, [apiIsReady]);
-    const serveiTipusField = apiCurrentFields?.find((f) => f?.name === 'serveiTipus');
-    //const estatField = apiCurrentFields?.find((f) => f.name === 'estat');
-    const data =
-        enviament && serveiTipusField
-            ? [
-                  { 'Identificador de la notificació': '4df434ab-c361-481b-8999-ded3d5b805c6' },
-                  { "Referència de l'enviament": '33b0dcd5-a5b7-4622-aa13-b27b656294cd' },
-                  { 'DEH NIF': '' },
-                  { 'DEH procediment': '' },
-                  { 'DEH obligada': 'No' },
-                  toDataItem(
-                      serveiTipusField.label,
-                      serveiTipusField.options[enviament.serveiTipus]
-                  ),
-                  //toDataItem(estatField.label, estatField.options[enviament.estat]),
-                  { Estat: 'Notificada' },
-              ]
-            : [];
+    const procedimentTipusField = apiCurrentFields?.find((f) => f?.name === 'procedimentTipus');
     return (
         <>
-            <DataCard title="Dades de la notificació" data={data} sx={{ mb: 3 }} />
+            <FieldsDataCard
+                title={t('page.notificacio.detail.dades.title')}
+                rows={[
+                    {
+                        field: 'organGestor',
+                    },
+                    {
+                        field: 'procediment',
+                        labelRenderer: () =>
+                            procedimentTipusField.options[notificacio.procedimentTipus],
+                    },
+                    {
+                        field: 'numExpedient',
+                    },
+                    {
+                        field: 'concepte',
+                    },
+                    {
+                        field: 'idioma',
+                    },
+                    {
+                        field: 'createdBy',
+                    },
+                    {
+                        field: 'createdDate',
+                    },
+                    {
+                        field: 'enviadaDate',
+                    },
+                    {
+                        field: 'caducitat',
+                        formatOptions: { noTime: true },
+                    },
+                    {
+                        field: 'retard',
+                    },
+                    {
+                        field: 'estat',
+                        valueRenderer: (_value: any, formattedValue: string) => {
+                            return (
+                                <>
+                                    <Typography>
+                                        <Icon
+                                            sx={{
+                                                position: 'relative',
+                                                top: 2,
+                                                mr: 0.6,
+                                                fontSize: 16,
+                                            }}
+                                        >
+                                            schedule
+                                        </Icon>
+                                        {formattedValue}
+                                    </Typography>
+                                </>
+                            );
+                        },
+                    },
+                ]}
+                fields={apiCurrentFields}
+                data={notificacio}
+                sx={{ mb: 1 }}
+            />
+            <Box sx={{ textAlign: 'right' }}>
+                <Button variant="outlined" startIcon={<Icon>file_download</Icon>}>
+                    {t('page.notificacio.detail.dades.justificant')}
+                </Button>
+            </Box>
         </>
     );
 };
 
-const NotificacioDetailDialogTabEnviaments: React.FC = () => {
-    return <span>Enviaments</span>;
+const NotificacioDetailDialogTabEnviaments: React.FC<{ id: any }> = (props) => {
+    const { id } = props;
+    const { t } = useTranslation();
+    const {
+        isReady: apiIsReady,
+        find: apiFind,
+        currentFields: apiCurrentFields,
+    } = useResourceApiService('notificacioEnviamentResource');
+    const [enviaments, setEnviaments] = React.useState<any[]>();
+    React.useEffect(() => {
+        if (apiIsReady) {
+            apiFind({ filter: 'notificacio.id:' + id, sorts: ['id'], unpaged: true }).then(
+                (response) => {
+                    console.log('>>> enviaments', response.rows);
+                    setEnviaments(response.rows);
+                }
+            );
+        }
+    }, [apiIsReady]);
+    return (
+        <>
+            {enviaments?.map((e, i) => (
+                <FieldsDataCard
+                    title={t('page.notificacio.detail.enviaments.title') + ' ' + (i + 1)}
+                    rows={[
+                        { field: 'titular' },
+                        { field: 'representant' },
+                        { field: 'notificaEstat' },
+                        { field: 'registre' },
+                        { field: 'certificacio' },
+                    ]}
+                    fields={apiCurrentFields}
+                    data={e}
+                    sx={{ mb: 1 }}
+                />
+            ))}
+        </>
+    );
 };
 
-const NotificacioDetailDialogTabDocuments: React.FC = () => {
-    return <span>Documents</span>;
+const NotificacioDetailDialogTabDocuments: React.FC<{ id: any }> = (props) => {
+    const { id } = props;
+    const { t } = useTranslation();
+    const { isReady: notificacioApiIsReady, getOne: notificacioApiGetOne } =
+        useResourceApiService('notificacioResource');
+    const {
+        isReady: documentApiIsReady,
+        find: documentApiFind,
+        currentFields: documentApiCurrentFields,
+    } = useResourceApiService('documentResource');
+    const [documents, setDocuments] = React.useState<any[]>();
+    React.useEffect(() => {
+        if (notificacioApiIsReady && documentApiIsReady) {
+            notificacioApiGetOne(id)
+                .then((notificacio) => {
+                    const documentIds = [notificacio.document.id];
+                    notificacio.document2 != null && documentIds.push(notificacio.document2.id);
+                    notificacio.document3 != null && documentIds.push(notificacio.document3.id);
+                    notificacio.document4 != null && documentIds.push(notificacio.document4.id);
+                    notificacio.document5 != null && documentIds.push(notificacio.document5.id);
+                    return documentIds;
+                })
+                .then((documentIds) => {
+                    documentApiFind({
+                        filter: 'id in (' + documentIds + ')',
+                        sorts: ['id'],
+                        unpaged: true,
+                    }).then((response) => {
+                        console.log('>>> documents', response.rows);
+                        setDocuments(response.rows);
+                    });
+                });
+        }
+    }, [notificacioApiIsReady && documentApiIsReady]);
+    return (
+        <>
+            {documents?.map((e, i) => (
+                <FieldsDataCard
+                    title={t('page.notificacio.detail.documents.title') + ' ' + (i + 1)}
+                    rows={[{ field: 'titular' }]}
+                    fields={documentApiCurrentFields}
+                    data={e}
+                    sx={{ mb: 1 }}
+                />
+            ))}
+        </>
+    );
 };
 
 const NotificacioDetailDialogTabRegistreEsdev: React.FC = () => {
@@ -83,8 +213,8 @@ const NotificacioDetailDialogContent: React.FC<{ id: any }> = (props) => {
             ]}
             contents={[
                 <NotificacioDetailDialogTabDades id={id} />,
-                <NotificacioDetailDialogTabEnviaments />,
-                <NotificacioDetailDialogTabDocuments />,
+                <NotificacioDetailDialogTabEnviaments id={id} />,
+                <NotificacioDetailDialogTabDocuments id={id} />,
                 <NotificacioDetailDialogTabRegistreEsdev />,
                 <NotificacioDetailDialogTabAccions />,
                 <NotificacioDetailDialogTabHistoric />,
