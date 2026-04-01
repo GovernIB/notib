@@ -12,15 +12,13 @@ import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 import es.caib.notib.logic.intf.model.NotificacioResource;
 import es.caib.notib.logic.intf.model.PersonaResource;
 import es.caib.notib.logic.intf.resourceservice.NotificacioResourceService;
-import es.caib.notib.persist.resourceentity.DocumentResourceEntity;
-import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
-import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
-import es.caib.notib.persist.resourceentity.PersonaResourceEntity;
+import es.caib.notib.persist.resourceentity.*;
 import es.caib.notib.persist.resourcerepository.DocumentResourceRepository;
 import es.caib.notib.persist.resourcerepository.NotificacioEnviamentResourceRepository;
 import es.caib.notib.persist.resourcerepository.PersonaResourceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -29,6 +27,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -44,16 +43,52 @@ public class NotificacioResourceServiceImpl
 
 	private final UserSessionHelper userSessionHelper;
 	private final AuthenticationHelper authenticationHelper;
+	private final LegacyHelper legacyHelper;
+	private final NotibPermissionHelper notibPermissionHelper;
 	private final NotificacioEnviamentResourceRepository notificacioEnviamentResourceRepository;
 	private final DocumentResourceRepository documentResourceRepository;
 	private final PersonaResourceRepository personaResourceRepository;
-	private final LegacyHelper legacyHelper;
 
 	@PostConstruct
 	public void init() {
 		register(null, new NotificacioResourceServiceImpl.InitOnChangeLogicProcessor());
 		register(NotificacioResource.Fields.caducitat, new NotificacioResourceServiceImpl.CaducitatOnChangeLogicProcessor());
 		register(NotificacioResource.Fields.caducitatDiesNaturals, new NotificacioResourceServiceImpl.CaducitatOnChangeLogicProcessor());
+	}
+
+	@Override
+	protected String additionalSpringFilter(
+		String currentSpringFilter,
+		String[] namedQueries) {
+		List<String> andConditions = new ArrayList<>();
+		// Condició per a mostrar només les notificacions de l'entitat actual
+		andConditions.add("entitat.id:" + userSessionHelper.getCurrentEntitatId());
+		// Condició per a mostrar només les notificacions sobre les que es tenen permisos. Les notificacions es poden
+		// veure si es compleix algun de les següents condicions:
+		//   - L'usuari te permisos de lectura sobre l'òrgan gestor de la notificació.
+		//   - L'usuari te permisos de lectura sobre el procediment no comú de la notificació.
+		//   - L'usuari te permisos de lectura sobre el procediment comú de la notificació i sobre el seu òrgan gestor.
+		List<String> permissionOrConditions = new ArrayList<>();
+		String readableOrganGestorIds = notibPermissionHelper.
+			organGestorIdsWithPermissionRecursive(BasePermission.READ).
+			stream().map(String::valueOf).collect(Collectors.joining(","));
+		if (!readableOrganGestorIds.isEmpty()) {
+			permissionOrConditions.add("organGestor.id in (" + readableOrganGestorIds + ")");
+		}
+		String readableProcedimentNoComuIds = notibPermissionHelper.
+			procedimentServeiNoComuIdsWithPermission(BasePermission.READ, null).
+			stream().map(String::valueOf).collect(Collectors.joining(","));
+		if (!readableProcedimentNoComuIds.isEmpty()) {
+			permissionOrConditions.add("procediment.id in (" + readableProcedimentNoComuIds + ")");
+		}
+		String readableProcedimentComuIds = notibPermissionHelper.
+			procedimentServeiComuIdsWithPermission(BasePermission.READ, null).
+			stream().map(String::valueOf).collect(Collectors.joining(","));
+		if (!readableProcedimentComuIds.isEmpty()) {
+			permissionOrConditions.add("procediment.id in (" + readableProcedimentComuIds + ")");
+		}
+		andConditions.add("(" + String.join(" or ", permissionOrConditions) + ")");
+		return String.join(" and ", andConditions);
 	}
 
 	@Override
@@ -67,6 +102,7 @@ public class NotificacioResourceServiceImpl
 		entity.setComunicacioTipus(NotificacioComunicacioTipusEnumDto.ASINCRON);
 		entity.setEstat(NotificacioEstatEnumDto.PENDENT);
 		entity.setReferencia(UUID.randomUUID().toString());
+		entity.setProcedimentCodiNotib(entity.getProcediment().getCodi());
 		if (resource.getDocumentsInfo() != null) {
 			saveDocuments(entity, resource.getDocumentsInfo());
 		}

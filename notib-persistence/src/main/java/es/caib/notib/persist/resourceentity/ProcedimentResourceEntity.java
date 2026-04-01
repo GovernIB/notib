@@ -2,9 +2,7 @@ package es.caib.notib.persist.resourceentity;
 
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
-import es.caib.notib.logic.intf.model.GrupResource;
 import es.caib.notib.logic.intf.model.ProcedimentResource;
-import es.caib.notib.persist.entity.cie.EntregaCieEntity;
 import lombok.*;
 import org.hibernate.annotations.Formula;
 
