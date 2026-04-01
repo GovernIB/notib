@@ -1,6 +1,5 @@
 package es.caib.notib.logic.resourceservice;
 
-import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.helper.AclHelper;
@@ -121,20 +120,20 @@ public class EntitatResourceServiceImpl
 			if (isRoleUser && currentEntitatId != null) {
 				resource.setCrearNotificacions(
 					checkPermisRemesa(
-						notibPermissionHelper.getOrganGestorNotificacioCreatePermission(EnviamentTipus.NOTIFICACIO),
-						notibPermissionHelper.getProcedimentNotificacioCreatePermission(EnviamentTipus.NOTIFICACIO),
+						ExtendedPermission.PERM4, // Permís de creació de notificacions als òrgans gestors
+						ExtendedPermission.PERM5, // Permís de creació de notificacions als procediments
 						false,
 						false));
 				resource.setCrearComunicacions(
 					checkPermisRemesa(
-						notibPermissionHelper.getOrganGestorNotificacioCreatePermission(EnviamentTipus.COMUNICACIO),
-						notibPermissionHelper.getProcedimentNotificacioCreatePermission(EnviamentTipus.COMUNICACIO),
+						ExtendedPermission.PERM5, // Permís de creació de comunicacions als òrgans gestors
+						ExtendedPermission.PERM8, // Permís de creació de comunicacions als procediments
 						null,
 						true));
 				resource.setCrearSir(
 					checkPermisRemesa(
-						notibPermissionHelper.getOrganGestorNotificacioCreatePermission(EnviamentTipus.SIR),
-						notibPermissionHelper.getProcedimentNotificacioCreatePermission(EnviamentTipus.SIR),
+						ExtendedPermission.PERM6, // Permís de creació de comunicacions SIR als òrgans gestors
+						ExtendedPermission.PERM7, // Permís de creació de comunicacions SIR als procediments
 						null,
 						true));
 			} else {
@@ -144,9 +143,8 @@ public class EntitatResourceServiceImpl
 			}
 		}
 		/**
-		 * Es mira si es tenen permisos per a crear un tipus de remesa.Es verifica si es te el permís corresponent
-		 * sobre algun òrgan gestor, sobre algun procediment/servei o sobre alguna combinació procediment/servei -
-		 * òrgan gestor.
+		 * Es mira si es tenen permisos per a crear un tipus de remesa. Bàsicamen es verifica si es te el permís
+		 * corresponent sobre algun òrgan gestor o sobre algun procediment/servei.
 		 *
 		 * @param permisOrgansGestors
 		 *            el permís sobre els òrgans gestors que es vol comprovar.
@@ -175,15 +173,15 @@ public class EntitatResourceServiceImpl
 				isEmpty()) {
 				return true;
 			}
-			// Comprovam si es tenen permisos sobre algun procediment/servei no comú
+			// Comprovam si es tenen permisos sobre procediments/serveis no comuns
 			if (!notibPermissionHelper.
 				procedimentServeiNoComuIdsWithPermission(permisProcediments, isServei).
 				isEmpty()) {
 				return true;
 			}
-			// Comprovam si es tenen permisos sobre algun procediment/servei comú
+			// Comprovam si es tenen permisos sobre procediments/serveis comuns
 			return !notibPermissionHelper.
-				procedimentServeiComuOrganGestorIdsWithPermission(permisProcediments, isServei).
+				procedimentServeiComuIdsWithPermission(permisProcediments, isServei).
 				isEmpty();
 		}
 	}

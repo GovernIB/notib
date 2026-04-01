@@ -202,26 +202,24 @@ const NotificacioDetailDialogContent: React.FC<{ id: any }> = (props) => {
     const { id } = props;
     const { t } = useTranslation();
     return (
-        <Box sx={{ height: '650px', minHeight: 0 }}>
-            <CustomTabs
-                tabs={[
-                    t('page.notificacio.detail.tab.dades'),
-                    t('page.notificacio.detail.tab.enviaments'),
-                    t('page.notificacio.detail.tab.documents'),
-                    t('page.notificacio.detail.tab.registreEsdev'),
-                    t('page.notificacio.detail.tab.accions'),
-                    t('page.notificacio.detail.tab.historic'),
-                ]}
-                contents={[
-                    <NotificacioDetailDialogTabDades id={id} />,
-                    <NotificacioDetailDialogTabEnviaments id={id} />,
-                    <NotificacioDetailDialogTabDocuments id={id} />,
-                    <NotificacioDetailDialogTabRegistreEsdev />,
-                    <NotificacioDetailDialogTabAccions />,
-                    <NotificacioDetailDialogTabHistoric />,
-                ]}
-            />
-        </Box>
+        <CustomTabs
+            tabs={[
+                t('page.notificacio.detail.tab.dades'),
+                t('page.notificacio.detail.tab.enviaments'),
+                t('page.notificacio.detail.tab.documents'),
+                t('page.notificacio.detail.tab.registreEsdev'),
+                t('page.notificacio.detail.tab.accions'),
+                t('page.notificacio.detail.tab.historic'),
+            ]}
+            contents={[
+                <NotificacioDetailDialogTabDades id={id} />,
+                <NotificacioDetailDialogTabEnviaments id={id} />,
+                <NotificacioDetailDialogTabDocuments id={id} />,
+                <NotificacioDetailDialogTabRegistreEsdev />,
+                <NotificacioDetailDialogTabAccions />,
+                <NotificacioDetailDialogTabHistoric />,
+            ]}
+        />
     );
 };
 

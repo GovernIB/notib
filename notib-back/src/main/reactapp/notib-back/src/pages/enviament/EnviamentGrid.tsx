@@ -61,15 +61,14 @@ const EnviamentGrid = () => {
         []
     );
     return (
-        <GridPage>
+        <GridPage disableMargins={false}>
             <MuiDataGrid
                 title={t('page.enviament.grid.title')}
                 resourceName="notificacioEnviamentResource"
                 columns={columns}
-                readOnly
                 paginationActive
-                toolbarType="upper"
                 toolbarHideCreate
+                readOnly
             />
             {dialogComponent}
         </GridPage>

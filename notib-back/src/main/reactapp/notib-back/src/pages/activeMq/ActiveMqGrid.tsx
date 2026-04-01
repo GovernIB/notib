@@ -52,13 +52,12 @@ export const ActiveMqGrid = () => {
     );
 
     return (
-        <GridPage>
+        <GridPage disableMargins={false}>
             <MuiDataGrid
-                title={t('page.activemq.grid.title')}
+                title={t('page.cache.grid.title')}
                 resourceName="activeMqResource"
                 columns={columns}
                 // paginationActive
-                toolbarType="upper"
                 toolbarBulkDelete
                 toolbarHideQuickFilter
             />

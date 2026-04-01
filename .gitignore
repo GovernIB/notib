@@ -29,4 +29,3 @@
 target/
 /activemq-data/
 .vite/
-notib-back/src/main/reactapp/notib-back/.vite/deps/_metadata.json

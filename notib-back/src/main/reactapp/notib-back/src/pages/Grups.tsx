@@ -2,7 +2,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import { GridPage, MuiDataGrid, FormField } from 'reactlib';
-import { useDatagridPageSizeOptionsProps } from '../hooks/useDataGrid';
 
 const columns = [
     {
@@ -30,18 +29,13 @@ const GrupForm: React.FC = () => {
 
 export const Grups: React.FC = () => {
     const { t } = useTranslation();
-    const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
-        <GridPage>
+        <GridPage disableMargins={false}>
             <MuiDataGrid
                 title={t('page.grups.grid.title')}
                 resourceName="grupResource"
                 columns={columns}
                 paginationActive
-                persistentStateActive
-                persistentStateClearPageSortPropsOnTopLevelRouteChange
-                {...pageSizeOptionsDataGridProps}
-                toolbarType="upper"
                 popupEditActive
                 popupEditFormContent={<GrupForm />}
                 popupEditFormDialogResourceTitle={t('page.grups.grid.popupResourceTitle')}
