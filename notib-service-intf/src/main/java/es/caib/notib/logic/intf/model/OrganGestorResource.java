@@ -23,9 +23,9 @@ import java.io.Serializable;
  * Informació d'un òrgan gestor.
  * Permisos:
  *   - ADMIN, READ: com sempre
- *   - PERM1: processar
- *   - PERM2: gestionar
- *   - PERM3: procediments comuns
+ *   - PERM1: processar (poden marcar una notificació com a processada)
+ *   - PERM2: gestionar (poden editar)
+ *   - PERM3: procediments/serveis comuns
  *   - PERM4: notificacions
  *   - PERM5: comunicacions
  *   - PERM6: comunicacions SIR
@@ -72,7 +72,7 @@ import java.io.Serializable;
 			grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE }
 		)
 	}
-	)
+)
 public class OrganGestorResource extends BaseResource<Long> {
 
 	public static final String DIR3_SYNC_ACTION_CODE = "DIR3_SYNC";
