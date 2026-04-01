@@ -4,8 +4,6 @@ import { useTranslation } from 'react-i18next';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
-import Icon from '@mui/material/Icon';
-import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
 import {
@@ -18,12 +16,14 @@ import {
     useAuthContext,
     useMuiDataGridApiRef,
     springFilterBuilder as filterBuilder,
+    useFilterApiRef,
+    MuiFilter,
+    FilterApi,
     MuiDataGridColDef,
-    useFilterApiContext,
 } from 'reactlib';
-import LinkToTab from '../../components/LinkToTab';
 import GridFormField from '../../components/GridFormField';
-import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
+import { Icon, IconButton } from '@mui/material';
+import LinkToTab from '../../components/LinkToTab';
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -73,12 +73,7 @@ const columns: MuiDataGridColDef[] = [
     },
 ];
 
-const useSse = (
-    queueId: string,
-    eventName: string,
-    onEvent: (event: any) => void,
-    closeOnError?: boolean
-) => {
+const useSse = (queueId: string, eventName: string, onEvent: (event: any) => void, closeOnError?: boolean) => {
     const { getToken } = useAuthContext();
     const { isReady: apiIsReady, currentLinks } = useResourceApiService('sse');
     React.useEffect(() => {
@@ -144,9 +139,7 @@ const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
     );
 };
 
-const OrganGridDir3SyncActionButton: React.FC<{
-    dataGridApiRef: React.RefObject<MuiDataGridApi>;
-}> = (props) => {
+const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: React.RefObject<MuiDataGridApi> }> = (props) => {
     const { dataGridApiRef } = props;
     const { t } = useTranslation();
     const { temporalMessageShow } = useBaseAppContext();
@@ -197,7 +190,7 @@ const OrganGridDir3SyncActionButton: React.FC<{
             formAdditionalData={{ simular }}
             formDialogTitle={t('page.organs.grid.sync.dialogTitle')}
             formDialogButtons={formDialogButtons}
-            formDialogLoading={<OrganGridDir3SyncLoading percent={percent} message={message} />}
+            formDialogLoading={<OrganGridDir3SyncLoading percent={percent} message={message}/>}
             formDialogResultProcessor={resultProcessor}
             buttonComponentProps={{ variant: 'contained' }}
             onSuccess={handleSuccess}
@@ -210,28 +203,14 @@ const OrganGridDir3SyncActionButton: React.FC<{
     );
 };
 
-const springFilterBuilder = (data: any) => {
-    return filterBuilder.and(
-        filterBuilder.like('codi', data?.codi),
-        filterBuilder.like('nom', data?.nom),
-        filterBuilder.eq('pare.id', data.pare?.id),
-        filterBuilder.like('llibre', data?.llibre),
-        filterBuilder.eq('estat', `'${data?.estat}'`),
-        data?.entregaCieActiva === 'true'
-            ? filterBuilder.neq('entregaCie', null)
-            : data?.entregaCieActiva === 'false'
-              ? filterBuilder.eq('entregaCie', null)
-              : null,
-        filterBuilder.eq('permetreSir', `'${data?.permetreSir}'`)
-    );
-};
-
-const ContentFilter: React.FC = () => {
+const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (props) => {
+    const { filterApiRef } = props;
     const { t } = useTranslation();
-    const filterApiRef = useFilterApiContext();
+
     const handleButtonClick = () => {
-        filterApiRef.current?.clear();
+        filterApiRef.current.clear();
     };
+
     return (
         <Grid container spacing={2}>
             <GridFormField size={1} name="codi" />
@@ -248,31 +227,54 @@ const ContentFilter: React.FC = () => {
     );
 };
 
+const OrganGestorGridFilter: React.FC = () => {
+    const filterApiRef = useFilterApiRef();
+
+    const springFilterBuilder = (data: any) => {
+        return filterBuilder.and(
+            filterBuilder.like('codi', data?.codi),
+            filterBuilder.like('nom', data?.nom),
+            filterBuilder.eq('pare.id', data.pare?.id),
+            filterBuilder.like('llibre', data?.llibre),
+            filterBuilder.eq('estat', `'${data?.estat}'`),
+            data?.entregaCieActiva === 'true'
+                ? filterBuilder.neq('entregaCie', null)
+                : data?.entregaCieActiva === 'false'
+                  ? filterBuilder.eq('entregaCie', null)
+                  : null,
+            filterBuilder.eq('permetreSir', `'${data?.permetreSir}'`)
+        );
+    };
+
+    return (
+        <MuiFilter
+            resourceName="organGestorResource"
+            code="FILTER_ORGAN_GESTOR"
+            apiRef={filterApiRef}
+            springFilterBuilder={springFilterBuilder}
+            componentProps={{ sx: { mb: 2, mt: 0 } }}
+            commonFieldComponentProps={{ size: 'small' }}
+        >
+            <ContentFilter filterApiRef={filterApiRef} />
+        </MuiFilter>
+    );
+};
+
 export const OrganGrid = () => {
     const { t } = useTranslation();
     const dataGridApiRef = useMuiDataGridApiRef();
-    const filterDataGridProps = useDatagridFilterProps(
-        'organGestorResource',
-        'FILTER_ORGAN_GESTOR',
-        springFilterBuilder,
-        <ContentFilter />
-    );
-    const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
-        <GridPage>
+        <GridPage disableMargins={false}>
             <MuiDataGrid
                 title={t('page.organs.grid.title')}
                 resourceName="organGestorResource"
                 columns={columns}
                 paginationActive
-                persistentStateActive
-                persistentStateClearPageSortPropsOnTopLevelRouteChange
-                {...filterDataGridProps}
-                {...pageSizeOptionsDataGridProps}
-                toolbarType="upper"
                 toolbarCreateLink="form"
                 rowLink="form/{{id}}"
                 rowUpdateLink="form/{{id}}"
+                toolbarAdditionalRow={<OrganGestorGridFilter />}
+                toolbarHideQuickFilter
                 toolbarElementsWithPositions={[
                     {
                         position: 2,

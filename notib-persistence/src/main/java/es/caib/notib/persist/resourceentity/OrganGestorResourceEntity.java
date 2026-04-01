@@ -73,13 +73,6 @@ public class OrganGestorResourceEntity
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(
-		name = "organ_pare",
-		referencedColumnName = "id",
-		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "organ_pare_fk"))
-	private OrganGestorResourceEntity pare;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(
 		name = "entrega_cie_id",
 		referencedColumnName = "id",
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "organ_entrega_cie_fk"))
@@ -98,6 +91,13 @@ public class OrganGestorResourceEntity
 	private String codiNom;
 	@Formula("(select og2.nom from " + BaseConfig.DB_PREFIX + "organ_gestor og2 where og2.entitat = entitat and og2.codi = codi_pare)")
 	private String nomPare;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(
+		name = "organ_pare",
+		referencedColumnName = "id",
+		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "organ_pare_fk"))
+	private OrganGestorResourceEntity pare;
 
 	@Formula("(case when entrega_cie_id is not null then 1 else 0 end)")
 	private boolean entregaCieActiva;

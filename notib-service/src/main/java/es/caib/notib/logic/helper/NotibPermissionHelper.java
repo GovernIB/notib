@@ -1,6 +1,5 @@
 package es.caib.notib.logic.helper;
 
-import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.ResourceNotCreatedException;
@@ -9,7 +8,6 @@ import es.caib.notib.logic.intf.base.model.Resource;
 import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.persist.resourcerepository.OrganGestorResourceRepository;
-import es.caib.notib.persist.resourcerepository.ProcedimentOrganGestorResourceRepository;
 import es.caib.notib.persist.resourcerepository.ProcedimentResourceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.acls.domain.BasePermission;
@@ -17,8 +15,12 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Helper per a la comprovació de permisos propis de NOTIB.
@@ -34,7 +36,6 @@ public class NotibPermissionHelper {
 	private final AuthenticationHelper authenticationHelper;
 	private final OrganGestorResourceRepository organGestorResourceRepository;
 	private final ProcedimentResourceRepository procedimentResourceRepository;
-	private final ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository;
 
 	/**
 	 * Crea una expressió Spring Filter per a consultar únicament les entitats sobre les que es tenen permisos.
@@ -168,15 +169,15 @@ public class NotibPermissionHelper {
 		// Només retorna els procediments/serveis no comuns que existeixen a la base de dades.
 		Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
 		ProcSerTipusEnum procSerTipus = getProcSerTipusForQuery(isServei);
-		return procedimentResourceRepository.findIdsByEntitatIdAndTipusAndIdInAndComuFalseAndActiuTrue(
+		return procedimentResourceRepository.findIdsByEntitatIdAndTipusAndIdInAndComuFalse(
 			currentEntitatId,
 			procSerTipus,
 			idsWithPermission);
 	}
 
 	/**
-	 * Retorna la llista d'ids de les combinacions procediment/servei - organ gestor de l'entitat actual sobre
-	 * els que l'usuari actual te el permís especificat.
+	 * Retorna la llista d'ids de procediments/serveis comuns de l'entitat actual sobre els que l'usuari actual te el
+	 * permís especificat.
 	 *
 	 * @param permission
 	 *            el permís que es vol comprovar.
@@ -185,112 +186,50 @@ public class NotibPermissionHelper {
 	 *            volen consultar tant procediments com serveis.
 	 * @return la llista d'ids de procediments/serveis comuns.
 	 */
-	public List<Long> procedimentServeiComuOrganGestorIdsWithPermission(
-		Permission permission,
-		Boolean isServei) {
-		// Obté la llista de combinacions procediment/servei amb el permís assignat.
+	public List<Long> procedimentServeiComuIdsWithPermission(Permission permission, Boolean isServei) {
+		// Obté els òrgans gestors sobre els que es tenen permísos per a procediments/serveis comuns.
 		Set<Long> idsWithPermission = aclHelper.findIdsWithAnyPermission(
-				AclHelper.PROCEDIMENT_ORGAN_CLASS,
+			AclHelper.ORGAN_GESTOR_CLASS,
+			List.of(ExtendedPermission.PERM3), // Permís de procediments/serveis comuns
+			aclHelper.getCurrentUserSids().toArray(Sid[]::new)).
+			stream().map(Long::valueOf).collect(Collectors.toSet());
+		if (!idsWithPermission.isEmpty()) {
+			// Si hi ha algún òrgan gestor amb permís per a procediments/serveis comuns retorna la llista de
+			// procediments/serveis comuns que no requereixen permís directe.
+			Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
+			ProcSerTipusEnum procSerTipus = getProcSerTipusForQuery(isServei);
+			List<Long> idsWithNoDirectPermission = procedimentResourceRepository.findIdsByEntitatIdAndTipusAndComuTrueAndPermisDirecte(
+				currentEntitatId,
+				procSerTipus,
+				false);
+			List<Long> idsWithDirectPermission = procedimentServeiComuIdsAmbPermisDirecte(
+				ExtendedPermission.PERM3,
+				isServei);
+			return Stream.concat(idsWithNoDirectPermission.stream(), idsWithDirectPermission.stream()).
+				distinct().collect(Collectors.toList());
+		} else {
+			return new ArrayList<>();
+		}
+	}
+
+	private List<Long> procedimentServeiComuIdsAmbPermisDirecte(Permission permission, Boolean isServei) {
+		Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
+		// Obté la llista de procediments/serveis amb el permís assignat.
+		Set<Long> idsWithPermission = aclHelper.findIdsWithAnyPermission(
+				AclHelper.PROCEDIMENT_CLASS,
 				List.of(permission),
 				aclHelper.getCurrentUserSids().toArray(Sid[]::new)).
 			stream().map(Long::valueOf).collect(Collectors.toSet());
-		Set<Long> procedimentOrganGestorIdsRequireDirectPermissionTrue = procedimentOrganGestorIdsWithRequireDirectPermission(
-			idsWithPermission,
-			true,
-			isServei);
-		Set<Long> procedimentOrganGestorIdsRequireDirectPermissionFalse = procedimentOrganGestorIdsWithRequireDirectPermission(
-			idsWithPermission,
-			false,
-			isServei);
-		Set<Long> allIds = new HashSet<>(procedimentOrganGestorIdsRequireDirectPermissionTrue);
-		allIds.addAll(procedimentOrganGestorIdsRequireDirectPermissionFalse);
-		return new ArrayList<>(allIds);
-	}
-
-	/**
-	 * Retorna el permís de l'òrgan gestor per a la creació d'enviaments d'un tipus determinat.
-	 *
-	 * @param enviamentTipus
-	 *            el tipus d'enviament.
-	 * @return el permís corresponent.
-	 */
-	public Permission getOrganGestorNotificacioCreatePermission(EnviamentTipus enviamentTipus) {
-		if (EnviamentTipus.COMUNICACIO.equals(enviamentTipus)) {
-			return ExtendedPermission.PERM5;
-		} else if (EnviamentTipus.SIR.equals(enviamentTipus)) {
-			return ExtendedPermission.PERM6;
-		} else {
-			return ExtendedPermission.PERM4;
-		}
-	}
-
-	/**
-	 * Retorna el permís del procediment per a la creació d'enviaments d'un tipus determinat.
-	 *
-	 * @param enviamentTipus
-	 *            el tipus d'enviament.
-	 * @return el permís corresponent.
-	 */
-	public Permission getProcedimentNotificacioCreatePermission(EnviamentTipus enviamentTipus) {
-		if (EnviamentTipus.COMUNICACIO.equals(enviamentTipus)) {
-			return ExtendedPermission.PERM8;
-		} else if (EnviamentTipus.SIR.equals(enviamentTipus)) {
-			return ExtendedPermission.PERM7;
-		} else {
-			return ExtendedPermission.PERM5;
-		}
-	}
-
-	/**
-	 * Filtra la llista d'ids de les combinacions procediment/servei - organ gestor segons el valor del camp
-	 * requireDirectPermission al procediment/servei:
-	 *   - Si el procediment/servei te el camp a true es verifica si es te el permís sobre la combinació organ gestor -
-	 *     procediment.
-	 *   - Si el procediment/servei te el camp a false es verifica si es te el permís sobre la combinació organ gestor -
-	 *     procediment i si la combinació òrgan gestor - procediment és d'un òrgan gestor amb permís de procediments
-	 *     comuns.
-	 *
-	 * @param idsWithPermission
-	 *            la llista de combinacions procediment/servei.
-	 * @param requireDirectPermission
-	 *            el valor del camp "requereix permís directe" del procediment/servei. Si aquest camp és false només
-	 *            es retornen les combinacions procediment/servei - organ gestor que tenen l'òrgan gestor amb el permís
-	 *            de procediments comuns.
-	 * @param isServei
-	 *            false si es volen consultar els procediments, true si es volen consultar els serveis o null si és
-	 *            volen consultar tant procediments com serveis.
-	 * @return el conjunt d'ids de les combinacions procediment/servei - organ gestor.
-	 */
-	private Set<Long> procedimentOrganGestorIdsWithRequireDirectPermission(
-		Set<Long> idsWithPermission,
-		boolean requireDirectPermission,
-		Boolean isServei) {
-		// Només retorna les combinacions procediment/servei comuns que existeixen a la base de dades.
-		Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
 		ProcSerTipusEnum procSerTipus = getProcSerTipusForQuery(isServei);
-		Set<Long> organGestorIds = !requireDirectPermission ? organGestorWithProcedimentsComunsPermission() : null;
-		return procedimentOrganGestorResourceRepository.findIdsComprovacioPermisos(
+		// Obté la llista de procediments/serveis de l'entitat que requereixen permis directe
+		List<Long> idsWithDirectPermission = procedimentResourceRepository.findIdsByEntitatIdAndTipusAndComuTrueAndPermisDirecte(
 			currentEntitatId,
 			procSerTipus,
-			requireDirectPermission,
-			true,
-			organGestorIds,
-			idsWithPermission);
-	}
-
-	private Set<Long> organGestorWithProcedimentsComunsPermission() {
-		Set<Long> idsWithPermission = aclHelper.findIdsWithAnyPermission(
-				AclHelper.ORGAN_GESTOR_CLASS,
-				List.of(ExtendedPermission.PERM3),
-				aclHelper.getCurrentUserSids().toArray(Sid[]::new)).
-			stream().map(Long::valueOf).collect(Collectors.toSet());
-		if (!idsWithPermission.isEmpty()) {
-			return idsWithPermission;
-		} else {
-			// Si no n'hi ha cap no pot retornar null perquè la consulta retornaria tots els resultats i no h'ha de
-			// retornar cap.
-			return Set.of(-1L);
-		}
+			false);
+		// Retorna els elements comuns de les dues llistes
+		return idsWithPermission.stream().
+			filter(idsWithDirectPermission::contains).
+			collect(Collectors.toList());
 	}
 
 	private ProcSerTipusEnum getProcSerTipusForQuery(Boolean isServei) {

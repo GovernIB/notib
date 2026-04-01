@@ -9,11 +9,11 @@ import java.util.List;
 
 /**
  * Declaració dels mètodes per a la gestió del item monitorIntegracio
- *
+ * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface MonitorTasquesService {
-
+	
 
 	 MonitorTascaInfo addTasca(String codiTasca);
 
@@ -30,10 +30,4 @@ public interface MonitorTasquesService {
 	 void fi(String codiTasca);
 
 	 void error(String codiTasca);
-
-	/** Mètode per posar totes les tasques en espera abans de reiniciar les tasques des de la
-	 * configuració dels paràmetres i la configuracío.
-	 *
-	 */
-	void reiniciarTasquesEnSegonPla(String codiTasca);
 }
