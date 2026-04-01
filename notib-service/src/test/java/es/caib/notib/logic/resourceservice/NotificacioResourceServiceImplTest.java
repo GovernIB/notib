@@ -9,10 +9,7 @@ import es.caib.notib.logic.intf.model.DocumentResource;
 import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 import es.caib.notib.logic.intf.model.NotificacioResource;
 import es.caib.notib.logic.intf.model.PersonaResource;
-import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
-import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
-import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
-import es.caib.notib.persist.resourceentity.PersonaResourceEntity;
+import es.caib.notib.persist.resourceentity.*;
 import es.caib.notib.persist.resourcerepository.DocumentResourceRepository;
 import es.caib.notib.persist.resourcerepository.NotificacioEnviamentResourceRepository;
 import es.caib.notib.persist.resourcerepository.PersonaResourceRepository;
@@ -56,6 +53,7 @@ class NotificacioResourceServiceImplTest {
 	@BeforeEach
 	void setUp() {
 		entity = new NotificacioResourceEntity();
+		entity.setProcediment(new ProcedimentResourceEntity());
 		resource = new NotificacioResource();
 	}
 
