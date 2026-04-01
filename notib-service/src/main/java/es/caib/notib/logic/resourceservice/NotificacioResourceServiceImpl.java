@@ -16,6 +16,7 @@ import es.caib.notib.persist.resourceentity.*;
 import es.caib.notib.persist.resourcerepository.DocumentResourceRepository;
 import es.caib.notib.persist.resourcerepository.NotificacioEnviamentResourceRepository;
 import es.caib.notib.persist.resourcerepository.PersonaResourceRepository;
+import es.caib.notib.persist.resourcerepository.ProcedimentOrganGestorResourceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.acls.domain.BasePermission;
@@ -48,6 +49,7 @@ public class NotificacioResourceServiceImpl
 	private final NotificacioEnviamentResourceRepository notificacioEnviamentResourceRepository;
 	private final DocumentResourceRepository documentResourceRepository;
 	private final PersonaResourceRepository personaResourceRepository;
+	private final ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository;
 
 	@PostConstruct
 	public void init() {
@@ -103,6 +105,7 @@ public class NotificacioResourceServiceImpl
 		entity.setEstat(NotificacioEstatEnumDto.PENDENT);
 		entity.setReferencia(UUID.randomUUID().toString());
 		entity.setProcedimentCodiNotib(entity.getProcediment().getCodi());
+		emplenarProcedimentOrganGestor(entity);
 		if (resource.getDocumentsInfo() != null) {
 			saveDocuments(entity, resource.getDocumentsInfo());
 		}
@@ -177,6 +180,15 @@ public class NotificacioResourceServiceImpl
 				resource(destinatari).
 				enviament(enviament).
 				build());
+	}
+
+	private void emplenarProcedimentOrganGestor(NotificacioResourceEntity entity) {
+		if (entity.getProcediment() != null && entity.getProcediment().isComu() && entity.getOrganGestor() != null) {
+			Optional<ProcedimentOrganGestorResourceEntity> procedimentOrganGestor = procedimentOrganGestorResourceRepository.findByProcedimentAndOrganGestor(
+				entity.getProcediment(),
+				entity.getOrganGestor());
+			procedimentOrganGestor.ifPresent(entity::setProcedimentOrganGestor);
+		}
 	}
 
 	/*
