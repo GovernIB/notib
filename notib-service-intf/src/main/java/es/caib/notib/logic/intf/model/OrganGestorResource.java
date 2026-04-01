@@ -49,17 +49,11 @@ import java.io.Serializable;
 				@ResourceAccessConstraint(
 					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
 					roles = { BaseConfig.ROLE_ADMIN })
-			}
-		),
+			}),
 		@ResourceArtifact(
 			type = ResourceArtifactType.FILTER,
 			code = OrganGestorResource.FILTER_CODE,
-			formClass = OrganGestorResource.OrganGestorResourceFilter.class
-		),
-		@ResourceArtifact(
-			type = ResourceArtifactType.PERSPECTIVE,
-			code = OrganGestorResource.PERSPECTIVE_TREE
-		),
+			formClass = OrganGestorResource.OrganGestorResourceFilter.class)
 	},
 	accessConstraints = {
 		@ResourceAccessConstraint(
@@ -80,8 +74,6 @@ import java.io.Serializable;
 	}
 )
 public class OrganGestorResource extends BaseResource<Long> {
-
-	public static final String PERSPECTIVE_TREE = "TREE";
 
 	public static final String DIR3_SYNC_ACTION_CODE = "DIR3_SYNC";
 	public static final String FILTER_CODE = "FILTER_ORGAN_GESTOR";
@@ -122,10 +114,6 @@ public class OrganGestorResource extends BaseResource<Long> {
 	private String codiNom;
 	private String nomPare;
 	private Integer aclEntryCount;
-
-	// Camps de la perspectiva TREE
-	private ResourceReference<OrganGestorResource, Long>[] path;
-	private Long childCount;
 
 	// Camps per emplenar els valors del formulari referent a la entrega CIE
 	private ResourceReference<PagadorCieResource, Long> entregaCiePagadorCie;

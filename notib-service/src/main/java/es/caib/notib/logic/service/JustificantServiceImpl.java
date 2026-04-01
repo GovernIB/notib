@@ -110,14 +110,9 @@ public class JustificantServiceImpl implements JustificantService {
 
         var timer = metricsHelper.iniciMetrica();
         try {
-//            var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow(() -> new ValidationException("L'enviament del que s'intenta generar el justificant no existeix"));
-            var enviament = notificacioEnviamentRepository.findById(enviamentId).orElse(null);
-            if (enviament == null) {
-                return FitxerDto.builder().nom("L'enviament del que s'intenta generar el justificant no existeix").build();
-            }
+            var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow(() -> new ValidationException("L'enviament del que s'intenta generar el justificant no existeix"));
             if (!enviament.isRegistreEstatFinal()){
-//                throw new ValidationException("No es pot generar un justificant de un enviament que no està en un estat final");
-                return FitxerDto.builder().nom("No es pot generar un justificant de un enviament que no està en un estat final").build();
+                throw new ValidationException("No es pot generar un justificant de un enviament que no està en un estat final");
             }
             entityComprovarHelper.comprovarEntitat(entitatId, false, true, true, false, true);
             if (isABackgroundProcessRunning(sequence)) {

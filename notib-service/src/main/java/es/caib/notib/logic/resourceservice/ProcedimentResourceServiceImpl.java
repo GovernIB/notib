@@ -9,8 +9,6 @@ import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.model.ProcedimentResource;
 import es.caib.notib.logic.intf.resourceservice.ProcedimentResourceService;
 import es.caib.notib.persist.resourceentity.EntregaCieResourceEntity;
-import es.caib.notib.persist.resourceentity.PagadorCieResourceEntity;
-import es.caib.notib.persist.resourceentity.PagadorPostalResourceEntity;
 import es.caib.notib.persist.resourceentity.ProcedimentResourceEntity;
 import es.caib.notib.persist.resourcerepository.EntregaCieResourceRepository;
 import es.caib.notib.persist.resourcerepository.PagadorCieResourceRepository;
@@ -21,7 +19,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Implementació del servei de gestió de procediments.
@@ -47,6 +44,7 @@ public class ProcedimentResourceServiceImpl
 		PagadorPostalResourceRepository pagadorPostalResourceRepository,
 		PagadorCieResourceRepository pagadorCieResourceRepository,
 		EntregaCieResourceRepository entregaCieResourceRepository) {
+
 		super(userSessionHelper, authenticationHelper, notibPermissionHelper);
 		this.aclHelper = aclHelper;
 		this.pagadorPostalResourceRepository = pagadorPostalResourceRepository;
@@ -60,32 +58,21 @@ public class ProcedimentResourceServiceImpl
 	}
 
 	@Override
-	protected void completeResource(ProcedimentResource resource) {
-		if (resource.isComu()) {
-			resource.setOrganGestor(null);
-		}
-	}
+	protected void afterConversion(ProcedimentResourceEntity entity, ProcedimentResource resource) {
 
-	@Override
-	protected void afterConversion(
-		ProcedimentResourceEntity entity,
-		ProcedimentResource resource) {
 		resource.setAclEntryCount(aclHelper.count(AclHelper.PROCEDIMENT_CLASS, entity.getId(), null));
-		if (entity.getEntregaCie() != null) {
-			PagadorCieResourceEntity pagadorCie = entity.getEntregaCie().getPagadorCie();
-			resource.setEntregaCiePagadorCie(
-				ResourceReference.toResourceReference(pagadorCie.getId(), pagadorCie.getNom()));
-			PagadorPostalResourceEntity pagadorPostal = entity.getEntregaCie().getPagadorPostal();
-			resource.setEntregaCiePagadorPostal(
-				ResourceReference.toResourceReference(pagadorPostal.getId(), pagadorPostal.getNomContracteNum()));
+		if (entity.getEntregaCie() == null) {
+			return;
 		}
+		var pagadorCie = entity.getEntregaCie().getPagadorCie();
+		resource.setEntregaCiePagadorCie(ResourceReference.toResourceReference(pagadorCie.getId(), pagadorCie.getNom()));
+		var pagadorPostal = entity.getEntregaCie().getPagadorPostal();
+		resource.setEntregaCiePagadorPostal(ResourceReference.toResourceReference(pagadorPostal.getId(), pagadorPostal.getNomContracteNum()));
 	}
 
 	@Override
-	protected void beforeUpdateSave(
-		ProcedimentResourceEntity entity,
-		ProcedimentResource resource,
-		Map<String, AnswerRequiredException.AnswerValue> answers) {
+	protected void beforeUpdateSave(ProcedimentResourceEntity entity, ProcedimentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+
 		if (!resource.isEntregaCieActiva()) {
 			entity.setEntregaCie(null);
 			return;
@@ -93,11 +80,9 @@ public class ProcedimentResourceServiceImpl
 		if (resource.getEntregaCiePagadorPostal() == null || resource.getEntregaCiePagadorCie() == null) {
 			return;
 		}
-		EntregaCieResourceEntity entregaCie = entity.getEntregaCie();
-		Optional<PagadorPostalResourceEntity> pagadorPostal = pagadorPostalResourceRepository.findById(
-			resource.getEntregaCiePagadorPostal().getId());
-		Optional<PagadorCieResourceEntity> pagadorCie = pagadorCieResourceRepository.findById(
-			resource.getEntregaCiePagadorCie().getId());
+		var entregaCie = entity.getEntregaCie();
+		var pagadorPostal = pagadorPostalResourceRepository.findById(resource.getEntregaCiePagadorPostal().getId());
+		var pagadorCie = pagadorCieResourceRepository.findById(resource.getEntregaCiePagadorCie().getId());
 		if (pagadorPostal.isEmpty() || pagadorCie.isEmpty()) {
 			return;
 		}

@@ -36,7 +36,6 @@ export type DialogButton = {
 };
 
 export type BaseAppContextType = {
-    code: string;
     getFormFieldComponent: (type?: string) => React.FC<FormFieldCustomProps> | undefined;
     getDetailFieldComponent: (type?: string) => React.FC<DetailFieldCustomProps> | undefined;
     setMarginsDisabled: (marginsDisabled: boolean) => void;
@@ -48,7 +47,6 @@ export type BaseAppContextType = {
     useBlocker: ((shouldBlock: boolean | ((args: any) => boolean)) => void) | undefined;
     useLocationPath: () => string;
     anyHistoryEntryExist: () => boolean;
-    topLevelRouteChanged: boolean;
     setMessageDialogShow: (fn: MessageDialogShowFn) => void;
     messageDialogShow: MessageDialogShowFn;
     setTemporalMessageShow: (fn: TemporalMessageShowFn) => void;

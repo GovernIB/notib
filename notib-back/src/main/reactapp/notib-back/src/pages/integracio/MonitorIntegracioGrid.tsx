@@ -47,7 +47,7 @@ const CustomTabs = ({ options, report, selectedTab, onTabChange }: MonitorProps)
     };
 
     return (
-        <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 2 }}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 1 }}>
             <Tabs
                 value={currentIndex === -1 ? 0 : currentIndex}
                 onChange={handleChange}
@@ -264,16 +264,15 @@ export const MonitorIntegracioGrid = () => {
     }, [apiCurrentFields]);
 
     return (
-        <GridPage>
+        <GridPage disableMargins={false}>
             <MuiDataGrid
                 title={t('page.integracio.grid.title')}
                 resourceName="monitorIntegracioResource"
                 columns={columns}
-                fixedFilter={staticFilter}
+                staticFilter={staticFilter}
                 paginationActive
                 toolbarHideQuickFilter
                 readOnly
-                toolbarType="upper"
                 toolbarAdditionalRow={
                     <MonitorIntegracioGridFilter
                         options={options}
