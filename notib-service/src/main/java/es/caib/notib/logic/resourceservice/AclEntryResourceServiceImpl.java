@@ -16,6 +16,12 @@ import es.caib.notib.logic.intf.model.OrganGestorResource;
 import es.caib.notib.logic.intf.model.ProcedimentResource;
 import es.caib.notib.logic.intf.resourceservice.AclEntryResourceService;
 import es.caib.notib.persist.resourceentity.AclEntryResourceEntity;
+import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
+import es.caib.notib.persist.resourceentity.ProcedimentOrganGestorResourceEntity;
+import es.caib.notib.persist.resourceentity.ProcedimentResourceEntity;
+import es.caib.notib.persist.resourcerepository.OrganGestorResourceRepository;
+import es.caib.notib.persist.resourcerepository.ProcedimentOrganGestorResourceRepository;
+import es.caib.notib.persist.resourcerepository.ProcedimentResourceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -54,6 +60,9 @@ public class AclEntryResourceServiceImpl
 	private final AclHelper aclHelper;
 	private final AuthenticationHelper authenticationHelper;
 	private final UserSessionHelper userSessionHelper;
+	private final ProcedimentResourceRepository procedimentResourceRepository;
+	private final OrganGestorResourceRepository organGestorResourceRepository;
+	private final ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository;
 
 	@Override
 	protected boolean isEntityRepositoryOptional() {
@@ -155,12 +164,14 @@ public class AclEntryResourceServiceImpl
 		if (resource.isPerm8Allowed()) permissionsGranted.add(PermissionEnum.PERM8);
 		if (resource.isPerm9Allowed()) permissionsGranted.add(PermissionEnum.PERM9);
 		if (resource.isPermXAllowed()) permissionsGranted.add(PermissionEnum.PERMX);
-		aclHelper.set(
-			getClassFromResourceName(resource.getResourceName()),
-			resource.getResourceId(),
-			resource.getSidName(),
-			resource.isSidGrantedAuthority(),
-			permissionsGranted);
+		if (!saveProcedimentComu(resource, permissionsGranted)) {
+			aclHelper.set(
+				getClassFromResourceName(resource.getResourceName()),
+				resource.getResourceId(),
+				resource.getSidName(),
+				resource.isSidGrantedAuthority(),
+				permissionsGranted);
+		}
 		return entity;
 	}
 
@@ -439,6 +450,48 @@ public class AclEntryResourceServiceImpl
 			}
 		} else {
 			return true;
+		}
+		return false;
+	}
+
+	/*
+	 * Si el resource pertany a un procediment comú desa els canvis als ACLs i retorna true. Si no retorna false.
+	 */
+	private boolean saveProcedimentComu(
+		AclEntryResource resource,
+		List<PermissionEnum> permissionsGranted) {
+		boolean isProcediment = AclHelper.PROCEDIMENT_CLASS.equals(getClassFromResourceName(resource.getResourceName()));
+		if (isProcediment) {
+			Optional<ProcedimentResourceEntity> procediment = procedimentResourceRepository.findById(
+				Long.parseLong(resource.getResourceId().toString()));
+			if (procediment.isPresent() && procediment.get().isComu()) {
+				// Es mira si ja existeix un registre pel procediment - òrgan gestor i, si no existeix, en crea un de nou.
+				Optional<OrganGestorResourceEntity> organGestor = organGestorResourceRepository.findById(
+					resource.getOrganGestor().getId());
+				if (organGestor.isPresent()) {
+					Optional<ProcedimentOrganGestorResourceEntity> procedimentOrganGestor = procedimentOrganGestorResourceRepository.findByProcedimentAndOrganGestor(
+						procediment.get(),
+						organGestor.get());
+					Long procedimentOrganGestorId;
+					if (procedimentOrganGestor.isPresent()) {
+						procedimentOrganGestorId = procedimentOrganGestor.get().getId();
+					} else {
+						ProcedimentOrganGestorResourceEntity creat = procedimentOrganGestorResourceRepository.saveAndFlush(
+							ProcedimentOrganGestorResourceEntity.builder().
+								procediment(procediment.get()).
+								organGestor(organGestor.get()).
+								build());
+						procedimentOrganGestorId = creat.getId();
+					}
+					aclHelper.set(
+						AclHelper.PROCEDIMENT_ORGAN_CLASS,
+						procedimentOrganGestorId,
+						resource.getSidName(),
+						resource.isSidGrantedAuthority(),
+						permissionsGranted);
+					return true;
+				}
+			}
 		}
 		return false;
 	}
