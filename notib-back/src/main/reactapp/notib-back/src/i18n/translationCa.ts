@@ -360,6 +360,16 @@ const translationCa = {
                     accions: 'Accions',
                     historic: 'Històric',
                 },
+                dades: {
+                    title: 'Dades de la notificació',
+                    justificant: 'Justificant',
+                },
+                enviaments: {
+                    title: 'Enviament',
+                },
+                documents: {
+                    title: 'Document',
+                },
             },
         },
         enviament: {

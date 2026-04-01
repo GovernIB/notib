@@ -92,7 +92,6 @@ public class EnviamentTableHelper {
                 .entregaPostal(enviament.getEntregaPostal() != null)
                 .anulable(isAnulable(enviament))
                 .build();
-
         enviamentTableRepository.save(tableViewItem);
     }
 
