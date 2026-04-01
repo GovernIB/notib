@@ -2,6 +2,7 @@ package es.caib.notib.persist.resourceentity;
 
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
+import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.explotacio.EnviamentOrigen;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
@@ -172,6 +173,10 @@ public class NotificacioResourceEntity
 		referencedColumnName = "id",
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "document5_notificacio_fk"))
 	protected DocumentResourceEntity document5;
+
+	@Enumerated(EnumType.STRING)
+	@Formula("(select prc.tipus from " + BaseConfig.DB_PREFIX + "procediment prc where prc.id = procediment_id)")
+	private ProcSerTipusEnum procedimentTipus;
 
 	@Formula("(select ntb.enviada_date from " + BaseConfig.DB_PREFIX + "notificacio_table ntb where ntb.id = id)")
 	private Date enviadaDate;
