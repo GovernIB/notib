@@ -353,6 +353,10 @@ const translationEs = {
                     accions: 'Acciones',
                     historic: 'Histórico',
                 },
+                dades: {
+                    title: 'Datos de la notificación',
+                    justificant: 'Justificante',
+                },
             },
         },
         enviament: {
