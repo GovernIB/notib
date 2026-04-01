@@ -22,10 +22,11 @@ public interface ProcedimentResourceRepository extends BaseRepository<Procedimen
 		"    p.entitat.id = :entitatId " +
 		"AND (:tipus IS NULL OR p.tipus = :tipus) " +
 		"AND p.comu = true " +
-		"AND p.requireDirectPermission = false")
-	List<Long> findIdsByEntitatIdAndTipusAndComuTrueAndPermisDirecteFalse(
+		"AND p.requireDirectPermission = :requireDirectPermission")
+	List<Long> findIdsByEntitatIdAndTipusAndComuTrueAndPermisDirecte(
 		@Param("entitatId") Long entitatId,
-		@Param("tipus") ProcSerTipusEnum tipus);
+		@Param("tipus") ProcSerTipusEnum tipus,
+		@Param("requireDirectPermission") boolean requireDirectPermission);
 
 	@Query("SELECT p.id " +
 		"FROM ProcedimentResourceEntity p " +
