@@ -87,7 +87,6 @@ public class ProcedimentResource extends BaseResource<Long> {
 	private ResourceReference<OrganGestorResource, Long> organGestor;
 	private ResourceReference<EntregaCieResource, Long> entregaCie;
 
-
 	// Camps calculats
 	private Integer grupCount;
 	private Integer aclEntryCount;
