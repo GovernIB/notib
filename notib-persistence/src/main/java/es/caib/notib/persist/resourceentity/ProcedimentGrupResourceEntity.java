@@ -24,14 +24,14 @@ public class ProcedimentGrupResourceEntity
 	extends BaseAuditableResourceEntity<ProcedimentGrupResource>
 	implements AdminEntitatResourceEntity<ProcedimentGrupResource> {
 
-	@ManyToOne(optional = false, fetch = FetchType.EAGER)
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(
 		name = "procediment",
 		referencedColumnName = "id",
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "pro_grup_fk"))
 	private ProcedimentResourceEntity procediment;
 
-	@ManyToOne(optional = false, fetch = FetchType.EAGER)
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(
 		name = "grup",
 		referencedColumnName = "id",
