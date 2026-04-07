@@ -1,7 +1,6 @@
 package es.caib.notib.logic.service;
 
 import es.caib.notib.logic.accionsMassives.AccionsMassivesListener;
-import es.caib.notib.logic.helper.AccioMassivaHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
@@ -24,7 +23,6 @@ import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.AccioMassivaEntity;
 import es.caib.notib.persist.entity.AccioMassivaElementEntity;
-import es.caib.notib.persist.entity.AccioMassivaEntity;
 import es.caib.notib.persist.repository.AccioMassivaRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
