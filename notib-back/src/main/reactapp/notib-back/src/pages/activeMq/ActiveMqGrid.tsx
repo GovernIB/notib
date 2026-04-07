@@ -54,7 +54,7 @@ export const ActiveMqGrid = () => {
     return (
         <GridPage disableMargins={false}>
             <MuiDataGrid
-                title={t('page.cache.grid.title')}
+                title={t('page.activemq.grid.title')}
                 resourceName="activeMqResource"
                 columns={columns}
                 // paginationActive

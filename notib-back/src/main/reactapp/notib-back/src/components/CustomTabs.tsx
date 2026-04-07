@@ -24,9 +24,10 @@ const CustomTabPanel = (props: TabPanelProps) => {
             hidden={value !== index}
             id={`simple-tabpanel-${index}`}
             aria-labelledby={`simple-tab-${index}`}
+            style={{ height: '100%', minHeight: 0 }}
             {...other}
         >
-            {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
+            {value === index && <Box sx={{ pt: 3, height: '100%' }}>{children}</Box>}
         </div>
     );
 };
@@ -38,7 +39,7 @@ const CustomTabs: React.FC<{ tabs: string[]; contents: React.ReactElement[] }> =
         setValue(newValue);
     };
     return (
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
                     {tabs.map((t, i) => (
