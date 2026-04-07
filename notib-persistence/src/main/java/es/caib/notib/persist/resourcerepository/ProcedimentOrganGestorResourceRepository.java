@@ -1,11 +1,16 @@
 package es.caib.notib.persist.resourcerepository;
 
+import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.persist.base.repository.BaseRepository;
 import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
 import es.caib.notib.persist.resourceentity.ProcedimentOrganGestorResourceEntity;
 import es.caib.notib.persist.resourceentity.ProcedimentResourceEntity;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Repositori per a la gestió d'entitats de tipus relació procediment - òrgan gestor.
@@ -17,5 +22,23 @@ public interface ProcedimentOrganGestorResourceRepository extends BaseRepository
 	Optional<ProcedimentOrganGestorResourceEntity> findByProcedimentAndOrganGestor(
 		ProcedimentResourceEntity procediment,
 		OrganGestorResourceEntity organGestor);
+
+	@Query("SELECT pog.id " +
+		"FROM ProcedimentOrganGestorResourceEntity pog " +
+		"WHERE " +
+		"    pog.procediment.entitat.id = :entitatId " +
+		"AND pog.organGestor.entitat.id = :entitatId " +
+		"AND (:tipus IS NULL OR pog.procediment.tipus = :tipus) " +
+		"AND (:requireDirectPermission IS NULL OR pog.procediment.requireDirectPermission = :requireDirectPermission) " +
+		"AND (:comu IS NULL OR pog.procediment.comu = :comu) " +
+		"AND (:organGestorIds IS NULL OR pog.organGestor.id IN (:organGestorIds)) " +
+		"AND pog.id IN (:ids)")
+	Set<Long> findIdsByOrganGestorEntitatIdAndProcedimentTipusAndDirecteTrueAndProcedimentComuAndOrganGestorIdInAndIdIn(
+		@Param("entitatId") Long entitatId,
+		@Param("tipus") ProcSerTipusEnum tipus,
+		@Param("requireDirectPermission") Boolean requireDirectPermission,
+		@Param("comu") Boolean comu,
+		@Param("organGestorIds") Set<Long> organGestorIds,
+		@Param("ids") Set<Long> ids);
 
 }
