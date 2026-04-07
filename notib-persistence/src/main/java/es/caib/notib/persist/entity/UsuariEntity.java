@@ -92,7 +92,6 @@ public class UsuariEntity implements Serializable {
 
 		rebreEmailsNotificacio = usuari.isRebreEmailsNotificacio();
 		rebreEmailsNotificacioCreats = usuari.isRebreEmailsNotificacioCreats();
-		rebreEmailsAgrupats = usuari.isRebreEmailsAgrupats();
 		idioma = Strings.isNullOrEmpty(usuari.getIdioma()) ? "ca" : usuari.getIdioma();
 		emailAlt = usuari.getEmailAlt();
 		numElementsPaginaDefecte = usuari.numElementsPaginaDefecte;
