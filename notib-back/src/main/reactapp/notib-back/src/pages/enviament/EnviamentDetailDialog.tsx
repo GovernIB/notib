@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useResourceApiService, useMuiContentDialog } from 'reactlib';
 import CustomTabs from '../../components/CustomTabs';
 import DataCard from '../../components/DataCard';
+import { Box } from '@mui/material';
 
 const toDataItem = (label: string, value: string) => {
     const item: Record<string, string> = {};
@@ -42,7 +43,7 @@ const EnviamentDetailDialogTabDades: React.FC<{ id: any }> = (props) => {
               ]
             : [];
     return (
-        <>
+        <Box sx={{ height: '100%', overflowY: 'auto', minHeight: 0 }}>
             <DataCard title="Dades de la notificació" data={data} sx={{ mb: 3 }} />
             <DataCard
                 title="Dades de l'interessat"
@@ -53,7 +54,7 @@ const EnviamentDetailDialogTabDades: React.FC<{ id: any }> = (props) => {
                     { 'Correu electrònic': 'joleza@dgtic.caib.es' },
                 ]}
             />
-        </>
+        </Box>
     );
 };
 
@@ -73,20 +74,22 @@ const EnviamentDetailDialogContent: React.FC<{ id: any }> = (props) => {
     const { id } = props;
     const { t } = useTranslation();
     return (
-        <CustomTabs
-            tabs={[
-                t('page.enviament.detail.tab.dades'),
-                t('page.enviament.detail.tab.notifica'),
-                t('page.enviament.detail.tab.registre'),
-                t('page.enviament.detail.tab.registreEsdev'),
-            ]}
-            contents={[
-                <EnviamentDetailDialogTabDades id={id} />,
-                <EnviamentDetailDialogTabNotifica />,
-                <EnviamentDetailDialogTabRegistre />,
-                <EnviamentDetailDialogTabRegistreEsdev />,
-            ]}
-        />
+        <Box sx={{ height: '650px', minHeight: 0 }}>
+            <CustomTabs
+                tabs={[
+                    t('page.enviament.detail.tab.dades'),
+                    t('page.enviament.detail.tab.notifica'),
+                    t('page.enviament.detail.tab.registre'),
+                    t('page.enviament.detail.tab.registreEsdev'),
+                ]}
+                contents={[
+                    <EnviamentDetailDialogTabDades id={id} />,
+                    <EnviamentDetailDialogTabNotifica />,
+                    <EnviamentDetailDialogTabRegistre />,
+                    <EnviamentDetailDialogTabRegistreEsdev />,
+                ]}
+            />
+        </Box>
     );
 };
 
