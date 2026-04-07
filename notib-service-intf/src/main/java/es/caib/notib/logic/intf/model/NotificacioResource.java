@@ -14,6 +14,7 @@ import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
+import es.caib.notib.logic.intf.model.validator.NotificacioProcedimentNotNull;
 import es.caib.notib.logic.intf.model.validator.PrimerEnviamentCodiDir3ObligatoriEnviamentTipusSir;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,6 +30,14 @@ import java.util.List;
 
 /**
  * Informació d'una notificació.
+ * <p>
+ * Per a poder consultar / gestionar una notificació s'ha de complir:
+ * - En el cas de procediments no comuns, s'ha de tenir el permís corresponent per a l'òrgan gestor o pel procediment.
+ * - En el cas de procediments comuns sense "requereix permisos directes" s'ha de tenir el permís corresponent per a la
+ *   combinació òrgan gestor - procediment.
+ * - En el cas de procediments comuns amb "requereix permisos directes" s'han de complir tots aquests punts:
+ *     · S'ha de tenir el permís de procediments comuns a l'òrgan gestor.
+ *     · S'ha de tenir el permís corresponent per a la combinació òrgan gestor - procediment.
  *
  * @author Límit Tecnologies
  */
@@ -54,7 +63,11 @@ import java.util.List;
 )
 @CustomValidation.List({
 	@CustomValidation(
-		customValidatorType = PrimerEnviamentCodiDir3ObligatoriEnviamentTipusSir.class)
+		customValidatorType = PrimerEnviamentCodiDir3ObligatoriEnviamentTipusSir.class),
+	@CustomValidation(
+		customValidatorType = NotificacioProcedimentNotNull.class,
+		targetFields = NotificacioResource.Fields.procediment,
+		springBean = true),
 })
 public class NotificacioResource extends BaseResource<Long> {
 
@@ -108,8 +121,8 @@ public class NotificacioResource extends BaseResource<Long> {
 
 	private ResourceReference<EntitatResource, Long> entitat;
 	@NotNull
+	@ResourceField(onChangeActive = true)
 	private ResourceReference<OrganGestorResource, Long> organGestor;
-	@NotNull
 	private ResourceReference<ProcedimentResource, Long> procediment;
 	private ResourceReference<DocumentResource, Long> document;
 	private ResourceReference<DocumentResource, Long> document2;
@@ -135,6 +148,7 @@ public class NotificacioResource extends BaseResource<Long> {
 	private LocalDateTime createdDate;
 	private String createdBy;
 	private ProcSerTipusEnum procedimentTipus;
+	private boolean procedimentRequired = true;
 
 	// Camps provinents de NotificacioTable
 	private Date enviadaDate;
