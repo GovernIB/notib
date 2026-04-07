@@ -169,6 +169,10 @@ public class EnviamentTableEntity extends NotibAuditable<Long> {
 	@Column(name = "registre_numero", length = 19)
 	protected String registreNumero;
 
+	public void registreNumero(String registreNumero) {
+		this.registreNumero = registreNumero;
+	}
+
 	@Column(name = "registre_data")
 	@Temporal(TemporalType.DATE)
 	protected Date registreData;

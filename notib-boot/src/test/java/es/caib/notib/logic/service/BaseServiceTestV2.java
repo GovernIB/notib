@@ -111,7 +111,8 @@ public class BaseServiceTestV2 {
 	@BeforeClass
 	public static void beforeClass() {
 //		JBossPropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties");
-		loadProperties("classpath:es/caib/notib/core/test.properties");
+//		loadProperties("classpath:es/caib/notib/core/test.properties");
+		loadProperties("classpath:es/caib/notib/logic/test.properties");
 	}
 
 	public static void loadProperties(String path) {

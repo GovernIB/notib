@@ -226,10 +226,16 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 
         EntitatEntity entitat = null;
         try {
+			if (Strings.isNullOrEmpty(notificacio.getEmisorDir3Codi())) {
+				return RespostaAlta.builder().error(true).errorDescripcio(messageHelper.getMessage("error.validacio.1000")).build();
+			}
             entitat = entitatRepository.findByDir3Codi(notificacio.getEmisorDir3Codi());
         } catch (Exception ex) {
             log.error("Error entitat no trobada a la bdd " + notificacio.getEmisorDir3Codi(), ex);
         }
+		if (entitat == null) {
+			return RespostaAlta.builder().error(true).errorDescripcio(messageHelper.getMessage("error.validacio.1010")).build();
+		}
         var auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth == null) {
 			log.error("[NotificacioServiceWsImplV2.alta] Error auth es null");
@@ -441,15 +447,15 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			}
 			NotibLogger.getInstance().info(">> [ALTA] enviaments creats", log, LoggingTipus.STATE_MACHINE);
 			notificacioGuardada = notificacioRepository.saveAndFlush(notificacioGuardada);
-				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-					@Override
-					public void afterCommit() {
-						if (TransactionSynchronizationManager.isActualTransactionActive()) {
-							for (var referencia : referencies) {
-								enviamentSmService.altaEnviament(referencia.getReferencia());
-							}
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+				@Override
+				public void afterCommit() {
+					if (TransactionSynchronizationManager.isActualTransactionActive()) {
+						for (var referencia : referencies) {
+							enviamentSmService.altaEnviament(referencia.getReferencia());
 						}
 					}
+				}
 			});
 			var respostaAlta = generaResposta(/*info,*/ notificacioGuardada, referencies, avisos);
 			SubsistemesHelper.addSuccessOperation(ARE, System.currentTimeMillis() - start);
@@ -1361,7 +1367,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	private PersonaEntity saveTitular(Enviament enviament) {
 
 		var titular = enviament.getTitular();
-		var docTipus = !Strings.isNullOrEmpty(titular.getNif()) && EidasValidator.isFormatEidas(titular.getNif())? DocumentTipus.ALTRE : null;
+		var docTipus = !Strings.isNullOrEmpty(titular.getNif()) && EidasValidator.isFormatEidas(titular.getNif()) ||
+						FISICA_SENSE_NIF.equals(titular.getInteressatTipus()) ? DocumentTipus.ALTRE : null;
 		return personaRepository.save(
 				PersonaEntity.builder()
 							.interessatTipus(titular.getInteressatTipus())
