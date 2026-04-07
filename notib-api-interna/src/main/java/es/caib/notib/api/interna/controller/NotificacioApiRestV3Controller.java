@@ -3,6 +3,7 @@
  */
 package es.caib.notib.api.interna.controller;
 
+import es.caib.notib.api.interna.openapi.interficies.NotificacioApiRestV2Intf;
 import es.caib.notib.api.interna.openapi.interficies.NotificacioApiRestV3Intf;
 import es.caib.notib.client.domini.DadesConsulta;
 import es.caib.notib.client.domini.PermisConsulta;
@@ -22,7 +23,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -69,10 +69,10 @@ public class NotificacioApiRestV3Controller extends NotificacioApiRestBaseContro
 		}
 	}
 
-	@GetMapping(value = {"/consultaEstatNotificacio/{identificador}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public RespostaConsultaEstatNotificacioV2 consultaEstatNotificacio(HttpServletRequest request, @PathVariable("identificador") String identificador) {
+	@GetMapping(value = {"/consultaEstatNotificacio/**"}, produces = MediaType.APPLICATION_JSON_VALUE)
+	public RespostaConsultaEstatNotificacioV2 consultaEstatNotificacio(HttpServletRequest request) {
 
-//		var identificador = extractIdentificador(request);
+		var identificador = extractIdentificador(request);
 		try {
 			if (!identificador.isEmpty()) {
 				return notificacioServiceWs.consultaEstatNotificacioV2(identificador);
@@ -84,10 +84,10 @@ public class NotificacioApiRestV3Controller extends NotificacioApiRestBaseContro
 		}
 	}
 
-	@GetMapping(value = {"/consultaEstatEnviament/{referencia}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public RespostaConsultaEstatEnviamentV2 consultaEstatEnviament(HttpServletRequest request, @PathVariable("referencia") String referencia) throws UnsupportedEncodingException {
+	@GetMapping(value = {"/consultaEstatEnviament/**"}, produces = MediaType.APPLICATION_JSON_VALUE)
+	public RespostaConsultaEstatEnviamentV2 consultaEstatEnviament(HttpServletRequest request) throws UnsupportedEncodingException {
 
-//		var referencia = extractIdentificador(request);
+		var referencia = extractIdentificador(request);
 		try {
 			if (!referencia.isEmpty()) {
 				return notificacioServiceWs.consultaEstatEnviamentV2(referencia);
@@ -109,8 +109,8 @@ public class NotificacioApiRestV3Controller extends NotificacioApiRestBaseContro
 		}
 	}
 
-	@GetMapping(value = {"/consultaJustificantNotificacio/{referencia}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public RespostaConsultaJustificantEnviament consultaJustificantV2(HttpServletRequest request, @PathVariable("referencia") String referencia) {
+	@GetMapping(value = {"/consultaJustificantNotificacio/**"}, produces = MediaType.APPLICATION_JSON_VALUE)
+	public RespostaConsultaJustificantEnviament consultaJustificantV2(HttpServletRequest request) {
 		return consultaJustificant(request);
 	}
 

@@ -66,7 +66,6 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -198,7 +197,6 @@ public class NotificacioMassivaServiceTest {
 //		Mockito.when(cacheHelper.findUsuariAmbCodi(anyString())).thenReturn(DadesUsuari.builder().codi(codiUsuari).build());
 		Mockito.when(cacheBridge.findUsuariAmbCodi(anyString())).thenReturn(DadesUsuari.builder().codi(codiUsuari).build());
 		setUpNotificacioMassiva();
-		TransactionSynchronizationManager.initSynchronization();
 //		setUpAuthentication();
 	}
 
@@ -531,7 +529,6 @@ public class NotificacioMassivaServiceTest {
 
 	@After
 	public void tearDown() {
-		TransactionSynchronizationManager.clearSynchronization();
 		Mockito.reset(pluginHelper);
 	}
 }

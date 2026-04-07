@@ -3,7 +3,6 @@
  */
 package es.caib.notib.logic.intf.dto;
 
-import com.google.common.base.Strings;
 import es.caib.notib.client.domini.NumElementsPaginaDefecte;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,15 +42,10 @@ public class UsuariDto implements Serializable {
 	private Long ultimaEntitat;
 	private Boolean rebreEmailsNotificacio;
 	private Boolean rebreEmailsNotificacioCreats;
-	private Boolean rebreEmailsAgrupats;
 	private NumElementsPaginaDefecte numElementsPaginaDefecte;
     private Long entitatDefecte;
     private Long procedimentDefecte;
     private Long organDefecte;
-
-	public String getEmailValor() {
-		return !Strings.isNullOrEmpty(emailAlt) ? emailAlt : email;
-	}
 
 	private static final long serialVersionUID = -139254994389509932L;
 

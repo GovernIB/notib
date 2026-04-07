@@ -33,7 +33,7 @@ public class EmailNotificacioMassivaHelper extends EmailHelper<NotificacioMassiv
 	}
 
 	@Override
-	protected String getMailHtmlBody(NotificacioMassivaEntity item, boolean agrupat, boolean mostrarFooter) {
+	protected String getMailHtmlBody(NotificacioMassivaEntity item) {
 
 		var htmlText = "";
 		htmlText += "<!DOCTYPE html>"+
@@ -110,26 +110,22 @@ public class EmailNotificacioMassivaHelper extends EmailHelper<NotificacioMassiv
 				"</style>"+
 				"</head>"+
 
-				"<body>"+ (
-					agrupat ?
-						"<div class=\"header\">"+
-						"	<span class=\"headerText\">"+ messageHelper.getMessage("notificacio.massiva.email.titol").toUpperCase()+"</span> "+
-						"</div>" : ""
-				) +
+				"<body>"+
+				"<div class=\"header\">"+
+				"	<span class=\"headerText\">"+ messageHelper.getMessage("notificacio.massiva.email.titol").toUpperCase()+"</span> "+
+				"</div>"+
 				"<div class=\"content\">" +
 				"	<p>" + messageHelper.getMessage("notificacio.massiva.email.body") + "</p>" +
 				" 	<ul>" +
 				"		<li>" + messageHelper.getMessage("notificacio.massiva.email.body.fitxer1") + "</li>" +
 				"		<li>" + messageHelper.getMessage("notificacio.massiva.email.body.fitxer2") + "</li>" +
 				"	</ul>" +
-				"</div>" + (
-					mostrarFooter ?
-						"<div class=\"footer\">"+
-						"	<span class=\"footerText\">"+
-						getEmailFooter() +
-						"	</span>"+
-						"</div>" : ""
-				) +
+				"</div>" +
+				"<div class=\"footer\">"+
+				"	<span class=\"footerText\">"+
+				getEmailFooter() +
+				"	</span>"+
+				"</div>"+
 				"</body>"+
 				"</html>";
 		return htmlText;

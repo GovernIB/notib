@@ -97,10 +97,4 @@ public class SchedulledService extends AbstractService<es.caib.notib.logic.intf.
 		getDelegateService().generarEstadistiques();
 	}
 
-	@Override
-	@RolesAllowed("**")
-	public void enviarCorreusAgrupats() {
-        getDelegateService().enviarCorreusAgrupats();
-	}
-
 }

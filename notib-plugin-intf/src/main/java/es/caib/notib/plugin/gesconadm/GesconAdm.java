@@ -9,7 +9,6 @@ import java.util.Date;
 @Setter
 public class GesconAdm {
 
-    private String codi;
     private String codiSIA;
     private String nom;
     private String unitatAdministrativacodi;

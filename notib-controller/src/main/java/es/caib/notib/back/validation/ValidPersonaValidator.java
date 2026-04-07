@@ -24,7 +24,7 @@ import java.util.Locale;
 public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, PersonaCommand> {
 
 	public static final int MAX_SIZE_NOM = 30;
-	public static final int MAX_SIZE_RAO_SOCIAL_JURIDICA = 255;
+	public static final int MAX_SIZE_RAO_SOCIAL_JURIDICA = 80;
 	public static final int MAX_SIZE_RAO_SOCIAL = 255;
 	private static final int MIN_SIZE_LLINATGES = 2;
 	private static final int MIN_SIZE_NOM_RAO = 2;

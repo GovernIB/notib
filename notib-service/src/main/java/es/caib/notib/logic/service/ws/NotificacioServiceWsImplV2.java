@@ -265,9 +265,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		} catch (Exception ex) {
 			log.error("Error entitat no trobada a la bdd " + notificacio.getEmisorDir3Codi(), ex);
 		}
-		if (entitat == null) {
-			return RespostaAltaV2.builder().error(true).errorData(new Date()).errorDescripcio("Entitat inexistent").build();
-		}
 //		var info = generateInfoAlta(notificacio, entitat != null ? entitat.getId() : null);
 		try {
 			log.debug("[ALTA] Alta de notificació: " + notificacio.toString());
@@ -855,11 +852,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 					log.debug("Notifica error de l'enviament amb referencia: " + referencia + ": " + enviament.isNotificaError());
 				}
 			} catch (Exception ex) {
-				log.error("Error consultar estat enviament amb referencia: " + referencia, ex);
+				log.debug("Error consultar estat enviament amb referencia: " + referencia, ex);
 				integracioHelper.addAccioError(info, "Error al obtenir l'estat de l'enviament", ex);
 				resposta.setError(true);
 				resposta.setErrorData(new Date());
-				resposta.setErrorDescripcio("Error inesperat al obtenir la informació de l'enviament amb referencia: " + referencia + " - " + ex.getMessage());
+				resposta.setErrorDescripcio("Error inesperat al obtenir la informació de l'enviament amb referencia: " + referencia);
 				return resposta;
 			}
 			integracioHelper.addAccioOk(info);
