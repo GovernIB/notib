@@ -7,6 +7,7 @@ import es.caib.notib.logic.intf.dto.ApiConsulta;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.persist.entity.DocumentEntity;
+import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.logic.helper.DocumentHelper;
@@ -102,7 +103,8 @@ public class ConsusltaApiRestV2Test {
     public void getDocumentArxiu() {
 
         var doc = new DocumentEntity();
-        var not = NotificacioEntity.builder().document(doc).build();
+        var entitat = new EntitatEntity();
+        var not = NotificacioEntity.builder().entitat(entitat).document(doc).build();
         var arxiu = ArxiuDto.builder().build();
         Mockito.when(notificacioRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(not));
         Mockito.when(documentHelper.documentToArxiuDto(Mockito.anyString(), Mockito.any(DocumentEntity.class))).thenReturn(arxiu);
@@ -115,8 +117,10 @@ public class ConsusltaApiRestV2Test {
     public void enviamentGetCertificacioArxiu() throws Exception {
 
         byte [] c = new byte[0];
+        var entitat = new EntitatEntity();
+        var not = NotificacioEntity.builder().entitat(entitat).build();
         var arxiu = ArxiuDto.builder().nom("certificacio_" + foo + ".pdf").contingut(c).build();
-        var env = NotificacioEnviamentEntity.builder().notificaIdentificador(foo).notificaCertificacioArxiuId(foo).build();
+        var env = NotificacioEnviamentEntity.builder().notificacio(not).notificaIdentificador(foo).notificaCertificacioArxiuId(foo).build();
         Mockito.when(notificacioEnviamentRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(env));
         var a = notificacioService.enviamentGetCertificacioArxiu(1L);
         assertNotNull(a);
@@ -147,7 +151,8 @@ public class ConsusltaApiRestV2Test {
 
         var resposta = new RespostaJustificantRecepcio();
         resposta.setJustificant(justificant.getBytes());
-        var not = NotificacioEntity.builder().emisorDir3Codi(justificant).build();
+        var entitat = new EntitatEntity();
+        var not = NotificacioEntity.builder().entitat(entitat).emisorDir3Codi(justificant).build();
         var env = NotificacioEnviamentEntity.builder().notificacio(not).registreNumeroFormatat(justificant).build();
         if (oficiExtern) {
             env.setRegistreEstat(NotificacioRegistreEstatEnumDto.OFICI_EXTERN);

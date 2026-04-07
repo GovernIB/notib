@@ -35,6 +35,7 @@ import es.caib.notib.logic.intf.dto.cie.CieTableItemDto;
 import es.caib.notib.logic.intf.dto.cie.EntregaPostalDto;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalDto;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalTableItemDto;
+import es.caib.notib.logic.intf.dto.config.ConfigDto;
 import es.caib.notib.logic.intf.dto.notenviament.EnviamentInfo;
 import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
@@ -78,6 +79,7 @@ import es.caib.notib.persist.entity.cie.PagadorCieEntity;
 import es.caib.notib.persist.entity.cie.PagadorCieFormatFullaEntity;
 import es.caib.notib.persist.entity.cie.PagadorCieFormatSobreEntity;
 import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
+import es.caib.notib.persist.entity.config.ConfigEntity;
 import es.caib.notib.persist.repository.AplicacioRepository;
 import es.caib.notib.persist.repository.CallbackRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
@@ -279,7 +281,7 @@ public class ConversioTipusHelper {
 						var data = entity.getCreatedDate().orElseThrow();
 						Date date = Date.from(data.atZone(ZoneId.systemDefault()).toInstant());
 						dto.setCreatedDate(date);
-                        if (entity.getNumErrors() > 0) {
+                        if (entity.getNumErrors() == entity.getElements().size()) {
                             dto.setNumOk(0);
                             dto.setNumPendent(0);
                             return;
@@ -503,6 +505,12 @@ public class ConversioTipusHelper {
 							usr.setCodi(usuari.getCodi());
 							dto.setCreatedBy(usr);
 						});
+					}}).byDefault().register();
+
+		mapperFactory.classMap(ConfigEntity.class, ConfigDto.class)
+				.customize(new CustomMapper<>() {
+					@Override
+					public void mapAtoB(ConfigEntity entity, ConfigDto dto, MappingContext context) {
 					}}).byDefault().register();
 
 		defineConverters();
