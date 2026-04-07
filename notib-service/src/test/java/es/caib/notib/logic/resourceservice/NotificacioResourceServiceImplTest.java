@@ -13,6 +13,7 @@ import es.caib.notib.persist.resourceentity.*;
 import es.caib.notib.persist.resourcerepository.DocumentResourceRepository;
 import es.caib.notib.persist.resourcerepository.NotificacioEnviamentResourceRepository;
 import es.caib.notib.persist.resourcerepository.PersonaResourceRepository;
+import liquibase.pro.packaged.M;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,6 +44,7 @@ class NotificacioResourceServiceImplTest {
 	@Mock private DocumentResourceRepository documentRepo;
 	@Mock private PersonaResourceRepository personaRepo;
 	@Mock private LegacyHelper legacyHelper;
+	@Mock private NotibPermissionHelper notibPermissionHelper;
 
 	@InjectMocks
 	private NotificacioResourceServiceImpl service;
@@ -53,7 +55,11 @@ class NotificacioResourceServiceImplTest {
 	@BeforeEach
 	void setUp() {
 		entity = new NotificacioResourceEntity();
+		OrganGestorResourceEntity organGestor = new OrganGestorResourceEntity();
+		organGestor.setId(1L);
+		entity.setOrganGestor(organGestor);
 		entity.setProcediment(new ProcedimentResourceEntity());
+		entity.setProcedimentOrganGestor(new ProcedimentOrganGestorResourceEntity());
 		resource = new NotificacioResource();
 	}
 
@@ -67,6 +73,7 @@ class NotificacioResourceServiceImplTest {
 		EntitatResourceEntity entitat = new EntitatResourceEntity();
 		entitat.setDir3Codi("DIR3");
 		when(userSessionHelper.getCurrentEntitat()).thenReturn(entitat);
+		when(notibPermissionHelper.organGestorIdsWithPermissionRecursive(any())).thenReturn(List.of(1L));
 		service.beforeCreateSave(entity, resource, Map.of());
 		assertEquals("user", entity.getUsuariCodi());
 		assertEquals(entitat, entity.getEntitat());
@@ -89,6 +96,7 @@ class NotificacioResourceServiceImplTest {
 		resource.setDocumentsInfo(List.of(doc));
 		when(legacyHelper.notificacioAdjuntCreate(any())).thenReturn("fileId");
 		when(documentRepo.save(any())).thenAnswer(i -> i.getArgument(0));
+		when(notibPermissionHelper.organGestorIdsWithPermissionRecursive(any())).thenReturn(List.of(1L));
 		service.beforeCreateSave(entity, resource, Map.of());
 		assertNotNull(entity.getDocument());
 	}
