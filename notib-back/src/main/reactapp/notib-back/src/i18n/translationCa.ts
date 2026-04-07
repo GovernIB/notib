@@ -92,7 +92,6 @@ const translationCa = {
         organs: {
             grid: {
                 title: 'Òrgans gestors',
-                groupColumn: 'Òrgan gestor',
                 sync: {
                     title: 'Sincronització DIR3',
                     dialogTitle: 'Sincronització DIR3',
@@ -504,9 +503,8 @@ const translationCa = {
             add: 'Afegir',
             refresh: 'Refrescar',
         },
-        UserProfile: {
+        UserProfileFormDialog: {
             perfil: "Perfil de l'usuari",
-            auto: "Automàtic",
         },
         FormDropzoneField: {
             arrosegar:  "Arrossega el fitxer aquí",

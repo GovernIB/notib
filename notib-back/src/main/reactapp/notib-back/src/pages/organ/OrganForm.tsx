@@ -13,20 +13,23 @@ const OrganFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = 
     const { t } = useTranslation();
     const { data } = useFormContext();
     const initialTab = useTabParam();
+
     React.useEffect(() => {
         setSubtitle(data?.codi + ', ' + data?.nom);
     }, [data]);
+
     const permisosTabLabel = (
         <Badge badgeContent={data.aclEntryCount} color="primary">
             {t('page.organs.form.tabs.permisos')}
         </Badge>
     );
+
     const tabs = [t('page.organs.form.tabs.dades'), { label: permisosTabLabel }];
+
     return (
         <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1]} initialIndex={initialTab}>
             <MuiFormTabContent index={0} showOnCreate>
                 <Grid container spacing={2}>
-                    <GridFormField size={12} name="pare" />
                     <GridFormField size={4} name="codi" />
                     <GridFormField size={8} name="nom" />
                     <GridFormField size={4} name="estat" />

@@ -1,6 +1,5 @@
 package es.caib.notib.logic.helper;
 
-import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.ResourceNotCreatedException;
@@ -168,7 +167,7 @@ public class NotibPermissionHelper {
 		// Només retorna els procediments/serveis no comuns que existeixen a la base de dades.
 		Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
 		ProcSerTipusEnum procSerTipus = getProcSerTipusForQuery(isServei);
-		return procedimentResourceRepository.findIdsByEntitatIdAndTipusAndIdInAndComuFalseAndActiuTrue(
+		return procedimentResourceRepository.findIdsByEntitatIdAndTipusAndIdInAndComuFalse(
 			currentEntitatId,
 			procSerTipus,
 			idsWithPermission);
@@ -208,40 +207,6 @@ public class NotibPermissionHelper {
 	}
 
 	/**
-	 * Retorna el permís de l'òrgan gestor per a la creació d'enviaments d'un tipus determinat.
-	 *
-	 * @param enviamentTipus
-	 *            el tipus d'enviament.
-	 * @return el permís corresponent.
-	 */
-	public Permission getOrganGestorNotificacioCreatePermission(EnviamentTipus enviamentTipus) {
-		if (EnviamentTipus.COMUNICACIO.equals(enviamentTipus)) {
-			return ExtendedPermission.PERM5;
-		} else if (EnviamentTipus.SIR.equals(enviamentTipus)) {
-			return ExtendedPermission.PERM6;
-		} else {
-			return ExtendedPermission.PERM4;
-		}
-	}
-
-	/**
-	 * Retorna el permís del procediment per a la creació d'enviaments d'un tipus determinat.
-	 *
-	 * @param enviamentTipus
-	 *            el tipus d'enviament.
-	 * @return el permís corresponent.
-	 */
-	public Permission getProcedimentNotificacioCreatePermission(EnviamentTipus enviamentTipus) {
-		if (EnviamentTipus.COMUNICACIO.equals(enviamentTipus)) {
-			return ExtendedPermission.PERM8;
-		} else if (EnviamentTipus.SIR.equals(enviamentTipus)) {
-			return ExtendedPermission.PERM7;
-		} else {
-			return ExtendedPermission.PERM5;
-		}
-	}
-
-	/**
 	 * Filtra la llista d'ids de les combinacions procediment/servei - organ gestor segons el valor del camp
 	 * requireDirectPermission al procediment/servei:
 	 *   - Si el procediment/servei te el camp a true es verifica si es te el permís sobre la combinació organ gestor -
@@ -269,7 +234,7 @@ public class NotibPermissionHelper {
 		Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
 		ProcSerTipusEnum procSerTipus = getProcSerTipusForQuery(isServei);
 		Set<Long> organGestorIds = !requireDirectPermission ? organGestorWithProcedimentsComunsPermission() : null;
-		return procedimentOrganGestorResourceRepository.findIdsComprovacioPermisos(
+		return procedimentOrganGestorResourceRepository.findIdsByOrganGestorEntitatIdAndProcedimentTipusAndDirecteTrueAndProcedimentComuAndOrganGestorIdInAndIdIn(
 			currentEntitatId,
 			procSerTipus,
 			requireDirectPermission,

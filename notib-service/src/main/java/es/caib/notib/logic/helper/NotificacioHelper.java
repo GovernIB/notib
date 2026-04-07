@@ -449,13 +449,6 @@ public class NotificacioHelper {
 		if (procSer != null) {
 			if (!procSer.isComu()) { //Tot procediment comú ha de informa un òrgan gestor
 				organGestor = procSer.getOrganGestor();
-			} else {
-				try {
-					var id = Long.valueOf(notificacio.getOrganGestor());
-					organGestor = organGestorRepository.findById(id).orElse(null);
-				} catch (Exception ex) {
-					organGestor = organGestorRepository.findByEntitatAndCodi(entitat, notificacio.getOrganGestor());
-				}
 			}
 
 			if (procSer.isComu() && organGestor != null) {
@@ -498,7 +491,6 @@ public class NotificacioHelper {
 										.grupNotificacio(grupNotificacio)
 										.organGestor(organGestor)
 										.procSer(procSer)
-										.procedimentOrgan(procedimentOrgan)
 										.notificacioMassivaEntity(notificacioMassivaEntity).build();
 	}
 
