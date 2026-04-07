@@ -1,18 +1,19 @@
 /**
- * 
+ *
  */
 package es.caib.notib.logic.helper;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import lombok.Synchronized;
 import org.springframework.stereotype.Component;
 
 import es.caib.notib.logic.intf.dto.ExcepcioLogDto;
 
 /**
  * Mètodes per a la gestió del log d'excepcions.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Component
@@ -37,5 +38,15 @@ public class ExcepcioLogHelper {
 			excepcions.remove(excepcions.size() - 1);
 		}
 		excepcions.add(0, new ExcepcioLogDto(exception));
+	}
+
+	@Synchronized
+	public void addExcepcio(String uri, Throwable exception) {
+		if (exception == null) return;
+
+		while (excepcions.size() >= DEFAULT_MAX_EXCEPCIONS) {
+			excepcions.removeLast();
+		}
+		excepcions.addFirst(new ExcepcioLogDto(uri, exception));
 	}
 }
