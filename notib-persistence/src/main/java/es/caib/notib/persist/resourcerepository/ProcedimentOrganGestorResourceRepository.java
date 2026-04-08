@@ -28,14 +28,12 @@ public interface ProcedimentOrganGestorResourceRepository extends BaseRepository
 		"WHERE " +
 		"    pog.procediment.entitat.id = :entitatId " +
 		"AND pog.organGestor.entitat.id = :entitatId " +
-		"AND pog.procediment.actiu = true " +
-		"AND pog.organGestor.estat = 'VIGENT' " +
 		"AND (:tipus IS NULL OR pog.procediment.tipus = :tipus) " +
 		"AND (:requireDirectPermission IS NULL OR pog.procediment.requireDirectPermission = :requireDirectPermission) " +
 		"AND (:comu IS NULL OR pog.procediment.comu = :comu) " +
 		"AND (:organGestorIds IS NULL OR pog.organGestor.id IN (:organGestorIds)) " +
 		"AND pog.id IN (:ids)")
-	Set<Long> findIdsComprovacioPermisos(
+	Set<Long> findIdsByOrganGestorEntitatIdAndProcedimentTipusAndDirecteTrueAndProcedimentComuAndOrganGestorIdInAndIdIn(
 		@Param("entitatId") Long entitatId,
 		@Param("tipus") ProcSerTipusEnum tipus,
 		@Param("requireDirectPermission") Boolean requireDirectPermission,

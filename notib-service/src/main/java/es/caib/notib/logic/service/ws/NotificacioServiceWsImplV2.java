@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.logic.service.ws;
 
@@ -53,10 +53,10 @@ import es.caib.notib.logic.intf.service.JustificantService;
 import es.caib.notib.logic.intf.service.NotificacioServiceWs;
 import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
-import es.caib.notib.logic.intf.util.DatesUtils;
 import es.caib.notib.logic.intf.util.EidasValidator;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2;
+import es.caib.notib.logic.intf.util.DatesUtils;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.AplicacioEntity;
@@ -118,7 +118,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * Implementació del servei per a l'enviament i consulta de notificacions V2 (Sense paràmetres SEU).
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -224,32 +224,26 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	@Override
 	public RespostaAlta alta(Notificacio notificacio) throws NotificacioServiceWsException {
 
-        EntitatEntity entitat = null;
-        try {
-			if (Strings.isNullOrEmpty(notificacio.getEmisorDir3Codi())) {
-				return RespostaAlta.builder().error(true).errorDescripcio(messageHelper.getMessage("error.validacio.1000")).build();
-			}
-            entitat = entitatRepository.findByDir3Codi(notificacio.getEmisorDir3Codi());
-        } catch (Exception ex) {
-            log.error("Error entitat no trobada a la bdd " + notificacio.getEmisorDir3Codi(), ex);
-        }
-		if (entitat == null) {
-			return RespostaAlta.builder().error(true).errorDescripcio(messageHelper.getMessage("error.validacio.1010")).build();
+		EntitatEntity entitat = null;
+		try {
+			entitat = entitatRepository.findByDir3Codi(notificacio.getEmisorDir3Codi());
+		} catch (Exception ex) {
+			log.error("Error entitat no trobada a la bdd " + notificacio.getEmisorDir3Codi(), ex);
 		}
-        var auth = SecurityContextHolder.getContext().getAuthentication();
+		var auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth == null) {
 			log.error("[NotificacioServiceWsImplV2.alta] Error auth es null");
-            return RespostaAlta.builder().error(true).errorDescripcio("Usuari inexistent").build();
+			return RespostaAlta.builder().error(true).errorDescripcio("Usuari inexistent").build();
 		}
-        var usuariCodi = auth.getName();
-        var msg = limitadorEnviamentsHelper.checkLimitEnviamentsAplicacioSuperat(usuariCodi, entitat.getId());
-        if (!Strings.isNullOrEmpty(msg)) {
-            return RespostaAlta.builder().error(true).errorDescripcio(msg).build();
-        }
+		var usuariCodi = auth.getName();
+		var msg = limitadorEnviamentsHelper.checkLimitEnviamentsAplicacioSuperat(usuariCodi, entitat.getId());
+		if (!Strings.isNullOrEmpty(msg)) {
+			return RespostaAlta.builder().error(true).errorDescripcio(msg).build();
+		}
 		var resposta = altaV2(notificacio);
 //		resposta.getReferenciesAsV1().forEach(r -> enviamentSmService.altaEnviament(r.getReferencia()));
 		return RespostaAlta.builder().identificador(resposta.getIdentificador()).estat(resposta.getEstat()).referencies(resposta.getReferenciesAsV1())
-				.error(resposta.isError()).errorDescripcio(resposta.getErrorDescripcio()).build();
+			.error(resposta.isError()).errorDescripcio(resposta.getErrorDescripcio()).build();
 	}
 
 	@Transactional
@@ -265,18 +259,15 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		} catch (Exception ex) {
 			log.error("Error entitat no trobada a la bdd " + notificacio.getEmisorDir3Codi(), ex);
 		}
-		if (entitat == null) {
-			return RespostaAltaV2.builder().error(true).errorData(new Date()).errorDescripcio("Entitat inexistent").build();
-		}
 //		var info = generateInfoAlta(notificacio, entitat != null ? entitat.getId() : null);
 		try {
 			log.debug("[ALTA] Alta de notificació: " + notificacio.toString());
-            var auth = SecurityContextHolder.getContext().getAuthentication();
+			var auth = SecurityContextHolder.getContext().getAuthentication();
 			if (auth == null) {
 				log.error("[NotificacioServiceWsImplV2.altaV2] Error auth es null");
-			    return RespostaAltaV2.builder().error(true).errorData(new Date()).errorDescripcio("Usuari inexistent").build();
+				return RespostaAltaV2.builder().error(true).errorData(new Date()).errorDescripcio("Usuari inexistent").build();
 			}
-            var usuariCodi = auth.getName();
+			var usuariCodi = auth.getName();
             var msg = limitadorEnviamentsHelper.checkLimitEnviamentsAplicacioSuperat(usuariCodi, entitat.getId());
             if (!Strings.isNullOrEmpty(msg)) {
 			    return RespostaAltaV2.builder().error(true).errorData(new Date()).errorDescripcio(msg).build();
@@ -1267,7 +1258,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	}
 
 
-	private RespostaAltaV2 generaResposta(/*IntegracioInfo info,*/ NotificacioEntity notificacioGuardada, List<EnviamentReferenciaV2> referencies, String warns) {
+	private RespostaAltaV2 generaResposta(NotificacioEntity notificacioGuardada, List<EnviamentReferenciaV2> referencies, String warns) {
 
 		RespostaAltaV2 resposta = new RespostaAltaV2();
 		resposta.setErrorDescripcio(warns);
@@ -1370,8 +1361,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	private PersonaEntity saveTitular(Enviament enviament) {
 
 		var titular = enviament.getTitular();
-		var docTipus = !Strings.isNullOrEmpty(titular.getNif()) && EidasValidator.isFormatEidas(titular.getNif()) ||
-						FISICA_SENSE_NIF.equals(titular.getInteressatTipus()) ? DocumentTipus.ALTRE : null;
+		var docTipus = !Strings.isNullOrEmpty(titular.getNif()) && EidasValidator.isFormatEidas(titular.getNif())? DocumentTipus.ALTRE : null;
 		return personaRepository.save(
 				PersonaEntity.builder()
 							.interessatTipus(titular.getInteressatTipus())
