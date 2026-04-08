@@ -62,7 +62,7 @@ public class NotEnviamentTableItemDto implements Serializable {
 	private boolean entregaPostalText;
 
 	//Registre
-	private Integer registreNumero;
+	private String registreNumero;
 	private Date registreData;
 
 	//Notific@
