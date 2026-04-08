@@ -7,6 +7,7 @@ import es.caib.notib.logic.cacheable.CacheBridge;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.persist.entity.UsuariEntity;
 import es.caib.notib.persist.repository.UsuariRepository;
+import joptsimple.internal.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -115,6 +116,7 @@ public class UsuariHelper {
 		if (dadesUsuari == null) {
 			throw new NotFoundException(auth.getName(), UsuariEntity.class);
 		}
+		idioma = Strings.isNullOrEmpty(idioma) ? "ca" : idioma;
 		var usr = UsuariEntity.builder().codi(dadesUsuari.getCodi()).email(dadesUsuari.getEmail()).idioma(idioma).nom(dadesUsuari.getNom())
 				.llinatges(dadesUsuari.getLlinatges()).nomSencer(dadesUsuari.getNomSencer()).build();
 		return usuariRepository.save(usr);
