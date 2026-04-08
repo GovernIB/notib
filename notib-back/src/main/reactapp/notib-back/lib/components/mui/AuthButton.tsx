@@ -101,19 +101,19 @@ const LoggedInUserButton: React.FC<AuthButtonProps> = (props) => {
     const { badgeIcon, additionalComponents } = props;
     const { t } = useBaseAppContext();
     const apiRef = React.useRef<AuthButtonApi>(undefined);
-    const buttonRef = React.useRef<HTMLButtonElement>(null);
     const { getTokenParsed, signOut } = useAuthContext();
     const [tokenParsed, setTokenParsed] = React.useState<any>();
-    const [menuOpened, setMenuOpened] = React.useState(false);
+    const [anchorEl, setAnchorEl] = React.useState();
     React.useEffect(() => {
         setTokenParsed(getTokenParsed());
     }, []);
+    const menuOpened = !!anchorEl;
     const id = menuOpened ? 'auth-menu' : undefined;
-    const handleIconButtonClick = () => {
-        setMenuOpened(true);
+    const handleIconButtonClick = (event: any) => {
+        setAnchorEl(event.currentTarget);
     };
     const handleMenuClose = () => {
-        setMenuOpened(false);
+        setAnchorEl(undefined);
     };
     apiRef.current = {
         close: handleMenuClose,
@@ -123,7 +123,6 @@ const LoggedInUserButton: React.FC<AuthButtonProps> = (props) => {
             <IconBadge icon={badgeIcon}>
                 <IconButton
                     id="auth-button"
-                    ref={buttonRef}
                     size="small"
                     aria-label="auth menu"
                     aria-controls={menuOpened ? id : undefined}
@@ -135,7 +134,7 @@ const LoggedInUserButton: React.FC<AuthButtonProps> = (props) => {
             </IconBadge>
             <Menu
                 id={id}
-                anchorEl={() => buttonRef.current}
+                anchorEl={anchorEl}
                 open={menuOpened}
                 onClose={() => handleMenuClose()}
                 MenuListProps={{

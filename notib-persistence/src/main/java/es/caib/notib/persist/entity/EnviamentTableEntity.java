@@ -133,9 +133,6 @@ public class EnviamentTableEntity extends NotibAuditable<Long> {
 	@Column(name = "procediment_nom")
 	private String procedimentNom;
 
-	@Column(name = "procediment_id")
-	private Long procedimentId;
-
 	@Column(name="referencia_notificacio")
 	private String referenciaNotificacio;
 
@@ -170,11 +167,7 @@ public class EnviamentTableEntity extends NotibAuditable<Long> {
 	// REGISTRE
 	// //
 	@Column(name = "registre_numero", length = 19)
-	protected String registreNumero;
-
-	public void registreNumero(String registreNumero) {
-		this.registreNumero = registreNumero;
-	}
+	protected Integer registreNumero;
 
 	@Column(name = "registre_data")
 	@Temporal(TemporalType.DATE)

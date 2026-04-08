@@ -234,16 +234,3 @@ databaseChangeLog:
                             -   column:
                                     name: tema
                                     type: varchar(10 ${varcharUnit})
-
-    -   changeSet:
-            id: 2_1_1_000-14
-            author: limit
-            changes:
-                -   addColumn:
-                        tableName: ${db_prefix}NOTIFICACIO_ENV_TABLE
-                        columns:
-                            -   column:
-                                    name: procediment_id
-                                    type: bigint
-                -   sql:
-                        "UPDATE NOT_NOTIFICACIO_ENV_TABLE t SET t.PROCEDIMENT_ID = (SELECT ID FROM NOT_PROCEDIMENT p WHERE p.codi = t.PROCEDIMENT_CODI_NOTIB);"

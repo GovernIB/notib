@@ -19,7 +19,6 @@ import {
 } from '../datacommon/MuiDataCommon';
 import { useDataToolbar } from '../datacommon/DataToolbar';
 import DataNoRows from '../datacommon/DataNoRows';
-import DataQuickFilter from '../datacommon/DataQuickFilter';
 import {
     ReactElementWithPosition,
     joinReactElementsWithPositionWithReactElementsWithPositions,
@@ -216,7 +215,6 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         popupEditFormI18nKeys,
     } = { ...defaultMuiComponentProps.dataList, ...props };
     const theme = useTheme();
-    const [quickFilter, setQuickFilter] = React.useState<string>(quickFilterInitialValue ?? '');
     const {
         currentActions: apiCurrentActions,
         currentError: apiCurrentError,
@@ -226,12 +224,11 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
     const findArgs = React.useMemo(
         () => ({
             filter,
-            quickFilter: quickFilter?.length ? quickFilter : undefined,
             namedQueries,
             perspectives,
             unpaged: true,
         }),
-        [filter, quickFilter, namedQueries, perspectives]
+        [filter, namedQueries, perspectives]
     );
     const {
         loading: _loading,
@@ -239,6 +236,7 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         rows,
         refresh,
         export: exportt,
+        quickFilterComponent,
     } = useApiDataCommon(
         resourceName,
         resourceType,
@@ -246,6 +244,9 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         resourceFieldName,
         findDisabled,
         findArgs,
+        quickFilterInitialValue,
+        undefined,
+        { sx: { ml: 1 } }
     );
     const {
         toolbarAddElement,
@@ -314,10 +315,7 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         subtitle,
         'default',
         apiCurrentError,
-        <DataQuickFilter
-            value={quickFilter}
-            onChange={setQuickFilter}
-            sx={{ ml: 1 }} />,
+        quickFilterComponent,
         refresh,
         exportt,
         toolbarBackButton,

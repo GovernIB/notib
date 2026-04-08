@@ -115,7 +115,7 @@ const PermissionGrid: React.FC<{
             title=""
             resourceName="aclEntryResource"
             columns={columns}
-            fixedFilter={"resourceName:'" + resourceName + "' and resourceId:" + id}
+            staticFilter={"resourceName:'" + resourceName + "' and resourceId:" + id}
             formAdditionalData={{
                 sidGrantedAuthority: false,
                 resourceName,

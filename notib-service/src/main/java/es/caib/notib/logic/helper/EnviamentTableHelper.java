@@ -62,7 +62,6 @@ public class EnviamentTableHelper {
                 .enviamentDataProgramada(notificacio.getEnviamentDataProgramada())
                 .procedimentCodiNotib(notificacio.getProcedimentCodiNotib())
                 .procedimentNom(notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : null)
-                .procedimentId(notificacio.getProcediment() != null ? notificacio.getProcediment().getId() : null)
                 .referenciaNotificacio(notificacio.getReferencia())
                 .grupCodi(notificacio.getGrupCodi())
                 .emisorDir3Codi(notificacio.getEmisorDir3Codi())
@@ -81,7 +80,7 @@ public class EnviamentTableHelper {
                 .procedimentOrganId(notificacio.getProcedimentOrgan() != null ? notificacio.getProcedimentOrgan().getId() : null)
                 .procedimentRequirePermission(notificacio.getProcediment() != null && notificacio.getProcediment().isRequireDirectPermission())
                 .procedimentTipus(notificacio.getProcediment() != null ? notificacio.getProcediment().getTipus() : null)
-                .registreNumero(enviament.getRegistreNumeroFormatat())
+                .registreNumero(notificacio.getRegistreNumero())
                 .registreData(enviament.getRegistreData())
                 .registreEnviamentIntent(0)
                 .notificaDataCaducitat(enviament.getNotificaDataCaducitat())
@@ -127,7 +126,6 @@ public class EnviamentTableHelper {
         tableViewItem.setEnviamentDataProgramada(notificacio.getEnviamentDataProgramada());
         tableViewItem.setProcedimentCodiNotib(notificacio.getProcedimentCodiNotib());
         tableViewItem.setProcedimentNom(notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : null);
-        tableViewItem.setProcedimentId(notificacio.getProcediment() != null ? notificacio.getProcediment().getId() : null);
         tableViewItem.setReferenciaNotificacio(notificacio.getReferencia());
         tableViewItem.setGrupCodi(notificacio.getGrupCodi());
         tableViewItem.setEmisorDir3Codi(notificacio.getEmisorDir3Codi());
@@ -149,7 +147,7 @@ public class EnviamentTableHelper {
         tableViewItem.setProcedimentRequirePermission(notificacio.getProcediment() != null && notificacio.getProcediment().isRequireDirectPermission());
         tableViewItem.setProcedimentTipus(notificacio.getProcediment() != null ? notificacio.getProcediment().getTipus() : null);
 
-        tableViewItem.setRegistreNumero(enviament.getRegistreNumeroFormatat());
+        tableViewItem.setRegistreNumero(notificacio.getRegistreNumero());
         tableViewItem.setRegistreData(enviament.getRegistreData());
         tableViewItem.setRegistreEnviamentIntent(notificacio.getRegistreEnviamentIntent());
 
