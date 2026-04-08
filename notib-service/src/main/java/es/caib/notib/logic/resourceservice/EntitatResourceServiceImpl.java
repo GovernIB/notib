@@ -1,5 +1,6 @@
 package es.caib.notib.logic.resourceservice;
 
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.helper.AclHelper;
@@ -120,20 +121,20 @@ public class EntitatResourceServiceImpl
 			if (isRoleUser && currentEntitatId != null) {
 				resource.setCrearNotificacions(
 					checkPermisRemesa(
-						ExtendedPermission.PERM4, // Permís de creació de notificacions als òrgans gestors
-						ExtendedPermission.PERM5, // Permís de creació de notificacions als procediments
+						notibPermissionHelper.getOrganGestorCreatePermissionForEnviamentTipus(EnviamentTipus.NOTIFICACIO),
+						notibPermissionHelper.getProcedimentCreatePermissionForEnviamentTipus(EnviamentTipus.NOTIFICACIO),
 						false,
 						false));
 				resource.setCrearComunicacions(
 					checkPermisRemesa(
-						ExtendedPermission.PERM5, // Permís de creació de comunicacions als òrgans gestors
-						ExtendedPermission.PERM8, // Permís de creació de comunicacions als procediments
+						notibPermissionHelper.getOrganGestorCreatePermissionForEnviamentTipus(EnviamentTipus.COMUNICACIO),
+						notibPermissionHelper.getProcedimentCreatePermissionForEnviamentTipus(EnviamentTipus.COMUNICACIO),
 						null,
 						true));
 				resource.setCrearSir(
 					checkPermisRemesa(
-						ExtendedPermission.PERM6, // Permís de creació de comunicacions SIR als òrgans gestors
-						ExtendedPermission.PERM7, // Permís de creació de comunicacions SIR als procediments
+						notibPermissionHelper.getOrganGestorCreatePermissionForEnviamentTipus(EnviamentTipus.SIR),
+						notibPermissionHelper.getProcedimentCreatePermissionForEnviamentTipus(EnviamentTipus.SIR),
 						null,
 						true));
 			} else {
