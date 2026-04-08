@@ -82,12 +82,13 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.validation.BindException;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.io.ICsvListWriter;
 import org.supercsv.prefs.CsvPreference;
+
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.annotation.Resource;
 import java.io.ByteArrayOutputStream;
@@ -179,8 +180,8 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     private OrganGestorService organGestorService;
     @Autowired
     private CacheBridge cacheBridge;
-	@Autowired
-	private NotificacioEnviamentRepository notificacioEnviamentRepository;
+    @Autowired
+    private NotificacioEnviamentRepository notificacioEnviamentRepository;
 
     @Override
     public NotificacioMassivaDataDto findById(Long entitatId, Long id) {
@@ -249,6 +250,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
                 var procediment = !Strings.isNullOrEmpty(notificacio.getProcedimentCodi()) ? procSerRepository.findByCodiAndEntitat(notificacio.getProcedimentCodi(), entitat) : null;
                 var organGestor = !Strings.isNullOrEmpty(notificacio.getOrganGestor()) ? organGestorRepository.findByEntitatAndCodi(entitat, notificacio.getOrganGestor()) : null;
+
                 validarFirma = !documentsProcessatsMassiu.containsKey(notificacio.getDocument().getArxiuNom());
                 var document = documentHelper.getDocument(notificacio.getDocument(), validarFirma);
 
@@ -341,31 +343,31 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     @Override
     public PaginaDto<NotificacioTableItemDto> findNotificacions(Long entitatId, Long notificacioMassivaId, NotificacioFiltreDto filtre, PaginacioParamsDto paginacioParams) {
 
-		var entitatActual = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
-		var pageable = notificacioListHelper.getMappeigPropietats(paginacioParams);
-		var f = notificacioListHelper.getFiltre(filtre, entitatId, null, null, null);
-		f.setNotificacioMassiva(notificacioMassivaRepository.findById(notificacioMassivaId).orElse(null));
-		if (!Strings.isNullOrEmpty(f.getIdentificador())) {
-			var enviament = notificacioEnviamentRepository.findByNotificaIdentificador(f.getIdentificador());
-			f.setReferencia(enviament != null ? enviament.getNotificacio().getReferencia() : "noReferencia");
-			f.setIdentificadorNull(true);
-			f.setIdentificador(null);
-			f.setReferenciaNull(false);
-		}
-		if (!Strings.isNullOrEmpty(f.getRegistreNum())) {
-			var enviament = notificacioEnviamentRepository.findByRegistreNumeroFormatat(f.getRegistreNum());
-			f.setRegistreNumNull(true);
-			f.setRegistreNum(null);
-			f.setReferenciaNull(false);
-			f.setReferencia(enviament.isPresent() ? enviament.get().getNotificacio().getReferencia() : "noReferencia");
-		}
-		var notificacions = notificacioTableViewRepository.findAmbFiltreByNotificacioMassiva(f, pageable);
-		var auth = SecurityContextHolder.getContext().getAuthentication();
-		var dtos = notificacioTableMapper.toNotificacionsTableItemDto(
-			notificacions.getContent(),
-			notificacioListHelper.getCodisProcedimentsAndOrgansAmpPermisProcessar(entitatId, auth.getName()),
-			cacheHelper.findOrganigramaNodeByEntitat(f.getEntitat().getDir3Codi()));
-		return paginacioHelper.toPaginaDto(dtos, notificacions);
+        var entitatActual = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false);
+        var pageable = notificacioListHelper.getMappeigPropietats(paginacioParams);
+        var f = notificacioListHelper.getFiltre(filtre, entitatId, null, null, null);
+        f.setNotificacioMassiva(notificacioMassivaRepository.findById(notificacioMassivaId).orElse(null));
+        if (!Strings.isNullOrEmpty(f.getIdentificador())) {
+            var enviament = notificacioEnviamentRepository.findByNotificaIdentificador(f.getIdentificador());
+            f.setReferencia(enviament != null ? enviament.getNotificacio().getReferencia() : "noReferencia");
+            f.setIdentificadorNull(true);
+            f.setIdentificador(null);
+            f.setReferenciaNull(false);
+        }
+        if (!Strings.isNullOrEmpty(f.getRegistreNum())) {
+            var enviament = notificacioEnviamentRepository.findByRegistreNumeroFormatat(f.getRegistreNum());
+            f.setRegistreNumNull(true);
+            f.setRegistreNum(null);
+            f.setReferenciaNull(false);
+            f.setReferencia(enviament.isPresent() ? enviament.get().getNotificacio().getReferencia() : "noReferencia");
+        }
+        var notificacions = notificacioTableViewRepository.findAmbFiltreByNotificacioMassiva(f, pageable);
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        var dtos = notificacioTableMapper.toNotificacionsTableItemDto(
+                notificacions.getContent(),
+                notificacioListHelper.getCodisProcedimentsAndOrgansAmpPermisProcessar(entitatId, auth.getName()),
+                cacheHelper.findOrganigramaNodeByEntitat(f.getEntitat().getDir3Codi()));
+        return paginacioHelper.toPaginaDto(dtos, notificacions);
     }
 
     @Override
@@ -681,24 +683,25 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 filtre.getEstatProces(), createdByNull, filtre.getCreatedByCodi(), paginacioHelper.toSpringDataPageable(paginacioParams));
     }
 
-	private void enviarCorreuElectronic(NotificacioMassivaEntity notificacioMassiva) {
+    private void enviarCorreuElectronic(NotificacioMassivaEntity notificacioMassiva) {
 
-		if (Strings.isNullOrEmpty(notificacioMassiva.getEmail())) {
-			return;
-		}
-		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-			@Override
-			public void afterCommit() {
-				if (TransactionSynchronizationManager.isActualTransactionActive()) {
-					try {
-						jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_MASSIVA, notificacioMassiva.getId());
-					} catch (JmsException ex) {
-						log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar enviar el correu electrònic.", ex);
-					}
-				}
-			}
-		});
-	}
+        if (Strings.isNullOrEmpty(notificacioMassiva.getEmail())) {
+            return;
+        }
+        if (TransactionSynchronizationManager.isActualTransactionActive()) {
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                    try {
+                        jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_MASSIVA, notificacioMassiva.getId());
+                    } catch (JmsException ex) {
+                        log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar enviar el correu electrònic.", ex);
+                    }
+                }
+            });
+        }
+    }
+
     private NotificacioMassivaEntity registrarNotificacioMassiva(EntitatEntity entitat, NotificacioMassivaDto notMassivaDto, int size) {
 
         var csvGesdocId = pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_MASSIUS_CSV, notMassivaDto.getFicheroCsvBytes());
