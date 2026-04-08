@@ -1,10 +1,7 @@
 package es.caib.notib.logic.intf.model;
 
-import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
-import es.caib.notib.logic.intf.base.annotation.ResourceArtifact;
-import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
 import es.caib.notib.logic.intf.base.validation.CustomValidation;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.explotacio.EnviamentOrigen;
@@ -27,7 +24,6 @@ import lombok.experimental.FieldNameConstants;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -63,13 +59,6 @@ import java.util.List;
 			roles = { BaseConfig.ROLE_USER },
 			grantedPermissions = { PermissionEnum.READ, PermissionEnum.CREATE }
 		),
-	},
-	artifacts = {
-		@ResourceArtifact(
-			type = ResourceArtifactType.FILTER,
-			code = NotificacioResource.FILTER_CODE,
-			formClass = NotificacioResource.NotificacioResourceFilter.class
-		),
 	}
 )
 @CustomValidation.List({
@@ -81,8 +70,6 @@ import java.util.List;
 		springBean = true),
 })
 public class NotificacioResource extends BaseResource<Long> {
-
-	public static final String FILTER_CODE = "FILTER_NOTIFICACIO";
 
 	@NotNull
 	private EnviamentTipus enviamentTipus;
@@ -162,42 +149,9 @@ public class NotificacioResource extends BaseResource<Long> {
 	private String createdBy;
 	private ProcSerTipusEnum procedimentTipus;
 	private boolean procedimentRequired = true;
-	private boolean entregaPostal;
 
 	// Camps provinents de NotificacioTable
 	private Date enviadaDate;
 	private String estatString;
-	private String registreNums;
-	private String titular;
-	private String notificaIds;
-
-
-	@Getter
-	@Setter
-	@NoArgsConstructor
-	public static class NotificacioResourceFilter implements Serializable {
-
-		private EnviamentTipus enviamentTipus;
-		private String concepte;
-		private NotificacioEstatEnumDto estat;
-		private Date dataIniciInici;
-		private Date dataIniciFi;
-		private String interessat;
-		private String numExpedient;
-		private String identificadorNotifica;
-		private ResourceReference<OrganGestorResource, Long> organGestor;
-		private ResourceReference<ProcedimentResource, Long> procediment;
-		private ResourceReference<ProcedimentResource, Long> servei;
-		private TipusUsuariEnumDto tipusUsuari;
-		private String createdBy;
-		protected String referencia;
-		private String registreNumeroSortida;
-		private Date dataCaducitatInici;
-		private Date dataCaducitatFi;
-		private boolean nomesLesMeves;	// TODO
-		private boolean codiPostal;
-		private boolean errorLastCallback;
-		private boolean entregaPostal;
-	}
 
 }

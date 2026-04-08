@@ -37,9 +37,13 @@ export const MuiFilter: React.FC<MuiFilterProps> = (props) => {
         }
         onSpringFilterChange?.(filter);
     };
+    const outerBoxSx = {
+        mt: 1,
+        ...componentProps?.sx,
+    };
     return (
         <Filter onSpringFilterChange={handleSpringFilterChange} {...otherProps}>
-            <Box {...componentProps}>
+            <Box {...componentProps} sx={outerBoxSx}>
                 {children}
             </Box>
         </Filter>

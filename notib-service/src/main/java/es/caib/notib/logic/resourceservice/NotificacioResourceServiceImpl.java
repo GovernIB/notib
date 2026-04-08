@@ -62,8 +62,9 @@ public class NotificacioResourceServiceImpl
 	}
 
 	@Override
-	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
-
+	protected String additionalSpringFilter(
+		String currentSpringFilter,
+		String[] namedQueries) {
 		List<String> andConditions = new ArrayList<>();
 		// Condició per a mostrar només les notificacions de l'entitat actual
 		andConditions.add("entitat.id:" + userSessionHelper.getCurrentEntitatId());
@@ -118,12 +119,12 @@ public class NotificacioResourceServiceImpl
 			resource(enviament).
 			notificacio(notificacio).
 			build();
-		enviamentNou.setReferenciaEnviament(uuid);
+		enviamentNou.setNotificaReferencia(uuid);
 		enviamentNou.setNotificaEstat(EnviamentEstat.PENDENT);
 		NotificacioEnviamentResourceEntity enviamentCreat = notificacioEnviamentResourceRepository.saveAndFlush(enviamentNou);
 		PersonaResourceEntity titular = saveDestinatari(enviamentCreat, enviament.getTitularInfo());
 		enviamentCreat.setTitular(titular);
-		enviamentCreat.setReferenciaEnviament(uuid);
+		enviamentCreat.setNotificaReferencia(uuid);
 		if (enviament.getRepresentantsInfo() != null) {
 			enviament.getRepresentantsInfo().forEach(r -> saveDestinatari(enviamentCreat, r));
 		}
