@@ -35,40 +35,47 @@ public interface OrganGestorResourceRepository extends BaseRepository<OrganGesto
 		value = "SELECT DISTINCT o.id " +
 			"FROM " + BaseConfig.DB_PREFIX + "organ_gestor o " +
 			"WHERE o.entitat = :entitatId " +
+			"AND o.estat = 'VIGENT' " +
 			"AND (" +
-			"    o.codi IN (:codis)" +
+			"    o.codi IN (:codis) " +
 			"    OR " +
-			"        o.codi_pare IN (:codis)" +
+			"        o.codi_pare IN (:codis) " +
 			"    OR o.codi_pare IN (" +
-			"        SELECT o1.codi" +
-			"        FROM " + BaseConfig.DB_PREFIX + "organ_gestor o1" +
-			"        WHERE o1.entitat = :entitatId" +
-			"        AND o1.codi_pare IN (:codis)" +
+			"        SELECT o1.codi " +
+			"        FROM " + BaseConfig.DB_PREFIX + "organ_gestor o1 " +
+			"        WHERE o1.entitat = :entitatId " +
+			"        AND o1.estat = 'VIGENT' " +
+			"        AND o1.codi_pare IN (:codis) " +
 			"    )" +
 			"    OR o.codi_pare IN (" +
-			"        SELECT o2.codi" +
-			"        FROM " + BaseConfig.DB_PREFIX + "organ_gestor o2" +
-			"        WHERE o2.entitat = :entitatId" +
+			"        SELECT o2.codi " +
+			"        FROM " + BaseConfig.DB_PREFIX + "organ_gestor o2 " +
+			"        WHERE o2.entitat = :entitatId " +
+			"        AND o2.estat = 'VIGENT' " +
 			"        AND o2.codi_pare IN (" +
-			"            SELECT o1.codi" +
-			"            FROM " + BaseConfig.DB_PREFIX + "organ_gestor o1" +
-			"            WHERE o1.entitat = :entitatId" +
-			"            AND o1.codi_pare IN (:codis)" +
+			"            SELECT o1.codi " +
+			"            FROM " + BaseConfig.DB_PREFIX + "organ_gestor o1 " +
+			"            WHERE o1.entitat = :entitatId " +
+			"            AND o1.estat = 'VIGENT' " +
+			"            AND o1.codi_pare IN (:codis) " +
 			"        )" +
 			"    )" +
 			"    OR o.codi_pare IN (" +
-			"        SELECT o3.codi" +
-			"        FROM " + BaseConfig.DB_PREFIX + "organ_gestor o3" +
-			"        WHERE o3.entitat = :entitatId" +
+			"        SELECT o3.codi " +
+			"        FROM " + BaseConfig.DB_PREFIX + "organ_gestor o3 " +
+			"        WHERE o3.entitat = :entitatId " +
+			"        AND o3.estat = 'VIGENT' " +
 			"        AND o3.codi_pare IN (" +
-			"            SELECT o2.codi" +
-			"            FROM " + BaseConfig.DB_PREFIX + "organ_gestor o2" +
-			"            WHERE o2.entitat = :entitatId" +
+			"            SELECT o2.codi " +
+			"            FROM " + BaseConfig.DB_PREFIX + "organ_gestor o2 " +
+			"            WHERE o2.entitat = :entitatId " +
+			"            AND o2.estat = 'VIGENT' " +
 			"            AND o2.codi_pare IN (" +
-			"                SELECT o1.codi" +
-			"                FROM " + BaseConfig.DB_PREFIX + "organ_gestor o1" +
-			"                WHERE o1.entitat = :entitatId" +
-			"                AND o1.codi_pare IN (:codis)" +
+			"                SELECT o1.codi " +
+			"                FROM " + BaseConfig.DB_PREFIX + "organ_gestor o1 " +
+			"                WHERE o1.entitat = :entitatId " +
+			"                AND o1.estat = 'VIGENT' " +
+			"                AND o1.codi_pare IN (:codis) " +
 			"            )" +
 			"        )" +
 			"    )" +
