@@ -168,7 +168,7 @@ public class NotibPermissionHelper {
 		// Només retorna els procediments/serveis no comuns que existeixen a la base de dades.
 		Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
 		ProcSerTipusEnum procSerTipus = getProcSerTipusForQuery(isServei);
-		return procedimentResourceRepository.findIdsByEntitatIdAndTipusAndIdInAndComuFalse(
+		return procedimentResourceRepository.findIdsByEntitatIdAndTipusAndIdInAndComuFalseAndActiuTrue(
 			currentEntitatId,
 			procSerTipus,
 			idsWithPermission);
@@ -269,7 +269,7 @@ public class NotibPermissionHelper {
 		Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
 		ProcSerTipusEnum procSerTipus = getProcSerTipusForQuery(isServei);
 		Set<Long> organGestorIds = !requireDirectPermission ? organGestorWithProcedimentsComunsPermission() : null;
-		return procedimentOrganGestorResourceRepository.findIdsByOrganGestorEntitatIdAndProcedimentTipusAndDirecteTrueAndProcedimentComuAndOrganGestorIdInAndIdIn(
+		return procedimentOrganGestorResourceRepository.findIdsComprovacioPermisos(
 			currentEntitatId,
 			procSerTipus,
 			requireDirectPermission,
