@@ -204,7 +204,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         var accioId = accioMassivaService.altaAccioMassiva(accio);
         accio.setAccioId(accioId);
         response.setHeader(SET_COOKIE, FILE_DOWNLOAD);
-        var certificacions = accioMassivaService.descarregarCertificacio(accio);
+        var certificacions = accioMassivaService.descarregarCertificacio(accioId);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ZipOutputStream zos = new ZipOutputStream(baos);
         for (var notCerts : certificacions) {
