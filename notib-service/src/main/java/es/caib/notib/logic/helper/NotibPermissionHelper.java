@@ -214,7 +214,7 @@ public class NotibPermissionHelper {
 	 *            el tipus d'enviament.
 	 * @return el permís corresponent.
 	 */
-	public Permission getOrganGestorCreatePermissionForEnviamentTipus(EnviamentTipus enviamentTipus) {
+	public Permission getOrganGestorNotificacioCreatePermission(EnviamentTipus enviamentTipus) {
 		if (EnviamentTipus.COMUNICACIO.equals(enviamentTipus)) {
 			return ExtendedPermission.PERM5;
 		} else if (EnviamentTipus.SIR.equals(enviamentTipus)) {
@@ -231,7 +231,7 @@ public class NotibPermissionHelper {
 	 *            el tipus d'enviament.
 	 * @return el permís corresponent.
 	 */
-	public Permission getProcedimentCreatePermissionForEnviamentTipus(EnviamentTipus enviamentTipus) {
+	public Permission getProcedimentNotificacioCreatePermission(EnviamentTipus enviamentTipus) {
 		if (EnviamentTipus.COMUNICACIO.equals(enviamentTipus)) {
 			return ExtendedPermission.PERM8;
 		} else if (EnviamentTipus.SIR.equals(enviamentTipus)) {

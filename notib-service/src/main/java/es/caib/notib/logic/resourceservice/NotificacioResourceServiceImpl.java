@@ -221,8 +221,10 @@ public class NotificacioResourceServiceImpl
 	 * del mètode springFilterWithReadPermission().
 	 */
 	private void checkCreatePermission(NotificacioResourceEntity entity) {
-		Permission organGestorPermission = notibPermissionHelper.getOrganGestorCreatePermissionForEnviamentTipus(entity.getEnviamentTipus());
-		Permission procedimentPermission = notibPermissionHelper.getProcedimentCreatePermissionForEnviamentTipus(entity.getEnviamentTipus());
+		Permission organGestorPermission = notibPermissionHelper.getOrganGestorNotificacioCreatePermission(
+			entity.getEnviamentTipus());
+		Permission procedimentPermission = notibPermissionHelper.getProcedimentNotificacioCreatePermission(
+			entity.getEnviamentTipus());
 		List<Long> organGestorIds = notibPermissionHelper.organGestorIdsWithPermissionRecursive(organGestorPermission);
 		List<Long> procedimentNoComuIds = notibPermissionHelper.procedimentServeiNoComuIdsWithPermission(
 			procedimentPermission,
