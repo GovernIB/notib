@@ -1,5 +1,6 @@
 package es.caib.notib.logic.helper;
 
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.ResourceNotCreatedException;
@@ -204,6 +205,40 @@ public class NotibPermissionHelper {
 		Set<Long> allIds = new HashSet<>(procedimentOrganGestorIdsRequireDirectPermissionTrue);
 		allIds.addAll(procedimentOrganGestorIdsRequireDirectPermissionFalse);
 		return new ArrayList<>(allIds);
+	}
+
+	/**
+	 * Retorna el permís de l'òrgan gestor per a la creació d'enviaments d'un tipus determinat.
+	 *
+	 * @param enviamentTipus
+	 *            el tipus d'enviament.
+	 * @return el permís corresponent.
+	 */
+	public Permission getOrganGestorCreatePermissionForEnviamentTipus(EnviamentTipus enviamentTipus) {
+		if (EnviamentTipus.COMUNICACIO.equals(enviamentTipus)) {
+			return ExtendedPermission.PERM5;
+		} else if (EnviamentTipus.SIR.equals(enviamentTipus)) {
+			return ExtendedPermission.PERM6;
+		} else {
+			return ExtendedPermission.PERM4;
+		}
+	}
+
+	/**
+	 * Retorna el permís del procediment per a la creació d'enviaments d'un tipus determinat.
+	 *
+	 * @param enviamentTipus
+	 *            el tipus d'enviament.
+	 * @return el permís corresponent.
+	 */
+	public Permission getProcedimentCreatePermissionForEnviamentTipus(EnviamentTipus enviamentTipus) {
+		if (EnviamentTipus.COMUNICACIO.equals(enviamentTipus)) {
+			return ExtendedPermission.PERM8;
+		} else if (EnviamentTipus.SIR.equals(enviamentTipus)) {
+			return ExtendedPermission.PERM7;
+		} else {
+			return ExtendedPermission.PERM5;
+		}
 	}
 
 	/**
