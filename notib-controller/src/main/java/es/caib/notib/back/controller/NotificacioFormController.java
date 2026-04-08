@@ -340,7 +340,7 @@ public class NotificacioFormController extends BaseUserController {
             } else {
                 var not = notificacioService.create(entitatActual.getId(), notificacioCommand.asNotificacioV2());
                 // SM
-                not.getEnviaments().forEach(e -> enviamentSmService.altaEnviamentWeb(e.getNotificaReferencia()));
+//                not.getEnviaments().forEach(e -> enviamentSmService.altaEnviamentWeb(e.getNotificaReferencia()));
 
             }
         } catch (Exception ex) {
