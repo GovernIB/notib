@@ -80,7 +80,7 @@ public class EnviamentTableHelper {
                 .procedimentOrganId(notificacio.getProcedimentOrgan() != null ? notificacio.getProcedimentOrgan().getId() : null)
                 .procedimentRequirePermission(notificacio.getProcediment() != null && notificacio.getProcediment().isRequireDirectPermission())
                 .procedimentTipus(notificacio.getProcediment() != null ? notificacio.getProcediment().getTipus() : null)
-                .registreNumero(notificacio.getRegistreNumero())
+                .registreNumero(enviament.getRegistreNumeroFormatat())
                 .registreData(enviament.getRegistreData())
                 .registreEnviamentIntent(0)
                 .notificaDataCaducitat(enviament.getNotificaDataCaducitat())
@@ -147,7 +147,7 @@ public class EnviamentTableHelper {
         tableViewItem.setProcedimentRequirePermission(notificacio.getProcediment() != null && notificacio.getProcediment().isRequireDirectPermission());
         tableViewItem.setProcedimentTipus(notificacio.getProcediment() != null ? notificacio.getProcediment().getTipus() : null);
 
-        tableViewItem.setRegistreNumero(notificacio.getRegistreNumero());
+        tableViewItem.setRegistreNumero(enviament.getRegistreNumeroFormatat());
         tableViewItem.setRegistreData(enviament.getRegistreData());
         tableViewItem.setRegistreEnviamentIntent(notificacio.getRegistreEnviamentIntent());
 
