@@ -23,6 +23,7 @@ import {
     useGridSelector,
     gridEditRowsStateSelector,
 } from '@mui/x-data-grid-pro';
+import { caES, esES, enUS } from '@mui/x-data-grid/locales';
 import Box from '@mui/material/Box';
 import Icon from '@mui/material/Icon';
 import { capitalize } from '../../../util/text';
@@ -515,6 +516,17 @@ const useGridColumns = (
         return processedColumns;
     }, [columns, fields, artifacts]);
     return processedColumns;
+};
+
+const useLocaleText = () => {
+    const { currentLanguage } = useBaseAppContext();
+    if (currentLanguage === 'ca') {
+        return caES.components.MuiDataGrid.defaultProps.localeText;
+    } else if (currentLanguage === 'es') {
+        return esES.components.MuiDataGrid.defaultProps.localeText;
+    } else {
+        return enUS.components.MuiDataGrid.defaultProps.localeText;
+    }
 };
 
 /**
@@ -1034,6 +1046,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
           }
         : null;
     const processedRows = React.useMemo(() => [...additionalRows, ...rows], [additionalRows, rows]);
+    const localeText = useLocaleText();
     const content = (
         <>
             {!toolbarHide && toolbar}
@@ -1081,6 +1094,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                 }}
                 semiBordered={semiBordered}
                 autoHeight={autoHeight}
+                localeText={localeText}
                 sx={{
                     height: autoHeight ? 'auto' : undefined,
                     ...gridMargins,
