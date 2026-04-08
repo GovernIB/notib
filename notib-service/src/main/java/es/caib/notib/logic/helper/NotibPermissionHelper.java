@@ -168,7 +168,7 @@ public class NotibPermissionHelper {
 		// Només retorna els procediments/serveis no comuns que existeixen a la base de dades.
 		Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
 		ProcSerTipusEnum procSerTipus = getProcSerTipusForQuery(isServei);
-		return procedimentResourceRepository.findIdsByEntitatIdAndTipusAndIdInAndComuFalseAndActiuTrue(
+		return procedimentResourceRepository.findIdsByEntitatIdAndTipusAndIdInAndComuFalse(
 			currentEntitatId,
 			procSerTipus,
 			idsWithPermission);
@@ -214,7 +214,7 @@ public class NotibPermissionHelper {
 	 *            el tipus d'enviament.
 	 * @return el permís corresponent.
 	 */
-	public Permission getOrganGestorNotificacioCreatePermission(EnviamentTipus enviamentTipus) {
+	public Permission getOrganGestorCreatePermissionForEnviamentTipus(EnviamentTipus enviamentTipus) {
 		if (EnviamentTipus.COMUNICACIO.equals(enviamentTipus)) {
 			return ExtendedPermission.PERM5;
 		} else if (EnviamentTipus.SIR.equals(enviamentTipus)) {
@@ -231,7 +231,7 @@ public class NotibPermissionHelper {
 	 *            el tipus d'enviament.
 	 * @return el permís corresponent.
 	 */
-	public Permission getProcedimentNotificacioCreatePermission(EnviamentTipus enviamentTipus) {
+	public Permission getProcedimentCreatePermissionForEnviamentTipus(EnviamentTipus enviamentTipus) {
 		if (EnviamentTipus.COMUNICACIO.equals(enviamentTipus)) {
 			return ExtendedPermission.PERM8;
 		} else if (EnviamentTipus.SIR.equals(enviamentTipus)) {
@@ -269,7 +269,7 @@ public class NotibPermissionHelper {
 		Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
 		ProcSerTipusEnum procSerTipus = getProcSerTipusForQuery(isServei);
 		Set<Long> organGestorIds = !requireDirectPermission ? organGestorWithProcedimentsComunsPermission() : null;
-		return procedimentOrganGestorResourceRepository.findIdsComprovacioPermisos(
+		return procedimentOrganGestorResourceRepository.findIdsByOrganGestorEntitatIdAndProcedimentTipusAndDirecteTrueAndProcedimentComuAndOrganGestorIdInAndIdIn(
 			currentEntitatId,
 			procSerTipus,
 			requireDirectPermission,

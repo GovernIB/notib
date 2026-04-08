@@ -23,8 +23,6 @@ type FormFieldEnumProps = FormFieldCustomProps & {
     requestParams?: any;
     /** Indica si el camp de l'enumerat s'ha de gestionar mitjançant el component Autocomplete de MUI */
     autocomplete?: boolean;
-    /** La descripció que s'ha de mostrar pel valor buit */
-    emptyValueDescription?: string;
 };
 
 type EnumOption = {
@@ -50,7 +48,6 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
         hiddenEnumValues,
         requestParams,
         autocomplete,
-        emptyValueDescription,
     } = props;
     const { t } = useBaseAppContext();
     const { requestHref } = useResourceApiContext();
@@ -177,24 +174,20 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
             helperText={helperText ?? componentProps.helperText}
             slotProps={{
                 input: inputProps,
-                inputLabel: { shrink: emptyValueDescription != null ? true : undefined },
                 select: {
                     multiple,
                     open: textFieldOpen,
                     readOnly,
-                    displayEmpty: emptyValueDescription != null,
+                    // displayEmpty: !isRequired && !multiple, TODO Se ha desactivado ya que causaba bugs visuales en todos los enums y no tenemos un ejemplo claro para probar la funcionalidad
                     onClose: () => setTextFieldOpen(false),
                     onOpen: () => setTextFieldOpen(true),
                     renderValue: (value: any) => {
                         const selectedText = (v: any) => {
-                            if (v === '' && emptyValueDescription != null) {
-                                return emptyValueDescription;
-                            } else {
-                                const found = enumOptions?.find((o) =>
-                                    v === '' ? o.value == null : o.value === v
-                                );
-                                return found?.description ?? found?.value;
-                            }
+                            const found = enumOptions?.find((o) =>
+                                // Diría que los enumValues vacíos vienen definidos como string vacío en lugar de null
+                                v === '' ? o.value == null : o.value === v
+                            );
+                            return found?.description ?? found?.value;
                         };
                         return multiple
                             ? value?.map((v: any) => selectedText(v)).join(', ')
@@ -203,9 +196,10 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
                 },
             }}
         >
+            {/* Diría que los enumValues vacíos vienen definidos como string vacío en lugar de null */}
             {!isRequired && !multiple && enumOptions?.find((o) => o.value == null) == null && (
                 <MenuItem key="" value="">
-                    {emptyValueDescription ?? <>&nbsp;</>}
+                    &nbsp;
                 </MenuItem>
             )}
             {enumOptions?.map((o) => {
@@ -296,21 +290,19 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
                             flexWrap: inline ? 'nowrap' : undefined,
                         },
                     }}
-                    slotProps={{
-                        input: {
-                            ...params.InputProps,
-                            startAdornment: params.InputProps.startAdornment ? (
-                                <>
-                                    {inputProps.startAdornment}
-                                    {params.InputProps.startAdornment}
-                                </>
-                            ) : (
-                                inputProps.startAdornment
-                            ),
-                            endAdornment: params.InputProps.endAdornment,
-                        },
-                        htmlInput: params.inputProps
+                    InputProps={{
+                        ...params.InputProps,
+                        startAdornment: params.InputProps.startAdornment ? (
+                            <>
+                                {inputProps.startAdornment}
+                                {params.InputProps.startAdornment}
+                            </>
+                        ) : (
+                            inputProps.startAdornment
+                        ),
+                        endAdornment: params.InputProps.endAdornment,
                     }}
+                    inputProps={params.inputProps}
                 />
             )}
             slotProps={{
@@ -319,10 +311,10 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
                         minWidth: '300px',
                     },
                 },
-                // The next prop fixes a bug in Firefox where the focus was put into the Listbox
-                // container, and then lost focus of the form completely when navigating to the next input
-                listbox: { tabIndex: '-1' },
             }}
+            // The next prop fixes a bug in Firefox where the focus was put into the Listbox
+            // container, and then lost focus of the form completely when navigating to the next input
+            ListboxProps={{ tabIndex: '-1' }}
             clearText={t('form.field.enum.clear')}
             noOptionsText={t('form.field.enum.noOptions')}
         />

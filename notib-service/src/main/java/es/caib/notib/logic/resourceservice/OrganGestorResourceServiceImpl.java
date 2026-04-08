@@ -5,22 +5,25 @@ import es.caib.notib.logic.helper.*;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.ActionExecutionException;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
-import es.caib.notib.logic.intf.base.exception.PerspectiveApplicationException;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
 import es.caib.notib.logic.intf.model.OrganGestorDir3Sync;
 import es.caib.notib.logic.intf.model.OrganGestorResource;
 import es.caib.notib.logic.intf.resourceservice.OrganGestorResourceService;
-import es.caib.notib.persist.resourceentity.*;
-import es.caib.notib.persist.resourcerepository.*;
-import lombok.RequiredArgsConstructor;
+import es.caib.notib.persist.resourceentity.EntregaCieResourceEntity;
+import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
+import es.caib.notib.persist.resourcerepository.EntitatResourceRepository;
+import es.caib.notib.persist.resourcerepository.EntregaCieResourceRepository;
+import es.caib.notib.persist.resourcerepository.PagadorCieResourceRepository;
+import es.caib.notib.persist.resourcerepository.PagadorPostalResourceRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -37,7 +40,6 @@ public class OrganGestorResourceServiceImpl
 	private final AclHelper aclHelper;
 	private final OrganGestorSyncHelper organGestorSyncHelper;
 	private final EntitatResourceRepository entitatResourceRepository;
-	private final OrganGestorResourceRepository organGestorResourceRepository;
 	private final PagadorPostalResourceRepository pagadorPostalResourceRepository;
 	private final PagadorCieResourceRepository pagadorCieResourceRepository;
 	private final EntregaCieResourceRepository entregaCieResourceRepository;
@@ -49,7 +51,6 @@ public class OrganGestorResourceServiceImpl
 		AclHelper aclHelper,
 		OrganGestorSyncHelper organGestorSyncHelper,
 		EntitatResourceRepository entitatResourceRepository,
-		OrganGestorResourceRepository organGestorResourceRepository,
 		PagadorPostalResourceRepository pagadorPostalResourceRepository,
 		PagadorCieResourceRepository pagadorCieResourceRepository,
 		EntregaCieResourceRepository entregaCieResourceRepository) {
@@ -57,7 +58,6 @@ public class OrganGestorResourceServiceImpl
 		this.aclHelper = aclHelper;
 		this.organGestorSyncHelper = organGestorSyncHelper;
 		this.entitatResourceRepository = entitatResourceRepository;
-		this.organGestorResourceRepository = organGestorResourceRepository;
 		this.pagadorPostalResourceRepository = pagadorPostalResourceRepository;
 		this.pagadorCieResourceRepository = pagadorCieResourceRepository;
 		this.entregaCieResourceRepository = entregaCieResourceRepository;
@@ -65,7 +65,6 @@ public class OrganGestorResourceServiceImpl
 
 	@PostConstruct
 	public void init() {
-		register(OrganGestorResource.PERSPECTIVE_TREE, new OrganGestorResourceTreePerspectiveApplicator());
 		register(OrganGestorResource.DIR3_SYNC_ACTION_CODE, new Dir3SyncActionExecutor());
 	}
 
@@ -75,12 +74,13 @@ public class OrganGestorResourceServiceImpl
 	 */
 	@Override
 	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
-		String superFilter = super.additionalSpringFilter(currentSpringFilter, namedQueries);
-		boolean isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
+
+		var superFilter = super.additionalSpringFilter(currentSpringFilter, namedQueries);
+		var isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
 		if (isRoleAdmin) {
 			return superFilter;
 		}
-		String filter = superFilter;
+		var filter = superFilter;
 		if (Arrays.asList(namedQueries).contains(OrganGestorResource.NAMED_QUERY_PERM_READ)) {
 			filter = addIdsWithPermissionFilterExpression(ExtendedPermission.READ, filter);
 		}
@@ -98,39 +98,48 @@ public class OrganGestorResourceServiceImpl
 
 	@Override
 	protected void afterConversion(OrganGestorResourceEntity entity, OrganGestorResource resource) {
+
 		resource.setAclEntryCount(aclHelper.count(AclHelper.ORGAN_GESTOR_CLASS, entity.getId(), null));
 		if (entity.getEntregaCie() == null) {
 			return;
 		}
-		PagadorCieResourceEntity pagadorCie = entity.getEntregaCie().getPagadorCie();
+		var pagadorCie = entity.getEntregaCie().getPagadorCie();
 		resource.setEntregaCiePagadorCie(ResourceReference.toResourceReference(pagadorCie.getId(), pagadorCie.getNom()));
-		PagadorPostalResourceEntity pagadorPostal = entity.getEntregaCie().getPagadorPostal();
+		var pagadorPostal = entity.getEntregaCie().getPagadorPostal();
 		resource.setEntregaCiePagadorPostal(ResourceReference.toResourceReference(pagadorPostal.getId(), pagadorPostal.getNomContracteNum()));
 	}
 
 	@Override
-	protected void beforeCreateSave(
-		OrganGestorResourceEntity entity,
-		OrganGestorResource resource,
-		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		beforeCreateUpdate(entity, resource);
+	protected void beforeUpdateSave(OrganGestorResourceEntity entity, OrganGestorResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+
+		if (!resource.isEntregaCieActiva()) {
+			entity.setEntregaCie(null);
+			return;
+		}
+		if (resource.getEntregaCiePagadorPostal() == null || resource.getEntregaCiePagadorCie() == null) {
+			return;
+		}
+		var entregaCie = entity.getEntregaCie();
+		var pagadorPostal = pagadorPostalResourceRepository.findById(resource.getEntregaCiePagadorPostal().getId());
+		var pagadorCie = pagadorCieResourceRepository.findById(resource.getEntregaCiePagadorCie().getId());
+		if (pagadorPostal.isEmpty() || pagadorCie.isEmpty()) {
+			return;
+		}
+		if (entregaCie == null) {
+			entregaCie = EntregaCieResourceEntity.builder().build();
+			entity.setEntregaCie(entregaCie);
+		}
+		entregaCie.setPagadorPostal(pagadorPostal.get());
+		entregaCie.setPagadorCie(pagadorCie.get());
+		entregaCieResourceRepository.save(entregaCie);
 	}
 
-	@Override
-	protected void beforeUpdateSave(
-		OrganGestorResourceEntity entity,
-		OrganGestorResource resource,
-		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		beforeCreateUpdate(entity, resource);
-	}
-
-	/**
-	 * Acció per a sincronitzar els òrgans gestors amb la informació de DIR3.
-	 */
 	public class Dir3SyncActionExecutor implements ActionExecutor<OrganGestorResourceEntity, OrganGestorResource.OrganGestorDir3SyncForm, OrganGestorDir3Sync> {
+
 		@Override
 		public OrganGestorDir3Sync exec(String code, OrganGestorResourceEntity entity, OrganGestorResource.OrganGestorDir3SyncForm params) throws ActionExecutionException {
-			Optional<EntitatResourceEntity> entitat = entitatResourceRepository.findById(userSessionHelper.getCurrentEntitatId());
+
+			var entitat = entitatResourceRepository.findById(userSessionHelper.getCurrentEntitatId());
 			if (entitat.isEmpty()) {
 				throw new ActionExecutionException(OrganGestorResource.class, null, code, "Couldn't find current entitat in user session");
 			}
@@ -146,108 +155,24 @@ public class OrganGestorResourceServiceImpl
 					ex);
 			}
 		}
+
 		@Override
 		public void onChange(Serializable id, OrganGestorResource.OrganGestorDir3SyncForm previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, OrganGestorResource.OrganGestorDir3SyncForm target) {
 		}
 	}
 
-	/**
-	 * Perspectiva per a emplenar els camps per a mostrar els òrgans en forma d'arbre.
-	 */
-	@RequiredArgsConstructor
-	public class OrganGestorResourceTreePerspectiveApplicator implements PerspectiveApplicator<OrganGestorResourceEntity, OrganGestorResource> {
-		@Override
-		public void applySingle(
-			String code,
-			OrganGestorResourceEntity entity,
-			OrganGestorResource resource) throws PerspectiveApplicationException {
-			List<Object[]> paresAll = organGestorResourceRepository.findParesByEntitatIdAndId(
-				resource.getEntitat().getId(),
-				null);
-			emplenarCamps(paresAll, resource);
-		}
-		@Override
-		public boolean applyMultiple(
-			String code,
-			List<OrganGestorResourceEntity> entities,
-			List<OrganGestorResource> resources) throws PerspectiveApplicationException {
-			if (!resources.isEmpty()) {
-				List<Object[]> paresAll = organGestorResourceRepository.findParesByEntitatIdAndId(
-					resources.get(0).getEntitat().getId(),
-					null);
-				for (OrganGestorResource resource: resources) {
-					emplenarCamps(paresAll, resource);
-				}
-			}
-			return true;
-		}
-		private void emplenarCamps(
-			List<Object[]> paresAll,
-			OrganGestorResource resource) {
-			List<Object[]> paresResource = paresAll.stream().
-				filter(p -> ((Number)p[0]).longValue() == resource.getId()).
-				collect(Collectors.collectingAndThen(
-					Collectors.toList(),
-					list -> {
-						Collections.reverse(list);
-						return list;
-					}
-				));
-			ResourceReference<?, ?>[] path = paresResource.stream().
-				map(p -> ResourceReference.toResourceReference(
-					((Number)p[1]).longValue(),
-					p[2] + ", " + p[3])
-				).toArray(ResourceReference[]::new);
-			resource.setPath((ResourceReference<OrganGestorResource, Long>[]) path);
-			resource.setChildCount(
-				paresAll.stream().
-					filter(p -> ((Number)p[1]).longValue() == resource.getId()).count() - 1);
-		}
-	}
-
-	private void beforeCreateUpdate(OrganGestorResourceEntity entity, OrganGestorResource resource) {
-		// Gestiona el codi del pare
-		entity.setCodiPare(entity.getPare() != null ? entity.getPare().getCodi() : null);
-		// Gestiona la entrega CIE
-		if (!resource.isEntregaCieActiva()) {
-			if (entity.getEntregaCie() != null) {
-				entregaCieResourceRepository.delete(entity.getEntregaCie());
-				entity.setEntregaCie(null);
-			}
-			return;
-		}
-		if (resource.getEntregaCiePagadorPostal() == null || resource.getEntregaCiePagadorCie() == null) {
-			return;
-		}
-		Optional<PagadorPostalResourceEntity> pagadorPostal = pagadorPostalResourceRepository.findById(
-			resource.getEntregaCiePagadorPostal().getId());
-		Optional<PagadorCieResourceEntity> pagadorCie = pagadorCieResourceRepository.findById(
-			resource.getEntregaCiePagadorCie().getId());
-		if (pagadorPostal.isEmpty() || pagadorCie.isEmpty()) {
-			return;
-		}
-		if (entity.getEntregaCie() == null) {
-			EntregaCieResourceEntity entregaCie = EntregaCieResourceEntity.builder().
-				pagadorPostal(pagadorPostal.get()).
-				pagadorCie(pagadorCie.get()).
-				build();
-			entity.setEntregaCie(entregaCieResourceRepository.save(entregaCie));
-		} else {
-			entity.getEntregaCie().setPagadorPostal(pagadorPostal.get());
-			entity.getEntregaCie().setPagadorCie(pagadorCie.get());
-		}
-	}
-
 	private String addIdsWithPermissionFilterExpression(Permission permission, String filter) {
-		List<Long> ids = notibPermissionHelper.organGestorIdsWithPermissionRecursive(permission);
+
+		var ids = notibPermissionHelper.organGestorIdsWithPermissionRecursive(permission);
 		if (ids.isEmpty()) {
 			return filter;
 		}
-		String joinedIds = ids.stream().map(Object::toString).collect(Collectors.joining(","));
+		var joinedIds = ids.stream().map(Object::toString).collect(Collectors.joining(","));
 		return concatenaFiltresAnd(filter, "id in (" + joinedIds + ")");
 	}
 
 	private String concatenaFiltresAnd(String... filtres) {
+
 		return Arrays.stream(filtres).
 			filter(f -> f != null && !f.isEmpty()).
 			map(f -> "(" + f + ")").

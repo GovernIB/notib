@@ -121,20 +121,20 @@ public class EntitatResourceServiceImpl
 			if (isRoleUser && currentEntitatId != null) {
 				resource.setCrearNotificacions(
 					checkPermisRemesa(
-						notibPermissionHelper.getOrganGestorNotificacioCreatePermission(EnviamentTipus.NOTIFICACIO),
-						notibPermissionHelper.getProcedimentNotificacioCreatePermission(EnviamentTipus.NOTIFICACIO),
+						notibPermissionHelper.getOrganGestorCreatePermissionForEnviamentTipus(EnviamentTipus.NOTIFICACIO),
+						notibPermissionHelper.getProcedimentCreatePermissionForEnviamentTipus(EnviamentTipus.NOTIFICACIO),
 						false,
 						false));
 				resource.setCrearComunicacions(
 					checkPermisRemesa(
-						notibPermissionHelper.getOrganGestorNotificacioCreatePermission(EnviamentTipus.COMUNICACIO),
-						notibPermissionHelper.getProcedimentNotificacioCreatePermission(EnviamentTipus.COMUNICACIO),
+						notibPermissionHelper.getOrganGestorCreatePermissionForEnviamentTipus(EnviamentTipus.COMUNICACIO),
+						notibPermissionHelper.getProcedimentCreatePermissionForEnviamentTipus(EnviamentTipus.COMUNICACIO),
 						null,
 						true));
 				resource.setCrearSir(
 					checkPermisRemesa(
-						notibPermissionHelper.getOrganGestorNotificacioCreatePermission(EnviamentTipus.SIR),
-						notibPermissionHelper.getProcedimentNotificacioCreatePermission(EnviamentTipus.SIR),
+						notibPermissionHelper.getOrganGestorCreatePermissionForEnviamentTipus(EnviamentTipus.SIR),
+						notibPermissionHelper.getProcedimentCreatePermissionForEnviamentTipus(EnviamentTipus.SIR),
 						null,
 						true));
 			} else {

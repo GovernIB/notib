@@ -4,7 +4,6 @@ import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
-import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
@@ -34,13 +33,10 @@ import java.util.List;
 @NoArgsConstructor
 @ResourceConfig(
 	descriptionField = "id",
-	accessConstraints = {
-		@ResourceAccessConstraint(
-			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-			roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER },
-			grantedPermissions = { PermissionEnum.READ }
-		),
-	}
+	accessConstraints = @ResourceAccessConstraint(
+		type = ResourceAccessConstraint.ResourceAccessConstraintType.AUTHENTICATED,
+		grantedPermissions = { PermissionEnum.READ, PermissionEnum.CREATE }
+	)
 )
 @CustomValidation.List({
 	@CustomValidation(

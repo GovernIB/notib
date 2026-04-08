@@ -91,7 +91,6 @@ const translationEs = {
         organs: {
             grid: {
                 title: 'Órganos gestores',
-                groupColumn: 'Órgano gestor',
                 sync: {
                     title: 'Sincronización DIR3',
                     dialogTitle: 'Sincronización DIR3',
@@ -491,22 +490,13 @@ const translationEs = {
             add: 'Añadir',
             refresh: 'Refrescar',
         },
-        UserProfile: {
-            perfil: "Perfil del usuario",
-            auto: "Automático",
+        UserProfileFormDialog: {
+            perfil: 'Perfil del usuario',
         },
         FormDropzoneField: {
             arrosegar:  "Arrastra el fichero aquí",
             amollar: "Suelta el fichero ahora ...",
             validacio: "El archivo no es válido",
-        },
-    },
-    hook: {
-        useDataGrid: {
-            treeData: {
-                collapseAll: 'Contraer todo',
-                expandAll: 'Expandir todo',
-            },
         },
     },
     comu: {
