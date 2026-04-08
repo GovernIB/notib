@@ -243,6 +243,7 @@ public class NotificacioValidator implements Validator {
         if (procediment == null || !procediment.isAgrupar()) {
             return;
         }
+        grupCodi = notificacio.getGrupCodi();
         var grupNotificacio = grupRepository.findByCodiAndEntitat(notificacio.getGrupCodi(), entitat);
 //        var grupNotificacio = grupRepository.findByCodiAndEntitat(grupCodi, entitat);
         if (grupNotificacio == null) {

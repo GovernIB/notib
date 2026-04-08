@@ -93,8 +93,6 @@ export type FormProps = React.PropsWithChildren & {
     fieldTypeMap?: Map<string, string>;
     /** Indica que és un formulari d'una sola línia (per exemple: formularis que es mostran a una fila de la graella) */
     inline?: true;
-    /** Indica que el bloquejador de sortida de formulari quan s'han fet modificacions està deshabilitat */
-    formBlockerDisabled?: true;
     /** Claus alternatives per a les traduccions */
     i18nKeys?: FormI18nKeys;
     /** Indica si s'han d'imprimir a la consola missatges de depuració */
@@ -237,7 +235,6 @@ export const Form: React.FC<FormProps> = (props) => {
         validationErrors,
         fieldTypeMap,
         inline,
-        formBlockerDisabled,
         i18nKeys,
         debug = false,
         children,
@@ -714,7 +711,8 @@ export const Form: React.FC<FormProps> = (props) => {
     React.useEffect(() => {
         // Controla l'estat de formulari amb modificacions
         if (isReady) {
-            setModified(!shallowEqual(data, revertData));
+            const modified = !shallowEqual(data, revertData);
+            setModified(modified);
             onDataChange?.(data, !modified);
             if (modified) {
                 validateWithValidator(data);
@@ -810,9 +808,7 @@ export const Form: React.FC<FormProps> = (props) => {
             <div style={divStyle} onKeyDown={handleFormEnterKeyPressed} ref={divRef}>
                 {isReady ? children : null}
             </div>
-            {!formBlockerDisabled && parentFormContext == null && (
-                <FormBlocker modified={anyModified} />
-            )}
+            {parentFormContext == null && <FormBlocker modified={anyModified} />}
         </ResourceApiFormContext.Provider>
     );
 };

@@ -266,18 +266,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         i18nHandleLanguageChange,
         i18nAddResourceBundleCallback
     );
-    const locationPath = routerUseLocationPath();
-    const previousLocationPath = React.useRef<string>(locationPath);
-    const [topLevelRouteChanged, setTopLevelRouteChanged] = React.useState<boolean>(false);
-    React.useEffect(() => {
-        const prev = previousLocationPath.current;
-        const getTopLevel = (path: string) => path.split('/')[1] || '';
-        const topLevelRouteChanged = getTopLevel(prev) !== getTopLevel(locationPath);
-        setTopLevelRouteChanged(topLevelRouteChanged);
-        previousLocationPath.current = locationPath;
-    }, [locationPath]);
     const context = {
-        code,
         getFormFieldComponent,
         getDetailFieldComponent,
         setMarginsDisabled: marginsDisabledProp == null ? setMarginsDisabled : emptyFunction,
@@ -292,7 +281,6 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         useBlocker: routerUseBlocker,
         useLocationPath: routerUseLocationPath,
         anyHistoryEntryExist: routerAnyHistoryEntryExist,
-        topLevelRouteChanged,
         setMessageDialogShow,
         messageDialogShow,
         setTemporalMessageShow,
