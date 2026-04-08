@@ -6,154 +6,106 @@ import Icon from '@mui/material/Icon';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Chip from '@mui/material/Chip';
-import { GRID_DETAIL_PANEL_TOGGLE_COL_DEF } from '@mui/x-data-grid-pro';
 import {
-    GridPage,
-    MuiDataGrid,
-    useResourceApiService,
-    springFilterBuilder as filterBuilder,
-    springFilterBuilder,
-    useMuiDataGridContext,
-    useMuiActionReportLogic,
-    useFilterApiContext,
-} from 'reactlib';
+    GridColDef,
+    GridApiPro,
+    GridColumnResizeParams,
+    useGridApiRef,
+    gridColumnFieldsSelector,
+    GRID_DETAIL_PANEL_TOGGLE_COL_DEF,
+} from '@mui/x-data-grid-pro';
+import { GridPage, MuiDataGrid, useResourceApiService, MuiDataGridColDef } from 'reactlib';
 import { useNotibContext } from '../../components/NotibContext';
-import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 import NotificacioGridEnviaments from './NotificacioGridEnviaments';
 import { useNotificacioDetailDialog } from './NotificacioDetailDialog';
-import { Grid, IconButton } from '@mui/material';
-import GridFormField, { GridButtonField } from '../../components/GridFormField';
-import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
-import AccionsMassives, { MenuOption } from '../../components/AccionsMassives';
 
-const useDataGridColumns = (onDetailClick: (id: any) => void) => {
-    const { t } = useTranslation();
-    return React.useMemo(
-        () => [
-            {
-                field: 'enviamentTipus',
-                flex: 0.4,
-                renderHeader: () => null,
-                renderCell: (params: any) => {
-                    const letter = params.value?.substring(0, 1);
-                    return <Chip label={letter} size="small" title={params.formattedValue} />;
-                },
-            },
-            {
-                field: 'createdDate',
-                flex: 1.4,
-            },
-            {
-                field: 'enviadaDate',
-                flex: 1.4,
-            },
-            {
-                field: 'registreNums',
-                flex: 1.4,
-            },
-            {
-                field: 'organGestor',
-                flex: 2,
-            },
-            {
-                field: 'procediment',
-                flex: 2,
-                renderCell: (params: any) => {
-                    const letter = params.row.procediment != null ? 'P' : 'S';
-                    const title =
-                        letter === 'P'
-                            ? t('page.notificacio.grid.procediment')
-                            : t('page.notificacio.grid.servei');
-                    return (
-                        <>
-                            <Chip label={letter} size="small" title={title} sx={{ mr: 1 }} />
-                            {params.formattedValue}
-                        </>
-                    );
-                },
-            },
-            {
-                field: 'numExpedient',
-                flex: 1,
-            },
-            {
-                field: 'concepte',
-                flex: 3,
-            },
-            {
-                field: 'createdBy',
-                flex: 1,
-            },
-            {
-                field: 'titular',
-                flex: 1,
-            },
-            {
-                field: 'estat',
-                flex: 1,
-            },
-            {
-                field: ' ',
-                headerName: t('page.notificacio.grid.column.detalls'),
-                flex: 1.2,
-                sortable: false,
-                exportable: false,
-                pinnable: false,
-                hideable: false,
-                renderHeader: () => null,
-                renderCell: (params: any) => {
-                    return (
-                        <Button
-                            variant="outlined"
-                            size="small"
-                            startIcon={<Icon>info</Icon>}
-                            onClick={() => onDetailClick(params.id)}
-                        >
-                            {t('page.notificacio.grid.enviament.detalls')}
-                        </Button>
-                    );
-                },
-            },
-            {
-                ...GRID_DETAIL_PANEL_TOGGLE_COL_DEF,
-                headerName: t('page.notificacio.grid.column.desplegar'),
-                hideable: false,
-            },
-        ],
-        []
+const LOCAL_STORAGE_PREFIX = 'NOTIB_ST_';
+
+const useDatagridPersistentState = (
+    apiRef: React.RefObject<GridApiPro | null>,
+    columns: GridColDef[],
+    key: string,
+    storeInLocalStorage?: boolean
+) => {
+    const storageKey = LOCAL_STORAGE_PREFIX + key;
+    const loadInitialState = () => {
+        try {
+            const storage = storeInLocalStorage ? localStorage : sessionStorage;
+            const raw = storage.getItem(storageKey);
+            return raw ? JSON.parse(raw) : null;
+        } catch {
+            return null;
+        }
+    };
+    const saveState = (state: any) => {
+        try {
+            const storage = storeInLocalStorage ? localStorage : sessionStorage;
+            storage.setItem(storageKey, JSON.stringify(state));
+        } catch {}
+    };
+    const initialState = loadInitialState();
+    const [widths, setWidths] = React.useState<Record<string, number>>(initialState?.widths || {});
+    const [orderedFields, setOrderedFields] = React.useState<string[]>(
+        initialState?.orderedFields || columns.map((c) => c.field)
     );
-};
-
-const useSpringFilterBuilder = () => {
-    const { currentUser } = useNotibContext();
-    return (data: any) => {
-        return filterBuilder.and(
-            filterBuilder.eq('enviamentTipus', `'${data?.enviamentTipus}'`),
-            filterBuilder.like('concepte', data.concepte),
-            filterBuilder.eq('estat', `'${data?.estat}'`),
-            data?.dataIniciInici &&
-                filterBuilder.gte('createdDate', `'${formatStartOfDay(data?.dataIniciInici)}'`),
-            data?.dataIniciFi &&
-                filterBuilder.lte('createdDate', `'${formatEndOfDay(data?.dataIniciFi)}'`),
-            filterBuilder.like('titular', data?.interessat),
-            filterBuilder.like('numExpedient', data.numExpedient),
-            filterBuilder.like('notificaIds', data.identificadorNotifica),
-            filterBuilder.eq('organGestor.id', data?.organGestor?.id),
-            filterBuilder.eq('procediment.id', data?.procediment?.id),
-            filterBuilder.eq('procediment.id', data?.servei?.id),
-            filterBuilder.eq('tipusUsuari', `'${data?.tipusUsuari}'`),
-            filterBuilder.eq('createdBy', `'${data?.createdBy}'`),
-            filterBuilder.like('referencia', data?.referencia),
-            filterBuilder.like('registreNums', data?.registreNumeroSortida),
-            data?.dataCaducitatInici &&
-                filterBuilder.gte('caducitat', `'${formatStartOfDay(data?.dataCaducitatInici)}'`),
-            data?.dataCaducitatFi &&
-                filterBuilder.lte('caducitat', `'${formatEndOfDay(data?.dataCaducitatFi)}'`),
-            data?.nomesLesMeves && filterBuilder.eq('createdBy', `'${currentUser.codi}'`),
-            data?.entregaPostal && filterBuilder.eq('entregaPostal', `'${data.entregaPostal}'`),
-            data?.errorLastCallback &&
-                filterBuilder.eq('errorLastCallback', `'${data.errorLastCallback}'`)
-        );
+    const [columnVisibilityModel, setColumnVisibilityModel] = React.useState(
+        initialState?.columnVisibilityModel || {}
+    );
+    const [pinnedColumns, setPinnedColumns] = React.useState(initialState?.pinnedColumns || {});
+    React.useEffect(() => {
+        saveState({
+            widths,
+            orderedFields,
+            columnVisibilityModel,
+            pinnedColumns,
+        });
+    }, [widths, orderedFields, columnVisibilityModel, pinnedColumns]);
+    const onColumnWidthChange = React.useCallback(
+        (params: GridColumnResizeParams) => {
+            const { colDef, width } = params;
+            setWidths((prev) => ({ ...prev, [colDef.field]: width }));
+        },
+        [setWidths]
+    );
+    const onColumnOrderChange = React.useCallback(() => {
+        setOrderedFields(gridColumnFieldsSelector(apiRef));
+    }, [apiRef, setOrderedFields]);
+    const onColumnVisibilityModelChange = React.useCallback((model: any) => {
+        setColumnVisibilityModel(model);
+    }, []);
+    const onPinnedColumnsChange = React.useCallback((model: any) => {
+        setPinnedColumns(model);
+    }, []);
+    const computedColumns = React.useMemo(
+        () =>
+            orderedFields.reduce<GridColDef[]>((acc, field) => {
+                const column = columns.find((col) => col.field === field);
+                if (!column) {
+                    return acc;
+                }
+                if (widths[field]) {
+                    acc.push({
+                        ...column,
+                        flex: 0,
+                        width: widths[field],
+                    });
+                    return acc;
+                }
+                acc.push(column);
+                return acc;
+            }, []),
+        [columns, widths, orderedFields]
+    );
+    return {
+        columns: computedColumns,
+        dataGridProps: {
+            onColumnWidthChange,
+            onColumnOrderChange,
+            onColumnVisibilityModelChange,
+            onPinnedColumnsChange,
+            columnVisibilityModel,
+            pinnedColumns,
+        },
     };
 };
 
@@ -205,184 +157,122 @@ const NotificacioAddButton: React.FC = () => {
     );
 };
 
-const MassiveActionsButton: React.FC = () => {
-    const { selection } = useMuiDataGridContext();
-
-    const { exec: execExemple } = useMuiActionReportLogic(
-        'notificacioEnviamentResource',
-        undefined,
-        'EXPORTAR_EXCEL',
-        'CSV'
-    );
-
-    const opcionsMenu: MenuOption[] = [
-        {
-            label: 'Marcar com a processades',
-            onClick: () => {
-                execExemple(selection?.ids);
-            },
-        },
-        {
-            label: "Actualitzar l'estat",
-            onClick: () => console.log("Actualitzar l'estat"),
-        },
-        {
-            label: 'Tornar a enviar les que han donat error',
-            onClick: () => console.log('Tornar a enviar les que han donat error'),
-        },
-        {
-            label: 'Esborrar',
-            onClick: () => console.log('Esborrar'),
-        },
-        {
-            label: 'Exporta a full de càlcul',
-            onClick: () => console.log('Exporta a full de càlcul'),
-        },
-        {
-            label: "Descarrega justificants d'enviemanet",
-            onClick: () => console.log("Descarrega justificants d'enviemanet"),
-        },
-        {
-            label: 'Descarrega certificats de recepció',
-            onClick: () => console.log('Descarrega certificats de recepció'),
-        },
-        {
-            label: 'Anul·lar',
-            onClick: () => console.log('Anul·lar'),
-        },
-        {
-            label: 'Ampliar termini',
-            onClick: () => console.log('Ampliar termini'),
-        },
-    ];
-
-    return <AccionsMassives options={opcionsMenu} sizeSelection={selection?.ids?.size} />;
-};
-
-const ContentFilter: React.FC = () => {
-    const { t } = useTranslation();
-    const filterApiRef = useFilterApiContext();
-    const [advancedFilter, setAdvancedFilter] = React.useState(false);
-
-    const handleButtonClick = () => {
-        filterApiRef.current?.clear();
-    };
-
-    const advancedFilterClick = () => {
-        setAdvancedFilter(!advancedFilter);
-    };
-
-    return (
-        <Grid container spacing={2}>
-            <GridFormField size={2} name="enviamentTipus" />
-            <GridFormField size={advancedFilter ? 4 : 2.5} name="concepte" />
-            <GridFormField size={2.5} name="estat" />
-            <GridFormField size={1.75} name="dataIniciInici" />
-            <GridFormField size={1.75} name="dataIniciFi" />
-
-            {advancedFilter && (
-                <>
-                    <GridFormField size={2} name="interessat" />
-                    <GridFormField size={2} name="numExpedient" />
-                    <GridFormField size={2} name="identificadorNotifica" />
-                    <GridFormField size={6} name="organGestor" />
-                    <GridFormField
-                        size={3.5}
-                        name="procediment"
-                        filter={springFilterBuilder.and(
-                            springFilterBuilder.eq('tipus', `'PROCEDIMENT'`)
-                        )}
-                    />
-                    <GridFormField
-                        size={3.5}
-                        name="servei"
-                        filter={springFilterBuilder.and(
-                            springFilterBuilder.eq('tipus', `'SERVEI'`)
-                        )}
-                    />
-                    <GridFormField size={2} name="tipusUsuari" />
-                    <GridFormField size={3} name="createdBy" />
-                    <GridFormField size={3} name="referencia" />
-                    <GridFormField size={2.5} name="registreNumeroSortida" />
-                    <GridFormField size={1.75} name="dataCaducitatInici" />
-                    <GridFormField size={1.75} name="dataCaducitatFi" />
-                    <GridButtonField size={0.5} name="nomesLesMeves" icon={'person'} hiddenLabel />
-                    <GridButtonField size={0.5} name="entregaPostal" icon={'email'} hiddenLabel />
-                    <GridButtonField
-                        size={0.5}
-                        name="errorLastCallback"
-                        icon={'report_problem'}
-                        hiddenLabel
-                    />
-                </>
-            )}
-            <Grid size={0.5} sx={{ textAlign: 'center' }}>
-                <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
-                    <Icon>filter_alt_off</Icon>
-                </IconButton>
-            </Grid>
-            <Grid size={0.5} sx={{ textAlign: 'center' }}>
-                <IconButton
-                    onClick={advancedFilterClick}
-                    title={t(
-                        advancedFilter ? 'comu.tancarFiltreAvançat' : 'comu.obrirFiltreAvançat'
-                    )}
-                >
-                    <Icon sx={{ transform: advancedFilter ? 'rotate(180deg)' : 'none' }}>
-                        filter_list
-                    </Icon>
-                </IconButton>
-            </Grid>
-        </Grid>
-    );
-};
-
 const NotificacioGrid = () => {
     const { t } = useTranslation();
+    const apiRef = useGridApiRef();
     const { dialogComponent, onDetailClick } = useNotificacioDetailDialog();
     const { currentActions: apiCurrentActions } = useResourceApiService('notificacioResource');
     const isCreateLinkPresent = apiCurrentActions?.['create'] != null;
-    const columns = useDataGridColumns(onDetailClick);
-    const springFilterBuilder = useSpringFilterBuilder();
-    const filterDataGridProps = useDatagridFilterProps(
-        'notificacioResource',
-        'FILTER_NOTIFICACIO',
-        springFilterBuilder,
-        <ContentFilter />
+    const columns: MuiDataGridColDef[] = React.useMemo(
+        () => [
+            {
+                field: 'enviamentTipus',
+                flex: 0.4,
+                renderHeader: () => null,
+                renderCell: (params: any) => {
+                    const letter = params.value?.substring(0, 1);
+                    return <Chip label={letter} size="small" title={params.formattedValue} />;
+                },
+            },
+            {
+                field: 'createdDate',
+                flex: 1.4,
+            },
+            {
+                field: 'enviadaDate',
+                flex: 1.4,
+            },
+            {
+                field: 'organGestor',
+                flex: 2,
+            },
+            {
+                field: 'procediment',
+                flex: 2,
+                renderCell: (params: any) => {
+                    const letter = params.row.procediment != null ? 'P' : 'S';
+                    const title =
+                        letter === 'P'
+                            ? t('page.notificacio.grid.procediment')
+                            : t('page.notificacio.grid.servei');
+                    return (
+                        <>
+                            <Chip label={letter} size="small" title={title} sx={{ mr: 1 }} />
+                            {params.formattedValue}
+                        </>
+                    );
+                },
+            },
+            {
+                field: 'numExpedient',
+                flex: 1,
+            },
+            {
+                field: 'concepte',
+                flex: 3,
+            },
+            {
+                field: 'estat',
+                flex: 1,
+            },
+            {
+                field: ' ',
+                headerName: t('page.notificacio.grid.column.detalls'),
+                flex: 1.2,
+                sortable: false,
+                exportable: false,
+                pinnable: false,
+                hideable: false,
+                renderHeader: () => null,
+                renderCell: (params: any) => {
+                    return (
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            startIcon={<Icon>info</Icon>}
+                            onClick={() => onDetailClick(params.id)}
+                        >
+                            {t('page.notificacio.grid.enviament.detalls')}
+                        </Button>
+                    );
+                },
+            },
+            {
+                ...GRID_DETAIL_PANEL_TOGGLE_COL_DEF,
+                headerName: t('page.notificacio.grid.column.desplegar'),
+                hideable: false,
+            },
+        ],
+        []
     );
-    const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
+    const { columns: persistentStateColumns, dataGridProps: persistentStateDataGridProps } =
+        useDatagridPersistentState(apiRef, columns, 'NOT_DG_STATE');
     return (
-        <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
+        <GridPage disableMargins={false}>
             <MuiDataGrid
                 title={t('page.notificacio.grid.title')}
                 resourceName="notificacioResource"
-                columns={columns}
-                defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
+                columns={persistentStateColumns}
+                sortModel={[{ field: 'createdDate', sort: 'desc' }]}
                 paginationActive
-                selectionActive
-                persistentStateActive
-                persistentStateClearPageSortPropsOnTopLevelRouteChange
-                {...filterDataGridProps}
-                {...pageSizeOptionsDataGridProps}
-                toolbarType="upper"
                 toolbarHideCreate
                 toolbarCreateLink="form"
-                toolbarElementsWithPositions={[
-                    ...(isCreateLinkPresent
+                toolbarElementsWithPositions={
+                    isCreateLinkPresent
                         ? [
                               {
                                   position: 2,
                                   element: <NotificacioAddButton />,
                               },
                           ]
-                        : []),
-                    {
-                        position: 2,
-                        element: <MassiveActionsButton />,
-                    },
-                ]}
+                        : undefined
+                }
+                readOnly
+                selectionActive
                 getDetailPanelContent={({ row }) => <NotificacioGridEnviaments id={row.id} />}
                 getDetailPanelHeight={() => 'auto'}
+                datagridApiRef={apiRef}
+                {...persistentStateDataGridProps}
             />
             {dialogComponent}
         </GridPage>

@@ -17,6 +17,7 @@ import PermissionGridSwitch from '../../components/PermissionGridSwitch';
 
 const PermissionForm: React.FC = () => {
     const { t } = useTranslation();
+
     const sidGrantedAuthorityEnumOptions = [
         {
             value: false,
@@ -27,6 +28,7 @@ const PermissionForm: React.FC = () => {
             description: t('component.PermissionGrid.grantedAuthority.role'),
         },
     ];
+
     return (
         <Grid container spacing={2}>
             <GridFormField
@@ -79,6 +81,7 @@ const ContentFilter: React.FC<{
             description: t('component.PermissionGrid.grantedAuthority.role'),
         },
     ];
+
     const handleButtonClick = () => {
         filterApiRef.current.clear();
     };
@@ -127,6 +130,7 @@ const ContentFilter: React.FC<{
 const EntitatGridFilter: React.FC<{ gridApiRef: MuiDataGridApiRef }> = (props) => {
     const { gridApiRef } = props;
     const filterApiRef = useFilterApiRef();
+
     // TODO: Falta aclarar com es pot filtrar de forma correcte a la bbdd,
     // ja que actualment el filtre s'envia al backend però no s'aplica correctament.
     const springFilterBuilder = (data: any) => {
@@ -139,6 +143,7 @@ const EntitatGridFilter: React.FC<{ gridApiRef: MuiDataGridApiRef }> = (props) =
             filterBuilder.eq('perm3Allowed', `'${data?.perm3Allowed}`)
         );
     };
+
     return (
         <MuiFilter
             resourceName="aclEntryResource"
@@ -157,6 +162,7 @@ const EntitatFormTabPermisos: React.FC = () => {
     const { t } = useTranslation();
     const { id } = useFormContext();
     const gridApiRef = useMuiDataGridApiRef();
+
     const permissionEntries = [
         {
             headerName: t('page.entitats.form.permisos.usuariAllowed'),
@@ -179,6 +185,7 @@ const EntitatFormTabPermisos: React.FC = () => {
             type: 'boolean',
         },
     ];
+
     return (
         <PermissionGrid
             apiRef={gridApiRef}

@@ -85,9 +85,6 @@ public class ProcedimentResourceEntity
 	@Formula("(case when entrega_cie_id is not null then 1 else 0 end)")
 	private boolean entregaCieActiva;
 
-	@Formula("(codi||' - '||nom)")
-	private String codiNom;
-
 	@Builder
 	public ProcedimentResourceEntity(ProcedimentResource resource, EntitatResourceEntity entitat, OrganGestorResourceEntity organGestor, EntregaCieResourceEntity entregaCie) {
 
