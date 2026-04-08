@@ -3,7 +3,6 @@
  */
 package es.caib.notib.persist.entity;
 
-import liquibase.repackaged.org.apache.commons.lang3.StringUtils;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.util.ObjectUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -90,7 +90,7 @@ public class UsuariEntity implements Serializable {
 
 		rebreEmailsNotificacio = usuari.isRebreEmailsNotificacio();
 		rebreEmailsNotificacioCreats = usuari.isRebreEmailsNotificacioCreats();
-		idioma = StringUtils.isEmpty(usuari.getIdioma()) ? "ca" : usuari.getIdioma();
+		idioma = ObjectUtils.isEmpty(usuari.getIdioma()) ? "ca" : usuari.getIdioma();
 		emailAlt = usuari.getEmailAlt();
 		numElementsPaginaDefecte = usuari.numElementsPaginaDefecte;
         entitatDefecte = usuari.getEntitatDefecte();
