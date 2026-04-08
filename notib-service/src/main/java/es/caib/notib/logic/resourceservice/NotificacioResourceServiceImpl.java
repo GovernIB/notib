@@ -217,20 +217,12 @@ public class NotificacioResourceServiceImpl
 	}
 
 	/*
-	 * Es verifica si es tenen permisos per a crear la notificació. Una notificació es pot crear si es compleix
-	 * alguna de les següents condicions:
-	 *   a) L'usuari te permís sobre l'òrgan gestor de la notificació.
-	 *   b) La notificació te un procediment no comú i l'usuari te permís sobre aquest procediment.
-	 *   c) La notificació te un procediment comú amb "requereix permisos directes" i l'usuari te permís sobre la
-	 *      combinació organ gestor - procediment de la notificació.
-	 *   d) La notificació te un procediment comú sense "requereix permisos directes",
-	 *      l'usuari te permís sobre la combinació organ gestor - procediment de la notificació i
-	 *      les combinacions òrgan gestor - procediment son únicament dels òrgans gestors amb permís de procediments
-	 *      comuns.
+	 * Es verifica si es tenen permisos per a crear la notificació. Les condicions que es verifiquen son les mateixes
+	 * del mètode springFilterWithReadPermission().
 	 */
 	private void checkCreatePermission(NotificacioResourceEntity entity) {
-		Permission organGestorPermission = getOrganGestorCreatePermissionForEnviamentTipus(entity.getEnviamentTipus());
-		Permission procedimentPermission = getProcedimentCreatePermissionForEnviamentTipus(entity.getEnviamentTipus());
+		Permission organGestorPermission = notibPermissionHelper.getOrganGestorCreatePermissionForEnviamentTipus(entity.getEnviamentTipus());
+		Permission procedimentPermission = notibPermissionHelper.getProcedimentCreatePermissionForEnviamentTipus(entity.getEnviamentTipus());
 		List<Long> organGestorIds = notibPermissionHelper.organGestorIdsWithPermissionRecursive(organGestorPermission);
 		List<Long> procedimentNoComuIds = notibPermissionHelper.procedimentServeiNoComuIdsWithPermission(
 			procedimentPermission,
@@ -248,26 +240,6 @@ public class NotificacioResourceServiceImpl
 			throw new ResourceNotCreatedException(
 				NotificacioResource.class,
 				"Not allowed to create notificació. Permission check failed.");
-		}
-	}
-
-	private Permission getOrganGestorCreatePermissionForEnviamentTipus(EnviamentTipus enviamentTipus) {
-		if (EnviamentTipus.COMUNICACIO.equals(enviamentTipus)) {
-			return ExtendedPermission.PERM5;
-		} else if (EnviamentTipus.SIR.equals(enviamentTipus)) {
-			return ExtendedPermission.PERM6;
-		} else {
-			return ExtendedPermission.PERM4;
-		}
-	}
-
-	private Permission getProcedimentCreatePermissionForEnviamentTipus(EnviamentTipus enviamentTipus) {
-		if (EnviamentTipus.COMUNICACIO.equals(enviamentTipus)) {
-			return ExtendedPermission.PERM8;
-		} else if (EnviamentTipus.SIR.equals(enviamentTipus)) {
-			return ExtendedPermission.PERM7;
-		} else {
-			return ExtendedPermission.PERM5;
 		}
 	}
 
