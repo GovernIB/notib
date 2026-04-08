@@ -1,8 +1,9 @@
 /**
- * 
+ *
  */
 package es.caib.notib.persist.entity;
 
+import liquibase.repackaged.org.apache.commons.lang3.StringUtils;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,7 +21,7 @@ import java.io.Serializable;
 
 /**
  * Classe de model de dades que conté la informació d'un usuari.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Entity
@@ -84,19 +85,19 @@ public class UsuariEntity implements Serializable {
 		this.nif = nif;
 		this.email = email;
 	}
-	
+
 	public void update(UsuariEntity usuari) {
 
 		rebreEmailsNotificacio = usuari.isRebreEmailsNotificacio();
 		rebreEmailsNotificacioCreats = usuari.isRebreEmailsNotificacioCreats();
-		idioma = usuari.getIdioma();
+		idioma = StringUtils.isEmpty(usuari.getIdioma()) ? "ca" : usuari.getIdioma();
 		emailAlt = usuari.getEmailAlt();
 		numElementsPaginaDefecte = usuari.numElementsPaginaDefecte;
         entitatDefecte = usuari.getEntitatDefecte();
         organDefecte = usuari.getOrganDefecte();
         procedimentDefecte = usuari.getProcedimentDefecte();
 	}
-	
+
 	public void updateUltimRol(String ultimRol) {
 		this.ultimRol = ultimRol;
 	}
