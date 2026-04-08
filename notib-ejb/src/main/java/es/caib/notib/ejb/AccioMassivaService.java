@@ -46,8 +46,8 @@ public class AccioMassivaService extends AbstractService<es.caib.notib.logic.int
     }
 
     @Override
-    public List<List<ArxiuDto>> descarregarCertificacio(AccioMassivaExecucio accio) {
-        return getDelegateService().descarregarCertificacio(accio);
+    public List<List<ArxiuDto>> descarregarCertificacio(Long accioId) {
+        return getDelegateService().descarregarCertificacio(accioId);
     }
 
     @Override
