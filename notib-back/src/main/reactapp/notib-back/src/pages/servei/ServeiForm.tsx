@@ -4,19 +4,21 @@ import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import Badge from '@mui/material/Badge';
 import { FormPage, MuiForm, MuiFormTabs, MuiFormTabContent, useFormContext } from 'reactlib';
-import ServeiFormTabGrups from './ServeiFormTabGrups';
+import ServeiFormTabGrups from './ServeiFormTabGrups.tsx';
 import ServeiFormTabPermisos from './ServeiFormTabPermisos';
-import GridFormField from '../../components/GridFormField';
-import { useTabParam } from '../../hooks/useSearchParams';
+import GridFormField from '../../components/GridFormField.tsx';
+import { useTabParam } from '../../hooks/useSearchParams.tsx';
 
 const ServeiFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
     const { setSubtitle } = props;
     const { t } = useTranslation();
     const { data } = useFormContext();
     const initialTab = useTabParam();
+
     React.useEffect(() => {
         setSubtitle(data?.codi + ', ' + data?.nom);
     }, [data]);
+
     const grupsTabLabel = (
         <Badge badgeContent={data.grupCount} color="primary">
             {t('page.serveis.form.tabs.grups')}
@@ -32,6 +34,7 @@ const ServeiFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> =
         { label: grupsTabLabel },
         { label: permisosTabLabel },
     ];
+
     return (
         <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1, 2]} initialIndex={initialTab}>
             <MuiFormTabContent index={0} showOnCreate>

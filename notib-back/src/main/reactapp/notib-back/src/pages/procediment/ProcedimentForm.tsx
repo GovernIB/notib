@@ -4,29 +4,33 @@ import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import Badge from '@mui/material/Badge';
 import { FormPage, MuiForm, MuiFormTabs, MuiFormTabContent, useFormContext } from 'reactlib';
-import ProcedimentFormTabGrups from './ProcedimentFormTabGrups';
+import ProcedimentFormTabGrups from './ProcedimentFormTabGrups.tsx';
 import ProcedimentFormTabPermisos from './ProcedimentFormTabPermisos';
-import GridFormField from '../../components/GridFormField';
-import { useTabParam } from '../../hooks/useSearchParams';
+import GridFormField from '../../components/GridFormField.tsx';
+import { useTabParam } from '../../hooks/useSearchParams.tsx';
 
 const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
     const { setSubtitle } = props;
     const { t } = useTranslation();
     const { data } = useFormContext();
     const initialTab = useTabParam();
+
     React.useEffect(() => {
         setSubtitle(data?.codi + ', ' + data?.nom);
     }, [data]);
+
     const grupsTabLabel = (
         <Badge badgeContent={data.grupCount} color="primary">
             {t('page.procediments.form.tabs.grups')}
         </Badge>
     );
+
     const permisosTabLabel = (
         <Badge badgeContent={data.aclEntryCount} color="primary">
             {t('page.procediments.form.tabs.permisos')}
         </Badge>
     );
+
     const tabs = [
         t('page.procediments.form.tabs.dades'),
         { label: grupsTabLabel },

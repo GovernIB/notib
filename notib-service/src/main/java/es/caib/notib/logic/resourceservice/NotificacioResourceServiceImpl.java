@@ -6,6 +6,7 @@ import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.helper.*;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
+import es.caib.notib.logic.intf.base.exception.ResourceNotCreatedException;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
@@ -19,6 +20,8 @@ import es.caib.notib.persist.resourcerepository.PersonaResourceRepository;
 import es.caib.notib.persist.resourcerepository.ProcedimentOrganGestorResourceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -27,6 +30,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -58,12 +62,14 @@ public class NotificacioResourceServiceImpl
 	}
 
 	@Override
-	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+	protected String additionalSpringFilter(
+		String currentSpringFilter,
+		String[] namedQueries) {
 		List<String> andConditions = new ArrayList<>();
 		// Condició per a mostrar només les notificacions de l'entitat actual
 		andConditions.add("entitat.id:" + userSessionHelper.getCurrentEntitatId());
 		// Condició per a mostrar només les notificacions amb permís de lectura
-		String permissionFilter = notibPermissionHelper.notificacioSpringFilterWithReadPermission("");
+		String permissionFilter = springFilterWithReadPermission();
 		if (!permissionFilter.isEmpty()) {
 			andConditions.add("(" + permissionFilter + ")");
 		}
@@ -83,7 +89,7 @@ public class NotificacioResourceServiceImpl
 		entity.setReferencia(UUID.randomUUID().toString());
 		entity.setProcedimentCodiNotib(entity.getProcediment().getCodi());
 		emplenarProcedimentOrganGestor(entity);
-		notibPermissionHelper.notificacioCheckCreatePermission(entity);
+		checkCreatePermission(entity);
 		if (resource.getDocumentsInfo() != null) {
 			saveDocuments(entity, resource.getDocumentsInfo());
 		}
@@ -113,12 +119,12 @@ public class NotificacioResourceServiceImpl
 			resource(enviament).
 			notificacio(notificacio).
 			build();
-		enviamentNou.setReferenciaEnviament(uuid);
+		enviamentNou.setNotificaReferencia(uuid);
 		enviamentNou.setNotificaEstat(EnviamentEstat.PENDENT);
 		NotificacioEnviamentResourceEntity enviamentCreat = notificacioEnviamentResourceRepository.saveAndFlush(enviamentNou);
 		PersonaResourceEntity titular = saveDestinatari(enviamentCreat, enviament.getTitularInfo());
 		enviamentCreat.setTitular(titular);
-		enviamentCreat.setReferenciaEnviament(uuid);
+		enviamentCreat.setNotificaReferencia(uuid);
 		if (enviament.getRepresentantsInfo() != null) {
 			enviament.getRepresentantsInfo().forEach(r -> saveDestinatari(enviamentCreat, r));
 		}
@@ -169,7 +175,75 @@ public class NotificacioResourceServiceImpl
 		}
 	}
 
+	/*
+	 * Condició en format Spring Filter per a mostrar només les notificacions sobre les que es tenen permisos. Les
+	 * notificacions es poden veure si es compleix alguna de les següents condicions:
+	 *   a) L'usuari te permís sobre l'òrgan gestor de la notificació.
+	 *   b) La notificació te un procediment no comú i l'usuari te permís sobre aquest procediment.
+	 *   c) La notificació te un procediment comú amb "requereix permisos directes" i l'usuari te permís
+	 *      sobre la combinació organ gestor - procediment de la notificació.
+	 *   d) La notificació te un procediment comú sense "requereix permisos directes",
+	 *      l'usuari te permís sobre la combinació organ gestor - procediment de la notificació i les combinacions
+	 *      òrgan gestor - procediment son únicament dels òrgans gestors amb permís de procediments comuns.
+	 */
+	private String springFilterWithReadPermission() {
+		List<Long> organGestorIds = notibPermissionHelper.organGestorIdsWithPermissionRecursive(BasePermission.READ);
+		List<Long> procedimentNoComuIds = notibPermissionHelper.procedimentServeiNoComuIdsWithPermission(
+			BasePermission.READ,
+			null);
+		List<Long> procedimentComuOrganGestorIds = notibPermissionHelper.procedimentServeiComuOrganGestorIdsWithPermission(
+			BasePermission.READ,
+			null);
+		List<String> permissionOrConditions = new ArrayList<>();
+		// a)
+		String joinedOrganGestorIds = organGestorIds.stream().
+			map(String::valueOf).collect(Collectors.joining(","));
+		if (!joinedOrganGestorIds.isEmpty()) {
+			permissionOrConditions.add("organGestor.id in (" + joinedOrganGestorIds + ")");
+		}
+		// b)
+		String joinedProcedimentNoComuIds = procedimentNoComuIds.stream().
+			map(String::valueOf).collect(Collectors.joining(","));
+		if (!joinedProcedimentNoComuIds.isEmpty()) {
+			permissionOrConditions.add("procediment.id in (" + joinedProcedimentNoComuIds + ")");
+		}
+		// c) o d)
+		String joinedProcedimentComuOrganGestorIds = procedimentComuOrganGestorIds.stream().
+			map(String::valueOf).collect(Collectors.joining(","));
+		if (!joinedProcedimentComuOrganGestorIds.isEmpty()) {
+			permissionOrConditions.add("procedimentOrganGestor.id in (" + joinedProcedimentComuOrganGestorIds + ")");
+		}
+		return String.join(" or ", permissionOrConditions);
+	}
 
+	/*
+	 * Es verifica si es tenen permisos per a crear la notificació. Les condicions que es verifiquen son les mateixes
+	 * del mètode springFilterWithReadPermission().
+	 */
+	private void checkCreatePermission(NotificacioResourceEntity entity) {
+		Permission organGestorPermission = notibPermissionHelper.getOrganGestorNotificacioCreatePermission(
+			entity.getEnviamentTipus());
+		Permission procedimentPermission = notibPermissionHelper.getProcedimentNotificacioCreatePermission(
+			entity.getEnviamentTipus());
+		List<Long> organGestorIds = notibPermissionHelper.organGestorIdsWithPermissionRecursive(organGestorPermission);
+		List<Long> procedimentNoComuIds = notibPermissionHelper.procedimentServeiNoComuIdsWithPermission(
+			procedimentPermission,
+			null);
+		List<Long> procedimentComuOrganGestorIds = notibPermissionHelper.procedimentServeiComuOrganGestorIdsWithPermission(
+			procedimentPermission,
+			null);
+		Long organGestorId = entity.getOrganGestor().getId();
+		Long procedimentId = entity.getProcediment().getId();
+		Long procedimentOrganGestorId = entity.getProcedimentOrganGestor().getId();
+		boolean permissionGranted = (organGestorId != null && organGestorIds.contains(organGestorId)) || // a)
+			(procedimentId != null && procedimentNoComuIds.contains(procedimentId)) || // b)
+			(procedimentOrganGestorId != null && procedimentComuOrganGestorIds.contains(procedimentOrganGestorId)); // c) o d)
+		if (!permissionGranted) {
+			throw new ResourceNotCreatedException(
+				NotificacioResource.class,
+				"Not allowed to create notificació. Permission check failed.");
+		}
+	}
 
 	/*
 	 * Lògica onChange que s'executa al carregar el formulari.

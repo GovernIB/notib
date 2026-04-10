@@ -714,7 +714,8 @@ export const Form: React.FC<FormProps> = (props) => {
     React.useEffect(() => {
         // Controla l'estat de formulari amb modificacions
         if (isReady) {
-            setModified(!shallowEqual(data, revertData));
+            const modified = !shallowEqual(data, revertData);
+            setModified(modified);
             onDataChange?.(data, !modified);
             if (modified) {
                 validateWithValidator(data);
@@ -810,9 +811,7 @@ export const Form: React.FC<FormProps> = (props) => {
             <div style={divStyle} onKeyDown={handleFormEnterKeyPressed} ref={divRef}>
                 {isReady ? children : null}
             </div>
-            {!formBlockerDisabled && parentFormContext == null && (
-                <FormBlocker modified={anyModified} />
-            )}
+            {!formBlockerDisabled && parentFormContext == null && <FormBlocker modified={anyModified} />}
         </ResourceApiFormContext.Provider>
     );
 };
