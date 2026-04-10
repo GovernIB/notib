@@ -119,7 +119,7 @@ const EntitatFormTabAplicacions: React.FC = () => {
             apiRef={gridApiRef}
             title=""
             resourceName="aplicacioResource"
-            staticFilter={'entitat.id:' + id}
+            fixedFilter={'entitat.id:' + id}
             formAdditionalData={{ entitat: { id } }}
             columns={columns}
             paginationActive
