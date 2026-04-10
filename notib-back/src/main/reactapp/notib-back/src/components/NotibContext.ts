@@ -10,6 +10,8 @@ export const ROLE_USER = 'tothom';
 export type NotibContextType = {
     isReady: boolean;
     currentUser: any;
+    setCurrentUser: (currentUser: any | undefined) => void;
+    currentUserGridPageSizeOptions?: number[];
     rolesAvailable?: string[];
     entitatsAvailable?: any[];
     currentRole?: string;
