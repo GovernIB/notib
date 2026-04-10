@@ -49,11 +49,9 @@ const CustomToolbar: React.FC = () => {
     const [tokenParsed, setTokenParsed] = React.useState<any>();
     const dataIsReady = data != null;
     const backgroundColor = data?.colorFons ?? '#fff';
-
     React.useEffect(() => {
         setTokenParsed(getTokenParsed());
     }, []);
-
     React.useEffect(() => {
         if (apiIsReady && dataIsReady) {
             if (data.logoCapsalera) {
@@ -66,7 +64,6 @@ const CustomToolbar: React.FC = () => {
             }
         }
     }, [apiIsReady, dataIsReady]);
-
     React.useEffect(() => {
         if (data.logoCapsalera) {
             setLogoUrl(`data:image/png;base64,${data.logoCapsalera.content}`);
@@ -74,7 +71,6 @@ const CustomToolbar: React.FC = () => {
             setLogoUrl(goibLogoLight);
         }
     }, [data?.logoCapsalera]);
-
     return (
         <Toolbar component={Paper} square sx={{ backgroundColor: backgroundColor }}>
             {logoUrl && (
@@ -103,7 +99,6 @@ const CustomToolbar: React.FC = () => {
 
 const EntitatFormTabPersonalitzar: React.FC = () => {
     const { t } = useTranslation();
-
     return (
         <Paper variant="outlined" sx={{ p: 2, pt: 1 }}>
             <Typography variant="h6" gutterBottom>
@@ -145,29 +140,24 @@ const EntitatFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> 
     const { t } = useTranslation();
     const { data } = useFormContext();
     const initialTab = useTabParam();
-
     React.useEffect(() => {
         setSubtitle(data?.codi + ', ' + data?.nom);
     }, [data]);
-
     const tipusDocsTabLabel = (
         <Badge badgeContent={data.tipusDocCount} color="primary">
             {t('page.entitats.form.tabs.tipusDocs')}
         </Badge>
     );
-
     const aplicacionsTabLabel = (
         <Badge badgeContent={data.aplicacioCount} color="primary">
             {t('page.entitats.form.tabs.aplicacions')}
         </Badge>
     );
-
     const permisosTabLabel = (
         <Badge badgeContent={data.aclEntryCount} color="primary">
             {t('page.entitats.form.tabs.permisos')}
         </Badge>
     );
-
     const tabs = [
         t('page.entitats.form.tabs.dades'),
         t('page.entitats.form.tabs.personalitzar'),
@@ -175,7 +165,6 @@ const EntitatFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> 
         { label: aplicacionsTabLabel },
         { label: permisosTabLabel },
     ];
-
     return (
         <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[2, 3, 4]} initialIndex={initialTab}>
             <MuiFormTabContent index={0} showOnCreate>
