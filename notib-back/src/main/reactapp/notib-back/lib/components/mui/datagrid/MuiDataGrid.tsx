@@ -30,6 +30,7 @@ import Icon from '@mui/material/Icon';
 import { capitalize } from '../../../util/text';
 import useLogConsole from '../../../util/useLogConsole';
 import { formattedFieldValue, isFieldNumericType } from '../../../util/fields';
+import * as springFilterBuilder from '../../../util/springFilterBuilder';
 import {
     ReactElementWithPosition,
     joinReactElementsWithPositionWithReactElementsWithPositions,
@@ -120,12 +121,16 @@ export type MuiDataGridProps = {
     selectionActive?: true;
     /** Activa la paginació */
     paginationActive?: true;
+    /** Model d'ordenació que s'afegirà sempre abans que els altres criteris d'ordenació */
+    fixedSortModel?: GridSortModel;
     /** Model d'ordenació inicial */
     defaultSortModel?: GridSortModel;
     /** Model de paginació inicial (un valor a pageSize de -1 indica que la mida de la pàgina s'ajusta a l'alçada del component) */
     defaultPaginationModel?: GridPaginationModel;
     /** Filtre en format Spring Filter que s'enviarà en les consultes d'informació al backend */
     filter?: string;
+    /** Filtre en format Spring Filter que s'afegirà sempre a filter amb and */
+    fixedFilter?: string;
     /** Valor inicial pel filtre ràpid */
     quickFilterInitialValue?: string;
     /** Indica si el camp de filtre ràpid ha de tenir el focus quan es crei el component */
@@ -263,11 +268,12 @@ export type MuiDataGridProps = {
 } & Omit<DataGridProps, 'apiRef'>;
 
 const processFindSortModel = (
+    fixedSortModel: GridSortModel | undefined,
     sortModel: GridSortModel | undefined,
     columns: MuiDataGridColDef[]
 ) => {
     const result: any[] = [];
-    sortModel?.forEach(({ field, sort }) => {
+    [...(fixedSortModel ?? []), ...(sortModel ?? [])].forEach(({ field, sort }) => {
         const columnForCurrentField = columns.find((c) => c.field === field);
         const mappedFields = columnForCurrentField?.sortProcessor
             ? columnForCurrentField.sortProcessor(field, sort)
@@ -719,10 +725,12 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         selectionActive,
         paginationActive,
         sortModel: sortModelProp,
+        fixedSortModel,
         defaultSortModel,
         paginationModel: paginationModelProp,
         defaultPaginationModel,
         filter: filterProp,
+        fixedFilter,
         quickFilterInitialValue,
         quickFilterSetFocus,
         quickFilterFullWidth,
@@ -798,6 +806,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     const treeDataAdditionalRowsIsFunction = treeDataAdditionalRows
         ? typeof treeDataAdditionalRows === 'function'
         : false;
+    const [filter, setFilter] = React.useState<string | undefined>(filterProp);
     const [_filterModel, setFilterModel] = React.useState<GridFilterModel>();
     const [rowSelectionModel, setRowSelectionModel] =
         React.useState<GridRowSelectionModel>(rowSelectionModelProp);
@@ -961,7 +970,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     const gridMargins = isUpperToolbarType ? { m: 2 } : null;
     const canDeleteAnyRow = rows.some((r) => r['_actions']?.['delete'] != null);
     React.useEffect(() => {
-        const processedFindSortModel = processFindSortModel(sortModel, columns);
+        const processedFindSortModel = processFindSortModel(fixedSortModel, sortModel, columns);
         const sorts = processedFindSortModel?.length
             ? processedFindSortModel.map(({ field, sort }) => `${field},${sort}`)
             : undefined;
@@ -974,15 +983,17 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         setFindArgs({
             ...paginationArgs,
             sorts,
-            filter: filterProp,
+            filter: springFilterBuilder.and(fixedFilter, filter),
             namedQueries,
             perspectives,
         });
     }, [
         paginationActive,
+        fixedSortModel,
         sortModel,
         paginationModel,
-        filterProp,
+        filter,
+        fixedFilter,
         namedQueries,
         perspectives,
         columns,
@@ -993,6 +1004,9 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
             setAdditionalRows((treeDataAdditionalRows as (rows: any[]) => any[])(rows));
         }
     }, [rows]);
+    React.useEffect(() => {
+        setFilter(filterProp);
+    }, [filterProp]);
     const toolbarNodesPosition = 2;
     const toolbarGridElementsWithPositions: ReactElementWithPosition[] = [];
     toolbarAddElement != null &&
@@ -1052,6 +1066,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         triggerCreate,
         triggerUpdate,
         triggerDelete,
+        setFilter,
     });
     React.useEffect(() => {
         apiRef.current = {
@@ -1060,14 +1075,16 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
             triggerCreate,
             triggerUpdate,
             triggerDelete,
+            setFilter,
         };
-    }, [refresh, gridExport, triggerCreate, triggerUpdate, triggerDelete]);
+    }, [refresh, gridExport, triggerCreate, triggerUpdate, triggerDelete, setFilter]);
     if (apiRefProp) {
         if (apiRefProp.current) {
             apiRefProp.current.refresh = refresh;
             apiRefProp.current.export = gridExport;
             apiRefProp.current.triggerCreate = triggerCreate;
             apiRefProp.current.triggerUpdate = triggerUpdate;
+            apiRefProp.current.setFilter = setFilter;
         } else {
             logConsole.warn('apiRef prop must be initialized with an empty object');
         }
