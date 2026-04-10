@@ -75,7 +75,7 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:Massi
 
     const menuActions = actions.filter(action=>action?.showInMenu && !(typeof action.hidden === 'function' ? action.hidden(selectedRows) : action.hidden));
 
-    return <Load value={actions.length>0 && actions.filter(a=>!a?.hidden).length>0} noEffect>
+    return null; /*<Load value={actions.length>0 && actions.filter(a=>!a?.hidden).length>0} noEffect>
         <Box sx={{ display: 'flex', alignItems: 'flex-start', ml: 1 }}>
         <ButtonGroup
             variant="outlined"
@@ -107,7 +107,7 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:Massi
                 />
             }
         </ButtonGroup>
-    </Box></Load>;
+    </Box></Load>;*/
 };
 
 export default MassiveActionSelector;
