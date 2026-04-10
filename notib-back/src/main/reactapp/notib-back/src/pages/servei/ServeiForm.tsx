@@ -14,11 +14,9 @@ const ServeiFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> =
     const { t } = useTranslation();
     const { data } = useFormContext();
     const initialTab = useTabParam();
-
     React.useEffect(() => {
         setSubtitle(data?.codi + ', ' + data?.nom);
     }, [data]);
-
     const grupsTabLabel = (
         <Badge badgeContent={data.grupCount} color="primary">
             {t('page.serveis.form.tabs.grups')}
@@ -34,7 +32,6 @@ const ServeiFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> =
         { label: grupsTabLabel },
         { label: permisosTabLabel },
     ];
-
     return (
         <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1, 2]} initialIndex={initialTab}>
             <MuiFormTabContent index={0} showOnCreate>
