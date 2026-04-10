@@ -59,9 +59,11 @@ const ContentFilter: React.FC<{
 }> = (props) => {
     const { filterApiRef, gridApiRef } = props;
     const { t } = useTranslation();
+
     const handleButtonClick = () => {
         filterApiRef.current.clear();
     };
+
     return (
         <Grid container spacing={2}>
             <GridFormField size={2} name="usuariCodi" />
@@ -82,6 +84,7 @@ const ContentFilter: React.FC<{
 const EntitatFormTabAplicacionsFilter: React.FC<{ gridApiRef: MuiDataGridApiRef }> = (props) => {
     const { gridApiRef } = props;
     const filterApiRef = useFilterApiRef();
+
     const springFilterBuilder = (data: any) => {
         return filterBuilder.and(
             filterBuilder.like('usuariCodi', data.usuariCodi),
@@ -89,6 +92,7 @@ const EntitatFormTabAplicacionsFilter: React.FC<{ gridApiRef: MuiDataGridApiRef 
             filterBuilder.eq('activa', `'${data?.activa}'`)
         );
     };
+
     return (
         <MuiFilter
             resourceName="aplicacioResource"

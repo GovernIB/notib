@@ -133,9 +133,6 @@ public class EnviamentTableEntity extends NotibAuditable<Long> {
 	@Column(name = "procediment_nom")
 	private String procedimentNom;
 
-	@Column(name = "procediment_id")
-	private Long procedimentId;
-
 	@Column(name="referencia_notificacio")
 	private String referenciaNotificacio;
 

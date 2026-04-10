@@ -11,8 +11,6 @@ import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.persist.resourcerepository.OrganGestorResourceRepository;
 import es.caib.notib.persist.resourcerepository.ProcedimentOrganGestorResourceRepository;
 import es.caib.notib.persist.resourcerepository.ProcedimentResourceRepository;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
@@ -244,31 +242,6 @@ public class NotibPermissionHelper {
 	}
 
 	/**
-	 * Retorna el conjunt d'ids necessari per a fer una verificació de permisos de notificacions.
-	 *
-	 * @param organGestorPermission
-	 *            el permís a verificar per l'òrgan gestor.
-	 * @param procedimentPermission
-	 *             el permís a verificar pel procediment.
-	 * @return la llista d'ids
-	 */
-	public IdsToCheckNotificacioPermission getIdsToCheckNotificacioPermission(
-		Permission organGestorPermission,
-		Permission procedimentPermission) {
-		List<Long> organGestorIds = organGestorIdsWithPermissionRecursive(organGestorPermission);
-		List<Long> procedimentNoComuIds = procedimentServeiNoComuIdsWithPermission(
-			procedimentPermission,
-			null);
-		List<Long> procedimentComuOrganGestorIds = procedimentServeiComuOrganGestorIdsWithPermission(
-			procedimentPermission,
-			null);
-		return new IdsToCheckNotificacioPermission(
-			organGestorIds,
-			procedimentNoComuIds,
-			procedimentComuOrganGestorIds);
-	}
-
-	/**
 	 * Filtra la llista d'ids de les combinacions procediment/servei - organ gestor segons el valor del camp
 	 * requireDirectPermission al procediment/servei:
 	 *   - Si el procediment/servei te el camp a true es verifica si es te el permís sobre la combinació organ gestor -
@@ -323,14 +296,6 @@ public class NotibPermissionHelper {
 	private ProcSerTipusEnum getProcSerTipusForQuery(Boolean isServei) {
 		if (isServei == null) return null;
 		return isServei ? ProcSerTipusEnum.SERVEI : ProcSerTipusEnum.PROCEDIMENT;
-	}
-
-	@Getter
-	@AllArgsConstructor
-	public static class IdsToCheckNotificacioPermission {
-		private List<Long> organGestorIds;
-		private List<Long> procedimentNoComuIds;
-		private List<Long> procedimentComuOrganGestorIds;
 	}
 
 }

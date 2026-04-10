@@ -25,15 +25,16 @@ export const CacheGrid = () => {
         ],
         []
     );
+
     return (
-        <GridPage>
+        <GridPage disableMargins={false}>
             <MuiDataGrid
                 title={t('page.cache.grid.title')}
                 resourceName="cacheResource"
                 columns={columns}
+                // paginationActive
                 toolbarBulkDelete
                 toolbarHideQuickFilter
-                toolbarType="upper"
             />
         </GridPage>
     );

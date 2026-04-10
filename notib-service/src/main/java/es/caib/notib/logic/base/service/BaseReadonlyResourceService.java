@@ -140,28 +140,23 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 				namedQueries,
 				pageable);
 		long elapsedDatabase = System.currentTimeMillis() - t0;
-		t0 = System.currentTimeMillis();
 		beforeConversion(resultat.getContent());
 		Page<R> response = new PageImpl<>(
 				entitiesToResources(resultat.getContent()),
 				pageable,
 				resultat.getTotalElements());
 		afterConversion(resultat.getContent(), response.getContent());
-		long elapsedConversion = System.currentTimeMillis() - t0;
-		long elapsedPerspectives = 0;
 		if (perspectives != null) {
-			t0 = System.currentTimeMillis();
 			applyPerspectives(
 					resultat.getContent(),
 					response.getContent(),
 					perspectives);
-			elapsedPerspectives = System.currentTimeMillis() - t0;
 		}
+		long elapsedConversion = System.currentTimeMillis() - t0;
 		log.debug(
-				"Query elapsed time (database={}ms, conversion={}ms, perspectives={}ms)",
+				"Query elapsed time (database={}ms, conversion={}ms)",
 				elapsedDatabase,
-				elapsedConversion,
-				elapsedPerspectives);
+				elapsedConversion);
 		return response;
 	}
 
