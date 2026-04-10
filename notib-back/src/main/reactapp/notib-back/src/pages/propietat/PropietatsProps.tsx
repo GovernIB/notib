@@ -60,11 +60,9 @@ const PropsListItem: React.FC<{ item: any; highlight?: string }> = (props) => {
     const disabled = item.jbossProperty;
     const password = item.configTypeCode === 'PASSWORD' ? true : undefined;
     const decimalScale = item.configTypeCode === 'INT' ? 0 : undefined;
-
     const handleFieldOnChange = (value: any) => {
         setChangedValue(value);
     };
-
     const handleSaveClick = () => {
         apiPatch(item.id, { data: { value: changedValue } })
             .then(() => {
@@ -75,11 +73,9 @@ const PropsListItem: React.FC<{ item: any; highlight?: string }> = (props) => {
                 temporalMessageShow(t('page.propietats.save.error'), error.message, 'error')
             );
     };
-
     const handleExpandClick = () => {
         console.log('>>> expand (TODO)');
     };
-
     return (
         <Grid container spacing={2} sx={{ width: '100%' }}>
             <Grid
