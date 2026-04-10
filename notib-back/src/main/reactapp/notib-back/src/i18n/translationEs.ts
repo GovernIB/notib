@@ -490,8 +490,9 @@ const translationEs = {
             add: 'Añadir',
             refresh: 'Refrescar',
         },
-        UserProfileFormDialog: {
-            perfil: 'Perfil del usuario',
+        UserProfile: {
+            perfil: "Perfil del usuario",
+            auto: "Automático",
         },
         FormDropzoneField: {
             arrosegar:  "Arrastra el fichero aquí",
