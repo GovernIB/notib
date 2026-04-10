@@ -160,11 +160,11 @@ export const ProcedimentGrid = () => {
                 resourceName="procedimentResource"
                 columns={columns}
                 fixedFilter={"tipus:'PROCEDIMENT' and entitat.id:" + currentEntitatId}
-                autoFindDisabled
                 paginationActive
                 persistentStateActive
                 toolbarCreateLink="form"
                 toolbarAdditionalRow={<ProcedimentGridFilter />}
+                toolbarAdditionalRowMinHeight="56px"
                 toolbarHideQuickFilter
                 rowLink="form/{{id}}"
                 rowUpdateLink="form/{{id}}"
