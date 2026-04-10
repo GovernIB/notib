@@ -31,7 +31,6 @@ export const PropietatsGroups: React.FC<{
     const [configGroups, setConfigGroups] = React.useState<any[]>();
     const [selectedGroupId, setSelectedGroupId] = React.useState<number>();
     const [selectedItems, setSelectedItems] = React.useState<string>('');
-
     React.useEffect(() => {
         if (apiIsReady) {
             const args = {
@@ -65,11 +64,9 @@ export const PropietatsGroups: React.FC<{
             });
         }
     }, [apiIsReady, quickFilter]);
-
     React.useEffect(() => {
         onChange?.(configGroups?.find((g) => g.id == selectedGroupId));
     }, [configGroups, selectedGroupId]);
-
     return (
         <SimpleTreeView
             selectedItems={selectedItems}
