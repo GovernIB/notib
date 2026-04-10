@@ -167,8 +167,10 @@ export type MuiDataGridProps = {
     toolbarCreateLink?: string;
     /** Elements addicionals (amb la seva posició) per a la barra d'eines */
     toolbarElementsWithPositions?: ReactElementWithPosition[];
-    /** Element que es col·locarà just a davall la barra d'eines */
+    /** Fila addicional que es col·locarà just a davall la barra d'eines */
     toolbarAdditionalRow?: React.ReactElement;
+    /** Estil minHeight per a la fila addicional */
+    toolbarAdditionalRowMinHeight?: string;
     /** Adreça que s'ha de mostrar al fer clic sobre una fila de la graella (només es permet fer clic sobre les files si s'especifica algun valor) */
     rowLink?: string;
     /** Adreça que s'ha de mostrar al fer clic sobre el botó per a mostrar els detalls d'una fila (només en mode només lectura) */
@@ -569,12 +571,11 @@ const usePersistentState = (
         initialState?.sortModel || (defaultSortModel ?? [])
     );
     const [paginationModel, setPaginationModel] = React.useState<GridPaginationModel>(
-        initialState?.paginationModel || (defaultPaginationModel ?? { page: 0, pageSize: -1 })
+        initialState?.paginationModel || defaultPaginationModel
     );
     const [autoPageSize, setAutoPageSize] = React.useState<boolean>(
-        initialState?.autoPageSize ||
-            defaultPaginationModel == null ||
-            defaultPaginationModel.pageSize === -1
+        initialState?.autoPageSize ??
+            (defaultPaginationModel == null || defaultPaginationModel.pageSize === -1)
     );
     React.useEffect(() => {
         sortModelProp !== undefined && setSortModel(sortModelProp);
@@ -752,6 +753,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         toolbarCreateLink,
         toolbarElementsWithPositions,
         toolbarAdditionalRow,
+        toolbarAdditionalRowMinHeight,
         rowLink,
         rowDetailLink,
         rowUpdateLink,
@@ -972,23 +974,29 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     const gridMargins = isUpperToolbarType ? { m: 2 } : null;
     const canDeleteAnyRow = rows.some((r) => r['_actions']?.['delete'] != null);
     React.useEffect(() => {
-        const processedFindSortModel = processFindSortModel(fixedSortModel, sortModel, columns);
-        const sorts = processedFindSortModel?.length
-            ? processedFindSortModel.map(({ field, sort }) => `${field},${sort}`)
-            : undefined;
-        const paginationArgs = paginationActive
-            ? {
-                  page: paginationModel?.page,
-                  size: paginationModel?.pageSize,
-              }
-            : { unpaged: true };
-        setFindArgs({
-            ...paginationArgs,
-            sorts,
-            filter: springFilterBuilder.and(fixedFilter, filter),
-            namedQueries,
-            perspectives,
-        });
+        if (!paginationActive || paginationModel != null) {
+            const processedFindSortModel = processFindSortModel(fixedSortModel, sortModel, columns);
+            const sorts = processedFindSortModel?.length
+                ? processedFindSortModel.map(({ field, sort }) => `${field},${sort}`)
+                : undefined;
+            const paginationArgs = paginationActive
+                ? {
+                      page: paginationModel?.page,
+                      size: paginationModel?.pageSize,
+                  }
+                : { unpaged: true };
+            const processedFilter = springFilterBuilder.and(fixedFilter, filter);
+            const newFindArgs = {
+                ...paginationArgs,
+                sorts,
+                filter: processedFilter !== '' ? processedFilter : undefined,
+                namedQueries,
+                perspectives,
+            };
+            if (JSON.stringify(findArgs) !== JSON.stringify(newFindArgs)) {
+                setFindArgs(newFindArgs);
+            }
+        }
     }, [
         paginationActive,
         fixedSortModel,
@@ -1193,7 +1201,18 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         <>
             {!toolbarHide && toolbar}
             {toolbarAdditionalRow ? (
-                <Box sx={{ ...gridMargins, mb: 0 }}>{toolbarAdditionalRow}</Box>
+                <Box
+                    className="toolbarAdditionalRow"
+                    sx={{
+                        ...gridMargins,
+                        mb: 0,
+                        ...(toolbarAdditionalRowMinHeight != null
+                            ? { minHeight: toolbarAdditionalRowMinHeight }
+                            : {}),
+                    }}
+                >
+                    {toolbarAdditionalRow}
+                </Box>
             ) : null}
             {formDialogComponent}
             <DataGridCustomStyle
