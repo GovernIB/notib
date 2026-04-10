@@ -1,6 +1,7 @@
 package es.caib.notib.logic.intf.model;
 
 import es.caib.notib.client.domini.Idioma;
+import es.caib.notib.client.domini.NumElementsPaginaDefecte;
 import es.caib.notib.client.domini.Tema;
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
@@ -54,14 +55,17 @@ public class UsuariResource extends BaseResource<String> {
 	private Long ultimaEntitat;
 	private Idioma idioma;
 	private Tema tema;
-	@Size(max = 3)
-	private String numElementsPaginaDefecte;
+	private NumElementsPaginaDefecte numElementsPaginaDefecte;
 	protected ResourceReference<EntitatResource, Long> entitatDefecte;
 	protected ResourceReference<OrganGestorResource, Long> organDefecte;
 	protected ResourceReference<ProcedimentResource, Long> procedimentDefecte;
 
 	public String getId() {
 		return codi;
+	}
+
+	public Integer getNumElementsPaginaDefecteAsInt() {
+		return numElementsPaginaDefecte != null ? numElementsPaginaDefecte.getElements(): null;
 	}
 
 	@Override

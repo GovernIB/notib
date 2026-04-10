@@ -31,7 +31,7 @@ export const UserProfileMenu: React.FC<{
             <ListItemIcon>
                 <Icon fontSize="small">account_circle</Icon>
             </ListItemIcon>
-            <ListItemText>{t('component.UserProfileFormDialog.perfil')}</ListItemText>
+            <ListItemText>{t('component.UserProfile.perfil')}</ListItemText>
         </MenuItem>
     );
 };
@@ -43,8 +43,8 @@ export const UserProfileFormDialog: React.FC<{
     const { t } = useTranslation();
     const { mode, setMode } = useColorScheme();
     const { currentLanguage, setCurrentLanguage } = useBaseAppContext();
-    const { currentUser } = useNotibContext();
-    const handleSaveSuccess = (data: any) => {
+    const { currentUser, setCurrentUser } = useNotibContext();
+    const handleSaveSuccess = (data: any, saveUser?: boolean) => {
         const profileLanguage = data?.idioma?.toLowerCase();
         if (profileLanguage != null && currentLanguage !== profileLanguage) {
             setCurrentLanguage(profileLanguage);
@@ -53,6 +53,7 @@ export const UserProfileFormDialog: React.FC<{
         if (mode !== profileMode) {
             setMode(profileMode);
         }
+        saveUser && setCurrentUser(data);
     };
     React.useEffect(() => {
         handleSaveSuccess(currentUser);
@@ -60,19 +61,19 @@ export const UserProfileFormDialog: React.FC<{
     return (
         <MuiFormDialog
             resourceName="usuariResource"
-            title={t('component.UserProfileFormDialog.perfil')}
+            title={t('component.UserProfile.perfil')}
             apiRef={formDialogApiRef}
             dialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
             formComponentProps={{
                 commonFieldComponentProps: { size: 'small' },
-                onSaveSuccess: handleSaveSuccess,
+                onSaveSuccess: (data: any) => handleSaveSuccess(data, true),
             }}
         >
             <Grid container spacing={2}>
-                <Grid size={3}>
+                <Grid size={4}>
                     <FormField name="codi" disabled />
                 </Grid>
-                <Grid size={9}>
+                <Grid size={8}>
                     <FormField name="nomSencer" disabled />
                 </Grid>
                 <Grid size={6}>
@@ -81,17 +82,20 @@ export const UserProfileFormDialog: React.FC<{
                 <Grid size={6}>
                     <FormField name="emailAlt" />
                 </Grid>
+                <Grid size={4}>
+                    <FormField name="numElementsPaginaDefecte" emptyValueDescription={t('component.UserProfile.auto')} />
+                </Grid>
+                <Grid size={4}>
+                    <FormField name="idioma" />
+                </Grid>
+                <Grid size={4}>
+                    <FormField name="tema" />
+                </Grid>
                 <Grid size={6}>
                     <FormField name="rebreEmailsNotificacio" />
                 </Grid>
                 <Grid size={6}>
                     <FormField name="rebreEmailsNotificacioCreats" />
-                </Grid>
-                <Grid size={6}>
-                    <FormField name="idioma" />
-                </Grid>
-                <Grid size={6}>
-                    <FormField name="tema" />
                 </Grid>
                 <Grid size={12}>
                     <FormField name="entitatDefecte" />
