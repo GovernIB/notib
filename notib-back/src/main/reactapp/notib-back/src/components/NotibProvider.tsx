@@ -63,8 +63,14 @@ const getSessionValue = (json: string | undefined, field: string) => {
 };
 
 const useCurrentUser = () => {
-    const { isReady: apiIsReady, find: apiFind } = useResourceApiService('usuariResource');
+    const {
+        isReady: apiIsReady,
+        find: apiFind,
+        currentFields: apiFields,
+    } = useResourceApiService('usuariResource');
     const [currentUser, setCurrentUser] = React.useState<string>();
+    const [currentUserGridPageSizeOptions, setCurrentUserGridPageSizeOptions] =
+        React.useState<number[]>();
     React.useEffect(() => {
         if (apiIsReady) {
             apiFind({ unpaged: true }).then((response) => {
@@ -72,9 +78,17 @@ const useCurrentUser = () => {
                     setCurrentUser(response.rows[0]);
                 }
             });
+            const gridPageSizeOptionsField = apiFields?.find(
+                (f) => f.name === 'numElementsPaginaDefecte'
+            );
+            const gridPageSizeOptions =
+                gridPageSizeOptionsField != null
+                    ? Object.values(gridPageSizeOptionsField?.options).map((v: any) => parseInt(v))
+                    : [10, 20, 50, 100];
+            setCurrentUserGridPageSizeOptions(gridPageSizeOptions);
         }
     }, [apiIsReady]);
-    return { currentUser };
+    return { currentUser, setCurrentUser, currentUserGridPageSizeOptions };
 };
 
 const useCurrentRole = () => {
@@ -263,7 +277,7 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
     const { offline: apiOffline } = useResourceApiContext();
     const { currentUserId, currentRole, currentRoleReady, rolesAvailable, setCurrentRole } =
         useCurrentRole();
-    const { currentUser } = useCurrentUser();
+    const { currentUser, setCurrentUser, currentUserGridPageSizeOptions } = useCurrentUser();
     const {
         currentEntitatId,
         currentEntitatReady,
@@ -276,6 +290,8 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
     const contextValue = {
         isReady,
         currentUser,
+        setCurrentUser,
+        currentUserGridPageSizeOptions,
         rolesAvailable,
         entitatsAvailable,
         currentRole,
