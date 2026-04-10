@@ -1,6 +1,7 @@
 package es.caib.notib.persist.resourceentity;
 
 import es.caib.notib.client.domini.Idioma;
+import es.caib.notib.client.domini.NumElementsPaginaDefecte;
 import es.caib.notib.client.domini.Tema;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.model.UsuariResource;
@@ -48,8 +49,9 @@ public class UsuariResourceEntity extends es.caib.notib.persist.base.entity.Base
 	private Idioma idioma;
 	@Column(name = "tema", length = 10)
 	private Tema tema;
+	@Convert(converter = NumElementsPaginaConverter.class)
 	@Column(name = "num_elements_pagina_defecte", length = 3)
-	private String numElementsPaginaDefecte;
+	private NumElementsPaginaDefecte numElementsPaginaDefecte;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(
@@ -108,6 +110,25 @@ public class UsuariResourceEntity extends es.caib.notib.persist.base.entity.Base
 		public Idioma convertToEntityAttribute(String dbData) {
 			if (dbData == null) return null;
 			return Idioma.valueOf(dbData.toUpperCase());
+		}
+	}
+
+	@Converter
+	public static class NumElementsPaginaConverter implements AttributeConverter<NumElementsPaginaDefecte, String> {
+		@Override
+		public String convertToDatabaseColumn(NumElementsPaginaDefecte attribute) {
+			return attribute != null ? String.valueOf(attribute.getElements()) : null;
+		}
+		@Override
+		public NumElementsPaginaDefecte convertToEntityAttribute(String dbData) {
+			if (dbData == null) return null;
+			int value = Integer.parseInt(dbData);
+			for (NumElementsPaginaDefecte e: NumElementsPaginaDefecte.values()) {
+				if (e.getElements() == value) {
+					return e;
+				}
+			}
+			throw new IllegalArgumentException("Unknown enum value: " + dbData);
 		}
 	}
 

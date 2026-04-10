@@ -503,8 +503,9 @@ const translationCa = {
             add: 'Afegir',
             refresh: 'Refrescar',
         },
-        UserProfileFormDialog: {
+        UserProfile: {
             perfil: "Perfil de l'usuari",
+            auto: "Automàtic",
         },
         FormDropzoneField: {
             arrosegar:  "Arrossega el fitxer aquí",

@@ -6,106 +6,20 @@ import Icon from '@mui/material/Icon';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Chip from '@mui/material/Chip';
-import {
-    GridColDef,
-    GridApiPro,
-    GridColumnResizeParams,
-    useGridApiRef,
-    gridColumnFieldsSelector,
-    GRID_DETAIL_PANEL_TOGGLE_COL_DEF,
-} from '@mui/x-data-grid-pro';
+import { GRID_DETAIL_PANEL_TOGGLE_COL_DEF } from '@mui/x-data-grid-pro';
 import { GridPage, MuiDataGrid, useResourceApiService, MuiDataGridColDef } from 'reactlib';
 import { useNotibContext } from '../../components/NotibContext';
 import NotificacioGridEnviaments from './NotificacioGridEnviaments';
 import { useNotificacioDetailDialog } from './NotificacioDetailDialog';
 
-const LOCAL_STORAGE_PREFIX = 'NOTIB_ST_';
-
-const useDatagridPersistentState = (
-    apiRef: React.RefObject<GridApiPro | null>,
-    columns: GridColDef[],
-    key: string,
-    storeInLocalStorage?: boolean
-) => {
-    const storageKey = LOCAL_STORAGE_PREFIX + key;
-    const loadInitialState = () => {
-        try {
-            const storage = storeInLocalStorage ? localStorage : sessionStorage;
-            const raw = storage.getItem(storageKey);
-            return raw ? JSON.parse(raw) : null;
-        } catch {
-            return null;
-        }
-    };
-    const saveState = (state: any) => {
-        try {
-            const storage = storeInLocalStorage ? localStorage : sessionStorage;
-            storage.setItem(storageKey, JSON.stringify(state));
-        } catch {}
-    };
-    const initialState = loadInitialState();
-    const [widths, setWidths] = React.useState<Record<string, number>>(initialState?.widths || {});
-    const [orderedFields, setOrderedFields] = React.useState<string[]>(
-        initialState?.orderedFields || columns.map((c) => c.field)
-    );
-    const [columnVisibilityModel, setColumnVisibilityModel] = React.useState(
-        initialState?.columnVisibilityModel || {}
-    );
-    const [pinnedColumns, setPinnedColumns] = React.useState(initialState?.pinnedColumns || {});
-    React.useEffect(() => {
-        saveState({
-            widths,
-            orderedFields,
-            columnVisibilityModel,
-            pinnedColumns,
-        });
-    }, [widths, orderedFields, columnVisibilityModel, pinnedColumns]);
-    const onColumnWidthChange = React.useCallback(
-        (params: GridColumnResizeParams) => {
-            const { colDef, width } = params;
-            setWidths((prev) => ({ ...prev, [colDef.field]: width }));
-        },
-        [setWidths]
-    );
-    const onColumnOrderChange = React.useCallback(() => {
-        setOrderedFields(gridColumnFieldsSelector(apiRef));
-    }, [apiRef, setOrderedFields]);
-    const onColumnVisibilityModelChange = React.useCallback((model: any) => {
-        setColumnVisibilityModel(model);
-    }, []);
-    const onPinnedColumnsChange = React.useCallback((model: any) => {
-        setPinnedColumns(model);
-    }, []);
-    const computedColumns = React.useMemo(
-        () =>
-            orderedFields.reduce<GridColDef[]>((acc, field) => {
-                const column = columns.find((col) => col.field === field);
-                if (!column) {
-                    return acc;
-                }
-                if (widths[field]) {
-                    acc.push({
-                        ...column,
-                        flex: 0,
-                        width: widths[field],
-                    });
-                    return acc;
-                }
-                acc.push(column);
-                return acc;
-            }, []),
-        [columns, widths, orderedFields]
-    );
+const useDatagridPageSizeOptionsProps = () => {
+    const { currentUser, currentUserGridPageSizeOptions } = useNotibContext();
     return {
-        columns: computedColumns,
-        dataGridProps: {
-            onColumnWidthChange,
-            onColumnOrderChange,
-            onColumnVisibilityModelChange,
-            onPinnedColumnsChange,
-            columnVisibilityModel,
-            pinnedColumns,
+        defaultPaginationModel: {
+            page: 0,
+            pageSize: currentUser.numElementsPaginaDefecteAsInt ?? -1,
         },
+        pageSizeOptions: currentUserGridPageSizeOptions,
     };
 };
 
@@ -159,7 +73,6 @@ const NotificacioAddButton: React.FC = () => {
 
 const NotificacioGrid = () => {
     const { t } = useTranslation();
-    const apiRef = useGridApiRef();
     const { dialogComponent, onDetailClick } = useNotificacioDetailDialog();
     const { currentActions: apiCurrentActions } = useResourceApiService('notificacioResource');
     const isCreateLinkPresent = apiCurrentActions?.['create'] != null;
@@ -245,15 +158,14 @@ const NotificacioGrid = () => {
         ],
         []
     );
-    const { columns: persistentStateColumns, dataGridProps: persistentStateDataGridProps } =
-        useDatagridPersistentState(apiRef, columns, 'NOT_DG_STATE');
+    const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
         <GridPage disableMargins={false}>
             <MuiDataGrid
                 title={t('page.notificacio.grid.title')}
                 resourceName="notificacioResource"
-                columns={persistentStateColumns}
-                sortModel={[{ field: 'createdDate', sort: 'desc' }]}
+                columns={columns}
+                defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
                 paginationActive
                 toolbarHideCreate
                 toolbarCreateLink="form"
@@ -269,10 +181,10 @@ const NotificacioGrid = () => {
                 }
                 readOnly
                 selectionActive
+                persistentStateActive
                 getDetailPanelContent={({ row }) => <NotificacioGridEnviaments id={row.id} />}
                 getDetailPanelHeight={() => 'auto'}
-                datagridApiRef={apiRef}
-                {...persistentStateDataGridProps}
+                {...pageSizeOptionsDataGridProps}
             />
             {dialogComponent}
         </GridPage>
