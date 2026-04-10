@@ -20,11 +20,9 @@ const PagadorCieFormContent: React.FC<{ setSubtitle: (subtitle: string) => void 
     const { t } = useTranslation();
     const { data } = useFormContext();
     const initialTab = useTabParam();
-
     React.useEffect(() => {
         setSubtitle(data?.nom);
     }, [data]);
-
     const fullesTabLabel = (
         <Badge badgeContent={data.fullaCount} color="primary">
             {t('page.pagadorCie.form.tabs.fulles')}
@@ -40,7 +38,6 @@ const PagadorCieFormContent: React.FC<{ setSubtitle: (subtitle: string) => void 
         { label: fullesTabLabel },
         { label: sobresTabLabel },
     ];
-
     return (
         <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1, 2]} initialIndex={initialTab}>
             <MuiFormTabContent index={0} showOnCreate>
