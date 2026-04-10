@@ -540,7 +540,7 @@ const usePersistentState = (
     storeInLocalStorage?: boolean
 ) => {
     const { code } = useBaseAppContext();
-    const storageKey = code + '_DG_' + key.toUpperCase();
+    const storageKey = code + '_DTG_' + key.toUpperCase();
     const loadInitialState = () => {
         try {
             const storage = storeInLocalStorage ? localStorage : sessionStorage;
@@ -572,7 +572,9 @@ const usePersistentState = (
         initialState?.paginationModel || (defaultPaginationModel ?? { page: 0, pageSize: -1 })
     );
     const [autoPageSize, setAutoPageSize] = React.useState<boolean>(
-        initialState?.autoPageSize || defaultPaginationModel?.pageSize === -1
+        initialState?.autoPageSize ||
+            defaultPaginationModel == null ||
+            defaultPaginationModel.pageSize === -1
     );
     React.useEffect(() => {
         sortModelProp !== undefined && setSortModel(sortModelProp);
