@@ -18,7 +18,7 @@ const PagadorCieFormTabFulles: React.FC = () => {
         <MuiDataGrid
             title=""
             resourceName="pagadorCieFormatFullaResource"
-            staticFilter={'pagadorCie.id:' + id}
+            fixedFilter={'pagadorCie.id:' + id}
             formAdditionalData={{ pagadorCie: { id } }}
             columns={columns}
             paginationActive
