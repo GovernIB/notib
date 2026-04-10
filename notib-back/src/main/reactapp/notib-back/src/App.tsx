@@ -223,7 +223,7 @@ const InnerApp: React.FC = () => {
     return (
         mode && (
             <BaseApp
-                code="not"
+                code="NOTIB"
                 logo={mode === 'light' ? goibLogoLight : goibLogoDark}
                 logoStyle={{
                     '& img': { height: '49px' },
