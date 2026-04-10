@@ -17,11 +17,9 @@ const PropietatsQuickFilter: React.FC<{
     const { t } = useTranslation();
     const [quickFilter, setQuickFilter] = React.useState<string>('');
     const quickFilterDebounced = useDebounce(quickFilter);
-
     React.useEffect(() => {
         onChange?.(quickFilterDebounced);
     }, [quickFilterDebounced]);
-
     return (
         <Box sx={{ display: 'flex', gap: 1 }}>
             <TextField
@@ -66,7 +64,6 @@ const Propietats: React.FC = () => {
     const [quickFilter, setQuickFilter] = React.useState<string>();
     const [selectedGroup, setSelectedGroup] = React.useState<any>();
     const formApiRef = useFormApiRef();
-
     return (
         <GridPage disableMargins>
             <Box
