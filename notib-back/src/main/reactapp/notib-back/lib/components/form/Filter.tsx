@@ -178,6 +178,7 @@ export const Filter: React.FC<FilterProps> = (props) => {
                         fieldTypeMap={fieldTypeMap}
                         validationErrors={validationErrors}
                         apiRef={formApiRef}
+                        formBlockerDisabled
                         {...otherFormProps}
                     >
                         {children}
