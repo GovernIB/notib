@@ -1,25 +1,17 @@
 package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
-import es.caib.notib.logic.helper.NotibPermissionHelper;
-import es.caib.notib.logic.helper.UserSessionHelper;
-import es.caib.notib.logic.intf.EntregaPostalResource;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
-import es.caib.notib.logic.intf.base.exception.PerspectiveApplicationException;
 import es.caib.notib.logic.intf.base.exception.ResourceNotCreatedException;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
-import es.caib.notib.logic.intf.model.PersonaResource;
 import es.caib.notib.logic.intf.resourceservice.NotificacioEnviamentResourceService;
 import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
-import lombok.RequiredArgsConstructor;
+import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
+import es.caib.notib.persist.resourceentity.ProcedimentResourceEntity;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,38 +23,20 @@ import java.util.Map;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class NotificacioEnviamentResourceServiceImpl
 	extends BaseMutableResourceService<NotificacioEnviamentResource, Long, NotificacioEnviamentResourceEntity>
 	implements NotificacioEnviamentResourceService {
 
-	private final UserSessionHelper userSessionHelper;
-	private final NotibPermissionHelper notibPermissionHelper;
-
-	@PostConstruct
-	public void init() {
-		register(NotificacioEnviamentResource.PERSPECTIVE_TITULAR, new NotificacioEnviamentResourceTitularPerspectiveApplicator());
-		register(NotificacioEnviamentResource.PERSPECTIVE_ENTREGA_POSTAL, new NotificacioEnviamentResourceEntregaPostalPerspectiveApplicator());
-	}
-
+	/*
+	 * Com que aquest servei no s'ha d'utilitzar més que per a consultar els fields feim que no es retorni mai cap
+	 * resultat.
+	 */
 	@Override
 	protected String additionalSpringFilter(
 		String currentSpringFilter,
 		String[] namedQueries) {
-		List<String> andConditions = new ArrayList<>();
-		// Condició per a mostrar només les notificacions de l'entitat actual
-		andConditions.add("notificacio.entitat.id:" + userSessionHelper.getCurrentEntitatId());
-		// Condició per a mostrar només les notificacions amb permís de lectura
-		NotibPermissionHelper.IdsToCheckNotificacioPermission ids = notibPermissionHelper.getIdsToCheckNotificacioPermission(
-			BasePermission.READ,
-			BasePermission.READ);
-		String permissionFilter = NotificacioResourceServiceImpl.springFilterWithReadPermission(
-			ids,
-			"notificacio.");
-		if (!permissionFilter.isEmpty()) {
-			andConditions.add("(" + permissionFilter + ")");
-		}
-		return String.join(" and ", andConditions);
+		//return "id is null";
+		return null;
 	}
 
 	/*
@@ -78,77 +52,19 @@ public class NotificacioEnviamentResourceServiceImpl
 	}
 
 	@Override
-	protected void afterConversion(NotificacioEnviamentResourceEntity entity, NotificacioEnviamentResource resource) {
-
-		var organGestor = entity.getNotificacio().getOrganGestor();
-		var procediment = entity.getNotificacio().getProcediment();
-		resource.setNotificacioOrganGestor(ResourceReference.toResourceReference(organGestor.getId(), organGestor.getCodiNom()));
-		resource.setNotificacioProcediment(ResourceReference.toResourceReference(procediment.getId(), procediment.getNom()));
-		resource.setReferenciaNotificacio(entity.getNotificacio().getReferencia());
-		var titular = entity.getTitular();
-		resource.setTitular(ResourceReference.toResourceReference(titular.getId(), titular.getNomSencerNif()));
-	}
-
-	/**
-	 * Perspectiva per a emplenar els camps del titular d'un enviament.
-	 */
-	@RequiredArgsConstructor
-	public static class NotificacioEnviamentResourceTitularPerspectiveApplicator implements PerspectiveApplicator<NotificacioEnviamentResourceEntity, NotificacioEnviamentResource> {
-
-		@Override
-		public void applySingle(String code, NotificacioEnviamentResourceEntity entity, NotificacioEnviamentResource resource) throws PerspectiveApplicationException {
-
-			var titularEntity = entity.getTitular();
-			var titularInfo = resource.getTitularInfo();
-			if (titularInfo == null) {
-				titularInfo = new PersonaResource();
-			}
-			titularInfo.setNif(titularEntity.getNif());
-			titularInfo.setNom(titularEntity.getNom());
-			titularInfo.setEmail(titularEntity.getEmail());
-			titularInfo.setTelefon(titularEntity.getTelefon());
-			titularInfo.setLlinatge1(titularEntity.getLlinatge1());
-			titularInfo.setLlinatge2(titularEntity.getLlinatge2());
-			resource.setTitularInfo(titularInfo);
-		}
-	}
-
-	/**
-	 * Perspectiva per a emplenar els camps de la entrega postal d'un enviament.
-	 */
-	@RequiredArgsConstructor
-	public static class NotificacioEnviamentResourceEntregaPostalPerspectiveApplicator implements PerspectiveApplicator<NotificacioEnviamentResourceEntity, NotificacioEnviamentResource> {
-
-		@Override
-		public void applySingle(String code, NotificacioEnviamentResourceEntity entity, NotificacioEnviamentResource resource) throws PerspectiveApplicationException {
-
-			var entregaPostalEntity = entity.getEntregaPostal();
-			if (entregaPostalEntity == null) {
-				return;
-			}
-			var entregaPostalInfo = resource.getEntregaPostalInfo();
-			if (entregaPostalInfo == null) {
-				entregaPostalInfo = new EntregaPostalResource();
-			}
-			entregaPostalInfo.setCieId(entregaPostalEntity.getCieId());
-			entregaPostalInfo.setCieEstat(entregaPostalEntity.getCieEstat());
-			entregaPostalInfo.setCieEstatData(entregaPostalEntity.getCieEstatData());
-			entregaPostalInfo.setCieDatatOrigen(entregaPostalEntity.getCieDatatOrigen());
-			entregaPostalInfo.setCieDatatReceptorNif(entregaPostalEntity.getCieDatatReceptorNif());
-			entregaPostalInfo.setCieDatatReceptorNom(entregaPostalEntity.getCieDatatReceptorNom());
-			entregaPostalInfo.setCieDatatNumSeguiment(entregaPostalEntity.getCieDatatNumSeguiment());
-			entregaPostalInfo.setCieDatatErrorDescripcio(entregaPostalEntity.getCieDatatErrorDescripcio());
-			entregaPostalInfo.setCieCertificacioData(entregaPostalEntity.getCieCertificacioData());
-			entregaPostalInfo.setCieCertificacioMime(entregaPostalEntity.getCieCertificacioMime());
-			entregaPostalInfo.setCieCertificacioOrigen(entregaPostalEntity.getCieCertificacioOrigen());
-			entregaPostalInfo.setCieCertificacioMetadades(entregaPostalEntity.getCieCertificacioMetadades());
-			entregaPostalInfo.setCieCertificacioCsv(entregaPostalEntity.getCieCertificacioCsv());
-			entregaPostalInfo.setCieCertificacioTipus(entregaPostalEntity.getCieCertificacioTipus());
-			entregaPostalInfo.setCieCertificacioArxiuTipus(entregaPostalEntity.getCieCertificacioArxiuTipus());
-			entregaPostalInfo.setCieCertificacioNumSeguiment(entregaPostalEntity.getCieCertificacioNumSeguiment());
-			entregaPostalInfo.setCieCertificacioArxiuNom(entregaPostalEntity.getCieCertificacioArxiuNom());
-			resource.setEntregaPostalInfo(entregaPostalInfo);
-		}
+	protected void afterConversion(
+		NotificacioEnviamentResourceEntity entity,
+		NotificacioEnviamentResource resource) {
+		OrganGestorResourceEntity organGestor = entity.getNotificacio().getOrganGestor();
+		ProcedimentResourceEntity procediment = entity.getNotificacio().getProcediment();
+		resource.setNotificacioOrganGestor(ResourceReference.toResourceReference(
+			organGestor.getId(),
+			organGestor.getCodiNom()));
+		resource.setNotificacioProcediment(
+			ResourceReference.toResourceReference(
+				procediment.getId(),
+				procediment.getNom())
+		);
 	}
 
 }

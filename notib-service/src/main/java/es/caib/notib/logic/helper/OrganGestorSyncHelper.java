@@ -231,13 +231,6 @@ public class OrganGestorSyncHelper {
 					entitat(entitat).
 					build());
 		}
-		if (updated.getCodiPare() != null) {
-			updated.setPare(
-				organGestorResourceRepository.findByCodiAndEstat(
-						updated.getCodiPare(),
-						OrganGestorEstatEnum.V).
-					orElse(null));
-		}
 		organGestorLlibreOficinaHelper.updateLlibre(updated);
 		organGestorLlibreOficinaHelper.updateOficina(updated, null);
 	}
