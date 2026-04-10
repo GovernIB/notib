@@ -10,7 +10,6 @@ import PermissionGridSwitch from '../../components/PermissionGridSwitch';
 const PermissionForm: React.FC = () => {
     const { t } = useTranslation();
     const { apiRef } = useFormContext();
-
     const doFieldChange = (targetValue: boolean) => {
         const permisos = [
             'readAllowed',
@@ -27,7 +26,6 @@ const PermissionForm: React.FC = () => {
             apiRef?.current?.setFieldValue?.(nomPermis, targetValue);
         });
     };
-
     const sidGrantedAuthorityEnumOptions = [
         {
             value: false,
@@ -38,7 +36,6 @@ const PermissionForm: React.FC = () => {
             description: t('component.PermissionGrid.grantedAuthority.role'),
         },
     ];
-
     return (
         <Grid container spacing={2}>
             <GridFormField
@@ -50,7 +47,6 @@ const PermissionForm: React.FC = () => {
                 size={3}
             />
             <GridFormField size={9} name="sidName" />
-
             <PermissionGridSwitch
                 name="adminAllowed"
                 label={t('page.organs.form.permisos.administrador')}
@@ -58,7 +54,6 @@ const PermissionForm: React.FC = () => {
                 icon={<Icon>person_add_alt_1</Icon>}
                 size={12}
             />
-
             <PermissionGridSwitch
                 name="selectAll"
                 label={'Seleccionar tots'}
@@ -74,7 +69,6 @@ const PermissionForm: React.FC = () => {
                 icon={<Icon>search</Icon>}
                 size={11}
             />
-
             <Grid size={1} />
             <PermissionGridSwitch
                 name="perm1Allowed"
@@ -83,7 +77,6 @@ const PermissionForm: React.FC = () => {
                 icon={<Icon>check_box</Icon>}
                 size={11}
             />
-
             <Grid size={1} />
             <PermissionGridSwitch
                 name="perm2Allowed"
@@ -92,7 +85,6 @@ const PermissionForm: React.FC = () => {
                 icon={<Icon>settings</Icon>}
                 size={11}
             />
-
             <Grid size={1} />
             <PermissionGridSwitch
                 name="perm3Allowed"
@@ -101,7 +93,6 @@ const PermissionForm: React.FC = () => {
                 icon={<Icon>public</Icon>}
                 size={11}
             />
-
             <Grid size={1} />
             <PermissionGridSwitch
                 name="perm4Allowed"
@@ -110,7 +101,6 @@ const PermissionForm: React.FC = () => {
                 icon={<Icon>gavel</Icon>}
                 size={11}
             />
-
             <Grid size={1} />
             <PermissionGridSwitch
                 name="perm5Allowed"
@@ -119,7 +109,6 @@ const PermissionForm: React.FC = () => {
                 icon={<MailOutlineIcon />}
                 size={11}
             />
-
             <Grid size={1} />
             <PermissionGridSwitch
                 name="perm6Allowed"
@@ -128,7 +117,6 @@ const PermissionForm: React.FC = () => {
                 icon={<Icon>email</Icon>}
                 size={11}
             />
-
             <Grid size={1} />
             <PermissionGridSwitch
                 name="perm7Allowed"
