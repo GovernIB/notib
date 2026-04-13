@@ -39,7 +39,6 @@ export const useDatagridFilterProps = (
         </MuiFilter>
     );
     return {
-        loading: autoFindDisabled,
         autoFindDisabled: autoFindDisabled,
         toolbarHideQuickFilter: true as true,
         toolbarAdditionalRow: filterComponent,
