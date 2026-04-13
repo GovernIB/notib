@@ -10,19 +10,7 @@ type DataQuickFilterProps = {
     onChange: (value: string) => void;
 } & any;
 
-export const useDataQuickFilter = (
-    initialValue?: string,
-    setFocus?: true,
-    otherProps?: any
-): { value: string; component: React.ReactElement } => {
-    const [value, setValue] = React.useState(initialValue ?? '');
-    const component = (
-        <DataQuickFilter value={value} setFocus={setFocus} onChange={setValue} {...otherProps} />
-    );
-    return { value, component };
-};
-
-const DataQuickFilter: React.FC<DataQuickFilterProps> = (props) => {
+export const DataQuickFilter: React.FC<DataQuickFilterProps> = (props) => {
     const { value, setFocus, onChange, ...otherProps } = props;
     return (
         <TextField
