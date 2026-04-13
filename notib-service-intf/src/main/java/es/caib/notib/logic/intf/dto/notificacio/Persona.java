@@ -43,6 +43,7 @@ public class Persona implements Serializable {
     private String llinatge1;
     @JsonDeserialize(using = TrimStringDeserializer.class)
     private String llinatge2;
+    @JsonDeserialize(using = TrimStringDeserializer.class)
     private DocumentTipus documentTipus;
     @JsonDeserialize(using = TrimStringDeserializer.class)
     private String nif;

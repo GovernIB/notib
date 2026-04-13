@@ -4,10 +4,10 @@ import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import Badge from '@mui/material/Badge';
 import { FormPage, MuiForm, MuiFormTabs, MuiFormTabContent, useFormContext } from 'reactlib';
-import ServeiFormTabGrups from './ServeiFormTabGrups';
+import ServeiFormTabGrups from './ServeiFormTabGrups.tsx';
 import ServeiFormTabPermisos from './ServeiFormTabPermisos';
-import GridFormField from '../../components/GridFormField';
-import { useTabParam } from '../../hooks/useSearchParams';
+import GridFormField from '../../components/GridFormField.tsx';
+import { useTabParam } from '../../hooks/useSearchParams.tsx';
 
 const ServeiFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
     const { setSubtitle } = props;

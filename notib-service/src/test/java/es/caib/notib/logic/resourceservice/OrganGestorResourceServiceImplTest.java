@@ -11,7 +11,10 @@ import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.model.OrganGestorDir3Sync;
 import es.caib.notib.logic.intf.model.OrganGestorResource;
 import es.caib.notib.persist.resourceentity.*;
-import es.caib.notib.persist.resourcerepository.*;
+import es.caib.notib.persist.resourcerepository.EntitatResourceRepository;
+import es.caib.notib.persist.resourcerepository.EntregaCieResourceRepository;
+import es.caib.notib.persist.resourcerepository.PagadorCieResourceRepository;
+import es.caib.notib.persist.resourcerepository.PagadorPostalResourceRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,7 +44,6 @@ class OrganGestorResourceServiceImplTest {
 	@Mock private AclHelper aclHelper;
 	@Mock private OrganGestorSyncHelper syncHelper;
 	@Mock private EntitatResourceRepository entitatRepo;
-	@Mock private OrganGestorResourceRepository organGestorResourceRepository;
 	@Mock private PagadorPostalResourceRepository pagadorPostalRepo;
 	@Mock private PagadorCieResourceRepository pagadorCieRepo;
 	@Mock private EntregaCieResourceRepository entregaCieRepo;
@@ -57,7 +59,6 @@ class OrganGestorResourceServiceImplTest {
 			aclHelper,
 			syncHelper,
 			entitatRepo,
-			organGestorResourceRepository,
 			pagadorPostalRepo,
 			pagadorCieRepo,
 			entregaCieRepo
@@ -179,7 +180,6 @@ class OrganGestorResourceServiceImplTest {
 		PagadorPostalResourceEntity postal = new PagadorPostalResourceEntity();
 		when(pagadorCieRepo.findById(1L)).thenReturn(Optional.of(cie));
 		when(pagadorPostalRepo.findById(2L)).thenReturn(Optional.of(postal));
-		when(entregaCieRepo.save(any())).thenReturn(new EntregaCieResourceEntity());
 		service.beforeUpdateSave(entity, resource, Map.of());
 		verify(entregaCieRepo).save(any());
 		assertNotNull(entity.getEntregaCie());
