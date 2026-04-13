@@ -1,18 +1,19 @@
 import { useTranslation } from 'react-i18next';
 import Chip from '@mui/material/Chip';
+import Grid from '@mui/material/Grid';
+import Icon from '@mui/material/Icon';
+import IconButton from '@mui/material/IconButton';
 import {
-    FilterApi,
     GridPage,
     MuiDataGrid,
-    MuiFilter,
-    useFilterApiRef,
     springFilterBuilder as filterBuilder,
     MuiDataGridColDef,
+    useFilterApiContext,
 } from 'reactlib';
 import { useNotibContext } from '../../components/NotibContext';
-import GridFormField, { GridButtonField } from '../../components/GridFormField';
-import { Grid, Icon, IconButton } from '@mui/material';
 import LinkToTab from '../../components/LinkToTab';
+import GridFormField, { GridButtonField } from '../../components/GridFormField';
+import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -92,11 +93,25 @@ const columns: MuiDataGridColDef[] = [
     },
 ];
 
-const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (props) => {
-    const { filterApiRef } = props;
+const springFilterBuilder = (data: any) => {
+    return filterBuilder.and(
+        filterBuilder.like('codi', data.codi),
+        filterBuilder.like('nom', data.nom),
+        filterBuilder.eq('organGestor.id', data.organGestor?.id),
+        data?.actiu && filterBuilder.eq('actiu', `'${data.actiu}'`),
+        data?.comu && filterBuilder.eq('comu', `'${data.comu}'`),
+        data?.entregaCieActiva ? filterBuilder.neq('entregaCie', null) : undefined,
+        data?.manual && filterBuilder.eq('manual', `'${data.manual}'`),
+        data?.requireDirectPermission &&
+            filterBuilder.eq('requireDirectPermission', `'${data.requireDirectPermission}'`)
+    );
+};
+
+const ContentFilter: React.FC = () => {
     const { t } = useTranslation();
+    const filterApiRef = useFilterApiContext();
     const handleButtonClick = () => {
-        filterApiRef.current.clear();
+        filterApiRef.current?.clear();
     };
     return (
         <Grid container spacing={2}>
@@ -120,38 +135,16 @@ const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (p
     );
 };
 
-const ProcedimentGridFilter: React.FC = () => {
-    const filterApiRef = useFilterApiRef();
-    const springFilterBuilder = (data: any) => {
-        return filterBuilder.and(
-            filterBuilder.like('codi', data.codi),
-            filterBuilder.like('nom', data.nom),
-            filterBuilder.eq('organGestor.id', data.organGestor?.id),
-            data?.actiu && filterBuilder.eq('actiu', `'${data.actiu}'`),
-            data?.comu && filterBuilder.eq('comu', `'${data.comu}'`),
-            data?.entregaCieActiva ? filterBuilder.neq('entregaCie', null) : undefined,
-            data?.manual && filterBuilder.eq('manual', `'${data.manual}'`),
-            data?.requireDirectPermission &&
-                filterBuilder.eq('requireDirectPermission', `'${data.requireDirectPermission}'`)
-        );
-    };
-    return (
-        <MuiFilter
-            resourceName="procedimentResource"
-            code="FILTER_PROCEDIMENT"
-            apiRef={filterApiRef}
-            springFilterBuilder={springFilterBuilder}
-            componentProps={{ sx: { mb: 2, mt: 0 } }}
-            commonFieldComponentProps={{ size: 'small' }}
-        >
-            <ContentFilter filterApiRef={filterApiRef} />
-        </MuiFilter>
-    );
-};
-
 export const ProcedimentGrid = () => {
     const { t } = useTranslation();
     const { currentEntitatId } = useNotibContext();
+    const filterDataGridProps = useDatagridFilterProps(
+        'procedimentResource',
+        'FILTER_PROCEDIMENT',
+        springFilterBuilder,
+        <ContentFilter />
+    );
+    const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
         <GridPage disableMargins={false}>
             <MuiDataGrid
@@ -160,8 +153,10 @@ export const ProcedimentGrid = () => {
                 columns={columns}
                 fixedFilter={"tipus:'SERVEI' and entitat.id:" + currentEntitatId}
                 paginationActive
-                toolbarAdditionalRow={<ProcedimentGridFilter />}
-                toolbarHideQuickFilter
+                persistentStateActive
+                persistentStateClearPageSortPropsOnTopLevelRouteChange
+                {...filterDataGridProps}
+                {...pageSizeOptionsDataGridProps}
                 toolbarCreateLink="form"
                 rowLink="form/{{id}}"
                 rowUpdateLink="form/{{id}}"
