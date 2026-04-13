@@ -162,6 +162,7 @@ export const ProcedimentGrid = () => {
                 fixedFilter={"tipus:'PROCEDIMENT' and entitat.id:" + currentEntitatId}
                 paginationActive
                 persistentStateActive
+                persistentStateClearPageSortPropsOnTopLevelRouteChange
                 toolbarCreateLink="form"
                 toolbarAdditionalRow={<ProcedimentGridFilter />}
                 toolbarAdditionalRowMinHeight="56px"
