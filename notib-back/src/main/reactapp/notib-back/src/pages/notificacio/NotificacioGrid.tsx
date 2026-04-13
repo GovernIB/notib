@@ -9,19 +9,9 @@ import Chip from '@mui/material/Chip';
 import { GRID_DETAIL_PANEL_TOGGLE_COL_DEF } from '@mui/x-data-grid-pro';
 import { GridPage, MuiDataGrid, useResourceApiService, MuiDataGridColDef } from 'reactlib';
 import { useNotibContext } from '../../components/NotibContext';
+import { useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 import NotificacioGridEnviaments from './NotificacioGridEnviaments';
 import { useNotificacioDetailDialog } from './NotificacioDetailDialog';
-
-const useDatagridPageSizeOptionsProps = () => {
-    const { currentUser, currentUserGridPageSizeOptions } = useNotibContext();
-    return {
-        defaultPaginationModel: {
-            page: 0,
-            pageSize: currentUser.numElementsPaginaDefecteAsInt ?? -1,
-        },
-        pageSizeOptions: currentUserGridPageSizeOptions,
-    };
-};
 
 const NotificacioAddButton: React.FC = () => {
     const { t } = useTranslation();
