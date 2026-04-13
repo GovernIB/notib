@@ -1,17 +1,18 @@
 import { useTranslation } from 'react-i18next';
 import Chip from '@mui/material/Chip';
+import Grid from '@mui/material/Grid';
+import Icon from '@mui/material/Icon';
+import IconButton from '@mui/material/IconButton';
 import {
-    FilterApi,
     GridPage,
     MuiDataGrid,
-    MuiFilter,
-    useFilterApiRef,
     springFilterBuilder as filterBuilder,
+    useFilterApiContext,
 } from 'reactlib';
-import GridFormField from '../../components/GridFormField';
-import { Grid, Icon, IconButton } from '@mui/material';
-import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
 import LinkToTab from '../../components/LinkToTab';
+import GridFormField from '../../components/GridFormField';
+import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
+import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 
 const columns = [
     {
@@ -62,11 +63,29 @@ const columns = [
     },
 ];
 
-const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (props) => {
-    const { filterApiRef } = props;
+const springFilterBuilder = (data: any) => {
+    return filterBuilder.and(
+        filterBuilder.like('nom', data.nom),
+        filterBuilder.eq('organEmisor.id', data?.organGestorEmissor?.id), //TODO: Revisar aquest filtre, el backend no te aquest camp a l'entity
+        filterBuilder.eq('organGestor.id', data?.organGestorPagador?.id),
+        data?.contracteDataVigInici &&
+            filterBuilder.gte(
+                'contracteDataVig',
+                `'${formatStartOfDay(data?.contracteDataVigInici)}'`
+            ),
+        data?.contracteDataVigFinal &&
+            filterBuilder.lte(
+                'contracteDataVig',
+                `'${formatEndOfDay(data?.contracteDataVigFinal)}'`
+            )
+    );
+};
+
+const ContentFilter: React.FC = () => {
     const { t } = useTranslation();
+        const filterApiRef = useFilterApiContext();
     const handleButtonClick = () => {
-        filterApiRef.current.clear();
+        filterApiRef.current?.clear();
     };
     return (
         <Grid container spacing={2}>
@@ -84,41 +103,15 @@ const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (p
     );
 };
 
-const AvisGridFilter: React.FC = () => {
-    const filterApiRef = useFilterApiRef();
-    const springFilterBuilder = (data: any) => {
-        return filterBuilder.and(
-            filterBuilder.like('nom', data.nom),
-            filterBuilder.eq('organEmisor.id', data?.organGestorEmissor?.id), //TODO: Revisar aquest filtre, el backend no te aquest camp a l'entity
-            filterBuilder.eq('organGestor.id', data?.organGestorPagador?.id),
-            data?.contracteDataVigInici &&
-                filterBuilder.gte(
-                    'contracteDataVig',
-                    `'${formatStartOfDay(data?.contracteDataVigInici)}'`
-                ),
-            data?.contracteDataVigFinal &&
-                filterBuilder.lte(
-                    'contracteDataVig',
-                    `'${formatEndOfDay(data?.contracteDataVigFinal)}'`
-                )
-        );
-    };
-    return (
-        <MuiFilter
-            resourceName="pagadorCieResource"
-            code="FILTER_PAGADOR_CIE"
-            apiRef={filterApiRef}
-            springFilterBuilder={springFilterBuilder}
-            componentProps={{ sx: { mb: 2, mt: 0 } }}
-            commonFieldComponentProps={{ size: 'small' }}
-        >
-            <ContentFilter filterApiRef={filterApiRef} />
-        </MuiFilter>
-    );
-};
-
 export const PagadorCieGrid: React.FC = () => {
     const { t } = useTranslation();
+    const filterDataGridProps = useDatagridFilterProps(
+        'pagadorCieResource',
+        'FILTER_PAGADOR_CIE',
+        springFilterBuilder,
+        <ContentFilter />
+    );
+    const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
         <GridPage disableMargins={false}>
             <MuiDataGrid
@@ -126,8 +119,10 @@ export const PagadorCieGrid: React.FC = () => {
                 resourceName="pagadorCieResource"
                 columns={columns}
                 paginationActive
-                toolbarHideQuickFilter
-                toolbarAdditionalRow={<AvisGridFilter />}
+                persistentStateActive
+                persistentStateClearPageSortPropsOnTopLevelRouteChange
+                {...filterDataGridProps}
+                {...pageSizeOptionsDataGridProps}
                 toolbarCreateLink="form"
                 rowLink="form/{{id}}"
                 rowUpdateLink="form/{{id}}"
