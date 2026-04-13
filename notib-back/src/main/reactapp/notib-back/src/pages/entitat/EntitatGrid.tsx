@@ -123,7 +123,7 @@ export const EntitatGrid: React.FC = () => {
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
-        <GridPage>
+        <GridPage disableMargins={false}>
             <MuiDataGrid
                 title={t('page.entitats.grid.title')}
                 resourceName="entitatResource"
@@ -133,7 +133,6 @@ export const EntitatGrid: React.FC = () => {
                 persistentStateClearPageSortPropsOnTopLevelRouteChange
                 {...filterDataGridProps}
                 {...pageSizeOptionsDataGridProps}
-                toolbarType="upper"
                 toolbarCreateLink="form"
                 rowLink="form/{{id}}"
                 rowUpdateLink="form/{{id}}"

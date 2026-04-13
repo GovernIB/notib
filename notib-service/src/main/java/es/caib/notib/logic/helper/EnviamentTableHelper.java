@@ -62,7 +62,6 @@ public class EnviamentTableHelper {
                 .enviamentDataProgramada(notificacio.getEnviamentDataProgramada())
                 .procedimentCodiNotib(notificacio.getProcedimentCodiNotib())
                 .procedimentNom(notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : null)
-                .procedimentId(notificacio.getProcediment() != null ? notificacio.getProcediment().getId() : null)
                 .referenciaNotificacio(notificacio.getReferencia())
                 .grupCodi(notificacio.getGrupCodi())
                 .emisorDir3Codi(notificacio.getEmisorDir3Codi())
@@ -127,7 +126,6 @@ public class EnviamentTableHelper {
         tableViewItem.setEnviamentDataProgramada(notificacio.getEnviamentDataProgramada());
         tableViewItem.setProcedimentCodiNotib(notificacio.getProcedimentCodiNotib());
         tableViewItem.setProcedimentNom(notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : null);
-        tableViewItem.setProcedimentId(notificacio.getProcediment() != null ? notificacio.getProcediment().getId() : null);
         tableViewItem.setReferenciaNotificacio(notificacio.getReferencia());
         tableViewItem.setGrupCodi(notificacio.getGrupCodi());
         tableViewItem.setEmisorDir3Codi(notificacio.getEmisorDir3Codi());

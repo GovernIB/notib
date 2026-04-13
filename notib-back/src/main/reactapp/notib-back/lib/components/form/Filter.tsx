@@ -1,5 +1,4 @@
 import React, { KeyboardEvent } from 'react';
-import { useAuthContext } from '../AuthContext';
 import { useBaseAppContext } from '../BaseAppContext';
 import Form from './Form';
 import { FilterApi, FilterApiRef, FilterContext, useFilterContext } from './FilterContext';
@@ -56,9 +55,7 @@ const usePersistentState = (
     storeInLocalStorage?: boolean
 ) => {
     const { code } = useBaseAppContext();
-    const { isAuthenticated, getUserId } = useAuthContext();
-    const userSuffix = isAuthenticated ? '_' + getUserId().toUpperCase() : '';
-    const storageKey = code + '_FLT_' + key.toUpperCase() + userSuffix;
+    const storageKey = code + '_FLT_' + key.toUpperCase();
     const loadInitialState = () => {
         try {
             const storage = storeInLocalStorage ? localStorage : sessionStorage;

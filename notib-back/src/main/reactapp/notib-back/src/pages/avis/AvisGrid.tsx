@@ -84,7 +84,7 @@ export const AvisGrid = () => {
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
-        <GridPage>
+        <GridPage disableMargins={false}>
             <MuiDataGrid
                 title={t('page.avisos.grid.title')}
                 resourceName="avisResource"
@@ -94,7 +94,6 @@ export const AvisGrid = () => {
                 persistentStateClearPageSortPropsOnTopLevelRouteChange
                 {...filterDataGridProps}
                 {...pageSizeOptionsDataGridProps}
-                toolbarType="upper"
                 toolbarBulkDelete
                 toolbarCreateLink="form"
                 rowUpdateLink="form/{{id}}"

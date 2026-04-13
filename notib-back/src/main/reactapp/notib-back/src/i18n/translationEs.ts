@@ -91,9 +91,6 @@ const translationEs = {
         organs: {
             grid: {
                 title: 'Órganos gestores',
-                viewSwitch: 'Vista en árbol',
-                groupColumn: 'Órgano gestor',
-                popupDialogTitle: 'órgano gestor',
                 sync: {
                     title: 'Sincronización DIR3',
                     dialogTitle: 'Sincronización DIR3',
@@ -283,12 +280,11 @@ const translationEs = {
                         estatPostal: 'Estado de entrega postal',
                         estatTelematica: 'Estado de entrega telemática',
                     },
-                    accions: 'Acciones',
+                    detalls: 'Detalles',
                 },
                 column: {
                     detalls: 'Detalles',
-                    mostrar: 'Mostrar envios',
-                    ocultar: 'Ocultar envios',
+                    desplegar: 'Desplegar envios',
                 },
                 procediment: 'Procedimiento',
                 servei: 'Servicio',
@@ -368,103 +364,14 @@ const translationEs = {
             grid: {
                 title: 'Envios',
                 detalls: 'Detalles',
-                remesa: 'Remesa',
-                anular: 'Anular',
-                ampliarTermini: 'Ampliar terminio'
             },
             detail: {
                 title: 'Detalles del envio',
                 tab: {
-                    dades: {
-                        title: 'Datos',
-                        enviaments: 'Datos del envio',
-                        interessat: 'Datos del interesado',
-                        titularInfo: {
-                            nif: "Nif",
-                            nom: "Nombre",
-                            llinatges: "Apellidos",
-                            telefon: "Teléfono",
-                            email: "Email",
-                        },
-                    },
-                    notifica: {
-                        title: 'Notific@',
-                        datat: 'Datado',
-                        certificacio: 'Certificación',
-                        noEnviat: 'Este envío todavía no ha sido enviado',
-                        notificacioNoEnviat: 'Esta notificación no ha sido enviada a Notific@',
-                        refrescar: 'Refrescar estado',
-                    },
-                    registre: {
-                        title: 'Registro',
-                        dadesRegistre: 'Datos del registro',
-                        noEnviada: "Esta notificación no ha sido enviada al registro",
-                    },
-                    entregaPostal: {
-                        title: 'Entrega postal',
-                        cieEstat: "Estado",
-                        cieEstatPendent: "La entrega postal no ha sido enviada o se ha enviado con errores. Ver pestaña de eventos para más información",
-                        cieEstatData: "Estado fecha",
-                        cieId: "Identificador Notifica",
-                        cieDatatErrorDescripcio: "Estado descripción",
-                        cieDatatOrigen: "Origen",
-                        cieDatatReceptorNif: "Receptor NIF",
-                        cieDatatReceptorNom: "Receptor nombre",
-                        cieDatatNumSeguiment: "Núm. seguimiento",
-                        cieErroni: "L'entrega CIE no es podrà donar d'alta ja que dona errors al crear-la al CIE",
-                        refrescarEstat: 'Refrescar estado',
-                        cancelarEntregaPostal: "Cancelar entrega postal",
-                        certificacio: "Certificación",
-                        cieCertificacioData: "Data",
-                        cieCertificacioMime: "Tipo MIME",
-                        cieCertificacioOrigen: "Origen",
-                        cieCertificacioMetadades: "Metadatos",
-                        cieCertificacioCsv: "CSV",
-                        cieCertificacioTipus: "Tipos",
-                        cieCertificacioArxiuTipus: "Tipos de archivo",
-                        cieCertificacioNumSeguiment: "Núm. seguimiento",
-                        cieCertificacioArxiuNom: "Documento",
-                    },
-                    registreEsdev: {
-                        title: 'Registro de acontecimientos',
-                        estatError: "Evento procesado con error",
-                        estatSuccess: "Evento procesado con éxito",
-                    },
-                    historic: {
-                        title: "Histórico",
-                    },
-                    stateMachine: {
-                        title: "State Machine",
-                        estatOrigen: "Estado origen",
-                        event: "Evento",
-                        taulaEstatsTitle: "Operacions que es realitzen al enviar events",
-                        descarregarDiagrama: "Descargar diagrama",
-                        missatge:"Atención! No alterar los estados de la state machine ni enviar eventos sin conocer las repercusiones que pueden tener estas acciones. " +
-                            "En caso de duda consultar antes de hacer nada. En cualquier caso solo hacerlo si la remesa se encuentra en un estado incoherente.",
-                        accioResultant: {
-                            header: "Acción resultante",
-                            registrar: "Registrado",
-                            resetIntentsRegistre: "Resetea intentos registro",
-                            reintentarRegistre: "Reintenta registro",
-                            errorRegistre: "Error de registro",
-                            registreOk: "Registro ok",
-                            enviarNotifica: "Envia a Notific@",
-                            notificaOk: "Notific@ ok",
-                            notificaError: "Error de Notific@",
-                            reintentNotifica: "Reintenta envío a Notific@",
-                            finalitzaRemesa: "Finaliza remesa",
-                            resetIntentsNotifica: "Resetea intentos de Notific@",
-                            consultaEstatEnviament: "Consulta estado envío",
-                            consultaEstatEnviamentOk: "Consulta estado envío ok",
-                            consultaEstatEnviamentError: "Consulta estat envío error",
-                            reintentarConsultaEstatEnviament: "Reintenta consulta estado envío",
-                            consultaEnviamentSir: "Consulta envío SIR",
-                            consultaEnviamentSirOk: "Consulta SIR ok",
-                            consultaEnviamentSirError: "Consulta SIR error",
-                            reintentarConsultaEnviamentSir: "Reintenta consulta SIR",
-                            finalitzarComunicacioSir: "Finaliza comunicación SIR"
-                        }
-                    },
+                    dades: 'Datos',
+                    notifica: 'Notific@',
+                    registre: 'Registro',
+                    registreEsdev: 'Registro de acontecimientos',
                 },
             },
         },
@@ -592,22 +499,9 @@ const translationEs = {
             amollar: "Suelta el fichero ahora ...",
             validacio: "El archivo no es válido",
         },
-        AccionsMassives: {
-            labelBoto: "Acciones masivas",
-        },
-    },
-    hook: {
-        useDataGrid: {
-            treeData: {
-                collapseAll: 'Contraer todo',
-                expandAll: 'Expandir todo',
-            },
-        },
     },
     comu: {
         netejarFiltre: 'Limpiar filtro',
-        obrirFiltreAvançat: 'Abrir filtro avanzado',
-        tancarFiltreAvançat: 'Cerrar filtro avanzado',
     },
 };
 
