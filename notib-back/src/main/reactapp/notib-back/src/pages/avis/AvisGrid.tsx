@@ -2,23 +2,62 @@ import { Grid, Icon, IconButton } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-    FilterApi,
     GridPage,
     MuiDataGrid,
     MuiDataGridColDef,
-    MuiFilter,
-    useFilterApiRef,
     springFilterBuilder as filterBuilder,
+    useFilterApiContext,
 } from 'reactlib';
 import GridFormField from '../../components/GridFormField';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
+import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 
-const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (props) => {
-    const { filterApiRef } = props;
+const columns: MuiDataGridColDef[] = [
+    {
+        field: 'entitat',
+        flex: 2,
+    },
+    {
+        field: 'assumpte',
+        flex: 4,
+    },
+    {
+        field: 'dataInici',
+        fieldType: 'date',
+        flex: 1,
+    },
+    {
+        field: 'dataFinal',
+        fieldType: 'date',
+        flex: 1,
+    },
+    {
+        field: 'avisNivell',
+        flex: 0.6,
+    },
+    {
+        field: 'actiu',
+        flex: 0.6,
+        type: 'boolean',
+    },
+];
+
+const springFilterBuilder = (data: any) => {
+    return filterBuilder.and(
+        filterBuilder.eq('entitat.id', data?.entitat?.id),
+        filterBuilder.like('assumpte', data.assumpte),
+        data?.dataInici && filterBuilder.gte('dataInici', `'${formatStartOfDay(data?.dataInici)}'`),
+        data?.dataFinal && filterBuilder.lte('dataFinal', `'${formatEndOfDay(data?.dataFinal)}'`),
+        filterBuilder.eq('avisNivell', `'${data?.avisNivell}'`),
+        filterBuilder.eq('actiu', `'${data?.actiu}'`)
+    );
+};
+
+const ContentFilter: React.FC = () => {
     const { t } = useTranslation();
-
+    const filterApiRef = useFilterApiContext();
     const handleButtonClick = () => {
-        filterApiRef.current.clear();
+        filterApiRef.current?.clear();
     };
     return (
         <Grid container spacing={2}>
@@ -35,69 +74,15 @@ const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (p
     );
 };
 
-const AvisGridFilter: React.FC = () => {
-    const filterApiRef = useFilterApiRef();
-
-    const springFilterBuilder = (data: any) => {
-        return filterBuilder.and(
-            filterBuilder.eq('entitat.id', data?.entitat?.id),
-            filterBuilder.like('assumpte', data.assumpte),
-            data?.dataInici && filterBuilder.gte('dataInici', `'${formatStartOfDay(data?.dataInici)}'`),
-            data?.dataFinal && filterBuilder.lte('dataFinal', `'${formatEndOfDay(data?.dataFinal)}'`),
-            filterBuilder.eq('avisNivell', `'${data?.avisNivell}'`),
-            filterBuilder.eq('actiu', `'${data?.actiu}'`)
-        );
-    };
-
-    return (
-        <MuiFilter
-            resourceName="avisResource"
-            code="FILTER_AVIS"
-            apiRef={filterApiRef}
-            springFilterBuilder={springFilterBuilder}
-            componentProps={{ sx: { mb: 2, mt: 0 } }}
-            commonFieldComponentProps={{ size: 'small' }}
-        >
-            <ContentFilter filterApiRef={filterApiRef} />
-        </MuiFilter>
-    );
-};
-
 export const AvisGrid = () => {
     const { t } = useTranslation();
-    const columns: MuiDataGridColDef[] = React.useMemo(
-        () => [
-            {
-                field: 'entitat',
-                flex: 2,
-            },
-            {
-                field: 'assumpte',
-                flex: 4,
-            },
-            {
-                field: 'dataInici',
-                fieldType: 'date',
-                flex: 1,
-            },
-            {
-                field: 'dataFinal',
-                fieldType: 'date',
-                flex: 1,
-            },
-            {
-                field: 'avisNivell',
-                flex: 0.6,
-            },
-            {
-                field: 'actiu',
-                flex: 0.6,
-                type: 'boolean',
-            },
-        ],
-        []
+    const filterDataGridProps = useDatagridFilterProps(
+        'avisResource',
+        'FILTER_AVIS',
+        springFilterBuilder,
+        <ContentFilter />
     );
-
+    const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
         <GridPage disableMargins={false}>
             <MuiDataGrid
@@ -105,11 +90,12 @@ export const AvisGrid = () => {
                 resourceName="avisResource"
                 columns={columns}
                 paginationActive
+                persistentStateActive
+                persistentStateClearPageSortPropsOnTopLevelRouteChange
+                {...filterDataGridProps}
+                {...pageSizeOptionsDataGridProps}
                 toolbarBulkDelete
                 toolbarCreateLink="form"
-                toolbarAdditionalRow={<AvisGridFilter />}
-                toolbarHideQuickFilter
-                //rowLink="form/{{id}}"
                 rowUpdateLink="form/{{id}}"
             />
         </GridPage>
