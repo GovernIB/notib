@@ -113,7 +113,7 @@ export const PagadorCieGrid: React.FC = () => {
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
-        <GridPage>
+        <GridPage disableMargins={false}>
             <MuiDataGrid
                 title={t('page.pagadorCie.grid.title')}
                 resourceName="pagadorCieResource"
@@ -123,7 +123,6 @@ export const PagadorCieGrid: React.FC = () => {
                 persistentStateClearPageSortPropsOnTopLevelRouteChange
                 {...filterDataGridProps}
                 {...pageSizeOptionsDataGridProps}
-                toolbarType="upper"
                 toolbarCreateLink="form"
                 rowLink="form/{{id}}"
                 rowUpdateLink="form/{{id}}"

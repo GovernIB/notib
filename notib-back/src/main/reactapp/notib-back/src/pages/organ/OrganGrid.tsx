@@ -5,11 +5,8 @@ import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import Icon from '@mui/material/Icon';
-import Switch from '@mui/material/Switch';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import CircularProgress from '@mui/material/CircularProgress';
 import {
     GridPage,
@@ -26,12 +23,7 @@ import {
 } from 'reactlib';
 import LinkToTab from '../../components/LinkToTab';
 import GridFormField from '../../components/GridFormField';
-import {
-    useDatagridFilterProps,
-    useDatagridPageSizeOptionsProps,
-    useDatagridTreeData,
-} from '../../hooks/useDataGrid';
-import { OrganFormContent } from './OrganForm';
+import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -69,35 +61,17 @@ const columns: MuiDataGridColDef[] = [
         flex: 1,
         renderCell: (params: any) => {
             return (
-                params.value != null && (
-                    <LinkToTab id={params.id} tab={1}>
-                        <Chip
-                            label={params.value}
-                            color={params.value ? 'primary' : undefined}
-                            size="small"
-                        />
-                    </LinkToTab>
-                )
+                <LinkToTab id={params.id} tab={1}>
+                    <Chip
+                        label={params.value}
+                        color={params.value ? 'primary' : undefined}
+                        size="small"
+                    />
+                </LinkToTab>
             );
         },
     },
 ];
-
-const springFilterBuilder = (data: any) => {
-    return filterBuilder.and(
-        filterBuilder.like('codi', data?.codi),
-        filterBuilder.like('nom', data?.nom),
-        filterBuilder.eq('pare.id', data.pare?.id),
-        filterBuilder.like('llibre', data?.llibre),
-        filterBuilder.eq('estat', `'${data?.estat}'`),
-        data?.entregaCieActiva === 'true'
-            ? filterBuilder.neq('entregaCie', null)
-            : data?.entregaCieActiva === 'false'
-              ? filterBuilder.eq('entregaCie', null)
-              : null,
-        filterBuilder.eq('permetreSir', `'${data?.permetreSir}'`)
-    );
-};
 
 const useSse = (
     queueId: string,
@@ -133,34 +107,6 @@ const useSse = (
             };
         }
     }, [apiIsReady]);
-};
-
-const useColumns = (treeDataActive: boolean) => {
-    return !treeDataActive
-        ? columns
-        : columns.filter((c) => c.field !== 'codi' && c.field !== 'nom' && c.field !== 'pare');
-};
-
-const useTreeDataViewSwitch = (label: string, defaultValue: boolean) => {
-    const [treeDataViewActive, setTreeDataViewActive] = React.useState<boolean>(defaultValue);
-    const viewSwitchComponent = (
-        <FormGroup sx={{ ml: 4 }}>
-            <FormControlLabel
-                control={
-                    <Switch
-                        checked={treeDataViewActive}
-                        onChange={(event) => setTreeDataViewActive(event.target.checked)}
-                        slotProps={{ input: { 'aria-label': 'controlled' } }}
-                    />
-                }
-                label={label}
-            />
-        </FormGroup>
-    );
-    return {
-        treeDataViewActive,
-        viewSwitchComponent,
-    };
 };
 
 const OrganGridDir3SyncLoading: React.FC<{ percent?: number; message?: string }> = (props) => {
@@ -247,13 +193,13 @@ const OrganGridDir3SyncActionButton: React.FC<{
             resourceName="organGestorResource"
             action="DIR3_SYNC"
             title={t('page.organs.grid.sync.title')}
-            buttonIcon="sync"
+            icon="sync"
             formAdditionalData={{ simular }}
             formDialogTitle={t('page.organs.grid.sync.dialogTitle')}
             formDialogButtons={formDialogButtons}
             formDialogLoading={<OrganGridDir3SyncLoading percent={percent} message={message} />}
             formDialogResultProcessor={resultProcessor}
-            buttonComponentProps={{ variant: 'contained', sx: { mr: 1 } }}
+            buttonComponentProps={{ variant: 'contained' }}
             onSuccess={handleSuccess}
             onClose={() => {
                 setSimular(true);
@@ -261,6 +207,22 @@ const OrganGridDir3SyncActionButton: React.FC<{
             }}
             dialogAutoSubmit
         />
+    );
+};
+
+const springFilterBuilder = (data: any) => {
+    return filterBuilder.and(
+        filterBuilder.like('codi', data?.codi),
+        filterBuilder.like('nom', data?.nom),
+        filterBuilder.eq('pare.id', data.pare?.id),
+        filterBuilder.like('llibre', data?.llibre),
+        filterBuilder.eq('estat', `'${data?.estat}'`),
+        data?.entregaCieActiva === 'true'
+            ? filterBuilder.neq('entregaCie', null)
+            : data?.entregaCieActiva === 'false'
+              ? filterBuilder.eq('entregaCie', null)
+              : null,
+        filterBuilder.eq('permetreSir', `'${data?.permetreSir}'`)
     );
 };
 
@@ -289,17 +251,6 @@ const ContentFilter: React.FC = () => {
 export const OrganGrid = () => {
     const { t } = useTranslation();
     const dataGridApiRef = useMuiDataGridApiRef();
-    const { treeDataViewActive, viewSwitchComponent } = useTreeDataViewSwitch(
-        t('page.organs.grid.viewSwitch'),
-        true
-    );
-    const columns = useColumns(treeDataViewActive);
-    const treeDataProps = useDatagridTreeData(
-        treeDataViewActive,
-        t('page.organs.grid.groupColumn'),
-        1,
-        { flex: 6 }
-    );
     const filterDataGridProps = useDatagridFilterProps(
         'organGestorResource',
         'FILTER_ORGAN_GESTOR',
@@ -308,33 +259,26 @@ export const OrganGrid = () => {
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
-        <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
+        <GridPage disableMargins={false}>
             <MuiDataGrid
                 title={t('page.organs.grid.title')}
                 resourceName="organGestorResource"
                 columns={columns}
-                {...treeDataProps}
+                paginationActive
                 persistentStateActive
                 persistentStateClearPageSortPropsOnTopLevelRouteChange
                 {...filterDataGridProps}
                 {...pageSizeOptionsDataGridProps}
-                toolbarType="upper"
-                popupEditActive
-                popupEditFormContent={<OrganFormContent />}
-                popupEditFormDialogResourceTitle={t('page.organs.grid.popupDialogTitle')}
-                popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
+                toolbarCreateLink="form"
+                rowLink="form/{{id}}"
+                rowUpdateLink="form/{{id}}"
                 toolbarElementsWithPositions={[
-                    {
-                        position: 1,
-                        element: viewSwitchComponent,
-                    },
                     {
                         position: 2,
                         element: <OrganGridDir3SyncActionButton dataGridApiRef={dataGridApiRef} />,
                     },
                 ]}
                 apiRef={dataGridApiRef}
-                density="compact"
             />
         </GridPage>
     );

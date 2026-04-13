@@ -48,7 +48,6 @@ export type MuiDataListProps = {
     primaryFieldRenderer?: (args: MuiDataListFieldRendererArgs) => React.ReactElement;
     secondaryFieldRenderer?: (args: MuiDataListFieldRendererArgs) => React.ReactElement;
     readOnly?: boolean;
-    loading?: true;
     findDisabled?: boolean;
     quickFilterInitialValue?: string;
     filter?: string;
@@ -180,7 +179,6 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         primaryFieldRenderer,
         secondaryFieldRenderer,
         readOnly,
-        loading: loadingProp,
         findDisabled,
         quickFilterInitialValue,
         filter,
@@ -246,7 +244,6 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         resourceType,
         resourceTypeCode,
         resourceFieldName,
-        loadingProp,
         findDisabled,
         findArgs,
     );

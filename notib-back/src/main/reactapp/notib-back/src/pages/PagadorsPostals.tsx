@@ -101,7 +101,7 @@ export const PagadorsPostals: React.FC = () => {
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
-        <GridPage>
+        <GridPage disableMargins={false}>
             <MuiDataGrid
                 title={t('page.pagadorPostal.grid.title')}
                 resourceName="pagadorPostalResource"
@@ -111,7 +111,6 @@ export const PagadorsPostals: React.FC = () => {
                 persistentStateClearPageSortPropsOnTopLevelRouteChange
                 {...filterDataGridProps}
                 {...pageSizeOptionsDataGridProps}
-                toolbarType="upper"
                 popupEditActive
                 popupEditFormContent={<PagadorPostalForm />}
                 popupEditFormDialogResourceTitle={t('page.pagadorPostal.grid.popupResourceTitle')}

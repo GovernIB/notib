@@ -32,7 +32,7 @@ export const Grups: React.FC = () => {
     const { t } = useTranslation();
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
-        <GridPage>
+        <GridPage disableMargins={false}>
             <MuiDataGrid
                 title={t('page.grups.grid.title')}
                 resourceName="grupResource"
@@ -40,11 +40,10 @@ export const Grups: React.FC = () => {
                 paginationActive
                 persistentStateActive
                 persistentStateClearPageSortPropsOnTopLevelRouteChange
-                {...pageSizeOptionsDataGridProps}
-                toolbarType="upper"
                 popupEditActive
                 popupEditFormContent={<GrupForm />}
                 popupEditFormDialogResourceTitle={t('page.grups.grid.popupResourceTitle')}
+                {...pageSizeOptionsDataGridProps}
             />
         </GridPage>
     );

@@ -1,15 +1,10 @@
 package es.caib.notib.logic.intf.model;
 
 import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.ServeiTipus;
-import es.caib.notib.logic.intf.EntregaPostalResource;
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
-import es.caib.notib.logic.intf.base.annotation.ResourceArtifact;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
-import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
-import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import es.caib.notib.logic.intf.base.validation.CustomValidation;
@@ -20,12 +15,10 @@ import es.caib.notib.logic.intf.model.validator.TitularIncapacitatObligatoriRepr
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -41,60 +34,23 @@ import java.util.List;
 @ResourceConfig(
 	descriptionField = "id",
 	accessConstraints = @ResourceAccessConstraint(
-		type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-		roles = {BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER},
-		grantedPermissions = {PermissionEnum.READ}
-	),
-	artifacts = {
-		@ResourceArtifact(
-			type = ResourceArtifactType.FILTER,
-			code = NotificacioEnviamentResource.FILTER_CODE,
-			formClass = NotificacioEnviamentResource.NotificacioEnviamentResourceFilter.class
-		),
-		@ResourceArtifact(
-			type = ResourceArtifactType.PERSPECTIVE,
-			code = NotificacioEnviamentResource.PERSPECTIVE_TITULAR
-		),
-		@ResourceArtifact(
-			type = ResourceArtifactType.PERSPECTIVE,
-			code = NotificacioEnviamentResource.PERSPECTIVE_ENTREGA_POSTAL
-		),
-		@ResourceArtifact(
-			type = ResourceArtifactType.REPORT,
-			code = NotificacioEnviamentResource.REPORT_DESCARREGAR_DIAGRAMA_STATE_MACHINE
-		),
-		@ResourceArtifact(
-			type = ResourceArtifactType.ACTION,
-			code = NotificacioEnviamentResource.ACTION_REFRESCAR_ESTAT_NOTIFICA,
-			requiresId = true,
-			accessConstraints = {
-					@ResourceAccessConstraint(
-						type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-						roles = { BaseConfig.ROLE_ADMIN }
-					)
-				}
-			),
-	}
+		type = ResourceAccessConstraint.ResourceAccessConstraintType.AUTHENTICATED,
+		grantedPermissions = { PermissionEnum.READ, PermissionEnum.CREATE }
+	)
 )
 @CustomValidation.List({
 	@CustomValidation(
 		customValidatorType = TitularIncapacitatObligatoriRepresentant.class,
-		message = "{es.caib.notib.validation.TitularIncapacitatObligatoriRepresentant.message}")
+		message="{es.caib.notib.validation.TitularIncapacitatObligatoriRepresentant.message}")
 })
 public class NotificacioEnviamentResource extends BaseResource<Long> {
-
-	public static final String FILTER_CODE = "FILTER_ENVIAMENT";
-	public static final String PERSPECTIVE_TITULAR = "TITULAR";
-	public static final String PERSPECTIVE_ENTREGA_POSTAL = "ENTREGA_POSTAL";
-	public static final String REPORT_DESCARREGAR_DIAGRAMA_STATE_MACHINE = "DESCARREGAR_DIAGRAMA_STATE_MACHINE";
-	public static final String ACTION_REFRESCAR_ESTAT_NOTIFICA = "REFRESCAR_ESTAT_NOTIFICA";
 
 	@NotNull
 	private ServeiTipus serveiTipus = ServeiTipus.NORMAL;
 	@Size(max = 36)
-	private String referenciaEnviament;
-	@Size(max = 20)
 	private String notificaReferencia;
+	@Size(max = 20)
+	private String notificaIdentificador;
 	private Date notificaDataCreacio;
 	private Date notificaDataDisposicio;
 	private Date notificaDataCaducitat;
@@ -175,7 +131,6 @@ public class NotificacioEnviamentResource extends BaseResource<Long> {
 	private boolean anulat;
 	@Size(max = 250)
 	private String motiuAnulacio;
-	private boolean entregaPostalActiva;
 
 	private ResourceReference<NotificacioResource, Long> notificacio;
 	private ResourceReference<PersonaResource, Long> titular;
@@ -192,62 +147,10 @@ public class NotificacioEnviamentResource extends BaseResource<Long> {
 	@Valid
 	private List<PersonaResource> representantsInfo;
 
-	private EntregaPostalResource entregaPostalInfo;
-
 	// Camps calculats
 	private String notificacioConcepte;
-	private String notificacioDescripcio;
 	private ResourceReference<OrganGestorResource, Long> notificacioOrganGestor;
 	private ResourceReference<ProcedimentResource, Long> notificacioProcediment;
 	private LocalDateTime enviatDate;
-	private LocalDateTime createdDate;
-	private String createdBy;
-	private LocalDateTime enviamentDataProgramada;
-	private String codiCsvUuidDocument;
-	private String representantsString;
-	private EnviamentTipus tipusEnviament;
-	private String referenciaNotificacio;
-	private String grupCodi;
-	private String procedimentCodi;
-	private String titularNom;
-	private String titularNif;
-
-	public String getNotificaCertificacioArxiuNom() {
-		return !StringUtils.isEmpty(notificaReferencia) ?  "certificacio_" + notificaReferencia + ".pdf" : null;
-	}
-
-
-	@Getter
-	@Setter
-	@NoArgsConstructor
-	public static class NotificacioEnviamentResourceFilter implements Serializable {
-
-		private EnviamentTipus tipusEnviament;
-		private String notificacioConcepte;
-		private EnviamentEstat notificaEstat;
-		private Date dataEnviamentInici;
-		private Date dataEnviamentFi;
-		private Date dataCreacioInici;
-		private Date dataCreacioFi;
-		private Date enviamentDataProgramadaInici;
-		private Date enviamentDataProgramadaFi;
-		private String notificaReferencia;
-		private String grupCodi;
-		private ResourceReference<OrganGestorResource, Long> organGestor;
-		private ResourceReference<ProcedimentResource, Long> procedimentServei;
-		private String createdBy;
-		private String notificacioDescripcio;
-		private String titularNomNif;
-		private String representantsString;
-		private String numRegistre;
-		private Date dataCaducitatInici;
-		private Date dataCaducitatFi;
-		private String referenciaEnviament;
-		private String referenciaNotificacio;
-		private String codiCsvUuidDocument;
-		private boolean entregaPostalActiva;
-
-		private String procedimentCodi;
-	}
 
 }

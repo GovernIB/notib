@@ -66,7 +66,7 @@ public abstract class BaseAdminEntitatResourceServiceImpl<R extends Resource<Lon
 			throw new ResourceNotCreatedException(getResourceClass(), "Not allowed to create a " + getResourceClass() + " without any entitat selected in session");
 		}
 		entity.setEntitat(currentEntitatResource);
-		notibPermissionHelper.entitatCheckAdminPermissionThrows(getResourceClass(), null, entity.getEntitat().getId(), BasePermission.CREATE);
+		notibPermissionHelper.entitatCheckAdminPermission(getResourceClass(), null, entity.getEntitat().getId(), BasePermission.CREATE);
 	}
 
 	/*
@@ -91,7 +91,7 @@ public abstract class BaseAdminEntitatResourceServiceImpl<R extends Resource<Lon
 				"Not allowed to update a " + getResourceClass() + " belonging to a different entitat than the one selected in the session (" +
 					"sessionEntitatId=" + currentEntitatResource.getId() + ")");
 		}
-		notibPermissionHelper.entitatCheckAdminPermissionThrows(getResourceClass(), entity.getId(), entity.getEntitat().getId(), BasePermission.WRITE);
+		notibPermissionHelper.entitatCheckAdminPermission(getResourceClass(), entity.getId(), entity.getEntitat().getId(), BasePermission.WRITE);
 	}
 
 	/*
@@ -110,7 +110,7 @@ public abstract class BaseAdminEntitatResourceServiceImpl<R extends Resource<Lon
 			String msg = "Not allowed to update a " + getResourceClass() + " belonging to a different entitat than the one selected in the session (sessionEntitatId=" + currentEntitatResource.getId() + ")";
 			throw new ResourceNotDeletedException(getResourceClass(), "" + entity.getId(), msg);
 		}
-		notibPermissionHelper.entitatCheckAdminPermissionThrows(getResourceClass(), entity.getId(), entity.getEntitat().getId(), BasePermission.DELETE);
+		notibPermissionHelper.entitatCheckAdminPermission(getResourceClass(), entity.getId(), entity.getEntitat().getId(), BasePermission.DELETE);
 	}
 
 }
