@@ -29,6 +29,7 @@ import Box from '@mui/material/Box';
 import Icon from '@mui/material/Icon';
 import { capitalize } from '../../../util/text';
 import useLogConsole from '../../../util/useLogConsole';
+import { useDebounce } from '../../../util/useDebounce';
 import { formattedFieldValue, isFieldNumericType } from '../../../util/fields';
 import * as springFilterBuilder from '../../../util/springFilterBuilder';
 import {
@@ -47,6 +48,7 @@ import {
     DataCommonFindArgs,
     DataCommonAdditionalAction,
 } from '../datacommon/MuiDataCommon';
+import DataQuickFilter from '../datacommon/DataQuickFilter';
 import { useDataToolbar, DataToolbarType } from '../datacommon/DataToolbar';
 import DataGridRow from './DataGridRow';
 import DataGridFooter from './DataGridFooter';
@@ -229,6 +231,8 @@ export type MuiDataGridProps = {
     popupEditFormI18nKeys?: FormI18nKeys;
     /** Indica si la persistència de l'estat està activa */
     persistentStateActive?: true;
+    /** Indica que s'han d'esborrar l'ordenació i la pàgina actual de l'estat persistent si hi ha un canvi en la ruta de primer nivell */
+    persistentStateClearPageSortPropsOnTopLevelRouteChange?: true;
     /** La clau amb la que es desarà l'estat (s'utilitzarà el valor de resourceName si no s'especifica) */
     persistentStateKey?: string;
     /** El magatzem del navegador que s'utilitzarà per a persistir l'estat (LocalStorage per defecte) */
@@ -532,22 +536,37 @@ const useGridColumns = (
 
 const usePersistentState = (
     active: boolean,
+    persistentStateClearPageSortPropsOnTopLevelRouteChange: boolean,
     columns: GridColDef[],
     sortModelProp: GridSortModel | undefined,
     defaultSortModel: GridSortModel | undefined,
     paginationModelProp: GridPaginationModel | undefined,
     defaultPaginationModel: GridPaginationModel | undefined,
+    quickFilterProp: string | undefined,
+    defaultQuickFilter: string | undefined,
     apiRef: React.RefObject<GridApiPro | null>,
     key: string,
     storeInLocalStorage?: boolean
 ) => {
-    const { code } = useBaseAppContext();
+    const { code, topLevelRouteChanged } = useBaseAppContext();
     const storageKey = code + '_DTG_' + key.toUpperCase();
     const loadInitialState = () => {
         try {
             const storage = storeInLocalStorage ? localStorage : sessionStorage;
             const raw = storage.getItem(storageKey);
-            return raw ? JSON.parse(raw) : null;
+            const state = raw ? JSON.parse(raw) : null;
+            if (persistentStateClearPageSortPropsOnTopLevelRouteChange && topLevelRouteChanged) {
+                const { sortModel, paginationModel, ...otherState } = state;
+                return {
+                    paginationModel: {
+                        page: 0,
+                        pageSize: paginationModel?.pageSize,
+                    },
+                    ...otherState,
+                };
+            } else {
+                return state;
+            }
         } catch {
             return null;
         }
@@ -567,16 +586,23 @@ const usePersistentState = (
         initialState?.columnVisibilityModel || {}
     );
     const [pinnedColumns, setPinnedColumns] = React.useState(initialState?.pinnedColumns || {});
+    const [autoPageSize, setAutoPageSize] = React.useState<boolean>(
+        initialState?.autoPageSize != null
+            ? initialState?.autoPageSize
+            : defaultPaginationModel == null || defaultPaginationModel.pageSize === -1
+    );
+    const [quickFilter, setQuickFilter] = React.useState<string>(
+        initialState?.quickFilter || defaultQuickFilter
+    );
     const [sortModel, setSortModel] = React.useState<GridSortModel>(
         initialState?.sortModel || (defaultSortModel ?? [])
     );
     const [paginationModel, setPaginationModel] = React.useState<GridPaginationModel>(
         initialState?.paginationModel || defaultPaginationModel
     );
-    const [autoPageSize, setAutoPageSize] = React.useState<boolean>(
-        initialState?.autoPageSize ??
-            (defaultPaginationModel == null || defaultPaginationModel.pageSize === -1)
-    );
+    React.useEffect(() => {
+        quickFilterProp !== undefined && setQuickFilter(quickFilterProp);
+    }, [quickFilterProp]);
     React.useEffect(() => {
         sortModelProp !== undefined && setSortModel(sortModelProp);
     }, [sortModelProp]);
@@ -590,18 +616,20 @@ const usePersistentState = (
                 orderedFields,
                 columnVisibilityModel,
                 pinnedColumns,
+                autoPageSize,
+                quickFilter,
                 sortModel,
                 paginationModel,
-                autoPageSize,
             });
     }, [
         widths,
         orderedFields,
         columnVisibilityModel,
         pinnedColumns,
+        autoPageSize,
+        quickFilter,
         sortModel,
         paginationModel,
-        autoPageSize,
     ]);
     const onColumnWidthChange = React.useCallback(
         (params: GridColumnResizeParams) => {
@@ -670,6 +698,8 @@ const usePersistentState = (
                   paginationModel,
                   autoPageSize,
               },
+        quickFilter: quickFilter ?? '',
+        setQuickFilter,
         setAutoPageSize,
     };
 };
@@ -783,6 +813,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         popupEditFormComponentProps,
         popupEditFormI18nKeys,
         persistentStateActive,
+        persistentStateClearPageSortPropsOnTopLevelRouteChange,
         persistentStateKey,
         persistentStateStorage,
         onRowsChange,
@@ -886,7 +917,6 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         error: apiDataCommonError,
         refresh,
         export: exportt,
-        quickFilterComponent,
     } = useApiDataCommon(
         resourceName,
         resourceType,
@@ -894,12 +924,6 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         resourceFieldName,
         autoFindDisabled,
         findArgs,
-        quickFilterInitialValue,
-        quickFilterSetFocus,
-        {
-            fullWidth: quickFilterFullWidth,
-            sx: { ml: quickFilterFullWidth ? 0 : 1 },
-        },
         anyArtifactRowAction
     );
     const {
@@ -957,24 +981,39 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         inlineStopRowEditMode,
         artifacts
     );
-    const { persistentStateColumns, persistentStateProps, setAutoPageSize } = usePersistentState(
+    const {
+        persistentStateColumns,
+        persistentStateProps,
+        quickFilter,
+        setQuickFilter,
+        setAutoPageSize,
+    } = usePersistentState(
         persistentStateActive ?? false,
+        persistentStateClearPageSortPropsOnTopLevelRouteChange ?? false,
         processedColumns,
         sortModelProp,
         defaultSortModel,
         paginationModelProp,
         defaultPaginationModel,
+        undefined, // quickFilterProp
+        quickFilterInitialValue, // defaultQuickFilter
         datagridApiRef,
         persistentStateKey ?? resourceName,
         persistentStateStorage === 'local'
     );
-    const { sortModel, paginationModel, autoPageSize, ...otherPersistentStateProps } =
-        persistentStateProps;
+    const {
+        sortModel,
+        paginationModel,
+        onPaginationModelChange,
+        autoPageSize,
+        ...otherPersistentStateProps
+    } = persistentStateProps;
     const isUpperToolbarType = toolbarType === 'upper';
     const gridMargins = isUpperToolbarType ? { m: 2 } : null;
     const canDeleteAnyRow = rows.some((r) => r['_actions']?.['delete'] != null);
+    const quickFilterDebounced = useDebounce(quickFilter);
     React.useEffect(() => {
-        if (!paginationActive || paginationModel != null) {
+        if (!paginationActive || (paginationModel != null && paginationModel.pageSize !== -1)) {
             const processedFindSortModel = processFindSortModel(fixedSortModel, sortModel, columns);
             const sorts = processedFindSortModel?.length
                 ? processedFindSortModel.map(({ field, sort }) => `${field},${sort}`)
@@ -989,6 +1028,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
             const newFindArgs = {
                 ...paginationArgs,
                 sorts,
+                quickFilter: quickFilterDebounced?.length ? quickFilterDebounced : undefined,
                 filter: processedFilter !== '' ? processedFilter : undefined,
                 namedQueries,
                 perspectives,
@@ -1002,6 +1042,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         fixedSortModel,
         sortModel,
         paginationModel,
+        quickFilterDebounced,
         filter,
         fixedFilter,
         namedQueries,
@@ -1061,7 +1102,13 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         subtitle,
         toolbarType,
         apiCurrentError || apiDataCommonError,
-        quickFilterComponent,
+        <DataQuickFilter
+            value={quickFilter}
+            onChange={setQuickFilter}
+            setFocus={quickFilterSetFocus}
+            fullWidth={quickFilterFullWidth}
+            sx={{ ml: quickFilterFullWidth ? 0 : 1 }}
+        />,
         refresh,
         gridExport,
         toolbarBackButton,
@@ -1113,6 +1160,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
               paginationMode: 'server',
               pagination: true,
               paginationModel,
+              onPaginationModelChange,
               autoPageSize: !autoHeight && autoPageSize,
               rowCount: pageInfo?.totalElements ?? 0,
           }
@@ -1197,6 +1245,58 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         : null;
     const processedRows = React.useMemo(() => [...additionalRows, ...rows], [additionalRows, rows]);
     const localeText = useLocaleText();
+    const isRowsPresentInOtherProps = 'rows' in otherProps;
+    const dataGridSlots = React.useMemo(() => {
+        return {
+            row: DataGridRow as GridSlots['row'],
+            footer: DataGridFooter as GridSlots['footer'],
+            noRowsOverlay: DataGridNoRowsOverlay,
+        };
+    }, []);
+    const dataGridSlotProps = React.useMemo(() => {
+        return {
+            row: { linkTo: rowLink, isRowLinkActive },
+            footer: {
+                paginationActive,
+                selectionActive,
+                paginationModel,
+                pageInfo,
+                setRowSelectionModel,
+                pageSizeOptions: otherProps?.pageSizeOptions,
+                enableAutoPageSizeOption: !autoHeight,
+                autoPageSize,
+                setAutoPageSize,
+            },
+            noRowsOverlay: {
+                requestPending:
+                    loading === undefined && autoFindDisabled && !isRowsPresentInOtherProps,
+                noRowsText: noRowsText,
+            },
+        };
+    }, [
+        rowLink,
+        isRowLinkActive,
+        paginationActive,
+        selectionActive,
+        paginationModel,
+        pageInfo,
+        setRowSelectionModel,
+        otherProps?.pageSizeOptions,
+        autoHeight,
+        autoPageSize,
+        setAutoPageSize,
+        loading,
+        autoFindDisabled,
+        isRowsPresentInOtherProps,
+        noRowsText,
+    ]);
+    const dataGridSx = React.useMemo(() => {
+        return {
+            height: autoHeight ? 'auto' : undefined,
+            ...gridMargins,
+            ...sx,
+        };
+    }, [autoHeight, gridMargins, sx]);
     const content = (
         <>
             {!toolbarHide && toolbar}
@@ -1229,38 +1329,12 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                 {...inlineEditingProps}
                 {...otherPersistentStateProps}
                 {...stripedProps}
-                slots={{
-                    row: DataGridRow as GridSlots['row'],
-                    footer: DataGridFooter as GridSlots['footer'],
-                    noRowsOverlay: DataGridNoRowsOverlay,
-                }}
-                slotProps={{
-                    row: { linkTo: rowLink, isRowLinkActive },
-                    footer: {
-                        paginationActive,
-                        selectionActive,
-                        paginationModel,
-                        pageInfo,
-                        setRowSelectionModel,
-                        pageSizeOptions: otherProps?.pageSizeOptions,
-                        enableAutoPageSizeOption: !autoHeight,
-                        autoPageSize,
-                        setAutoPageSize,
-                    },
-                    noRowsOverlay: {
-                        requestPending:
-                            loading === undefined && autoFindDisabled && !('rows' in otherProps),
-                        noRowsText: noRowsText,
-                    },
-                }}
+                slots={dataGridSlots}
+                slotProps={dataGridSlotProps}
                 semiBordered={semiBordered}
                 autoHeight={autoHeight}
                 localeText={localeText}
-                sx={{
-                    height: autoHeight ? 'auto' : undefined,
-                    ...gridMargins,
-                    ...sx,
-                }}
+                sx={dataGridSx}
             />
         </>
     );
