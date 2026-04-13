@@ -182,6 +182,7 @@ const NotificacioGrid = () => {
                 readOnly
                 selectionActive
                 persistentStateActive
+                persistentStateClearPageSortPropsOnTopLevelRouteChange
                 getDetailPanelContent={({ row }) => <NotificacioGridEnviaments id={row.id} />}
                 getDetailPanelHeight={() => 'auto'}
                 {...pageSizeOptionsDataGridProps}

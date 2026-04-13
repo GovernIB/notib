@@ -48,6 +48,7 @@ export type BaseAppContextType = {
     useBlocker: ((shouldBlock: boolean | ((args: any) => boolean)) => void) | undefined;
     useLocationPath: () => string;
     anyHistoryEntryExist: () => boolean;
+    topLevelRouteChanged: boolean;
     setMessageDialogShow: (fn: MessageDialogShowFn) => void;
     messageDialogShow: MessageDialogShowFn;
     setTemporalMessageShow: (fn: TemporalMessageShowFn) => void;
