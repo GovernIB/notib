@@ -115,6 +115,8 @@ export type MuiDataGridProps = {
     columns: MuiDataGridColDef[];
     /** Indica si la graella és de només lectura (no es permeten modificacions) */
     readOnly?: true;
+    /** Força l'estat de carregant de la graella */
+    loading?: true;
     /** Desactiva la primera petició automàtica al backend per a obtenir la informació a mostrar a la graella */
     autoFindDisabled?: boolean;
     /** Text pel missatge de que no hi ha resultats */
@@ -753,6 +755,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         resourceFieldName,
         columns,
         readOnly,
+        loading: loadingProp,
         autoFindDisabled,
         noRowsText,
         selectionActive,
@@ -922,6 +925,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         resourceType,
         resourceTypeCode,
         resourceFieldName,
+        loadingProp,
         autoFindDisabled,
         findArgs,
         anyArtifactRowAction
@@ -1246,14 +1250,15 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     const processedRows = React.useMemo(() => [...additionalRows, ...rows], [additionalRows, rows]);
     const localeText = useLocaleText();
     const isRowsPresentInOtherProps = 'rows' in otherProps;
-    const dataGridSlots = React.useMemo(() => {
+    const memoizedSlots = React.useMemo(() => {
         return {
             row: DataGridRow as GridSlots['row'],
             footer: DataGridFooter as GridSlots['footer'],
             noRowsOverlay: DataGridNoRowsOverlay,
         };
     }, []);
-    const dataGridSlotProps = React.useMemo(() => {
+    const memoizedSlotProps = React.useMemo(() => {
+        const requestPending = loading === undefined && autoFindDisabled && !isRowsPresentInOtherProps;
         return {
             row: { linkTo: rowLink, isRowLinkActive },
             footer: {
@@ -1268,9 +1273,8 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                 setAutoPageSize,
             },
             noRowsOverlay: {
-                requestPending:
-                    loading === undefined && autoFindDisabled && !isRowsPresentInOtherProps,
-                noRowsText: noRowsText,
+                requestPending,
+                noRowsText,
             },
         };
     }, [
@@ -1290,7 +1294,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         isRowsPresentInOtherProps,
         noRowsText,
     ]);
-    const dataGridSx = React.useMemo(() => {
+    const memoizedSx = React.useMemo(() => {
         return {
             height: autoHeight ? 'auto' : undefined,
             ...gridMargins,
@@ -1317,7 +1321,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
             {formDialogComponent}
             <DataGridCustomStyle
                 {...otherProps}
-                loading={otherProps?.loading ?? loading}
+                loading={loading}
                 rows={otherProps?.rows ?? processedRows}
                 columns={persistentStateColumns}
                 onRowOrderChange={onRowOrderChange}
@@ -1329,12 +1333,12 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                 {...inlineEditingProps}
                 {...otherPersistentStateProps}
                 {...stripedProps}
-                slots={dataGridSlots}
-                slotProps={dataGridSlotProps}
+                slots={memoizedSlots}
+                slotProps={memoizedSlotProps}
                 semiBordered={semiBordered}
                 autoHeight={autoHeight}
                 localeText={localeText}
-                sx={dataGridSx}
+                sx={memoizedSx}
             />
         </>
     );
