@@ -1,17 +1,17 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
+import Icon from '@mui/material/Icon';
+import IconButton from '@mui/material/IconButton';
 import {
     GridPage,
     MuiDataGrid,
-    MuiFilter,
-    FilterApi,
-    useFilterApiRef,
     springFilterBuilder as filterBuilder,
+    useFilterApiContext,
 } from 'reactlib';
 import GridFormField from '../components/GridFormField';
-import { Icon, IconButton } from '@mui/material';
 import { formatEndOfDay, formatStartOfDay } from '../utils/dateUtils';
+import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../hooks/useDataGrid';
 
 const columns = [
     {
@@ -36,6 +36,25 @@ const columns = [
     },
 ];
 
+const springFilterBuilder = (data: any) => {
+    return filterBuilder.and(
+        filterBuilder.like('nom', data.nom),
+        filterBuilder.eq('organGestor.id', data?.organGestor?.id),
+        filterBuilder.like('contracteNum', data.contracteNum),
+        data?.contracteDataVigInici &&
+            filterBuilder.gte(
+                'contracteDataVig',
+                `'${formatStartOfDay(data?.contracteDataVigInici)}'`
+            ),
+        data?.contracteDataVigFinal &&
+            filterBuilder.lte(
+                'contracteDataVig',
+                `'${formatEndOfDay(data?.contracteDataVigFinal)}'`
+            ),
+        filterBuilder.like('facturacioClientCodi', data.facturacioClientCodi)
+    );
+};
+
 const PagadorPostalForm: React.FC = () => {
     return (
         <Grid container spacing={2}>
@@ -49,12 +68,11 @@ const PagadorPostalForm: React.FC = () => {
     );
 };
 
-const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (props) => {
-    const { filterApiRef } = props;
+const ContentFilter: React.FC = () => {
     const { t } = useTranslation();
-
+    const filterApiRef = useFilterApiContext();
     const handleButtonClick = () => {
-        filterApiRef.current.clear();
+        filterApiRef.current?.clear();
     };
     return (
         <Grid container spacing={2}>
@@ -73,44 +91,15 @@ const ContentFilter: React.FC<{ filterApiRef: React.RefObject<FilterApi> }> = (p
     );
 };
 
-const AvisGridFilter: React.FC = () => {
-    const filterApiRef = useFilterApiRef();
-
-    const springFilterBuilder = (data: any) => {
-        return filterBuilder.and(
-            filterBuilder.like('nom', data.nom),
-            filterBuilder.eq('organGestor.id', data?.organGestor?.id),
-            filterBuilder.like('contracteNum', data.contracteNum),
-            data?.contracteDataVigInici &&
-                filterBuilder.gte(
-                    'contracteDataVig',
-                    `'${formatStartOfDay(data?.contracteDataVigInici)}'`
-                ),
-            data?.contracteDataVigFinal &&
-                filterBuilder.lte(
-                    'contracteDataVig',
-                    `'${formatEndOfDay(data?.contracteDataVigFinal)}'`
-                ),
-            filterBuilder.like('facturacioClientCodi', data.facturacioClientCodi)
-        );
-    };
-
-    return (
-        <MuiFilter
-            resourceName="pagadorPostalResource"
-            code="FILTER_PAGADOR_POSTAL"
-            apiRef={filterApiRef}
-            springFilterBuilder={springFilterBuilder}
-            componentProps={{ sx: { mb: 2, mt: 0 } }}
-            commonFieldComponentProps={{ size: 'small' }}
-        >
-            <ContentFilter filterApiRef={filterApiRef} />
-        </MuiFilter>
-    );
-};
-
 export const PagadorsPostals: React.FC = () => {
     const { t } = useTranslation();
+    const filterDataGridProps = useDatagridFilterProps(
+        'pagadorPostalResource',
+        'FILTER_PAGADOR_POSTAL',
+        springFilterBuilder,
+        <ContentFilter />
+    );
+    const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
         <GridPage disableMargins={false}>
             <MuiDataGrid
@@ -118,8 +107,10 @@ export const PagadorsPostals: React.FC = () => {
                 resourceName="pagadorPostalResource"
                 columns={columns}
                 paginationActive
-                toolbarHideQuickFilter
-                toolbarAdditionalRow={<AvisGridFilter />}
+                persistentStateActive
+                persistentStateClearPageSortPropsOnTopLevelRouteChange
+                {...filterDataGridProps}
+                {...pageSizeOptionsDataGridProps}
                 popupEditActive
                 popupEditFormContent={<PagadorPostalForm />}
                 popupEditFormDialogResourceTitle={t('page.pagadorPostal.grid.popupResourceTitle')}
