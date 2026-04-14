@@ -265,6 +265,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		} catch (Exception ex) {
 			log.error("Error entitat no trobada a la bdd " + notificacio.getEmisorDir3Codi(), ex);
 		}
+		if (entitat == null) {
+			return RespostaAltaV2.builder().error(true).errorData(new Date()).errorDescripcio("Entitat inexistent").build();
+		}
 //		var info = generateInfoAlta(notificacio, entitat != null ? entitat.getId() : null);
 		try {
 			log.debug("[ALTA] Alta de notificació: " + notificacio.toString());
