@@ -18,7 +18,7 @@ export const useDatagridFilterProps = (
     code: string,
     springFilterBuilder: (data: any) => string | undefined,
     content: React.ReactElement,
-    minHeight: string = '56px',
+    minHeight: string = '40px',
 ) => {
     const [autoFindDisabled, setAutoFindDisabled] = React.useState<boolean>(true);
     const handleSpringFilterChange = (springFilter: string | undefined) => {
@@ -32,14 +32,14 @@ export const useDatagridFilterProps = (
             persistentStateActive
             springFilterBuilder={springFilterBuilder}
             onSpringFilterChange={handleSpringFilterChange}
-            componentProps={{ sx: { mb: 2, mt: 0 } }}
+            componentProps={{ sx: { mb: 0, mt: 0 } }}
             commonFieldComponentProps={{ size: 'small' }}
         >
             {content}
         </MuiFilter>
     );
     return {
-        loading: autoFindDisabled,
+        loading: autoFindDisabled ? autoFindDisabled : undefined,
         autoFindDisabled: autoFindDisabled,
         toolbarHideQuickFilter: true as true,
         toolbarAdditionalRow: filterComponent,

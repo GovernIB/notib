@@ -259,7 +259,7 @@ export const OrganGrid = () => {
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
-        <GridPage disableMargins={false}>
+        <GridPage>
             <MuiDataGrid
                 title={t('page.organs.grid.title')}
                 resourceName="organGestorResource"
@@ -269,6 +269,7 @@ export const OrganGrid = () => {
                 persistentStateClearPageSortPropsOnTopLevelRouteChange
                 {...filterDataGridProps}
                 {...pageSizeOptionsDataGridProps}
+                toolbarType="upper"
                 toolbarCreateLink="form"
                 rowLink="form/{{id}}"
                 rowUpdateLink="form/{{id}}"
