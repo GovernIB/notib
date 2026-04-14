@@ -150,7 +150,7 @@ const NotificacioGrid = () => {
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
-        <GridPage disableMargins={false}>
+        <GridPage>
             <MuiDataGrid
                 title={t('page.notificacio.grid.title')}
                 resourceName="notificacioResource"
@@ -158,6 +158,7 @@ const NotificacioGrid = () => {
                 defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
                 paginationActive
                 toolbarHideCreate
+                toolbarType="upper"
                 toolbarCreateLink="form"
                 toolbarElementsWithPositions={
                     isCreateLinkPresent
