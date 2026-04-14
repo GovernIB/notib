@@ -1,9 +1,11 @@
 package es.caib.notib.persist.resourcerepository;
 
 import es.caib.notib.logic.intf.base.config.BaseConfig;
+import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.persist.base.repository.BaseRepository;
 import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
 import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -27,6 +29,8 @@ public interface OrganGestorResourceRepository extends BaseRepository<OrganGesto
 
 	@Query("SELECT og.codi FROM OrganGestorResourceEntity og WHERE og.id IN :ids")
 	List<String> findCodisByIdsIn(@Param("ids") Set<Long> ids);
+
+	Optional<OrganGestorResourceEntity> findByCodiAndEstat(String codi, OrganGestorEstatEnum estat);
 
 	// Per millorar el rendiment de la següent consulta es recomana crear els següents índexos:
 	//   CREATE INDEX orgges_entitat_codi_idx ON not_organ_gestor(entitat, codi);
