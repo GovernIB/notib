@@ -86,14 +86,6 @@ public class EjbClientConfig {
 		return getLocalEjbFactoyBean(NotificacioEnviamentResourceService.class, true);
 	}
 	@Bean
-	public LocalStatelessSessionProxyFactoryBean notificacioEnviamentAuditResourceService() {
-		return getLocalEjbFactoyBean(NotificacioEnviamentAuditResourceService.class, true);
-	}
-	@Bean
-	public LocalStatelessSessionProxyFactoryBean notificacioAuditResourceService() {
-		return getLocalEjbFactoyBean(NotificacioAuditResourceService.class, true);
-	}
-	@Bean
 	public LocalStatelessSessionProxyFactoryBean notificacioResourceService() {
 		return getLocalEjbFactoyBean(NotificacioResourceService.class, true);
 	}
