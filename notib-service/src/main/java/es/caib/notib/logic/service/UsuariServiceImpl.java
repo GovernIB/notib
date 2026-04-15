@@ -1,7 +1,6 @@
 package es.caib.notib.logic.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Strings;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
@@ -296,7 +295,6 @@ public class UsuariServiceImpl implements UsuariService {
 
     private UsuariEntity cloneUsuari(String codiNou, UsuariEntity usuariAntic) {
 
-        var idioma = Strings.isNullOrEmpty(usuariAntic.getIdioma()) ? "ca" : usuariAntic.getIdioma();
         var usuariNou = UsuariEntity.builder()
                 .codi(codiNou)
                 .nom(usuariAntic.getNom())
@@ -309,7 +307,7 @@ public class UsuariServiceImpl implements UsuariService {
                 .rebreEmailsNotificacioCreats(usuariAntic.isRebreEmailsNotificacioCreats())
                 .ultimRol(usuariAntic.getUltimRol())
                 .ultimaEntitat(usuariAntic.getUltimaEntitat())
-                .idioma(idioma)
+                .idioma(usuariAntic.getIdioma())
                 .numElementsPaginaDefecte(usuariAntic.getNumElementsPaginaDefecte())
                 .build();
         return usuariRepository.saveAndFlush(usuariNou);

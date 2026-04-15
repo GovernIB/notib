@@ -1,6 +1,7 @@
 package es.caib.notib.logic.service;
 
 import es.caib.notib.logic.accionsMassives.AccionsMassivesListener;
+import es.caib.notib.logic.helper.AccioMassivaHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
@@ -23,6 +24,7 @@ import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.AccioMassivaEntity;
 import es.caib.notib.persist.entity.AccioMassivaElementEntity;
+import es.caib.notib.persist.entity.AccioMassivaEntity;
 import es.caib.notib.persist.repository.AccioMassivaRepository;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
@@ -74,6 +76,8 @@ public class AccioMassivaServiceImpl implements AccioMassivaService {
     private AccionsMassivesListener accionsMassivesListener;
     @Autowired
     private AccioMassivaElementRepository accioMassivaElementRepository;
+    @Autowired
+    private AccioMassivaHelper accioMassivaHelper;
 
     @Override
     public PaginaDto<AccioMassivaDto> findAmbFiltre(AccioMassivaFiltre filtre, PaginacioParamsDto paginacioParams) {
@@ -220,52 +224,32 @@ public class AccioMassivaServiceImpl implements AccioMassivaService {
         return justificants;
     }
 
+    @Transactional
     @Override
-    public List<List<ArxiuDto>> descarregarCertificacio(Long accioId) {
+    public List<List<ArxiuDto>> descarregarCertificacio(AccioMassivaExecucio accio) {
 
         List<List<ArxiuDto>> certificacions = new ArrayList<>();
-        var accioEntity = accioMassivaRepository.findById(accioId).orElseThrow();
+        var accioEntity = accioMassivaRepository.findById(accio.getAccioId()).orElseThrow();
         accioEntity.setDataInici(new Date());
         try {
             List<ArxiuDto> notCertificacions;
             var contingut = false;
-            for (var accioElement : accioEntity.getElements()) {
-                var enviaments = enviamentService.enviamentFindAmbNotificacio(accioElement.getElementId());
+            for (var notificacioId : accio.getSeleccio()) {
+                var enviaments = enviamentService.enviamentFindAmbNotificacio(notificacioId);
                 Map<String, Integer> interessats = new HashMap<>();
                 int numInteressats = 0;
                 notCertificacions = new ArrayList<>();
                 ArxiuDto certificacio;
                 for (var env : enviaments) {
-                    if (env.isSir()) {
-                        certificacio = new ArxiuDto();
-                        var fitxer = justificantService.generarJustificantComunicacioSIR(env.getId(), accioEntity.getEntitatId(), UUID.randomUUID().toString());
-                        if (fitxer == null) {
-                            log.error("Error descarregant la certificacio SIR per l'enviament " + env.getId());
-                            accioElement.actualitzar("El fitxer retornat es null", "");
-                            accioElement.actualitzar(fitxer.getNom(), "");
-                            accioEntity.setError(true);
-                            continue;
-                        }
-                        if (fitxer.getContingut() == null) {
-                            accioElement.actualitzar(fitxer.getNom(), "");
-                            accioEntity.setError(true);
-                            continue;
-                        }
-                        certificacio.setContingut(fitxer.getContingut());
-                        certificacio.setNom(fitxer.getNom());
-                    } else {
-                        if (env.getNotificaCertificacioData() == null) {
-                            accioElement.actualitzar("La data de certificació no pot ser null", "");
-                            continue;
-                        }
-                        try {
-                            certificacio = notificacioService.enviamentGetCertificacioArxiu(env.getId());
-                        } catch (Exception ex) {
-                            log.error("Error descarregant la certificacio per l'enviament " + env.getId());
-                            accioElement.actualitzar(ex.getMessage(), Arrays.toString(ex.getStackTrace()));
-                            accioEntity.setError(true);
-                            continue;
-                        }
+                    if (env.getNotificaCertificacioData() == null) {
+                        continue;
+                    }
+                    try {
+                        certificacio = notificacioService.enviamentGetCertificacioArxiu(env.getId());
+                    } catch (Exception ex) {
+                        log.error("Error descarregant la certificacio per l'enviament " + env.getId());
+                        accioEntity.getElement(notificacioId).actualitzar(ex.getMessage(), Arrays.toString(ex.getStackTrace()));
+                        continue;
                     }
                     certificacio.setNom(env.getTitular().getNif() + "_" + certificacio.getNom());
                     if (interessats.get(env.getTitular().getNif()) == null) {
@@ -276,8 +260,7 @@ public class AccioMassivaServiceImpl implements AccioMassivaService {
                     contingut = true;
                     notCertificacions.add(certificacio);
                 }
-                accioElement.actualitzar();
-                accioMassivaElementRepository.saveAndFlush(accioElement);
+                accioEntity.getElement(notificacioId).actualitzar();
                 if (!contingut) {
                     continue;
                 }
@@ -291,7 +274,7 @@ public class AccioMassivaServiceImpl implements AccioMassivaService {
             accioEntity.setExcepcioStacktrace(Arrays.toString(ex.getStackTrace()));
         }
         accioEntity.setDataFi(new Date());
-        accioMassivaRepository.saveAndFlush(accioEntity);
+        accioMassivaRepository.save(accioEntity);
         return certificacions;
     }
 
