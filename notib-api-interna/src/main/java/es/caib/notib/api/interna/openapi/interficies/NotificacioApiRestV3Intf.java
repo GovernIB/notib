@@ -1,7 +1,7 @@
 package es.caib.notib.api.interna.openapi.interficies;
 
 import es.caib.notib.api.interna.openapi.model.notificacio.DadesConsultaApi;
-import es.caib.notib.api.interna.openapi.model.notificacio.NotificacioV2Api;
+import es.caib.notib.api.interna.openapi.model.notificacio.NotificacioV3Api;
 import es.caib.notib.api.interna.openapi.model.notificacio.PermisConsultaApi;
 import es.caib.notib.api.interna.openapi.model.notificacio.RespostaAltaV2Api;
 import es.caib.notib.api.interna.openapi.model.notificacio.RespostaConsultaDadesRegistreV2Api;
@@ -15,7 +15,6 @@ import es.caib.notib.client.domini.RespostaConsultaDadesRegistreV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
-import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioV3;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -45,7 +44,7 @@ public interface NotificacioApiRestV3Intf {
             @ApiResponse(responseCode = "201", description = "Alta de notificació", content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RespostaAltaV2Api.class, description = "Informació de alta"))})})
     @PostMapping(value = "/alta", produces = MediaType.APPLICATION_JSON_VALUE)
     public RespostaAltaV2 alta(
-            @Parameter(description = "Objecte amb les dades necessàries per a donar d'alta una notificació", required = true, schema = @Schema(implementation = NotificacioV2Api.class))
+            @Parameter(description = "Objecte amb les dades necessàries per a donar d'alta una notificació", required = true, schema = @Schema(implementation = NotificacioV3Api.class))
             @RequestBody NotificacioV3 notificacio);
 
     @Operation(summary = "Consulta de la informació d'una notificació", description = "Retorna la informació sobre l'estat de l'enviament dins Notib o Notific@")
