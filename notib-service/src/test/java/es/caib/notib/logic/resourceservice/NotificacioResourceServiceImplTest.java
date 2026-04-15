@@ -7,7 +7,6 @@ import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.exception.ResourceNotCreatedException;
 import es.caib.notib.logic.intf.base.model.FileReference;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
-import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.model.*;
 import es.caib.notib.persist.resourceentity.*;
@@ -73,25 +72,22 @@ class NotificacioResourceServiceImplTest {
 	// =====================================================
 
 	@Test
-	void additionalSpringFilterShouldReturnNoResults_whenNoPermissions() {
+	void additionalSpringFilterShouldReturnOnlyEntitatFilter_whenNoPermissions() {
 		when(userSessionHelper.getCurrentEntitatId()).thenReturn(1L);
-		when(notibPermissionHelper.getIdsToCheckNotificacioPermission(BasePermission.READ, BasePermission.READ)).thenReturn(
-			new NotibPermissionHelper.IdsToCheckNotificacioPermission(
-				new ArrayList<>(),
-				new ArrayList<>(),
-				new ArrayList<>()));
+		when(notibPermissionHelper.organGestorIdsWithPermissionRecursive(BasePermission.READ)).thenReturn(
+			Collections.emptyList());
+		when(notibPermissionHelper.procedimentServeiNoComuIdsWithPermission(BasePermission.READ, null)).thenReturn(
+			Collections.emptyList());
+		when(notibPermissionHelper.procedimentServeiComuOrganGestorIdsWithPermission(BasePermission.READ, null)).thenReturn(
+			Collections.emptyList());
 		String result = service.additionalSpringFilter("", null);
-		assertEquals("entitat.id:1 and (id is null)", result);
+		assertEquals("entitat.id:1", result);
 	}
 
 	@Test
-	void additionalSpringFilterShouldReturnOrganGestorCondition_whenPermissionsExist() {
+	void additionalSpringFilterShouldReturnORganGestorCondition_whenPermissionsExist() {
 		when(userSessionHelper.getCurrentEntitatId()).thenReturn(1L);
-		when(notibPermissionHelper.getIdsToCheckNotificacioPermission(BasePermission.READ, BasePermission.READ)).thenReturn(
-			new NotibPermissionHelper.IdsToCheckNotificacioPermission(
-				new ArrayList<>(List.of(10L)),
-				new ArrayList<>(),
-				new ArrayList<>()));
+		when(notibPermissionHelper.organGestorIdsWithPermissionRecursive(BasePermission.READ)).thenReturn(List.of(10L));
 		String result = service.additionalSpringFilter("", null);
 		assertEquals("entitat.id:1 and (organGestor.id in (10))", result);
 	}
@@ -99,11 +95,12 @@ class NotificacioResourceServiceImplTest {
 	@Test
 	void additionalSpringFilterShouldReturnProcedimentNoComuCondition_whenAnyProcedimentServeiNoComuPermission() {
 		when(userSessionHelper.getCurrentEntitatId()).thenReturn(1L);
-		when(notibPermissionHelper.getIdsToCheckNotificacioPermission(BasePermission.READ, BasePermission.READ)).thenReturn(
-			new NotibPermissionHelper.IdsToCheckNotificacioPermission(
-				new ArrayList<>(),
-				new ArrayList<>(List.of(5L)),
-				new ArrayList<>()));
+		when(notibPermissionHelper.organGestorIdsWithPermissionRecursive(BasePermission.READ)).thenReturn(
+			Collections.emptyList());
+		when(notibPermissionHelper.procedimentServeiNoComuIdsWithPermission(BasePermission.READ, null)).thenReturn(
+			List.of(5L));
+		when(notibPermissionHelper.procedimentServeiComuOrganGestorIdsWithPermission(BasePermission.READ, null)).thenReturn(
+			Collections.emptyList());
 		String result = service.additionalSpringFilter("", null);
 		assertEquals("entitat.id:1 and (procediment.id in (5))", result);
 	}
@@ -111,11 +108,12 @@ class NotificacioResourceServiceImplTest {
 	@Test
 	void additionalSpringFilterShouldReturnProcedimentComuOrganGestorCondition_whenAnyProcedimentServeiComuOrganGestorPermission() {
 		when(userSessionHelper.getCurrentEntitatId()).thenReturn(1L);
-		when(notibPermissionHelper.getIdsToCheckNotificacioPermission(BasePermission.READ, BasePermission.READ)).thenReturn(
-			new NotibPermissionHelper.IdsToCheckNotificacioPermission(
-				new ArrayList<>(),
-				new ArrayList<>(),
-				new ArrayList<>(List.of(7L, 8L))));
+		when(notibPermissionHelper.organGestorIdsWithPermissionRecursive(BasePermission.READ)).thenReturn(
+			Collections.emptyList());
+		when(notibPermissionHelper.procedimentServeiNoComuIdsWithPermission(BasePermission.READ, null)).thenReturn(
+			Collections.emptyList());
+		when(notibPermissionHelper.procedimentServeiComuOrganGestorIdsWithPermission(BasePermission.READ, null)).thenReturn(
+			List.of(7L, 8L));
 		String result = service.additionalSpringFilter("", null);
 		assertEquals("entitat.id:1 and (procedimentOrganGestor.id in (7,8))", result);
 	}
@@ -123,13 +121,27 @@ class NotificacioResourceServiceImplTest {
 	@Test
 	void additionalSpringFilterShouldReturnAllConditionsWithOr_whenAllPermissionsGranted() {
 		when(userSessionHelper.getCurrentEntitatId()).thenReturn(1L);
-		when(notibPermissionHelper.getIdsToCheckNotificacioPermission(BasePermission.READ, BasePermission.READ)).thenReturn(
-			new NotibPermissionHelper.IdsToCheckNotificacioPermission(
-				new ArrayList<>(List.of(10L)),
-				new ArrayList<>(List.of(20L)),
-				new ArrayList<>(List.of(30L))));
+		when(notibPermissionHelper.organGestorIdsWithPermissionRecursive(BasePermission.READ)).thenReturn(
+			List.of(10L));
+		when(notibPermissionHelper.procedimentServeiNoComuIdsWithPermission(BasePermission.READ, null)).thenReturn(
+			List.of(20L));
+		when(notibPermissionHelper.procedimentServeiComuOrganGestorIdsWithPermission(BasePermission.READ, null)).thenReturn(
+			List.of(30L));
 		String result = service.additionalSpringFilter("", null);
 		assertEquals("entitat.id:1 and (organGestor.id in (10) or procediment.id in (20) or procedimentOrganGestor.id in (30))", result);
+	}
+
+	@Test
+	void additionalSpringFilterShouldReturnEmptyOrCondition_whenNoPermissionsAtAll() {
+		when(userSessionHelper.getCurrentEntitatId()).thenReturn(1L);
+		when(notibPermissionHelper.organGestorIdsWithPermissionRecursive(BasePermission.READ)).thenReturn(
+			Collections.emptyList());
+		when(notibPermissionHelper.procedimentServeiNoComuIdsWithPermission(BasePermission.READ, null)).thenReturn(
+			Collections.emptyList());
+		when(notibPermissionHelper.procedimentServeiComuOrganGestorIdsWithPermission(BasePermission.READ, null)).thenReturn(
+			Collections.emptyList());
+		String result = service.additionalSpringFilter("", null);
+		assertEquals("entitat.id:1", result);
 	}
 
 	// =====================================================
@@ -142,13 +154,7 @@ class NotificacioResourceServiceImplTest {
 		EntitatResourceEntity entitat = new EntitatResourceEntity();
 		entitat.setDir3Codi("DIR3");
 		when(userSessionHelper.getCurrentEntitat()).thenReturn(entitat);
-		when(notibPermissionHelper.getOrganGestorNotificacioCreatePermission(any())).thenReturn(ExtendedPermission.PERM4);
-		when(notibPermissionHelper.getProcedimentNotificacioCreatePermission(any())).thenReturn(ExtendedPermission.PERM5);
-		when(notibPermissionHelper.getIdsToCheckNotificacioPermission(ExtendedPermission.PERM4, ExtendedPermission.PERM5)).thenReturn(
-			new NotibPermissionHelper.IdsToCheckNotificacioPermission(
-				new ArrayList<>(List.of(1L)),
-				new ArrayList<>(),
-				new ArrayList<>()));
+		when(notibPermissionHelper.organGestorIdsWithPermissionRecursive(any())).thenReturn(List.of(1L));
 		service.beforeCreateSave(entity, resource, Map.of());
 		assertEquals("user", entity.getUsuariCodi());
 		assertEquals(entitat, entity.getEntitat());
@@ -171,13 +177,7 @@ class NotificacioResourceServiceImplTest {
 		resource.setDocumentsInfo(List.of(doc));
 		when(legacyHelper.notificacioAdjuntCreate(any())).thenReturn("fileId");
 		when(documentRepo.save(any())).thenAnswer(i -> i.getArgument(0));
-		when(notibPermissionHelper.getOrganGestorNotificacioCreatePermission(any())).thenReturn(ExtendedPermission.PERM4);
-		when(notibPermissionHelper.getProcedimentNotificacioCreatePermission(any())).thenReturn(ExtendedPermission.PERM5);
-		when(notibPermissionHelper.getIdsToCheckNotificacioPermission(ExtendedPermission.PERM4, ExtendedPermission.PERM5)).thenReturn(
-			new NotibPermissionHelper.IdsToCheckNotificacioPermission(
-				new ArrayList<>(List.of(1L)),
-				new ArrayList<>(),
-				new ArrayList<>()));
+		when(notibPermissionHelper.organGestorIdsWithPermissionRecursive(any())).thenReturn(List.of(1L));
 		service.beforeCreateSave(entity, resource, Map.of());
 		assertNotNull(entity.getDocument());
 	}
@@ -186,13 +186,12 @@ class NotificacioResourceServiceImplTest {
 	void beforeCreateSaveShouldThrowResourceNotCreatedException_whenNoPermissionGranted() {
 		when(authenticationHelper.getCurrentUserName()).thenReturn("user");
 		when(userSessionHelper.getCurrentEntitat()).thenReturn(new EntitatResourceEntity());
-		when(notibPermissionHelper.getOrganGestorNotificacioCreatePermission(any())).thenReturn(ExtendedPermission.PERM4);
-		when(notibPermissionHelper.getProcedimentNotificacioCreatePermission(any())).thenReturn(ExtendedPermission.PERM5);
-		when(notibPermissionHelper.getIdsToCheckNotificacioPermission(ExtendedPermission.PERM4, ExtendedPermission.PERM5)).thenReturn(
-			new NotibPermissionHelper.IdsToCheckNotificacioPermission(
-				new ArrayList<>(),
-				new ArrayList<>(),
-				new ArrayList<>()));
+		when(notibPermissionHelper.organGestorIdsWithPermissionRecursive(any())).thenReturn(
+			Collections.emptyList());
+		when(notibPermissionHelper.procedimentServeiNoComuIdsWithPermission(any(), any())).thenReturn(
+			Collections.emptyList());
+		when(notibPermissionHelper.procedimentServeiComuOrganGestorIdsWithPermission(any(), any())).thenReturn(
+			Collections.emptyList());
 		assertThrows(ResourceNotCreatedException.class, () -> {
 			service.beforeCreateSave(entity, resource, Map.of());
 		});
@@ -202,13 +201,12 @@ class NotificacioResourceServiceImplTest {
 	void beforeCreateSaveShouldThrowResourceNotCreatedException_whenOrganGestorPermissionGranted() {
 		when(authenticationHelper.getCurrentUserName()).thenReturn("user");
 		when(userSessionHelper.getCurrentEntitat()).thenReturn(new EntitatResourceEntity());
-		when(notibPermissionHelper.getOrganGestorNotificacioCreatePermission(any())).thenReturn(ExtendedPermission.PERM4);
-		when(notibPermissionHelper.getProcedimentNotificacioCreatePermission(any())).thenReturn(ExtendedPermission.PERM5);
-		when(notibPermissionHelper.getIdsToCheckNotificacioPermission(ExtendedPermission.PERM4, ExtendedPermission.PERM5)).thenReturn(
-			new NotibPermissionHelper.IdsToCheckNotificacioPermission(
-				new ArrayList<>(List.of(1L)),
-				new ArrayList<>(),
-				new ArrayList<>()));
+		when(notibPermissionHelper.organGestorIdsWithPermissionRecursive(any())).thenReturn(
+			List.of(1L));
+		when(notibPermissionHelper.procedimentServeiNoComuIdsWithPermission(any(), any())).thenReturn(
+			Collections.emptyList());
+		when(notibPermissionHelper.procedimentServeiComuOrganGestorIdsWithPermission(any(), any())).thenReturn(
+			Collections.emptyList());
 		assertDoesNotThrow(() -> {
 			service.beforeCreateSave(entity, resource, Map.of());
 		});
@@ -218,13 +216,12 @@ class NotificacioResourceServiceImplTest {
 	void beforeCreateSaveShouldThrowResourceNotCreatedException_whenProcedimentServeiNoComuPermissionGranted() {
 		when(authenticationHelper.getCurrentUserName()).thenReturn("user");
 		when(userSessionHelper.getCurrentEntitat()).thenReturn(new EntitatResourceEntity());
-		when(notibPermissionHelper.getOrganGestorNotificacioCreatePermission(any())).thenReturn(ExtendedPermission.PERM4);
-		when(notibPermissionHelper.getProcedimentNotificacioCreatePermission(any())).thenReturn(ExtendedPermission.PERM5);
-		when(notibPermissionHelper.getIdsToCheckNotificacioPermission(ExtendedPermission.PERM4, ExtendedPermission.PERM5)).thenReturn(
-			new NotibPermissionHelper.IdsToCheckNotificacioPermission(
-				new ArrayList<>(),
-				new ArrayList<>(List.of(2L)),
-				new ArrayList<>()));
+		when(notibPermissionHelper.organGestorIdsWithPermissionRecursive(any())).thenReturn(
+			Collections.emptyList());
+		when(notibPermissionHelper.procedimentServeiNoComuIdsWithPermission(any(), any())).thenReturn(
+			List.of(2L));
+		when(notibPermissionHelper.procedimentServeiComuOrganGestorIdsWithPermission(any(), any())).thenReturn(
+			Collections.emptyList());
 		assertDoesNotThrow(() -> {
 			service.beforeCreateSave(entity, resource, Map.of());
 		});
@@ -234,13 +231,12 @@ class NotificacioResourceServiceImplTest {
 	void beforeCreateSaveShouldThrowResourceNotCreatedException_whenProcedimentServeiComuOrganGestorPermissionGranted() {
 		when(authenticationHelper.getCurrentUserName()).thenReturn("user");
 		when(userSessionHelper.getCurrentEntitat()).thenReturn(new EntitatResourceEntity());
-		when(notibPermissionHelper.getOrganGestorNotificacioCreatePermission(any())).thenReturn(ExtendedPermission.PERM4);
-		when(notibPermissionHelper.getProcedimentNotificacioCreatePermission(any())).thenReturn(ExtendedPermission.PERM5);
-		when(notibPermissionHelper.getIdsToCheckNotificacioPermission(ExtendedPermission.PERM4, ExtendedPermission.PERM5)).thenReturn(
-			new NotibPermissionHelper.IdsToCheckNotificacioPermission(
-				new ArrayList<>(),
-				new ArrayList<>(),
-				new ArrayList<>(List.of(3L))));
+		when(notibPermissionHelper.organGestorIdsWithPermissionRecursive(any())).thenReturn(
+			Collections.emptyList());
+		when(notibPermissionHelper.procedimentServeiNoComuIdsWithPermission(any(), any())).thenReturn(
+			Collections.emptyList());
+		when(notibPermissionHelper.procedimentServeiComuOrganGestorIdsWithPermission(any(), any())).thenReturn(
+			List.of(3L));
 		assertDoesNotThrow(() -> {
 			service.beforeCreateSave(entity, resource, Map.of());
 		});

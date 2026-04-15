@@ -1,7 +1,6 @@
 package es.caib.notib.persist.resourceentity;
 
 import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioArxiuTipusEnumDto;
@@ -9,22 +8,14 @@ import es.caib.notib.logic.intf.dto.NotificaCertificacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 import es.caib.notib.persist.entity.*;
-import es.caib.notib.persist.entity.cie.EntregaPostalEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Formula;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Entitat de base de dades d'enviament d'una notificació.
@@ -33,7 +24,6 @@ import java.util.List;
  */
 @Entity
 @Table(name = BaseConfig.DB_PREFIX + "notificacio_env")
-@SecondaryTable(name = BaseConfig.DB_PREFIX +  "notificacio_env_table", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -43,9 +33,9 @@ public class NotificacioEnviamentResourceEntity extends BaseAuditableResourceEnt
 	@Enumerated(EnumType.ORDINAL)
 	private ServeiTipus serveiTipus;
 	@Column(name = "notifica_ref", length = 36, unique = true)
-	private String referenciaEnviament;
-	@Column(name = "notifica_id", length = 20)
 	private String notificaReferencia;
+	@Column(name = "notifica_id", length = 20)
+	private String notificaIdentificador;
 	@Column(name = "notifica_datcre")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date notificaDataCreacio;
@@ -170,8 +160,6 @@ public class NotificacioEnviamentResourceEntity extends BaseAuditableResourceEnt
 	private boolean anulat;
 	@Column(name = "motiu_anulacio", length = 250)
 	private String motiuAnulacio;
-	@Column(name = "entrega_postal")
-	private boolean entregaPostalActiva; // TOODO FALTA CREAR LA COLUMNA ENTREGA_POSTAL_ID A BDD!!!
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(
@@ -189,71 +177,19 @@ public class NotificacioEnviamentResourceEntity extends BaseAuditableResourceEnt
 		nullable = false)
 	private PersonaResourceEntity titular;
 
-	@OneToMany(fetch = FetchType.LAZY, orphanRemoval = true)
-//	@org.hibernate.annotations.ForeignKey(name = "not_persona_not_fk")
-	@JoinColumn(
-		name = "notificacio_env_id",
-		referencedColumnName = "id",
-		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "not_persona_not_fk"))
-	@NotFound(action = NotFoundAction.IGNORE)
-	protected List<PersonaResourceEntity> destinataris = new ArrayList<>();
-
-	@OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-	@JoinColumn(name = "entrega_postal_id", foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "notificacio_notenv_fk"))
-	@org.hibernate.annotations.ForeignKey(name = "NOT_ENV_ENTREGA_POSTAL_FK")
-	@OnDelete(action = OnDeleteAction.CASCADE)
-	private EntregaPostalResourceEntity entregaPostal;
-
-
-	@Column(table = BaseConfig.DB_PREFIX + "notificacio_env_table", name = "ultim_event_data", insertable = false, updatable = false)
-	private LocalDateTime enviatDate;
-
-	@Column(table = BaseConfig.DB_PREFIX + "notificacio_env_table", name = "data_programada", insertable = false, updatable = false)
-	private LocalDateTime enviamentDataProgramada;
-
-	@Column(table = BaseConfig.DB_PREFIX + "notificacio_env_table", name = "concepte", insertable = false, updatable = false)
+	@Formula("(select ntf.concepte from " + BaseConfig.DB_PREFIX + "notificacio ntf where ntf.id = notificacio_id)")
 	private String notificacioConcepte;
 
-	@Column(table = BaseConfig.DB_PREFIX + "notificacio_env_table", name = "descripcio", insertable = false, updatable = false)
-	private String notificacioDescripcio;
-
-	@Column(table = BaseConfig.DB_PREFIX + "notificacio_env_table", name = "destinataris", insertable = false, updatable = false)
-	private String representantsString;
-
-	@Column(table = BaseConfig.DB_PREFIX + "notificacio_env_table", name = "tipus_enviament", insertable = false, updatable = false)
-	private EnviamentTipus tipusEnviament;
-
-	@Column(table = BaseConfig.DB_PREFIX + "notificacio_env_table", name = "referencia_notificacio", insertable = false, updatable = false)
-	private String referenciaNotificacio;
-
-	@Column(table = BaseConfig.DB_PREFIX + "notificacio_env_table", name = "csv_uuid", insertable = false, updatable = false)
-	private String codiCsvUuidDocument;
-
-	@Column(table = BaseConfig.DB_PREFIX + "notificacio_env_table", name = "grup_codi", insertable = false, updatable = false)
-	private String grupCodi;
-
-	@Column(table = BaseConfig.DB_PREFIX + "notificacio_env_table", name = "organ_id", insertable = false, updatable = false)
-	private Long organId;
-
-	@Column(table = BaseConfig.DB_PREFIX + "notificacio_env_table", name = "procediment_id", insertable = false, updatable = false)
-	private String procedimentId;
-
-	@Column(table = BaseConfig.DB_PREFIX + "notificacio_env_table", name = "titular_nom", insertable = false, updatable = false)
-	private String titularNom;
-
-
-	@Column(table = BaseConfig.DB_PREFIX + "notificacio_env_table", name = "titular_nif", insertable = false, updatable = false)
-	private String titularNif;
-
-
 	@Builder
-	public NotificacioEnviamentResourceEntity(NotificacioEnviamentResource resource, NotificacioResourceEntity notificacio, PersonaResourceEntity titular) {
-
+	public NotificacioEnviamentResourceEntity(
+		NotificacioEnviamentResource resource,
+		NotificacioResourceEntity notificacio,
+		PersonaResourceEntity titular) {
 		this.serveiTipus = resource.getServeiTipus();
 		this.plazoAmpliado = resource.isPlazoAmpliado();
 		this.perEmail = resource.isPerEmail();
 		this.notificaReferencia = resource.getNotificaReferencia();
-		this.referenciaEnviament = resource.getReferenciaEnviament();
+		this.notificaIdentificador = resource.getNotificaIdentificador();
 		this.notificaDataCreacio = resource.getNotificaDataCreacio();
 		this.notificaDataDisposicio = resource.getNotificaDataDisposicio();
 		this.notificaDataCaducitat = resource.getNotificaDataCaducitat();
@@ -307,8 +243,6 @@ public class NotificacioEnviamentResourceEntity extends BaseAuditableResourceEnt
 		this.errorLastCallback = resource.isErrorLastCallback();
 		this.anulat = resource.isAnulat();
 		this.motiuAnulacio = resource.getMotiuAnulacio();
-//		this.entregaPostal = resource.getEntregaPostal();
-		this.entregaPostalActiva = resource.isEntregaPostalActiva();
 		this.notificacio = notificacio;
 		this.titular = titular;
 	}

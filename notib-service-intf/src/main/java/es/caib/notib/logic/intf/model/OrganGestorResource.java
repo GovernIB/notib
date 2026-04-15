@@ -131,6 +131,10 @@ public class OrganGestorResource extends BaseResource<Long> {
 	private ResourceReference<PagadorCieResource, Long> entregaCiePagadorCie;
 	private ResourceReference<PagadorPostalResource, Long> entregaCiePagadorPostal;
 
+	public boolean isEntregaCieActiva() {
+		return entregaCieActiva || entregaCie != null;
+	}
+
 	@Getter
 	@Setter
 	@NoArgsConstructor

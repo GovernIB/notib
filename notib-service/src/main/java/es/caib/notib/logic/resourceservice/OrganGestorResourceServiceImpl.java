@@ -109,19 +109,29 @@ public class OrganGestorResourceServiceImpl
 	}
 
 	@Override
-	protected void beforeCreateSave(
-		OrganGestorResourceEntity entity,
-		OrganGestorResource resource,
-		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		beforeCreateUpdate(entity, resource);
-	}
-
-	@Override
-	protected void beforeUpdateSave(
-		OrganGestorResourceEntity entity,
-		OrganGestorResource resource,
-		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		beforeCreateUpdate(entity, resource);
+	protected void beforeUpdateSave(OrganGestorResourceEntity entity, OrganGestorResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+		if (!resource.isEntregaCieActiva()) {
+			entity.setEntregaCie(null);
+			return;
+		}
+		if (resource.getEntregaCiePagadorPostal() == null || resource.getEntregaCiePagadorCie() == null) {
+			return;
+		}
+		EntregaCieResourceEntity entregaCie = entity.getEntregaCie();
+		Optional<PagadorPostalResourceEntity> pagadorPostal = pagadorPostalResourceRepository.findById(
+			resource.getEntregaCiePagadorPostal().getId());
+		Optional<PagadorCieResourceEntity> pagadorCie = pagadorCieResourceRepository.findById(
+			resource.getEntregaCiePagadorCie().getId());
+		if (pagadorPostal.isEmpty() || pagadorCie.isEmpty()) {
+			return;
+		}
+		if (entregaCie == null) {
+			entregaCie = EntregaCieResourceEntity.builder().build();
+			entity.setEntregaCie(entregaCie);
+		}
+		entregaCie.setPagadorPostal(pagadorPostal.get());
+		entregaCie.setPagadorCie(pagadorCie.get());
+		entregaCieResourceRepository.save(entregaCie);
 	}
 
 	/**
@@ -202,39 +212,6 @@ public class OrganGestorResourceServiceImpl
 			resource.setChildCount(
 				paresAll.stream().
 					filter(p -> ((Number)p[1]).longValue() == resource.getId()).count() - 1);
-		}
-	}
-
-	private void beforeCreateUpdate(OrganGestorResourceEntity entity, OrganGestorResource resource) {
-		// Gestiona el codi del pare
-		entity.setCodiPare(entity.getPare() != null ? entity.getPare().getCodi() : null);
-		// Gestiona la entrega CIE
-		if (!resource.isEntregaCieActiva()) {
-			if (entity.getEntregaCie() != null) {
-				entregaCieResourceRepository.delete(entity.getEntregaCie());
-				entity.setEntregaCie(null);
-			}
-			return;
-		}
-		if (resource.getEntregaCiePagadorPostal() == null || resource.getEntregaCiePagadorCie() == null) {
-			return;
-		}
-		Optional<PagadorPostalResourceEntity> pagadorPostal = pagadorPostalResourceRepository.findById(
-			resource.getEntregaCiePagadorPostal().getId());
-		Optional<PagadorCieResourceEntity> pagadorCie = pagadorCieResourceRepository.findById(
-			resource.getEntregaCiePagadorCie().getId());
-		if (pagadorPostal.isEmpty() || pagadorCie.isEmpty()) {
-			return;
-		}
-		if (entity.getEntregaCie() == null) {
-			EntregaCieResourceEntity entregaCie = EntregaCieResourceEntity.builder().
-				pagadorPostal(pagadorPostal.get()).
-				pagadorCie(pagadorCie.get()).
-				build();
-			entity.setEntregaCie(entregaCieResourceRepository.save(entregaCie));
-		} else {
-			entity.getEntregaCie().setPagadorPostal(pagadorPostal.get());
-			entity.getEntregaCie().setPagadorCie(pagadorCie.get());
 		}
 	}
 
