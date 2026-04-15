@@ -1151,7 +1151,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         }
     }
     const filteringProps: any = {
-        filterMode: 'server',
+        filterMode: !otherProps.treeData ? 'server' : undefined,
         disableColumnFilter: true,
         onFilterModelChange: setFilterModel,
     };
