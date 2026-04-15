@@ -8,6 +8,7 @@ import Icon from '@mui/material/Icon';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
+import { GridDensity } from '@mui/x-data-grid-pro';
 import {
     GridPage,
     MuiDataGrid,
@@ -72,6 +73,49 @@ const columns: MuiDataGridColDef[] = [
         },
     },
 ];
+
+const springFilterBuilder = (data: any) => {
+    return filterBuilder.and(
+        filterBuilder.like('codi', data?.codi),
+        filterBuilder.like('nom', data?.nom),
+        filterBuilder.eq('pare.id', data.pare?.id),
+        filterBuilder.like('llibre', data?.llibre),
+        filterBuilder.eq('estat', `'${data?.estat}'`),
+        data?.entregaCieActiva === 'true'
+            ? filterBuilder.neq('entregaCie', null)
+            : data?.entregaCieActiva === 'false'
+              ? filterBuilder.eq('entregaCie', null)
+              : null,
+        filterBuilder.eq('permetreSir', `'${data?.permetreSir}'`)
+    );
+};
+
+const useColumns = (treeDataActive: boolean) => {
+    return !treeDataActive
+        ? columns
+        : columns.filter((c) => c.field !== 'codi' && c.field !== 'nom' && c.field !== 'pare');
+};
+
+const useTreeData = (active: boolean, defaultGroupingExpansionDepth?: number) => {
+    const getTreeDataPath = (row: any) => {
+        return row.path?.map((p: any) => p.description);
+    };
+    return active
+        ? {
+              perspectives: ['TREE'],
+              treeData: true as true,
+              getTreeDataPath,
+              groupingColDef: {
+                  headerName: 'Òrgan gestor',
+                  flex: 6,
+              },
+              density: 'compact' as GridDensity,
+              defaultGroupingExpansionDepth
+          }
+        : {
+              paginationActive: true as true,
+          };
+};
 
 const useSse = (
     queueId: string,
@@ -210,22 +254,6 @@ const OrganGridDir3SyncActionButton: React.FC<{
     );
 };
 
-const springFilterBuilder = (data: any) => {
-    return filterBuilder.and(
-        filterBuilder.like('codi', data?.codi),
-        filterBuilder.like('nom', data?.nom),
-        filterBuilder.eq('pare.id', data.pare?.id),
-        filterBuilder.like('llibre', data?.llibre),
-        filterBuilder.eq('estat', `'${data?.estat}'`),
-        data?.entregaCieActiva === 'true'
-            ? filterBuilder.neq('entregaCie', null)
-            : data?.entregaCieActiva === 'false'
-              ? filterBuilder.eq('entregaCie', null)
-              : null,
-        filterBuilder.eq('permetreSir', `'${data?.permetreSir}'`)
-    );
-};
-
 const ContentFilter: React.FC = () => {
     const { t } = useTranslation();
     const filterApiRef = useFilterApiContext();
@@ -250,6 +278,7 @@ const ContentFilter: React.FC = () => {
 
 export const OrganGrid = () => {
     const { t } = useTranslation();
+    const [treeDataActive] = React.useState<boolean>(true);
     const dataGridApiRef = useMuiDataGridApiRef();
     const filterDataGridProps = useDatagridFilterProps(
         'organGestorResource',
@@ -257,6 +286,8 @@ export const OrganGrid = () => {
         springFilterBuilder,
         <ContentFilter />
     );
+    const columns = useColumns(treeDataActive);
+    const treeDataProps = useTreeData(treeDataActive, 1);
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
         <GridPage>
@@ -264,7 +295,7 @@ export const OrganGrid = () => {
                 title={t('page.organs.grid.title')}
                 resourceName="organGestorResource"
                 columns={columns}
-                paginationActive
+                {...treeDataProps}
                 persistentStateActive
                 persistentStateClearPageSortPropsOnTopLevelRouteChange
                 {...filterDataGridProps}
