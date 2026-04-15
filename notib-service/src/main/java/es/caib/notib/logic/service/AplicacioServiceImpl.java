@@ -178,7 +178,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 		if (dadesUsuari == null) {
 			throw new NotFoundException(codi, DadesUsuari.class);
 		}
-		idioma = Strings.isNullOrEmpty(idioma) ? "ca" : idioma;
 		var u = UsuariEntity.builder().codi(dadesUsuari.getCodi()).email(dadesUsuari.getEmail()).idioma(idioma).nom(dadesUsuari.getNom())
 				.llinatges(dadesUsuari.getLlinatges()).nomSencer(dadesUsuari.getNomSencer()).build();
 		usuariRepository.save(u);
@@ -192,12 +191,11 @@ public class AplicacioServiceImpl implements AplicacioService {
 		try {
 			log.debug("Actualitzant configuració de usuari actual");
 			var usuari = usuariRepository.findById(dto.getCodi()).orElseThrow();
-			var idioma = Strings.isNullOrEmpty(dto.getIdioma()) ? "ca" : dto.getIdioma();
 			var usr = UsuariEntity.builder()
 					.rebreEmailsNotificacio(dto.getRebreEmailsNotificacio())
 					.emailAlt(dto.getEmailAlt())
 					.rebreEmailsNotificacioCreats(dto.getRebreEmailsNotificacioCreats())
-                    .idioma(idioma)
+                    .idioma(dto.getIdioma())
 					.numElementsPaginaDefecte(dto.getNumElementsPaginaDefecte().name())
                     .entitatDefecte(dto.getEntitatDefecte())
                     .organDefecte(dto.getOrganDefecte())

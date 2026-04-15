@@ -90,8 +90,8 @@ public class RegistrePluginMockImpl extends AbstractSalutPlugin implements Regis
 		respostaConsultaRegistre.setRegistreNumeroFormatat(registre[1] + "/" + registre[0]);
 		respostaConsultaRegistre.setRegistreNumero(String.valueOf(registre[1]));
 		respostaConsultaRegistre.setRegistreData(data);
-		respostaConsultaRegistre.setEstat(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT);
-//		respostaConsultaRegistre.setEstat(NotificacioRegistreEstatEnumDto.PENDENT);
+//		respostaConsultaRegistre.setEstat(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT);
+		respostaConsultaRegistre.setEstat(NotificacioRegistreEstatEnumDto.PENDENT);
 
 		 if (respostaConsultaRegistre.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_SIR))
 			 respostaConsultaRegistre.setSirRecepecioData(data);

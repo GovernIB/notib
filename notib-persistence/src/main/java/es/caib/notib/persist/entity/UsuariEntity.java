@@ -3,7 +3,6 @@
  */
 package es.caib.notib.persist.entity;
 
-import com.google.common.base.Strings;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -90,7 +89,7 @@ public class UsuariEntity implements Serializable {
 
 		rebreEmailsNotificacio = usuari.isRebreEmailsNotificacio();
 		rebreEmailsNotificacioCreats = usuari.isRebreEmailsNotificacioCreats();
-		idioma = Strings.isNullOrEmpty(usuari.getIdioma()) ? "ca" : usuari.getIdioma();
+		idioma = usuari.getIdioma();
 		emailAlt = usuari.getEmailAlt();
 		numElementsPaginaDefecte = usuari.numElementsPaginaDefecte;
         entitatDefecte = usuari.getEntitatDefecte();
