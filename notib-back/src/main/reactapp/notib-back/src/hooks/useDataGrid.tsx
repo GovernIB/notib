@@ -8,33 +8,18 @@ import {
     GridRowsProp,
     useGridApiRef,
     gridRowNodeSelector,
-    type DataGridProProps,
-    type GridEventListener,
 } from '@mui/x-data-grid-pro';
 import { MuiFilter } from 'reactlib';
 import { useNotibContext } from '../components/NotibContext';
 
-export const useDatagridPageSizeOptionsProps = (
-    innerScroll: boolean = true,
-    autoHeightMinHeight?: string
-) => {
+export const useDatagridPageSizeOptionsProps = () => {
     const { currentUser, currentUserGridPageSizeOptions } = useNotibContext();
-    const [autoPageSize, setAutoPageSize] = React.useState<boolean>();
-    const handlePersistentStateChange = (state: any) => {
-        !innerScroll && setAutoPageSize(state.autoPageSize);
-    };
     return {
         defaultPaginationModel: {
             page: 0,
             pageSize: currentUser.numElementsPaginaDefecteAsInt ?? -1,
         },
         pageSizeOptions: currentUserGridPageSizeOptions,
-        onPersistentStateChange: handlePersistentStateChange,
-        ...(!innerScroll &&
-            !autoPageSize && {
-                autoHeight: true,
-                sx: { minHeight: autoHeightMinHeight ?? '400px' },
-            }),
     };
 };
 
@@ -75,59 +60,37 @@ export const useDatagridFilterProps = (
 export const useDatagridTreeData = (
     active: boolean,
     headerName: string,
-    reorderingActive: boolean,
     defaultGroupingExpansionDepth?: number,
     groupingColDefProps?: any
 ) => {
     const { t } = useTranslation();
     const theme = useTheme();
     const datagridApiRef = useGridApiRef();
+    const [rowIds, setRowIds] = React.useState<any[]>();
+    const handleRowsChange = (rows: GridRowsProp) => {
+        setRowIds(rows?.map((r) => r.id));
+    };
     const changeAllNodesExpansion = (expanded: boolean) => {
-        const rowIds = Array.from(datagridApiRef.current?.getRowModels().keys() ?? []);
         rowIds?.forEach((id) => {
             const node = gridRowNodeSelector(datagridApiRef, id) as any;
             if (node?.children?.length) {
                 if (expanded) {
                     datagridApiRef.current?.setRowChildrenExpansion(id, expanded);
-                } else if (
-                    defaultGroupingExpansionDepth == null ||
-                    node.depth >= defaultGroupingExpansionDepth
-                ) {
+                } else if (defaultGroupingExpansionDepth == null || node.depth >= defaultGroupingExpansionDepth) {
                     datagridApiRef.current?.setRowChildrenExpansion(id, expanded);
                 }
             }
         });
     };
-    const getTreeDataPath: DataGridProProps['getTreeDataPath'] = (row: any) => {
+    const getTreeDataPath = (row: any) => {
         return row.path?.map((p: any) => p.description) ?? [row.id];
     };
-    const setTreeDataPath: DataGridProProps['setTreeDataPath'] = (path, row) => {
-        return {
-            ...row,
-            path: path.map((p) => ({ id: -1, description: p })),
-        };
-    };
-    const processRowUpdate: DataGridProProps['processRowUpdate'] = (newRow: any, oldRow: any) => {
-        console.log('>>> reordenació 1', oldRow.id, oldRow.path, newRow.id, newRow.path);
-    };
-    const onRowOrderChange: GridEventListener<'rowOrderChange'> = (params) => {
-        if (params.oldParent === params.newParent) {
-            console.log('>>> reordenació 2', params);
-        }
-    };
-    const reorderingProps = reorderingActive
-        ? {
-              rowReordering: true,
-              setTreeDataPath,
-              processRowUpdate,
-              onRowOrderChange,
-          }
-        : {};
     return active
         ? {
               perspectives: ['TREE'],
               treeData: true as true,
               getTreeDataPath,
+              onRowsChange: handleRowsChange,
               datagridApiRef,
               groupingColDef: {
                   headerName,
@@ -178,7 +141,6 @@ export const useDatagridTreeData = (
                   ...groupingColDefProps,
               },
               defaultGroupingExpansionDepth,
-              ...reorderingProps,
               sx: {
                   '& [data-field="__tree_data_group__"] .MuiDataGrid-columnHeaderTitleContainerContent':
                       {
@@ -188,5 +150,6 @@ export const useDatagridTreeData = (
           }
         : {
               paginationActive: true as true,
+              getTreeDataPath,
           };
 };

@@ -27,6 +27,7 @@ type DataGridFooterPaginationProps = {
     paginationModel: GridPaginationModel;
     pageInfo: any;
     pageSizeOptions: number[];
+    enableAutoPageSizeOption: boolean;
     autoPageSize: boolean;
     setAutoPageSize: (value: boolean) => void;
 };
@@ -62,7 +63,14 @@ const DataGridFooterSelection: React.FC<DataGridFooterSelectionProps> = (props) 
 };
 
 const GridFooterPagination: React.FC<DataGridFooterPaginationProps> = (props) => {
-    const { paginationModel, pageInfo, pageSizeOptions, autoPageSize, setAutoPageSize } = props;
+    const {
+        paginationModel,
+        pageInfo,
+        pageSizeOptions,
+        enableAutoPageSizeOption,
+        autoPageSize,
+        setAutoPageSize,
+    } = props;
     const { t } = useBaseAppContext();
     const apiRef = useGridApiContext();
     const page = useGridSelector(apiRef, gridPageSelector);
@@ -82,7 +90,6 @@ const GridFooterPagination: React.FC<DataGridFooterPaginationProps> = (props) =>
         const lastElement = Math.min(firstElementIndex + pageRowCount - 1, pageInfo?.totalElements);
         const boxStyle = { display: 'flex', justifContent: 'flex-end', alignItems: 'center' };
         const currentPageSize = paginationModel?.pageSize;
-        const enableAutoPageSizeOption = pageSizeOptions != null && pageSizeOptions.includes(-1);
         return (
             <Box style={boxStyle}>
                 {pageSizeOptions && (
@@ -101,15 +108,14 @@ const GridFooterPagination: React.FC<DataGridFooterPaginationProps> = (props) =>
                                             pageSize: event.target.value as number,
                                         });
                                     }
-                                }}>
+                                }}
+                            >
                                 {enableAutoPageSizeOption && (
                                     <MenuItem value={-1}>{t('grid.footer.sizeAuto')}</MenuItem>
                                 )}
-                                {pageSizeOptions
-                                    .filter((o: number) => o !== -1)
-                                    .map((o: number) => (
-                                        <MenuItem value={o}>{o}</MenuItem>
-                                    ))}
+                                {pageSizeOptions.map((o: number) => (
+                                    <MenuItem value={o}>{o}</MenuItem>
+                                ))}
                             </Select>
                         </FormControl>
                     </Box>
@@ -163,6 +169,7 @@ const DataGridFooter: React.FC<DataGridFooterProps> = (props) => {
         pageInfo,
         pageSizeOptions,
         setRowSelectionModel,
+        enableAutoPageSizeOption,
         autoPageSize,
         setAutoPageSize,
     } = props;
@@ -175,6 +182,7 @@ const DataGridFooter: React.FC<DataGridFooterProps> = (props) => {
                     paginationModel={paginationModel}
                     pageInfo={pageInfo}
                     pageSizeOptions={pageSizeOptions}
+                    enableAutoPageSizeOption={enableAutoPageSizeOption}
                     autoPageSize={autoPageSize}
                     setAutoPageSize={setAutoPageSize}
                 />

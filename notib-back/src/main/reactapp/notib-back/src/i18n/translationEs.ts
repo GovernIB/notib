@@ -21,15 +21,6 @@ const translationEs = {
             cache: "Cache de aplicaciones",
             activemq: "Monitor ActiveMQ",
             callbacksError: "Notificaciones callback erroneas",
-            enviamentMassiu: "Envíos masivos",
-            nouEnviamentmassiu: "Nuevo envío masivo",
-            consultaEnviamentmassiu: "Consulta envíos masivos",
-            gestio: "Gestión",
-            errorRegistre: "Notificación con error de registro",
-            notificacioEsborrades: "Notificaciones borradas",
-            callbackPendent: "Callback pendiente",
-            accionsMassives: "Consulta acciones masivas",
-            permisosUsuari: "Permisos de usuario",
         },
     },
     page: {
@@ -100,9 +91,7 @@ const translationEs = {
         organs: {
             grid: {
                 title: 'Órganos gestores',
-                viewSwitch: 'Vista en árbol',
                 groupColumn: 'Órgano gestor',
-                popupDialogTitle: 'órgano gestor',
                 sync: {
                     title: 'Sincronización DIR3',
                     dialogTitle: 'Sincronización DIR3',
@@ -292,12 +281,11 @@ const translationEs = {
                         estatPostal: 'Estado de entrega postal',
                         estatTelematica: 'Estado de entrega telemática',
                     },
-                    accions: 'Acciones',
+                    detalls: 'Detalles',
                 },
                 column: {
                     detalls: 'Detalles',
-                    mostrar: 'Mostrar envios',
-                    ocultar: 'Ocultar envios',
+                    desplegar: 'Desplegar envios',
                 },
                 procediment: 'Procedimiento',
                 servei: 'Servicio',

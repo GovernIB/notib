@@ -4,12 +4,7 @@ import { useBaseAppContext, DialogButton } from '../../BaseAppContext';
 import { useFormDialog, FormDialogSubmitFn } from '../form/FormDialog';
 
 export type DataFormDialogApi = {
-    show: (
-        id?: any,
-        additionalData?: any,
-        title?: string,
-        dialogButtons?: DialogButton[]
-    ) => Promise<string>;
+    show: (id?: any, additionalData?: any) => Promise<string>;
     close: () => void;
 };
 
@@ -21,7 +16,7 @@ export type DataFormDialogProps = React.PropsWithChildren & {
     dialogComponentProps?: any;
     formComponentProps?: any;
     formI18nKeys?: FormI18nKeys;
-    apiRef?: React.RefObject<DataFormDialogApi | null>;
+    apiRef?: React.RefObject<DataFormDialogApi | undefined>;
     formSubmit?: FormDialogSubmitFn;
     onClose?: (reason?: string) => boolean;
 };
@@ -31,8 +26,8 @@ export type DataFormDialogProps = React.PropsWithChildren & {
  *
  * @returns referència a l'API del component MuiDataFormDialog.
  */
-export const useDataFormDialogApiRef: () => React.RefObject<DataFormDialogApi | null> = () => {
-    const gridApiRef = React.useRef<DataFormDialogApi>(null);
+export const useMuiDataFormDialogApiRef: () => React.RefObject<DataFormDialogApi> = () => {
+    const gridApiRef = React.useRef<DataFormDialogApi | any>({});
     return gridApiRef;
 };
 
@@ -65,19 +60,17 @@ export const DataFormDialog: React.FC<DataFormDialogProps> = (props) => {
         formI18nKeys,
         onClose
     );
-    const show = (id?: any, additionalData?: any, title?: string, dialogButtons?: DialogButton[]) =>
+    const show = (id?: any, additionalData?: any) =>
         formDialogShow(id, {
             title:
-                title ??
                 titleProp ??
                 (id != null ? t('datacommon.update.label') : t('datacommon.create.label')) +
                     ' ' +
                     (resourceTitle ?? resourceName),
             additionalData,
-            dialogButtons,
         });
     const close = () => formDialogClose();
-    if (apiRef) {
+    if (apiRef != null) {
         apiRef.current = { show, close };
     }
     return <>{formDialogComponent}</>;
