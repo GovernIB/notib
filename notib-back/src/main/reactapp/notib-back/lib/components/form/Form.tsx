@@ -183,8 +183,8 @@ const useControlledId = (idProp: any) => {
  *
  * @returns referència a l'API del component Form.
  */
-export const useFormApiRef: () => FormApiRef = () => {
-    const formApiRef = React.useRef<FormApi>(null);
+export const useFormApiRef: () => React.RefObject<FormApi> = () => {
+    const formApiRef = React.useRef<FormApi | any>({});
     return formApiRef;
 };
 
@@ -280,6 +280,7 @@ export const Form: React.FC<FormProps> = (props) => {
     const [isDataInitialized, setIsDataInitialized] = React.useState<boolean>(false);
     const [apiActions, setApiActions] = React.useState<any>(undefined);
     const [navigateToLink, setNavigateToLink] = React.useState<string>();
+    const apiRef = React.useRef<FormApi>(undefined);
     const { id, setInternalId } = useControlledId(idProp);
     const location = useLocation();
     const additionalData = additionalDataProp ?? location.state?.additionalData;
@@ -726,7 +727,7 @@ export const Form: React.FC<FormProps> = (props) => {
             navigateToSaveLink(navigateToLink, id, true);
         }
     }, [navigateToLink]);
-    const getFormApi = () => ({
+    apiRef.current = {
         getId,
         getData,
         refresh: () => refresh(true),
@@ -739,10 +740,23 @@ export const Form: React.FC<FormProps> = (props) => {
         setFieldValue,
         setModified: setExternalModified,
         handleSubmissionErrors,
-    });
-    const apiRef = React.useRef<FormApi>(getFormApi());
+    };
     if (apiRefProp) {
-        apiRefProp.current = getFormApi();
+        if (apiRefProp.current) {
+            apiRefProp.current.getId = getId;
+            apiRefProp.current.getData = getData;
+            apiRefProp.current.refresh = () => refresh(true);
+            apiRefProp.current.reset = externalReset;
+            apiRefProp.current.revert = revert;
+            apiRefProp.current.validate = validate;
+            apiRefProp.current.save = save;
+            apiRefProp.current.delete = delette;
+            apiRefProp.current.focus = focus;
+            apiRefProp.current.setFieldValue = setFieldValue;
+            apiRefProp.current.handleSubmissionErrors = handleSubmissionErrors;
+        } else {
+            logConsole.warn('apiRef prop must be initialized with an empty object');
+        }
     }
     const fieldErrors = [
         ...(validationErrors ?? []),

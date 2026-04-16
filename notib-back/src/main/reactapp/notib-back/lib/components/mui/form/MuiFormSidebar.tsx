@@ -62,7 +62,7 @@ export const MuiFormSidebar: React.FC<FormSidebarProps> = (props) => {
         rejectFn?.();
         setOpen(false);
     };
-    if (apiRef) {
+    if (apiRef != null) {
         apiRef.current = {
             show,
             hide,
