@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -92,5 +93,17 @@ public class PersonaResource extends BaseResource<Long> {
 
 	// Camps calculats
 	private String nomSencerNif;
+
+	public String getLlinatges(){
+		var a = StringUtils.trimToEmpty(llinatge1);
+		var b = StringUtils.trimToEmpty(llinatge2);
+		if (a.isEmpty())  {
+			return b;
+		}
+		if (b.isEmpty()) {
+			return a;
+		}
+		return a + " " + b;
+	}
 
 }
