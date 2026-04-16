@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Icon from '@mui/material/Icon';
 import IconButton from '@mui/material/IconButton';
 import { useTheme } from '@mui/material/styles';
@@ -62,6 +63,7 @@ export const useDatagridTreeData = (
     defaultGroupingExpansionDepth?: number,
     groupingColDefProps?: any
 ) => {
+    const { t } = useTranslation();
     const theme = useTheme();
     const datagridApiRef = useGridApiRef();
     const [rowIds, setRowIds] = React.useState<any[]>();
@@ -72,7 +74,11 @@ export const useDatagridTreeData = (
         rowIds?.forEach((id) => {
             const node = gridRowNodeSelector(datagridApiRef, id) as any;
             if (node?.children?.length) {
-                datagridApiRef.current?.setRowChildrenExpansion(id, expanded);
+                if (expanded) {
+                    datagridApiRef.current?.setRowChildrenExpansion(id, expanded);
+                } else if (defaultGroupingExpansionDepth == null || node.depth >= defaultGroupingExpansionDepth) {
+                    datagridApiRef.current?.setRowChildrenExpansion(id, expanded);
+                }
             }
         });
     };
@@ -103,12 +109,14 @@ export const useDatagridTreeData = (
                                   <IconButton
                                       size="small"
                                       onClick={() => changeAllNodesExpansion(false)}
+                                      title={t('hook.useDataGrid.treeData.collapseAll')}
                                   >
                                       <Icon fontSize="inherit">unfold_less</Icon>
                                   </IconButton>
                                   <IconButton
                                       size="small"
                                       onClick={() => changeAllNodesExpansion(true)}
+                                      title={t('hook.useDataGrid.treeData.expandAll')}
                                   >
                                       <Icon fontSize="inherit">unfold_more</Icon>
                                   </IconButton>
