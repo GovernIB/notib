@@ -31,6 +31,7 @@ import {
     useDatagridPageSizeOptionsProps,
     useDatagridTreeData,
 } from '../../hooks/useDataGrid';
+import { OrganFormContent } from './OrganForm';
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -318,9 +319,13 @@ export const OrganGrid = () => {
                 {...filterDataGridProps}
                 {...pageSizeOptionsDataGridProps}
                 toolbarType="upper"
-                toolbarCreateLink="form"
+                popupEditActive
+                popupEditFormContent={<OrganFormContent />}
+                popupEditFormDialogResourceTitle={"òrgan gestor"}
+                popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
+                /*toolbarCreateLink="form"
                 rowLink="form/{{id}}"
-                rowUpdateLink="form/{{id}}"
+                rowUpdateLink="form/{{id}}"*/
                 toolbarElementsWithPositions={[
                     {
                         position: 1,
