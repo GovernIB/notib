@@ -71,6 +71,7 @@ const DataCard: React.FC<
 
 export type DataCardRow = {
     field: string;
+    label?: string;
     labelRenderer?: () => React.ReactElement;
     valueRenderer?: (
         value: any,
@@ -78,19 +79,35 @@ export type DataCardRow = {
         data: any
     ) => React.ReactElement;
     formatOptions?: any;
+    alwaysVisible?: boolean;
+};
+
+// Funció d'ajuda per obtenir valors niuats (ex: "user.address.street")
+const getNestedValue = (obj: any, path: string) => {
+    if (!obj || !path) return undefined;
+    return path.split('.').reduce((acc, part) => acc && acc[part], obj);
 };
 
 const FieldsDataCardItem: React.FC<{ key: any; row: DataCardRow; fields: any[]; data: any }> = (
     props
 ) => {
     const { key, row, fields, data } = props;
-    const field = fields?.find((f) => f?.name === row.field);
-    const label = row.labelRenderer != null ? row.labelRenderer() : (field?.label ?? row.field);
-    const formattedValue = formattedFieldValue(data?.[row.field], field, row.formatOptions);
+    const field = fields?.find((field) => field?.name === row.field);
+    const label =
+        row.labelRenderer != null ? row.labelRenderer() : (row.label ?? field?.label ?? row.field);
+
+    const rawValue = getNestedValue(data, row.field);
+    const formattedValue = formattedFieldValue(rawValue, field, row.formatOptions);
+
     const value =
         row.valueRenderer != null
-            ? row.valueRenderer(data[row.field], formattedValue, data)
+            ? row.valueRenderer(rawValue, formattedValue, data)
             : formattedValue;
+
+    if (!row.alwaysVisible && !value) {
+        return null;
+    }
+
     return (
         <TableRow key={key}>
             <TableCell
@@ -125,6 +142,7 @@ export const FieldsDataCard: React.FC<
     const theme = useTheme();
     const bgColor =
         theme.palette.mode === 'light' ? theme.palette.grey[200] : theme.palette.grey[900];
+
     return (
         data && (
             <Card {...otherProps} sx={{ '& .MuiCardContent-root ': { padding: 0 }, ...sx }}>
@@ -143,8 +161,13 @@ export const FieldsDataCard: React.FC<
                             </TableHead>
                         )}
                         <TableBody>
-                            {rows.map((r: any, i: number) => (
-                                <FieldsDataCardItem key={i} row={r} fields={fields} data={data} />
+                            {rows.map((row: any, index: number) => (
+                                <FieldsDataCardItem
+                                    key={index}
+                                    row={row}
+                                    fields={fields}
+                                    data={data}
+                                />
                             ))}
                         </TableBody>
                     </Table>
