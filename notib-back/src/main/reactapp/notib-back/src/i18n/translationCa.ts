@@ -92,6 +92,7 @@ const translationCa = {
         organs: {
             grid: {
                 title: 'Òrgans gestors',
+                groupColumn: 'Òrgan gestor',
                 sync: {
                     title: 'Sincronització DIR3',
                     dialogTitle: 'Sincronització DIR3',
