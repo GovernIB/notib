@@ -302,7 +302,7 @@ export const OrganGrid = () => {
     const treeDataProps = useDatagridTreeData(
         treeDataViewActive,
         t('page.organs.grid.groupColumn'),
-        2,
+        1,
         { flex: 6 }
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
