@@ -1,0 +1,268 @@
+package es.caib.notib.persist.resourceentity;
+
+import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.EnviamentTipus;
+import es.caib.notib.logic.intf.base.config.BaseConfig;
+import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
+import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
+import es.caib.notib.logic.intf.model.NotificacioEnviamentTableResource;
+import es.caib.notib.logic.intf.model.NotificacioTableResource;
+import es.caib.notib.logic.intf.rest.consulta.Estat;
+import es.caib.notib.persist.entity.EntitatEntity;
+import es.caib.notib.persist.entity.NotificacioEntity;
+import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import java.util.Date;
+
+/**
+ * Entitat de base de dades de taula optimitzada d'enviaments.
+ *
+ * @author Límit Tecnologies
+ */
+@Entity
+@Table(name = BaseConfig.DB_PREFIX + "notificacio_env_table")
+@Getter
+@Setter
+@NoArgsConstructor
+public class NotificacioEnviamentTableResourceEntity extends BaseAuditableResourceEntity<NotificacioEnviamentTableResource> implements AdminEntitatResourceEntity<NotificacioEnviamentTableResource> {
+
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "id")
+	@MapsId
+	private NotificacioEnviamentEntity enviament;
+
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "NOTIFICACIO_ID")
+	private NotificacioEntity notificacio;
+
+	@Column(name = "not_id")
+	private Long notificacioId;
+
+	@Column(name = "ultim_event_data")
+	private Date enviadaDate;
+
+	@Column(name = "TIPUS_ENVIAMENT", nullable = false)
+	protected EnviamentTipus tipusEnviament;
+
+	@Column(name = "DESTINATARIS", length = 4000, nullable = false)
+	protected String destinataris;
+
+	/**
+	 * INDEXS
+	 */
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "entitat_id")
+	private EntitatResourceEntity entitat;
+
+	@Column(name = "PROCEDIMENT_CODI_NOTIB", length = 9)
+	private String procedimentCodiNotib;
+
+	@Column(name = "usuari_codi", length = 64, nullable = false)
+	private String usuariCodi;
+
+	@Column(name = "grup_codi", length = 64)
+	private String grupCodi;
+
+
+	/**
+	 * FIELDS
+	 */
+	@Column(name = "TITULAR_NIF", length = 9)
+	private String titularNif;
+	@Column(name = "TITULAR_NOM", length = 255)
+	private String titularNom;
+	@Column(name = "TITULAR_EMAIL", length = 160)
+	private String titularEmail;
+	@Column(name = "TITULAR_LLINATGE1", length = 40)
+	private String titularLlinatge1;
+	@Column(name = "TITULAR_LLINATGE2", length = 40)
+	private String titularLlinatge2;
+	@Column(name = "TITULAR_RAOSOCIAL", length = 100)
+	private String titularRaoSocial;
+
+	////
+	// INFO NOTIFICACIO
+	////
+
+	@Column(name = "DATA_PROGRAMADA")
+	@Temporal(TemporalType.DATE)
+	protected Date enviamentDataProgramada;
+
+	@Column(name = "EMISOR_DIR3", length = 9, nullable = false)
+	protected String emisorDir3Codi;
+
+	@Column(name = "concepte", length = 255, nullable = false)
+	protected String concepte;
+
+	@Column(name = "descripcio", length = 1000)
+	protected String descripcio;
+
+	@Column(name = "LLIBRE")
+	private String registreLlibreNom;
+
+	@Column(name = "NOT_ORGAN_CODI")
+	private String organCodi;
+
+	@Column(name = "ORGAN_ID")
+	private String organId;
+
+	@Column(name = "organ_nom")
+	private String organNom;
+
+	@Column(name = "ORGAN_ESTAT")
+	private OrganGestorEstatEnum organEstat;
+
+	@Column(name = "procediment_nom")
+	private String procedimentNom;
+
+	@Column(name="referencia_notificacio")
+	private String referenciaNotificacio;
+
+	@Column(name = "NOT_ESTAT", nullable = false)
+	protected NotificacioEstatEnumDto estat;
+
+	@Column(name = "CSV_UUID", length = 256)
+	protected String csv_uuid;
+
+	@Column(name = "HAS_ERRORS")
+	protected Boolean hasErrors;
+
+
+	// //
+	// PROCEDIMENT
+	// //
+	@Column(name = "PROCEDIMENT_IS_COMU")
+	private Boolean procedimentIsComu;
+
+	@Column(name = "PROCEDIMENT_PROCORGAN_ID")
+	protected Long procedimentOrganId; // TODO: useless
+
+	@Column(name = "PROCEDIMENT_REQUIRE_PERMISSION")
+	private boolean procedimentRequirePermission;
+
+	@Column(name = "PROCEDIMENT_TIPUS")
+	@Enumerated(EnumType.STRING)
+	private ProcSerTipusEnum procedimentTipus;
+
+
+	// //
+	// REGISTRE
+	// //
+	@Column(name = "registre_numero", length = 19)
+	protected String registreNumero;
+
+	public void registreNumero(String registreNumero) {
+		this.registreNumero = registreNumero;
+	}
+
+	@Column(name = "registre_data")
+	@Temporal(TemporalType.DATE)
+	protected Date registreData;
+
+	@Column(name = "REGISTRE_ENVIAMENT_INTENT")
+	protected Integer registreEnviamentIntent;
+
+
+	// //
+	// CAMPS DE NOTIFICA
+	// //
+
+	@Column(name = "NOTIFICA_DATA_CADUCITAT")
+	@Temporal(TemporalType.TIMESTAMP)
+	protected Date notificaDataCaducitat;
+
+	@Column(name = "NOTIFICA_IDENTIFICADOR", length = 20)
+	protected String notificaIdentificador;
+
+	@Column(name = "NOTIFICA_CERT_NUM_SEGUIMENT", length = 50)
+	protected String notificaCertificacioNumSeguiment;
+
+	@Column(name = "NOTIFICA_ESTAT", length = 50)
+	protected EnviamentEstat notificaEstat;
+
+	@Column(name = "NOTIFICA_REF", length = 36)
+	protected String notificaReferencia;
+
+	@Column(name = "callback_error")
+	protected boolean errorLastCallback;
+
+	@Column(name = "entrega_postal")
+	protected boolean entregaPostal;
+
+	@Column(name = "anulable")
+	protected Boolean anulable;
+
+	@Column(name = "anulat")
+	protected boolean anulat;
+
+	@Column(name = "motiu_anulacio")
+	protected String motiuAnulacio;
+
+	@Builder
+	public NotificacioEnviamentTableResourceEntity(NotificacioTableResource resource, EntitatResourceEntity entitat) {
+
+//		notificacioId;
+//		enviadaDate = resource.getEnviadaDate();
+//		tipusEnviament;
+//		destinataris;
+//		procedimentCodiNotib;
+//		usuariCodi;
+//		grupCodi;
+//		titularNif;
+//		titularNom;
+//		titularEmail;
+//		titularLlinatge1;
+//		titularLlinatge2;
+//		titularRaoSocial;
+//		enviamentDataProgramada;
+//		emisorDir3Codi;
+//		concepte = resource.getConcepte();
+//		descripcio;
+//		registreLlibreNom;
+//		organCodi;
+//		organId;
+//		organNom;
+//		organEstat;
+//		procedimentNom;
+//		referenciaNotificacio;
+//		estat;
+//		csv_uuid;
+//		hasErrors;
+//		procedimentIsComu;
+//		procedimentOrganId;
+//		procedimentRequirePermission;
+//		procedimentTipus;
+//		registreNumero;
+//		registreEnviamentIntent;
+//		registreData;
+//		notificaDataCaducitat;
+//		notificaIdentificador;
+//		notificaCertificacioNumSeguiment;
+//		notificaEstat;
+//		notificaReferencia;
+//		errorLastCallback;
+//		entregaPostal;
+//		anulable;
+//		anulat;
+//		motiuAnulacio;
+	}
+
+
+}

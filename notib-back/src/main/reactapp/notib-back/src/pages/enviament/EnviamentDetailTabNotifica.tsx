@@ -1,0 +1,174 @@
+import { Alert, Box, Button, Icon } from '@mui/material';
+import React from 'react';
+import { FieldsDataCard } from '../../components/DataCard';
+import { useTranslation } from 'react-i18next';
+
+const EnviamentDetailTabNotifica: React.FC<{
+    enviament: any;
+    apiCurrentFields: any[] | undefined;
+    isRolActualAdministradorLectura?: boolean;
+}> = (props) => {
+    const { enviament, apiCurrentFields, isRolActualAdministradorLectura } = props;
+    const { t } = useTranslation();
+
+    const renderAlertEstat = () => {
+        if (enviament?.notificaEstat === 'PENDENT') {
+            return (
+                <Alert severity="warning" sx={{ mb: 1, mt: 2 }}>
+                    {enviament?.perEmail
+                        ? t('page.enviament.detail.tab.notifica.noEnviat')
+                        : t('page.enviament.detail.tab.notifica.notificacioNoEnviat')}
+                </Alert>
+            );
+        }
+    };
+    const renderContingutRefrescar = () => {
+        // Cas NO PENDENT
+        const isCasEspecialSir =
+            (enviament?.tipusEnviament === 'COMUNICACIO' || enviament?.tipusEnviament === 'SIR') &&
+            enviament?.titularInfo?.interessatTipus === 'ADMINISTRACIO';
+
+        const potRefrescar = !isRolActualAdministradorLectura;
+
+        // Si és el cas de SIR i pot refrescar
+        if (isCasEspecialSir && potRefrescar) {
+            return (
+                <Box display="flex" justifyContent="flex-end">
+                    <Button
+                        startIcon={<Icon>refresh</Icon>}
+                        variant="outlined"
+                        // onClick={handleRefrescarSir} // TODO: S'ha de fer sa logica d'aquest boto
+                    >
+                        {t('page.enviament.detail.tab.notifica.refrescar')}
+                    </Button>
+                </Box>
+            );
+        }
+
+        // Cas general: Botó de refrescar estàndard
+        if (potRefrescar) {
+            return (
+                <Box display="flex" justifyContent="flex-end">
+                    <Button
+                        startIcon={<Icon>refresh</Icon>}
+                        variant="outlined"
+                        // onClick={handleRefrescarEstàndard} // TODO: S'ha de fer sa logica d'aquest boto
+                    >
+                        {t('page.enviament.detail.tab.notifica.refrescar')}
+                    </Button>
+                </Box>
+            );
+        }
+
+        return null;
+    };
+
+    return (
+        <Box sx={{ height: '100%', overflowY: 'auto', minHeight: 0 }}>
+            {renderContingutRefrescar()}
+            {renderAlertEstat()}
+            <FieldsDataCard
+                title={t('page.enviament.detail.tab.notifica.datat')}
+                rows={[
+                    {
+                        field: 'notificaEstat',
+                        alwaysVisible: true,
+                    },
+                    {
+                        field: 'notificaDataCaducitat',
+                        alwaysVisible: true,
+                    },
+                    {
+                        field: 'plazoAmpliado',
+                        valueRenderer: (_value: any, formattedValue: string) => {
+                            return _value === true ? formattedValue : undefined;
+                        },
+                    },
+                    {
+                        field: 'sirRecepcioData',
+                    },
+                    {
+                        field: 'sirRegDestiData',
+                    },
+                    {
+                        field: 'notificaEstatData',
+                    },
+                    {
+                        field: 'notificaReferencia',
+                    },
+                    // {
+                    //     field: '',
+                    //     //enviament.notificaDatatErrorDescripcio
+                    // },
+                    {
+                        field: 'notificaDatatOrigen',
+                    },
+                    {
+                        field: 'notificaDatatReceptorNif',
+                    },
+                    {
+                        field: 'notificaDatatReceptorNom',
+                    },
+                    {
+                        field: 'notificaDatatNumSeguiment',
+                    },
+                    {
+                        field: 'notificaDatatErrorDescripcio',
+                    },
+                ]}
+                fields={apiCurrentFields}
+                data={enviament}
+                sx={{ mb: 1 }}
+            />
+            {enviament.notificaCertificacioData && (
+                <FieldsDataCard
+                    title={t('page.enviament.detail.tab.notifica.certificacio')}
+                    rows={[
+                        {
+                            field: 'notificaCertificacioData',
+                            alwaysVisible: true,
+                        },
+                        {
+                            field: 'notificaCertificacioMime',
+                        },
+
+                        {
+                            field: 'notificaCertificacioOrigen',
+                        },
+
+                        {
+                            field: 'notificaCertificacioMetadades',
+                        },
+
+                        {
+                            field: 'notificaCertificacioCsv',
+                        },
+
+                        {
+                            field: 'notificaCertificacioTipus',
+                        },
+
+                        {
+                            field: 'notificaCertificacioArxiuTipus',
+                        },
+
+                        {
+                            field: 'notificaCertificacioNumSeguiment',
+                        },
+
+                        {
+                            field: 'notificaCertificacioArxiuNom',
+                            // TODO: S'ha de poder descargar el certificat
+                            //<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/certificacioDescarregar"/>"
+                        },
+                    ]}
+                    fields={apiCurrentFields}
+                    data={enviament}
+                    sx={{ mb: 1 }}
+                />
+            )}
+        </Box>
+    );
+};
+
+export default EnviamentDetailTabNotifica;

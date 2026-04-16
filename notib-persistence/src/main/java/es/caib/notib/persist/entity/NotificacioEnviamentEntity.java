@@ -277,7 +277,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 
 	@OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
 	@JoinColumn(name = "ENTREGA_POSTAL_ID")
-	@ForeignKey(name = "NOT_NOTIFICACIO_ENV_DOM_FK")
+	@ForeignKey(name = "NOT_ENV_ENTREGA_POSTAL_FK")
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private EntregaPostalEntity entregaPostal;
 
