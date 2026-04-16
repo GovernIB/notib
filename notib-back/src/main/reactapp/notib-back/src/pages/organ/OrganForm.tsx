@@ -8,13 +8,13 @@ import OrganFormTabPermisos from './OrganFormTabPermisos';
 import GridFormField from '../../components/GridFormField';
 import { useTabParam } from '../../hooks/useSearchParams';
 
-const OrganFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
+export const OrganFormContent: React.FC<{ setSubtitle?: (subtitle: string) => void }> = (props) => {
     const { setSubtitle } = props;
     const { t } = useTranslation();
     const { data } = useFormContext();
     const initialTab = useTabParam();
     React.useEffect(() => {
-        setSubtitle(data?.codi + ', ' + data?.nom);
+        setSubtitle?.(data?.codi + ', ' + data?.nom);
     }, [data]);
     const permisosTabLabel = (
         <Badge badgeContent={data.aclEntryCount} color="primary">
@@ -45,7 +45,7 @@ const OrganFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = 
                     <GridFormField size={3} name="entregaCieDesactivada" />
                 </Grid>
             </MuiFormTabContent>
-            <MuiFormTabContent index={1}>
+            <MuiFormTabContent index={1} style={{ height: '500px' }}>
                 <OrganFormTabPermisos />
             </MuiFormTabContent>
         </MuiFormTabs>
