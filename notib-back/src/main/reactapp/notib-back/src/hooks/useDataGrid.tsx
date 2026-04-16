@@ -1,6 +1,13 @@
 import React from 'react';
+import Icon from '@mui/material/Icon';
+import IconButton from '@mui/material/IconButton';
 import { useTheme } from '@mui/material/styles';
-import { GridTreeDataGroupingCell } from '@mui/x-data-grid-pro';
+import {
+    GridTreeDataGroupingCell,
+    GridRowsProp,
+    useGridApiRef,
+    gridRowNodeSelector,
+} from '@mui/x-data-grid-pro';
 import { MuiFilter } from 'reactlib';
 import { useNotibContext } from '../components/NotibContext';
 
@@ -53,9 +60,22 @@ export const useDatagridTreeData = (
     active: boolean,
     headerName: string,
     defaultGroupingExpansionDepth?: number,
-    groupingColDefProps?: any,
+    groupingColDefProps?: any
 ) => {
     const theme = useTheme();
+    const datagridApiRef = useGridApiRef();
+    const [rowIds, setRowIds] = React.useState<any[]>();
+    const handleRowsChange = (rows: GridRowsProp) => {
+        setRowIds(rows?.map((r) => r.id));
+    };
+    const changeAllNodesExpansion = (expanded: boolean) => {
+        rowIds?.forEach((id) => {
+            const node = gridRowNodeSelector(datagridApiRef, id) as any;
+            if (node?.children?.length) {
+                datagridApiRef.current?.setRowChildrenExpansion(id, expanded);
+            }
+        });
+    };
     const getTreeDataPath = (row: any) => {
         return row.path?.map((p: any) => p.description) ?? [row.id];
     };
@@ -64,8 +84,38 @@ export const useDatagridTreeData = (
               perspectives: ['TREE'],
               treeData: true as true,
               getTreeDataPath,
+              onRowsChange: handleRowsChange,
+              datagridApiRef,
               groupingColDef: {
                   headerName,
+                  renderHeader: (params: any) => {
+                      return (
+                          <div
+                              style={{
+                                  display: 'flex',
+                                  flexGrow: 1,
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between',
+                              }}
+                          >
+                              <div>{params.colDef.headerName}</div>
+                              <div>
+                                  <IconButton
+                                      size="small"
+                                      onClick={() => changeAllNodesExpansion(false)}
+                                  >
+                                      <Icon fontSize="inherit">unfold_less</Icon>
+                                  </IconButton>
+                                  <IconButton
+                                      size="small"
+                                      onClick={() => changeAllNodesExpansion(true)}
+                                  >
+                                      <Icon fontSize="inherit">unfold_more</Icon>
+                                  </IconButton>
+                              </div>
+                          </div>
+                      );
+                  },
                   renderCell: (params: any) => {
                       return (
                           <div
@@ -80,12 +130,18 @@ export const useDatagridTreeData = (
                           </div>
                       );
                   },
-                  ...groupingColDefProps
+                  ...groupingColDefProps,
               },
               defaultGroupingExpansionDepth,
+              sx: {
+                  '& [data-field="__tree_data_group__"] .MuiDataGrid-columnHeaderTitleContainerContent':
+                      {
+                          flexGrow: 1,
+                      },
+              },
           }
         : {
               paginationActive: true as true,
-              getTreeDataPath
+              getTreeDataPath,
           };
 };
