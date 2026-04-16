@@ -7,24 +7,16 @@ import TasquesSegonPlaTab from './TasquesSegonPlaTab.tsx';
 
 const MonitorSistema: React.FC = () => {
     const { t } = useTranslation();
-    const tabs = [
-        {
-            id: 'tabSistema',
-            label: t('page.monitorSistema.tab.sistema.title'),
-            content: <SistemaTab />,
-        },
-        {
-            id: 'tabFilsExecucio',
-            label: t('page.monitorSistema.tab.fils.title'),
-            content: <FilsExecucioTab />,
-        },
-        {
-            id: 'tabTasques',
-            label: t('page.monitorSistema.tab.tasques.title'),
-            content: <TasquesSegonPlaTab />,
-        },
-    ];
-    return <CustomTabs tabs={tabs} />;
+    return (
+        <CustomTabs
+            tabs={[
+                t('page.monitorSistema.tab.sistema.title'),
+                t('page.monitorSistema.tab.fils.title'),
+                t('page.monitorSistema.tab.tasques.title'),
+            ]}
+            contents={[<SistemaTab />, <FilsExecucioTab />, <TasquesSegonPlaTab />]}
+        />
+    );
 };
 
 export default MonitorSistema;

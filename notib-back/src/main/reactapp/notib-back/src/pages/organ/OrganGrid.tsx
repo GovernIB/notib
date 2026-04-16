@@ -31,7 +31,6 @@ import {
     useDatagridPageSizeOptionsProps,
     useDatagridTreeData,
 } from '../../hooks/useDataGrid';
-import { OrganFormContent } from './OrganForm';
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -289,26 +288,26 @@ const ContentFilter: React.FC = () => {
 export const OrganGrid = () => {
     const { t } = useTranslation();
     const dataGridApiRef = useMuiDataGridApiRef();
-    const { treeDataViewActive, viewSwitchComponent } = useTreeDataViewSwitch(
-        t('page.organs.grid.viewSwitch'),
-        true
-    );
-    const columns = useColumns(treeDataViewActive);
-    const treeDataProps = useDatagridTreeData(
-        treeDataViewActive,
-        t('page.organs.grid.groupColumn'),
-        1,
-        { flex: 6 }
-    );
     const filterDataGridProps = useDatagridFilterProps(
         'organGestorResource',
         'FILTER_ORGAN_GESTOR',
         springFilterBuilder,
         <ContentFilter />
     );
+    const { treeDataViewActive, viewSwitchComponent } = useTreeDataViewSwitch(
+        'Vista en arbre',
+        true
+    );
+    const columns = useColumns(treeDataViewActive);
+    const treeDataProps = useDatagridTreeData(
+        treeDataViewActive,
+        t('page.organs.grid.groupColumn'),
+        2,
+        { flex: 6 }
+    );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
-        <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
+        <GridPage>
             <MuiDataGrid
                 title={t('page.organs.grid.title')}
                 resourceName="organGestorResource"
@@ -319,10 +318,9 @@ export const OrganGrid = () => {
                 {...filterDataGridProps}
                 {...pageSizeOptionsDataGridProps}
                 toolbarType="upper"
-                popupEditActive
-                popupEditFormContent={<OrganFormContent />}
-                popupEditFormDialogResourceTitle={t('page.organs.grid.popupDialogTitle')}
-                popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
+                toolbarCreateLink="form"
+                rowLink="form/{{id}}"
+                rowUpdateLink="form/{{id}}"
                 toolbarElementsWithPositions={[
                     {
                         position: 1,
