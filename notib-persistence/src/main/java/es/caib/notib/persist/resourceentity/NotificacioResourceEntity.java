@@ -13,7 +13,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -27,6 +26,7 @@ import java.util.Date;
 @Table(
 	name = BaseConfig.DB_PREFIX + "notificacio",
 	uniqueConstraints = @UniqueConstraint(columnNames = { "referencia" }))
+@SecondaryTable(name = BaseConfig.DB_PREFIX +  "notificacio_table", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -182,18 +182,30 @@ public class NotificacioResourceEntity
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "procorgan_not_fk"))
 	private ProcedimentOrganGestorResourceEntity procedimentOrganGestor;
 
+	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "registre_nums", insertable = false, updatable = false)
+	private String registreNums;
+
 	@Enumerated(EnumType.STRING)
-	@Formula("(select prc.tipus from " + BaseConfig.DB_PREFIX + "procediment prc where prc.id = procediment_id)")
+	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "procediment_tipus", insertable = false, updatable = false)
 	private ProcSerTipusEnum procedimentTipus;
 
-	@Formula("(select ntb.enviada_date from " + BaseConfig.DB_PREFIX + "notificacio_table ntb where ntb.id = id)")
+	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "enviada_date", insertable = false, updatable = false)
 	private Date enviadaDate;
-	@Formula("(select ntb.estat_string from " + BaseConfig.DB_PREFIX + "notificacio_table ntb where ntb.id = id)")
+
+	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "estat_string", insertable = false, updatable = false)
 	private String estatString;
 
+	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "titular", insertable = false, updatable = false)
+	private String titular;
+
+	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "notifica_ids", insertable = false, updatable = false)
+	private String notificaIds;
+
+	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "entrega_postal", insertable = false, updatable = false)
+	private boolean entregaPostal;
+
 	@Builder
-	public NotificacioResourceEntity(
-		NotificacioResource resource,
+	public NotificacioResourceEntity(NotificacioResource resource,
 		EntitatResourceEntity entitat,
 		OrganGestorResourceEntity organGestor,
 		ProcedimentResourceEntity procediment,
