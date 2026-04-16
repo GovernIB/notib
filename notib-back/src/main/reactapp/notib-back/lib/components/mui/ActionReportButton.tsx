@@ -22,7 +22,8 @@ export type ActionReportCustomButtonProps = {
 };
 
 type IconCustomButtonProps = ActionReportCustomButtonProps & React.PropsWithChildren;
-type TextCustomButtonProps = ActionReportCustomButtonProps & React.PropsWithChildren;
+type TextCustomButtonProps = ActionReportCustomButtonProps &
+    React.PropsWithChildren & { icon?: string };
 
 /**
  * Propietats del component ActionReportButton.
@@ -40,6 +41,8 @@ export type ActionReportButtonProps = {
     id?: any;
     /** Icona pel botó (si no s'especifica es mostrarà un botó de text) */
     icon?: any;
+    /** Icona per a mostrar a dins el botó */
+    buttonIcon?: any;
     /** Títol pel botó */
     title?: string;
     /** Indica que l'execució de l'artefacte requereix confirmació de l'usuari (només per a artefactes de tipus acció) */
@@ -126,9 +129,14 @@ const IconCustomButton: React.FC<IconCustomButtonProps> = (props) => {
 };
 
 const TextCustomButton: React.FC<TextCustomButtonProps> = (props) => {
-    const { disabled, onClick, title, ...otherProps } = props;
+    const { disabled, onClick, title, icon, ...otherProps } = props;
     return (
-        <Button disabled={disabled} onClick={onClick} {...otherProps}>
+        <Button
+            disabled={disabled}
+            onClick={onClick}
+            startIcon={icon != null ? <Icon>{icon}</Icon> : undefined}
+            {...otherProps}
+        >
             {title}
         </Button>
     );
@@ -367,6 +375,7 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
         reportFileType = 'PDF',
         id,
         icon,
+        buttonIcon,
         title,
         confirm,
         confirmMessage,
@@ -428,6 +437,7 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
                 onClickFromComponentProps?.();
             }}
             title={buttonTitle}
+            icon={icon == null ? buttonIcon : undefined}
             {...otherButtonComponentProps}>
             {icon != null && <Icon {...iconComponentProps}>{icon}</Icon>}
         </ButtonComponent>

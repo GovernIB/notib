@@ -5,7 +5,6 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.dto.organisme.TipusTransicioEnumDto;
 import es.caib.notib.logic.intf.model.OrganGestorResource;
 import es.caib.notib.persist.entity.OrganGestorEntity;
-import es.caib.notib.persist.entity.cie.EntregaCieEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
