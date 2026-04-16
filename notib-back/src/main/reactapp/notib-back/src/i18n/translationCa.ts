@@ -19,9 +19,9 @@ const translationCa = {
             notificacions: 'Remeses',
             integracions: 'Integracions',
             cache: "Cache d'aplicacions",
-            activemq: "Monitor ActiveMQ",
-            callbacksError: "Notificacions callback erronies",
-            monitorSistema: "Monitor de sistema"
+            activemq: 'Monitor ActiveMQ',
+            callbacksError: 'Notificacions callback erronies',
+            monitorSistema: 'Monitor de sistema',
         },
     },
     page: {
@@ -123,21 +123,29 @@ const translationCa = {
                     administrador: 'Administrador',
                     administradorTooltip: "Assigna el perfil d'administrador d'òrgan.",
                     consulta: 'Consulta',
-                    consultaTooltip: 'Dona permís per a consultar les notificacions i comunicacions (SIR i no SIR creades amb aquest òrgan o un òrgan fill com a òrgan emissor).',
+                    consultaTooltip:
+                        'Dona permís per a consultar les notificacions i comunicacions (SIR i no SIR creades amb aquest òrgan o un òrgan fill com a òrgan emissor).',
                     processar: 'Processar',
-                    processarTooltip: 'Permet marcar les notificacions i comunicacions (SIR i no SIR creades amb aquest òrgan o un òrgan fill com a òrgan emissor) en un estat final com a processades, sempre que hagin estat creades des de la mateixa aplicació, i no via API REST.',
+                    processarTooltip:
+                        'Permet marcar les notificacions i comunicacions (SIR i no SIR creades amb aquest òrgan o un òrgan fill com a òrgan emissor) en un estat final com a processades, sempre que hagin estat creades des de la mateixa aplicació, i no via API REST.',
                     gestio: 'Gestió',
-                    gestioTooltip: "Dona accés a la pestanya d'accions del detall de les notificacions i comunicacions (SIR i no SIR creades amb aquest òrgan o un òrgan fill com a òrgan).",
+                    gestioTooltip:
+                        "Dona accés a la pestanya d'accions del detall de les notificacions i comunicacions (SIR i no SIR creades amb aquest òrgan o un òrgan fill com a òrgan).",
                     comuns: 'Procediments i serveis comuns',
-                    comunsTooltip: 'Permet realitzar notificacions i comunicacions (SIR i no SIR) sobre tots els procediments i serveis comuns amb aquest òrgan o un òrgan fill com a òrgan emissor, sempre que el procediment o servei no requereixi permís directe.',
+                    comunsTooltip:
+                        'Permet realitzar notificacions i comunicacions (SIR i no SIR) sobre tots els procediments i serveis comuns amb aquest òrgan o un òrgan fill com a òrgan emissor, sempre que el procediment o servei no requereixi permís directe.',
                     notificacions: 'Notificacions',
-                    notificacionsTooltip: 'Permet realitzar notificacions sobre tots els procediments i serveis que pertanyen a aquest òrgan o un òrgan fill, sempre que el procediment o servei no requereixi permís directe.',
+                    notificacionsTooltip:
+                        'Permet realitzar notificacions sobre tots els procediments i serveis que pertanyen a aquest òrgan o un òrgan fill, sempre que el procediment o servei no requereixi permís directe.',
                     comunicacions: 'Comunicacions',
-                    comunicacionsTooltip: 'Permet realitzar comunicacions sobre tots els procediments i serveis que pertanyen a aquest òrgan o un òrgan fill, sempre que el procediment o servei no requereixi permís directe.',
+                    comunicacionsTooltip:
+                        'Permet realitzar comunicacions sobre tots els procediments i serveis que pertanyen a aquest òrgan o un òrgan fill, sempre que el procediment o servei no requereixi permís directe.',
                     sir: 'Comunicacions SIR',
-                    sirTooltip: 'Permet realitzar comunicacions SIR sobre tots els procediments i serveis que pertanyen a aquest òrgan o un òrgan fill, sempre que el procediment o servei no requereixi permís directe.',
+                    sirTooltip:
+                        'Permet realitzar comunicacions SIR sobre tots els procediments i serveis que pertanyen a aquest òrgan o un òrgan fill, sempre que el procediment o servei no requereixi permís directe.',
                     comSenseProc: 'Comunicacions sense procediment',
-                    comSenseProcTooltip: 'Permet realitzar comunicacions (SIR i no SIR) sense procediment ni servei amb aquest òrgan o un òrgan fill com a òrgan emissor, sempre que el procediment o servei no requereixi permís directe.',
+                    comSenseProcTooltip:
+                        'Permet realitzar comunicacions (SIR i no SIR) sense procediment ni servei amb aquest òrgan o un òrgan fill com a òrgan emissor, sempre que el procediment o servei no requereixi permís directe.',
                 },
             },
         },
@@ -190,17 +198,23 @@ const translationCa = {
                 },
                 permisos: {
                     consultaAllowed: 'Consulta',
-                    consultaAllowedTooltip: 'Dona permís per a consultar les notificacions i comunicacions (SIR i no SIR creades amb aquest procediment o servei).',
+                    consultaAllowedTooltip:
+                        'Dona permís per a consultar les notificacions i comunicacions (SIR i no SIR creades amb aquest procediment o servei).',
                     procesAllowed: 'Processar',
-                    procesAllowedTooltip: 'Permet marcar les notificacions i comunicacions (SIR i no SIR creades amb aquest procediment o servei) en un estat final com a processades, sempre que hagin estat creades de la mateixa aplicació i no via API REST.',
+                    procesAllowedTooltip:
+                        'Permet marcar les notificacions i comunicacions (SIR i no SIR creades amb aquest procediment o servei) en un estat final com a processades, sempre que hagin estat creades de la mateixa aplicació i no via API REST.',
                     gestioAllowed: 'Gestió',
-                    gestioAllowedTooltip: "Dona accés a la pestanya d'accions del detall de les notificacions i comunicacions (SIR i no SIR amb aquest procediment o servei).",
+                    gestioAllowedTooltip:
+                        "Dona accés a la pestanya d'accions del detall de les notificacions i comunicacions (SIR i no SIR amb aquest procediment o servei).",
                     notificacioAllowed: 'Notificacions',
-                    notificacioAllowedTooltip: 'Permet realitzar notificacions amb aquest procediment o servei.',
+                    notificacioAllowedTooltip:
+                        'Permet realitzar notificacions amb aquest procediment o servei.',
                     comunicacioAllowed: 'Comunicacions',
-                    comunicacioAllowedTooltip: 'Permet realitzar comunicacions amb aquest procediment o servei.',
+                    comunicacioAllowedTooltip:
+                        'Permet realitzar comunicacions amb aquest procediment o servei.',
                     comunicacioSirAllowed: 'Comunicacions SIR',
-                    comunicacioSirAllowedTooltip: 'Permet realitzar comunicacions SIR amb aquest procediment o servei.',
+                    comunicacioSirAllowedTooltip:
+                        'Permet realitzar comunicacions SIR amb aquest procediment o servei.',
                 },
             },
         },
@@ -235,17 +249,23 @@ const translationCa = {
                 },
                 permisos: {
                     consultaAllowed: 'Consulta',
-                    consultaAllowedTooltip: 'Dona permís per a consultar les notificacions i comunicacions (SIR i no SIR creades amb aquest procediment o servei).',
+                    consultaAllowedTooltip:
+                        'Dona permís per a consultar les notificacions i comunicacions (SIR i no SIR creades amb aquest procediment o servei).',
                     procesAllowed: 'Processar',
-                    procesAllowedTooltip: 'Permet marcar les notificacions i comunicacions (SIR i no SIR creades amb aquest procediment o servei) en un estat final com a processades, sempre que hagin estat creades de la mateixa aplicació i no via API REST.',
+                    procesAllowedTooltip:
+                        'Permet marcar les notificacions i comunicacions (SIR i no SIR creades amb aquest procediment o servei) en un estat final com a processades, sempre que hagin estat creades de la mateixa aplicació i no via API REST.',
                     gestioAllowed: 'Gestió',
-                    gestioAllowedTooltip: "Dona accés a la pestanya d'accions del detall de les notificacions i comunicacions (SIR i no SIR amb aquest procediment o servei).",
+                    gestioAllowedTooltip:
+                        "Dona accés a la pestanya d'accions del detall de les notificacions i comunicacions (SIR i no SIR amb aquest procediment o servei).",
                     notificacioAllowed: 'Notificacions',
-                    notificacioAllowedTooltip: 'Permet realitzar notificacions amb aquest procediment o servei.',
+                    notificacioAllowedTooltip:
+                        'Permet realitzar notificacions amb aquest procediment o servei.',
                     comunicacioAllowed: 'Comunicacions',
-                    comunicacioAllowedTooltip: 'Permet realitzar comunicacions amb aquest procediment o servei.',
+                    comunicacioAllowedTooltip:
+                        'Permet realitzar comunicacions amb aquest procediment o servei.',
                     comunicacioSirAllowed: 'Comunicacions SIR',
-                    comunicacioSirAllowedTooltip: 'Permet realitzar comunicacions SIR amb aquest procediment o servei.',
+                    comunicacioSirAllowedTooltip:
+                        'Permet realitzar comunicacions SIR amb aquest procediment o servei.',
                 },
             },
         },
@@ -422,43 +442,43 @@ const translationCa = {
         },
         cache: {
             grid: {
-                title: "Cache d'aplicacions"
+                title: "Cache d'aplicacions",
             },
         },
         activemq: {
             grid: {
-                title: "Monitor ActiveMQ"
+                title: 'Monitor ActiveMQ',
             },
         },
         callbacksError: {
             grid: {
-                title: "Notificacions amb error a l'últim callback"
+                title: "Notificacions amb error a l'últim callback",
             },
         },
-        monitorSistema :{
-            tab : {
+        monitorSistema: {
+            tab: {
                 sistema: {
-                    title: "Sistema",
-                    sistemaOperatiu: "Sistema operatiu",
-                    arquitectura: "Arquitectura",
-                    processadors: "Processadors",
-                    jbossVersion: "Versió de Jboss",
+                    title: 'Sistema',
+                    sistemaOperatiu: 'Sistema operatiu',
+                    arquitectura: 'Arquitectura',
+                    processadors: 'Processadors',
+                    jbossVersion: 'Versió de Jboss',
                     applicationServerInfo: "Informació del servidor d'aplicacions",
-                    tempsFuncionant: "Temps funcionant",
-                    jvmMemory: "Màquina virtual de Java",
-                    disksUsage: "Disc i CPU",
+                    tempsFuncionant: 'Temps funcionant',
+                    jvmMemory: 'Màquina virtual de Java',
+                    disksUsage: 'Disc i CPU',
                 },
                 fils: {
                     title: "Fils d'execució",
                 },
                 tasques: {
-                    title: "Tasques en segon pla",
-                    restart: "Reiniciar",
-                    restartOk: "Reiniciat correctament",
-                    restartSelect: "Reiniciar seleccionades",
-                    restartSelectOk: "Reiniciades correctament",
-                }
-            }
+                    title: 'Tasques en segon pla',
+                    restart: 'Reiniciar',
+                    restartOk: 'Reiniciat correctament',
+                    restartSelect: 'Reiniciar seleccionades',
+                    restartSelectOk: 'Reiniciades correctament',
+                },
+            },
         },
         notFound: {
             title: 'Pàgina no trobada',
@@ -506,12 +526,20 @@ const translationCa = {
         },
         UserProfile: {
             perfil: "Perfil de l'usuari",
-            auto: "Automàtic",
+            auto: 'Automàtic',
         },
         FormDropzoneField: {
-            arrosegar:  "Arrossega el fitxer aquí",
-            amollar: "Amolla el fitxer ara ...",
+            arrosegar: 'Arrossega el fitxer aquí',
+            amollar: 'Amolla el fitxer ara ...',
             validacio: "L'arxiu no és vàlid",
+        },
+    },
+    hook: {
+        useDataGrid: {
+            treeData: {
+                collapseAll: 'Contreure tot',
+                expandAll: 'Expandir tot',
+            },
         },
     },
     comu: {
