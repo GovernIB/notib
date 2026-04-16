@@ -3,10 +3,11 @@ import { useTranslation } from 'react-i18next';
 import Icon from '@mui/material/Icon';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import { useResourceApiService, useMuiContentDialog } from 'reactlib';
+import { useResourceApiService, useMuiContentDialog, useCloseDialogButtons } from 'reactlib';
 import CustomTabs from '../../components/CustomTabs';
 import { FieldsDataCard } from '../../components/DataCard';
 import { Typography } from '@mui/material';
+import NotificacioDetailTabHistoric from './NotificacioDetailTabHistoric.tsx';
 
 const NotificacioDetailDialogTabDades: React.FC<{ id: any }> = (props) => {
     const { id } = props;
@@ -194,33 +195,46 @@ const NotificacioDetailDialogTabAccions: React.FC = () => {
     return <span>Accions</span>;
 };
 
-const NotificacioDetailDialogTabHistoric: React.FC = () => {
-    return <span>Històric</span>;
-};
-
 const NotificacioDetailDialogContent: React.FC<{ id: any }> = (props) => {
     const { id } = props;
     const { t } = useTranslation();
+
+    const tabs = [
+        {
+            id: 'tabDades',
+            label: t('page.notificacio.detail.tab.dades'),
+            content: <NotificacioDetailDialogTabDades id={id} />,
+        },
+        {
+            id: 'tabEnviaments',
+            label: t('page.notificacio.detail.tab.enviaments'),
+            content: <NotificacioDetailDialogTabEnviaments id={id} />,
+        },
+        {
+            id: 'tabDocuments',
+            label: t('page.notificacio.detail.tab.documents'),
+            content: <NotificacioDetailDialogTabDocuments id={id} />,
+        },
+        {
+            id: 'tabRegistreEsdev',
+            label: t('page.notificacio.detail.tab.registreEsdev'),
+            content: <NotificacioDetailDialogTabRegistreEsdev />,
+        },
+        {
+            id: 'tabAccions',
+            label: t('page.notificacio.detail.tab.accions'),
+            content: <NotificacioDetailDialogTabAccions />,
+        },
+        {
+            id: 'tabHistoric',
+            label: t('page.notificacio.detail.tab.historic'),
+            content: <NotificacioDetailTabHistoric id={id} />,
+        },
+    ];
+
     return (
         <Box sx={{ height: '650px', minHeight: 0 }}>
-            <CustomTabs
-                tabs={[
-                    t('page.notificacio.detail.tab.dades'),
-                    t('page.notificacio.detail.tab.enviaments'),
-                    t('page.notificacio.detail.tab.documents'),
-                    t('page.notificacio.detail.tab.registreEsdev'),
-                    t('page.notificacio.detail.tab.accions'),
-                    t('page.notificacio.detail.tab.historic'),
-                ]}
-                contents={[
-                    <NotificacioDetailDialogTabDades id={id} />,
-                    <NotificacioDetailDialogTabEnviaments id={id} />,
-                    <NotificacioDetailDialogTabDocuments id={id} />,
-                    <NotificacioDetailDialogTabRegistreEsdev />,
-                    <NotificacioDetailDialogTabAccions />,
-                    <NotificacioDetailDialogTabHistoric />,
-                ]}
-            />
+            <CustomTabs tabs={tabs} />
         </Box>
     );
 };
@@ -228,11 +242,12 @@ const NotificacioDetailDialogContent: React.FC<{ id: any }> = (props) => {
 export const useNotificacioDetailDialog = () => {
     const { t } = useTranslation();
     const [dialogShow, dialogComponent] = useMuiContentDialog();
+    const defaultDialogButtons = useCloseDialogButtons();
     const handleDetailButtonClick = (id: any) => {
         dialogShow(
             t('page.notificacio.detail.title.notificacio'),
             <NotificacioDetailDialogContent id={id} />,
-            undefined,
+            defaultDialogButtons,
             {
                 maxWidth: 'lg',
                 fullWidth: true,
