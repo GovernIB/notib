@@ -501,6 +501,14 @@ const translationEs = {
             validacio: "El archivo no es válido",
         },
     },
+    hook: {
+        useDataGrid: {
+            treeData: {
+                collapseAll: 'Contraer todo',
+                expandAll: 'Expandir todo',
+            },
+        },
+    },
     comu: {
         netejarFiltre: 'Limpiar filtro',
     },
