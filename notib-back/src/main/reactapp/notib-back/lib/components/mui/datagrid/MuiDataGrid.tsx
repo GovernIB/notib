@@ -21,6 +21,7 @@ import {
     useGridApiRef as useMuiDatagridApiRef,
     useGridApiContext,
     useGridSelector,
+    gridRowNodeSelector,
     gridColumnFieldsSelector,
     gridEditRowsStateSelector,
 } from '@mui/x-data-grid-pro';
@@ -151,6 +152,8 @@ export type MuiDataGridProps = {
     formAdditionalData?: ((row: any, action: string) => any) | any;
     /** Files addicionals per a la vista en arbre (si la vista d'arbre no està activa aquest atribut s'ignorarà) */
     treeDataAdditionalRows?: any[] | ((rows: any[]) => any[]);
+    /** Llista d'ids de les files expandides per defecte */
+    treeDataDefaultExpandedRowIds?: any[];
     /** Tipus de barra d'eines que es mostrarà a la part superior */
     toolbarType?: DataToolbarType;
     /** Oculta la barra d'eines de la part superior */
@@ -546,6 +549,7 @@ const usePersistentState = (
     defaultPaginationModel: GridPaginationModel | undefined,
     quickFilterProp: string | undefined,
     defaultQuickFilter: string | undefined,
+    defaultExpandedRowIds: any[] | undefined,
     apiRef: React.RefObject<GridApiPro | null>,
     key: string,
     storeInLocalStorage?: boolean
@@ -558,12 +562,13 @@ const usePersistentState = (
             const raw = storage.getItem(storageKey);
             const state = raw ? JSON.parse(raw) : null;
             if (persistentStateClearPageSortPropsOnTopLevelRouteChange && topLevelRouteChanged) {
-                const { sortModel, paginationModel, ...otherState } = state;
+                const { sortModel, paginationModel, expandedRowIds, ...otherState } = state;
                 return {
                     paginationModel: {
                         page: 0,
                         pageSize: paginationModel?.pageSize,
                     },
+                    expandedRowIds: [],
                     ...otherState,
                 };
             } else {
@@ -602,6 +607,9 @@ const usePersistentState = (
     const [paginationModel, setPaginationModel] = React.useState<GridPaginationModel>(
         initialState?.paginationModel || defaultPaginationModel
     );
+    const [expandedRowIds, setExpandedRowIds] = React.useState<any[]>(
+        initialState?.expandedRowIds || (defaultExpandedRowIds ?? [])
+    );
     React.useEffect(() => {
         quickFilterProp !== undefined && setQuickFilter(quickFilterProp);
     }, [quickFilterProp]);
@@ -611,6 +619,18 @@ const usePersistentState = (
     React.useEffect(() => {
         paginationModelProp !== undefined && setPaginationModel(paginationModelProp);
     }, [paginationModelProp]);
+    React.useEffect(() => {
+        const unsubscribe = apiRef.current?.subscribeEvent('rowExpansionChange', (params) => {
+            setExpandedRowIds((prev) => {
+                if (params.childrenExpanded) {
+                    return [...prev, params.id];
+                } else {
+                    return prev.filter((id) => id !== params.id);
+                }
+            });
+        });
+        return unsubscribe;
+    }, []);
     React.useEffect(() => {
         active &&
             saveState({
@@ -622,6 +642,7 @@ const usePersistentState = (
                 quickFilter,
                 sortModel,
                 paginationModel,
+                expandedRowIds,
             });
     }, [
         widths,
@@ -632,6 +653,7 @@ const usePersistentState = (
         quickFilter,
         sortModel,
         paginationModel,
+        expandedRowIds,
     ]);
     const onColumnWidthChange = React.useCallback(
         (params: GridColumnResizeParams) => {
@@ -701,6 +723,7 @@ const usePersistentState = (
                   autoPageSize,
               },
         quickFilter: quickFilter ?? '',
+        expandedRowIds,
         setQuickFilter,
         setAutoPageSize,
     };
@@ -775,6 +798,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         exportFileType = 'PDF',
         formAdditionalData,
         treeDataAdditionalRows,
+        treeDataDefaultExpandedRowIds,
         toolbarType = 'default',
         toolbarHide,
         toolbarBackButton,
@@ -989,6 +1013,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         persistentStateColumns,
         persistentStateProps,
         quickFilter,
+        expandedRowIds,
         setQuickFilter,
         setAutoPageSize,
     } = usePersistentState(
@@ -1001,6 +1026,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         defaultPaginationModel,
         undefined, // quickFilterProp
         quickFilterInitialValue, // defaultQuickFilter
+        treeDataDefaultExpandedRowIds,
         datagridApiRef,
         persistentStateKey ?? resourceName,
         persistentStateStorage === 'local'
@@ -1057,6 +1083,15 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         onRowsChange?.(rows, pageInfo);
         if (treeDataAdditionalRowsIsFunction) {
             setAdditionalRows((treeDataAdditionalRows as (rows: any[]) => any[])(rows));
+        }
+        if (otherProps.treeData && rows.length) {
+            const firstNode = gridRowNodeSelector(datagridApiRef, rows[0].id);
+            if (firstNode?.depth !== undefined) {
+                expandedRowIds?.forEach((id) => {
+                    const node = gridRowNodeSelector(datagridApiRef, id);
+                    node && datagridApiRef.current?.setRowChildrenExpansion(id, true);
+                });
+            }
         }
     }, [rows]);
     React.useEffect(() => {
@@ -1258,7 +1293,8 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         };
     }, []);
     const memoizedSlotProps = React.useMemo(() => {
-        const requestPending = loading === undefined && autoFindDisabled && !isRowsPresentInOtherProps;
+        const requestPending =
+            loading === undefined && autoFindDisabled && !isRowsPresentInOtherProps;
         return {
             row: { linkTo: rowLink, isRowLinkActive },
             footer: {
