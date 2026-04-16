@@ -2,7 +2,6 @@ import { Alert, Box, Button, Icon } from '@mui/material';
 import React from 'react';
 import { FieldsDataCard } from '../../components/DataCard';
 import { useTranslation } from 'react-i18next';
-import {MuiActionReportButton} from "reactlib";
 
 const EnviamentDetailTabNotifica: React.FC<{
     enviament: any;
@@ -30,6 +29,7 @@ const EnviamentDetailTabNotifica: React.FC<{
             enviament?.titularInfo?.interessatTipus === 'ADMINISTRACIO';
 
         const potRefrescar = !isRolActualAdministradorLectura;
+
         // Si és el cas de SIR i pot refrescar
         if (isCasEspecialSir && potRefrescar) {
             return (
@@ -46,30 +46,21 @@ const EnviamentDetailTabNotifica: React.FC<{
         }
 
         // Cas general: Botó de refrescar estàndard
-        // if (potRefrescar) {
-        //     return (
-        //         <Box display="flex" justifyContent="flex-end">
-        //             <MuiActionReportButton
-        //                 resourceName={"notificacioEnviamentResource"}
-        //                 action="REFRESCAR_ESTAT_NOTIFICA"
-        //                 title={t('page.enviament.detail.tab.notifica.refrescar')}
-        //                 buttonComponentProps={{ variant: 'outlined', sx: { mr: 1 } }}
-        //                 buttonIcon="refresh"/>
-        //         </Box>
-        //     );
-        // }
+        if (potRefrescar) {
+            return (
+                <Box display="flex" justifyContent="flex-end">
+                    <Button
+                        startIcon={<Icon>refresh</Icon>}
+                        variant="outlined"
+                        // onClick={handleRefrescarEstàndard} // TODO: S'ha de fer sa logica d'aquest boto
+                    >
+                        {t('page.enviament.detail.tab.notifica.refrescar')}
+                    </Button>
+                </Box>
+            );
+        }
 
-        return (
-            <Box display="flex" justifyContent="flex-end">
-                <MuiActionReportButton
-                    resourceName="notificacioEnviamentResource"
-                    action="REFRESCAR_ESTAT_NOTIFICA"
-                    id = {enviament.id}
-                    title={t('page.enviament.detail.tab.notifica.refrescar')}
-                    buttonComponentProps={{ variant: 'outlined', sx: { mr: 1 } }}
-                    buttonIcon="refresh"/>
-            </Box>
-        );
+        return null;
     };
 
     return (
@@ -129,7 +120,7 @@ const EnviamentDetailTabNotifica: React.FC<{
                 data={enviament}
                 sx={{ mb: 1 }}
             />
-            {enviament?.notificaCertificacioData && (
+            {enviament.notificaCertificacioData && (
                 <FieldsDataCard
                     title={t('page.enviament.detail.tab.notifica.certificacio')}
                     rows={[
