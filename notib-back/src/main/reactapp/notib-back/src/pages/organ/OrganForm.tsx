@@ -26,6 +26,7 @@ const OrganFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = 
         <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1]} initialIndex={initialTab}>
             <MuiFormTabContent index={0} showOnCreate>
                 <Grid container spacing={2}>
+                    <GridFormField size={12} name="pare" />
                     <GridFormField size={4} name="codi" />
                     <GridFormField size={8} name="nom" />
                     <GridFormField size={4} name="estat" />
