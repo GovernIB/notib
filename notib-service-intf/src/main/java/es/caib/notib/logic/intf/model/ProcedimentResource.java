@@ -37,7 +37,7 @@ import java.util.Date;
 @NoArgsConstructor
 @FieldNameConstants
 @ResourceConfig(
-	descriptionField = ProcedimentResource.Fields.codiNom,
+	descriptionField = ProcedimentResource.Fields.nom,
 	quickFilterFields = { ProcedimentResource.Fields.codi, ProcedimentResource.Fields.nom },
 	accessConstraints = @ResourceAccessConstraint(
 		type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
@@ -92,7 +92,6 @@ public class ProcedimentResource extends BaseResource<Long> {
 	private Integer aclEntryCount;
 	private boolean fieldOrganGestorDisabled;
 	private boolean fieldEntregaCieHidden;
-	private String codiNom;
 
 	// Camps per emplenar els valors del formulari referent a la entrega CIE
 	private ResourceReference<PagadorCieResource, Long> entregaCiePagadorCie;

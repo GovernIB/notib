@@ -14,7 +14,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import {
     GridPage,
     MuiDataGrid,
-    MuiDataGridApiRef,
+    MuiDataGridApi,
     MuiActionReportButton,
     useBaseAppContext,
     useResourceApiService,
@@ -31,7 +31,6 @@ import {
     useDatagridPageSizeOptionsProps,
     useDatagridTreeData,
 } from '../../hooks/useDataGrid';
-import { OrganFormContent } from './OrganForm';
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -199,7 +198,7 @@ const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
 };
 
 const OrganGridDir3SyncActionButton: React.FC<{
-    dataGridApiRef: MuiDataGridApiRef;
+    dataGridApiRef: React.RefObject<MuiDataGridApi>;
 }> = (props) => {
     const { dataGridApiRef } = props;
     const { t } = useTranslation();
@@ -223,7 +222,7 @@ const OrganGridDir3SyncActionButton: React.FC<{
     };
     const handleSuccess = (result?: any) => {
         if (!result.simulat) {
-            dataGridApiRef.current?.refresh();
+            dataGridApiRef.current.refresh();
             temporalMessageShow(null, t('page.organs.grid.sync.success'), 'success');
         }
     };
@@ -289,27 +288,26 @@ const ContentFilter: React.FC = () => {
 export const OrganGrid = () => {
     const { t } = useTranslation();
     const dataGridApiRef = useMuiDataGridApiRef();
-    const { treeDataViewActive, viewSwitchComponent } = useTreeDataViewSwitch(
-        t('page.organs.grid.viewSwitch'),
-        true
-    );
-    const columns = useColumns(treeDataViewActive);
-    const treeDataProps = useDatagridTreeData(
-        treeDataViewActive,
-        t('page.organs.grid.groupColumn'),
-        false,
-        1,
-        { flex: 6 }
-    );
     const filterDataGridProps = useDatagridFilterProps(
         'organGestorResource',
         'FILTER_ORGAN_GESTOR',
         springFilterBuilder,
         <ContentFilter />
     );
+    const { treeDataViewActive, viewSwitchComponent } = useTreeDataViewSwitch(
+        'Vista en arbre',
+        true
+    );
+    const columns = useColumns(treeDataViewActive);
+    const treeDataProps = useDatagridTreeData(
+        treeDataViewActive,
+        t('page.organs.grid.groupColumn'),
+        2,
+        { flex: 6 }
+    );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
-        <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
+        <GridPage>
             <MuiDataGrid
                 title={t('page.organs.grid.title')}
                 resourceName="organGestorResource"
@@ -320,10 +318,9 @@ export const OrganGrid = () => {
                 {...filterDataGridProps}
                 {...pageSizeOptionsDataGridProps}
                 toolbarType="upper"
-                popupEditActive
-                popupEditFormContent={<OrganFormContent />}
-                popupEditFormDialogResourceTitle={t('page.organs.grid.popupDialogTitle')}
-                popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
+                toolbarCreateLink="form"
+                rowLink="form/{{id}}"
+                rowUpdateLink="form/{{id}}"
                 toolbarElementsWithPositions={[
                     {
                         position: 1,

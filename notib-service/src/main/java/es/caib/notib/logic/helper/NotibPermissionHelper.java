@@ -11,8 +11,6 @@ import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.persist.resourcerepository.OrganGestorResourceRepository;
 import es.caib.notib.persist.resourcerepository.ProcedimentOrganGestorResourceRepository;
 import es.caib.notib.persist.resourcerepository.ProcedimentResourceRepository;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
@@ -81,8 +79,7 @@ public class NotibPermissionHelper {
 	}
 
 	/**
-	 * Verifica si es tenen permisos per a administrar l'entitat. Si no es tenen permisos es llença una excepció
-	 * ResourceNotCreatedException o ResourceNotUpdatedException, depenent del permís que s'està comprovant.
+	 * Verifica si es tenen permisos per a administrar l'entitat.
 	 *
 	 * @param resourceClass
 	 *            la classe del recurs.
@@ -93,7 +90,7 @@ public class NotibPermissionHelper {
 	 * @param permission
 	 *            el permís que s'està comprovant (només per a crear l'excepció).
 	 */
-	public void entitatCheckAdminPermissionThrows(
+	public void entitatCheckAdminPermission(
 		Class<? extends Resource<?>> resourceClass,
 		Long id,
 		Long entitatId,
@@ -121,46 +118,6 @@ public class NotibPermissionHelper {
 						"Not allowed to " + permissionText + " " + resourceClass.getSimpleName());
 				}
 			}
-		}
-	}
-
-	/**
-	 * Verifica si es te el permís especificat sobre l'entitat actual.
-	 *
-	 * @param permission
-	 *            el permís que es vol comprovar.
-	 * @return true si es tenen permisos o false en cas contrari.
-	 */
-	public boolean currentEntitatPermissionAllowed(Permission permission) {
-		Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
-		if (currentEntitatId != null) {
-			return aclHelper.anyPermissionGranted(
-				AclHelper.ENTITAT_CLASS,
-				currentEntitatId,
-				List.of(permission),
-				aclHelper.getCurrentUserSids().toArray(Sid[]::new));
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * Verifica si es te el permís especificat sobre l'òrgan gestor actual.
-	 *
-	 * @param permission
-	 *            el permís que es vol comprovar.
-	 * @return true si es tenen permisos o false en cas contrari.
-	 */
-	public boolean currentOrganGestorPermissionAllowed(Permission permission) {
-		Long currentOrganGestorId = userSessionHelper.getCurrentOrganGestorId();
-		if (currentOrganGestorId != null) {
-			return aclHelper.anyPermissionGranted(
-				AclHelper.ORGAN_GESTOR_CLASS,
-				currentOrganGestorId,
-				List.of(permission),
-				aclHelper.getCurrentUserSids().toArray(Sid[]::new));
-		} else {
-			return false;
 		}
 	}
 
@@ -285,31 +242,6 @@ public class NotibPermissionHelper {
 	}
 
 	/**
-	 * Retorna el conjunt d'ids necessari per a fer una verificació de permisos de notificacions.
-	 *
-	 * @param organGestorPermission
-	 *            el permís a verificar per l'òrgan gestor.
-	 * @param procedimentPermission
-	 *             el permís a verificar pel procediment.
-	 * @return la llista d'ids
-	 */
-	public IdsToCheckNotificacioPermission getIdsToCheckNotificacioPermission(
-		Permission organGestorPermission,
-		Permission procedimentPermission) {
-		List<Long> organGestorIds = organGestorIdsWithPermissionRecursive(organGestorPermission);
-		List<Long> procedimentNoComuIds = procedimentServeiNoComuIdsWithPermission(
-			procedimentPermission,
-			null);
-		List<Long> procedimentComuOrganGestorIds = procedimentServeiComuOrganGestorIdsWithPermission(
-			procedimentPermission,
-			null);
-		return new IdsToCheckNotificacioPermission(
-			organGestorIds,
-			procedimentNoComuIds,
-			procedimentComuOrganGestorIds);
-	}
-
-	/**
 	 * Filtra la llista d'ids de les combinacions procediment/servei - organ gestor segons el valor del camp
 	 * requireDirectPermission al procediment/servei:
 	 *   - Si el procediment/servei te el camp a true es verifica si es te el permís sobre la combinació organ gestor -
@@ -364,14 +296,6 @@ public class NotibPermissionHelper {
 	private ProcSerTipusEnum getProcSerTipusForQuery(Boolean isServei) {
 		if (isServei == null) return null;
 		return isServei ? ProcSerTipusEnum.SERVEI : ProcSerTipusEnum.PROCEDIMENT;
-	}
-
-	@Getter
-	@AllArgsConstructor
-	public static class IdsToCheckNotificacioPermission {
-		private List<Long> organGestorIds;
-		private List<Long> procedimentNoComuIds;
-		private List<Long> procedimentComuOrganGestorIds;
 	}
 
 }
