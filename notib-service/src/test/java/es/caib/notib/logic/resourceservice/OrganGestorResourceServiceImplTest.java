@@ -179,6 +179,7 @@ class OrganGestorResourceServiceImplTest {
 		PagadorPostalResourceEntity postal = new PagadorPostalResourceEntity();
 		when(pagadorCieRepo.findById(1L)).thenReturn(Optional.of(cie));
 		when(pagadorPostalRepo.findById(2L)).thenReturn(Optional.of(postal));
+		when(entregaCieRepo.save(any())).thenReturn(new EntregaCieResourceEntity());
 		service.beforeUpdateSave(entity, resource, Map.of());
 		verify(entregaCieRepo).save(any());
 		assertNotNull(entity.getEntregaCie());
