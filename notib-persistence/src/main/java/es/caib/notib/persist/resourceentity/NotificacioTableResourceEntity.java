@@ -104,7 +104,7 @@ public class NotificacioTableResourceEntity
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(
-		name = "entitat",
+		name = "entitat_id",
 		referencedColumnName = "id",
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "organ_entitat_fk"),
 		nullable = false)
