@@ -93,7 +93,7 @@ public class OrganGestorResourceEntity
 	@ManyToMany(mappedBy = "nous")
 	private List<OrganGestorEntity> antics = new ArrayList<>();
 
-	@Formula("(codi||', '||nom)")
+	@Formula("(codi||' - '||nom)")
 	private String codiNom;
 	@Formula("(select og2.nom from " + BaseConfig.DB_PREFIX + "organ_gestor og2 where og2.entitat = entitat and og2.codi = codi_pare)")
 	private String nomPare;
