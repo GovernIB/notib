@@ -124,8 +124,8 @@ export const NotificacioForm: React.FC = () => {
     const handleReset = () => {
         // Feim això perquè, si no refrescam l'id de l'enviament i del document que es crea per defecte, React no detecta que ha
         // canviat l'atribut key i no refresca la informació dels formularis.
-        formApiRef.current?.setFieldValue('enviamentsInfo', [{ id: new Date().valueOf() }]);
-        formApiRef.current?.setFieldValue('documentsInfo', [{ id: new Date().valueOf() }]);
+        formApiRef.current.setFieldValue('enviamentsInfo', [{ id: new Date().valueOf() }]);
+        formApiRef.current.setFieldValue('documentsInfo', [{ id: new Date().valueOf() }]);
     };
     return (
         <FormPage>

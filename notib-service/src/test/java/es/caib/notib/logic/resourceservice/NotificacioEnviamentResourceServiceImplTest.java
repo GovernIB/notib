@@ -6,7 +6,6 @@ import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
 import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
 import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
-import es.caib.notib.persist.resourceentity.PersonaResourceEntity;
 import es.caib.notib.persist.resourceentity.ProcedimentResourceEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,7 +40,6 @@ class NotificacioEnviamentResourceServiceImplTest {
 
 	@Test
 	void afterConversionShouldPopulateResourceReferences() {
-
 		// Given
 		OrganGestorResourceEntity organGestor = new OrganGestorResourceEntity();
 		organGestor.setId(1L);
@@ -54,10 +52,6 @@ class NotificacioEnviamentResourceServiceImplTest {
 		notificacio.setProcediment(procediment);
 		NotificacioEnviamentResourceEntity enviamentEntity = new NotificacioEnviamentResourceEntity();
 		enviamentEntity.setNotificacio(notificacio);
-		var titular = new PersonaResourceEntity();
-		titular.setNom("test");
-		titular.setNif("12345678z");
-		enviamentEntity.setTitular(titular);
 		NotificacioEnviamentResource resource = new NotificacioEnviamentResource();
 		// When
 		service.afterConversion(enviamentEntity, resource);
