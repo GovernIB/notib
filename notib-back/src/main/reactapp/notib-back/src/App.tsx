@@ -63,74 +63,6 @@ const InnerApp: React.FC = () => {
     const { mode } = useColorScheme();
     const { currentRole, currentEntitatId } = useNotibContext();
 
-    const menuEnviamentMassiu = [
-        {
-            id: 'nouEnviamentMassiu',
-            title: t('app.menu.nouEnviamentmassiu'),
-            to: '/enviament/new',
-            icon: 'add',
-            resourceName: 'notifiacioResource',
-            hidden: currentRole !== ROLE_USER,
-        },
-        {
-            id: 'enviamentMassiu',
-            title: t('app.menu.consultaEnviamentmassiu'),
-            to: '/notificacio/massiva',
-            icon: 'forward_to_inbox',
-            resourceName: 'notifiacioResource',
-            hidden: currentRole !== ROLE_USER,
-        },
-    ];
-    const menuGestio = [
-        {
-            id: 'notificacionsError',
-            title: t('app.menu.errorRegistre'),
-            to: '/notificacionsError',
-            icon: 'error',
-            resourceName: 'notifiacioResource',
-            hidden: currentRole !== ROLE_ADMIN,
-        },
-        {
-            id: 'enviamentMassiu',
-            title: t('app.menu.consultaEnviamentmassiu'),
-            to: '/notificacio/massiva',
-            icon: 'forward_to_inbox',
-            resourceName: 'accioMassivaResource',
-            hidden: currentRole !== ROLE_ADMIN,
-        },
-        {
-            id: 'notificacionsEsborrades',
-            title: t('app.menu.notificacioEsborrades'),
-            to: '/notificacionsEsborrades',
-            icon: 'delete_outline',
-            resourceName: 'notifiacioResource',
-            hidden: currentRole !== ROLE_ADMIN,
-        },
-        {
-            id: 'callbackPendent',
-            title: t('app.menu.callbackPendent'),
-            to: '/callback',
-            icon: 'pending_actions',
-            resourceName: 'callbackResource',
-            hidden: currentRole !== ROLE_ADMIN,
-        },
-        {
-            id: 'accionsMassives',
-            title: t('app.menu.accionsMassives'),
-            to: '/accions/massives',
-            icon: 'format_list_bulleted',
-            resourceName: 'notificacioMassivaResource',
-            hidden: currentRole !== ROLE_ADMIN,
-        },
-        {
-            id: 'permisosUsuari',
-            title: t('app.menu.permisosUsuari'),
-            to: '/permisos',
-            icon: 'group',
-            resourceName: '',
-            hidden: currentRole !== ROLE_ADMIN,
-        },
-    ];
     const menuConfig = [
         {
             id: 'entitats',
@@ -262,32 +194,18 @@ const InnerApp: React.FC = () => {
             icon: 'home',
         },
         {
-            id: 'notificacions',
+            id: 'config',
             title: t('app.menu.notificacions'),
             to: '/notificacions',
             icon: 'mail',
             resourceName: 'notificacioResource',
         },
         {
-            id: 'enviaments',
+            id: 'config',
             title: t('app.menu.enviaments'),
             to: '/enviaments',
             icon: 'send',
             resourceName: 'notificacioEnviamentResource',
-        },
-        {
-            id: 'enviamentsMassius',
-            title: t('app.menu.enviamentMassiu'),
-            icon: 'dashboard',
-            children: menuEnviamentMassiu,
-            hidden: currentRole !== ROLE_USER,
-        },
-        {
-            id: 'gestio',
-            title: t('app.menu.gestio'),
-            icon: 'dashboard',
-            children: menuGestio,
-            hidden: currentRole !== ROLE_ADMIN,
         },
         {
             id: 'config',

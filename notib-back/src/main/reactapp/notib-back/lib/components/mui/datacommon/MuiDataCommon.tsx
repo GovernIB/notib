@@ -3,9 +3,9 @@ import { useResourceApiService, ResourceApiFindCommonArgs } from '../../Resource
 import { ResourceType, ExportFileType } from '../../ResourceApiContext';
 import { FormI18nKeys } from '../../form/Form';
 import { useBaseAppContext, DialogButton } from '../../BaseAppContext';
-import { useConfirmDialogButtons, useCloseDialogButtons } from '../../AppButtons';
+import { useConfirmDialogButtons } from '../../AppButtons';
 import { toToolbarIcon } from '../ToolbarIcon';
-import DataFormDialog, { useDataFormDialogApiRef } from './DataFormDialog';
+import DataFormDialog, { DataFormDialogApi } from './DataFormDialog';
 
 export type DataCommonFindArgs = ResourceApiFindCommonArgs;
 
@@ -241,9 +241,8 @@ export const useDataCommonEditable = (
     onDelete: ((id: any | any[]) => void) | undefined
 ) => {
     const { t, temporalMessageShow, messageDialogShow } = useBaseAppContext();
-    const dataFormDialogApiRef = useDataFormDialogApiRef();
+    const dataDialogPopupApiRef = React.useRef<DataFormDialogApi>(undefined);
     const confirmDialogButtons = useConfirmDialogButtons();
-    const closeDialogButtons = useCloseDialogButtons();
     const confirmDialogComponentProps = { maxWidth: 'sm', fullWidth: true };
     const isInlineEditCreate = inlineEditActive || inlineCreateEditActive;
     const isInlineEditUpdate = inlineEditActive || inlineUpdateEditActive;
@@ -257,7 +256,7 @@ export const useDataCommonEditable = (
                     : formAdditionalData),
                 ...additionalData,
             };
-            dataFormDialogApiRef.current
+            dataDialogPopupApiRef.current
                 ?.show(undefined, processedAdditionalData)
                 .then((data) => {
                     onCreate?.(data);
@@ -278,11 +277,8 @@ export const useDataCommonEditable = (
                     : formAdditionalData),
                 ...additionalData,
             };
-            const hasUpdateAction = row?._actions['update'] != null;
-            const noUpdateLinkTitle = !hasUpdateAction ? t('datacommon.details.label') : undefined;
-            const noUpdateDialogButtons = !hasUpdateAction ? closeDialogButtons : undefined;
-            dataFormDialogApiRef.current
-                ?.show(id, processedAdditionalData, noUpdateLinkTitle, noUpdateDialogButtons)
+            dataDialogPopupApiRef.current
+                ?.show(id, processedAdditionalData)
                 .then((data) => {
                     onUpdate?.(data);
                     refresh?.();
@@ -422,20 +418,6 @@ export const useDataCommonEditable = (
             rowLink: 'delete',
             clickTriggerDelete: true,
         });
-    isPopupEditUpdate && !rowDetailLink &&
-        rowEditActions.push({
-            label: t('datacommon.details.label'),
-            rowLink: '!update',
-            icon: 'info',
-            linkTo: rowUpdateLink,
-            linkState:
-                rowUpdateLink != null && formAdditionalData != null
-                    ? { additionalData: formAdditionalData }
-                    : undefined,
-            disabled: rowDisableUpdateButton || updateLinkConfigError,
-            hidden: rowHideUpdateButton,
-            clickShowUpdateDialog: rowUpdateLink == null,
-        });
     rowDetailLink &&
         rowEditActions.push({
             label: t('datacommon.details.label'),
@@ -471,7 +453,7 @@ export const useDataCommonEditable = (
                 formComponentProps={popupEditFormComponentProps}
                 formI18nKeys={popupEditFormI18nKeys}
                 onClose={popupEditFormDialogOnClose}
-                apiRef={dataFormDialogApiRef}
+                apiRef={dataDialogPopupApiRef}
             >
                 {popupEditFormContent}
             </DataFormDialog>
