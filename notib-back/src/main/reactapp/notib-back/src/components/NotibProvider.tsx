@@ -85,9 +85,6 @@ const useCurrentUser = () => {
                 gridPageSizeOptionsField != null
                     ? Object.values(gridPageSizeOptionsField?.options).map((v: any) => parseInt(v))
                     : [10, 20, 50, 100];
-            if (!gridPageSizeOptions.includes(-1)) {
-                gridPageSizeOptions.unshift(-1);
-            }
             setCurrentUserGridPageSizeOptions(gridPageSizeOptions);
         }
     }, [apiIsReady]);

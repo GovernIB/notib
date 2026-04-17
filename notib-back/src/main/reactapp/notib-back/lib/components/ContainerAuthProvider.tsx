@@ -31,13 +31,13 @@ const parseJwt = (token?: string) => {
 };
 
 const useTokenWatchTimeout = (callback: () => void, delay: number = 1000) => {
-    const timeoutIdRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+    let timeoutId: any;
     const start = (newDelay?: number) => {
-        clearTimeout(timeoutIdRef.current);
-        timeoutIdRef.current = setTimeout(callback, newDelay ?? delay);
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(callback, newDelay ?? delay);
     };
     const refresh = (newDelay?: number) => start(newDelay);
-    const stop = () => clearTimeout(timeoutIdRef.current);
+    const stop = () => clearTimeout(timeoutId);
     return {
         refresh,
         stop,
@@ -80,15 +80,9 @@ export const AuthProvider = (props: AuthProviderProps) => {
         tokenRef.current = token;
         const tokenParsed = parseJwt(token);
         tokenParsedRef.current = tokenParsed;
-        if (typeof tokenParsed?.exp === 'number') {
-            const checkTokenTimeout =
-                (tokenParsed.exp - Date.now() / 1000 - CHECK_TOKEN_TIMEOUT_MARGIN_SECS) * 1000;
-            if (checkTokenTimeout > 0) {
-                checkTokenRefresh(checkTokenTimeout);
-            } else {
-                debug && logConsole.debug('El token ja està expirat; no es programa verificació');
-            }
-        }
+        const checkTokenTimeout =
+            (tokenParsed.exp - Date.now() / 1000 + CHECK_TOKEN_TIMEOUT_MARGIN_SECS) * 1000;
+        tokenParsed && checkTokenRefresh(checkTokenTimeout);
         setLoading(false);
         debug && logConsole.debug('Token', verified ? 'verificat:' : 'obtingut:', token);
     };

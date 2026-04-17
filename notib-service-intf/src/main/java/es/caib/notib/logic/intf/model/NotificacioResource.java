@@ -70,14 +70,6 @@ import java.util.List;
 			code = NotificacioResource.FILTER_CODE,
 			formClass = NotificacioResource.NotificacioResourceFilter.class
 		),
-		@ResourceArtifact(
-			type = ResourceArtifactType.PERSPECTIVE,
-			code = NotificacioResource.PERSPECTIVE_ENVIAMENTS_NOTIFICACIO
-		),
-		@ResourceArtifact(
-			type = ResourceArtifactType.PERSPECTIVE,
-			code = NotificacioResource.PERSPECTIVE_DOCUMENTS_NOTIFICACIO
-		),
 	}
 )
 @CustomValidation.List({
@@ -91,8 +83,6 @@ import java.util.List;
 public class NotificacioResource extends BaseResource<Long> {
 
 	public static final String FILTER_CODE = "FILTER_NOTIFICACIO";
-	public static final String PERSPECTIVE_ENVIAMENTS_NOTIFICACIO = "ENVIAMENTS_NOTIFICACIO";
-	public static final String PERSPECTIVE_DOCUMENTS_NOTIFICACIO = "DOCUMENTS_NOTIFICACIO";
 
 	@NotNull
 	private EnviamentTipus enviamentTipus;
@@ -204,7 +194,8 @@ public class NotificacioResource extends BaseResource<Long> {
 		private String registreNumeroSortida;
 		private Date dataCaducitatInici;
 		private Date dataCaducitatFi;
-		private boolean nomesLesMeves;
+		private boolean nomesLesMeves;	// TODO
+		private boolean codiPostal;
 		private boolean errorLastCallback;
 		private boolean entregaPostal;
 	}

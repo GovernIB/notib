@@ -5,15 +5,14 @@ server:
 spring:
   mvc:
     view:
-      prefix: /WEB-INF/jsp/
+      prefix: /WEB_INF/jsp/
       suffix: .jsp
 
   liquibase:
-    enabled: false
-#    enabled: true
-#    drop-first: false
-#    change-log: classpath:db/liquibase-changelog.xml
-#    default-schema: public
+    enabled: true
+    drop-first: false
+    change-log: classpath:db/liquibase-changelog.xml
+    default-schema: public
 
 springdoc:
   packages-to-scan: es.caib.notib.api.interna.controller

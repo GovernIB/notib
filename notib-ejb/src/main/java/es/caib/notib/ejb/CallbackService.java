@@ -23,7 +23,7 @@ import java.util.Set;
 @Primary
 @Stateless
 public class CallbackService extends AbstractService<es.caib.notib.logic.intf.service.CallbackService> implements es.caib.notib.logic.intf.service.CallbackService {
-
+	
 	@Override
 	@PermitAll
 	public void processarPendents() {

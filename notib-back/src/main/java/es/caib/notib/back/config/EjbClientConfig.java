@@ -34,24 +34,12 @@ public class EjbClientConfig {
 		return getLocalEjbFactoyBean(AclEntryResourceService.class, true);
 	}
 	@Bean
-	public LocalStatelessSessionProxyFactoryBean activeMqResourceService() {
-		return getLocalEjbFactoyBean(ActiveMqResourceService.class, true);
-	}
-	@Bean
 	public LocalStatelessSessionProxyFactoryBean aplicacioResourceService() {
 		return getLocalEjbFactoyBean(AplicacioResourceService.class, true);
 	}
 	@Bean
 	public LocalStatelessSessionProxyFactoryBean avisResourceService() {
 		return getLocalEjbFactoyBean(AvisResourceService.class, true);
-	}
-	@Bean
-	public LocalStatelessSessionProxyFactoryBean backGroundTaskResourceService() {
-		return getLocalEjbFactoyBean(BackGroundTaskResourceService.class, true);
-	}
-	@Bean
-	public LocalStatelessSessionProxyFactoryBean cacheResourceService() {
-		return getLocalEjbFactoyBean(CacheResourceService.class, true);
 	}
 	@Bean
 	public LocalStatelessSessionProxyFactoryBean configGroupResourceService() {
@@ -82,14 +70,6 @@ public class EjbClientConfig {
 		return getLocalEjbFactoyBean(EntitatTipusDocumentResourceService.class, true);
 	}
 	@Bean
-	public LocalStatelessSessionProxyFactoryBean entregaCieResourceService() {
-		return getLocalEjbFactoyBean(EntregaCieResourceService.class, true);
-	}
-	@Bean
-	public LocalStatelessSessionProxyFactoryBean eventResourceService() {
-		return getLocalEjbFactoyBean(EventResourceService.class, true);
-	}
-	@Bean
 	public LocalStatelessSessionProxyFactoryBean grupResourceService() {
 		return getLocalEjbFactoyBean(GrupResourceService.class, true);
 	}
@@ -102,16 +82,16 @@ public class EjbClientConfig {
 		return getLocalEjbFactoyBean(MonitorIntegracioResourceService.class, true);
 	}
 	@Bean
-	public LocalStatelessSessionProxyFactoryBean notificacioAuditResourceService() {
-		return getLocalEjbFactoyBean(NotificacioAuditResourceService.class, true);
-	}
-	@Bean
 	public LocalStatelessSessionProxyFactoryBean notificacioEnviamentResourceService() {
 		return getLocalEjbFactoyBean(NotificacioEnviamentResourceService.class, true);
 	}
 	@Bean
 	public LocalStatelessSessionProxyFactoryBean notificacioEnviamentAuditResourceService() {
 		return getLocalEjbFactoyBean(NotificacioEnviamentAuditResourceService.class, true);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean notificacioAuditResourceService() {
+		return getLocalEjbFactoyBean(NotificacioAuditResourceService.class, true);
 	}
 	@Bean
 	public LocalStatelessSessionProxyFactoryBean notificacioResourceService() {
@@ -138,6 +118,10 @@ public class EjbClientConfig {
 		return getLocalEjbFactoyBean(PagadorCieResourceService.class, true);
 	}
 	@Bean
+	public LocalStatelessSessionProxyFactoryBean entregaCieResourceService() {
+		return getLocalEjbFactoyBean(EntregaCieResourceService.class, true);
+	}
+	@Bean
 	public LocalStatelessSessionProxyFactoryBean pagadorPostalResourceService() {
 		return getLocalEjbFactoyBean(PagadorPostalResourceService.class, true);
 	}
@@ -156,10 +140,6 @@ public class EjbClientConfig {
 	@Bean
 	public LocalStatelessSessionProxyFactoryBean sseEventService() {
 		return getLocalEjbFactoyBean(SseEventService.class, true);
-	}
-	@Bean
-	public LocalStatelessSessionProxyFactoryBean threadInfoResourceService() {
-		return getLocalEjbFactoyBean(ThreadInfoResourceService.class, true);
 	}
 	@Bean
 	public LocalStatelessSessionProxyFactoryBean usuariResourceService() {

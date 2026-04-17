@@ -1,5 +1,5 @@
 /**
- *
+ * 
  */
 package es.caib.notib.ejb;
 
@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Implementació de GrupService com a EJB que empra una clase
  * delegada per accedir a la funcionalitat del servei.
- *
+ * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Primary
@@ -74,7 +74,7 @@ public class GrupService extends AbstractService<es.caib.notib.logic.intf.servic
 	public ProcSerGrupDto findProcedimentGrupById(Long entitatId, Long procedimentGrupId) {
 		return getDelegateService().findProcedimentGrupById(entitatId, procedimentGrupId);
 	}
-
+	
 	@Override
 	@RolesAllowed("**")
 	public Boolean existProcedimentGrupByGrupId(Long entitatId, Long grupId) {
@@ -86,7 +86,7 @@ public class GrupService extends AbstractService<es.caib.notib.logic.intf.servic
 	public List<GrupDto> findByEntitat(Long entitatId) {
 		return getDelegateService().findByEntitat(entitatId);
 	}
-
+	
 	@Override
 	@RolesAllowed("**")
 	public List<GrupDto> findByEntitatAndOrganGestor(EntitatDto entitat, OrganGestorDto organGestor) {

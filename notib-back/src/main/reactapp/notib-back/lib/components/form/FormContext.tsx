@@ -8,7 +8,7 @@ export type FormApi = {
     refresh: () => void;
     reset: (data?: any, id?: any) => void;
     revert: (unconfirmed?: boolean) => void;
-    validate: () => Promise<void>;
+    validate: () => void;
     save: () => Promise<any>;
     delete: () => void;
     focus: (name?: string) => void;
@@ -17,7 +17,7 @@ export type FormApi = {
     handleSubmissionErrors: (error: ResourceApiError, temporalMessageTitle?: string) => void;
 };
 
-export type FormApiRef = React.RefObject<FormApi | null>;
+export type FormApiRef = React.RefObject<FormApi | undefined>;
 
 export enum FormFieldDataActionType {
     RESET = 'RESET',

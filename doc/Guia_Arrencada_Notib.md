@@ -1,164 +1,56 @@
-# Guia d'arrencada de Notib
-
-Aquest document recull els fluxos habituals per arrencar Notib en local:
-
-- Spring Boot amb el front empaquetat per Maven.
-- Spring Boot amb el front React en mode desenvolupament.
-- JBoss/EAP dins Docker.
-
-Els exemples fan servir Oracle, Keycloak i SMTP externs. Substitueix sempre els valors d'host, usuari i secrets pels del teu entorn.
+# Guia d'arrencada de Notib (Spring Boot i JBoss)
 
 ---
 
-## 1) Requisits
+## 1) Arrencar amb Spring Boot (sense dev server del front)
 
-- JDK 11.
-- Maven 3.8 o superior.
-- Accés a la base de dades configurada.
-- Accés al servidor d'autenticació Keycloak.
-- Docker o Docker Compose si s'arrenca l'EAR dins JBoss.
+- Perfils de Maven: `front`, `ide`, `oracle`
 
-Per al front en mode desenvolupament també cal `npm`. El build Maven del perfil `front` instal·la Node automàticament amb `frontend-maven-plugin` dins `notib-back/target`.
+## 2) Arrencar amb Spring Boot + `npm run dev` (front en mode desenvolupament)
 
----
+- Perfils de Maven: `ide`, `oracle`
+- Per arrencar el frontal en local:
+  1. Inicia el dev server com qualsevol projecte base React:
+     - Des del directori del front: `notib-back/src/main/reactapp/notib-back`
+     - Executa: `npm install` (la primera vegada) i després `npm run dev`
+  2. Al backend, passa-li el perfil de SPRING (no de Maven) `devProxy`.
 
-## 2) Spring Boot amb front empaquetat
+- Un cop fet això, podràs accedir al servidor de desenvolupament a través del backend, via proxy, a:
+  - `http://localhost:8080/notibback/reactapp/`
+  - El proxy està configurat a la classe `DevProxyController`.
 
-Aquest mode compila el front React i el deixa servit pel backend a `/notibback/reactapp/`.
+- Important: Has d'entrar a través de l'URL del backend. No pots entrar directament al dev server del front, perquè no s'aplicarà l'autenticació per sessió de Notib i les peticions fallaran.
 
-Perfils Maven:
+### 2.1) Configuració del front (`.env.local`)
 
-- `front`
-- `ide`
-- `oracle`
+Crea un fitxer `.env.local` a l'arrel de la carpeta del frontal: `notib-back/src/main/reactapp/notib-back` amb el contingut:
 
-Compilació des de l'arrel del projecte:
-
-```bash
-mvn -pl notib-back -am package -Pfront,ide,oracle -DskipTests
 ```
-
-Arrencada recomanada:
-
-- Classe principal: `es.caib.notib.NotibBackBootApp`
-- Perfil Maven: `front,ide,oracle`
-- Perfil Spring: cap
-
-Si tens els mòduls interns instal·lats al repositori Maven local, també pots arrencar només el mòdul del backoffice:
-
-```bash
-mvn -f notib-back/pom.xml spring-boot:run -Pfront,ide
-```
-
-URL principal:
-
-```text
-http://localhost:8080/notibback/reactapp/
-```
-
----
-
-## 3) Spring Boot amb front React en mode desenvolupament
-
-Aquest mode deixa Vite servint el front, però l'entrada s'ha de fer sempre a través del backend. El backend fa de proxy mitjançant `DevProxyController`, actiu amb el perfil Spring `devProxy`.
-
-Perfils Maven:
-
-- `ide`
-- `oracle`
-
-Perfil Spring:
-
-- `devProxy`
-
-### 3.1) Arrencar el backend
-
-Compilació des de l'arrel del projecte:
-
-```bash
-mvn -pl notib-back -am package -Pide,oracle -DskipTests
-```
-
-Arrencada recomanada:
-
-- Classe principal: `es.caib.notib.NotibBackBootApp`
-- Perfil Maven: `ide,oracle`
-- Perfil Spring: `devProxy`
-
-Si tens els mòduls interns instal·lats al repositori Maven local:
-
-```bash
-mvn -f notib-back/pom.xml spring-boot:run -Pide -Dspring-boot.run.profiles=devProxy
-```
-
-Si el dev server de Vite no escolta a `http://localhost:5173`, afegeix aquesta propietat al `application.properties` local:
-
-```properties
-es.caib.notib.development.proxyUrl=http://localhost:5173
-```
-
-### 3.2) Arrencar el front
-
-Directori:
-
-```text
-notib-back/src/main/reactapp/notib-back
-```
-
-Primera vegada:
-
-```bash
-npm install
-```
-
-Arrencada:
-
-```bash
-npm run dev
-```
-
-### 3.3) `.env.local` del front
-
-Crea `notib-back/src/main/reactapp/notib-back/.env.local`:
-
-```dotenv
-VITE_API_URL=http://localhost:8080/notibback/apinew
-VITE_AUTH_URL=https://authdev.limit.es
-VITE_AUTH_REALM=GOIB
-VITE_AUTH_CLIENTID=goib-default
+VITE_API_URL=http://localhost:8080/notibback/api2/
+VITE_AUTH_PROVIDER_URL=https://authdev.limit.es
+VITE_AUTH_PROVIDER_REALM=GOIB
+VITE_AUTH_PROVIDER_CLIENTID=goib-default
 DISABLE_OPEN_ON_START=true
 ```
 
-Important: entra sempre per l'URL del backend:
+### 2.2) Configuració del backend (`application.properties` a l'arrel)
 
-```text
-http://localhost:8080/notibback/reactapp/
+Crea/ajusta el fitxer `application.properties` a l'arrel del projecte Spring Boot amb el contingut següent:
+
 ```
-
-No entris directament a `http://localhost:5173`, perquè no s'aplicarà l'autenticació per sessió de Notib i les peticions al backend poden fallar.
-
----
-
-## 4) `application.properties` local per Spring Boot
-
-Per arrencar en local amb Spring Boot pots crear un `application.properties` a l'arrel del projecte. Aquest fitxer està ignorat per Git.
-
-Exemple mínim:
-
-```properties
-spring.datasource.url=jdbc:oracle:thin:@HOST:1521:SID
+spring.datasource.url=jdbc:oracle:thin:@10.35.3.77:1521:xe
 spring.datasource.username=notib
-spring.datasource.password=CHANGE_ME
+spring.datasource.password=notib
 
-spring.mail.host=smtp.example.org
+spring.mail.host=correu.limit.es
 spring.mail.port=465
-spring.mail.username=user@example.org
-spring.mail.password=CHANGE_ME
+spring.mail.username=proves_limit@limit.es
+spring.mail.password=R8lmu-98TRN
 spring.mail.properties.mail.smtp.auth=true
 spring.mail.properties.mail.smtp.ssl.enable=true
 spring.mail.properties.mail.smtp.starttls.enable=false
 
-spring.security.oauth2.client.provider.keycloak.issuer-uri=https://auth.example.org/realms/GOIB
+spring.security.oauth2.client.provider.keycloak.issuer-uri=https://authdev.limit.es/realms/GOIB
 spring.security.oauth2.client.provider.keycloak.user-name-attribute=preferred_username
 spring.security.oauth2.client.registration.keycloak.client-id=goib-default
 spring.security.oauth2.client.registration.keycloak.authorization-grant-type=authorization_code
@@ -166,64 +58,109 @@ spring.security.oauth2.client.registration.keycloak.authorization-grant-type=aut
 spring.liquibase.enabled=false
 spring.jpa.properties.hibernate.hbm2ddl.auto=none
 
-es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.serverurl=https://auth.example.org
+es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.serverurl=https://authdev.limit.es
 es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.realm=GOIB
 es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.client_id=goib-ws
-es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.password_secret=CHANGE_ME
+es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.password_secret=KXbtEBU3kMpiekjvktZSmnpk5cGsnJNY
 ```
 
-Per al front empaquetat, el backend exposa les variables Vite via `/notibback/sysenv?format=vite`. Si cal forçar-les des de properties:
+> Nota: Revisa credencials/URLs segons el teu entorn abans d'usar-les en producció.
 
-```properties
-es.caib.notib.front.api.url=http://localhost:8080/notibback/apinew
-es.caib.notib.front.auth.url=https://auth.example.org
-es.caib.notib.front.auth.realm=GOIB
-es.caib.notib.front.auth.clientid=goib-default
+---
+
+## 3) Arrencar a JBoss
+
+- Perfils de Maven: `jboss`, `front`
+- `application.properties`: es reutilitza el mateix d'abans (apartat 2.2)
+
+### 3.1) Fitxer `.env` (a l'arrel del projecte)
+
+Crea un `.env` amb:
+
+```
+DB_URL=jdbc:oracle:thin:@10.35.3.77:1521:xe
+DB_USERNAME=notib
+DB_PASSWORD=notib
+
+MAIL_HOST=correu.limit.es
+MAIL_PORT=465
+MAIL_USERNAME=proves_limit@limit.es
+MAIL_PASSWORD=T0GjtFq8T2
+MAIL_SSL=true
+MAIL_TLS=true
+
+AUTH_URL=https://authdev.limit.es
+AUTH_REALM=GOIB
+AUTH_CLIENTID=goib-default
+AUTH_WS_CLIENTID=goib-ws
+AUTH_CREDENTIAL_SECRET=KXbtEBU3kMpiekjvktZSmnpk5cGsnJNY
+
+PLUGIN_USERINFO_KEYCLOAK_SERVER_URL=https://authdev.limit.es
+PLUGIN_USERINFO_KEYCLOAK_REALM=GOIB
+PLUGIN_USERINFO_KEYCLOAK_CLIENT_ID=goib-ws
+PLUGIN_USERINFO_KEYCLOAK_PASSWD_SECRET=KXbtEBU3kMpiekjvktZSmnpk5cGsnJNY
+
+DEBUG=true
+```
+
+### 3.2) `docker-compose.yml` (a l'arrel)
+
+Utilitza el següent contingut (indentació YAML corregida):
+
+```yaml
+version: "3.8"
+
+volumes:
+  notib_files:
+    driver: local
+
+services:
+  notib:
+    image: notib:2.0.12
+    ports:
+      - "${APP_PORT:-8080}:8080"
+      - "${DEBUG_PORT:-8787}:8787"
+      - "${MGM_PORT:-9990}:9990"
+    volumes:
+      - notib_files:/home/jboss/apps/notib/files
+    environment:
+      - JAVA_OPTS=-Xms1303m -Xmx1303m -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=512m -Djava.net.preferIPv4Stack=true
+      - JBOSS_APP_NAME=${APP_NAME:-notib}
+      - JBOSS_DB_DRIVER=${DB_DRIVER:-oracle}
+      - JBOSS_DB_URL=${DB_URL}
+      - JBOSS_DB_USERNAME=${DB_USERNAME}
+      - JBOSS_DB_PASSWORD=${DB_PASSWORD}
+      - JBOSS_AUTH_URL=${AUTH_URL}
+      - JBOSS_AUTH_REALM=${AUTH_REALM}
+      - JBOSS_AUTH_CLIENTID=${AUTH_CLIENTID}
+      - JBOSS_AUTH_WS_CLIENTID=${AUTH_WS_CLIENTID}
+      - JBOSS_AUTH_CREDENTIAL_SECRET=${AUTH_CREDENTIAL_SECRET}
+      - JBOSS_MAIL_HOST=${MAIL_HOST}
+      - JBOSS_MAIL_PORT=${MAIL_PORT}
+      - JBOSS_MAIL_USERNAME=${MAIL_USERNAME}
+      - JBOSS_MAIL_PASSWORD=${MAIL_PASSWORD}
+      - JBOSS_MAIL_SSL=${MAIL_SSL}
+      - JBOSS_MAIL_TLS=${MAIL_TLS}
+      - JBOSS_PROXY_HOST=${PROXY_HOST:-}
+      - JBOSS_PROXY_PORT=${PROXY_PORT:-}
+      - es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.serverurl=${PLUGIN_USERINFO_KEYCLOAK_SERVER_URL:-https://authdev.limit.es}
+      - es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.realm=${PLUGIN_USERINFO_KEYCLOAK_REALM:-GOIB}
+      - es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.client_id=${PLUGIN_USERINFO_KEYCLOAK_CLIENT_ID:-goib-ws}
+      - es.caib.notib.plugin.dades.usuari.pluginsib.userinformation.keycloak.password_secret=${PLUGIN_USERINFO_KEYCLOAK_PASSWD_SECRET:-}
+      - es.caib.notib.front.api.url=${API_URL:-http://localhost:8080/notibback/api/}
+      - DEBUG=${DEBUG:-}
+      - DEBUG_PORT=${DEBUG_HOST:-0.0.0.0:}${DEBUG_PORT:-8787}
+    restart: always
 ```
 
 ---
 
-## 5) JBoss/EAP amb Docker
+## 4) Resum ràpid
 
-La imatge Docker es genera des de `notib-ear/pom.xml` amb `io.fabric8:docker-maven-plugin`; no hi ha cap `Dockerfile` manual al repositori.
+- Spring Boot sense front: perfils Maven `front,ide,oracle` (el front no es desplega automàticament).
+- Spring Boot + dev server del front: perfils Maven `ide,oracle` i perfil Spring `devProxy`; accés via `http://localhost:8080/notibback/reactapp/`.
+- `.env.local` al front amb URLs i dades d'auth de Keycloak.
+- `application.properties` al backend amb BBDD, mail i Keycloak.
+- Entorn JBoss: `.env` a l'arrel + `docker-compose.yml` proveït.
 
-Documentació detallada:
-
-```text
-notib-ear/docker/README.md
-```
-
-Resum ràpid:
-
-```bash
-mvn -pl notib-ear -am clean package -Pdocker-eap72-caib-openshift -DskipTests
-mvn -pl notib-ear docker:build -Pdocker-eap72-caib-openshift
-docker compose up -d
-```
-
-Fitxers locals esperats a l'arrel del projecte:
-
-- `.env`
-- `docker-compose.yml`
-
-Tots dos estan pensats com a configuració local d'entorn i no s'han de commitar amb secrets reals.
-
-URLs habituals:
-
-```text
-http://localhost:8080/notibback/
-http://localhost:8080/notibback/reactapp/
-http://localhost:8080/notibapi/interna/
-http://localhost:8080/notibapi/externa/
-```
-
----
-
-## 6) Resum de perfils
-
-| Mode | Perfils Maven | Perfil Spring | Notes |
-| --- | --- | --- | --- |
-| Spring Boot amb front empaquetat | `front,ide,oracle` | cap | Maven compila el front i el serveix des del backend. |
-| Spring Boot amb Vite | `ide,oracle` | `devProxy` | Entrar sempre per `/notibback/reactapp/`. |
-| JBoss Docker | `docker-eap72-caib-openshift` | cap | Perfil Docker per defecte de `notib-ear`. |
-| JBoss Docker legacy | `docker-legacy` | cap | Usa `docker/jboss` i `jboss_config.sh`. |
+> Recorda: Entra sempre a través de l'URL del backend per garantir l'autenticació per sessió de Notib.

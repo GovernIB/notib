@@ -5,11 +5,8 @@ server:
 spring:
   mvc:
     view:
-      prefix: /WEB-INF/jsp/
+      prefix: /WEB_INF/jsp/
       suffix: .jsp
-
-  liquibase:
-    enabled: false
 
 springdoc:
   packages-to-scan: es.caib.notib.api.externa.controller

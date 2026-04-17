@@ -1,5 +1,5 @@
 /**
- *
+ * 
  */
 package es.caib.notib.ejb;
 
@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * Implementació de UsuariAplicacioService com a EJB que empra una clase
  * delegada per accedir a la funcionalitat del servei.
- *
+ * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Primary
@@ -50,7 +50,7 @@ public class UsuariAplicacioService extends AbstractService<es.caib.notib.logic.
 	public AplicacioDto findById(Long aplicacioId) {
 		return getDelegateService().findById(aplicacioId);
 	}
-
+	
 	@Override
 	@RolesAllowed("**")
 	public AplicacioDto findByEntitatAndId(Long entitatId, Long aplicacioId) {
@@ -62,7 +62,7 @@ public class UsuariAplicacioService extends AbstractService<es.caib.notib.logic.
 	public AplicacioDto findByUsuariCodi(String usuariCodi) {
 		return getDelegateService().findByUsuariCodi(usuariCodi);
 	}
-
+	
 	@Override
 	@RolesAllowed("**")
 	public AplicacioDto findByEntitatAndUsuariCodi(Long entitatId, String usuariCodi) {

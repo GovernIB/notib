@@ -9,6 +9,7 @@ import es.caib.notib.logic.intf.statemachine.events.EnviamentRegistreRequest;
 import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 
 /**

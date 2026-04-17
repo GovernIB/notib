@@ -1,5 +1,5 @@
 /**
- *
+ * 
  */
 package es.caib.notib.ejb;
 
@@ -17,7 +17,7 @@ import java.math.BigInteger;
 /**
  * Implementació dels mètodes per al servei de recepció de
  * callbacks de portafirmes.
- *
+ * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Primary

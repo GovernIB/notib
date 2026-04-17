@@ -1,5 +1,5 @@
 /**
- *
+ * 
  */
 package es.caib.notib.ejb;
 
@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Implementació de ConfigService com a EJB que empra una clase
  * delegada per accedir a la funcionalitat del servei.
- *
+ * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Primary

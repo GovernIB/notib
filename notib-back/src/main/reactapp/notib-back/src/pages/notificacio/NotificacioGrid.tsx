@@ -6,14 +6,7 @@ import Icon from '@mui/material/Icon';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Chip from '@mui/material/Chip';
-import {
-    GridRenderCellParams,
-    useGridApiContext,
-    useGridSelector,
-    gridDetailPanelExpandedRowsContentCacheSelector,
-    gridDetailPanelExpandedRowIdsSelector,
-    GRID_DETAIL_PANEL_TOGGLE_COL_DEF,
-} from '@mui/x-data-grid-pro';
+import { GRID_DETAIL_PANEL_TOGGLE_COL_DEF } from '@mui/x-data-grid-pro';
 import {
     GridPage,
     MuiDataGrid,
@@ -23,7 +16,6 @@ import {
     useMuiDataGridContext,
     useMuiActionReportLogic,
     useFilterApiContext,
-    MuiDataGridColDef,
 } from 'reactlib';
 import { useNotibContext } from '../../components/NotibContext';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
@@ -34,40 +26,9 @@ import GridFormField, { GridButtonField } from '../../components/GridFormField';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
 import AccionsMassives, { MenuOption } from '../../components/AccionsMassives';
 
-const CustomDetailPanelToggle = (props: Pick<GridRenderCellParams, 'id' | 'value'>) => {
-    const { id } = props;
+const useDataGridColumns = (onDetailClick: (id: any) => void) => {
     const { t } = useTranslation();
-    const apiRef = useGridApiContext();
-    const contentCache = useGridSelector(apiRef, gridDetailPanelExpandedRowsContentCacheSelector);
-    const hasDetail = React.isValidElement(contentCache[id]);
-    const expandedRowIds = useGridSelector(apiRef, gridDetailPanelExpandedRowIdsSelector);
-    const isExpanded = expandedRowIds.has(id);
-    return (
-        <IconButton
-            size="small"
-            tabIndex={-1}
-            disabled={!hasDetail}
-            title={isExpanded ? t('page.notificacio.grid.column.ocultar') : t('page.notificacio.grid.column.mostrar')}
-            aria-label={isExpanded ? t('page.notificacio.grid.column.ocultar') : t('page.notificacio.grid.column.mostrar')}
-        >
-            <Icon
-                sx={(theme) => ({
-                    transform: `rotateZ(${isExpanded ? 180 : 0}deg)`,
-                    transition: theme.transitions.create('transform', {
-                        duration: theme.transitions.duration.shortest,
-                    }),
-                })}
-                fontSize="inherit"
-            >
-                expand_more
-            </Icon>
-        </IconButton>
-    );
-};
-
-const useDataGridColumns = () => {
-    const { t } = useTranslation();
-    const columns: MuiDataGridColDef[] = React.useMemo(
+    return React.useMemo(
         () => [
             {
                 field: 'enviamentTipus',
@@ -132,16 +93,35 @@ const useDataGridColumns = () => {
                 flex: 1,
             },
             {
-                ...GRID_DETAIL_PANEL_TOGGLE_COL_DEF,
+                field: ' ',
+                headerName: t('page.notificacio.grid.column.detalls'),
+                flex: 1.2,
+                sortable: false,
+                exportable: false,
+                pinnable: false,
                 hideable: false,
-                renderCell: (params: any) => (
-                    <CustomDetailPanelToggle id={params.id} value={params.value} />
-                ),
+                renderHeader: () => null,
+                renderCell: (params: any) => {
+                    return (
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            startIcon={<Icon>info</Icon>}
+                            onClick={() => onDetailClick(params.id)}
+                        >
+                            {t('page.notificacio.grid.enviament.detalls')}
+                        </Button>
+                    );
+                },
+            },
+            {
+                ...GRID_DETAIL_PANEL_TOGGLE_COL_DEF,
+                headerName: t('page.notificacio.grid.column.desplegar'),
+                hideable: false,
             },
         ],
         []
     );
-    return columns;
 };
 
 const useSpringFilterBuilder = () => {
@@ -293,7 +273,7 @@ const ContentFilter: React.FC = () => {
     };
 
     return (
-        <Grid container spacing={1}>
+        <Grid container spacing={2}>
             <GridFormField size={2} name="enviamentTipus" />
             <GridFormField size={advancedFilter ? 4 : 2.5} name="concepte" />
             <GridFormField size={2.5} name="estat" />
@@ -362,7 +342,7 @@ const NotificacioGrid = () => {
     const { dialogComponent, onDetailClick } = useNotificacioDetailDialog();
     const { currentActions: apiCurrentActions } = useResourceApiService('notificacioResource');
     const isCreateLinkPresent = apiCurrentActions?.['create'] != null;
-    const columns = useDataGridColumns();
+    const columns = useDataGridColumns(onDetailClick);
     const springFilterBuilder = useSpringFilterBuilder();
     const filterDataGridProps = useDatagridFilterProps(
         'notificacioResource',
@@ -380,7 +360,6 @@ const NotificacioGrid = () => {
                 defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
                 paginationActive
                 selectionActive
-                readOnly
                 persistentStateActive
                 persistentStateClearPageSortPropsOnTopLevelRouteChange
                 {...filterDataGridProps}
@@ -400,20 +379,6 @@ const NotificacioGrid = () => {
                     {
                         position: 2,
                         element: <MassiveActionsButton />,
-                    },
-                ]}
-                onRowClick={(params) => onDetailClick(params.id)}
-                rowActionsColumnIndex={11}
-                rowActionsColumnProps={{
-                    flex: 0.5,
-                }}
-                rowAdditionalActions={[
-                    {
-                        label: t('page.notificacio.grid.column.detalls'),
-                        title: t('page.notificacio.grid.column.detalls'),
-                        icon: 'info',
-                        showInMenu: false,
-                        onClick: (id) => onDetailClick(id),
                     },
                 ]}
                 getDetailPanelContent={({ row }) => <NotificacioGridEnviaments id={row.id} />}

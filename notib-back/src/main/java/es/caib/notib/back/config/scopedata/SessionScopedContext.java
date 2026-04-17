@@ -90,12 +90,7 @@ public class SessionScopedContext {
 
 
     public String getIdiomaUsuari() {
-		if (this.usuariActual == null) {
-			return "ca";
-		}
-
-		String idioma = this.usuariActual.getIdioma();
-		return idioma != null ? idioma : "ca";
+        return this.usuariActual != null ? this.usuariActual.getIdioma() : "ca";
     }
     public String getEntitatActualCodi() {
         return this.entitatActual != null ? this.entitatActual.getCodi() : null;

@@ -1,5 +1,5 @@
 /**
- *
+ * 
  */
 package es.caib.notib.ejb;
 
@@ -15,6 +15,7 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import org.springframework.context.annotation.Primary;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.List;
 /**
  * Implementació de PagadorPostalService com a EJB que empra una clase
  * delegada per accedir a la funcionalitat del servei.
- *
+ * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Primary
