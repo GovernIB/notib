@@ -12,14 +12,27 @@ import {
 import { MuiFilter } from 'reactlib';
 import { useNotibContext } from '../components/NotibContext';
 
-export const useDatagridPageSizeOptionsProps = () => {
+export const useDatagridPageSizeOptionsProps = (
+    innerScroll: boolean = true,
+    autoHeightMinHeight?: string
+) => {
     const { currentUser, currentUserGridPageSizeOptions } = useNotibContext();
+    const [autoPageSize, setAutoPageSize] = React.useState<boolean>();
+    const handlePersistentStateChange = (state: any) => {
+        !innerScroll && setAutoPageSize(state.autoPageSize);
+    };
     return {
         defaultPaginationModel: {
             page: 0,
             pageSize: currentUser.numElementsPaginaDefecteAsInt ?? -1,
         },
         pageSizeOptions: currentUserGridPageSizeOptions,
+        onPersistentStateChange: handlePersistentStateChange,
+        ...(!innerScroll &&
+            !autoPageSize && {
+                autoHeight: true,
+                sx: { minHeight: autoHeightMinHeight ?? '400px' },
+            }),
     };
 };
 
@@ -76,7 +89,10 @@ export const useDatagridTreeData = (
             if (node?.children?.length) {
                 if (expanded) {
                     datagridApiRef.current?.setRowChildrenExpansion(id, expanded);
-                } else if (defaultGroupingExpansionDepth == null || node.depth >= defaultGroupingExpansionDepth) {
+                } else if (
+                    defaultGroupingExpansionDepth == null ||
+                    node.depth >= defaultGroupingExpansionDepth
+                ) {
                     datagridApiRef.current?.setRowChildrenExpansion(id, expanded);
                 }
             }
