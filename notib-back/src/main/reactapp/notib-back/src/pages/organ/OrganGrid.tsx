@@ -293,18 +293,18 @@ export const OrganGrid = () => {
         t('page.organs.grid.viewSwitch'),
         true
     );
-    const filterDataGridProps = useDatagridFilterProps(
-        'organGestorResource',
-        'FILTER_ORGAN_GESTOR',
-        springFilterBuilder,
-        <ContentFilter />
-    );
     const columns = useColumns(treeDataViewActive);
     const treeDataProps = useDatagridTreeData(
         treeDataViewActive,
         t('page.organs.grid.groupColumn'),
         1,
         { flex: 6 }
+    );
+    const filterDataGridProps = useDatagridFilterProps(
+        'organGestorResource',
+        'FILTER_ORGAN_GESTOR',
+        springFilterBuilder,
+        <ContentFilter />
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
