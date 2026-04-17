@@ -9,7 +9,7 @@ export type OpenAnswerRequiredDialogFn = (
 ) => Promise<string>;
 
 export type ResourceType = 'ACTION' | 'REPORT' | 'FILTER';
-export type ExportFileType = 'CSV' | 'ODS' | 'ODT' | 'XLSX' | 'DOCX' | 'PDF';
+export type ExportFileType = 'CSV' | 'ODS' | 'ODT' | 'XLSX' | 'DOCX' | 'PDF' | 'CUSTOM';
 export type ReportOutputFormat =
     | 'PDF'
     | 'XLS'
