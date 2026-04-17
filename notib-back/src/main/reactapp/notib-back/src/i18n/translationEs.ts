@@ -91,7 +91,9 @@ const translationEs = {
         organs: {
             grid: {
                 title: 'Órganos gestores',
+                viewSwitch: 'Vista en árbol',
                 groupColumn: 'Órgano gestor',
+                popupDialogTitle: 'órgano gestor',
                 sync: {
                     title: 'Sincronización DIR3',
                     dialogTitle: 'Sincronización DIR3',
