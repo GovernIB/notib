@@ -2,26 +2,157 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Icon from '@mui/material/Icon';
 import {
-    FilterApi,
+    GridPage,
     MuiDataGrid,
-    MuiDataGridColDef,
-    MuiFilter,
-    useFilterApiRef,
+    useFilterApiContext,
     springFilterBuilder as filterBuilder,
-    MuiDataGridApiRef,
     useMuiDataGridApiRef,
     useMuiActionReportLogic,
     useMuiDataGridContext,
-    useBaseAppContext,
 } from 'reactlib';
-import { Box, Grid, IconButton } from '@mui/material';
+import { Grid, IconButton } from '@mui/material';
 import GridFormField, { GridButtonField } from '../../components/GridFormField';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
-import { useEnviamentDetailDialog } from './EnviamentDetailDialog';
 import { useNotificacioDetailDialog } from '../notificacio/NotificacioDetailDialog';
 import AccionsMassives, { MenuOption } from '../../components/AccionsMassives';
+import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
+import { useEnviamentDetailDialog } from './EnviamentDetailDialog';
 
-const MenuActions: React.FC = () => {
+const columns = [
+    {
+        field: 'createdDate',
+    },
+    {
+        field: 'enviatDate',
+    },
+    {
+        field: 'enviamentDataProgramada',
+    },
+    {
+        field: 'notificaReferencia',
+    },
+    {
+        field: 'createdBy',
+    },
+    {
+        field: 'notificacioOrganGestor',
+    },
+    {
+        field: 'notificacioProcediment',
+    },
+    {
+        field: 'notificacioConcepte',
+    },
+    {
+        field: 'notificacioDescripcio',
+    },
+    {
+        field: 'titular',
+    },
+    {
+        field: 'representantsString',
+    },
+    {
+        field: 'registreNumeroFormatat',
+    },
+    {
+        field: 'notificaDataCaducitat',
+    },
+    {
+        field: 'tipusEnviament',
+    },
+    {
+        field: 'referenciaEnviament',
+    },
+    {
+        field: 'referenciaNotificacio',
+    },
+    {
+        field: 'codiCsvUuidDocument',
+        flex: 2,
+    },
+    {
+        field: 'notificaEstat',
+    },
+    {
+        field: 'entregaPostalActiva',
+    },
+    // {
+    //     field: ' ',
+    //     // flex: 1.2,
+    //     width: 150,
+    //     sortable: false,
+    //     hideable: false,
+    //     exportable: false,
+    //     pinnable: false,
+    //     renderCell: (params: any) => {
+    //         return (
+    //             <Button
+    //                 variant="outlined"
+    //                 size="small"
+    //                 startIcon={<Icon>info</Icon>}
+    //                 onClick={() => onDetailClick(params.id)}
+    //             >
+    //                 {t('page.enviament.grid.detalls')}
+    //             </Button>
+    //         );
+    //     },
+    // },
+];
+
+const springFilterBuilder = (data: any) => {
+    return filterBuilder.and(
+        filterBuilder.eq('tipusEnviament', `'${data?.tipusEnviament}'`),
+        filterBuilder.like('notificacioConcepte', data.notificacioConcepte),
+        filterBuilder.eq('notificaEstat', `'${data?.notificaEstat}'`),
+        data?.dataEnviamentInici &&
+            filterBuilder.gte('enviatDate', `'${formatStartOfDay(data?.dataEnviamentInici)}'`),
+        data?.dataEnviamentFi &&
+            filterBuilder.lte('enviatDate', `'${formatEndOfDay(data?.dataEnviamentFi)}'`),
+        data?.dataCreacioInici &&
+            filterBuilder.gte('createdDate', `'${formatStartOfDay(data?.dataCreacioInici)}'`),
+        data?.dataCreacioFi &&
+            filterBuilder.lte('createdDate', `'${formatEndOfDay(data?.dataCreacioFi)}'`),
+        data?.enviamentDataProgramadaInici &&
+            filterBuilder.gte(
+                'enviamentDataProgramada',
+                `'${formatStartOfDay(data?.enviamentDataProgramadaInici)}'`
+            ),
+        data?.enviamentDataProgramadaFi &&
+            filterBuilder.lte(
+                'enviamentDataProgramada',
+                `'${formatEndOfDay(data?.enviamentDataProgramadaFi)}'`
+            ),
+        filterBuilder.like('notificaReferencia', data.notificaReferencia),
+        filterBuilder.like('grupCodi', data.grupCodi),
+        filterBuilder.eq('organId', data?.organGestor?.id),
+        filterBuilder.like('procedimentId', data?.procedimentServei?.id),
+        filterBuilder.eq('createdBy', `'${data?.createdBy}'`),
+        filterBuilder.like('notificacioDescripcio', data?.notificacioDescripcio),
+        filterBuilder.or(
+            filterBuilder.like('titularNom', data.titularNomNif),
+            filterBuilder.like('titularNif', data.titularNomNif)
+        ),
+        filterBuilder.like('representantsString', data?.representantsString),
+        filterBuilder.like('registreNumeroFormatat', data.numRegistre),
+        data?.dataCaducitatInici &&
+            filterBuilder.gte(
+                'notificaDataCaducitat',
+                `'${formatStartOfDay(data?.dataCaducitatInici)}'`
+            ),
+        data?.dataCaducitatFi &&
+            filterBuilder.lte(
+                'notificaDataCaducitat',
+                `'${formatEndOfDay(data?.dataCaducitatFi)}'`
+            ),
+        filterBuilder.like('referenciaEnviament', data.referenciaEnviament),
+        filterBuilder.like('referenciaNotificacio', data.referenciaNotificacio),
+        filterBuilder.like('codiCsvUuidDocument', data.codiCsvUuidDocument),
+        filterBuilder.eq('entregaPostalActiva', `'${data.entregaPostalActiva}'`)
+    );
+};
+
+const MassiveActionsButton: React.FC = () => {
     const { selection } = useMuiDataGridContext();
 
     const { exec: execExemple } = useMuiActionReportLogic(
@@ -59,23 +190,16 @@ const MenuActions: React.FC = () => {
     return <AccionsMassives options={opcionsMenu} sizeSelection={selection?.ids?.size} />;
 };
 
-const ContentFilter: React.FC<{
-    filterApiRef: React.RefObject<FilterApi>;
-    gridApiRef: MuiDataGridApiRef;
-}> = (props) => {
-    const { filterApiRef, gridApiRef } = props;
+const ContentFilter: React.FC = () => {
+    const filterApiRef = useFilterApiContext();
     const { t } = useTranslation();
     const [advancedFilter, setAdvancedFilter] = React.useState(false);
 
     const handleButtonClick = () => {
-        filterApiRef.current.clear();
+        filterApiRef.current?.clear();
     };
     const advancedFilterClick = () => {
         setAdvancedFilter(!advancedFilter);
-    };
-
-    const refreshButtonClick = () => {
-        gridApiRef.current?.refresh();
     };
     return (
         <Grid container spacing={2}>
@@ -130,86 +254,7 @@ const ContentFilter: React.FC<{
                     </Icon>
                 </IconButton>
             </Grid>
-            <Grid size={0.5}>
-                <IconButton
-                    onClick={refreshButtonClick}
-                    title={t('component.GridToolbarButton.refresh')}
-                >
-                    <Icon>refresh</Icon>
-                </IconButton>
-            </Grid>
-            <MenuActions />
         </Grid>
-    );
-};
-
-const EnviamentGridFilter: React.FC<{ gridApiRef: MuiDataGridApiRef }> = (props) => {
-    const { gridApiRef } = props;
-    const filterApiRef = useFilterApiRef();
-
-    const springFilterBuilder = (data: any) => {
-        return filterBuilder.and(
-            filterBuilder.eq('tipusEnviament', `'${data?.tipusEnviament}'`),
-            filterBuilder.like('notificacioConcepte', data.notificacioConcepte),
-            filterBuilder.eq('notificaEstat', `'${data?.notificaEstat}'`),
-            data?.dataEnviamentInici &&
-                filterBuilder.gte('enviatDate', `'${formatStartOfDay(data?.dataEnviamentInici)}'`),
-            data?.dataEnviamentFi &&
-                filterBuilder.lte('enviatDate', `'${formatEndOfDay(data?.dataEnviamentFi)}'`),
-            data?.dataCreacioInici &&
-                filterBuilder.gte('createdDate', `'${formatStartOfDay(data?.dataCreacioInici)}'`),
-            data?.dataCreacioFi &&
-                filterBuilder.lte('createdDate', `'${formatEndOfDay(data?.dataCreacioFi)}'`),
-            data?.enviamentDataProgramadaInici &&
-                filterBuilder.gte(
-                    'enviamentDataProgramada',
-                    `'${formatStartOfDay(data?.enviamentDataProgramadaInici)}'`
-                ),
-            data?.enviamentDataProgramadaFi &&
-                filterBuilder.lte(
-                    'enviamentDataProgramada',
-                    `'${formatEndOfDay(data?.enviamentDataProgramadaFi)}'`
-                ),
-            filterBuilder.like('notificaReferencia', data.notificaReferencia),
-            filterBuilder.like('grupCodi', data.grupCodi),
-            filterBuilder.eq('organId', data?.organGestor?.id),
-            filterBuilder.like('procedimentId', data?.procedimentServei?.id),
-            filterBuilder.eq('createdBy', `'${data?.createdBy}'`),
-            filterBuilder.like('notificacioDescripcio', data?.notificacioDescripcio),
-            filterBuilder.or(
-                filterBuilder.like('titularNom', data.titularNomNif),
-                filterBuilder.like('titularNif', data.titularNomNif)
-            ),
-            filterBuilder.like('representantsString', data?.representantsString),
-            filterBuilder.like('registreNumeroFormatat', data.numRegistre),
-            data?.dataCaducitatInici &&
-                filterBuilder.gte(
-                    'notificaDataCaducitat',
-                    `'${formatStartOfDay(data?.dataCaducitatInici)}'`
-                ),
-            data?.dataCaducitatFi &&
-                filterBuilder.lte(
-                    'notificaDataCaducitat',
-                    `'${formatEndOfDay(data?.dataCaducitatFi)}'`
-                ),
-            filterBuilder.like('referenciaEnviament', data.referenciaEnviament),
-            filterBuilder.like('referenciaNotificacio', data.referenciaNotificacio),
-            filterBuilder.like('codiCsvUuidDocument', data.codiCsvUuidDocument),
-            filterBuilder.eq('entregaPostalActiva', `'${data.entregaPostalActiva}'`)
-        );
-    };
-
-    return (
-        <MuiFilter
-            resourceName="notificacioEnviamentResource"
-            code="FILTER_ENVIAMENT"
-            apiRef={filterApiRef}
-            springFilterBuilder={springFilterBuilder}
-            componentProps={{ sx: { mb: 2, mt: 0 } }}
-            commonFieldComponentProps={{ size: 'small' }}
-        >
-            <ContentFilter filterApiRef={filterApiRef} gridApiRef={gridApiRef} />
-        </MuiFilter>
     );
 };
 
@@ -219,109 +264,33 @@ const EnviamentGrid = () => {
     const { dialogComponent: enviamentDialogComponent, onDetailClick } = useEnviamentDetailDialog();
     const { dialogComponent: notificacioDialogComponent, onDetailClick: onNotificacioDetailClick } =
         useNotificacioDetailDialog();
-    const { setMarginsDisabled } = useBaseAppContext();
-
-    React.useEffect(() => {
-        setMarginsDisabled(true);
-        return () => setMarginsDisabled(false);
-    }, [setMarginsDisabled]);
-
-    const columns: MuiDataGridColDef[] = React.useMemo(
-        () => [
-            {
-                field: 'createdDate',
-            },
-            {
-                field: 'enviatDate',
-            },
-            {
-                field: 'enviamentDataProgramada',
-            },
-            {
-                field: 'notificaReferencia',
-            },
-            {
-                field: 'createdBy',
-            },
-            {
-                field: 'notificacioOrganGestor',
-            },
-            {
-                field: 'notificacioProcediment',
-            },
-            {
-                field: 'notificacioConcepte',
-            },
-            {
-                field: 'notificacioDescripcio',
-            },
-            {
-                field: 'titular',
-            },
-            {
-                field: 'representantsString',
-            },
-            {
-                field: 'registreNumeroFormatat',
-            },
-            {
-                field: 'notificaDataCaducitat',
-            },
-            {
-                field: 'tipusEnviament',
-            },
-            {
-                field: 'referenciaEnviament',
-            },
-            {
-                field: 'referenciaNotificacio',
-            },
-            {
-                field: 'codiCsvUuidDocument',
-                flex: 2,
-            },
-            {
-                field: 'notificaEstat',
-            },
-            {
-                field: 'entregaPostalActiva',
-            },
-            // {
-            //     field: ' ',
-            //     // flex: 1.2,
-            //     width: 150,
-            //     sortable: false,
-            //     hideable: false,
-            //     exportable: false,
-            //     pinnable: false,
-            //     renderCell: (params: any) => {
-            //         return (
-            //             <Button
-            //                 variant="outlined"
-            //                 size="small"
-            //                 startIcon={<Icon>info</Icon>}
-            //                 onClick={() => onDetailClick(params.id)}
-            //             >
-            //                 {t('page.enviament.grid.detalls')}
-            //             </Button>
-            //         );
-            //     },
-            // },
-        ],
-        []
+    const filterDataGridProps = useDatagridFilterProps(
+        'notificacioEnviamentResource',
+        'FILTER_ENVIAMENT',
+        springFilterBuilder,
+        <ContentFilter />
     );
-
+    const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
-        <Box sx={{ height: '1000px' }}>
+        <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
             <MuiDataGrid
                 apiRef={gridApiRef}
                 title={t('page.enviament.grid.title')}
                 resourceName="notificacioEnviamentResource"
                 columns={columns}
-                toolbarAdditionalRow={<EnviamentGridFilter gridApiRef={gridApiRef} />}
-                toolbarHideQuickFilter
-                toolbarHideRefresh
-                toolbarHideCreate
+                paginationActive
+                selectionActive
+                persistentStateActive
+                persistentStateClearPageSortPropsOnTopLevelRouteChange
+                {...filterDataGridProps}
+                {...pageSizeOptionsDataGridProps}
+                toolbarType="upper"
+                toolbarElementsWithPositions={[
+                    {
+                        position: 2,
+                        element: <MassiveActionsButton />,
+                    },
+                ]}
                 rowAdditionalActions={[
                     {
                         label: t('page.enviament.grid.detalls'),
@@ -352,14 +321,10 @@ const EnviamentGrid = () => {
                         // onClick: (id) => onNotificacioDetailClick(id), // TODO FALTA AFEGIR L'ACCIÓ I QUE ES MOSTRI L'ENTRADA DEL MENU SEGONS CONDICIO
                     },
                 ]}
-                readOnly
-                paginationActive
-                toolbarType="upper"
-                selectionActive
             />
             {enviamentDialogComponent}
             {notificacioDialogComponent}
-        </Box>
+        </GridPage>
     );
 };
 
