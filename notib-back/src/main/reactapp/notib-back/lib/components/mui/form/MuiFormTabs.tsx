@@ -69,7 +69,7 @@ export const MuiFormTabContent: React.FC<FormTabContentProps> = (props) => {
             style={{ height: '100%' }}
             {...other}
         >
-            {currentIndex === index && <Box sx={{ pt: 3, pb: 2, height: '100%' }}>{children}</Box>}
+            {currentIndex === index && <Box sx={{ pt: 3, height: '100%' }}>{children}</Box>}
         </div>
     ) : showOnCreate ? (
         children
