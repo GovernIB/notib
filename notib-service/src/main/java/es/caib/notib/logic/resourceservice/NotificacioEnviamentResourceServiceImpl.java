@@ -1,29 +1,24 @@
 package es.caib.notib.logic.resourceservice;
 
-import es.caib.notib.client.domini.EnviamentTipus;
-import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.EntregaPostalResource;
-import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.exception.PerspectiveApplicationException;
 import es.caib.notib.logic.intf.base.exception.ResourceNotCreatedException;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
-import es.caib.notib.logic.intf.model.EntitatResource;
 import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 import es.caib.notib.logic.intf.model.PersonaResource;
 import es.caib.notib.logic.intf.resourceservice.NotificacioEnviamentResourceService;
-import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
 import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
-import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
-import es.caib.notib.persist.resourceentity.ProcedimentResourceEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,10 +30,13 @@ import java.util.Map;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class NotificacioEnviamentResourceServiceImpl
 	extends BaseMutableResourceService<NotificacioEnviamentResource, Long, NotificacioEnviamentResourceEntity>
 	implements NotificacioEnviamentResourceService {
 
+	private final UserSessionHelper userSessionHelper;
+	private final NotibPermissionHelper notibPermissionHelper;
 
 	@PostConstruct
 	public void init() {
@@ -46,16 +44,19 @@ public class NotificacioEnviamentResourceServiceImpl
 		register(NotificacioEnviamentResource.PERSPECTIVE_ENTREGA_POSTAL, new NotificacioEnviamentResourceEntregaPostalPerspectiveApplicator());
 	}
 
-	/*
-	 * Com que aquest servei no s'ha d'utilitzar més que per a consultar els fields feim que no es retorni mai cap
-	 * resultat.
-	 */
 	@Override
 	protected String additionalSpringFilter(
 		String currentSpringFilter,
 		String[] namedQueries) {
-		//return "id is null";
-		return null;
+		List<String> andConditions = new ArrayList<>();
+		// Condició per a mostrar només les notificacions de l'entitat actual
+		andConditions.add("notificacio.entitat.id:" + userSessionHelper.getCurrentEntitatId());
+		// Condició per a mostrar només les notificacions amb permís de lectura
+		String permissionFilter = notibPermissionHelper.notificacioSpringFilterWithReadPermission("notificacio.");
+		if (!permissionFilter.isEmpty()) {
+			andConditions.add("(" + permissionFilter + ")");
+		}
+		return String.join(" and ", andConditions);
 	}
 
 	/*
@@ -143,4 +144,5 @@ public class NotificacioEnviamentResourceServiceImpl
 			resource.setEntregaPostalInfo(entregaPostalInfo);
 		}
 	}
+
 }
