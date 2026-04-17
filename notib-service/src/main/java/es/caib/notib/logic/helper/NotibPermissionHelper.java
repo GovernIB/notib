@@ -8,6 +8,8 @@ import es.caib.notib.logic.intf.base.exception.ResourceNotUpdatedException;
 import es.caib.notib.logic.intf.base.model.Resource;
 import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
+import es.caib.notib.logic.intf.model.NotificacioResource;
+import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
 import es.caib.notib.persist.resourcerepository.OrganGestorResourceRepository;
 import es.caib.notib.persist.resourcerepository.ProcedimentOrganGestorResourceRepository;
 import es.caib.notib.persist.resourcerepository.ProcedimentResourceRepository;
@@ -238,6 +240,76 @@ public class NotibPermissionHelper {
 			return ExtendedPermission.PERM7;
 		} else {
 			return ExtendedPermission.PERM5;
+		}
+	}
+
+	/*
+	 * Condició en format Spring Filter per a mostrar només les notificacions sobre les que es tenen permisos. Les
+	 * notificacions es poden veure si es compleix alguna de les següents condicions:
+	 *   a) L'usuari te permís sobre l'òrgan gestor de la notificació.
+	 *   b) La notificació te un procediment no comú i l'usuari te permís sobre aquest procediment.
+	 *   c) La notificació te un procediment comú amb "requereix permisos directes" i l'usuari te permís
+	 *      sobre la combinació organ gestor - procediment de la notificació.
+	 *   d) La notificació te un procediment comú sense "requereix permisos directes",
+	 *      l'usuari te permís sobre la combinació organ gestor - procediment de la notificació i les combinacions
+	 *      òrgan gestor - procediment son únicament dels òrgans gestors amb permís de procediments comuns.
+	 */
+	public String notificacioSpringFilterWithReadPermission(String fieldPrefix) {
+		List<Long> organGestorIds = organGestorIdsWithPermissionRecursive(BasePermission.READ);
+		List<Long> procedimentNoComuIds = procedimentServeiNoComuIdsWithPermission(
+			BasePermission.READ,
+			null);
+		List<Long> procedimentComuOrganGestorIds = procedimentServeiComuOrganGestorIdsWithPermission(
+			BasePermission.READ,
+			null);
+		List<String> permissionOrConditions = new ArrayList<>();
+		// a)
+		String joinedOrganGestorIds = organGestorIds.stream().
+			map(String::valueOf).collect(Collectors.joining(","));
+		if (!joinedOrganGestorIds.isEmpty()) {
+			permissionOrConditions.add(fieldPrefix + "organGestor.id in (" + joinedOrganGestorIds + ")");
+		}
+		// b)
+		String joinedProcedimentNoComuIds = procedimentNoComuIds.stream().
+			map(String::valueOf).collect(Collectors.joining(","));
+		if (!joinedProcedimentNoComuIds.isEmpty()) {
+			permissionOrConditions.add(fieldPrefix + "procediment.id in (" + joinedProcedimentNoComuIds + ")");
+		}
+		// c) o d)
+		String joinedProcedimentComuOrganGestorIds = procedimentComuOrganGestorIds.stream().
+			map(String::valueOf).collect(Collectors.joining(","));
+		if (!joinedProcedimentComuOrganGestorIds.isEmpty()) {
+			permissionOrConditions.add(fieldPrefix + "procedimentOrganGestor.id in (" + joinedProcedimentComuOrganGestorIds + ")");
+		}
+		return String.join(" or ", permissionOrConditions);
+	}
+
+	/*
+	 * Es verifica si es tenen permisos per a crear la notificació. Les condicions que es verifiquen son les mateixes
+	 * del mètode springFilterWithReadPermission().
+	 */
+	public void notificacioCheckCreatePermission(NotificacioResourceEntity entity) {
+		Permission organGestorPermission = getOrganGestorNotificacioCreatePermission(
+			entity.getEnviamentTipus());
+		Permission procedimentPermission = getProcedimentNotificacioCreatePermission(
+			entity.getEnviamentTipus());
+		List<Long> organGestorIds = organGestorIdsWithPermissionRecursive(organGestorPermission);
+		List<Long> procedimentNoComuIds = procedimentServeiNoComuIdsWithPermission(
+			procedimentPermission,
+			null);
+		List<Long> procedimentComuOrganGestorIds = procedimentServeiComuOrganGestorIdsWithPermission(
+			procedimentPermission,
+			null);
+		Long organGestorId = entity.getOrganGestor().getId();
+		Long procedimentId = entity.getProcediment().getId();
+		Long procedimentOrganGestorId = entity.getProcedimentOrganGestor().getId();
+		boolean permissionGranted = (organGestorId != null && organGestorIds.contains(organGestorId)) || // a)
+			(procedimentId != null && procedimentNoComuIds.contains(procedimentId)) || // b)
+			(procedimentOrganGestorId != null && procedimentComuOrganGestorIds.contains(procedimentOrganGestorId)); // c) o d)
+		if (!permissionGranted) {
+			throw new ResourceNotCreatedException(
+				NotificacioResource.class,
+				"Not allowed to create notification. Permission check failed.");
 		}
 	}
 
