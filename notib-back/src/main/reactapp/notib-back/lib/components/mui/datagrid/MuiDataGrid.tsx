@@ -257,6 +257,8 @@ export type MuiDataGridProps = {
     onRowUpdate?: (row: any) => void;
     /** Event que es llença quan s'elimina una fila */
     onRowDelete?: (id: any | any[]) => void;
+    /** Event que es llença quan canvia l'estat persistit (només es crida si persistentStateActive és true) */
+    onPersistentStateChange?: (state: any) => void;
     /** Referència a l'api del component */
     apiRef?: MuiDataGridApiRef;
     /** Referència a l'api interna del component DataGrid de MUI */
@@ -543,6 +545,7 @@ const usePersistentState = (
     active: boolean,
     persistentStateClearPageSortPropsOnTopLevelRouteChange: boolean,
     columns: GridColDef[],
+    onPersistentStateChange: ((state: any) => void) | undefined,
     sortModelProp: GridSortModel | undefined,
     defaultSortModel: GridSortModel | undefined,
     paginationModelProp: GridPaginationModel | undefined,
@@ -560,10 +563,10 @@ const usePersistentState = (
         try {
             const storage = storeInLocalStorage ? localStorage : sessionStorage;
             const raw = storage.getItem(storageKey);
-            const state = raw ? JSON.parse(raw) : null;
+            const parsedState = raw ? JSON.parse(raw) : null;
             if (persistentStateClearPageSortPropsOnTopLevelRouteChange && topLevelRouteChanged) {
-                const { sortModel, paginationModel, expandedRowIds, ...otherState } = state;
-                return {
+                const { sortModel, paginationModel, expandedRowIds, ...otherState } = parsedState;
+                const state: any = {
                     paginationModel: {
                         page: 0,
                         pageSize: paginationModel?.pageSize,
@@ -571,8 +574,11 @@ const usePersistentState = (
                     expandedRowIds: [],
                     ...otherState,
                 };
-            } else {
+                onPersistentStateChange?.(state);
                 return state;
+            } else {
+                onPersistentStateChange?.(parsedState);
+                return parsedState;
             }
         } catch {
             return null;
@@ -582,6 +588,7 @@ const usePersistentState = (
         try {
             const storage = storeInLocalStorage ? localStorage : sessionStorage;
             storage.setItem(storageKey, JSON.stringify(state));
+            onPersistentStateChange?.(state);
         } catch {}
     };
     const initialState = active ? loadInitialState() : undefined;
@@ -849,6 +856,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         onRowCreate,
         onRowUpdate,
         onRowDelete: onRowDeleteProp,
+        onPersistentStateChange,
         apiRef: apiRefProp,
         datagridApiRef: datagridApiRefProp,
         height,
@@ -1020,6 +1028,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         persistentStateActive ?? false,
         persistentStateClearPageSortPropsOnTopLevelRouteChange ?? false,
         processedColumns,
+        onPersistentStateChange,
         sortModelProp,
         defaultSortModel,
         paginationModelProp,
@@ -1304,7 +1313,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                 pageInfo,
                 setRowSelectionModel,
                 pageSizeOptions: otherProps?.pageSizeOptions,
-                enableAutoPageSizeOption: !autoHeight,
+                enableAutoPageSizeOption: true,
                 autoPageSize,
                 setAutoPageSize,
             },
