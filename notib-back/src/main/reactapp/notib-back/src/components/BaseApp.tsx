@@ -6,6 +6,7 @@ import {
     Link as RouterLink,
     type LinkProps as RouterLinkProps,
 } from 'react-router-dom';
+import { saveAs } from 'file-saver';
 import i18n from '../i18n/i18n';
 import { useTranslation } from 'react-i18next';
 import Box from '@mui/material/Box';
@@ -191,6 +192,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             routerUseLocationPath={useLocationPath}
             routerAnyHistoryEntryExist={anyHistoryEntryExist}
             linkComponent={Link}
+            saveAs={saveAs}
             menuEntries={baseAppMenuEntries}
         >
             <CustomLocalizationProvider>
