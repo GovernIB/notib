@@ -197,13 +197,12 @@ public class AplicacioServiceImpl implements AplicacioService {
 					.rebreEmailsNotificacio(dto.getRebreEmailsNotificacio())
 					.emailAlt(dto.getEmailAlt())
 					.rebreEmailsNotificacioCreats(dto.getRebreEmailsNotificacioCreats())
-					.rebreEmailsAgrupats(dto.getRebreEmailsAgrupats())
-					.idioma(idioma)
+                    .idioma(idioma)
 					.numElementsPaginaDefecte(dto.getNumElementsPaginaDefecte().name())
-					.entitatDefecte(dto.getEntitatDefecte())
-					.organDefecte(dto.getOrganDefecte())
-					.procedimentDefecte(dto.getProcedimentDefecte())
-					.build();
+                    .entitatDefecte(dto.getEntitatDefecte())
+                    .organDefecte(dto.getOrganDefecte())
+                    .procedimentDefecte(dto.getProcedimentDefecte())
+                    .build();
 			usuari.update(usr);
 			cacheHelper.evictUsuariByCodi(usuari.getCodi());
 			return toUsuariDtoAmbRols(usuari);

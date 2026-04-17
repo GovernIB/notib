@@ -69,7 +69,7 @@ public class EntitatResourceServiceImpl
 		EntitatResourceEntity entity,
 		EntitatResource resource,
 		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		notibPermissionHelper.entitatCheckAdminPermissionThrows(
+		notibPermissionHelper.entitatCheckAdminPermission(
 			getResourceClass(),
 			null,
 			null,
@@ -81,7 +81,7 @@ public class EntitatResourceServiceImpl
 		EntitatResourceEntity entity,
 		EntitatResource resource,
 		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		notibPermissionHelper.entitatCheckAdminPermissionThrows(
+		notibPermissionHelper.entitatCheckAdminPermission(
 			getResourceClass(),
 			resource.getId(),
 			resource.getId(),
@@ -92,7 +92,7 @@ public class EntitatResourceServiceImpl
 	protected void beforeDelete(
 		EntitatResourceEntity entity,
 		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		notibPermissionHelper.entitatCheckAdminPermissionThrows(
+		notibPermissionHelper.entitatCheckAdminPermission(
 			getResourceClass(),
 			entity.getId(),
 			entity.getId(),

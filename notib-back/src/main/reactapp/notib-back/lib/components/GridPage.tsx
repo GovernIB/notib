@@ -28,7 +28,7 @@ export const GridPage: React.FC<GridPageProps> = (props) => {
     } = useBaseAppContext();
     const [proceed, setProceed] = React.useState<boolean>(contentExpandsToAvailableHeight);
     React.useEffect(() => {
-        if (!proceed && contentExpandsToAvailableHeight === !autoHeight) {
+        if (!proceed && contentExpandsToAvailableHeight) {
             setProceed(true);
         }
     }, [contentExpandsToAvailableHeight]);
@@ -37,19 +37,15 @@ export const GridPage: React.FC<GridPageProps> = (props) => {
         return () => setMarginsDisabled(false);
     }, [disableMargins]);
     React.useEffect(() => {
-        if (!autoHeight) {
-            setContentExpandsToAvailableHeight(true);
-            return () => setContentExpandsToAvailableHeight(false);
-        } else {
-            setContentExpandsToAvailableHeight(false);
-        }
-    }, [autoHeight]);
+        setContentExpandsToAvailableHeight(true);
+        return () => setContentExpandsToAvailableHeight(false);
+    }, []);
     return (
         <div
             style={{
                 ...(!autoHeight
                     ? { display: 'flex', flexDirection: 'column', height: '100%' }
-                    : { }),
+                    : { paddingBottom: '40px' }),
                 ...style,
             }}
         >

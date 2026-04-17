@@ -80,8 +80,8 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 
 	@Override
 	@RolesAllowed("**")
-	public FitxerDto exportacio(AccioMassivaExecucio accioMassivaExecucio) throws IOException, NotFoundException, ParseException {
-		return getDelegateService().exportacio(accioMassivaExecucio);
+	public FitxerDto exportacio(Long entitatId, Collection<Long> enviamentIds, String format) throws IOException, NotFoundException, ParseException {
+		return getDelegateService().exportacio(entitatId, enviamentIds, format);
 	}
 
 	@Override

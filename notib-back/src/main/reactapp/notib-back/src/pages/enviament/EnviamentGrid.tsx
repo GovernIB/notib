@@ -77,6 +77,27 @@ const columns = [
     {
         field: 'entregaPostalActiva',
     },
+    // {
+    //     field: ' ',
+    //     // flex: 1.2,
+    //     width: 150,
+    //     sortable: false,
+    //     hideable: false,
+    //     exportable: false,
+    //     pinnable: false,
+    //     renderCell: (params: any) => {
+    //         return (
+    //             <Button
+    //                 variant="outlined"
+    //                 size="small"
+    //                 startIcon={<Icon>info</Icon>}
+    //                 onClick={() => onDetailClick(params.id)}
+    //             >
+    //                 {t('page.enviament.grid.detalls')}
+    //             </Button>
+    //         );
+    //     },
+    // },
 ];
 
 const springFilterBuilder = (data: any) => {
@@ -181,7 +202,7 @@ const ContentFilter: React.FC = () => {
         setAdvancedFilter(!advancedFilter);
     };
     return (
-        <Grid container spacing={1}>
+        <Grid container spacing={2}>
             <GridFormField size={2} name="tipusEnviament" />
             <GridFormField size={advancedFilter ? 4 : 2.5} name="notificacioConcepte" />
             <GridFormField size={2.5} name="notificaEstat" />
@@ -270,8 +291,6 @@ const EnviamentGrid = () => {
                         element: <MassiveActionsButton />,
                     },
                 ]}
-                onRowClick={(params) => onDetailClick(params.id)}
-                rowActionsColumnIndex={19}
                 rowAdditionalActions={[
                     {
                         label: t('page.enviament.grid.detalls'),

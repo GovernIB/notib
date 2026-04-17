@@ -14,7 +14,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import {
     GridPage,
     MuiDataGrid,
-    MuiDataGridApiRef,
+    MuiDataGridApi,
     MuiActionReportButton,
     useBaseAppContext,
     useResourceApiService,
@@ -199,7 +199,7 @@ const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
 };
 
 const OrganGridDir3SyncActionButton: React.FC<{
-    dataGridApiRef: MuiDataGridApiRef;
+    dataGridApiRef: React.RefObject<MuiDataGridApi>;
 }> = (props) => {
     const { dataGridApiRef } = props;
     const { t } = useTranslation();
@@ -223,7 +223,7 @@ const OrganGridDir3SyncActionButton: React.FC<{
     };
     const handleSuccess = (result?: any) => {
         if (!result.simulat) {
-            dataGridApiRef.current?.refresh();
+            dataGridApiRef.current.refresh();
             temporalMessageShow(null, t('page.organs.grid.sync.success'), 'success');
         }
     };
@@ -293,19 +293,18 @@ export const OrganGrid = () => {
         t('page.organs.grid.viewSwitch'),
         true
     );
-    const columns = useColumns(treeDataViewActive);
-    const treeDataProps = useDatagridTreeData(
-        treeDataViewActive,
-        t('page.organs.grid.groupColumn'),
-        false,
-        1,
-        { flex: 6 }
-    );
     const filterDataGridProps = useDatagridFilterProps(
         'organGestorResource',
         'FILTER_ORGAN_GESTOR',
         springFilterBuilder,
         <ContentFilter />
+    );
+    const columns = useColumns(treeDataViewActive);
+    const treeDataProps = useDatagridTreeData(
+        treeDataViewActive,
+        t('page.organs.grid.groupColumn'),
+        1,
+        { flex: 6 }
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (

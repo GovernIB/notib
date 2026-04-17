@@ -56,6 +56,4 @@ public interface SchedulledService {
 	void evictCachePaisosProvincies();
 
 	void generarEstadistiques();
-
-	void enviarCorreusAgrupats();
 }

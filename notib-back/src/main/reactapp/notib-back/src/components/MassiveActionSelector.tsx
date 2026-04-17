@@ -1,4 +1,9 @@
 import React from 'react';
+import {Box, Button, ButtonGroup, Chip, Icon, Tooltip} from '@mui/material';
+import {useResourceApiService} from 'reactlib';
+import { useTranslation } from 'react-i18next';
+import {MenuActionButton} from "./MenuButton.tsx";
+import Load from "./Load.tsx";
 
 export type MassiveActionProps = {
     title?: string;
@@ -19,11 +24,10 @@ type MassiveActionSelectorProps = {
     hiddenDefSelector?: boolean,
 }
 
-const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (/*props:MassiveActionSelectorProps*/) => {
-    //const {resourceName, filter, namedQueries, selectedRows, setSelectedRows, disabledDefSelector, hiddenDefSelector, actions } = props;
-    //const { t } = useTranslation();
+const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:MassiveActionSelectorProps) => {
+    const {resourceName, filter, namedQueries, selectedRows, setSelectedRows, disabledDefSelector, hiddenDefSelector, actions } = props;
+    const { t } = useTranslation();
 
-    /*
     const {
         isReady: apiIsReady,
         find: apiFindAll,
@@ -43,10 +47,8 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (/*props:Mas
     const handleClearSelection = () => {
         setSelectedRows([]);
     };
-    */
 
     {/* Selection buttons */}
-    /*
     const buttonActions = [
         {
             label: t('common.select.all'),
@@ -72,7 +74,6 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (/*props:Mas
     ]
 
     const menuActions = actions.filter(action=>action?.showInMenu && !(typeof action.hidden === 'function' ? action.hidden(selectedRows) : action.hidden));
-    */
 
     return null; /*<Load value={actions.length>0 && actions.filter(a=>!a?.hidden).length>0} noEffect>
         <Box sx={{ display: 'flex', alignItems: 'flex-start', ml: 1 }}>

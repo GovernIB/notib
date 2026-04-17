@@ -60,8 +60,6 @@ public class CieNexeaPluginImpl extends AbstractSalutPlugin implements CiePlugin
     private static final String NOTIB = "Notib";
     private static final String CIE = "CIE";
 
-    private WsClientHelper<NotificaWsV2PortType> wsClientHelper;
-
     public CieNexeaPluginImpl(Properties properties, boolean configuracioEspecifica) {
 
         this.properties = properties;
@@ -100,8 +98,6 @@ public class CieNexeaPluginImpl extends AbstractSalutPlugin implements CiePlugin
             log.error(desc, ex);
             incrementarOperacioError();
             return RespostaCie.builder().codiResposta(CIE).descripcioError(desc).build();
-        } finally {
-            wsClientHelper.deleteTmpFile();
         }
     }
 
@@ -452,8 +448,6 @@ public class CieNexeaPluginImpl extends AbstractSalutPlugin implements CiePlugin
             log.error(desc, ex);
             incrementarOperacioError();
             return RespostaCie.builder().codiResposta(NOTIB).descripcioError(desc).build();
-        } finally {
-            wsClientHelper.deleteTmpFile();
         }
     }
 
@@ -480,8 +474,6 @@ public class CieNexeaPluginImpl extends AbstractSalutPlugin implements CiePlugin
             log.error(desc, ex);
             incrementarOperacioError();
             return InfoCie.builder().identificador(enviament.getIdentificador()).codiResposta(NOTIB).descripcioResposta(desc).build();
-        } finally {
-            wsClientHelper.deleteTmpFile();
         }
     }
 
@@ -543,19 +535,18 @@ public class CieNexeaPluginImpl extends AbstractSalutPlugin implements CiePlugin
 
     private NotificaWsV2PortType getNotificaWs(String apiKey) throws MalformedURLException, MalformedObjectNameException, InstanceNotFoundException, NamingException, RemoteException, CreateException {
 
-        wsClientHelper = new WsClientHelper<>();
-        return wsClientHelper.generarClientWs(
-            getClass().getResource("https://nexea.es/serviciosweb_pre/NotificaWsV2Service?wsdl"),
-            properties.get("es.caib.notib.plugin.cie.url").toString(),
-        //                new QName("https://nexea.es/serviciosweb_pre/NotificaWsV2Service","NotificaWsV2Service"),
-            new QName("https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/","NotificaWsV2Service"),
-            null,
-            null,
-            Boolean.parseBoolean(properties.get("es.caib.notib.log.tipus.ENTREGA_CIE").toString()),
-            true,
-            true,
-            NotificaWsV2PortType.class,
-            new ApiKeySOAPHandlerV2(apiKey));
+
+         return new WsClientHelper<NotificaWsV2PortType>().generarClientWs(
+                getClass().getResource("https://nexea.es/serviciosweb_pre/NotificaWsV2Service?wsdl"),
+                properties.get("es.caib.notib.plugin.cie.url").toString(),
+//                new QName("https://nexea.es/serviciosweb_pre/NotificaWsV2Service","NotificaWsV2Service"),
+                new QName("https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/","NotificaWsV2Service"),
+                null,
+                null,
+			 	Boolean.parseBoolean(properties.get("es.caib.notib.log.tipus.ENTREGA_CIE").toString()),
+                true,
+                NotificaWsV2PortType.class,
+                new ApiKeySOAPHandlerV2(apiKey));
     }
 
     private static class ApiKeySOAPHandlerV2 implements SOAPHandler<SOAPMessageContext> {

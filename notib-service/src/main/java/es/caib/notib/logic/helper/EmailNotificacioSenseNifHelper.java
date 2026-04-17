@@ -90,8 +90,7 @@ public class EmailNotificacioSenseNifHelper {
 				auditHelper.auditaEnviament(enviament, AuditService.TipusOperacio.UPDATE, "EmailNotificacioSenseNifHelper.notificacioEnviarEmail");
 			}
 			var fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
-			var event = notificacioEventHelper.addEmailEnviamentEvent(enviament, error != null, error, fiReintents);
-			enviament.setUltimEvent(event);
+			notificacioEventHelper.addEmailEnviamentEvent(enviament, error != null, error, fiReintents) ;
 //			callbackHelper.updateCallback(enviament, Strings.isNullOrEmpty(error), error);
 			hasErrors = hasErrors || error != null;
 		}

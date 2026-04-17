@@ -1,6 +1,5 @@
 package es.caib.notib.back.validation;
 
-
 import es.caib.notib.back.command.PersonaCommand;
 import es.caib.notib.back.config.scopedata.SessionScopedContext;
 import es.caib.notib.back.helper.MessageHelper;
@@ -17,14 +16,14 @@ import java.util.Locale;
 
 /**
  * Constraint de validació que controla que camp email és obligatori si està habilitada l'entrega a la Direcció Electrònica Hablitada (DEH)
- *
+ * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
 public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, PersonaCommand> {
 
 	public static final int MAX_SIZE_NOM = 30;
-	public static final int MAX_SIZE_RAO_SOCIAL_JURIDICA = 255;
+	public static final int MAX_SIZE_RAO_SOCIAL_JURIDICA = 80;
 	public static final int MAX_SIZE_RAO_SOCIAL = 255;
 	private static final int MIN_SIZE_LLINATGES = 2;
 	private static final int MIN_SIZE_NOM_RAO = 2;

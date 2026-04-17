@@ -108,9 +108,8 @@ public interface EnviamentService {
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("isAuthenticated()")
-//	FitxerDto exportacio(Long entitatId, Collection<Long> enviamentIds, String format) throws IOException, NotFoundException, ParseException;
-	FitxerDto exportacio(AccioMassivaExecucio accioMassivaExecucio) throws IOException, NotFoundException, ParseException;
-
+	FitxerDto exportacio(Long entitatId, Collection<Long> enviamentIds, String format) throws IOException, NotFoundException, ParseException;
+	
 	@PreAuthorize("isAuthenticated()")
 	NotificacioEnviamentDtoV2 getOne(Long enviamentId);
 

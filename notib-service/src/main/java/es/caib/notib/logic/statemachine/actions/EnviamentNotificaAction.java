@@ -110,11 +110,7 @@ public class EnviamentNotificaAction implements Action<EnviamentSmEstat, Enviame
             var errorDescripcio = StringUtils.truncate("Error al enviar l'event de notificació. " + t.getMessage() + "\n" + ExceptionUtils.getStackTrace(t), 2000);
 
             // Controlar si hi ha enviaments per email
-            notificacio.getEnviaments().stream().filter(e -> e.isPerEmail()).forEach(e -> {
-
-                var event = notificacioEventHelper.addEmailEnviamentEvent(e, true, errorDescripcio, fiReintents);
-                e.setUltimEvent(event);
-            });
+            notificacio.getEnviaments().stream().filter(e -> e.isPerEmail()).forEach(e -> notificacioEventHelper.addEmailEnviamentEvent(e, true, errorDescripcio, fiReintents));
             if (fiReintents && (NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat()))) {
                 notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS);
             }

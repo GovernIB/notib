@@ -40,8 +40,6 @@ import es.caib.notib.logic.intf.dto.PermisEnum;
 import es.caib.notib.logic.intf.dto.PersonaDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
-import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaTipus;
-import es.caib.notib.logic.intf.dto.accioMassiva.SeleccioTipus;
 import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -520,12 +518,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public FitxerDto exportacio(AccioMassivaExecucio accioMassivaExecucio) throws IOException {
+	public FitxerDto exportacio(Long entitatId, Collection<Long> enviamentIds, String format) throws IOException {
 
-		var entitatId = accioMassivaExecucio.getEntitatId();
-		var enviamentIds = accioMassivaExecucio.getSeleccio();
-		var format = accioMassivaExecucio.getFormat();
-		var isSeleccioNotificacio = SeleccioTipus.NOTIFICACIO.equals(accioMassivaExecucio.getTipusElementSeleccionat());
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Exportant informació dels enviaments (entitatId=" + entitatId + ", enviamentsIds=" + enviamentIds + ", format=" + format + ")");
@@ -599,12 +593,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 				} else {
 					fila[14] = entitatEntity.getLlibre();
 				}
-				var registreNum = isSeleccioNotificacio && !Strings.isNullOrEmpty(enviament.getNotificacio().getRegistreNumeroFormatat())
-									? enviament.getNotificacio().getRegistreNumeroFormatat() : enviament.getRegistreNumeroFormatat();
-				fila[15] = !Strings.isNullOrEmpty(registreNum) ? registreNum : "";
-				fila[16] = isSeleccioNotificacio && enviament.getNotificacio().getRegistreData() != null ?
-							enviament.getNotificacio().getRegistreData().toString()
-							: (enviament.getRegistreData() != null ? enviament.getRegistreData().toString() : "");
+				fila[15] = String.valueOf(enviament.getNotificacio().getRegistreNumero());
+				fila[16] = (enviament.getNotificacio().getRegistreData() != null)? enviament.getNotificacio().getRegistreData().toString() : "";
 				fila[17] = enviament.getNotificacio().getCaducitat() != null ? sdf.format(enviament.getNotificacio().getCaducitat()) : "";
 				fila[19] = enviament.getNotificaCertificacioNumSeguiment();
 				fila[20] = csvUuid;
