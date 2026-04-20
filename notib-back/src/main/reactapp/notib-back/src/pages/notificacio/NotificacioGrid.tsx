@@ -6,7 +6,14 @@ import Icon from '@mui/material/Icon';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Chip from '@mui/material/Chip';
-import { GRID_DETAIL_PANEL_TOGGLE_COL_DEF } from '@mui/x-data-grid-pro';
+import {
+    GridRenderCellParams,
+    useGridApiContext,
+    useGridSelector,
+    gridDetailPanelExpandedRowsContentCacheSelector,
+    gridDetailPanelExpandedRowIdsSelector,
+    GRID_DETAIL_PANEL_TOGGLE_COL_DEF,
+} from '@mui/x-data-grid-pro';
 import {
     GridPage,
     MuiDataGrid,
@@ -16,6 +23,7 @@ import {
     useMuiDataGridContext,
     useMuiActionReportLogic,
     useFilterApiContext,
+    MuiDataGridColDef,
 } from 'reactlib';
 import { useNotibContext } from '../../components/NotibContext';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
@@ -26,9 +34,40 @@ import GridFormField, { GridButtonField } from '../../components/GridFormField';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
 import AccionsMassives, { MenuOption } from '../../components/AccionsMassives';
 
+const CustomDetailPanelToggle = (props: Pick<GridRenderCellParams, 'id' | 'value'>) => {
+    const { id } = props;
+    const { t } = useTranslation();
+    const apiRef = useGridApiContext();
+    const contentCache = useGridSelector(apiRef, gridDetailPanelExpandedRowsContentCacheSelector);
+    const hasDetail = React.isValidElement(contentCache[id]);
+    const expandedRowIds = useGridSelector(apiRef, gridDetailPanelExpandedRowIdsSelector);
+    const isExpanded = expandedRowIds.has(id);
+    return (
+        <IconButton
+            size="small"
+            tabIndex={-1}
+            disabled={!hasDetail}
+            title={isExpanded ? t('page.notificacio.grid.column.ocultar') : t('page.notificacio.grid.column.mostrar')}
+            aria-label={isExpanded ? t('page.notificacio.grid.column.ocultar') : t('page.notificacio.grid.column.mostrar')}
+        >
+            <Icon
+                sx={(theme) => ({
+                    transform: `rotateZ(${isExpanded ? 180 : 0}deg)`,
+                    transition: theme.transitions.create('transform', {
+                        duration: theme.transitions.duration.shortest,
+                    }),
+                })}
+                fontSize="inherit"
+            >
+                expand_more
+            </Icon>
+        </IconButton>
+    );
+};
+
 const useDataGridColumns = () => {
     const { t } = useTranslation();
-    return React.useMemo(
+    const columns: MuiDataGridColDef[] = React.useMemo(
         () => [
             {
                 field: 'enviamentTipus',
@@ -94,12 +133,15 @@ const useDataGridColumns = () => {
             },
             {
                 ...GRID_DETAIL_PANEL_TOGGLE_COL_DEF,
-                headerName: t('page.notificacio.grid.column.desplegar'),
                 hideable: false,
+                renderCell: (params: any) => (
+                    <CustomDetailPanelToggle id={params.id} value={params.value} />
+                ),
             },
         ],
         []
     );
+    return columns;
 };
 
 const useSpringFilterBuilder = () => {
@@ -335,7 +377,6 @@ const NotificacioGrid = () => {
                 title={t('page.notificacio.grid.title')}
                 resourceName="notificacioResource"
                 columns={columns}
-                onRowClick={(params) => onDetailClick(params.id)}
                 defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
                 paginationActive
                 selectionActive
@@ -361,7 +402,7 @@ const NotificacioGrid = () => {
                         element: <MassiveActionsButton />,
                     },
                 ]}
-                onRowClick={(id) => onDetailClick(id)}
+                onRowClick={(params) => onDetailClick(params.id)}
                 rowActionsColumnIndex={11}
                 rowActionsColumnProps={{
                     flex: 0.5,
