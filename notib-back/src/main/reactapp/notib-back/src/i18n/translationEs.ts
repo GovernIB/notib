@@ -283,7 +283,7 @@ const translationEs = {
                         estatPostal: 'Estado de entrega postal',
                         estatTelematica: 'Estado de entrega telemática',
                     },
-                    detalls: 'Detalles',
+                    accions: 'Acciones',
                 },
                 column: {
                     detalls: 'Detalles',

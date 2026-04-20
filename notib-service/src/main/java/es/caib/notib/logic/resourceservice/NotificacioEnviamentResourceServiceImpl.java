@@ -1,15 +1,16 @@
 package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
+import es.caib.notib.logic.enviaments.DiagramaStateMachineReportGenerator;
+import es.caib.notib.logic.enviaments.EntregaPostalPerspectiveApplicator;
+import es.caib.notib.logic.enviaments.RefrescarEstatNotificaActionExecutor;
+import es.caib.notib.logic.enviaments.TitularPerspectiveApplicator;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
-import es.caib.notib.logic.intf.EntregaPostalResource;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
-import es.caib.notib.logic.intf.base.exception.PerspectiveApplicationException;
 import es.caib.notib.logic.intf.base.exception.ResourceNotCreatedException;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
-import es.caib.notib.logic.intf.model.PersonaResource;
 import es.caib.notib.logic.intf.resourceservice.NotificacioEnviamentResourceService;
 import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
 import lombok.RequiredArgsConstructor;
@@ -41,8 +42,10 @@ public class NotificacioEnviamentResourceServiceImpl
 
 	@PostConstruct
 	public void init() {
-		register(NotificacioEnviamentResource.PERSPECTIVE_TITULAR, new NotificacioEnviamentResourceTitularPerspectiveApplicator());
-		register(NotificacioEnviamentResource.PERSPECTIVE_ENTREGA_POSTAL, new NotificacioEnviamentResourceEntregaPostalPerspectiveApplicator());
+		register(NotificacioEnviamentResource.PERSPECTIVE_TITULAR, new TitularPerspectiveApplicator());
+		register(NotificacioEnviamentResource.PERSPECTIVE_ENTREGA_POSTAL, new EntregaPostalPerspectiveApplicator());
+		register(NotificacioEnviamentResource.REPORT_DESCARREGAR_DIAGRAMA_STATE_MACHINE, new DiagramaStateMachineReportGenerator());
+		register(NotificacioEnviamentResource.ACTION_REFRESCAR_ESTAT_NOTIFICA, new RefrescarEstatNotificaActionExecutor());
 	}
 
 	@Override
@@ -88,67 +91,4 @@ public class NotificacioEnviamentResourceServiceImpl
 		var titular = entity.getTitular();
 		resource.setTitular(ResourceReference.toResourceReference(titular.getId(), titular.getNomSencerNif()));
 	}
-
-	/**
-	 * Perspectiva per a emplenar els camps del titular d'un enviament.
-	 */
-	@RequiredArgsConstructor
-	public static class NotificacioEnviamentResourceTitularPerspectiveApplicator implements PerspectiveApplicator<NotificacioEnviamentResourceEntity, NotificacioEnviamentResource> {
-
-		@Override
-		public void applySingle(String code, NotificacioEnviamentResourceEntity entity, NotificacioEnviamentResource resource) throws PerspectiveApplicationException {
-
-			var titularEntity = entity.getTitular();
-			var titularInfo = resource.getTitularInfo();
-			if (titularInfo == null) {
-				titularInfo = new PersonaResource();
-			}
-			titularInfo.setNif(titularEntity.getNif());
-			titularInfo.setNom(titularEntity.getNom());
-			titularInfo.setEmail(titularEntity.getEmail());
-			titularInfo.setTelefon(titularEntity.getTelefon());
-			titularInfo.setLlinatge1(titularEntity.getLlinatge1());
-			titularInfo.setLlinatge2(titularEntity.getLlinatge2());
-			resource.setTitularInfo(titularInfo);
-		}
-	}
-
-	/**
-	 * Perspectiva per a emplenar els camps de la entrega postal d'un enviament.
-	 */
-	@RequiredArgsConstructor
-	public static class NotificacioEnviamentResourceEntregaPostalPerspectiveApplicator implements PerspectiveApplicator<NotificacioEnviamentResourceEntity, NotificacioEnviamentResource> {
-
-		@Override
-		public void applySingle(String code, NotificacioEnviamentResourceEntity entity, NotificacioEnviamentResource resource) throws PerspectiveApplicationException {
-
-			var entregaPostalEntity = entity.getEntregaPostal();
-			if (entregaPostalEntity == null) {
-				return;
-			}
-			var entregaPostalInfo = resource.getEntregaPostalInfo();
-			if (entregaPostalInfo == null) {
-				entregaPostalInfo = new EntregaPostalResource();
-			}
-			entregaPostalInfo.setCieId(entregaPostalEntity.getCieId());
-			entregaPostalInfo.setCieEstat(entregaPostalEntity.getCieEstat());
-			entregaPostalInfo.setCieEstatData(entregaPostalEntity.getCieEstatData());
-			entregaPostalInfo.setCieDatatOrigen(entregaPostalEntity.getCieDatatOrigen());
-			entregaPostalInfo.setCieDatatReceptorNif(entregaPostalEntity.getCieDatatReceptorNif());
-			entregaPostalInfo.setCieDatatReceptorNom(entregaPostalEntity.getCieDatatReceptorNom());
-			entregaPostalInfo.setCieDatatNumSeguiment(entregaPostalEntity.getCieDatatNumSeguiment());
-			entregaPostalInfo.setCieDatatErrorDescripcio(entregaPostalEntity.getCieDatatErrorDescripcio());
-			entregaPostalInfo.setCieCertificacioData(entregaPostalEntity.getCieCertificacioData());
-			entregaPostalInfo.setCieCertificacioMime(entregaPostalEntity.getCieCertificacioMime());
-			entregaPostalInfo.setCieCertificacioOrigen(entregaPostalEntity.getCieCertificacioOrigen());
-			entregaPostalInfo.setCieCertificacioMetadades(entregaPostalEntity.getCieCertificacioMetadades());
-			entregaPostalInfo.setCieCertificacioCsv(entregaPostalEntity.getCieCertificacioCsv());
-			entregaPostalInfo.setCieCertificacioTipus(entregaPostalEntity.getCieCertificacioTipus());
-			entregaPostalInfo.setCieCertificacioArxiuTipus(entregaPostalEntity.getCieCertificacioArxiuTipus());
-			entregaPostalInfo.setCieCertificacioNumSeguiment(entregaPostalEntity.getCieCertificacioNumSeguiment());
-			entregaPostalInfo.setCieCertificacioArxiuNom(entregaPostalEntity.getCieCertificacioArxiuNom());
-			resource.setEntregaPostalInfo(entregaPostalInfo);
-		}
-	}
-
 }

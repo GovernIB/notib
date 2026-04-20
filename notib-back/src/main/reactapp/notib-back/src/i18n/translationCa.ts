@@ -307,7 +307,7 @@ const translationCa = {
                         estatPostal: "Estat d'entrega postal",
                         estatTelematica: "Estat d'entrega telemàtica",
                     },
-                    detalls: 'Detalls',
+                    accions: 'Accions',
                 },
                 column: {
                     detalls: 'Detalls',
