@@ -14,6 +14,7 @@ import es.caib.notib.logic.intf.resourceservice.NotificacioEnviamentResourceServ
 import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -52,7 +53,12 @@ public class NotificacioEnviamentResourceServiceImpl
 		// Condició per a mostrar només les notificacions de l'entitat actual
 		andConditions.add("notificacio.entitat.id:" + userSessionHelper.getCurrentEntitatId());
 		// Condició per a mostrar només les notificacions amb permís de lectura
-		String permissionFilter = notibPermissionHelper.notificacioSpringFilterWithReadPermission("notificacio.");
+		NotibPermissionHelper.IdsToCheckNotificacioPermission ids = notibPermissionHelper.getIdsToCheckNotificacioPermission(
+			BasePermission.READ,
+			BasePermission.READ);
+		String permissionFilter = NotificacioResourceServiceImpl.springFilterWithReadPermission(
+			ids,
+			"notificacio.");
 		if (!permissionFilter.isEmpty()) {
 			andConditions.add("(" + permissionFilter + ")");
 		}
