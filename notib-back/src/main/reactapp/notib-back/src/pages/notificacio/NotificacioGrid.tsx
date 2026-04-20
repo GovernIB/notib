@@ -26,7 +26,7 @@ import GridFormField, { GridButtonField } from '../../components/GridFormField';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
 import AccionsMassives, { MenuOption } from '../../components/AccionsMassives';
 
-const useDataGridColumns = (onDetailClick: (id: any) => void) => {
+const useDataGridColumns = () => {
     const { t } = useTranslation();
     return React.useMemo(
         () => [
@@ -91,28 +91,6 @@ const useDataGridColumns = (onDetailClick: (id: any) => void) => {
             {
                 field: 'estat',
                 flex: 1,
-            },
-            {
-                field: ' ',
-                headerName: t('page.notificacio.grid.column.detalls'),
-                flex: 1.2,
-                sortable: false,
-                exportable: false,
-                pinnable: false,
-                hideable: false,
-                renderHeader: () => null,
-                renderCell: (params: any) => {
-                    return (
-                        <Button
-                            variant="outlined"
-                            size="small"
-                            startIcon={<Icon>info</Icon>}
-                            onClick={() => onDetailClick(params.id)}
-                        >
-                            {t('page.notificacio.grid.enviament.detalls')}
-                        </Button>
-                    );
-                },
             },
             {
                 ...GRID_DETAIL_PANEL_TOGGLE_COL_DEF,
@@ -273,7 +251,7 @@ const ContentFilter: React.FC = () => {
     };
 
     return (
-        <Grid container spacing={2}>
+        <Grid container spacing={1}>
             <GridFormField size={2} name="enviamentTipus" />
             <GridFormField size={advancedFilter ? 4 : 2.5} name="concepte" />
             <GridFormField size={2.5} name="estat" />
@@ -342,7 +320,7 @@ const NotificacioGrid = () => {
     const { dialogComponent, onDetailClick } = useNotificacioDetailDialog();
     const { currentActions: apiCurrentActions } = useResourceApiService('notificacioResource');
     const isCreateLinkPresent = apiCurrentActions?.['create'] != null;
-    const columns = useDataGridColumns(onDetailClick);
+    const columns = useDataGridColumns();
     const springFilterBuilder = useSpringFilterBuilder();
     const filterDataGridProps = useDatagridFilterProps(
         'notificacioResource',
@@ -360,6 +338,7 @@ const NotificacioGrid = () => {
                 defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
                 paginationActive
                 selectionActive
+                readOnly
                 persistentStateActive
                 persistentStateClearPageSortPropsOnTopLevelRouteChange
                 {...filterDataGridProps}
@@ -379,6 +358,20 @@ const NotificacioGrid = () => {
                     {
                         position: 2,
                         element: <MassiveActionsButton />,
+                    },
+                ]}
+                onRowClick={(id) => onDetailClick(id)}
+                rowActionsColumnIndex={11}
+                rowActionsColumnProps={{
+                    flex: 0.5,
+                }}
+                rowAdditionalActions={[
+                    {
+                        label: t('page.notificacio.grid.column.detalls'),
+                        title: t('page.notificacio.grid.column.detalls'),
+                        icon: 'info',
+                        showInMenu: false,
+                        onClick: (id) => onDetailClick(id),
                     },
                 ]}
                 getDetailPanelContent={({ row }) => <NotificacioGridEnviaments id={row.id} />}
