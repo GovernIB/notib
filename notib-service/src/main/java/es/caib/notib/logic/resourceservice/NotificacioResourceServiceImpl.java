@@ -5,6 +5,7 @@ import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.helper.*;
+import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.exception.ResourceNotCreatedException;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
@@ -62,18 +63,29 @@ public class NotificacioResourceServiceImpl
 
 	@Override
 	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
-		List<String> andConditions = new ArrayList<>();
 		// Condició per a mostrar només les notificacions de l'entitat actual
-		andConditions.add("entitat.id:" + userSessionHelper.getCurrentEntitatId());
-		// Condició per a mostrar només les notificacions amb permís de lectura
-		NotibPermissionHelper.IdsToCheckNotificacioPermission ids = notibPermissionHelper.getIdsToCheckNotificacioPermission(
-			BasePermission.READ,
-			BasePermission.READ);
-		String permissionFilter = springFilterWithReadPermission(ids, "");
-		if (!permissionFilter.isEmpty()) {
-			andConditions.add("(" + permissionFilter + ")");
+		String entitatFilter = "entitat.id:" + userSessionHelper.getCurrentEntitatId();
+		boolean isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
+		boolean isRoleAdminLectura = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN_LECTURA);
+		boolean isRoleAdminOrgan = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN);
+		if ((isRoleAdmin && notibPermissionHelper.currentEntitatPermissionAllowed(ExtendedPermission.PERM2)) ||
+			(isRoleAdminLectura && notibPermissionHelper.currentEntitatPermissionAllowed(ExtendedPermission.PERMX))) {
+			return entitatFilter;
+		} else if (isRoleAdminOrgan && notibPermissionHelper.currentOrganGestorPermissionAllowed(BasePermission.ADMINISTRATION)) {
+			return entitatFilter + " and organGestor.id:" + userSessionHelper.getCurrentOrganGestorId();
+		} else {
+			// Condició per a mostrar només les notificacions amb permís de lectura
+			NotibPermissionHelper.IdsToCheckNotificacioPermission ids = notibPermissionHelper.getIdsToCheckNotificacioPermission(
+				BasePermission.READ,
+				BasePermission.READ);
+			List<String> andConditions = new ArrayList<>();
+			andConditions.add(entitatFilter);
+			String permissionFilter = springFilterWithReadPermission(ids, "");
+			if (!permissionFilter.isEmpty()) {
+				andConditions.add("(" + permissionFilter + ")");
+			}
+			return String.join(" and ", andConditions);
 		}
-		return String.join(" and ", andConditions);
 	}
 
 	@Override

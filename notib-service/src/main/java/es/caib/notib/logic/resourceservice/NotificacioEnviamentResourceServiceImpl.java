@@ -1,5 +1,6 @@
 package es.caib.notib.logic.resourceservice;
 
+import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.enviaments.DiagramaStateMachineReportGenerator;
 import es.caib.notib.logic.enviaments.EntregaPostalPerspectiveApplicator;
@@ -7,9 +8,11 @@ import es.caib.notib.logic.enviaments.RefrescarEstatNotificaActionExecutor;
 import es.caib.notib.logic.enviaments.TitularPerspectiveApplicator;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
+import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.exception.ResourceNotCreatedException;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
+import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
 import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 import es.caib.notib.logic.intf.resourceservice.NotificacioEnviamentResourceService;
 import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
@@ -38,6 +41,7 @@ public class NotificacioEnviamentResourceServiceImpl
 	implements NotificacioEnviamentResourceService {
 
 	private final UserSessionHelper userSessionHelper;
+	private final AuthenticationHelper authenticationHelper;
 	private final NotibPermissionHelper notibPermissionHelper;
 
 	@PostConstruct
@@ -52,20 +56,30 @@ public class NotificacioEnviamentResourceServiceImpl
 	protected String additionalSpringFilter(
 		String currentSpringFilter,
 		String[] namedQueries) {
-		List<String> andConditions = new ArrayList<>();
 		// Condició per a mostrar només les notificacions de l'entitat actual
-		andConditions.add("notificacio.entitat.id:" + userSessionHelper.getCurrentEntitatId());
-		// Condició per a mostrar només les notificacions amb permís de lectura
-		NotibPermissionHelper.IdsToCheckNotificacioPermission ids = notibPermissionHelper.getIdsToCheckNotificacioPermission(
-			BasePermission.READ,
-			BasePermission.READ);
-		String permissionFilter = NotificacioResourceServiceImpl.springFilterWithReadPermission(
-			ids,
-			"notificacio.");
-		if (!permissionFilter.isEmpty()) {
-			andConditions.add("(" + permissionFilter + ")");
+		String entitatFilter = "notificacio.entitat.id:" + userSessionHelper.getCurrentEntitatId();
+		boolean isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
+		boolean isRoleAdminLectura = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN_LECTURA);
+		boolean isRoleAdminOrgan = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN);
+		if ((isRoleAdmin && notibPermissionHelper.currentEntitatPermissionAllowed(ExtendedPermission.PERM2)) ||
+			(isRoleAdminLectura && notibPermissionHelper.currentEntitatPermissionAllowed(ExtendedPermission.PERMX))) {
+			return entitatFilter;
+		} else if (isRoleAdminOrgan && notibPermissionHelper.currentOrganGestorPermissionAllowed(BasePermission.ADMINISTRATION)) {
+			return entitatFilter + " and notificacio.organGestor.id:" + userSessionHelper.getCurrentOrganGestorId();
+		} else {
+			List<String> andConditions = new ArrayList<>();
+			// Condició per a mostrar només les notificacions amb permís de lectura
+			NotibPermissionHelper.IdsToCheckNotificacioPermission ids = notibPermissionHelper.getIdsToCheckNotificacioPermission(
+				BasePermission.READ,
+				BasePermission.READ);
+			String permissionFilter = NotificacioResourceServiceImpl.springFilterWithReadPermission(
+				ids,
+				"notificacio.");
+			if (!permissionFilter.isEmpty()) {
+				andConditions.add("(" + permissionFilter + ")");
+			}
+			return String.join(" and ", andConditions);
 		}
-		return String.join(" and ", andConditions);
 	}
 
 	/*
