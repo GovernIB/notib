@@ -238,7 +238,6 @@ const ContentFilter: React.FC = () => {
 };
 
 const EnviamentGrid = () => {
-
     const { t } = useTranslation();
     const gridApiRef = useMuiDataGridApiRef();
     const { dialogComponent: enviamentDialogComponent, onDetailClick } = useEnviamentDetailDialog();
@@ -258,7 +257,6 @@ const EnviamentGrid = () => {
                 title={t('page.enviament.grid.title')}
                 resourceName="notificacioEnviamentResource"
                 columns={columns}
-                onRowClick={(params) => onDetailClick(params.id) }
                 paginationActive
                 selectionActive
                 persistentStateActive
@@ -272,14 +270,14 @@ const EnviamentGrid = () => {
                         element: <MassiveActionsButton />,
                     },
                 ]}
-                onRowClick={(id) => onDetailClick(id)}
+                onRowClick={(params) => onDetailClick(params.id)}
                 rowActionsColumnIndex={19}
                 rowAdditionalActions={[
                     {
                         label: t('page.enviament.grid.detalls'),
                         title: t('page.enviament.grid.detalls'),
                         icon: 'info',
-                        showInMenu: true,
+                        showInMenu: false,
                         onClick: (id) => onDetailClick(id),
                     },
                     {
