@@ -81,7 +81,8 @@ public class NotibPermissionHelper {
 	}
 
 	/**
-	 * Verifica si es tenen permisos per a administrar l'entitat.
+	 * Verifica si es tenen permisos per a administrar l'entitat. Si no es tenen permisos es llença una excepció
+	 * ResourceNotCreatedException o ResourceNotUpdatedException, depenent del permís que s'està comprovant.
 	 *
 	 * @param resourceClass
 	 *            la classe del recurs.
@@ -92,7 +93,7 @@ public class NotibPermissionHelper {
 	 * @param permission
 	 *            el permís que s'està comprovant (només per a crear l'excepció).
 	 */
-	public void entitatCheckAdminPermission(
+	public void entitatCheckAdminPermissionThrows(
 		Class<? extends Resource<?>> resourceClass,
 		Long id,
 		Long entitatId,
@@ -120,6 +121,46 @@ public class NotibPermissionHelper {
 						"Not allowed to " + permissionText + " " + resourceClass.getSimpleName());
 				}
 			}
+		}
+	}
+
+	/**
+	 * Verifica si es te el permís especificat sobre l'entitat actual.
+	 *
+	 * @param permission
+	 *            el permís que es vol comprovar.
+	 * @return true si es tenen permisos o false en cas contrari.
+	 */
+	public boolean currentEntitatPermissionAllowed(Permission permission) {
+		Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
+		if (currentEntitatId != null) {
+			return aclHelper.anyPermissionGranted(
+				AclHelper.ENTITAT_CLASS,
+				currentEntitatId,
+				List.of(permission),
+				aclHelper.getCurrentUserSids().toArray(Sid[]::new));
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Verifica si es te el permís especificat sobre l'òrgan gestor actual.
+	 *
+	 * @param permission
+	 *            el permís que es vol comprovar.
+	 * @return true si es tenen permisos o false en cas contrari.
+	 */
+	public boolean currentOrganGestorPermissionAllowed(Permission permission) {
+		Long currentOrganGestorId = userSessionHelper.getCurrentOrganGestorId();
+		if (currentOrganGestorId != null) {
+			return aclHelper.anyPermissionGranted(
+				AclHelper.ORGAN_GESTOR_CLASS,
+				currentOrganGestorId,
+				List.of(permission),
+				aclHelper.getCurrentUserSids().toArray(Sid[]::new));
+		} else {
+			return false;
 		}
 	}
 

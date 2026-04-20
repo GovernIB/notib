@@ -48,7 +48,7 @@ public class ProcedimentGrupResourceServiceImpl
 		// Repeteix les mateixes comprovacions per a l'entitat del grup.
 		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
 		if (Objects.equals(entity.getGrup().getEntitat(), currentEntitat)) {
-			notibPermissionHelper.entitatCheckAdminPermission(
+			notibPermissionHelper.entitatCheckAdminPermissionThrows(
 				getResourceClass(),
 				null,
 				entity.getGrup().getEntitat().getId(),
@@ -72,7 +72,7 @@ public class ProcedimentGrupResourceServiceImpl
 		// Repeteix les mateixes comprovacions per a l'entitat del grup.
 		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
 		if (Objects.equals(entity.getGrup().getEntitat(), currentEntitat)) {
-			notibPermissionHelper.entitatCheckAdminPermission(
+			notibPermissionHelper.entitatCheckAdminPermissionThrows(
 				getResourceClass(),
 				entity.getId(),
 				entity.getGrup().getEntitat().getId(),
@@ -95,7 +95,7 @@ public class ProcedimentGrupResourceServiceImpl
 		// Repeteix les mateixes comprovacions per a l'entitat del grup.
 		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
 		if (Objects.equals(entity.getGrup().getEntitat(), currentEntitat)) {
-			notibPermissionHelper.entitatCheckAdminPermission(
+			notibPermissionHelper.entitatCheckAdminPermissionThrows(
 				getResourceClass(),
 				entity.getId(),
 				entity.getGrup().getEntitat().getId(),
