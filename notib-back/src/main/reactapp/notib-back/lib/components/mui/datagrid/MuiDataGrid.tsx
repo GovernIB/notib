@@ -39,6 +39,7 @@ import {
 } from '../../../util/reactNodePosition';
 import { Form, FormI18nKeys, useFormApiRef } from '../../form/Form';
 import { FormField } from '../../form/FormField';
+import { useAuthContext } from '../../AuthContext';
 import { useBaseAppContext, DialogButton } from '../../BaseAppContext';
 import { useMuiBaseAppContext } from '../MuiBaseAppContext';
 import { useResourceApiService } from '../../ResourceApiProvider';
@@ -242,6 +243,8 @@ export type MuiDataGridProps = {
     persistentStateKey?: string;
     /** El magatzem del navegador que s'utilitzarà per a persistir l'estat (LocalStorage per defecte) */
     persistentStateStorage?: 'local' | 'session';
+    /** Event que es llença quan es fa clic sobre una fila */
+    onRowClick?: (id: any, rowData: any) => void;
     /** Event que es llença quan hi ha canvis en les files que mostra la graella */
     onRowsChange?: (rows: GridRowsProp, pageInfo: any) => void;
     /** Event que es llença quan hi ha canvis en l'ordenació de la graella */
@@ -558,7 +561,9 @@ const usePersistentState = (
     storeInLocalStorage?: boolean
 ) => {
     const { code, topLevelRouteChanged } = useBaseAppContext();
-    const storageKey = code + '_DTG_' + key.toUpperCase();
+    const { isAuthenticated, getUserId } = useAuthContext();
+    const userSuffix = isAuthenticated ? '_' + getUserId().toUpperCase() : '';
+    const storageKey = code + '_DTG_' + key.toUpperCase() + userSuffix;
     const loadInitialState = () => {
         try {
             const storage = storeInLocalStorage ? localStorage : sessionStorage;
@@ -850,6 +855,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         persistentStateClearPageSortPropsOnTopLevelRouteChange,
         persistentStateKey,
         persistentStateStorage,
+        onRowClick,
         onRowsChange,
         onRowOrderChange,
         onRowSelectionModelChange,
@@ -1305,7 +1311,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         const requestPending =
             loading === undefined && autoFindDisabled && !isRowsPresentInOtherProps;
         return {
-            row: { linkTo: rowLink, isRowLinkActive },
+            row: { linkTo: rowLink, isRowLinkActive, onClick: onRowClick },
             footer: {
                 paginationActive,
                 selectionActive,
