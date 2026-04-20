@@ -69,7 +69,7 @@ class AplicacioResourceServiceImplTest {
 	@Test
 	void beforeCreateEntityShouldCallPermissionCheck() {
 		service.beforeCreateEntity(entity, resource, Map.of());
-		verify(notibPermissionHelper).entitatCheckAdminPermission(
+		verify(notibPermissionHelper).entitatCheckAdminPermissionThrows(
 			any(),
 			isNull(),
 			eq(5L),
@@ -80,7 +80,7 @@ class AplicacioResourceServiceImplTest {
 	@Test
 	void beforeUpdateEntityShouldCallPermissionCheck() {
 		service.beforeUpdateEntity(entity, resource, Map.of());
-		verify(notibPermissionHelper).entitatCheckAdminPermission(
+		verify(notibPermissionHelper).entitatCheckAdminPermissionThrows(
 			any(),
 			eq(10L),
 			eq(5L),
@@ -92,7 +92,7 @@ class AplicacioResourceServiceImplTest {
 	void beforeDeleteShouldCallPermissionCheck() {
 		entity.setId(20L);
 		service.beforeDelete(entity, Map.of());
-		verify(notibPermissionHelper).entitatCheckAdminPermission(
+		verify(notibPermissionHelper).entitatCheckAdminPermissionThrows(
 			any(),
 			eq(20L),
 			eq(5L),
