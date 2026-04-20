@@ -1,10 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import {MuiDataGridColDef} from 'reactlib';
+import {MuiActionReportButton, MuiDataGridColDef} from 'reactlib';
 import {DataGridPro} from "@mui/x-data-grid-pro";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import {Alert, Button, Icon} from "@mui/material";
+import {Alert} from "@mui/material";
 
 const EnviamentDetailTabStateMachine: React.FC<{ id: any }> = (props) => {
 
@@ -64,9 +64,13 @@ const EnviamentDetailTabStateMachine: React.FC<{ id: any }> = (props) => {
                 {t('page.enviament.detail.tab.stateMachine.missatge')}
             </Alert>
             <Box display="flex" justifyContent="flex-end">
-                <Button startIcon={<Icon>download</Icon>} variant="outlined"/* onClick={handleRefrescarEstàndard} */>
-                    {t('page.enviament.detail.tab.stateMachine.descarregarDiagrama')}
-                </Button>
+                <MuiActionReportButton
+                    resourceName={"notificacioEnviamentResource"}
+                    report="DESCARREGAR_DIAGRAMA_STATE_MACHINE"
+                    reportFileType="CUSTOM"
+                    title={t('page.enviament.detail.tab.stateMachine.descarregarDiagrama')}
+                    buttonComponentProps={{ variant: 'outlined', sx: { mr: 1 } }}
+                    buttonIcon="download"/>
             </Box>
             {/*<FormPage>*/}
             {/*    <MuiForm*/}
