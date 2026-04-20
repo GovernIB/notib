@@ -59,6 +59,21 @@ import java.util.List;
 			type = ResourceArtifactType.PERSPECTIVE,
 			code = NotificacioEnviamentResource.PERSPECTIVE_ENTREGA_POSTAL
 		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.REPORT,
+			code = NotificacioEnviamentResource.REPORT_DESCARREGAR_DIAGRAMA_STATE_MACHINE
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioEnviamentResource.ACTION_REFRESCAR_ESTAT_NOTIFICA,
+			requiresId = true,
+			accessConstraints = {
+					@ResourceAccessConstraint(
+						type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+						roles = { BaseConfig.ROLE_ADMIN }
+					)
+				}
+			),
 	}
 )
 @CustomValidation.List({
@@ -71,6 +86,8 @@ public class NotificacioEnviamentResource extends BaseResource<Long> {
 	public static final String FILTER_CODE = "FILTER_ENVIAMENT";
 	public static final String PERSPECTIVE_TITULAR = "TITULAR";
 	public static final String PERSPECTIVE_ENTREGA_POSTAL = "ENTREGA_POSTAL";
+	public static final String REPORT_DESCARREGAR_DIAGRAMA_STATE_MACHINE = "DESCARREGAR_DIAGRAMA_STATE_MACHINE";
+	public static final String ACTION_REFRESCAR_ESTAT_NOTIFICA = "REFRESCAR_ESTAT_NOTIFICA";
 
 	@NotNull
 	private ServeiTipus serveiTipus = ServeiTipus.NORMAL;
