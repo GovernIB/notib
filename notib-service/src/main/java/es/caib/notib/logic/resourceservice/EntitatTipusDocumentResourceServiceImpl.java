@@ -39,7 +39,7 @@ public class EntitatTipusDocumentResourceServiceImpl
 		EntitatTipusDocumentResourceEntity entity,
 		EntitatTipusDocumentResource resource,
 		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		notibPermissionHelper.entitatCheckAdminPermission(
+		notibPermissionHelper.entitatCheckAdminPermissionThrows(
 			getResourceClass(),
 			null,
 			resource.getEntitat().getId(),
@@ -51,7 +51,7 @@ public class EntitatTipusDocumentResourceServiceImpl
 		EntitatTipusDocumentResourceEntity entity,
 		EntitatTipusDocumentResource resource,
 		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		notibPermissionHelper.entitatCheckAdminPermission(
+		notibPermissionHelper.entitatCheckAdminPermissionThrows(
 			getResourceClass(),
 			resource.getId(),
 			resource.getEntitat().getId(),
@@ -62,7 +62,7 @@ public class EntitatTipusDocumentResourceServiceImpl
 	protected void beforeDelete(
 		EntitatTipusDocumentResourceEntity entity,
 		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		notibPermissionHelper.entitatCheckAdminPermission(
+		notibPermissionHelper.entitatCheckAdminPermissionThrows(
 			getResourceClass(),
 			entity.getId(),
 			entity.getEntitat().getId(),

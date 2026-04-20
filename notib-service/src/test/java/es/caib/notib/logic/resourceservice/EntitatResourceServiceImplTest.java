@@ -107,7 +107,7 @@ class EntitatResourceServiceImplTest {
 		// when
 		service.beforeCreateEntity(null, resource, Map.of());
 		// then
-		verify(notibPermissionHelper).entitatCheckAdminPermission(
+		verify(notibPermissionHelper).entitatCheckAdminPermissionThrows(
 			any(),
 			isNull(),
 			isNull(),
@@ -123,7 +123,7 @@ class EntitatResourceServiceImplTest {
 		// when
 		service.beforeUpdateEntity(null, resource, Map.of());
 		// then
-		verify(notibPermissionHelper).entitatCheckAdminPermission(
+		verify(notibPermissionHelper).entitatCheckAdminPermissionThrows(
 			any(),
 			eq(10L),
 			eq(10L),
@@ -139,7 +139,7 @@ class EntitatResourceServiceImplTest {
 		// when
 		service.beforeDelete(entity, Map.of());
 		// then
-		verify(notibPermissionHelper).entitatCheckAdminPermission(
+		verify(notibPermissionHelper).entitatCheckAdminPermissionThrows(
 			any(),
 			eq(20L),
 			eq(20L),
