@@ -244,7 +244,7 @@ export type MuiDataGridProps = {
     /** El magatzem del navegador que s'utilitzarà per a persistir l'estat (LocalStorage per defecte) */
     persistentStateStorage?: 'local' | 'session';
     /** Event que es llença quan es fa clic sobre una fila */
-    onRowClick?: (id: any, rowData: any) => void;
+    onRowClick?: GridEventListener<'rowClick'>;
     /** Event que es llença quan hi ha canvis en les files que mostra la graella */
     onRowsChange?: (rows: GridRowsProp, pageInfo: any) => void;
     /** Event que es llença quan hi ha canvis en l'ordenació de la graella */
@@ -1311,7 +1311,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         const requestPending =
             loading === undefined && autoFindDisabled && !isRowsPresentInOtherProps;
         return {
-            row: { linkTo: rowLink, isRowLinkActive, onClick: onRowClick },
+            row: { linkTo: rowLink, isRowLinkActive, isRowClickActive: onRowClick != null },
             footer: {
                 paginationActive,
                 selectionActive,
@@ -1386,6 +1386,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                 {...stripedProps}
                 slots={memoizedSlots}
                 slotProps={memoizedSlotProps}
+                onRowClick={onRowClick}
                 semiBordered={semiBordered}
                 autoHeight={autoHeight}
                 localeText={localeText}
