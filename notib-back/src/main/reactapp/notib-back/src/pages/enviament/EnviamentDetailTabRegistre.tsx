@@ -12,7 +12,7 @@ const EnviamentDetailTabRegistre: React.FC<{
 
     return (
         <Box sx={{ height: '100%', overflowY: 'auto', minHeight: 0 }}>
-            {!enviament.registreNumeroFormatat ? (
+            {!enviament?.registreNumeroFormatat ? (
                 <Alert severity="warning" sx={{ mb: 1, mt: 2 }}>
                     {t('page.enviament.detail.tab.registre.noEnviada')}
                 </Alert>
