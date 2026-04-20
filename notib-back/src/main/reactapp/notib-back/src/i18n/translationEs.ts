@@ -287,7 +287,8 @@ const translationEs = {
                 },
                 column: {
                     detalls: 'Detalles',
-                    desplegar: 'Desplegar envios',
+                    mostrar: 'Mostrar envios',
+                    ocultar: 'Ocultar envios',
                 },
                 procediment: 'Procedimiento',
                 servei: 'Servicio',

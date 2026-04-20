@@ -68,7 +68,7 @@ class ProcedimentGrupResourceServiceImplTest {
 	@Test
 	void beforeCreateSaveShouldCallPermissionIfEntitatMatches() {
 		service.beforeCreateSave(entity, resource, Map.of());
-		verify(notibPermissionHelper, atLeastOnce()).entitatCheckAdminPermission(
+		verify(notibPermissionHelper, atLeastOnce()).entitatCheckAdminPermissionThrows(
 			eq(ProcedimentGrupResource.class),
 			isNull(),
 			eq(sessionEntitat.getId()),
@@ -90,7 +90,7 @@ class ProcedimentGrupResourceServiceImplTest {
 	@Test
 	void beforeUpdateEntityShouldCallPermissionIfEntitatMatches() {
 		service.beforeUpdateEntity(entity, resource, Map.of());
-		verify(notibPermissionHelper, atLeastOnce()).entitatCheckAdminPermission(
+		verify(notibPermissionHelper, atLeastOnce()).entitatCheckAdminPermissionThrows(
 			eq(ProcedimentGrupResource.class),
 			eq(entity.getId()),
 			eq(sessionEntitat.getId()),
@@ -112,7 +112,7 @@ class ProcedimentGrupResourceServiceImplTest {
 	@Test
 	void beforeDeleteShouldCallPermissionIfEntitatMatches() {
 		service.beforeDelete(entity, Map.of());
-		verify(notibPermissionHelper, atLeastOnce()).entitatCheckAdminPermission(
+		verify(notibPermissionHelper, atLeastOnce()).entitatCheckAdminPermissionThrows(
 			eq(ProcedimentGrupResource.class),
 			eq(entity.getId()),
 			eq(sessionEntitat.getId()),

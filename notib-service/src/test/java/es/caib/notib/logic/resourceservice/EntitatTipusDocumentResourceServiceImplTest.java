@@ -45,7 +45,7 @@ class EntitatTipusDocumentResourceServiceImplTest {
 			EntitatTipusDocumentResourceEntity.builder().resource(resource).build(),
 			resource,
 			null);
-		verify(notibPermissionHelper).entitatCheckAdminPermission(
+		verify(notibPermissionHelper).entitatCheckAdminPermissionThrows(
 			EntitatTipusDocumentResource.class,
 			null,
 			10L,
@@ -61,7 +61,7 @@ class EntitatTipusDocumentResourceServiceImplTest {
 			EntitatTipusDocumentResourceEntity.builder().resource(resource).build(),
 			resource,
 			null);
-		verify(notibPermissionHelper).entitatCheckAdminPermission(
+		verify(notibPermissionHelper).entitatCheckAdminPermissionThrows(
 			EntitatTipusDocumentResource.class,
 			5L,
 			20L,
@@ -83,7 +83,7 @@ class EntitatTipusDocumentResourceServiceImplTest {
 			build();
 		entity.setId(resource.getId());
 		service.beforeDelete(entity, null);
-		verify(notibPermissionHelper).entitatCheckAdminPermission(
+		verify(notibPermissionHelper).entitatCheckAdminPermissionThrows(
 			EntitatTipusDocumentResource.class,
 			7L,
 			30L,
