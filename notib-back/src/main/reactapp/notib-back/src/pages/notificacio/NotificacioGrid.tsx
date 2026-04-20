@@ -335,6 +335,7 @@ const NotificacioGrid = () => {
                 title={t('page.notificacio.grid.title')}
                 resourceName="notificacioResource"
                 columns={columns}
+                onRowClick={(params) => onDetailClick(params.id)}
                 defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
                 paginationActive
                 selectionActive
