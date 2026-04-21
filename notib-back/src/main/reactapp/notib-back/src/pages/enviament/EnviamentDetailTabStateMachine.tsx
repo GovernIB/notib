@@ -6,9 +6,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import {Alert} from "@mui/material";
 
-const EnviamentDetailTabStateMachine: React.FC<{ id: any }> = (props) => {
-
-    const { id } = props;
+const EnviamentDetailTabStateMachine: React.FC<{ id: any }> = () => {
     const { t } = useTranslation();
     const columns: MuiDataGridColDef[] = React.useMemo(
         () => [
