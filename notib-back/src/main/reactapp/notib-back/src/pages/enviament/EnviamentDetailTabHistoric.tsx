@@ -1,10 +1,8 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { GridPage, MuiDataGrid, MuiDataGridColDef } from 'reactlib';
 
 const EnviamentDetailTabHistoric: React.FC<{ id: any }> = (props) => {
     const { id } = props;
-    const { t } = useTranslation();
     const columns: MuiDataGridColDef[] = React.useMemo(
         () => [
             {
