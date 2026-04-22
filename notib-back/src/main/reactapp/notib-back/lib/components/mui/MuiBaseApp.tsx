@@ -48,6 +48,7 @@ export type MuiBaseAppProps = Omit<BaseAppProps, 'contentComponentSlots'> & {
     menuOnTitleClose?: () => void;
     menuShrinkDisabled?: boolean;
     menuWidth?: number;
+    menuPanelWidth?: number;
     defaultMuiComponentProps?: DefaultMuiComponentProps;
 };
 
@@ -157,6 +158,7 @@ const useMenu = (
     menuOnTitleClose: (() => void) | undefined,
     menuWidth: number | undefined,
     menuFooterHeight: number | undefined,
+    menuPanelWidth: number | undefined,
 ) => {
     const { shrink, iconClicked, buttonComponent: menuButton } = useToolbarMenuIcon();
     const menuComponent =
@@ -169,6 +171,7 @@ const useMenu = (
                 shrink={shrink}
                 iconClicked={iconClicked}
                 footerHeight={menuFooterHeight}
+                compactPanelWidth={menuPanelWidth}
             />
         ) : undefined;
     if (menuComponent && menuFooterHeight == null) {
@@ -200,6 +203,7 @@ export const MuiBaseApp: React.FC<MuiBaseAppProps> = (props) => {
         menuOnTitleClose,
         menuShrinkDisabled,
         menuWidth,
+        menuPanelWidth,
         formFieldComponents,
         children,
         defaultMuiComponentProps,
@@ -211,7 +215,8 @@ export const MuiBaseApp: React.FC<MuiBaseAppProps> = (props) => {
         menuEntries,
         menuOnTitleClose,
         menuWidth,
-        footerHeight
+        footerHeight,
+        menuPanelWidth,
     );
     const appbarComponent =
         headerTitle != null ? (
