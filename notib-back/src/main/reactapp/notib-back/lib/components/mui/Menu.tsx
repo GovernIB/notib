@@ -89,14 +89,14 @@ const ShrinkableDrawer = styled(Drawer, {
     shouldForwardProp: (prop) => prop !== 'open' && prop !== 'width',
 })(({ theme, open, ...otherProps }) => {
     const width = (otherProps as any)?.['width'];
-    const shrinkableStyles = {
+    const shrinkableStyles: CSSObject = {
         ...(open && {
             ...openedMixin(theme, width),
             '& .MuiDrawer-paper': openedMixin(theme, width),
+            overflowWrap: 'anywhere',
         }),
         ...(!open && {
             ...closedMixin(theme),
-            whiteSpace: 'nowrap',
             '& .MuiDrawer-paper': closedMixin(theme),
         }),
     };
@@ -143,6 +143,8 @@ const isCurrentMenuEntryOrAnyChildrenSelected = (
         return anyChildSelected;
     }
 };
+
+const menuItemIconClassName = 'menu-item-icon';
 
 const MenuItem: React.FC<MenuItemProps> = (props) => {
     const {
@@ -200,12 +202,11 @@ const MenuItem: React.FC<MenuItemProps> = (props) => {
             onMenuItemClick?.(entry);
         }
     };
-    const expandedIconComponent =
-        children != null ? (
+    const expandedIconComponent = children != null ? (
             <Icon fontSize={'small'}>{expanded ? 'expand_less' : 'expand_more'}</Icon>
-        ) : null;
+    ) : null;
     const iconComponent = icon ? (
-        <ListItemIcon sx={itemIconSx}>
+        <ListItemIcon className={menuItemIconClassName} sx={itemIconSx}>
             <Icon fontSize={'small'}>{icon}</Icon>
         </ListItemIcon>
     ) : null;
@@ -225,8 +226,7 @@ const MenuItem: React.FC<MenuItemProps> = (props) => {
                     sx={itemButtonSx}
                     style={{
                         paddingLeft: shrink ? '40px' : 24 + 16 * level + (level > 0 ? 8 : 0) + 'px',
-                    }}
-                >
+                    }}>
                     {iconComponent}
                     <ListItemText primary={primary} sx={itemTextSx} />
                     {expandedIconComponent}
@@ -269,8 +269,7 @@ const ListMenuContent: React.FC<ListMenuContentProps> = (props) => {
                         boldPrimary={boldPrimary}
                         onMenuItemClick={onMenuItemClick}
                         onMenuItemMouseEnter={onMenuItemMouseEnter}
-                        onMenuItemMouseLeave={onMenuItemMouseLeave}
-                    >
+                        onMenuItemMouseLeave={onMenuItemMouseLeave}>
                         {item.children?.length && !hideChildren ? (
                             <Box>
                                 <ListMenuContent
@@ -375,7 +374,7 @@ export const Menu: React.FC<MenuProps> = (props) => {
             clearTimeout(closeTimeoutRef.current);
             closeTimeoutRef.current = null;
         }
-    };
+    }
     const handleCompactEntryMouseEnter = (entry: MenuEntry) => {
         if (!compactMode || !window.matchMedia('(hover: hover)').matches) {
             return;
@@ -421,11 +420,10 @@ export const Menu: React.FC<MenuProps> = (props) => {
                                 width: compactPanelWidth,
                                 borderRight: `1px solid ${theme.palette.divider}`,
                                 backgroundColor: theme.palette.background.paper,
-                                color: theme.palette.text.primary,
+                                color:  theme.palette.text.primary,
                                 overflowY: 'auto',
                                 zIndex: theme.zIndex.drawer + 1,
-                            })}
-                        >
+                            })}>
                             <Box
                                 sx={(theme) => ({
                                     px: 2,
@@ -433,15 +431,13 @@ export const Menu: React.FC<MenuProps> = (props) => {
                                     backgroundColor: theme.palette.background.paper,
                                     borderBottom: `1px solid ${theme.palette.divider}`,
                                     minHeight: submenuTitleHeight,
-                                })}
-                            >
+                                })}>
                                 <Typography
                                     variant="subtitle1"
                                     sx={() => ({
                                         fontWeight: 700,
                                         color: theme.palette.primary.light,
-                                    })}
-                                >
+                                    })}>
                                     {compactPanelEntry.title}
                                 </Typography>
                                 {compactPanelEntry.description ? (
@@ -451,19 +447,25 @@ export const Menu: React.FC<MenuProps> = (props) => {
                                             mt: 0.25,
                                             color: 'text.secondary',
                                             fontSize: '0.6rem',
-                                        }}
-                                    >
+                                        }}>
                                         {compactPanelEntry.description}
                                     </Typography>
                                 ) : null}
                             </Box>
-                            <ListMenuContent
-                                entries={compactPanelEntry.children}
-                                level={0}
-                                shrink={false}
-                                boldPrimary={false}
-                                onMenuItemClick={handleMenuItemClick}
-                            />
+                            <Box
+                                sx={{
+                                    [`& .${menuItemIconClassName}`]: { ml: -1 },
+                                    overflowWrap: 'anywhere',
+                                }}
+                            >
+                                <ListMenuContent
+                                    entries={compactPanelEntry.children}
+                                    level={0}
+                                    shrink={false}
+                                    boldPrimary={false}
+                                    onMenuItemClick={handleMenuItemClick}
+                                />
+                            </Box>
                         </Box>
                     ) : null}
                 </div>
@@ -492,8 +494,7 @@ export const Menu: React.FC<MenuProps> = (props) => {
                     width: drawerWidth,
                     boxSizing: 'border-box',
                 },
-            }}
-        >
+            }}>
             {drawerContent}
         </Drawer>
     );
