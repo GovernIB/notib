@@ -26,7 +26,7 @@ public interface AccioMassivaService {
 
     List<FitxerDto> descarregarJustificant(AccioMassivaExecucio accio);
 
-    List<List<ArxiuDto>> descarregarCertificacio(AccioMassivaExecucio accio);
+    List<List<ArxiuDto>> descarregarCertificacio(Long accioId);
 
     RespostaAccio<AccioMassivaElement> reactivarErrors(AccioMassivaExecucio accio);
 
