@@ -18,6 +18,7 @@ import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioV3;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,6 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,28 +53,25 @@ public interface NotificacioApiRestV3Intf {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Consulta realitzada correctament", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RespostaConsultaEstatNotificacioV2Api.class, description = "Estat de la notificació")) }) })
     @Parameter(name = "identificador",
-            description = "Identificador de la notificació a consultar. \n" +
-                    " * A la url del mètode es mostra aquest identificador com a '**' degut a que per compatibilitat amb versions antigues, es poden trobar identificadors que contenen el caràcter '/'. \n" +
-                    " * Actualment els identificadors tenen el format de UUID",
+            description = "Identificador de la notificació a consultar.",
             required = true,
+            in = ParameterIn.PATH,
             example = "00000000-0000-0000-0000-000000000000",
             schema = @Schema(implementation = String.class))
-    @GetMapping(value = {"/consultaEstatNotificacio/**"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public RespostaConsultaEstatNotificacioV2 consultaEstatNotificacio(HttpServletRequest request) throws UnsupportedEncodingException;
+    @GetMapping(value = {"/consultaEstatNotificacio/{identificador}"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public RespostaConsultaEstatNotificacioV2 consultaEstatNotificacio(HttpServletRequest request, @PathVariable("identificador") String identificador) throws UnsupportedEncodingException;
 
     @Operation(summary = "Consulta la informació de l'estat d'un enviament dins Notific@", description = "Retorna la informació sobre l'estat de l'enviament dins Notific@.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Consulta realitzada correctament", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RespostaConsultaEstatEnviamentV2Api.class, description = "Estat de l'enviament")) }) })
-    @Parameter(name = "referencia", description = "Referència de la notificació a consultar", required = true)
     @Parameter(name = "referencia",
-            description = "Referència de la notificació a consultar. \n" +
-                    " * A la url del mètode es mostra aquesta referència com a '**' degut a que per compatibilitat amb versions antigues, es poden trobar referències que contenen el caràcter '/'. \n" +
-                    " * Actualment les referències tenen el format de UUID",
+            description = "Referència de la notificació a consultar.",
             required = true,
+            in = ParameterIn.PATH,
             example = "00000000-0000-0000-0000-000000000000",
             schema = @Schema(implementation = String.class))
-    @GetMapping(value = {"/consultaEstatEnviament/**"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public RespostaConsultaEstatEnviamentV2 consultaEstatEnviament(HttpServletRequest request) throws UnsupportedEncodingException;
+    @GetMapping(value = {"/consultaEstatEnviament/{referencia}"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public RespostaConsultaEstatEnviamentV2 consultaEstatEnviament(HttpServletRequest request, @PathVariable("referencia") String referencia) throws UnsupportedEncodingException;
 
     @Operation(summary = "Genera el justificant i consulta la informació del registre d'una notificació.", description = "Retorna la informació del registre i el justificant d'una notificació dins Notib.")
     @ApiResponses(value = {
@@ -86,14 +85,13 @@ public interface NotificacioApiRestV3Intf {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Consulta realitzada correctament", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RespostaConsultaJustificantEnviamentApi.class, description = "Justificant de l'enviament")) }) })
     @Parameter(name = "identificador",
-            description = "Identificador de la notificació a consultar. \n" +
-                    " * A la url del mètode es mostra aquest identificador com a '**' degut a que per compatibilitat amb versions antigues, es poden trobar identificadors que contenen el caràcter '/'. \n" +
-                    " * Actualment els identificadors tenen el format de UUID",
+            description = "Identificador de la notificació a consultar.",
             required = true,
+            in = ParameterIn.PATH,
             example = "00000000-0000-0000-0000-000000000000",
             schema = @Schema(implementation = String.class))
-    @GetMapping(value = {"/consultaJustificantNotificacio/**"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public RespostaConsultaJustificantEnviament consultaJustificantV2(HttpServletRequest request);
+    @GetMapping(value = {"/consultaJustificantNotificacio/{identificador}"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public RespostaConsultaJustificantEnviament consultaJustificantV2(HttpServletRequest request, @PathVariable("identificador") String identificador);
 
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Donar permis de consulta a un usuari sobre un procediment", description = "Aquest mètode permet donar el permís de consulta a un usuari específic")
