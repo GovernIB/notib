@@ -855,11 +855,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 					log.debug("Notifica error de l'enviament amb referencia: " + referencia + ": " + enviament.isNotificaError());
 				}
 			} catch (Exception ex) {
-				log.debug("Error consultar estat enviament amb referencia: " + referencia, ex);
+				log.error("Error consultar estat enviament amb referencia: " + referencia, ex);
 				integracioHelper.addAccioError(info, "Error al obtenir l'estat de l'enviament", ex);
 				resposta.setError(true);
 				resposta.setErrorData(new Date());
-				resposta.setErrorDescripcio("Error inesperat al obtenir la informació de l'enviament amb referencia: " + referencia);
+				resposta.setErrorDescripcio("Error inesperat al obtenir la informació de l'enviament amb referencia: " + referencia + " - " + ex.getMessage());
 				return resposta;
 			}
 			integracioHelper.addAccioOk(info);

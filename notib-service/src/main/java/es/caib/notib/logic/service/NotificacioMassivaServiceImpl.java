@@ -689,9 +689,9 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             return;
         }
         if (TransactionSynchronizationManager.isActualTransactionActive()) {
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-            @Override
-            public void afterCommit() {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
                     try {
                         jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_MASSIVA, notificacioMassiva.getId());
                     } catch (JmsException ex) {
@@ -701,6 +701,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             });
         }
     }
+
 
     private NotificacioMassivaEntity registrarNotificacioMassiva(EntitatEntity entitat, NotificacioMassivaDto notMassivaDto, int size) {
 
