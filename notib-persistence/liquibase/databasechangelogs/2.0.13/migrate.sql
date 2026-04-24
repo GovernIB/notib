@@ -81,3 +81,15 @@ UPDATE NOT_CONFIG SET DESCRIPTION = 'Nombre màxim de vegades que es reintentar�
 UPDATE NOT_CONFIG SET DESCRIPTION = 'Nombre màxim de vegades que es reintentarà un enviament erroni a Notific@' WHERE key = 'es.caib.notib.tasca.notifica.enviaments.reintents.maxim';
 
 UPDATE NOT_CONFIG SET DESCRIPTION = 'Nombre màxim de vegades que es reintentarà una consulta d''estat d''enviament errònia a Notific@' WHERE key = 'es.caib.notib.tasca.enviament.actualitzacio.estat.reintents.maxim';
+
+UPDATE NOT_CONFIG_GROUP SET DESCRIPTION = 'Tasca periòdica d''actualització de l''estat dels enviaments amb l''estat de Notific@ que no s''han actualitzat amb adviser després de X dies' WHERE code = 'SCHEDULLED_UPDATE_STATUS_NOTIFICA';
+
+INSERT INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (5, 'es.caib.notib.tasca.enviament.actualitzacio.estat.dies.revisio', '6',
+                                                                                          'Nombre de dies a esperar abans de consultar l''estat d''enviaments no finalitzats',
+                                                                                          'INT',
+                                                                                          'SCHEDULLED_UPDATE_STATUS_NOTIFICA');
+UPDATE not_notificacio_env_table SET registre_numero = NULL;
+
+ALTER TABLE not_notificacio_env_table MODIFY registre_numero VARCHAR2(50 CHAR);
+
+UPDATE not_notificacio_env_table t SET registre_numero = (SELECT registre_numero_formatat FROM NOT_NOTIFICACIO_ENV e WHERE t.id = e.id);
