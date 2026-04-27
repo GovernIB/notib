@@ -113,7 +113,7 @@ public class NotificacioValidator implements Validator {
 
     private boolean cieActiu;
 
-    private final int MAX_SIZE_RAO_SOCIAL_JURIDICA = 80;
+    private final int MAX_SIZE_RAO_SOCIAL_JURIDICA = 255;
     private final int MAX_SIZE_RAO_SOCIAL = 255;
 
     @Override
