@@ -1100,7 +1100,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 						.nom(justificantDto.getNom())
 						.contentType(justificantDto.getContentType())
 						.tamany(justificantDto.getTamany())
-						.contingut(org.apache.commons.codec.binary.Base64.encodeBase64(justificantDto.getContingut())).build());
+						.contingut(justificantDto.getContingut()).build());
 				integracioHelper.addAccioOk(info);
 				return resposta;
 
