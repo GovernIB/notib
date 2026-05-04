@@ -49,6 +49,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
     private static String GENERAR_DADES_EXPLOTACIO_DEFCRON = "0 30 0 * * *";
     private static String NETEJAR_LIMIT_ENVIAMENTS_MINUT_APLICACIONS = "0 * * * * *";
     private static String NETEJAR_LIMIT_ENVIAMENTS_DIES_APLICACIONS = "0 0 0 * * *";
+    private static String ENVIAR_CORREUS_AGRUPATS_DEFCRON = "0 00 21 * * *";
 
     private static Integer CALLBACK_CLIENT = 0;
     private static Integer CERT_DEH = 1;
@@ -231,6 +232,14 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 (Supplier<SchedulledService> s) -> s.get().generarEstadistiques(),
                 PropertiesConstants.GENERAR_DADES_EXPLOTACIO_CRON,
                 GENERAR_DADES_EXPLOTACIO_DEFCRON);
+        // 13. Enviar emails canvi estat agrupats per usuar/dia
+        /////////////////////////////////////////////////////////////////////////
+        registerCronTask(
+                "refrescarNotificacionsExpirades",
+                schedulledServiceSupplier,
+                (Supplier<SchedulledService> s) -> s.get().enviarCorreusAgrupats(),
+                PropertiesConstants.ENVIAR_CORREUS_AGRUPATS_CRON,
+                ENVIAR_CORREUS_AGRUPATS_DEFCRON);
     }
 
     private <T> void registerCronTask(String taskName, Supplier<T> supplier, Consumer<Supplier<T>> method, String cronConfig, String defualtCron) {

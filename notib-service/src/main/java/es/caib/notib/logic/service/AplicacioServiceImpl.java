@@ -197,6 +197,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 					.rebreEmailsNotificacio(dto.getRebreEmailsNotificacio())
 					.emailAlt(dto.getEmailAlt())
 					.rebreEmailsNotificacioCreats(dto.getRebreEmailsNotificacioCreats())
+					.rebreEmailsAgrupats(dto.getRebreEmailsAgrupats())
 					.idioma(idioma)
 					.numElementsPaginaDefecte(dto.getNumElementsPaginaDefecte().name())
 					.entitatDefecte(dto.getEntitatDefecte())

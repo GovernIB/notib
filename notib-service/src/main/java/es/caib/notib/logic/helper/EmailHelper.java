@@ -1,6 +1,8 @@
 package es.caib.notib.logic.helper;
 
 import es.caib.notib.logic.cacheable.CacheBridge;
+import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.repository.UsuariRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -32,7 +34,7 @@ public abstract class EmailHelper<T> {
     @Resource
     protected JavaMailSender mailSender;
 
-    protected abstract String getMailHtmlBody(T item);
+    protected abstract String getMailHtmlBody(T item, boolean mostrarHeader, boolean mostrarFooter);
     protected abstract String getMailPlainTextBody(T item);
     protected abstract String getMailSubject();
 
@@ -50,22 +52,49 @@ public abstract class EmailHelper<T> {
     protected void sendEmailNotificacio(String emailDestinatari, T item) throws MessagingException {
         sendEmailNotificacio(emailDestinatari, item ,null);
     }
+
     protected void sendEmailNotificacio(String emailDestinatari, T item, List<Attachment> files) throws MessagingException {
 
-        log.debug("Enviament correu notificació");
+        NotibLogger.getInstance().info("Enviament correu notificació", log, LoggingTipus.EMAIL);
         var missatge = mailSender.createMimeMessage();
         var helper = new MimeMessageHelper(missatge, true, "UTF-8");
         helper.setTo(emailDestinatari);
         helper.setFrom(getRemitent());
         helper.setSubject(configHelper.getPrefix() + " " + getMailSubject());
         //Html text
-        helper.setText(getMailPlainTextBody(item), getMailHtmlBody(item));
+        helper.setText(getMailPlainTextBody(item), getMailHtmlBody(item, true, true));
         if (files != null) {
             for (var attach: files) {
                 helper.addAttachment(attach.filename, new ByteArrayResource(attach.content));
             }
         }
 
+        mailSender.send(missatge);
+    }
+
+    protected void sendEmailsAgrupats(String emailDestinatari, List<T> items, List<Attachment> files) throws MessagingException {
+
+        NotibLogger.getInstance().info("Enviament correu electrònic agrupats ", log, LoggingTipus.EMAIL);
+        var missatge = mailSender.createMimeMessage();
+        var helper = new MimeMessageHelper(missatge, true, "UTF-8");
+        helper.setTo(emailDestinatari);
+        helper.setFrom(getRemitent());
+        helper.setSubject(configHelper.getPrefix() + " " + getMailSubject());
+        //Html text
+        StringBuilder plainText = new StringBuilder();
+        StringBuilder htmlText = new StringBuilder();
+        var i = 0;
+        for (var item : items) {
+            plainText.append(getMailPlainTextBody(item));
+            htmlText.append(getMailHtmlBody(item, i == 0, i == items.size()-1));
+            i++;
+        }
+        helper.setText(plainText.toString(), htmlText.toString());
+        if (files != null) {
+            for (var attach: files) {
+                helper.addAttachment(attach.filename, new ByteArrayResource(attach.content));
+            }
+        }
         mailSender.send(missatge);
     }
 

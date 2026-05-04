@@ -8,12 +8,17 @@ import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.utils.NotibLogger;
+import es.caib.notib.persist.entity.CorreusAgrupatsEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.repository.CorreusAgrupatsRepository;
 import es.caib.notib.plugin.usuari.DadesUsuari;
+import liquibase.pro.packaged.T;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import javax.mail.MessagingException;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -31,10 +36,19 @@ import java.util.Set;
 @Component
 public class EmailNotificacioHelper extends EmailHelper<NotificacioEnviamentEntity> {
 
-	@Resource ProcSerHelper procSerHelper;
-	@Resource IntegracioHelper integracioHelper;
+	@Resource
+	ProcSerHelper procSerHelper;
+	@Resource
+	IntegracioHelper integracioHelper;
+	@Autowired
+    CorreusAgrupatsRepository correusAgrupatsRepository;
 
-	public String prepararEnvioEmailNotificacio(NotificacioEnviamentEntity enviament) throws Exception {
+	public void prepararEmailsAgrupats(String emailDestinatari, List<NotificacioEnviamentEntity> items, List<Attachment> files) throws MessagingException {
+
+		sendEmailsAgrupats(emailDestinatari, items, files);
+	}
+
+	public String prepararEnvioEmailNotificacio(NotificacioEnviamentEntity enviament, boolean correuAgrupats) throws Exception {
 
 		var notificacio = enviament.getNotificacio();
 		var info = new IntegracioInfo(IntegracioCodi.EMAIL, "Enviament de emails per notificació " + notificacio.getId(), IntegracioAccioTipusEnumDto.ENVIAMENT);
@@ -42,7 +56,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEnviamentEnti
 		info.setNotificacioId(notificacio.getId());
 		info.setAplicacio(notificacio.getTipusUsuari(), notificacio.getCreatedBy().get().getCodi());
 		info.addParam("Identificador de la notificacio", String.valueOf(notificacio.getId()));
-		var destinataris = obtenirCodiDestinataris(enviament, info);
+		var destinataris = obtenirCodiDestinataris(enviament, info, correuAgrupats);
 		if (destinataris == null || destinataris.isEmpty()) {
 			var msg = String.format("La notificació (Id= %d) no té candidats per a enviar el correu electrònic", notificacio.getId());
 			log.info(msg);
@@ -61,6 +75,10 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEnviamentEnti
 				info.addParam("Error", msg);
 //				integracioHelper.addAccioError(info, "Destinatari " + usuariDto.getNom() + " no té email");
 				numEnviamentsErronis++;
+				continue;
+			}
+			if (!correuAgrupats && Boolean.TRUE.equals(usuariDto.getRebreEmailsAgrupats())) {
+				correusAgrupatsRepository.save(CorreusAgrupatsEntity.builder().enviament(enviament).build());
 				continue;
 			}
 			var email = !Strings.isNullOrEmpty(usuariDto.getEmailAlt()) ? usuariDto.getEmailAlt() : usuariDto.getEmail();
@@ -94,7 +112,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEnviamentEnti
 		return resultat;
 	}
 
-	private List<UsuariDto> obtenirCodiDestinataris(NotificacioEnviamentEntity enviament, IntegracioInfo info) {
+	public List<UsuariDto> obtenirCodiDestinataris(NotificacioEnviamentEntity enviament, IntegracioInfo info, boolean correuAgrupat) {
 
 		List<UsuariDto> destinataris = new ArrayList<>();
 		Set<String> usuaris;
@@ -122,6 +140,9 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEnviamentEnti
 				log.error("[EMAIL] Error al consultar l'usuari", ex);
 			}
 			var user = usuariRepository.findById(usuari).orElse(null);
+			if (correuAgrupat && user != null && !user.isRebreEmailsAgrupats()) {
+				continue;
+			}
 			var usr = notificacio.getCreatedBy().orElse(null);
 			var codi = usr != null ? usr.getCodi() : null;
 			if (user == null && usuari.equals(codi) || (user != null && user.isRebreEmailsNotificacio() && (!user.isRebreEmailsNotificacioCreats() || user.isRebreEmailsNotificacioCreats() && usuari.equals(codi)))) {
@@ -131,8 +152,9 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEnviamentEnti
 				var email = user != null && !Strings.isNullOrEmpty(user.getEmailAlt()) ? user.getEmailAlt() : dadesUsuari != null ? dadesUsuari.getEmail() : usuari + "@caib.es";
 				u.setNom(nom);
 				u.setEmail(email);
+				u.setRebreEmailsAgrupats(user != null && user.isRebreEmailsAgrupats());
 				destinataris.add(u);
-			} else {
+			} else if (info != null){
 				info.addParam(usuari, "No té activat l'enviament per correu electrònic");
 			}
 		}
@@ -140,7 +162,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEnviamentEnti
 	}
 
 	@Override
-	protected String getMailHtmlBody(NotificacioEnviamentEntity enviament) {
+	protected String getMailHtmlBody(NotificacioEnviamentEntity enviament, boolean mostrarHeader, boolean mostrarFooter) {
 
 		var appBaseUrl = configHelper.getConfig("es.caib.notib.app.base.url");
 		var notificacio = enviament.getNotificacio();
@@ -258,11 +280,12 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEnviamentEnti
 				"}"+
 				"</style>"+
 				"</head>"+
-
-				"<body>"+
-				"<div class=\"header\">"+
-				"	<span class=\"headerText\">"+ messageHelper.getMessage("notificacio.titol").toUpperCase()+"</span> "+
-				"</div>"+
+				"<body>"+ (
+					mostrarHeader ?
+						"<div class=\"header\">"+
+						"	<span class=\"headerText\">"+ messageHelper.getMessage("notificacio.titol").toUpperCase()+"</span> "+
+						"</div>" : ""
+				) +
 				"<div class=\"content\">"+
 				"	<table>"+
 				"		<tr>"+
@@ -320,12 +343,14 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEnviamentEnti
 				"			</td>"+
 				"		</tr>"+
 				"	</table>" +
-				"</div>"+
-				"<div class=\"footer\">"+
-				"	<span class=\"footerText\">"+
-				getEmailFooter() +
-				"	</span>"+
-				"</div>"+
+				"</div>"+ (
+					mostrarFooter ?
+						"<div class=\"footer\">"+
+						"	<span class=\"footerText\">"+
+						getEmailFooter() +
+						"	</span>"+
+						"</div>" : ""
+				) +
 				"</body>"+
 				"</html>";
 		return htmlText;
