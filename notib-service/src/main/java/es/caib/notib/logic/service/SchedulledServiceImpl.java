@@ -452,7 +452,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional
 	public void enviarCorreusAgrupats() {
 
 		try {
