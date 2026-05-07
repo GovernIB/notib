@@ -6,7 +6,7 @@ import TextField from '@mui/material/TextField';
 import {
     FormField,
     MuiDataGridDialog,
-    useMuiDataGridDialogApiRef,
+    useDataGridDialogApiRef,
     MuiFilter,
     useFormContext,
     useFilterContext,
@@ -122,7 +122,7 @@ export const Dir3SearchInput: React.FC<{ name: string; required?: true }> = (pro
     const { name, required } = props;
     const [dir3Name, setDir3Name] = React.useState<string>();
     const { apiRef: formApiRef } = useFormContext();
-    const gridDialogApiRef = useMuiDataGridDialogApiRef();
+    const gridDialogApiRef = useDataGridDialogApiRef();
     const springFilterBuilder = (data: any) => {
         return filterBuilder.and(
             filterBuilder.eq('codi', data?.codi),
@@ -135,7 +135,7 @@ export const Dir3SearchInput: React.FC<{ name: string; required?: true }> = (pro
     };
     const handleSearchClick = () => {
         gridDialogApiRef.current
-            .show()
+            ?.show()
             .then((value) => {
                 formApiRef.current?.setFieldValue(name, value.codi);
                 setDir3Name(value.denominacio);
