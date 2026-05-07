@@ -21,7 +21,7 @@ export type DataFormDialogProps = React.PropsWithChildren & {
     dialogComponentProps?: any;
     formComponentProps?: any;
     formI18nKeys?: FormI18nKeys;
-    apiRef?: React.RefObject<DataFormDialogApi | undefined>;
+    apiRef?: React.RefObject<DataFormDialogApi | null>;
     formSubmit?: FormDialogSubmitFn;
     onClose?: (reason?: string) => boolean;
 };
@@ -31,8 +31,8 @@ export type DataFormDialogProps = React.PropsWithChildren & {
  *
  * @returns referència a l'API del component MuiDataFormDialog.
  */
-export const useMuiDataFormDialogApiRef: () => React.RefObject<DataFormDialogApi> = () => {
-    const gridApiRef = React.useRef<DataFormDialogApi | any>({});
+export const useDataFormDialogApiRef: () => React.RefObject<DataFormDialogApi | null> = () => {
+    const gridApiRef = React.useRef<DataFormDialogApi>(null);
     return gridApiRef;
 };
 
@@ -77,7 +77,7 @@ export const DataFormDialog: React.FC<DataFormDialogProps> = (props) => {
             dialogButtons,
         });
     const close = () => formDialogClose();
-    if (apiRef != null) {
+    if (apiRef) {
         apiRef.current = { show, close };
     }
     return <>{formDialogComponent}</>;
