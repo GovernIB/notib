@@ -7,7 +7,7 @@ import {
     springFilterBuilder as filterBuilder,
     useFilterApiRef,
     MuiFilter,
-    FilterApi,
+    FilterApiRef,
     useMuiDataGridApiRef,
     MuiDataGridApiRef,
     MuiDataGridColDef,
@@ -54,13 +54,13 @@ const EntitatFormTabAplicacionsFormContent: React.FC = () => {
 };
 
 const ContentFilter: React.FC<{
-    filterApiRef: React.RefObject<FilterApi>;
+    filterApiRef: FilterApiRef;
     gridApiRef: MuiDataGridApiRef;
 }> = (props) => {
     const { filterApiRef, gridApiRef } = props;
     const { t } = useTranslation();
     const handleButtonClick = () => {
-        filterApiRef.current.clear();
+        filterApiRef.current?.clear();
     };
     return (
         <Grid container spacing={2}>
