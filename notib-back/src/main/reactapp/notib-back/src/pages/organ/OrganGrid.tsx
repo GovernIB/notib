@@ -14,7 +14,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import {
     GridPage,
     MuiDataGrid,
-    MuiDataGridApi,
+    MuiDataGridApiRef,
     MuiActionReportButton,
     useBaseAppContext,
     useResourceApiService,
@@ -199,7 +199,7 @@ const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
 };
 
 const OrganGridDir3SyncActionButton: React.FC<{
-    dataGridApiRef: React.RefObject<MuiDataGridApi>;
+    dataGridApiRef: MuiDataGridApiRef;
 }> = (props) => {
     const { dataGridApiRef } = props;
     const { t } = useTranslation();
@@ -223,7 +223,7 @@ const OrganGridDir3SyncActionButton: React.FC<{
     };
     const handleSuccess = (result?: any) => {
         if (!result.simulat) {
-            dataGridApiRef.current.refresh();
+            dataGridApiRef.current?.refresh();
             temporalMessageShow(null, t('page.organs.grid.sync.success'), 'success');
         }
     };
@@ -297,6 +297,7 @@ export const OrganGrid = () => {
     const treeDataProps = useDatagridTreeData(
         treeDataViewActive,
         t('page.organs.grid.groupColumn'),
+        false,
         1,
         { flex: 6 }
     );

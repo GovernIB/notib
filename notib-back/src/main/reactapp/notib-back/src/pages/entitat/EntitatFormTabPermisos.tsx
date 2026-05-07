@@ -5,7 +5,7 @@ import {
     useFilterApiRef,
     useFormContext,
     springFilterBuilder as filterBuilder,
-    FilterApi,
+    FilterApiRef,
     MuiDataGridApiRef,
     useMuiDataGridApiRef,
 } from 'reactlib';
@@ -64,7 +64,7 @@ const PermissionForm: React.FC = () => {
 };
 
 const ContentFilter: React.FC<{
-    filterApiRef: React.RefObject<FilterApi>;
+    filterApiRef: FilterApiRef;
     gridApiRef: MuiDataGridApiRef;
 }> = (props) => {
     const { filterApiRef, gridApiRef } = props;
@@ -80,7 +80,7 @@ const ContentFilter: React.FC<{
         },
     ];
     const handleButtonClick = () => {
-        filterApiRef.current.clear();
+        filterApiRef.current?.clear();
     };
     return (
         <Grid container spacing={2}>
