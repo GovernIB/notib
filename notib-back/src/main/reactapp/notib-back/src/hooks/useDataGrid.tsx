@@ -8,6 +8,8 @@ import {
     GridRowsProp,
     useGridApiRef,
     gridRowNodeSelector,
+    type DataGridProProps,
+    type GridEventListener,
 } from '@mui/x-data-grid-pro';
 import { MuiFilter } from 'reactlib';
 import { useNotibContext } from '../components/NotibContext';
@@ -73,6 +75,7 @@ export const useDatagridFilterProps = (
 export const useDatagridTreeData = (
     active: boolean,
     headerName: string,
+    reorderingActive: boolean,
     defaultGroupingExpansionDepth?: number,
     groupingColDefProps?: any
 ) => {
@@ -98,9 +101,31 @@ export const useDatagridTreeData = (
             }
         });
     };
-    const getTreeDataPath = (row: any) => {
+    const getTreeDataPath: DataGridProProps['getTreeDataPath'] = (row: any) => {
         return row.path?.map((p: any) => p.description) ?? [row.id];
     };
+    const setTreeDataPath: DataGridProProps['setTreeDataPath'] = (path, row) => {
+        return {
+            ...row,
+            path: path.map((p) => ({ id: -1, description: p })),
+        };
+    };
+    const processRowUpdate: DataGridProProps['processRowUpdate'] = (newRow: any, oldRow: any) => {
+        console.log('>>> reordenació 1', oldRow.id, oldRow.path, newRow.id, newRow.path);
+    };
+    const onRowOrderChange: GridEventListener<'rowOrderChange'> = (params) => {
+        if (params.oldParent === params.newParent) {
+            console.log('>>> reordenació 2', params);
+        }
+    };
+    const reorderingProps = reorderingActive
+        ? {
+              rowReordering: true,
+              setTreeDataPath,
+              processRowUpdate,
+              onRowOrderChange,
+          }
+        : {};
     return active
         ? {
               perspectives: ['TREE'],
@@ -157,6 +182,7 @@ export const useDatagridTreeData = (
                   ...groupingColDefProps,
               },
               defaultGroupingExpansionDepth,
+              ...reorderingProps,
               sx: {
                   '& [data-field="__tree_data_group__"] .MuiDataGrid-columnHeaderTitleContainerContent':
                       {
@@ -166,6 +192,5 @@ export const useDatagridTreeData = (
           }
         : {
               paginationActive: true as true,
-              getTreeDataPath,
           };
 };
