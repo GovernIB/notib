@@ -19,7 +19,7 @@ import {
     type MenuEntry,
     useBaseAppContext,
     useResourceApiContext,
-    useMuiDataFormDialogApiRef,
+    useDataFormDialogApiRef,
 } from 'reactlib';
 import { useNotibContext, ROLE_SUPER } from './NotibContext';
 import Offline from './Offline';
@@ -140,7 +140,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
     const location = useLocation();
     const { currentRole } = useNotibContext();
     const baseAppMenuEntries = useBaseAppMenuEntries(menuEntries);
-    const formDialogApiRef = useMuiDataFormDialogApiRef();
+    const formDialogApiRef = useDataFormDialogApiRef();
     const i18nHandleLanguageChange = (language?: string) => {
         i18n.changeLanguage(language);
     };

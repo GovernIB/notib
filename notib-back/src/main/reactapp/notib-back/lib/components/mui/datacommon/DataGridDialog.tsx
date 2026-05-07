@@ -18,7 +18,7 @@ export type DataGridDialogProps = {
     onRowClickEnabled?: boolean | ((row: any) => boolean);
     dialogComponentProps?: any;
     dataGridComponentProps?: any;
-    apiRef?: React.RefObject<DataGridDialogApi | undefined>;
+    apiRef?: React.RefObject<DataGridDialogApi | null>;
 };
 
 /**
@@ -26,8 +26,8 @@ export type DataGridDialogProps = {
  *
  * @returns referència a l'API del component MuiDataGridDialog.
  */
-export const useMuiDataGridDialogApiRef: () => React.RefObject<DataGridDialogApi> = () => {
-    const gridApiRef = React.useRef<DataGridDialogApi | any>({});
+export const useDataGridDialogApiRef: () => React.RefObject<DataGridDialogApi | null> = () => {
+    const gridApiRef = React.useRef<DataGridDialogApi>(null);
     return gridApiRef;
 };
 
@@ -60,7 +60,7 @@ export const DataGridDialog: React.FC<DataGridDialogProps> = (props) => {
             ...args,
         });
     const close = () => dataGridDialogClose();
-    if (apiRef != null) {
+    if (apiRef) {
         apiRef.current = { show, close };
     }
     return <>{dataGridDialogComponent}</>;
