@@ -18,13 +18,13 @@ import {
 import { useNotibContext } from './NotibContext';
 
 export const UserProfileMenu: React.FC<{
-    formDialogApiRef: React.RefObject<MuiDataFormDialogApi>;
+    formDialogApiRef: React.RefObject<MuiDataFormDialogApi | null>;
 }> = (props) => {
     const { formDialogApiRef } = props;
     const { t } = useTranslation();
     const { getUserId: authGetUserId } = useAuthContext();
     const showUserProfileDialog = () => {
-        formDialogApiRef.current.show(authGetUserId()).catch(() => null);
+        formDialogApiRef.current?.show(authGetUserId()).catch(() => null);
     };
     return (
         <MenuItem onClick={() => showUserProfileDialog()} sx={{ width: '100%' }}>
@@ -37,7 +37,7 @@ export const UserProfileMenu: React.FC<{
 };
 
 export const UserProfileFormDialog: React.FC<{
-    formDialogApiRef: React.RefObject<MuiDataFormDialogApi>;
+    formDialogApiRef: React.RefObject<MuiDataFormDialogApi | null>;
 }> = (props) => {
     const { formDialogApiRef } = props;
     const { t } = useTranslation();

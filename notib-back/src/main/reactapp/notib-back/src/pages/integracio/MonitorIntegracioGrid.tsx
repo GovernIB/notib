@@ -7,7 +7,7 @@ import {
     useFilterApiRef,
     useResourceApiService,
     springFilterBuilder as filterBuilder,
-    FilterApi,
+    FilterApiRef,
     useCloseDialogButtons,
 } from 'reactlib';
 import GridFormField from '../../components/GridFormField';
@@ -106,11 +106,11 @@ const CustomTabs = ({ options, report, selectedTab, onTabChange }: MonitorProps)
     );
 };
 
-const ContentFilter = ({ filterApiRef }: { filterApiRef: React.RefObject<FilterApi> }) => {
+const ContentFilter = ({ filterApiRef }: { filterApiRef: FilterApiRef }) => {
     const { t } = useTranslation();
 
     const handleButtonClick = () => {
-        filterApiRef.current.clear();
+        filterApiRef.current?.clear();
     };
     return (
         <Grid container spacing={2}>
