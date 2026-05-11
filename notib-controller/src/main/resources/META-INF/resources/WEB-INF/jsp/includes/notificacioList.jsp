@@ -197,7 +197,11 @@
         recuperarEstatEnviament: returnEnviamentsStatusDiv,
         hlpIsUsuari: isRolActualUsuari,
         hlpIsAdministradorEntitat: isRolActualAdministradorEntitat,
-        hlpIsAdministradorOrgan: isRolActualAdministradorOrgan};
+        hlpIsAdministradorOrgan: isRolActualAdministradorOrgan,
+        creatEstatHtmlHelper: function(estatJson) {
+            return creatEstatHtml(estatJson);
+        }
+    };
 
     $.views.helpers(myHelpers);
 
@@ -751,6 +755,72 @@
             }
         });
     }
+
+    function creatEstatHtml(jsonString) {
+
+        if (!jsonString) {
+            return "";
+        }
+        let json = JSON.parse(jsonString);
+        console.log(json);
+        let html = '';
+        if (json.entregaPostal) {
+            html += '<span class="label ' + json.entregaPostal.label + '" title="' + json.entregaPostal.title + '" style="float: right; position: relative; top: 0px;"><span class="fa fa-envelope"></span></span>';
+        }
+        html += '<div class="flex-column">'
+        html += '<div style="display:flex; justify-content:space-between"><span>';
+        if (json.registreEstat && json.registreEstat.length > 0) {
+            let registreEstats = json.registreEstat
+            for (let registreEstat of registreEstats) {
+                html += '<span style="margin-right: 3px;">' +
+                            '<span style="padding-bottom:1px; background-color:' + registreEstat.backgroundColor + ';" title="' + registreEstat.title + '" ' +
+                                'class="label label-primary"> ' + registreEstat.label + '</span></span>';
+            }
+        }
+        if (!json.anulat) {
+            html += '<span><span class="' + json.iconaEstat + '"></span> ' + json.nomEstat + ' </span>';
+        } else {
+            html += '<span><span class="fa fa-ban" title="' + json.anulat +' "></span> ' + json.nomEstat + ' </span>';
+        }
+        let eventError = json.eventError;
+        if (eventError.error && eventError.error.length > 0) {
+            let title = "";
+            for (let error of eventError.error) {
+                title += error.title;
+            }
+            html += '<span class="fa fa-warning text-danger" title="' + title + '">&nbsp;</span>';
+        }
+        if (eventError.errorFiReintents) {
+            html += '<span class="fa fa-warning text-warning" title=" ' + eventError.errorFiReintents + '">&nbsp;</span>';
+        }
+        if (eventError.errorCallback) {
+            html += '<span class="fa fa-exclamation-circle text-primary" title=" ' + eventError.errorCallback.errorCallback + '">&nbsp;</span>';
+        }
+        if (json.callbackFiReintents) {
+            html += '<span class="fa fa-warning text-info" title=" ' + json.callbackFiReintents + '">&nbsp;</span>';
+        }
+        let notificacioMovilError = json.notificacioMovilError;
+        if (notificacioMovilError && notificacioMovilError.length > 0) {
+            let title = "";
+            for (let errorMovil of notificacioMovilError) {
+                title += errorMovil.eventCarpeta;
+            }
+            html += '<span style="color:#8a6d3b;" class="fa fa-mobile fa-lg" title="' + title + ' ">&nbsp;</span>';
+        }
+        html += "</span>";
+        html += '</div>';
+        if (json.dataEstat) {
+            html += '<span class="horaProcessat">' + json.dataEstat +'</span>'
+        }
+        if (json.notificaEstats && json.notificaEstats.length > 0) {
+            for (let estat of json.notificaEstats) {
+                html += '<div style="font-size:11px; box-shadow: inset 3px 0px 0px ' + estat.color + '; padding-left: 5px;"><span>' + estat.value + ' </span>'+ estat.message + '</div>';
+            }
+        }
+        html += '</div>';
+        console.log(html);
+        return html;
+    }
 </script>
 <form:form id="form-filtre" action="" method="post" cssClass="well" modelAttribute="notificacioFiltreCommand">
     <div class="row">
@@ -1008,7 +1078,7 @@
             <th data-col-name="estatString" data-template="#cellEstatTemplate" <c:if test="${isRolActualAdministradorEntitat}"> data-disable-events="true" </c:if>width="120px"><spring:message code="notificacio.list.columna.estat"/>
                 <script id="cellEstatTemplate" type="text/x-jsrender">
                     <div class="cellEstat estatColor {{:estatColor}}">
-                        {{:estatString}}
+                        {{:~creatEstatHtmlHelper(estatString)}}
                         {^{if ~hlpIsAdministradorEntitat() }}
                             <div class="hover-button"><a href="<c:url value="/notificacio/{{:id}}/updateEstatList"/>"><span class="fa fa-refresh"></span></a></div>
                         {{/if}}
