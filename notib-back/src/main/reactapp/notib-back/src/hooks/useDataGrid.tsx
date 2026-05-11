@@ -82,11 +82,8 @@ export const useDatagridTreeData = (
     const { t } = useTranslation();
     const theme = useTheme();
     const datagridApiRef = useGridApiRef();
-    const [rowIds, setRowIds] = React.useState<any[]>();
-    const handleRowsChange = (rows: GridRowsProp) => {
-        setRowIds(rows?.map((r) => r.id));
-    };
     const changeAllNodesExpansion = (expanded: boolean) => {
+        const rowIds = Array.from(datagridApiRef.current?.getRowModels().keys() ?? []);
         rowIds?.forEach((id) => {
             const node = gridRowNodeSelector(datagridApiRef, id) as any;
             if (node?.children?.length) {
@@ -131,7 +128,6 @@ export const useDatagridTreeData = (
               perspectives: ['TREE'],
               treeData: true as true,
               getTreeDataPath,
-              onRowsChange: handleRowsChange,
               datagridApiRef,
               groupingColDef: {
                   headerName,
