@@ -1078,6 +1078,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
             };
             if (JSON.stringify(findArgs) !== JSON.stringify(newFindArgs)) {
                 setFindArgs(newFindArgs);
+                setExpandedRowIds(treeDataDefaultExpandedRowIds ?? []);
             }
         }
     }, [
@@ -1099,7 +1100,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
             if (firstNode?.depth !== undefined) {
                 expandedRowIds?.forEach((id) => {
                     const node = gridRowNodeSelector(datagridApiRef, id);
-                    if (node) {
+                    if (node?.type === 'group') {
                         const api = datagridApiRef.current as {
                             setRowChildrenExpansion?: (id: any, expanded: boolean) => void;
                         };
@@ -1108,7 +1109,6 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                 });
             }
         }
-        setExpandedRowIds(treeDataDefaultExpandedRowIds ?? []);
     }, [rows]);
     React.useEffect(() => {
         setFilter(filterProp);
