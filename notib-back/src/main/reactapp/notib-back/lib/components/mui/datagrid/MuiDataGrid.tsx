@@ -630,16 +630,21 @@ const usePersistentState = (
         paginationModelProp !== undefined && setPaginationModel(paginationModelProp);
     }, [paginationModelProp]);
     React.useEffect(() => {
-        const unsubscribe = apiRef.current?.subscribeEvent('rowExpansionChange', (params) => {
-            setExpandedRowIds((prev) => {
-                if (params.childrenExpanded) {
-                    return [...prev, params.id];
-                } else {
-                    return prev.filter((id) => id !== params.id);
+        if (active) {
+            const unsubscribe = apiRef.current?.subscribeEvent(
+                'rowExpansionChange',
+                (params: any) => {
+                    setExpandedRowIds((prev) => {
+                        if (params.childrenExpanded) {
+                            return [...prev, params.id];
+                        } else {
+                            return prev.filter((id) => id !== params.id);
+                        }
+                    });
                 }
-            });
-        });
-        return unsubscribe;
+            );
+            return unsubscribe;
+        }
     }, []);
     React.useEffect(() => {
         active &&
@@ -736,6 +741,7 @@ const usePersistentState = (
         expandedRowIds,
         setQuickFilter,
         setAutoPageSize,
+        setExpandedRowIds,
     };
 };
 
@@ -1021,6 +1027,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         expandedRowIds,
         setQuickFilter,
         setAutoPageSize,
+        setExpandedRowIds,
     } = usePersistentState(
         persistentStateActive ?? false,
         persistentStateClearPageSortPropsOnTopLevelRouteChange ?? false,
@@ -1101,6 +1108,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                 });
             }
         }
+        setExpandedRowIds(treeDataDefaultExpandedRowIds ?? []);
     }, [rows]);
     React.useEffect(() => {
         setFilter(filterProp);
@@ -1345,8 +1353,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                         ...(toolbarAdditionalRowMinHeight != null
                             ? { minHeight: toolbarAdditionalRowMinHeight }
                             : {}),
-                    }}
-                >
+                    }}>
                     {toolbarAdditionalRow}
                 </Box>
             ) : null}
@@ -1401,15 +1408,13 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                         flexDirection: 'column',
                         height: height ? height : '100%',
                         ...virtualScrollerStyles,
-                    }}
-                >
+                    }}>
                     {inlineEditable ? (
                         <Form
                             resourceName={resourceName}
                             apiRef={formApiRef}
                             additionalData={formAdditionalData}
-                            commonFieldComponentProps={{ size: 'small' }}
-                        >
+                            commonFieldComponentProps={{ size: 'small' }}>
                             {content}
                         </Form>
                     ) : (
