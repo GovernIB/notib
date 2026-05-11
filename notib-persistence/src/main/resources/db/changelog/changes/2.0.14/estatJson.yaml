@@ -1,0 +1,6 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - sql: "UPDATE not_notificacio_table SET per_actualitzar = 1;"
