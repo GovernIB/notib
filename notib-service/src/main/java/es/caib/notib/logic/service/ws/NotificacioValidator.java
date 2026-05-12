@@ -523,7 +523,7 @@ public class NotificacioValidator implements Validator {
 
     public void validarDocumentCIE(Document document, Errors errors, String doc, String prefix) throws IOException {
 
-        if (!procediment.getEntregaCieEfectiva().getCie().isCieExtern()) {
+        if (procediment.getEntregaCieEfectiva() != null && !procediment.getEntregaCieEfectiva().getCie().isCieExtern()) {
             return;
         }
         var bytes = Base64.decode(document.getContingutBase64());
