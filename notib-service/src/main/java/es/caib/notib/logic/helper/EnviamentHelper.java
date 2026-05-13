@@ -1,11 +1,13 @@
 package es.caib.notib.logic.helper;
 
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioCertificacioDto;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import lombok.NonNull;
@@ -42,6 +44,7 @@ public class EnviamentHelper {
 		refrescarEnviamentsExpirats(new ProgresActualitzacioCertificacioDto());
 	}
 
+	@Transactional(readOnly = true)
 	public void refrescarEnviamentsExpirats(@NonNull ProgresActualitzacioCertificacioDto progres) {
 
 		log.info("[EXPIRATS] Execució procés actualització enviaments expirats");
@@ -51,7 +54,7 @@ public class EnviamentHelper {
 				IntegracioAccioTipusEnumDto.PROCESSAR, new AccioParam("Usuari encarregat: ", username));
 		var enviamentsIds = notificacioEnviamentRepository.findIdExpiradesAndNotificaCertificacioDataNull();
 		if (enviamentsIds == null || enviamentsIds.isEmpty()) {
-			log.debug("[EXPIRATS] No s'han trobat enviaments expirats.");
+			log.info("[EXPIRATS] No s'han trobat enviaments expirats.");
 			var msgInfoEnviamentsEmpty = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.empty");
 			progres.addInfo(TipusActInfo.WARNING, msgInfoEnviamentsEmpty);
 			info.getParams().add(new AccioParam("Msg. Títol:", msgInfoEnviamentsEmpty));
@@ -59,7 +62,7 @@ public class EnviamentHelper {
 			integracioHelper.addAccioOk(info);
 			return;
 		}
-		log.debug(String.format("[EXPIRATS] Actualitzant %d enviaments expirats", enviamentsIds.size()));
+		log.info(String.format("[EXPIRATS] Actualitzant %d enviaments expirats", enviamentsIds.size()));
 		var msgInfoInici = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.inici");
 		progres.setNumEnviamentsExpirats(enviamentsIds.size());
 		progres.addInfo(TipusActInfo.TITOL, msgInfoInici);
@@ -91,7 +94,8 @@ public class EnviamentHelper {
 		enviament.updateCIECertNovaConsulta(configHelper.getConfigAsInteger(PropertiesConstants.ENVIAMENT_CIE_REFRESCAR_CERT_PENDENTS_RATE));
 	}
 
-	private void enviamentRefrescarEstat(Long enviamentId, ProgresActualitzacioCertificacioDto progres, IntegracioInfo info) {
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void enviamentRefrescarEstat(Long enviamentId, ProgresActualitzacioCertificacioDto progres, IntegracioInfo info) {
 
 		long t0 = System.currentTimeMillis();
 		log.debug("Refrescant l'estat de la notificació de Notific@ (enviamentId=" + enviamentId + ")");
