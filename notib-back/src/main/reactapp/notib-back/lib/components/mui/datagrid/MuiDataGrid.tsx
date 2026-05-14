@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+    GridApiPro as DataGridApi,
     DataGridProProps as DataGridProps,
     GridRowsProp,
     GridRenderCellParams,
@@ -13,7 +14,6 @@ import {
     GridRowSelectionModel,
     GridRowModesModel,
     GridSlots,
-    GridApiPro,
     GridEventListener,
     GridCallbackDetails,
     GridActionsCell,
@@ -149,8 +149,6 @@ export type MuiDataGridProps = {
     exportFileType?: ExportFileType;
     /** Dades addicionals pel formulari de creació o modificació d'una fila de la graella */
     formAdditionalData?: ((row: any, action: string) => any) | any;
-    /** Files addicionals per a la vista en arbre (si la vista d'arbre no està activa aquest atribut s'ignorarà) */
-    treeDataAdditionalRows?: any[] | ((rows: any[]) => any[]);
     /** Llista d'ids de les files expandides per defecte */
     treeDataDefaultExpandedRowIds?: any[];
     /** Tipus de barra d'eines que es mostrarà a la part superior */
@@ -205,6 +203,8 @@ export type MuiDataGridProps = {
     rowAdditionalActions?: DataCommonAdditionalAction[];
     /** Model amb les files seleccionades */
     rowSelectionModel?: GridRowSelectionModel;
+    /** Funció que processa les files abans de passar-les al DataGrid de MUI */
+    rowsTransformer?: (rows: any[]) => any[];
     /** Indica que la creació i modificació en la mateixa fila està activa */
     inlineEditActive?: boolean;
     /** Indica que només la creació en la mateixa fila està activa */
@@ -263,7 +263,7 @@ export type MuiDataGridProps = {
     /** Referència a l'api del component */
     apiRef?: MuiDataGridApiRef;
     /** Referència a l'api interna del component DataGrid de MUI */
-    datagridApiRef?: React.RefObject<GridApiPro | null>;
+    datagridApiRef?: React.RefObject<DataGridApi | null>;
     /** Alçada del component en píxels */
     height?: number;
     /**
@@ -554,7 +554,7 @@ const usePersistentState = (
     quickFilterProp: string | undefined,
     defaultQuickFilter: string | undefined,
     defaultExpandedRowIds: any[] | undefined,
-    apiRef: React.RefObject<GridApiPro | null>,
+    apiRef: React.RefObject<DataGridApi | null>,
     key: string,
     storeInLocalStorage?: boolean
 ) => {
@@ -630,16 +630,21 @@ const usePersistentState = (
         paginationModelProp !== undefined && setPaginationModel(paginationModelProp);
     }, [paginationModelProp]);
     React.useEffect(() => {
-        const unsubscribe = apiRef.current?.subscribeEvent('rowExpansionChange', (params) => {
-            setExpandedRowIds((prev) => {
-                if (params.childrenExpanded) {
-                    return [...prev, params.id];
-                } else {
-                    return prev.filter((id) => id !== params.id);
+        if (active) {
+            const unsubscribe = apiRef.current?.subscribeEvent(
+                'rowExpansionChange',
+                (params: any) => {
+                    setExpandedRowIds((prev) => {
+                        if (params.childrenExpanded) {
+                            return [...prev, params.id];
+                        } else {
+                            return prev.filter((id) => id !== params.id);
+                        }
+                    });
                 }
-            });
-        });
-        return unsubscribe;
+            );
+            return unsubscribe;
+        }
     }, []);
     React.useEffect(() => {
         active &&
@@ -736,6 +741,7 @@ const usePersistentState = (
         expandedRowIds,
         setQuickFilter,
         setAutoPageSize,
+        setExpandedRowIds,
     };
 };
 
@@ -807,7 +813,6 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         perspectives,
         exportFileType = 'PDF',
         formAdditionalData,
-        treeDataAdditionalRows,
         treeDataDefaultExpandedRowIds,
         toolbarType = 'default',
         toolbarHide,
@@ -835,6 +840,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         rowActionsColumnProps,
         rowAdditionalActions = [],
         rowSelectionModel: rowSelectionModelProp = DEFAULT_ROW_SELECTION,
+        rowsTransformer,
         inlineEditActive,
         inlineEditCreateActive,
         inlineEditUpdateActive,
@@ -876,16 +882,10 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     const formApiRef = useFormApiRef();
     const anyArtifactRowAction =
         rowAdditionalActions?.find((a) => a.action != null || a.report != null) != null;
-    const treeDataAdditionalRowsIsFunction = treeDataAdditionalRows
-        ? typeof treeDataAdditionalRows === 'function'
-        : false;
     const [filter, setFilter] = React.useState<string | undefined>(filterProp);
     const [_filterModel, setFilterModel] = React.useState<GridFilterModel>();
     const [rowSelectionModel, setRowSelectionModel] =
         React.useState<GridRowSelectionModel>(rowSelectionModelProp);
-    const [additionalRows, setAdditionalRows] = React.useState<any[]>(
-        !treeDataAdditionalRowsIsFunction ? [] : (treeDataAdditionalRows as any[])
-    );
     const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
     const [findArgs, setFindArgs] = React.useState<DataCommonFindArgs>();
     const anyRowInEditMode = Object.keys(rowModesModel).length > 0;
@@ -1027,6 +1027,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         expandedRowIds,
         setQuickFilter,
         setAutoPageSize,
+        setExpandedRowIds,
     } = usePersistentState(
         persistentStateActive ?? false,
         persistentStateClearPageSortPropsOnTopLevelRouteChange ?? false,
@@ -1077,6 +1078,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
             };
             if (JSON.stringify(findArgs) !== JSON.stringify(newFindArgs)) {
                 setFindArgs(newFindArgs);
+                setExpandedRowIds(treeDataDefaultExpandedRowIds ?? []);
             }
         }
     }, [
@@ -1093,15 +1095,17 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     ]);
     React.useEffect(() => {
         onRowsChange?.(rows, pageInfo);
-        if (treeDataAdditionalRowsIsFunction) {
-            setAdditionalRows((treeDataAdditionalRows as (rows: any[]) => any[])(rows));
-        }
-        if (otherProps.treeData && rows.length) {
+        if ((otherProps as any).treeData && rows.length) {
             const firstNode = gridRowNodeSelector(datagridApiRef, rows[0].id);
             if (firstNode?.depth !== undefined) {
                 expandedRowIds?.forEach((id) => {
                     const node = gridRowNodeSelector(datagridApiRef, id);
-                    node && datagridApiRef.current?.setRowChildrenExpansion(id, true);
+                    if (node?.type === 'group') {
+                        const api = datagridApiRef.current as {
+                            setRowChildrenExpansion?: (id: any, expanded: boolean) => void;
+                        };
+                        api.setRowChildrenExpansion?.(id, true);
+                    }
                 });
             }
         }
@@ -1184,7 +1188,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         apiRefProp.current = getDataGridApi();
     }
     const filteringProps: any = {
-        filterMode: !otherProps.treeData ? 'server' : undefined,
+        filterMode: !(otherProps as any).treeData ? 'server' : undefined,
         disableColumnFilter: true,
         onFilterModelChange: setFilterModel,
     };
@@ -1280,7 +1284,10 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                   params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd',
           }
         : null;
-    const processedRows = React.useMemo(() => [...additionalRows, ...rows], [additionalRows, rows]);
+    const processedRows = React.useMemo(
+        () => (rowsTransformer ? rowsTransformer(rows) : rows),
+        [rows]
+    );
     const localeText = useLocaleText();
     const isRowsPresentInOtherProps = 'rows' in otherProps;
     const memoizedSlots = React.useMemo(() => {
@@ -1346,8 +1353,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                         ...(toolbarAdditionalRowMinHeight != null
                             ? { minHeight: toolbarAdditionalRowMinHeight }
                             : {}),
-                    }}
-                >
+                    }}>
                     {toolbarAdditionalRow}
                 </Box>
             ) : null}
@@ -1402,15 +1408,13 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                         flexDirection: 'column',
                         height: height ? height : '100%',
                         ...virtualScrollerStyles,
-                    }}
-                >
+                    }}>
                     {inlineEditable ? (
                         <Form
                             resourceName={resourceName}
                             apiRef={formApiRef}
                             additionalData={formAdditionalData}
-                            commonFieldComponentProps={{ size: 'small' }}
-                        >
+                            commonFieldComponentProps={{ size: 'small' }}>
                             {content}
                         </Form>
                     ) : (
