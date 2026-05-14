@@ -4,13 +4,14 @@
 	<parent>
 		<groupId>es.caib.notib</groupId>
 		<artifactId>notib</artifactId>
-		<version>2.0.12</version>
+		<version>2.1.1</version>
 	</parent>
 	<artifactId>notib-ear</artifactId>
 	<packaging>ear</packaging>
 	<properties>
 		<docker.image.name>${project.parent.artifactId}</docker.image.name>
-		<docker.image.from>280421/jboss-eap-caib-7.2</docker.image.from>
+<!--		<docker.auth.username>${env.DOCKER_USER}</docker.auth.username>-->
+<!--		<docker.auth.password>${env.DOCKER_PASSWORD}</docker.auth.password>-->
 		<docker.jboss.userhome>/home/jboss</docker.jboss.userhome>
 	</properties>
 	<dependencies>
@@ -123,94 +124,6 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>io.fabric8</groupId>
-				<artifactId>docker-maven-plugin</artifactId>
-				<version>0.42.1</version>
-				<configuration>
-					<verbose>true</verbose>
-					<images>
-						<image>
-							<name>${docker.image.name}</name>
-							<alias>${project.parent.artifactId}</alias>
-							<build>
-								<from>${docker.image.from}</from>
-								<maintainer>limit@limit.es</maintainer>
-								<args>
-									<VITE_APP_VERSION>${project.version}</VITE_APP_VERSION>
-								</args>
-								<ports>
-									<port>8080</port>
-									<port>8787</port>
-								</ports>
-								<assemblies>
-									<assembly>
-										<name>copy_jboss_config</name>
-										<inline>
-											<fileSets>
-												<fileSet>
-													<directory>${basedir}/docker/jboss</directory>
-													<outputDirectory>config</outputDirectory>
-												</fileSet>
-											</fileSets>
-										</inline>
-										<targetDir>$JBOSS_USERHOME</targetDir>
-										<user>jboss:nogroup</user>
-									</assembly>
-									<assembly>
-										<name>copy_properties</name>
-										<inline>
-											<fileSets>
-												<fileSet>
-													<directory>${basedir}/docker/properties</directory>
-													<outputDirectory>${project.parent.artifactId}</outputDirectory>
-												</fileSet>
-											</fileSets>
-										</inline>
-										<targetDir>$JBOSS_USERHOME/apps</targetDir>
-										<user>jboss:nogroup</user>
-									</assembly>
-									<assembly>
-										<name>copy_keystores</name>
-										<inline>
-											<fileSets>
-												<fileSet>
-													<directory>${basedir}/docker/keystores</directory>
-													<outputDirectory>keystores</outputDirectory>
-												</fileSet>
-											</fileSets>
-										</inline>
-										<targetDir>$JBOSS_USERHOME</targetDir>
-										<user>jboss:nogroup</user>
-									</assembly>
-									<assembly>
-										<descriptorRef>artifact</descriptorRef>
-										<targetDir>$JBOSS_HOME/standalone/deployments</targetDir>
-										<user>jboss:nogroup</user>
-									</assembly>
-								</assemblies>
-								<runCmds>
-									<run>chmod a+x $JBOSS_USERHOME/config/jboss_config.sh</run>
-									<run>dos2unix $JBOSS_USERHOME/config/jboss_config.sh</run>
-									<run>sed -i 's~#!/bin/sh~#!/bin/sh\n$JBOSS_USERHOME/config/jboss_config.sh~' $JBOSS_HOME/bin/standalone.sh</run>
-								</runCmds>
-								<tags>
-									<tag>latest</tag>
-									<tag>${project.version}</tag>
-								</tags>
-							</build>
-							<run>
-								<ports>
-									<port>8787:8787</port>
-								</ports>
-								<env>
-									<JAVA_OPTS>-agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=n</JAVA_OPTS>
-								</env>
-							</run>
-						</image>
-					</images>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-ear-plugin</artifactId>
 				<version>3.2.0</version>
@@ -261,4 +174,225 @@
 		</plugins>
 		<finalName>notib</finalName>
 	</build>
+	<profiles>
+		<profile>
+			<id>docker-legacy</id>
+			<properties>
+				<docker.image.from>280421/jboss-eap-caib-7.2</docker.image.from>
+			</properties>
+				<build>
+					<plugins>
+						<plugin>
+							<groupId>io.fabric8</groupId>
+							<artifactId>docker-maven-plugin</artifactId>
+							<version>0.42.1</version>
+						<configuration>
+							<verbose>true</verbose>
+<!--							<authConfig>-->
+<!--								<username>${docker.auth.username}</username>-->
+<!--								<password>${docker.auth.password}</password>-->
+<!--							</authConfig>-->
+							<images>
+								<image>
+									<name>${docker.image.name}</name>
+									<alias>${project.parent.artifactId}</alias>
+									<build>
+										<from>${docker.image.from}</from>
+										<maintainer>limit@limit.es</maintainer>
+										<args>
+											<VITE_APP_VERSION>${project.version}</VITE_APP_VERSION>
+										</args>
+										<ports>
+											<port>8080</port>
+											<port>8787</port>
+										</ports>
+										<assemblies>
+											<assembly>
+												<name>copy_jboss_config</name>
+												<inline>
+													<fileSets>
+														<fileSet>
+															<directory>${basedir}/docker/jboss</directory>
+															<outputDirectory>config</outputDirectory>
+														</fileSet>
+													</fileSets>
+												</inline>
+												<targetDir>${docker.jboss.userhome}</targetDir>
+												<user>jboss:root</user>
+											</assembly>
+											<assembly>
+												<name>copy_properties</name>
+												<inline>
+													<fileSets>
+														<fileSet>
+															<directory>${basedir}/docker/properties</directory>
+															<outputDirectory>${project.parent.artifactId}</outputDirectory>
+														</fileSet>
+													</fileSets>
+												</inline>
+												<targetDir>${docker.jboss.userhome}/apps</targetDir>
+												<user>jboss:root</user>
+											</assembly>
+											<assembly>
+												<name>copy_keystores</name>
+												<inline>
+													<fileSets>
+														<fileSet>
+															<directory>${basedir}/docker/keystores</directory>
+															<outputDirectory>keystores</outputDirectory>
+														</fileSet>
+													</fileSets>
+												</inline>
+												<targetDir>${docker.jboss.userhome}</targetDir>
+												<user>jboss:root</user>
+											</assembly>
+											<assembly>
+												<descriptorRef>artifact</descriptorRef>
+												<targetDir>$JBOSS_HOME/standalone/deployments</targetDir>
+												<user>jboss:root</user>
+											</assembly>
+										</assemblies>
+										<runCmds>
+											<run>chmod a+x ${docker.jboss.userhome}/config/jboss_config.sh</run>
+											<run>chmod -R g=u ${docker.jboss.userhome}/config ${docker.jboss.userhome}/apps ${docker.jboss.userhome}/keystores</run>
+											<run>sed -i '1a ${docker.jboss.userhome}/config/jboss_config.sh' $JBOSS_HOME/bin/standalone.sh</run>
+										</runCmds>
+										<tags>
+											<tag>latest</tag>
+											<tag>${project.version}</tag>
+										</tags>
+									</build>
+								</image>
+							</images>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>docker-eap72-base</id>
+			<properties>
+				<docker.image.from>280421/jboss-eap-caib-openshift-7.2</docker.image.from>
+				<app.name>notib</app.name>
+				<app.name.cap>Notib</app.name.cap>
+			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+				<build>
+					<plugins>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-antrun-plugin</artifactId>
+							<version>3.1.0</version>
+							<executions>
+								<execution>
+									<id>filter-standalone-openshift</id>
+									<phase>generate-resources</phase>
+									<goals>
+										<goal>run</goal>
+									</goals>
+									<configuration>
+										<target>
+											<mkdir dir="${project.build.directory}/generated-resources/docker/jboss"/>
+											<copy file="${basedir}/docker/jboss_caib/standalone-openshift.xml" tofile="${project.build.directory}/generated-resources/docker/jboss/standalone-openshift.xml" encoding="${project.build.sourceEncoding}" overwrite="true">
+												<filterset begintoken="[" endtoken="]">
+													<filter token="app" value="${app.name}"/>
+													<filter token="App" value="${app.name.cap}"/>
+												</filterset>
+											</copy>
+										</target>
+									</configuration>
+								</execution>
+							</executions>
+						</plugin>
+						<plugin>
+							<groupId>io.fabric8</groupId>
+							<artifactId>docker-maven-plugin</artifactId>
+						<version>0.42.1</version>
+						<configuration>
+							<verbose>true</verbose>
+<!--							<authConfig>-->
+<!--								<username>${docker.auth.username}</username>-->
+<!--								<password>${docker.auth.password}</password>-->
+<!--							</authConfig>-->
+							<images>
+								<image>
+									<name>${docker.image.name}</name>
+									<alias>${project.parent.artifactId}</alias>
+									<build>
+										<from>${docker.image.from}</from>
+										<buildOptions>
+											<platform>linux/amd64</platform>
+										</buildOptions>
+										<maintainer>limit@limit.es</maintainer>
+										<args>
+											<VITE_APP_VERSION>${project.version}</VITE_APP_VERSION>
+										</args>
+										<ports>
+											<port>8080</port>
+											<port>8787</port>
+										</ports>
+										<assemblies>
+											<assembly>
+												<name>copy_standalone_openshift</name>
+												<inline>
+														<files>
+															<file>
+																<source>${project.build.directory}/generated-resources/docker/jboss/standalone-openshift.xml</source>
+																<outputDirectory>.</outputDirectory>
+															</file>
+														</files>
+												</inline>
+												<targetDir>$JBOSS_HOME/standalone/configuration</targetDir>
+												<user>jboss:root</user>
+											</assembly>
+											<assembly>
+												<name>copy_properties</name>
+												<inline>
+													<fileSets>
+														<fileSet>
+															<directory>${basedir}/docker/properties</directory>
+															<outputDirectory>${project.parent.artifactId}</outputDirectory>
+														</fileSet>
+													</fileSets>
+												</inline>
+												<targetDir>${docker.jboss.userhome}/apps</targetDir>
+												<user>jboss:root</user>
+											</assembly>
+											<assembly>
+												<name>copy_keystores</name>
+												<inline>
+													<fileSets>
+														<fileSet>
+															<directory>${basedir}/docker/keystores</directory>
+															<outputDirectory>keystores</outputDirectory>
+														</fileSet>
+													</fileSets>
+												</inline>
+												<targetDir>${docker.jboss.userhome}</targetDir>
+												<user>jboss:root</user>
+											</assembly>
+											<assembly>
+												<descriptorRef>artifact</descriptorRef>
+												<targetDir>$JBOSS_HOME/standalone/deployments</targetDir>
+												<user>jboss:root</user>
+											</assembly>
+										</assemblies>
+										<runCmds>
+											<run>chmod -R g=u ${docker.jboss.userhome}/apps ${docker.jboss.userhome}/keystores</run>
+										</runCmds>
+										<tags>
+											<tag>latest</tag>
+											<tag>${project.version}</tag>
+										</tags>
+									</build>
+								</image>
+							</images>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

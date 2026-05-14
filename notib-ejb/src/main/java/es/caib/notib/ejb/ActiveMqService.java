@@ -8,8 +8,6 @@ import org.springframework.context.annotation.Primary;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
-import javax.management.MalformedObjectNameException;
-import javax.management.openmbean.OpenDataException;
 import java.util.List;
 
 @Primary

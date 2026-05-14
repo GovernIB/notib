@@ -8,7 +8,6 @@ import es.caib.notib.logic.intf.statemachine.EnviamentSmEstat;
 import es.caib.notib.logic.intf.statemachine.EnviamentSmEvent;
 import es.caib.notib.logic.intf.statemachine.dto.ParametresSm;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.repository.query.Param;
 import org.springframework.statemachine.StateMachine;
 
 import javax.annotation.security.RolesAllowed;

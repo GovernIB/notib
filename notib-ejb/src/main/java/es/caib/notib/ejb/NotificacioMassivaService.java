@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.ejb;
 
@@ -27,7 +27,7 @@ import java.nio.file.NoSuchFileException;
 /**
  * Implementació de NotificacioService com a EJB que empra una clase
  * delegada per accedir a la funcionalitat del servei.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Primary

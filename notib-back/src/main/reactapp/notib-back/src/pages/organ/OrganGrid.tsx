@@ -291,7 +291,7 @@ export const OrganGrid = () => {
     const dataGridApiRef = useMuiDataGridApiRef();
     const { treeDataViewActive, viewSwitchComponent } = useTreeDataViewSwitch(
         t('page.organs.grid.viewSwitch'),
-        true
+        false
     );
     const columns = useColumns(treeDataViewActive);
     const treeDataProps = useDatagridTreeData(

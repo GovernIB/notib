@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.ejb;
 
@@ -13,7 +13,7 @@ import javax.ejb.Stateless;
 /**
  * Implementació de Schedulled Service com a EJB que empra una clase
  * delegada per accedir a la funcionalitat del servei.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Primary

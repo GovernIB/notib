@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.ejb;
 
@@ -27,22 +27,16 @@ import javax.xml.bind.annotation.XmlElement;
 
 /**
  * EJB per a la publicació del servei web de gestió de notificacions.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Primary
 @Stateless
 public class NotificacioServiceWs extends AbstractService<es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2> implements es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2 {
 
-//	@Autowired
-//	private UsuariAuthHelper usuariHelper;
-
-
 	@Override
 	@RolesAllowed({"NOT_APL"})
 	public RespostaAlta alta(Notificacio notificacio) {
-
-//		usuariHelper.generarUsuariAutenticatEjb(sessionContext, true);
 		return getDelegateService().alta(notificacio);
 	}
 
@@ -87,7 +81,7 @@ public class NotificacioServiceWs extends AbstractService<es.caib.notib.logic.in
 //		usuariHelper.generarUsuariAutenticatEjb(sessionContext, true);
 		return getDelegateService().donarPermisConsulta(permisConsulta);
 	}
-	
+
 	@Override
 	@RolesAllowed({"NOT_APL"})
 	public RespostaConsultaDadesRegistre consultaDadesRegistre(DadesConsulta dadesConsulta) {

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.ejb;
 
@@ -11,7 +11,7 @@ import javax.ejb.Stateless;
 /**
  * Implementació de AuditaService com a EJB que empra una clase
  * delegada per accedir a la funcionalitat del servei.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Primary
@@ -23,5 +23,5 @@ public class AuditService extends AbstractService<es.caib.notib.logic.intf.servi
 	public void audita(Object objecteAuditar, TipusOperacio tipusOperacio, TipusEntitat tipusEntitat, TipusObjecte tipusObjecte, String joinPoint) {
 		getDelegateService().audita(objecteAuditar, tipusOperacio, tipusEntitat, tipusObjecte, joinPoint);
 	}
-	
+
 }

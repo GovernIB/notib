@@ -4,26 +4,17 @@ import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EntregaPostalVia;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
-import es.caib.notib.logic.intf.base.annotation.ResourceArtifact;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
-import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
-import es.caib.notib.logic.intf.base.validation.CustomValidation;
 import es.caib.notib.logic.intf.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificaDomiciliTipusEnumDto;
 import es.caib.notib.logic.intf.dto.cie.CieCertificacioArxiuTipus;
 import es.caib.notib.logic.intf.dto.cie.CieCertificacioTipus;
-import es.caib.notib.logic.intf.model.validator.TitularIncapacitatObligatoriRepresentant;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import java.util.Date;
 
 /**

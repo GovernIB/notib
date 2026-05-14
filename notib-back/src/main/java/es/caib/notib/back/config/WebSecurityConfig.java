@@ -180,7 +180,7 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 					result = new PreauthWebAuthenticationDetails(
 							context,
 							j2eeUserRoles2GrantedAuthoritiesMapper.getGrantedAuthorities(roles),
-							keycloakPrincipal.getKeycloakSecurityContext().getIdTokenString(),
+							keycloakPrincipal.getKeycloakSecurityContext().getTokenString(),
 							nameAttributeKey.equals("preferred_username") ?
 									idToken.getPreferredUsername() :
 									(String)idToken.getOtherClaims().get(nameAttributeKey),

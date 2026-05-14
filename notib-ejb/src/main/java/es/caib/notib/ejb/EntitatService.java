@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.ejb;
 
@@ -21,15 +21,15 @@ import org.springframework.context.annotation.Primary;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
+import org.jboss.ejb3.annotation.SecurityDomain;
 import java.io.IOException;
-import java.nio.file.NoSuchFileException;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Implementació de EntitatService com a EJB que empra una clase
  * delegada per accedir a la funcionalitat del servei.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Primary
