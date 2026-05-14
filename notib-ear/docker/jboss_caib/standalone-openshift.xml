@@ -135,18 +135,6 @@
             <logger category="org.springframework">
                 <level name="INFO"/>
             </logger>
-            <logger category="org.springframework.security">
-                <level name="DEBUG"/>
-            </logger>
-            <logger category="org.keycloak">
-                <level name="DEBUG"/>
-            </logger>
-            <logger category="org.keycloak.adapters">
-                <level name="DEBUG"/>
-            </logger>
-            <logger category="io.undertow.security">
-                <level name="DEBUG"/>
-            </logger>
             <logger category="es.caib.${env.JBOSS_APP_NAME}">
                 <level name="INFO"/>
             </logger>

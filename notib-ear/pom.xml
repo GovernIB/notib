@@ -175,102 +175,22 @@
 		<finalName>notib</finalName>
 	</build>
 	<profiles>
+		<!-- Profile per generar la imatge de docker amb la imatge de JBoss EAP 7.2 per openshift -->
+		<!-- Per configurar aquesta imatge s'utilitza el fitxer docker/jboss_caib/standalone-openshift amb variables d'entorn -->
+		<!-- Abans de copiar aquest fitxer dins la imatge es substitueixen els valors [app] i [App] per tal de configurar: -->
+		<!--  - Datasource: -->
+		<!--      - jdi-name per defecte: jboss/datasources/notibDS -->
+		<!--      - pool-name per defecte: notibDS -->
+		<!--  - Correu: -->
+		<!--      - Nom del mail session: notib-mail -->
+		<!--      - Nom del jndi-name: java:jboss/mail/NotibSession -->
+		<!--      - Nom del outbound-socket-binding: notib-smtp -->
+		<!--  - Noms dels secure-deployment del subsistema de keycloak: -->
+		<!--      - notib-back.war -->
+		<!--      - notib-api-interna.war -->
+		<!--      - notib-api-externa.war -->
 		<profile>
-			<id>docker-legacy</id>
-			<properties>
-				<docker.image.from>280421/jboss-eap-caib-7.2</docker.image.from>
-			</properties>
-				<build>
-					<plugins>
-						<plugin>
-							<groupId>io.fabric8</groupId>
-							<artifactId>docker-maven-plugin</artifactId>
-							<version>0.42.1</version>
-						<configuration>
-							<verbose>true</verbose>
-<!--							<authConfig>-->
-<!--								<username>${docker.auth.username}</username>-->
-<!--								<password>${docker.auth.password}</password>-->
-<!--							</authConfig>-->
-							<images>
-								<image>
-									<name>${docker.image.name}</name>
-									<alias>${project.parent.artifactId}</alias>
-									<build>
-										<from>${docker.image.from}</from>
-										<maintainer>limit@limit.es</maintainer>
-										<args>
-											<VITE_APP_VERSION>${project.version}</VITE_APP_VERSION>
-										</args>
-										<ports>
-											<port>8080</port>
-											<port>8787</port>
-										</ports>
-										<assemblies>
-											<assembly>
-												<name>copy_jboss_config</name>
-												<inline>
-													<fileSets>
-														<fileSet>
-															<directory>${basedir}/docker/jboss</directory>
-															<outputDirectory>config</outputDirectory>
-														</fileSet>
-													</fileSets>
-												</inline>
-												<targetDir>${docker.jboss.userhome}</targetDir>
-												<user>jboss:root</user>
-											</assembly>
-											<assembly>
-												<name>copy_properties</name>
-												<inline>
-													<fileSets>
-														<fileSet>
-															<directory>${basedir}/docker/properties</directory>
-															<outputDirectory>${project.parent.artifactId}</outputDirectory>
-														</fileSet>
-													</fileSets>
-												</inline>
-												<targetDir>${docker.jboss.userhome}/apps</targetDir>
-												<user>jboss:root</user>
-											</assembly>
-											<assembly>
-												<name>copy_keystores</name>
-												<inline>
-													<fileSets>
-														<fileSet>
-															<directory>${basedir}/docker/keystores</directory>
-															<outputDirectory>keystores</outputDirectory>
-														</fileSet>
-													</fileSets>
-												</inline>
-												<targetDir>${docker.jboss.userhome}</targetDir>
-												<user>jboss:root</user>
-											</assembly>
-											<assembly>
-												<descriptorRef>artifact</descriptorRef>
-												<targetDir>$JBOSS_HOME/standalone/deployments</targetDir>
-												<user>jboss:root</user>
-											</assembly>
-										</assemblies>
-										<runCmds>
-											<run>chmod a+x ${docker.jboss.userhome}/config/jboss_config.sh</run>
-											<run>chmod -R g=u ${docker.jboss.userhome}/config ${docker.jboss.userhome}/apps ${docker.jboss.userhome}/keystores</run>
-											<run>sed -i '1a ${docker.jboss.userhome}/config/jboss_config.sh' $JBOSS_HOME/bin/standalone.sh</run>
-										</runCmds>
-										<tags>
-											<tag>latest</tag>
-											<tag>${project.version}</tag>
-										</tags>
-									</build>
-								</image>
-							</images>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>docker-eap72-base</id>
+			<id>docker-eap72-caib-openshift</id>
 			<properties>
 				<docker.image.from>280421/jboss-eap-caib-openshift-7.2</docker.image.from>
 				<app.name>notib</app.name>
@@ -312,10 +232,6 @@
 						<version>0.42.1</version>
 						<configuration>
 							<verbose>true</verbose>
-<!--							<authConfig>-->
-<!--								<username>${docker.auth.username}</username>-->
-<!--								<password>${docker.auth.password}</password>-->
-<!--							</authConfig>-->
 							<images>
 								<image>
 									<name>${docker.image.name}</name>
@@ -381,6 +297,98 @@
 										</assemblies>
 										<runCmds>
 											<run>chmod -R g=u ${docker.jboss.userhome}/apps ${docker.jboss.userhome}/keystores</run>
+										</runCmds>
+										<tags>
+											<tag>latest</tag>
+											<tag>${project.version}</tag>
+										</tags>
+									</build>
+								</image>
+							</images>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<!-- Profile per poder generar la imatge de docker amb la imatge de JBoss EAP 7.2 amb adaptador keycloak v.12 -->
+		<!-- Per configurar aquesta imatge s'utilitzen els fitxers dins docker/jboss, i l'script jboss_config.sh -->
+		<profile>
+			<id>docker-legacy</id>
+			<properties>
+				<docker.image.from>280421/jboss-eap-caib-7.2</docker.image.from>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>io.fabric8</groupId>
+						<artifactId>docker-maven-plugin</artifactId>
+						<version>0.42.1</version>
+						<configuration>
+							<verbose>true</verbose>
+							<images>
+								<image>
+									<name>${docker.image.name}</name>
+									<alias>${project.parent.artifactId}</alias>
+									<build>
+										<from>${docker.image.from}</from>
+										<maintainer>limit@limit.es</maintainer>
+										<args>
+											<VITE_APP_VERSION>${project.version}</VITE_APP_VERSION>
+										</args>
+										<ports>
+											<port>8080</port>
+											<port>8787</port>
+										</ports>
+										<assemblies>
+											<assembly>
+												<name>copy_jboss_config</name>
+												<inline>
+													<fileSets>
+														<fileSet>
+															<directory>${basedir}/docker/jboss</directory>
+															<outputDirectory>config</outputDirectory>
+														</fileSet>
+													</fileSets>
+												</inline>
+												<targetDir>${docker.jboss.userhome}</targetDir>
+												<user>jboss:root</user>
+											</assembly>
+											<assembly>
+												<name>copy_properties</name>
+												<inline>
+													<fileSets>
+														<fileSet>
+															<directory>${basedir}/docker/properties</directory>
+															<outputDirectory>${project.parent.artifactId}</outputDirectory>
+														</fileSet>
+													</fileSets>
+												</inline>
+												<targetDir>${docker.jboss.userhome}/apps</targetDir>
+												<user>jboss:root</user>
+											</assembly>
+											<assembly>
+												<name>copy_keystores</name>
+												<inline>
+													<fileSets>
+														<fileSet>
+															<directory>${basedir}/docker/keystores</directory>
+															<outputDirectory>keystores</outputDirectory>
+														</fileSet>
+													</fileSets>
+												</inline>
+												<targetDir>${docker.jboss.userhome}</targetDir>
+												<user>jboss:root</user>
+											</assembly>
+											<assembly>
+												<descriptorRef>artifact</descriptorRef>
+												<targetDir>$JBOSS_HOME/standalone/deployments</targetDir>
+												<user>jboss:root</user>
+											</assembly>
+										</assemblies>
+										<runCmds>
+											<run>chmod a+x ${docker.jboss.userhome}/config/jboss_config.sh</run>
+											<run>chmod -R g=u ${docker.jboss.userhome}/config ${docker.jboss.userhome}/apps ${docker.jboss.userhome}/keystores</run>
+											<run>sed -i '1a ${docker.jboss.userhome}/config/jboss_config.sh' $JBOSS_HOME/bin/standalone.sh</run>
 										</runCmds>
 										<tags>
 											<tag>latest</tag>
