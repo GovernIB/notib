@@ -1,5 +1,6 @@
 package es.caib.notib.plugin.gesconadm.rolsac2;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,6 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Rolsac2ProcedimentFilterRequest implements Cloneable {
 	private String codigoUA;
 	private String codigoUADir3;

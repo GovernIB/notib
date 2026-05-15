@@ -9,7 +9,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.common.base.Strings;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
 import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.SistemaExternException;
 
@@ -456,7 +458,18 @@ public class Rolsac2ProcedimentPlugin extends AbstractSalutPlugin implements Ges
 		if (jerseyClient != null) {
 			return jerseyClient;
 		}
-		jerseyClient = new Client();
+		var config = new DefaultClientConfig();
+
+		mapper = new ObjectMapper();
+		mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+		mapper.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING);
+		mapper.setSerializationInclusion(Include.NON_NULL);
+		mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+		var provider = new JacksonJsonProvider(mapper);
+		config.getSingletons().add(provider);
+
+		jerseyClient = Client.create(config);
 		if (getServiceTimeout() != null) {
 			jerseyClient.setConnectTimeout(getServiceTimeout());
 			jerseyClient.setReadTimeout(getServiceTimeout());
@@ -464,15 +477,6 @@ public class Rolsac2ProcedimentPlugin extends AbstractSalutPlugin implements Ges
 		if (getServiceUsername() != null) {
 			jerseyClient.addFilter(new HTTPBasicAuthFilter(getServiceUsername(), getServicePassword()));
 		}
-		mapper = new ObjectMapper();
-		// Permet rebre un sol objecte en el lloc a on hi hauria d'haver una llista.
-		mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
-		// Mecanisme de deserialització dels enums
-		mapper.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING);
-		// Per a no serialitzar propietats amb valors NULL
-		mapper.setSerializationInclusion(Include.NON_NULL);
-		// No falla si hi ha propietats que no estan definides a l'objecte destí
-		mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 		return jerseyClient;
 	}
 

@@ -2,6 +2,7 @@ package es.caib.notib.plugin.gesconadm.rolsac2;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Rolsac2ServicioFilterRequest implements Cloneable {
 	public Object plataforma;
 	public Object version;
