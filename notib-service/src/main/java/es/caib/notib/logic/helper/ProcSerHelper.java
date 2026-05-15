@@ -505,7 +505,7 @@ public class ProcSerHelper {
 		}
 	}
 
-	@Transactional
+	@Transactional(timeout = 300, propagation = Propagation.REQUIRES_NEW)
 	public void deshabilitarProcedimentsNoActius(List<ProcSerDto> procedimentsGda, String entitatCodi, ProgresActualitzacioProcSer progres) {
 
 		var procedimentsActiusNotib = procedimentRepository.findCodiActiusByEntitat(entitatCodi);
