@@ -608,7 +608,7 @@ public class ProcSerHelper {
 		}
 	}
 
-	@Transactional
+	@Transactional(timeout = 300, propagation = Propagation.REQUIRES_NEW)
 	public void deshabilitarServeisNoActius(List<ProcSerDto> serveisGda, String entitatCodi, ProgresActualitzacioProcSer progres) {
 
 		var serveisActiusNotib = serveiRepository.findCodiActiusByEntitat(entitatCodi);
