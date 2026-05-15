@@ -762,7 +762,6 @@
             return "";
         }
         let json = JSON.parse(jsonString);
-        console.log(json);
         let html = '';
         if (json.entregaPostal) {
             html += '<span class="label ' + json.entregaPostal.label + '" title="' + json.entregaPostal.title + '" style="float: right; position: relative; top: 0px;"><span class="fa fa-envelope"></span></span>';
@@ -818,7 +817,6 @@
             }
         }
         html += '</div>';
-        console.log(html);
         return html;
     }
 </script>
