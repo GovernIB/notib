@@ -235,7 +235,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
         // 13. Enviar emails canvi estat agrupats per usuar/dia
         /////////////////////////////////////////////////////////////////////////
         registerCronTask(
-                "refrescarNotificacionsExpirades",
+                "enviarEmailsAgrupats",
                 schedulledServiceSupplier,
                 (Supplier<SchedulledService> s) -> s.get().enviarCorreusAgrupats(),
                 PropertiesConstants.ENVIAR_CORREUS_AGRUPATS_CRON,
