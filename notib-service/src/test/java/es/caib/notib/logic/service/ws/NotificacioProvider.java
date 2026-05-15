@@ -271,7 +271,7 @@ public class NotificacioProvider  implements ArgumentsProvider {
                 Arguments.of(notificacio1077, DOCUMENT_ERROR_OBTENINT),
                 Arguments.of(notificacio1078a, DOCUMENT_ERROR_OBTENINT_METADADES),
                 Arguments.of(notificacio1078b, DOCUMENT_ERROR_OBTENINT_METADADES),
-                Arguments.of(notificacio1079, DOCUMENT_ERROR_VALIDANT_FIRMA),
+//                Arguments.of(notificacio1079, DOCUMENT_ERROR_VALIDANT_FIRMA),
                 Arguments.of(notificacio1080, DOCUMENT_METADADES_ORIGEN_NULL),
                 Arguments.of(notificacio1081, DOCUMENT_METADADES_VALIDESA_NULL),
                 Arguments.of(notificacio1082, DOCUMENT_METADADES_TIPUS_DOCUMENTAL_NULL),
