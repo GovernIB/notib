@@ -1,0 +1,2 @@
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.enviar.correus.agrupats.cron', '0 0 21 * * *', 'Especificar l''expressió cron indicant la freqüencia en que s''han d''enviar les correus aguprats per dia', 'EMAIL', 1, 0, 'CRON', 0);
+UPDATE not_notificacio_table SET per_actualitzar = 1;
