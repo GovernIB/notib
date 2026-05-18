@@ -90,3 +90,4 @@ INSERT INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE
                                                                                    'INT',
                                                                                    'SCHEDULLED_UPDATE_STATUS_NOTIFICA');
 
+UPDATE not_notificacio_env_table SET registre_numero = NULL;

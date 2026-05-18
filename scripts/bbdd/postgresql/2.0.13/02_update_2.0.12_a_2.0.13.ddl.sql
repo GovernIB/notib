@@ -1,0 +1,1 @@
+ALTER TABLE not_notificacio_env_table ALTER COLUMN registre_numero TYPE varchar(50);

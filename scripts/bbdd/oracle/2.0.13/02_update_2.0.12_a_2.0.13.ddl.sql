@@ -1,0 +1,1 @@
+ALTER TABLE not_notificacio_env_table MODIFY registre_numero VARCHAR2(50 CHAR);
