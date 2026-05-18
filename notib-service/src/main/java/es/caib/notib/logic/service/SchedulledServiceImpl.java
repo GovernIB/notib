@@ -1,13 +1,31 @@
 package es.caib.notib.logic.service;
 
 import com.google.common.base.Strings;
-import es.caib.notib.logic.helper.*;
+import es.caib.notib.logic.email.EmailConstants;
+import es.caib.notib.logic.helper.CacheHelper;
+import es.caib.notib.logic.helper.ConfigHelper;
+import es.caib.notib.logic.helper.EmailNotificacioHelper;
+import es.caib.notib.logic.helper.EnviamentHelper;
+import es.caib.notib.logic.helper.IntegracioHelper;
+import es.caib.notib.logic.helper.MetricsHelper;
+import es.caib.notib.logic.helper.NotificaHelper;
+import es.caib.notib.logic.helper.NotificacioHelper;
+import es.caib.notib.logic.helper.OrganGestorHelper;
+import es.caib.notib.logic.helper.PluginHelper;
+import es.caib.notib.logic.helper.PropertiesConstants;
+import es.caib.notib.logic.intf.dto.EmailAgrupat;
 import es.caib.notib.logic.intf.dto.EntitatDto;
-import es.caib.notib.logic.intf.service.*;
-import es.caib.notib.logic.intf.statemachine.dto.ConsultaNotificaDto;
+import es.caib.notib.logic.intf.dto.UsuariDto;
+import es.caib.notib.logic.intf.service.EntitatService;
+import es.caib.notib.logic.intf.service.EstadisticaService;
+import es.caib.notib.logic.intf.service.NotificacioService;
+import es.caib.notib.logic.intf.service.ProcedimentService;
+import es.caib.notib.logic.intf.service.SchedulledService;
+import es.caib.notib.logic.intf.service.ServeiService;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
+import es.caib.notib.persist.repository.CorreusAgrupatsRepository;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.EnviamentTableRepository;
 import es.caib.notib.persist.repository.NotificacioTableViewRepository;
@@ -16,8 +34,10 @@ import es.caib.notib.persist.repository.monitor.MonitorIntegracioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -36,7 +56,9 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.Calendar.DAY_OF_MONTH;
 
@@ -86,9 +108,15 @@ public class SchedulledServiceImpl implements SchedulledService {
     private EstadisticaService estadisticaService;
     @Autowired
     private NotificacioHelper notificacioHelper;
+    @Autowired
+    private CorreusAgrupatsRepository correusAgrupatsRepository;
+	@Autowired
+	protected JmsTemplate jmsTemplate;
+	@Autowired
+	protected EmailNotificacioHelper emailNotificacioHelper;
 
 
-    // 1. Actualització dels procediments a partir de la informació de Rolsac
+	// 1. Actualització dels procediments a partir de la informació de Rolsac
 	/////////////////////////////////////////////////////////////////////////
 	@Override
 	public void actualitzarProcediments() {
@@ -380,7 +408,38 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}
 	}
 
-    private void esborrarTemporals(String dir) throws Exception {
+	@Override
+	@Transactional(readOnly = true)
+	public void enviarCorreusAgrupats() {
+
+		try {
+			var correus = correusAgrupatsRepository.findAll();
+			if (correus.isEmpty()) {
+				return;
+			}
+			List<UsuariDto> destinataris;
+            Map<UsuariDto, List<Long>> correusUsuari = new HashMap<>();
+			List<Long> enviaments;
+			for (var correu : correus) {
+				var enviamentId = correu.getEnviament().getId();
+				destinataris = emailNotificacioHelper.obtenirCodiDestinataris(correu.getEnviament(), null, true);
+				for (var destinatari : destinataris) {
+                    enviaments = correusUsuari.computeIfAbsent(destinatari, k -> new ArrayList<>());
+                    enviaments.add(enviamentId);
+				}
+			}
+            EmailAgrupat enviamentMail;
+			for (var usuari : correusUsuari.keySet()) {
+				enviamentMail = EmailAgrupat.builder().email(usuari.getEmailValor()).enviaments(correusUsuari.get(usuari)).build();
+				jmsTemplate.convertAndSend(EmailConstants.CUA_EMAIL_NOTIFICACIO_AGRUPATS, enviamentMail);
+			}
+			correusAgrupatsRepository.deleteAll(correus);
+		} catch (Exception ex) {
+			log.error("Error enviant els correus agrupats per dia", ex);
+		}
+	}
+
+	private void esborrarTemporals(String dir) throws Exception {
 
 		if (Strings.isNullOrEmpty(dir)) {
 			return;

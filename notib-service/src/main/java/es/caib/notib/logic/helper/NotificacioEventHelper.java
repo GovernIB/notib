@@ -277,9 +277,9 @@ public class NotificacioEventHelper {
     // Events d'enviament via Email
     // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void addEmailEnviamentEvent(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio, boolean fiReintents) {
+    public NotificacioEventEntity addEmailEnviamentEvent(NotificacioEnviamentEntity enviament, boolean error, String errorDescripcio, boolean fiReintents) {
 
-         addEvent(EventInfo.builder().enviament(enviament).tipus(NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT)
+         return addEvent(EventInfo.builder().enviament(enviament).tipus(NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT)
                 .error(error).errorDescripcio(errorDescripcio).fiReintents(fiReintents).build());
     }
 

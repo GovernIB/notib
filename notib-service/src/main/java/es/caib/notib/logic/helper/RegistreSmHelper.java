@@ -174,6 +174,8 @@ public class RegistreSmHelper {
 		}
 		enviament.getNotificacio().setRegistreLlibreNom(valors[0]);
 		enviament.getNotificacio().setRegistreOficinaNom(valors[1]);
+		enviament.getNotificacio().updateRegistreNumeroFormatat(registreNum);
+		enviament.getNotificacio().updateRegistreData(registreData);
 		llibreOficina.remove(enviament.getNotificacio().getId());
 	}
 

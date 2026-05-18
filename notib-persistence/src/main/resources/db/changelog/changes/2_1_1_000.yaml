@@ -1,4 +1,28 @@
 databaseChangeLog:
+    -   property:
+            name: booleanFalse
+            value: 0
+            dbms: oracle
+    -   property:
+            name: booleanFalse
+            value: false
+            dbms: postgresql
+    -   property:
+            dbms: oracle
+            name: type.pk
+            value: number(19,0)
+    -   property:
+            dbms: postgresql
+            name: type.pk
+            value: SERIAL
+    -   property:
+            name: varcharUnit
+            value: CHAR
+            dbms: oracle
+    -   property:
+            name: varcharUnit
+            value: ''
+            dbms: postgresql
     -   changeSet:
             id: 2_1_1_000-1
             author: limit
@@ -247,3 +271,57 @@ databaseChangeLog:
                                     type: bigint
                 -   sql:
                         "UPDATE NOT_NOTIFICACIO_ENV_TABLE t SET t.PROCEDIMENT_ID = (SELECT ID FROM NOT_PROCEDIMENT p WHERE p.codi = t.PROCEDIMENT_CODI_NOTIB);"
+    -   changeSet:
+            id: 2_1_1_000-15
+            author: limit
+            changes:
+                -   addColumn:
+                        tableName: not_usuari
+                        columns:
+                            -   column:
+                                    name: rebre_emails_agrupats
+                                    type: boolean
+                                    defaultValue: ${booleanFalse}
+                -   createTable:
+                        tableName: NOT_CORREUS_AGRUPATS
+                        columns:
+                            -   column:
+                                    name: id
+                                    type: ${type.pk}
+                                    constraints:
+                                        nullable: false
+                                        primaryKey: true
+                                        primaryKeyName: NOT_CORREUS_AGRUPATS_PK
+                            -   column:
+                                    name: enviament_id
+                                    type: BIGINT
+                                    constraints:
+                                        nullable: false
+                            -   column:
+                                    name: createdby_codi
+                                    type: varchar(64 ${varcharUnit})
+                            -   column:
+                                    name: LASTMODIFIEDBY_CODI
+                                    type: varchar(64 ${varcharUnit})
+                            -   column:
+                                    name: LASTMODIFIEDDATE
+                                    type: TIMESTAMP(6)
+                            -   column:
+                                    name: createddate
+                                    type: TIMESTAMP(6)
+                -   addForeignKeyConstraint:
+                        baseTableName: NOT_CORREUS_AGRUPATS
+                        baseColumnNames: enviament_id
+                        referencedTableName: NOT_NOTIFICACIO_ENV
+                        referencedColumnNames: id
+                        constraintName: CORREUS_AGRUPATS_ENV_ID_FK
+                -   sql: "INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.enviar.correus.agrupats.cron', '0 0 21 * * *', 'Especificar l''expressió cron indicant la freqüencia en que s''han d''enviar les correus aguprats per dia', 'EMAIL', 1, 0, 'CRON', 0);"
+
+    -   changeSet:
+            id: 2_1_1_000-16
+            author: limit
+            changes:
+                -   modifyDataType:
+                        tableName: NOT_PERSONA
+                        columnName: RAO_SOCIAL
+                        newDataType: varchar(255 ${varcharUnit})

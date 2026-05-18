@@ -56,4 +56,5 @@ public class PropertiesConstants {
 
     public static final String EVICT_CACHE_PAISOS_PROVINCIES = "es.caib.notib.cache.paisos.provincies";
     public static final String GENERAR_DADES_EXPLOTACIO_CRON = "es.caib.notib.generar.dades.explotacio.cron";
+    public static final String ENVIAR_CORREUS_AGRUPATS_CRON = "es.caib.notib.enviar.correus.agrupats.cron";
 }

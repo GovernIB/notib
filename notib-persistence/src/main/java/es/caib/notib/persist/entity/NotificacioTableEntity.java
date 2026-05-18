@@ -161,7 +161,7 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 	@Column(name = "ESTAT_MASK")
 	private Integer estatMask;
 
-	@Column(name = "ESTAT_STRING", length = 512)
+	@Column(name = "ESTAT_STRING", length = 2000)
 	private String estatString;
 	@Column(name = "DOCUMENT_ID")
 	private Long documentId;

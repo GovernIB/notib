@@ -35,6 +35,7 @@ public class UsuariCommand implements Serializable {
 	private String[] rols;
 	private Boolean rebreEmailsNotificacio;
 	private Boolean rebreEmailsNotificacioCreats;
+	private Boolean rebreEmailsAgrupats;
 	private NumElementsPaginaDefecte numElementsPaginaDefecte;
 
 	public static UsuariCommand asCommand(UsuariDto dto) {
