@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.logic.intf.dto;
 
@@ -12,12 +12,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 
 /**
  * Informació d'un usuari.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter
@@ -42,10 +43,15 @@ public class UsuariDto implements Serializable {
 	private Long ultimaEntitat;
 	private Boolean rebreEmailsNotificacio;
 	private Boolean rebreEmailsNotificacioCreats;
+	private Boolean rebreEmailsAgrupats;
 	private NumElementsPaginaDefecte numElementsPaginaDefecte;
     private Long entitatDefecte;
     private Long procedimentDefecte;
     private Long organDefecte;
+
+	public String getEmailValor() {
+		return !StringUtils.isEmpty(emailAlt) ? emailAlt : email;
+	}
 
 	private static final long serialVersionUID = -139254994389509932L;
 

@@ -1072,6 +1072,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				getPasswordProperty(),
 				logMissatge,
 				true,
+				false,
 				NotificaWsV2PortType.class,
 				new ApiKeySOAPHandlerV2(apiKey));
 	}
@@ -1087,6 +1088,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				null,
 				false,
 				true,
+				false,
 				SincronizarEnvioWsPortType.class,
 				new ApiKeySOAPHandlerV2(apiKey));
 //				new Handler[0]);

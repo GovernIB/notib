@@ -359,7 +359,8 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
             }
             configHelper.setEntitatCodi(entitat.getCodi());
             info.setCodiEntitat(entitat.getCodi());
-            var cieEntity = notificacio.getProcediment().getEntregaCieEfectiva();
+            var cieEntity = !notificacio.getProcediment().isComu() ? notificacio.getProcediment().getEntregaCieEfectiva() :
+                            notificacio.getOrganGestor().getEntregaCie();
             if (!cieEntity.getCie().isCieExtern()) {
                 return true;
             }

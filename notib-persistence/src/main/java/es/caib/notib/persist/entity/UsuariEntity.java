@@ -55,6 +55,8 @@ public class UsuariEntity implements Serializable {
 	@Column(name = "rebre_emails_creats")
 	@Builder.Default
 	private boolean rebreEmailsNotificacioCreats = true;
+	@Column(name = "rebre_emails_agrupats")
+	private boolean rebreEmailsAgrupats;
 	@Column(name = "ultim_rol", length = 40)
 	private String ultimRol;
 	@Column(name = "ultima_entitat")
@@ -90,6 +92,7 @@ public class UsuariEntity implements Serializable {
 
 		rebreEmailsNotificacio = usuari.isRebreEmailsNotificacio();
 		rebreEmailsNotificacioCreats = usuari.isRebreEmailsNotificacioCreats();
+		rebreEmailsAgrupats = usuari.isRebreEmailsAgrupats();
 		idioma = ObjectUtils.isEmpty(usuari.getIdioma()) ? "ca" : usuari.getIdioma();
 		emailAlt = usuari.getEmailAlt();
 		numElementsPaginaDefecte = usuari.numElementsPaginaDefecte;

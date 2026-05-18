@@ -56,7 +56,7 @@ public class PersonaEntity extends NotibAuditable<Long> {
 	private String nom;
 	@Column(name = "telefon", length = 16)
 	private String telefon;
-	@Column(name = "rao_social", length = 100)
+	@Column(name = "rao_social", length = 255)
 	private String raoSocial;
 	@Column(name = "cod_entitat_desti", length = 9)
 	private String dir3Codi;

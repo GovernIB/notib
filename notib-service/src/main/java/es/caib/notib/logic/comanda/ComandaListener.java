@@ -172,24 +172,23 @@ public class ComandaListener {
 		}
 	}
 
-	public boolean diagnosticar() throws Exception {
+    public boolean diagnosticar() throws Exception {
 
-		var url = configHelper.getConfig("es.caib.notib.plugin.comanda.url");
-		if (url == null) {
-			throw new Exception("La propietat es.caib.notib.plugin.comanda.url.base no pot ser null");
-		}
-		url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "salut/v1/";
-		var httpHeaders = new HttpHeaders();
-		httpHeaders.set("Content-Type", "application/json");
-		var username = configHelper.getConfig("es.caib.notib.plugin.comanda.usuari");
-		var password = configHelper.getConfig("es.caib.notib.plugin.comanda.password");
-		String auth = username + ":" + password;
-		byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
-		String authHeader = "Basic " + new String(encodedAuth);
-		httpHeaders.set("Authorization", authHeader);
-		var restTemplate = new RestTemplate();
-		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(httpHeaders), String.class);
-		return HttpStatus.OK.equals(response.getStatusCode());
-	}
+        var url = configHelper.getConfig("es.caib.notib.plugin.comanda.url");
+        if (url == null) {
+            throw new Exception("La propietat es.caib.notib.plugin.comanda.url.base no pot ser null");
+        }
+        url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "salut/v1";
+        var httpHeaders = new HttpHeaders();
+        httpHeaders.set("Content-Type", "application/json");
+//        var username = configHelper.getConfig("es.caib.notib.plugin.comanda.usuari");
+//        var password = configHelper.getConfig("es.caib.notib.plugin.comanda.password");
+//        String auth = username + ":" + password;
+//        byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
+//        String authHeader = "Basic " + new String(encodedAuth);
+//        httpHeaders.set("Authorization", authHeader);
+        var restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(httpHeaders), String.class);
+        return HttpStatus.OK.equals(response.getStatusCode());
+    }
 }
-

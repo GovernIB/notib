@@ -11,6 +11,8 @@ import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import javax.ejb.CreateException;
 import javax.management.InstanceNotFoundException;
@@ -20,6 +22,11 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 import javax.xml.ws.handler.Handler;
@@ -28,13 +35,17 @@ import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -46,8 +57,90 @@ import java.util.Set;
 @Slf4j
 public class WsClientHelper<T> {
 
+	private List<Path> tmpFile = new ArrayList<>();
+
+	private Document fetchDocument(URL url) throws Exception {
+
+		var conn = (HttpURLConnection) url.openConnection();
+		conn.setInstanceFollowRedirects(true);
+		conn.setRequestMethod("GET");
+		conn.setRequestProperty("Accept", "application/wsdl+xml, application/xml, */*");
+		conn.setRequestProperty("User-Agent", "Java/" + System.getProperty("java.version"));
+		conn.connect();
+		try (var in = conn.getInputStream()) {
+			var dbf = DocumentBuilderFactory.newInstance();
+			dbf.setNamespaceAware(true);
+			return dbf.newDocumentBuilder().parse(in);
+		}
+	}
+
+	private Path writeDocumentToTemp(Document doc, String suffix) throws Exception {
+
+		var tmp = Files.createTempFile("nexeaWsdl-", suffix);
+		try (var os = Files.newOutputStream(tmp)) {
+			var tf = TransformerFactory.newInstance();
+			var t = tf.newTransformer();
+			t.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+			t.setOutputProperty(OutputKeys.INDENT, "yes");
+			t.transform(new DOMSource(doc), new StreamResult(os));
+			tmpFile.add(tmp);
+		}
+		return tmp;
+	}
+
+	private void resolveAndReplaceImports(Document doc, String baseUrl, Map<String,Path> cache) throws Exception {
+
+		// wsdl:import
+		var wimports = doc.getElementsByTagNameNS("http://schemas.xmlsoap.org/wsdl/", "import");
+		for (int i = 0; i < wimports.getLength(); i++) {
+			var imp = (Element) wimports.item(i);
+			var loc = imp.getAttribute("location");
+			if (loc == null || loc.isEmpty()) continue;
+			var resolved = new URL(new URL(baseUrl), loc).toString();
+			if (resolved.startsWith("http://nexea.es/")) resolved = resolved.replaceFirst("http://", "https://");
+			if (!cache.containsKey(resolved)) {
+				var child = fetchDocument(new URL(resolved));
+				resolveAndReplaceImports(child, resolved, cache);
+				var childFile = writeDocumentToTemp(child, ".wsdl");
+				cache.put(resolved, childFile);
+			}
+			imp.setAttribute("location", cache.get(resolved).toUri().toString());
+		}
+
+		// xsd:import / xsd:include
+		var ximports = doc.getElementsByTagNameNS("http://www.w3.org/2001/XMLSchema", "import");
+		for (int i = 0; i < ximports.getLength(); i++) {
+			var imp = (Element) ximports.item(i);
+			var loc = imp.getAttribute("schemaLocation");
+			if (loc == null || loc.isEmpty()) {
+				continue;
+			}
+			var resolved = new URL(new URL(baseUrl), loc).toString();
+			if (resolved.startsWith("http://nexea.es/")) {
+				resolved = resolved.replaceFirst("http://", "https://");
+			}
+			if (!cache.containsKey(resolved)) {
+				var child = fetchDocument(new URL(resolved));
+				resolveAndReplaceImports(child, resolved, cache);
+				Path childFile = writeDocumentToTemp(child, ".xsd");
+				cache.put(resolved, childFile);
+			}
+			imp.setAttribute("schemaLocation", cache.get(resolved).toUri().toString());
+		}
+	}
+
+	public void deleteTmpFile() {
+		try {
+			for (var path : tmpFile) {
+				Files.delete(path);
+			}
+		} catch (Exception ex) {
+			log.error("Error esborrant el tmpFile " + tmpFile);
+		}
+	}
+
 	public T generarClientWs(URL wsdlResourceUrl, String endpoint, QName qname, String username, String password, String soapAction, boolean logMissatgesActiu,
-							boolean disableCxfChunking, Class<T> clazz, Handler<?>... handlers)
+							boolean disableCxfChunking, boolean generateTmpFile, Class<T> clazz, Handler<?>... handlers)
 							throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
 
 		var url = wsdlResourceUrl;
@@ -55,7 +148,26 @@ public class WsClientHelper<T> {
 		if (url == null) {
 			url = !endpoint.endsWith(wsdl) ? new URL(endpoint + wsdl) : new URL(endpoint);
 		}
-		var service = Service.create(url, qname);
+		Service service = null;
+		if (!generateTmpFile) {
+			service = Service.create(url, qname);
+		} else {
+			try {
+				// fetch main WSDL as DOM
+				var mainDoc = fetchDocument(url);
+				// resolve imports and write imported docs to temp files, rewriting locations to file:// URIs
+				Map<String, Path> cache = new HashMap<>();
+				resolveAndReplaceImports(mainDoc, url.toString(), cache);
+				// write final combined main WSDL to temp file
+				var tmp = writeDocumentToTemp(mainDoc, ".wsdl");
+				service = Service.create(tmp.toUri().toURL(), qname);
+			} catch (Exception ex) {
+				log.error("Error creant el wsdl", ex);
+				return null;
+			}
+
+		}
+
 		T servicePort = service.getPort(clazz);
 		var bindingProvider = (BindingProvider)servicePort;
 		// Configura l'adreça del servei
@@ -133,24 +245,24 @@ public class WsClientHelper<T> {
 		return servicePort;
 	}
 
-	public T generarClientWs(URL wsdlResourceUrl, String endpoint, QName qname, String userName, String password, boolean logMissatgeActiu, boolean disableCxfChunking, Class<T> clazz, Handler<?>... handlers)
+	public T generarClientWs(URL wsdlResourceUrl, String endpoint, QName qname, String userName, String password, boolean logMissatgeActiu, boolean disableCxfChunking, boolean generateTmpFile, Class<T> clazz, Handler<?>... handlers)
 							throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
-		return this.generarClientWs(wsdlResourceUrl, endpoint, qname, userName, password, null, logMissatgeActiu, disableCxfChunking, clazz, handlers);
+		return this.generarClientWs(wsdlResourceUrl, endpoint, qname, userName, password, null, logMissatgeActiu, disableCxfChunking, generateTmpFile, clazz, handlers);
 	}
 
 	public T generarClientWs(URL wsdlResourceUrl, String endpoint, QName qname, String userName, String password, Class<T> clazz, Handler<?>... handlers)
 							throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
-		return this.generarClientWs(wsdlResourceUrl, endpoint, qname, userName, password, null, false, false, clazz, handlers);
+		return this.generarClientWs(wsdlResourceUrl, endpoint, qname, userName, password, null, false, false, false, clazz, handlers);
 	}
 
 	public T generarClientWs(String endpoint, QName qname, String userName, String password, Class<T> clazz, Handler<?>... handlers)
 							throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
-		return this.generarClientWs(null, endpoint, qname, userName, password, null, false, false, clazz, handlers);
+		return this.generarClientWs(null, endpoint, qname, userName, password, null, false, false, false, clazz,  handlers);
 	}
 
 	public T generarClientWs(String endpoint, QName qname, Class<T> clazz, Handler<?>... handlers)
 							throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
-		return this.generarClientWs(null, endpoint, qname, null, null, null, false, false, clazz, handlers);
+		return this.generarClientWs(null, endpoint, qname, null, null, null, false, false, false, clazz, handlers);
 	}
 
 	public static class SOAPLoggingHandler implements SOAPHandler<SOAPMessageContext> {

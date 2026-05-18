@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.logic.service.ws;
 
@@ -118,7 +118,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * Implementació del servei per a l'enviament i consulta de notificacions V2 (Sense paràmetres SEU).
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -855,11 +855,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 					log.debug("Notifica error de l'enviament amb referencia: " + referencia + ": " + enviament.isNotificaError());
 				}
 			} catch (Exception ex) {
-				log.debug("Error consultar estat enviament amb referencia: " + referencia, ex);
+				log.error("Error consultar estat enviament amb referencia: " + referencia, ex);
 				integracioHelper.addAccioError(info, "Error al obtenir l'estat de l'enviament", ex);
 				resposta.setError(true);
 				resposta.setErrorData(new Date());
-				resposta.setErrorDescripcio("Error inesperat al obtenir la informació de l'enviament amb referencia: " + referencia);
+				resposta.setErrorDescripcio("Error inesperat al obtenir la informació de l'enviament amb referencia: " + referencia + " - " + ex.getMessage());
 				return resposta;
 			}
 			integracioHelper.addAccioOk(info);
@@ -1100,7 +1100,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 						.nom(justificantDto.getNom())
 						.contentType(justificantDto.getContentType())
 						.tamany(justificantDto.getTamany())
-						.contingut(org.apache.commons.codec.binary.Base64.encodeBase64(justificantDto.getContingut())).build());
+						.contingut(justificantDto.getContingut()).build());
 				integracioHelper.addAccioOk(info);
 				return resposta;
 
