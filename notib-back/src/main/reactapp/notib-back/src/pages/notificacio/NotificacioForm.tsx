@@ -10,9 +10,11 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { FormPage, MuiForm, FormField, useFormContext, useFormApiRef } from 'reactlib';
 import NotificacioFormEnviaments from './NotificacioFormEnviaments';
 import NotificacioFormDocuments from './NotificacioFormDocuments';
+import GridFormField from '../../components/GridFormField';
 
 const JSonButton: React.FC = () => {
     const { data } = useFormContext();
+    // TODO: Revisar que es aixo i per que serveix
     const visible = false;
     return (
         visible && (
@@ -27,12 +29,14 @@ const ProcedimentServeiField: React.FC = () => {
     const { t } = useTranslation();
     const { data, apiRef: formApiRef } = useFormContext();
     const [type, setType] = React.useState<string>('procediment');
+
     const handleChange = (value: any) => {
         setType(value);
         if (data.procediment != null) {
             formApiRef.current?.setFieldValue('procediment', null);
         }
     };
+
     if (data.enviamentTipus === 'SIR') {
         return (
             <Grid container spacing={2}>
@@ -55,7 +59,7 @@ const ProcedimentServeiField: React.FC = () => {
                 <Grid size={9}>
                     <FormField
                         name="procediment"
-                        label={t('page.notificacio.form.camps.' + type)}
+                        label={t(`page.notificacio.form.camps.${type}`)}
                         filter={"tipus:'" + type.toUpperCase() + "'"}
                         required={data.procedimentRequired}
                     />
@@ -81,32 +85,18 @@ const NotificacioFormContent: React.FC = () => {
                 <Typography variant="h6" sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}>
                     {t('page.notificacio.form.tabs.remesa')}
                 </Typography>
-                <FormField name="concepte" />
+                <GridFormField size={12} name="concepte" />
             </Grid>
-            <Grid size={12}>
-                <FormField name="descripcio" type="textarea" />
-            </Grid>
-            <Grid size={6}>
-                <FormField name="organGestor" />
-            </Grid>
+            <GridFormField size={12} name="descripcio" type="textarea" />
+            <GridFormField size={6} name="organGestor" />
             <Grid size={6}>
                 <ProcedimentServeiField />
             </Grid>
-            <Grid size={6}>
-                <FormField name="numExpedient" />
-            </Grid>
-            <Grid size={6}>
-                <FormField name="idioma" />
-            </Grid>
-            <Grid size={6}>
-                <FormField name="enviamentDataProgramada" type="date" />
-            </Grid>
-            <Grid size={2}>
-                <FormField name="caducitatDiesNaturals" />
-            </Grid>
-            <Grid size={4}>
-                <FormField name="caducitat" type="date" />
-            </Grid>
+            <GridFormField size={6} name="numExpedient" />
+            <GridFormField size={6} name="idioma" />
+            <GridFormField size={6} name="enviamentDataProgramada" type="date" />
+            <GridFormField size={2} name="caducitatDiesNaturals" />
+            <GridFormField size={4} name="caducitat" type="date" />
         </Grid>
     );
 };
@@ -121,12 +111,14 @@ export const NotificacioForm: React.FC = () => {
         enviamentsInfo: [{ id: new Date().valueOf() }],
         documentsInfo: [{ id: new Date().valueOf() }],
     };
+
     const handleReset = () => {
         // Feim això perquè, si no refrescam l'id de l'enviament i del document que es crea per defecte, React no detecta que ha
         // canviat l'atribut key i no refresca la informació dels formularis.
         formApiRef.current?.setFieldValue('enviamentsInfo', [{ id: new Date().valueOf() }]);
         formApiRef.current?.setFieldValue('documentsInfo', [{ id: new Date().valueOf() }]);
     };
+
     return (
         <FormPage>
             <MuiForm
@@ -134,8 +126,8 @@ export const NotificacioForm: React.FC = () => {
                 id={id != null ? parseInt(id) : id}
                 title={
                     id != null
-                        ? t('page.notificacio.form.title.' + type + '.update')
-                        : t('page.notificacio.form.title.' + type + '.create')
+                        ? t(`page.notificacio.form.title.${type}.update`)
+                        : t(`page.notificacio.form.title.${type}.create`)
                 }
                 initOnChangeRequest
                 additionalData={type ? { enviamentTipus: type, ...initialData } : initialData}

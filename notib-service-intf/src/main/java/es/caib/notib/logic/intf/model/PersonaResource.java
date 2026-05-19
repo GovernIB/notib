@@ -10,6 +10,8 @@ import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import es.caib.notib.logic.intf.base.validation.CustomValidation;
 import es.caib.notib.logic.intf.model.validator.PersonaInteressatTipusRequiredFields;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,6 +28,8 @@ import java.util.List;
  *
  * @author Límit Tecnologies
  */
+@Builder
+@AllArgsConstructor
 @Getter
 @Setter
 @NoArgsConstructor

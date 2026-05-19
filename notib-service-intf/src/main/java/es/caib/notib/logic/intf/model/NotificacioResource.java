@@ -78,6 +78,14 @@ import java.util.List;
 			type = ResourceArtifactType.PERSPECTIVE,
 			code = NotificacioResource.PERSPECTIVE_DOCUMENTS_NOTIFICACIO
 		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.PERSPECTIVE,
+			code = NotificacioResource.PERSPECTIVE_OPERADORS_CIE_POSTAL
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.PERSPECTIVE,
+			code = NotificacioResource.PERSPECTIVE_GRUP
+		),
 	}
 )
 @CustomValidation.List({
@@ -93,6 +101,8 @@ public class NotificacioResource extends BaseResource<Long> {
 	public static final String FILTER_CODE = "FILTER_NOTIFICACIO";
 	public static final String PERSPECTIVE_ENVIAMENTS_NOTIFICACIO = "ENVIAMENTS_NOTIFICACIO";
 	public static final String PERSPECTIVE_DOCUMENTS_NOTIFICACIO = "DOCUMENTS_NOTIFICACIO";
+	public static final String PERSPECTIVE_OPERADORS_CIE_POSTAL = "OPERADORS_CIE_POSTAL";
+	public static final String PERSPECTIVE_GRUP = "OPERADORS_GRUP";
 
 	@NotNull
 	private EnviamentTipus enviamentTipus;
@@ -180,6 +190,11 @@ public class NotificacioResource extends BaseResource<Long> {
 	private String registreNums;
 	private String titular;
 	private String notificaIds;
+
+	// Camps pel detall de remeses
+	private PagadorPostalResource operadorPostalInfo;
+	private PagadorCieResource operadorCieInfo;
+	private GrupResource grupInfo;
 
 
 	@Getter

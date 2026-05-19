@@ -1,181 +1,184 @@
 import React from 'react';
 import { GridPage, MuiDataGrid, MuiDataGridColDef } from 'reactlib';
+import { useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 
 const EnviamentDetailTabHistoric: React.FC<{ id: any }> = (props) => {
     const { id } = props;
+    const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
+
     const columns: MuiDataGridColDef[] = React.useMemo(
         () => [
             {
                 field: 'tipusOperacio',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'joinPoint',
-                flex: 3,
+                width: 150,
             },
             {
                 field: 'createdBy',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'createdDate',
-                flex: 1,
+                width: 150,
             },
             {
                 field: 'titularId',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'destinataris',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'domiciliTipus',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'domicili',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'serveiTipus',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'cie',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'formatSobre',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'formatFulla',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'dehObligat',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'dehNif',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'notificaReferencia',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'notificaIdentificador',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'notificaDataCreacio',
-                flex: 1,
+                width: 150,
             },
             {
                 field: 'notificaDataDisposicio',
-                flex: 1,
+                width: 150,
             },
             {
                 field: 'notificaDataCaducitat',
-                flex: 1,
+                width: 150,
             },
             {
                 field: 'notificaEmisorDir3',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'notificaArrelDir3',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'notificaEstat',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'notificaEstatData',
-                flex: 1,
+                width: 150,
             },
             {
                 field: 'notificaEstatFinal',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'notificaDatatOrigen',
-                flex: 1,
+                width: 150,
             },
             {
                 field: 'notificaDatatReceptorNif',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'notificaDatatNumSeguiment',
-                flex: 1,
+                width: 150,
             },
             {
                 field: 'notificaCertificacioData',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'notificaCertificacioArxiuId',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'notificaCertificacioOrigen',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'notificaCertificacioTipus',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'notificaCertificacioArxiuTipus',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'notificaCertificacioNumSeguiment',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'registreNumeroFormatat',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'registreData',
-                flex: 1,
+                width: 150,
             },
             {
                 field: 'registreEstat',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'registreEstatFinal',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'sirConsultaData',
-                flex: 1,
+                width: 150,
             },
             {
                 field: 'sirRecepcioData',
-                flex: 1,
+                width: 150,
             },
             {
                 field: 'sirRegDestiData',
-                flex: 1,
+                width: 150,
             },
             {
                 field: 'notificacioErrorEvent',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'notificaError',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'notificaDatatErrorDescripcio',
-                flex: 1,
+                width: 120,
             },
         ],
         []
@@ -184,12 +187,16 @@ const EnviamentDetailTabHistoric: React.FC<{ id: any }> = (props) => {
     return (
         <GridPage disableMargins={false}>
             <MuiDataGrid
-                title=''
+                title=""
                 resourceName="notificacioEnviamentAuditResource"
                 fixedFilter={'enviamentId:' + id}
+                sortModel={[{ field: 'tipusOperacio', sort: 'desc' }]}
                 columns={columns}
                 readOnly
-                toolbarHideQuickFilter
+                persistentStateActive
+                persistentStateClearPageSortPropsOnTopLevelRouteChange
+                paginationActive
+                {...pageSizeOptionsDataGridProps}
             />
         </GridPage>
     );

@@ -14,6 +14,7 @@ import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.NodeDir3;
+import joptsimple.internal.Strings;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -157,7 +158,7 @@ public class LegacyHelper {
 	public List<CodiValor> dir3ConsultaProvincies(String comunitatAutonomaCodi) {
 		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
 		ConfigHelper.setEntitatCodi(currentEntitat.getCodi());
-		return unitatsOrganitzativesPluginHelper.llistarProvincies();
+		return !Strings.isNullOrEmpty(comunitatAutonomaCodi) ? unitatsOrganitzativesPluginHelper.llistarProvincies(comunitatAutonomaCodi) : unitatsOrganitzativesPluginHelper.llistarProvincies();
 	}
 
 	/**

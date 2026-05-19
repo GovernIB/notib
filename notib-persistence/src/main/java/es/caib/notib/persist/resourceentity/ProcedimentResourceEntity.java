@@ -3,6 +3,7 @@ package es.caib.notib.persist.resourceentity;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.model.ProcedimentResource;
+import es.caib.notib.persist.entity.cie.EntregaCieEntity;
 import lombok.*;
 import org.hibernate.annotations.Formula;
 
@@ -109,6 +110,38 @@ public class ProcedimentResourceEntity
 		this.entitat = entitat;
 		this.organGestor = organGestor;
 		this.entregaCie = entregaCie;
+	}
+
+	public boolean isEntregaCieActivaAlgunNivell() {
+		if (entregaCie != null) {
+			return true;
+		}
+
+		if (organGestor != null && organGestor.getEntregaCie() != null) {
+			return true;
+		}
+
+		if (entitat != null && entitat.getEntregaCie() != null) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public EntregaCieResourceEntity getEntregaCieEfectiva() {
+		if (entregaCie != null) {
+			return entregaCie;
+		}
+
+		if (organGestor != null && organGestor.getEntregaCie() != null) {
+			return organGestor.getEntregaCie();
+		}
+
+		if (entitat != null && entitat.getEntregaCie() != null) {
+			return entitat.getEntregaCie();
+		}
+
+		return null;
 	}
 
 }

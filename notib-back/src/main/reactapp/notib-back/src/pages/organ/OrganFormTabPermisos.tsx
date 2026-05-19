@@ -10,6 +10,7 @@ import PermissionGridSwitch from '../../components/PermissionGridSwitch';
 const PermissionForm: React.FC = () => {
     const { t } = useTranslation();
     const { apiRef } = useFormContext();
+
     const doFieldChange = (targetValue: boolean) => {
         const permisos = [
             'readAllowed',
@@ -26,6 +27,7 @@ const PermissionForm: React.FC = () => {
             apiRef?.current?.setFieldValue?.(nomPermis, targetValue);
         });
     };
+
     const sidGrantedAuthorityEnumOptions = [
         {
             value: false,
@@ -36,6 +38,7 @@ const PermissionForm: React.FC = () => {
             description: t('component.PermissionGrid.grantedAuthority.role'),
         },
     ];
+
     return (
         <Grid container spacing={2}>
             <GridFormField
@@ -132,6 +135,7 @@ const PermissionForm: React.FC = () => {
 const OrganFormTabPermisos: React.FC = () => {
     const { t } = useTranslation();
     const { id } = useFormContext();
+
     const permissionEntries = [
         {
             headerName: t('page.organs.form.permisos.administrador'),
@@ -257,6 +261,7 @@ const OrganFormTabPermisos: React.FC = () => {
             type: 'boolean',
         },
     ];
+
     return (
         <PermissionGrid
             resourceName="organGestorResource"

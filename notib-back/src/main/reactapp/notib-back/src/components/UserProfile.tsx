@@ -8,14 +8,9 @@ import Grid from '@mui/material/Grid';
 import { useColorScheme } from '@mui/material/styles';
 import 'dayjs/locale/ca';
 import 'dayjs/locale/es';
-import {
-    MuiFormDialog,
-    MuiDataFormDialogApi,
-    useBaseAppContext,
-    FormField,
-    useAuthContext,
-} from 'reactlib';
+import { MuiFormDialog, MuiDataFormDialogApi, useBaseAppContext, useAuthContext } from 'reactlib';
 import { useNotibContext } from './NotibContext';
+import GridFormField from './GridFormField';
 
 export const UserProfileMenu: React.FC<{
     formDialogApiRef: React.RefObject<MuiDataFormDialogApi | null>;
@@ -26,6 +21,7 @@ export const UserProfileMenu: React.FC<{
     const showUserProfileDialog = () => {
         formDialogApiRef.current?.show(authGetUserId()).catch(() => null);
     };
+
     return (
         <MenuItem onClick={() => showUserProfileDialog()} sx={{ width: '100%' }}>
             <ListItemIcon>
@@ -44,6 +40,7 @@ export const UserProfileFormDialog: React.FC<{
     const { mode, setMode } = useColorScheme();
     const { currentLanguage, setCurrentLanguage } = useBaseAppContext();
     const { currentUser, setCurrentUser } = useNotibContext();
+
     const handleSaveSuccess = (data: any, saveUser?: boolean) => {
         const profileLanguage = data?.idioma?.toLowerCase();
         if (profileLanguage != null && currentLanguage !== profileLanguage) {
@@ -53,11 +50,15 @@ export const UserProfileFormDialog: React.FC<{
         if (mode !== profileMode) {
             setMode(profileMode);
         }
-        saveUser && setCurrentUser(data);
+        if (saveUser) {
+            setCurrentUser(data);
+        }
     };
+
     React.useEffect(() => {
         handleSaveSuccess(currentUser);
     }, [currentUser]);
+
     return (
         <MuiFormDialog
             resourceName="usuariResource"
@@ -70,42 +71,22 @@ export const UserProfileFormDialog: React.FC<{
             }}
         >
             <Grid container spacing={2}>
-                <Grid size={4}>
-                    <FormField name="codi" disabled />
-                </Grid>
-                <Grid size={8}>
-                    <FormField name="nomSencer" disabled />
-                </Grid>
-                <Grid size={6}>
-                    <FormField name="email" disabled />
-                </Grid>
-                <Grid size={6}>
-                    <FormField name="emailAlt" />
-                </Grid>
-                <Grid size={4}>
-                    <FormField name="numElementsPaginaDefecte" emptyValueDescription={t('component.UserProfile.auto')} />
-                </Grid>
-                <Grid size={4}>
-                    <FormField name="idioma" />
-                </Grid>
-                <Grid size={4}>
-                    <FormField name="tema" />
-                </Grid>
-                <Grid size={6}>
-                    <FormField name="rebreEmailsNotificacio" />
-                </Grid>
-                <Grid size={6}>
-                    <FormField name="rebreEmailsNotificacioCreats" />
-                </Grid>
-                <Grid size={12}>
-                    <FormField name="entitatDefecte" />
-                </Grid>
-                <Grid size={12}>
-                    <FormField name="organDefecte" />
-                </Grid>
-                <Grid size={12}>
-                    <FormField name="procedimentDefecte" />
-                </Grid>
+                <GridFormField size={4} name="codi" disabled />
+                <GridFormField size={8} name="nomSencer" disabled />
+                <GridFormField size={6} name="email" disabled />
+                <GridFormField size={6} name="emailAlt" />
+                <GridFormField
+                    size={4}
+                    name="numElementsPaginaDefecte"
+                    emptyValueDescription={t('component.UserProfile.auto')}
+                />
+                <GridFormField size={4} name="idioma" />
+                <GridFormField size={4} name="tema" />
+                <GridFormField size={6} name="rebreEmailsNotificacio" />
+                <GridFormField size={6} name="rebreEmailsNotificacioCreats" />
+                <GridFormField size={12} name="entitatDefecte" />
+                <GridFormField size={12} name="organDefecte" />
+                <GridFormField size={12} name="procedimentDefecte" />
             </Grid>
         </MuiFormDialog>
     );

@@ -8,14 +8,18 @@ import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
+import es.caib.notib.logic.intf.model.GrupResource;
 import es.caib.notib.logic.intf.model.NotificacioResource;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Entitat de base de dades de notificació.
@@ -59,8 +63,8 @@ public class NotificacioResourceEntity
 	private Date caducitatOriginal;
 	@Column(name = "proc_codi_notib", length = 9)
 	private String procedimentCodiNotib;
-	@Column(name = "grup_codi", length = 64)
-	private String grupCodi;
+//	@Column(name = "grup_codi", length = 64)
+//	private String grupCodi;
 	@Column(name = "estat", nullable = false)
 	private NotificacioEstatEnumDto estat;
 	@Column(name = "estat_date")
@@ -113,6 +117,7 @@ public class NotificacioResourceEntity
 	private EnviamentOrigen origen;
 	@Column(name = "deleted")
 	private boolean deleted = false;
+
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(
@@ -182,26 +187,49 @@ public class NotificacioResourceEntity
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "procorgan_not_fk"))
 	private ProcedimentOrganGestorResourceEntity procedimentOrganGestor;
 
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(
+		name = "grup_id",
+		referencedColumnName = "id",
+		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "grup_fk"),
+		nullable = false)
+	private GrupResourceEntity grup;
+
+	@OneToMany(
+		mappedBy = "notificacio",
+		fetch = FetchType.LAZY,
+		cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH},
+		orphanRemoval = true)
+	protected Set<NotificacioEnviamentResourceEntity> enviaments = new LinkedHashSet<>();
+
 	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "registre_nums", insertable = false, updatable = false)
+	@Formula("(select t.registre_nums from " + BaseConfig.DB_PREFIX + "notificacio_table t where t.id = id)")
 	private String registreNums;
 
 	@Enumerated(EnumType.STRING)
-	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "procediment_tipus", insertable = false, updatable = false)
+//	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "procediment_tipus", insertable = false, updatable = false)
+	@Formula("(select t.procediment_tipus from " + BaseConfig.DB_PREFIX + "notificacio_table t where t.id = id)")
 	private ProcSerTipusEnum procedimentTipus;
 
-	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "enviada_date", insertable = false, updatable = false)
+//	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "enviada_date", insertable = false, updatable = false)
+	@Formula("(select t.enviada_date from " + BaseConfig.DB_PREFIX + "notificacio_table t where t.id = id)")
 	private Date enviadaDate;
 
-	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "estat_string", insertable = false, updatable = false)
+//	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "estat_string", insertable = false, updatable = false)
+	@Formula("(select t.estat_string from " + BaseConfig.DB_PREFIX + "notificacio_table t where t.id = id)")
 	private String estatString;
 
-	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "titular", insertable = false, updatable = false)
+//	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "titular", insertable = false, updatable = false)
+	@Formula("(select t.titular from " + BaseConfig.DB_PREFIX + "notificacio_table t where t.id = id)")
 	private String titular;
 
-	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "notifica_ids", insertable = false, updatable = false)
+//	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "notifica_ids", insertable = false, updatable = false)
+	@Formula("(select t.notifica_ids from " + BaseConfig.DB_PREFIX + "notificacio_table t where t.id = id)")
 	private String notificaIds;
 
-	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "entrega_postal", insertable = false, updatable = false)
+//	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "entrega_postal", insertable = false, updatable = false)
+//	@Formula("(select (case when t.entrega_postal = 1 then 1 else 0 end) from " + BaseConfig.DB_PREFIX + "notificacio_table t where t.id = id)")
+	@Transient
 	private boolean entregaPostal;
 
 	@Builder
@@ -209,7 +237,9 @@ public class NotificacioResourceEntity
 		EntitatResourceEntity entitat,
 		OrganGestorResourceEntity organGestor,
 		ProcedimentResourceEntity procediment,
-		ProcedimentOrganGestorResourceEntity procedimentOrganGestor) {
+		ProcedimentOrganGestorResourceEntity procedimentOrganGestor,
+		GrupResourceEntity grup) {
+
 		this.enviamentDataProgramada = resource.getEnviamentDataProgramada();
 		this.concepte = resource.getConcepte();
 		this.descripcio = resource.getDescripcio();
@@ -217,7 +247,7 @@ public class NotificacioResourceEntity
 		this.caducitat = resource.getCaducitat();
 		this.caducitatOriginal = resource.getCaducitatOriginal();
 		this.procedimentCodiNotib = resource.getProcedimentCodiNotib();
-		this.grupCodi = resource.getGrupCodi();
+//		this.grupCodi = resource.getGrupCodi();
 		this.estat = resource.getEstat();
 		this.estatDate = resource.getEstatDate();
 		this.tipusUsuari = resource.getTipusUsuari();
@@ -245,6 +275,7 @@ public class NotificacioResourceEntity
 		this.organGestor = organGestor;
 		this.procediment = procediment;
 		this.procedimentOrganGestor = procedimentOrganGestor;
+		this.grup = grup;
 	}
 
 }

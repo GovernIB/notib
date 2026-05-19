@@ -8,6 +8,8 @@ import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,6 +25,8 @@ import java.util.Date;
  *
  * @author Límit Tecnologies
  */
+@Builder
+@AllArgsConstructor
 @Getter
 @Setter
 @NoArgsConstructor

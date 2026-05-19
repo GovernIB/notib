@@ -110,25 +110,51 @@ public class Dir3ResourceServiceImpl extends BaseNoDatabaseReadonlyResourceServi
 			orElse(null);
 	}
 
+	private List<List<String>> partition(Set<String> coll, int size) {
+		List<String> list = new ArrayList<>(coll);
+		List<List<String>> parts = new ArrayList<>();
+		for (int i = 0; i < list.size(); i += size) {
+			parts.add(list.subList(i, Math.min(i + size, list.size())));
+		}
+		return parts;
+	}
 	private void calcularCampsRecurs(Page<Dir3Resource> page) {
-		if (!page.isEmpty()) {
-			// Calcula i emplena els camps que falten del recurs
-			Boolean isPermesComunicacionsSirPropiaEntitat = configHelper.getConfigAsBoolean(PropertyConfig.PROP_COMUNICACIONS_SIR_INTERNES);
-			// Cerca els codis DIR3 locals que coincideixin amb algun dels de la pàgina de resultats
-			List<String> codisLocals = organGestorResourceRepository.findCodisByEntitatAndCodiIn(
-				userSessionHelper.getCurrentEntitat(),
-				page.stream().map(Dir3Resource::getCodi).collect(Collectors.toSet()));
-			page.stream().forEach(r -> {
-				if (r.getCif() == null) {
-					r.setNoCif(true);
-				} else if (!r.isSir()) {
-					r.setNoSir(true);
-				} else if (!isPermesComunicacionsSirPropiaEntitat && codisLocals.contains(r.getCodi())) {
-					r.setViaValib(true);
-				} else {
-					r.setSelectable(true);
+
+		if (page.isEmpty()) {
+			return;
+		}
+		// Calcula i emplena els camps que falten del recurs
+		var isPermesComunicacionsSirPropiaEntitat = configHelper.getConfigAsBoolean(PropertyConfig.PROP_COMUNICACIONS_SIR_INTERNES);
+		// Cerca els codis DIR3 locals que coincideixin amb algun dels de la pàgina de resultats
+		var organCodis = page.stream().map(Dir3Resource::getCodi).collect(Collectors.toSet());
+		List<String> codisLocals = new ArrayList<>();
+		if (organCodis.size()  <= 1000) {
+			codisLocals = organGestorResourceRepository.findCodisByEntitatAndCodiIn(userSessionHelper.getCurrentEntitat(), organCodis);
+		} else {
+			var parts = partition(organCodis, 1000);
+			for (List<String> chunk : parts) {
+				// Convertim a Set per si el mètode del repositori espera un Set<String>
+				Set<String> chunkSet = new HashSet<>(chunk);
+				var partial = organGestorResourceRepository.findCodisByEntitatAndCodiIn(userSessionHelper.getCurrentEntitat(), chunkSet);
+				if (partial != null) {
+					codisLocals.addAll(partial);
 				}
-			});
+			}
+		}
+		for (var r : page) {
+			if (r.getCif() == null) {
+				r.setNoCif(true);
+				continue;
+			}
+			if (!r.isSir()) {
+				r.setNoSir(true);
+				continue;
+			}
+			if (!isPermesComunicacionsSirPropiaEntitat && codisLocals.contains(r.getCodi())) {
+				r.setViaValib(true);
+				continue;
+			}
+			r.setSelectable(true);
 		}
 	}
 

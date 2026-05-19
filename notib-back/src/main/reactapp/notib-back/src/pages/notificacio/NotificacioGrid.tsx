@@ -1,11 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import Button from '@mui/material/Button';
-import Icon from '@mui/material/Icon';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import Chip from '@mui/material/Chip';
 import {
     GridRenderCellParams,
     useGridApiContext,
@@ -13,6 +8,8 @@ import {
     gridDetailPanelExpandedRowsContentCacheSelector,
     gridDetailPanelExpandedRowIdsSelector,
     GRID_DETAIL_PANEL_TOGGLE_COL_DEF,
+    useGridApiRef,
+    GridApiPro,
 } from '@mui/x-data-grid-pro';
 import {
     GridPage,
@@ -29,10 +26,13 @@ import { useNotibContext } from '../../components/NotibContext';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 import NotificacioGridEnviaments from './NotificacioGridEnviaments';
 import { useNotificacioDetailDialog } from './NotificacioDetailDialog';
-import { Grid, IconButton } from '@mui/material';
+import { Grid, IconButton, Button, Icon, Menu, MenuItem, Chip } from '@mui/material';
 import GridFormField, { GridButtonField } from '../../components/GridFormField';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
 import AccionsMassives, { MenuOption } from '../../components/AccionsMassives';
+import ButtonDetailExpandColapse from '../../components/ButtonDetailExpandColapse';
+import { DataCommonAdditionalAction } from '../../../lib/components/mui/datacommon/MuiDataCommon';
+import NotificacioEstatRender from './NotificacioEstatRender';
 
 const CustomDetailPanelToggle = (props: Pick<GridRenderCellParams, 'id' | 'value'>) => {
     const { id } = props;
@@ -42,13 +42,22 @@ const CustomDetailPanelToggle = (props: Pick<GridRenderCellParams, 'id' | 'value
     const hasDetail = React.isValidElement(contentCache[id]);
     const expandedRowIds = useGridSelector(apiRef, gridDetailPanelExpandedRowIdsSelector);
     const isExpanded = expandedRowIds.has(id);
+
     return (
         <IconButton
             size="small"
             tabIndex={-1}
             disabled={!hasDetail}
-            title={isExpanded ? t('page.notificacio.grid.column.ocultar') : t('page.notificacio.grid.column.mostrar')}
-            aria-label={isExpanded ? t('page.notificacio.grid.column.ocultar') : t('page.notificacio.grid.column.mostrar')}
+            title={
+                isExpanded
+                    ? t('page.notificacio.grid.column.ocultar')
+                    : t('page.notificacio.grid.column.mostrar')
+            }
+            aria-label={
+                isExpanded
+                    ? t('page.notificacio.grid.column.ocultar')
+                    : t('page.notificacio.grid.column.mostrar')
+            }
         >
             <Icon
                 sx={(theme) => ({
@@ -65,13 +74,14 @@ const CustomDetailPanelToggle = (props: Pick<GridRenderCellParams, 'id' | 'value
     );
 };
 
-const useDataGridColumns = () => {
+const useDataGridColumns = (datagridApiRef: any) => {
     const { t } = useTranslation();
+
     const columns: MuiDataGridColDef[] = React.useMemo(
         () => [
             {
                 field: 'enviamentTipus',
-                flex: 0.4,
+                width: 40,
                 renderHeader: () => null,
                 renderCell: (params: any) => {
                     const letter = params.value?.substring(0, 1);
@@ -80,23 +90,23 @@ const useDataGridColumns = () => {
             },
             {
                 field: 'createdDate',
-                flex: 1.4,
+                width: 110,
             },
             {
                 field: 'enviadaDate',
-                flex: 1.4,
+                width: 100,
             },
             {
                 field: 'registreNums',
-                flex: 1.4,
+                width: 130,
             },
             {
                 field: 'organGestor',
-                flex: 2,
+                width: 180,
             },
             {
                 field: 'procediment',
-                flex: 2,
+                width: 180,
                 renderCell: (params: any) => {
                     const letter = params.row.procediment != null ? 'P' : 'S';
                     const title =
@@ -113,27 +123,48 @@ const useDataGridColumns = () => {
             },
             {
                 field: 'numExpedient',
-                flex: 1,
+                width: 130,
             },
             {
                 field: 'concepte',
-                flex: 3,
+                width: 120,
             },
             {
                 field: 'createdBy',
-                flex: 1,
             },
             {
                 field: 'titular',
-                flex: 1,
             },
+            // {
+            //     field: 'estat',
+            //     width: 80,
+            // },
             {
-                field: 'estat',
-                flex: 1,
+                field: 'estatString',
+                width: 200,
+                renderCell: (params: any) => {
+                    const estatJson = params?.formattedValue;
+                    try {
+                        const estatObjecte = JSON.parse(estatJson);
+                        return (
+                            <NotificacioEstatRender
+                                estatObjecte={estatObjecte}
+                                estatEnum={params?.row?.estat}
+                            />
+                        );
+                    } catch (error) {
+                        console.error('La cadena no és un JSON vàlid:', error);
+                    }
+                },
             },
             {
                 ...GRID_DETAIL_PANEL_TOGGLE_COL_DEF,
                 hideable: false,
+                sortable: false,
+                resizable: false,
+                width: 90,
+                align: 'center',
+                renderHeader: () => <ButtonDetailExpandColapse datagridApiRef={datagridApiRef} />,
                 renderCell: (params: any) => (
                     <CustomDetailPanelToggle id={params.id} value={params.value} />
                 ),
@@ -225,7 +256,9 @@ const NotificacioAddButton: React.FC = () => {
     );
 };
 
-const MassiveActionsButton: React.FC = () => {
+const MassiveActionsButton: React.FC<{ datagridApiRef: React.RefObject<GridApiPro | null> }> = ({
+    datagridApiRef,
+}) => {
     const { selection } = useMuiDataGridContext();
 
     const { exec: execExemple } = useMuiActionReportLogic(
@@ -276,7 +309,13 @@ const MassiveActionsButton: React.FC = () => {
         },
     ];
 
-    return <AccionsMassives options={opcionsMenu} sizeSelection={selection?.ids?.size} />;
+    return (
+        <AccionsMassives
+            options={opcionsMenu}
+            sizeSelection={selection?.ids?.size}
+            datagridApiRef={datagridApiRef}
+        />
+    );
 };
 
 const ContentFilter: React.FC = () => {
@@ -362,7 +401,8 @@ const NotificacioGrid = () => {
     const { dialogComponent, onDetailClick } = useNotificacioDetailDialog();
     const { currentActions: apiCurrentActions } = useResourceApiService('notificacioResource');
     const isCreateLinkPresent = apiCurrentActions?.['create'] != null;
-    const columns = useDataGridColumns();
+    const datagridApiRef = useGridApiRef();
+    const columns = useDataGridColumns(datagridApiRef);
     const springFilterBuilder = useSpringFilterBuilder();
     const filterDataGridProps = useDatagridFilterProps(
         'notificacioResource',
@@ -371,9 +411,73 @@ const NotificacioGrid = () => {
         <ContentFilter />
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
+
+    const rowAdditionalActions = () => {
+        const listActions: DataCommonAdditionalAction[] = [
+            {
+                label: t('page.notificacio.grid.column.detalls'),
+                title: t('page.notificacio.grid.column.detalls'),
+                icon: 'info',
+                showInMenu: false,
+                onClick: (id) => onDetailClick(id),
+            },
+            {
+                label: t('page.notificacio.grid.accions.documentEnviat'),
+                title: t('page.notificacio.grid.accions.documentEnviat'),
+                icon: 'download',
+                showInMenu: true,
+                onClick: (id) => console.error(`En construcció: ${id}`),
+            },
+            {
+                label: t('page.notificacio.grid.accions.anular'),
+                title: t('page.notificacio.grid.accions.anular'),
+                icon: 'block',
+                showInMenu: true,
+                onClick: (id) => console.error(`En construcció: ${id}`),
+                // hidden: (row) => !row.anulable,
+            },
+            {
+                label: t('page.notificacio.grid.accions.certificacio'),
+                title: t('page.notificacio.grid.accions.certificacio'),
+                icon: 'download',
+                showInMenu: true,
+                onClick: (id) => console.error(`En construcció: ${id}`),
+                // hidden: (row) => !row.envCerData,
+            },
+            {
+                label: t('page.notificacio.grid.accions.processat'),
+                title: t('page.notificacio.grid.accions.processat'),
+                icon: 'check_circle',
+                showInMenu: true,
+                onClick: (id) => console.error(`En construcció: ${id}`),
+                // hidden: (row) => row,
+                // if ${!isRolActualAdministradorLectura} && ((~hlpIsAdministradorEntitat() && estat == 'FINALITZADA') || permisProcessar)
+            },
+            {
+                label: t('page.notificacio.grid.accions.justificantEnviament'),
+                title: t('page.notificacio.grid.accions.justificantEnviament'),
+                icon: 'download',
+                showInMenu: true,
+                onClick: (id) => console.error(`En construcció: ${id}`),
+                // hidden: (row) => !row?.justificant,
+            },
+            {
+                label: t('page.notificacio.grid.accions.ampliarTermini'),
+                title: t('page.notificacio.grid.accions.ampliarTermini'),
+                icon: 'calendar_month',
+                showInMenu: true,
+                onClick: (id) => console.error(`En construcció: ${id}`),
+                // hidden: (row) => isRolActualAdministradorLectura && !row?.plazoAmpliable,
+            },
+        ];
+
+        return listActions;
+    };
+
     return (
         <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
             <MuiDataGrid
+                datagridApiRef={datagridApiRef}
                 title={t('page.notificacio.grid.title')}
                 resourceName="notificacioResource"
                 columns={columns}
@@ -399,25 +503,23 @@ const NotificacioGrid = () => {
                         : []),
                     {
                         position: 2,
-                        element: <MassiveActionsButton />,
+                        element: <MassiveActionsButton datagridApiRef={datagridApiRef} />,
                     },
                 ]}
                 onRowClick={(params) => onDetailClick(params.id)}
                 rowActionsColumnIndex={11}
                 rowActionsColumnProps={{
-                    flex: 0.5,
+                    width: 90,
                 }}
-                rowAdditionalActions={[
-                    {
-                        label: t('page.notificacio.grid.column.detalls'),
-                        title: t('page.notificacio.grid.column.detalls'),
-                        icon: 'info',
-                        showInMenu: false,
-                        onClick: (id) => onDetailClick(id),
-                    },
-                ]}
+                rowAdditionalActions={rowAdditionalActions()}
                 getDetailPanelContent={({ row }) => <NotificacioGridEnviaments id={row.id} />}
                 getDetailPanelHeight={() => 'auto'}
+                getRowHeight={() => 'auto'}
+                // sx={{
+                //     '& .MuiDataGrid-cell': {
+                //         alignItems: 'flex-start',
+                //     },
+                // }}
             />
             {dialogComponent}
         </GridPage>

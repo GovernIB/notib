@@ -88,10 +88,10 @@ const getNestedValue = (obj: any, path: string) => {
     return path.split('.').reduce((acc, part) => acc && acc[part], obj);
 };
 
-const FieldsDataCardItem: React.FC<{ key: any; row: DataCardRow; fields: any[]; data: any }> = (
+const FieldsDataCardItem: React.FC<{ row: DataCardRow; fields: any[]; data: any }> = (
     props
 ) => {
-    const { key, row, fields, data } = props;
+    const { row, fields, data } = props;
     const field = fields?.find((field) => field?.name === row.field);
     const label =
         row.labelRenderer != null ? row.labelRenderer() : (row.label ?? field?.label ?? row.field);
@@ -109,7 +109,7 @@ const FieldsDataCardItem: React.FC<{ key: any; row: DataCardRow; fields: any[]; 
     }
 
     return (
-        <TableRow key={key}>
+        <TableRow>
             <TableCell
                 component="th"
                 scope="row"

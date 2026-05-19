@@ -4,6 +4,7 @@ import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
+import es.caib.notib.logic.enviaments.RefrescarEstatNotificaActionExecutor;
 import es.caib.notib.logic.helper.*;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
@@ -14,6 +15,10 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumD
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.model.*;
 import es.caib.notib.logic.intf.resourceservice.NotificacioResourceService;
+import es.caib.notib.logic.notificacions.DocumentPerspectiveApplicator;
+import es.caib.notib.logic.notificacions.EnviamentPerspectiveApplicator;
+import es.caib.notib.logic.notificacions.GrupPerspectiveApplicator;
+import es.caib.notib.logic.notificacions.OperadorPostalCiePerspectiveApplicator;
 import es.caib.notib.persist.resourceentity.*;
 import es.caib.notib.persist.resourcerepository.DocumentResourceRepository;
 import es.caib.notib.persist.resourcerepository.NotificacioEnviamentResourceRepository;
@@ -59,6 +64,10 @@ public class NotificacioResourceServiceImpl
 		register(NotificacioResource.Fields.organGestor, new NotificacioResourceServiceImpl.OrganGestorOnChangeLogicProcessor());
 		register(NotificacioResource.Fields.caducitat, new NotificacioResourceServiceImpl.CaducitatOnChangeLogicProcessor());
 		register(NotificacioResource.Fields.caducitatDiesNaturals, new NotificacioResourceServiceImpl.CaducitatOnChangeLogicProcessor());
+		register(NotificacioResource.PERSPECTIVE_DOCUMENTS_NOTIFICACIO, new DocumentPerspectiveApplicator());
+		register(NotificacioResource.PERSPECTIVE_ENVIAMENTS_NOTIFICACIO, new EnviamentPerspectiveApplicator());
+		register(NotificacioResource.PERSPECTIVE_OPERADORS_CIE_POSTAL, new OperadorPostalCiePerspectiveApplicator());
+		register(NotificacioResource.PERSPECTIVE_GRUP, new GrupPerspectiveApplicator());
 	}
 
 	@Override
@@ -173,7 +182,7 @@ public class NotificacioResourceServiceImpl
 			notibPermissionHelper.getProcedimentNotificacioCreatePermission(entity.getEnviamentTipus()));
 		Long organGestorId = entity.getOrganGestor().getId();
 		Long procedimentId = entity.getProcediment().getId();
-		Long procedimentOrganGestorId = entity.getProcedimentOrganGestor().getId();
+		Long procedimentOrganGestorId = entity.getProcedimentOrganGestor() != null ? entity.getProcedimentOrganGestor().getId() : null;
 		boolean permissionGranted = (organGestorId != null && ids.getOrganGestorIds().contains(organGestorId)) || // a)
 			(procedimentId != null && ids.getProcedimentNoComuIds().contains(procedimentId)) || // b)
 			(procedimentOrganGestorId != null && ids.getProcedimentComuOrganGestorIds().contains(procedimentOrganGestorId)); // c) o d)

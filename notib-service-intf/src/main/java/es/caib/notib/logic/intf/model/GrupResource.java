@@ -6,6 +6,8 @@ import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +22,8 @@ import javax.validation.constraints.Size;
  *
  * @author Límit Tecnologies
  */
+@Builder
+@AllArgsConstructor
 @Getter
 @Setter
 @NoArgsConstructor

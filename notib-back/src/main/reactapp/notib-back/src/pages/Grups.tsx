@@ -1,8 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
-import { GridPage, MuiDataGrid, FormField } from 'reactlib';
+import { GridPage, MuiDataGrid } from 'reactlib';
 import { useDatagridPageSizeOptionsProps } from '../hooks/useDataGrid';
+import GridFormField from '../components/GridFormField';
 
 const columns = [
     {
@@ -18,12 +19,8 @@ const columns = [
 const GrupForm: React.FC = () => {
     return (
         <Grid container spacing={2}>
-            <Grid size={12}>
-                <FormField name="codi" />
-            </Grid>
-            <Grid size={12}>
-                <FormField name="nom" />
-            </Grid>
+            <GridFormField size={12} name="codi" />
+            <GridFormField size={12} name="nom" />
         </Grid>
     );
 };

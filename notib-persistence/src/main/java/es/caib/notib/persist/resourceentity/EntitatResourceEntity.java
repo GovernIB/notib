@@ -84,7 +84,7 @@ public class EntitatResourceEntity extends BaseAuditableResourceEntity<EntitatRe
 			name = "entrega_cie_id",
 			referencedColumnName = "id",
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "entitat_entrega_cie_fk"))
-	private EntregaCieEntity entregaCie;
+	private EntregaCieResourceEntity entregaCie;
 
 	@Formula("(select count(*) from " + BaseConfig.DB_PREFIX + "entitat_tipus_doc tdc where tdc.entitat_id = id)")
 	private Integer tipusDocCount;
@@ -97,7 +97,7 @@ public class EntitatResourceEntity extends BaseAuditableResourceEntity<EntitatRe
 	@Builder
 	public EntitatResourceEntity(
 			EntitatResource resource,
-			EntregaCieEntity entregaCie) {
+			EntregaCieResourceEntity entregaCie) {
 		this.codi = resource.getCodi();
 		this.nom = resource.getNom();
 		this.tipus = resource.getTipus();

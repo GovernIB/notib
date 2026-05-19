@@ -13,15 +13,19 @@ export const OrganFormContent: React.FC<{ setSubtitle?: (subtitle: string) => vo
     const { t } = useTranslation();
     const { data } = useFormContext();
     const initialTab = useTabParam();
+
     React.useEffect(() => {
         setSubtitle?.(data?.codi + ', ' + data?.nom);
     }, [data]);
+
     const permisosTabLabel = (
         <Badge badgeContent={data.aclEntryCount} color="primary">
             {t('page.organs.form.tabs.permisos')}
         </Badge>
     );
+
     const tabs = [t('page.organs.form.tabs.dades'), { label: permisosTabLabel }];
+
     return (
         <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1]} initialIndex={initialTab}>
             <MuiFormTabContent index={0} showOnCreate>
@@ -33,16 +37,15 @@ export const OrganFormContent: React.FC<{ setSubtitle?: (subtitle: string) => vo
                     <GridFormField size={6} name="llibre" />
                     <GridFormField size={6} name="oficina" />
                     <GridFormField size={2} name="permetreSir" />
-                    <Grid size={4} />
                     <GridFormField size={2} name="entregaCieActiva" />
                     {data?.entregaCieActiva && (
                         <>
                             <GridFormField size={3} name="entregaCiePagadorPostal" />
                             <GridFormField size={3} name="entregaCiePagadorCie" />
-                            <GridFormField size={3} name="sobrescriureCieOrganEmisor" />
+                            <GridFormField size={4} name="sobrescriureCieOrganEmisor" />
                         </>
                     )}
-                    <GridFormField size={3} name="entregaCieDesactivada" />
+                    <GridFormField size={4} name="entregaCieDesactivada" />
                 </Grid>
             </MuiFormTabContent>
             <MuiFormTabContent index={1} style={{ height: '500px' }}>
@@ -56,6 +59,7 @@ export const OrganForm: React.FC = () => {
     const { t } = useTranslation();
     const { id } = useParams();
     const [subtitle, setSubtitle] = React.useState<string>();
+
     return (
         <FormPage>
             <MuiForm

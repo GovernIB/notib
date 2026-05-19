@@ -111,6 +111,14 @@ const translationCa = {
                         cancel: 'Cancel·lar',
                         query: 'Consultar canvis',
                         apply: 'Aplicar canvis',
+                        creacions: "Creacions",
+                        modificacions: "Modificacions",
+                        substitucions: "Substitucions",
+                        extincions: "Extincions",
+                        fusions: "Fusions",
+                        divisions: "Divisions",
+                        aplicarCanvis: "Faci clic al botó d'aplicar per a fer efectius els canvis.",
+                        senseCanvis: "Sense canvis",
                     },
                     success: 'Canvis aplicats amb èxit',
                 },
@@ -303,6 +311,7 @@ const translationCa = {
         notificacio: {
             grid: {
                 title: 'Remeses',
+                detall: 'Detall',
                 new: {
                     title: 'Nou enviament',
                     NOTIFICACIO: 'Notificació',
@@ -322,6 +331,14 @@ const translationCa = {
                     detalls: 'Detalls',
                     mostrar: 'Mostrar enviaments',
                     ocultar: 'Ocultar enviaments',
+                },
+                accions: {
+                    documentEnviat: "Document enviat",
+                    anular: "Anular",
+                    certificacio: "Certificacio",
+                    processat: "Marcar com a processat",
+                    justificantEnviament: "Justificant d'enviament",
+                    ampliarTermini: "Ampliar termini",
                 },
                 procediment: 'Procediment',
                 servei: 'Servei',
@@ -398,12 +415,61 @@ const translationCa = {
                 dades: {
                     title: 'Dades de la notificació',
                     justificant: 'Justificant',
+                    grup: {
+                        title: 'Grup',
+                        codi: "Codi",
+                        nom: "Nom",
+                    },
+                    documents: {
+                        title: 'Document',
+                        nom: "Nom arxiu",
+                        normalitzat: "Normalitzat",
+                        csv: "Generar CSV",
+                    },
+                    pagadorPostal: {
+                        title: "Dades del pagador postal",
+                        organismePagadorNom: "Organisme pagador",
+                        contracteNum: "Número de contracte",
+                        facturacioClientCodi: "Codi del client",
+                        contracteDataVig: "Data de vigència del contracte",
+                    },
+                    pagadorCie: {
+                        title: "Dades del pagador CIE",
+                        organismeEmissor: "Organisme emissor",
+                        vigencia: "Data de vigència del contracte",
+                    },
+                    enviaments: {
+                        title: 'Enviament',
+                        interessat: "Interessat",
+                        destinataris: "Representants",
+                        senseDestinataris: "Sense destinataris",
+                        estat: "Estat",
+                        registre: {
+                            title: "Registre",
+                            registreNumeroFormatat: "Núm. registre",
+                            registreData: "Data registre",
+                            registreEstat: "Estat registre",
+                            sirRecepcioData: "Data recepció SIR",
+                            registreMotiu: "Motiu",
+                            sirRegDestiData: "Data registre SIR",
+                            registreOficinaNom: "Oficina",
+                            registreLlibreNom: "Llibre",
+                            noRegistrat: "No registrat",
+                            certificacio: "Certificació",
+                            noCertificacio: "Sena certificació",
+                            notificaCertificacioData: "Data",
+                            notificaCertificacioMime: "Tipus MIME",
+                            notificaCertificacioOrigen: "Origen",
+                            notificaCertificacioMetadades: "Metadades",
+                            notificaCertificacioCsv: "CSV",
+                            notificaCertificacioTipus: "Tipus",
+                            notificaCertificacioArxiuTipus: "Tipus d'arxiu",
+                            notificaCertificacioNumSeguiment: "Núm. seguiment",
+                        },
+                    },
                 },
-                enviaments: {
-                    title: 'Enviament',
-                },
-                documents: {
-                    title: 'Document',
+                accions: {
+                    noAccions: "No hi ha accions disponibles per a aquest enviament",
                 },
             },
         },
@@ -639,6 +705,22 @@ const translationCa = {
         },
         AccionsMassives: {
             labelBoto: 'Accions massives',
+            selectAll: "Seleccionar tot",
+            deselectAll: "Desmarcar tot",
+        },
+        ButtonDetailExpandColapse: {
+            expandAll: "Expandir tots",
+            collapseAll: "Contreure tots",
+        },
+        Dir3SearchInput: {
+            search: "Cercar",
+            dialog: {
+                title: "Consulta d'administracions públiques a DIR3",
+                netejar: "Netejar",
+                noCif: "Sense CIF",
+                noSir: "Sense SIR",
+                viaValib: "Via Valib",
+            }
         },
     },
     hook: {
@@ -651,6 +733,7 @@ const translationCa = {
     },
     comu: {
         netejarFiltre: 'Netejar filtre',
+        filtrar: 'Filtrar',
         obrirFiltreAvançat: 'Obrir filtre avançat',
         tancarFiltreAvançat: 'Tancar filtre avançat',
     },

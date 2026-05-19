@@ -3,64 +3,51 @@ import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import Badge from '@mui/material/Badge';
-import {
-    FormPage,
-    MuiForm,
-    FormField,
-    MuiFormTabs,
-    MuiFormTabContent,
-    useFormContext,
-} from 'reactlib';
+import { FormPage, MuiForm, MuiFormTabs, MuiFormTabContent, useFormContext } from 'reactlib';
 import PagadorCieFormTabFulles from './PagadorCieFormTabFulles';
 import PagadorCieFormTabSobres from './PagadorCieFormTabSobres';
 import { useTabParam } from '../../hooks/useSearchParams';
+import GridFormField from '../../components/GridFormField';
 
 const PagadorCieFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
     const { setSubtitle } = props;
     const { t } = useTranslation();
     const { data } = useFormContext();
     const initialTab = useTabParam();
+
     React.useEffect(() => {
         setSubtitle(data?.nom);
     }, [data]);
+
     const fullesTabLabel = (
         <Badge badgeContent={data.fullaCount} color="primary">
             {t('page.pagadorCie.form.tabs.fulles')}
         </Badge>
     );
+
     const sobresTabLabel = (
         <Badge badgeContent={data.sobreCount} color="primary">
             {t('page.pagadorCie.form.tabs.sobres')}
         </Badge>
     );
+
     const tabs = [
         t('page.pagadorCie.form.tabs.dades'),
         { label: fullesTabLabel },
         { label: sobresTabLabel },
     ];
+
     return (
         <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1, 2]} initialIndex={initialTab}>
             <MuiFormTabContent index={0} showOnCreate>
                 <Grid container spacing={2}>
-                    <Grid size={6}>
-                        <FormField name="nom" />
-                    </Grid>
+                    <GridFormField size={6} name="nom" />
                     <Grid size={6}></Grid>
-                    <Grid size={6}>
-                        <FormField name="organGestorEmissor" />
-                    </Grid>
-                    <Grid size={6}>
-                        <FormField name="organGestorPagador" />
-                    </Grid>
-                    <Grid size={6}>
-                        <FormField name="apiKey" />
-                    </Grid>
-                    <Grid size={6}>
-                        <FormField name="contracteDataVig" />
-                    </Grid>
-                    <Grid size={6}>
-                        <FormField name="cieExtern" />
-                    </Grid>
+                    <GridFormField size={6} name="organGestorEmissor" />
+                    <GridFormField size={6} name="organGestorPagador" />
+                    <GridFormField size={6} name="apiKey" />
+                    <GridFormField size={6} name="contracteDataVig" />
+                    <GridFormField size={6} name="cieExtern" />
                 </Grid>
             </MuiFormTabContent>
             <MuiFormTabContent index={1}>
@@ -77,6 +64,7 @@ export const PagadorCieForm: React.FC = () => {
     const { t } = useTranslation();
     const { id } = useParams();
     const [subtitle, setSubtitle] = React.useState<string>();
+
     return (
         <FormPage>
             <MuiForm

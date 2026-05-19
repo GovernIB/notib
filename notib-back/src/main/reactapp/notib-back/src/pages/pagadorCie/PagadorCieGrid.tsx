@@ -83,10 +83,12 @@ const springFilterBuilder = (data: any) => {
 
 const ContentFilter: React.FC = () => {
     const { t } = useTranslation();
-        const filterApiRef = useFilterApiContext();
+    const filterApiRef = useFilterApiContext();
+
     const handleButtonClick = () => {
         filterApiRef.current?.clear();
     };
+
     return (
         <Grid container spacing={2}>
             <GridFormField size={2} name="nom" />
@@ -112,6 +114,7 @@ export const PagadorCieGrid: React.FC = () => {
         <ContentFilter />
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
+
     return (
         <GridPage>
             <MuiDataGrid

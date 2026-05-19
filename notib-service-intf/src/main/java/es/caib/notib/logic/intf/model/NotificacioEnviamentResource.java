@@ -17,6 +17,8 @@ import es.caib.notib.logic.intf.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.model.validator.TitularIncapacitatObligatoriRepresentant;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -35,6 +37,8 @@ import java.util.List;
  *
  * @author Límit Tecnologies
  */
+@Builder
+@AllArgsConstructor
 @Getter
 @Setter
 @NoArgsConstructor

@@ -31,6 +31,9 @@ export const NotificacioGridEnviaments: React.FC<{ id: any }> = (props) => {
             });
         }
     }, [apiIsReady]);
+
+    // WEB-INF/jsp/includes/notificacioList.jsp:283
+    
     return (
         enviaments != null && (
             <TableContainer
@@ -61,10 +64,10 @@ export const NotificacioGridEnviaments: React.FC<{ id: any }> = (props) => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {enviaments.map((e) => (
-                            <TableRow key={e.id}>
+                        {enviaments.map((enviament) => (
+                            <TableRow key={enviament.id}>
                                 <TableCell component="th" scope="row">
-                                    {e.titular.description}
+                                    {enviament.titular.description}
                                 </TableCell>
                                 <TableCell component="th" scope="row"></TableCell>
                                 <TableCell component="th" scope="row"></TableCell>
@@ -74,7 +77,7 @@ export const NotificacioGridEnviaments: React.FC<{ id: any }> = (props) => {
                                         variant="outlined"
                                         size="small"
                                         startIcon={<Icon>info</Icon>}
-                                        onClick={() => onDetailClick(e.id)}
+                                        onClick={() => onDetailClick(enviament.id)}
                                     >
                                         Detalls
                                     </Button>

@@ -58,12 +58,11 @@ const springFilterBuilder = (data: any) => {
 const PagadorPostalForm: React.FC = () => {
     return (
         <Grid container spacing={2}>
-            <GridFormField size={6} name="nom" />
-            <Grid size={6} />
-            <GridFormField size={6} name="organGestor" />
-            <GridFormField size={6} name="contracteNum" />
-            <GridFormField size={6} name="facturacioClientCodi" />
-            <GridFormField size={6} name="contracteDataVig" />
+            <GridFormField size={12} name="nom" />
+            <GridFormField size={12} name="organGestor" />
+            <GridFormField size={4} name="contracteNum" />
+            <GridFormField size={4} name="facturacioClientCodi" />
+            <GridFormField size={4} name="contracteDataVig" />
         </Grid>
     );
 };
@@ -74,6 +73,7 @@ const ContentFilter: React.FC = () => {
     const handleButtonClick = () => {
         filterApiRef.current?.clear();
     };
+
     return (
         <Grid container spacing={2}>
             <GridFormField size={2} name="nom" />
@@ -100,6 +100,7 @@ export const PagadorsPostals: React.FC = () => {
         <ContentFilter />
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
+
     return (
         <GridPage>
             <MuiDataGrid

@@ -75,8 +75,9 @@ const NotificacioFormDocument: React.FC<{
     index: number;
     indexKey: number;
     handleRemove: (indexKey: number) => void;
+    canDelete?: boolean;
 }> = (props) => {
-    const { index, indexKey, handleRemove } = props;
+    const { index, indexKey, handleRemove, canDelete } = props;
     const { t } = useTranslation();
     const [currentDocumentFieldValidationErrors, setCurrentDocumentFieldValidationErrors] =
         React.useState<any[]>();
@@ -85,6 +86,7 @@ const NotificacioFormDocument: React.FC<{
         fieldErrors: parentFieldErrors,
         apiRef: parentFormApiRef,
     } = useFormContext();
+
     React.useEffect(() => {
         const errorPrefix = 'documentsInfo[' + index + ']';
         const currentDocumentFieldValidationErrors = parentFieldErrors
@@ -92,13 +94,17 @@ const NotificacioFormDocument: React.FC<{
             .map((e) => ({ ...e, field: e.field.substring(errorPrefix.length + 1) }));
         setCurrentDocumentFieldValidationErrors(currentDocumentFieldValidationErrors);
     }, [parentFieldErrors]);
+
     const handleDataChange = (data: any, initial: boolean) => {
         const documentsWithData = parentFormData?.documentsInfo?.map((e: any) =>
             e.id === indexKey ? { id: indexKey, ...data } : e
         );
         parentFormApiRef.current?.setFieldValue('documentsInfo', documentsWithData);
-        !initial && parentFormApiRef.current?.setModified(true);
+        if (!initial) {
+            parentFormApiRef.current?.setModified(true);
+        }
     };
+
     return (
         <Paper sx={{ px: 2, py: 1, mb: 2 }}>
             <Grid container spacing={2}>
@@ -108,11 +114,15 @@ const NotificacioFormDocument: React.FC<{
                     </Typography>
                 </Grid>
                 <Grid size={2} sx={{ textAlign: 'right' }}>
-                    <IconButton onClick={() => handleRemove(indexKey)}>
-                        <Icon fontSize="small" title={t('page.notificacio.form.documents.remove')}>
-                            delete
-                        </Icon>
-                    </IconButton>
+                    {canDelete && (
+                        <IconButton
+                            title={t('page.notificacio.form.documents.remove')}
+                            onClick={() => handleRemove(indexKey)}
+                            color="error"
+                        >
+                            <Icon fontSize="small">delete</Icon>
+                        </IconButton>
+                    )}
                 </Grid>
                 <Grid size={12}>
                     <MuiForm
@@ -137,29 +147,33 @@ const NotificacioFormDocuments: React.FC = () => {
     const { t } = useTranslation();
     const { data, apiRef: formApiRef } = useFormContext();
     const documentsInfo = data?.documentsInfo;
+
     const handleAddClick = () => {
         formApiRef.current?.setFieldValue('documentsInfo', [
             ...(documentsInfo ?? []),
             { id: new Date().valueOf() },
         ]);
     };
+
     const handleRemoveClick = (indexKey: number) => {
         formApiRef.current?.setFieldValue(
             'documentsInfo',
             documentsInfo.filter((e: any) => e.id !== indexKey)
         );
     };
+
     return (
         <>
             <Typography variant="h6" sx={{ mt: 3, mb: 2, borderBottom: 1, borderColor: 'divider' }}>
                 {t('page.notificacio.form.tabs.documents')}
             </Typography>
-            {documentsInfo?.map((e: any, i: number) => (
+            {documentsInfo?.map((document: any, index: number) => (
                 <NotificacioFormDocument
-                    key={e.id}
-                    index={i}
-                    indexKey={e.id}
+                    key={document.id}
+                    index={index}
+                    indexKey={document.id}
                     handleRemove={handleRemoveClick}
+                    canDelete={documentsInfo.length > 1}
                 />
             ))}
             {data?.enviamentTipus === 'SIR' && documentsInfo.length < 5 && (

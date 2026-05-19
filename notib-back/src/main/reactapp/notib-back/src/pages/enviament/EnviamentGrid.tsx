@@ -300,6 +300,7 @@ const EnviamentGrid = () => {
                         icon: 'calendar_month',
                         showInMenu: true,
                         // onClick: (id) => onNotificacioDetailClick(id), // TODO FALTA AFEGIR L'ACCIÓ I QUE ES MOSTRI L'ENTRADA DEL MENU SEGONS CONDICIO
+                        // hidden: (row) => isRolActualAdministradorLectura && !row?.plazoAmpliable,
                     },
                 ]}
             />

@@ -325,3 +325,31 @@ databaseChangeLog:
                         tableName: NOT_PERSONA
                         columnName: RAO_SOCIAL
                         newDataType: varchar(255 ${varcharUnit})
+
+    -   changeSet:
+            id: 2_1_1_000-17
+            author: limit
+            changes:
+                -   update:
+                        tableName: ${db_prefix}notificacio_env_table
+                        columns:
+                            -   column:
+                                    name: registre_numero
+                                    value: null
+                -   modifyDataType:
+                        tableName: ${db_prefix}notificacio_env_table
+                        columnName: registre_numero
+                        newDataType: varchar(50 ${varcharUnit})
+                -   sql: "UPDATE not_notificacio_env_table t SET registre_numero = (SELECT registre_numero_formatat FROM NOT_NOTIFICACIO_ENV e WHERE t.id = e.id);"
+
+    -   changeSet:
+            id: 2_1_1_000-18
+            author: limit
+            changes:
+                -   addColumn:
+                        tableName: ${db_prefix}notificacio
+                        columns:
+                            -   column:
+                                    name: grup_id
+                                    type: bigint
+                -   sql: "UPDATE not_notificacio n SET grup_id = (SELECT id FROM not_grup g WHERE n.GRUP_CODI = g.CODI) WHERE n.GRUP_CODI IS NOT NULL;"

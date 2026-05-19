@@ -126,7 +126,9 @@ const useSse = (
                 onEvent?.(data);
             });
             eventSource.onerror = () => {
-                closeOnError && eventSource.close();
+                if (closeOnError) {
+                    eventSource.close();
+                }
             };
             return () => {
                 eventSource.close();
@@ -177,20 +179,52 @@ const OrganGridDir3SyncLoading: React.FC<{ percent?: number; message?: string }>
 
 const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
     const { result } = props;
+    const { t } = useTranslation();
+
     return (
         <Grid container>
             <Grid size={12}>
                 {result.senseCanvis ? (
-                    <p>Sense canvis</p>
+                    <Typography>{t('page.organs.grid.sync.dialogButton.senseCanvis')}</Typography>
                 ) : (
                     <>
-                        <p>Creacions: {result.creacions?.length ?? 0}</p>
-                        <p>Modificacions: {result.modificacions?.length ?? 0}</p>
-                        <p>Substitucions: {result.substitucions?.length ?? 0}</p>
-                        <p>Extincions: {result.extincions?.length ?? 0}</p>
-                        <p>Fusions: {result.fusions?.length ?? 0}</p>
-                        <p>Divisions: {result.divisions?.length ?? 0}</p>
-                        <p>Faci clic al botó d'aplicar per a fer efectius els canvis.</p>
+                        <Typography gutterBottom sx={{ fontWeight: 'bold' }}>
+                            {`${t('page.organs.grid.sync.dialogButton.creacions')}: `}
+                            <Typography component="span">
+                                {result.creacions?.length ?? 0}
+                            </Typography>
+                        </Typography>
+                        <Typography gutterBottom sx={{ fontWeight: 'bold' }}>
+                            {`${t('page.organs.grid.sync.dialogButton.modificacions')}: `}
+                            <Typography component="span">
+                                {result.modificacions?.length ?? 0}
+                            </Typography>
+                        </Typography>
+                        <Typography gutterBottom sx={{ fontWeight: 'bold' }}>
+                            {`${t('page.organs.grid.sync.dialogButton.substitucions')}: `}
+                            <Typography component="span">
+                                {result.substitucions?.length ?? 0}
+                            </Typography>
+                        </Typography>
+                        <Typography gutterBottom sx={{ fontWeight: 'bold' }}>
+                            {`${t('page.organs.grid.sync.dialogButton.extincions')}: `}
+                            <Typography component="span">
+                                {result.extincions?.length ?? 0}
+                            </Typography>
+                        </Typography>
+                        <Typography gutterBottom sx={{ fontWeight: 'bold' }}>
+                            {`${t('page.organs.grid.sync.dialogButton.fusions')}: `}
+                            <Typography component="span">{result.fusions?.length ?? 0}</Typography>
+                        </Typography>
+                        <Typography gutterBottom sx={{ fontWeight: 'bold' }}>
+                            {`${t('page.organs.grid.sync.dialogButton.divisions')}: `}
+                            <Typography component="span">
+                                {result.divisions?.length ?? 0}
+                            </Typography>
+                        </Typography>
+                        <Typography gutterBottom sx={{ mt: 3 }}>
+                            {t('page.organs.grid.sync.dialogButton.aplicarCanvis')}
+                        </Typography>
                     </>
                 )}
             </Grid>
@@ -208,10 +242,12 @@ const OrganGridDir3SyncActionButton: React.FC<{
     const [senseCanvis, setSenseCanvis] = React.useState<boolean>();
     const [percent, setPercent] = React.useState<number>();
     const [message, setMessage] = React.useState<string>();
+
     useSse('PROGRESS', 'DIR3_SYNC', (event: any) => {
         setPercent(event.percent);
         setMessage(event.message);
     });
+
     const resultProcessor = (result: any) => {
         setSenseCanvis(result.senseCanvis);
         if (result.simulat) {
@@ -221,12 +257,14 @@ const OrganGridDir3SyncActionButton: React.FC<{
             setSimular(true);
         }
     };
+
     const handleSuccess = (result?: any) => {
         if (!result.simulat) {
             dataGridApiRef.current?.refresh();
             temporalMessageShow(null, t('page.organs.grid.sync.success'), 'success');
         }
     };
+
     const formDialogButtons = [
         {
             value: false,
@@ -242,6 +280,7 @@ const OrganGridDir3SyncActionButton: React.FC<{
             componentProps: { variant: 'contained', disabled: senseCanvis === true },
         },
     ];
+
     return (
         <MuiActionReportButton
             resourceName="organGestorResource"

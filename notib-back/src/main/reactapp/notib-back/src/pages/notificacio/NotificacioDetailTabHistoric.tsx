@@ -1,159 +1,166 @@
 import React from 'react';
 import { GridPage, MuiDataGrid, MuiDataGridColDef } from 'reactlib';
+import { useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 
 const NotificacioDetailTabHistoric: React.FC<{ id: any }> = (props) => {
     const { id } = props;
+    const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
+
     const columns: MuiDataGridColDef[] = React.useMemo(
         () => [
             {
                 field: 'tipusOperacio',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'joinPoint',
-                flex: 3,
+                width: 150,
             },
             {
                 field: 'createdBy',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'createdDate',
-                flex: 1,
+                width: 150,
             },
             {
                 field: 'notificacioId',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'comunicacioTipus',
-                flex: 1,
+                width: 130,
             },
             {
                 field: 'tipusUsuari',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'usuari',
-                flex: 1,
+                width: 100,
             },
             {
                 field: 'emisor',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'tipus',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'entitatId',
-                flex: 1,
+                width: 100,
             },
             {
                 field: 'organ',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'procediment',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'grup',
-                flex: 1,
+                width: 100,
             },
             {
                 field: 'concepte',
-                flex: 1,
+                width: 160,
             },
             {
                 field: 'descripcio',
-                flex: 1,
+                width: 160,
             },
             {
                 field: 'numExpedient',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'enviamentDataProgramada',
-                flex: 1,
+                width: 150,
             },
             {
                 field: 'retard',
-                flex: 1,
+                width: 100,
             },
             {
                 field: 'caducitat',
-                flex: 1,
+                width: 150,
             },
             {
                 field: 'documentId',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'estat',
-                flex: 1,
+                width: 100,
             },
             {
                 field: 'estatDate',
-                flex: 1,
+                width: 150,
             },
             {
                 field: 'estatProcessatDate',
-                flex: 1,
+                width: 150,
             },
             {
                 field: 'motiu',
-                flex: 1,
+                width: 150,
             },
             {
                 field: 'registreEnviamentIntent',
-                flex: 1,
+                width: 100,
             },
             {
                 field: 'registreNumero',
-                flex: 1,
+                width: 100,
             },
             {
                 field: 'registreNumeroFormatat',
-                flex: 1,
+                width: 100,
             },
             {
                 field: 'registreData',
-                flex: 1,
+                width: 150,
             },
             {
                 field: 'notificaEnviamentData',
-                flex: 1,
+                width: 150,
             },
             {
                 field: 'notificaEnviamentIntent',
-                flex: 1,
+                width: 100,
             },
             {
                 field: 'errorLastCallback',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'errorEventId',
-                flex: 1,
+                width: 120,
             },
             {
                 field: 'referencia',
-                flex: 1,
-            }
+                width: 150,
+            },
         ],
         []
     );
 
     return (
-        <GridPage disableMargins={false}>
+        <GridPage>
             <MuiDataGrid
-                title=''
+                title=""
                 resourceName="notificacioAuditResource"
                 fixedFilter={'notificacioId:' + id}
+                sortModel={[{ field: 'tipusOperacio', sort: 'desc' }]}
                 columns={columns}
                 readOnly
-                toolbarHideQuickFilter
+                persistentStateActive
+                persistentStateClearPageSortPropsOnTopLevelRouteChange
+                paginationActive
+                {...pageSizeOptionsDataGridProps}
             />
         </GridPage>
     );

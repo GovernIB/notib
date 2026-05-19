@@ -12,10 +12,12 @@ const RoleSelector: React.FC = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { rolesAvailable, currentRole, setCurrentRole } = useNotibContext();
+
     const handleRoleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setCurrentRole(event.target.value);
         navigate('/', { replace: true });
     };
+
     return rolesAvailable ? (
         <TextField
             value={currentRole ?? ''}
@@ -31,10 +33,11 @@ const RoleSelector: React.FC = () => {
                     ),
                 },
             }}
-            sx={{ mr: 1 }}>
-            {rolesAvailable.map((r) => (
-                <MenuItem key={r} value={r}>
-                    <ListItemText>{t('component.RoleSelector.role.' + r)}</ListItemText>
+            sx={{ mr: 1 }}
+        >
+            {rolesAvailable.map((rol) => (
+                <MenuItem key={rol} value={rol}>
+                    <ListItemText>{t(`component.RoleSelector.role.${rol}`)}</ListItemText>
                 </MenuItem>
             ))}
         </TextField>

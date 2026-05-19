@@ -1,117 +1,433 @@
-import { Box, Button, Icon, Typography } from '@mui/material';
+import { Box, Button, Divider, Icon, Typography } from '@mui/material';
 import { FieldsDataCard } from '../../components/DataCard';
-import { useResourceApiService } from 'reactlib';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-const NotificacioDetailDialogTabEnviaments: React.FC<{ id: any }> = (props) => {
-    const { id } = props;
-    const { t } = useTranslation();
-    const {
-        isReady: apiIsReady,
-        find: apiFind,
-        currentFields: apiCurrentFields,
-    } = useResourceApiService('notificacioEnviamentResource');
-    const [enviaments, setEnviaments] = React.useState<any[]>();
-
-    React.useEffect(() => {
-        if (apiIsReady) {
-            apiFind({ filter: 'notificacio.id:' + id, sorts: ['id'], unpaged: true }).then(
-                (response) => {
-                    console.log('>>> enviaments', response.rows);
-                    setEnviaments(response.rows);
-                }
-            );
-        }
-    }, [apiIsReady]);
-
-    return (
-        <>
-            {enviaments?.map((e, i) => (
-                <FieldsDataCard
-                    key="enviament-{i}"
-                    title={t('page.notificacio.detail.enviaments.title') + ' ' + (i + 1)}
-                    rows={[
-                        { field: 'titular' },
-                        { field: 'representant' },
-                        { field: 'notificaEstat' },
-                        { field: 'registre' },
-                        { field: 'certificacio' },
-                    ]}
-                    fields={apiCurrentFields}
-                    data={e}
-                    sx={{ mb: 1 }}
-                />
-            ))}
-        </>
-    );
-};
-
-const NotificacioDetailDialogTabDocuments: React.FC<{ id: any }> = (props) => {
-    const { id } = props;
-    const { t } = useTranslation();
-    const { isReady: notificacioApiIsReady, getOne: notificacioApiGetOne } =
-        useResourceApiService('notificacioResource');
-    const {
-        isReady: documentApiIsReady,
-        find: documentApiFind,
-        currentFields: documentApiCurrentFields,
-    } = useResourceApiService('documentResource');
-    const [documents, setDocuments] = React.useState<any[]>();
-
-    React.useEffect(() => {
-        if (notificacioApiIsReady && documentApiIsReady) {
-            notificacioApiGetOne(id)
-                .then((notificacio) => {
-                    const documentIds = [
-                        notificacio.document?.id,
-                        notificacio.document2?.id,
-                        notificacio.document3?.id,
-                        notificacio.document4?.id,
-                        notificacio.document5?.id,
-                    ].filter((id) => id != null);
-                    return documentIds;
-                })
-                .then((documentIds) => {
-                    documentApiFind({
-                        filter: 'id in (' + documentIds + ')',
-                        sorts: ['id'],
-                        unpaged: true,
-                    }).then((response) => {
-                        console.log('>>> documents', response.rows);
-                        setDocuments(response.rows);
-                    });
-                });
-        }
-    }, [notificacioApiIsReady && documentApiIsReady]);
-
-    return (
-        <>
-            {documents?.map((e, i) => (
-                <FieldsDataCard
-                    id="docment-{i}"
-                    title={t('page.notificacio.detail.documents.title') + ' ' + (i + 1)}
-                    rows={[{ field: 'titular' }]}
-                    fields={documentApiCurrentFields}
-                    data={e}
-                    sx={{ mb: 1 }}
-                />
-            ))}
-        </>
-    );
-};
-
-const NotificacioDetailDialogTabDades: React.FC<{
-    id: any;
+interface PropsTabDades {
     notificacio: any;
     apiCurrentFields: any[] | undefined;
-}> = (props) => {
-    const { id, notificacio, apiCurrentFields } = props;
+}
+
+const TableGrup: React.FC<PropsTabDades> = (props) => {
+    const { notificacio, apiCurrentFields } = props;
+    const { t } = useTranslation();
+
+    if (!notificacio?.grupInfo) return null;
+
+    return (
+        <FieldsDataCard
+            title={t('page.notificacio.detail.dades.grup.title')}
+            rows={[
+                {
+                    field: 'grupInfo.codi',
+                    label: t('page.notificacio.detail.dades.grup.codi'),
+                },
+                {
+                    field: 'grupInfo.nom',
+                    label: t('page.notificacio.detail.dades.grup.nom'),
+                },
+            ]}
+            fields={apiCurrentFields}
+            data={notificacio}
+            sx={{ mb: 1 }}
+        />
+    );
+};
+
+const TableDocuments: React.FC<PropsTabDades> = (props) => {
+    const { apiCurrentFields, notificacio } = props;
+    const { t } = useTranslation();
+    const documentsInfo = notificacio?.documentsInfo;
+
+    if (!documentsInfo) return null;
+
+    return (
+        <>
+            {documentsInfo?.map((document: any, index: number) => (
+                <FieldsDataCard
+                    key={`docment-${index + 1}`}
+                    id={`docment-${index + 1}`}
+                    title={t('page.notificacio.detail.dades.documents.title') + ' ' + (index + 1)}
+                    rows={[
+                        {
+                            field: 'arxiuNom',
+                            label: t('page.notificacio.detail.dades.documents.nom'),
+                        },
+                        {
+                            field: 'normalitzat',
+                            label: t('page.notificacio.detail.dades.documents.normalitzat'),
+                            valueRenderer: (_value: any, formattedValue: string) => {
+                                return formattedValue ? 'Si' : 'No';
+                            },
+                        },
+                        {
+                            field: 'csv',
+                            label: t('page.notificacio.detail.dades.documents.csv'),
+                            valueRenderer: (_value: any, formattedValue: string) => {
+                                return formattedValue ? 'Si' : 'No';
+                            },
+                        },
+                    ]}
+                    fields={apiCurrentFields}
+                    data={document}
+                    sx={{ mb: 1 }}
+                />
+            ))}
+        </>
+    );
+};
+
+const TableOperadorPostal: React.FC<PropsTabDades> = (props) => {
+    const { apiCurrentFields, notificacio } = props;
+    const { t } = useTranslation();
+
+    // TODO: Revisar es nom des camp, ha de ser es mateix que abaix
+    if (!notificacio?.operadorPostal?.organismePagadorCodi) return null;
+
+    return (
+        <FieldsDataCard
+            title={t('page.notificacio.detail.dades.pagadorPostal.title')}
+            rows={[
+                {
+                    field: 'operadorPostalInfo.organismePagadorNom', // TODO
+                    label: t('page.notificacio.detail.dades.pagadorPostal.organismePagadorNom'),
+                },
+                {
+                    field: 'operadorPostalInfo.contracteNum',
+                    label: t('page.notificacio.detail.dades.pagadorPostal.contracteNum'),
+                },
+                {
+                    field: 'operadorPostalInfo.facturacioClientCodi',
+                    label: t('page.notificacio.detail.dades.pagadorPostal.facturacioClientCodi'),
+                },
+                {
+                    field: 'operadorPostalInfo.contracteDataVig',
+                    label: t('page.notificacio.detail.dades.pagadorPostal.contracteDataVig'),
+                },
+            ]}
+            fields={apiCurrentFields}
+            data={notificacio}
+            sx={{ mb: 1 }}
+        />
+    );
+};
+
+const TableCie: React.FC<PropsTabDades> = (props) => {
+    const { apiCurrentFields, notificacio } = props;
+    const { t } = useTranslation();
+
+    // TODO revisar es valor d'aqui, ha de ser igual que abaix
+    if (!notificacio?.operadorCieInfo.organismePagadorCodi) return null;
+
+    return (
+        <FieldsDataCard
+            title={t('page.notificacio.detail.dades.pagadorCie.title')}
+            rows={[
+                {
+                    field: '${notificacio.cie.organismePagadorCodi} - ${notificacio.cie.organismePagadorNom', // TODO
+                    label: t('page.notificacio.detail.dades.pagadorCie.organismeEmissor'),
+                },
+                {
+                    field: 'operadorCieInfo.contracteDataVig',
+                    label: t('page.notificacio.detail.dades.pagadorCie.vigencia'),
+                },
+            ]}
+            fields={apiCurrentFields}
+            data={notificacio}
+            sx={{ mb: 1 }}
+        />
+    );
+};
+
+const TableEnviaments: React.FC<PropsTabDades> = (props) => {
+    const { notificacio, apiCurrentFields } = props;
+    const { t } = useTranslation();
+    const enviamentsInfo = notificacio?.enviamentsInfo;
+
+    if (!enviamentsInfo) return null;
+
+    return (
+        <>
+            {enviamentsInfo?.map((enviament: any, index: number) => (
+                <FieldsDataCard
+                    key={`enviament-${index + 1}`}
+                    title={`${t('page.notificacio.detail.dades.enviaments.title')} ${index + 1}`}
+                    rows={[
+                        {
+                            field: 'titularInfo.nom',
+                            label: t('page.notificacio.detail.dades.enviaments.interessat'),
+                            valueRenderer: () => {
+                                const { nom, llinatge1, llinatge2, nif, email } =
+                                    enviament.titularInfo;
+                                const nomComplet = [nom, llinatge1, llinatge2]
+                                    .filter(Boolean) // Elimina null, undefined o strings buits
+                                    .join(' ');
+
+                                const identitatAmbNif = nif
+                                    ? `${nomComplet} (${nif})`.trim()
+                                    : nomComplet;
+
+                                return (
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            flexWrap: 'wrap',
+                                            gap: 0.5,
+                                        }}
+                                    >
+                                        <Typography>{identitatAmbNif}</Typography>
+
+                                        {identitatAmbNif && email && (
+                                            <Typography sx={{ mx: 0.5 }}>-</Typography>
+                                        )}
+
+                                        {email && (
+                                            <Box
+                                                sx={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: 0.5,
+                                                }}
+                                            >
+                                                <Icon
+                                                    sx={{
+                                                        fontSize: '1.2rem',
+                                                        color: 'action.active',
+                                                    }}
+                                                >
+                                                    email
+                                                </Icon>
+                                                <Typography>{email}</Typography>
+                                            </Box>
+                                        )}
+                                    </Box>
+                                );
+                            },
+                        },
+                        {
+                            field: 'enviament.destinataris',
+                            label: t('page.notificacio.detail.dades.enviaments.destinataris'),
+                            valueRenderer: () => {
+                                if (
+                                    !enviament?.representantsInfo ||
+                                    !Array.isArray(enviament?.representantsInfo) ||
+                                    enviament?.representantsInfo?.length === 0
+                                ) {
+                                    return (
+                                        <Typography sx={{ fontStyle: 'italic' }}>
+                                            {t(
+                                                'page.notificacio.detail.dades.enviaments.senseDestinataris'
+                                            )}
+                                        </Typography>
+                                    );
+                                }
+
+                                return (
+                                    <Box
+                                        sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}
+                                    >
+                                        {enviament?.representantsInfo.map(
+                                            (destinatari: any, index: number) => {
+                                                const { nom, llinatge1, llinatge2, nif } =
+                                                    destinatari;
+
+                                                const nomComplet = [nom, llinatge1, llinatge2]
+                                                    .filter(Boolean)
+                                                    .join(' ');
+                                                const identitat = nif
+                                                    ? `${nomComplet} (${nif})`.trim()
+                                                    : nomComplet;
+
+                                                return (
+                                                    <Typography
+                                                        key={index}
+                                                        variant="body2"
+                                                        sx={{ display: 'block' }}
+                                                    >
+                                                        {identitat}
+                                                    </Typography>
+                                                );
+                                            }
+                                        )}
+                                        <Divider sx={{ my: 0.5 }} />
+                                        <Typography
+                                            variant="caption"
+                                            sx={{
+                                                fontWeight: 'bold',
+                                                color: 'primary.main',
+                                                textAlign: 'right',
+                                            }}
+                                        >
+                                            {`Total: ${enviament?.representantsInfo?.length}`}
+                                        </Typography>
+                                    </Box>
+                                );
+                            },
+                        },
+                        {
+                            field: 'notificaEstat', // TODO: Revisar back
+                            // Revisar condicions JSP Linia 775 a 807 notificacioInfo.jsp
+                        },
+                        {
+                            field: 'registre',
+                            label: t('page.notificacio.detail.dades.enviaments.registre.title'),
+                            valueRenderer: () => {
+                                return enviament?.registreNumeroFormatat ? (
+                                    <FieldsDataCard
+                                        rows={[
+                                            {
+                                                field: 'registreNumeroFormatat',
+                                                label: t(
+                                                    'page.notificacio.detail.dades.enviaments.registre.registreNumeroFormatat'
+                                                ),
+                                            },
+                                            {
+                                                field: 'registreData',
+                                                label: t(
+                                                    'page.notificacio.detail.dades.enviaments.registre.registreData'
+                                                ),
+                                            },
+                                            {
+                                                field: 'registreEstat',
+                                                label: t(
+                                                    'page.notificacio.detail.dades.enviaments.registre.registreEstat'
+                                                ),
+                                            },
+                                            {
+                                                field: 'sirRecepcioData',
+                                                label: t(
+                                                    'page.notificacio.detail.dades.enviaments.registre.sirRecepcioData'
+                                                ),
+                                            },
+                                            {
+                                                field: 'registreMotiu',
+                                                label: t(
+                                                    'page.notificacio.detail.dades.enviaments.registre.registreMotiu'
+                                                ),
+                                            },
+                                            {
+                                                field: 'sirRegDestiData',
+                                                label: t(
+                                                    'page.notificacio.detail.dades.enviaments.registre.sirRegDestiData'
+                                                ),
+                                            },
+                                            //${(isRolActualAdministradorEntitat || isRolActualAdministradorOrgan)
+                                            // && (not empty notificacio.registreOficinaNom || not empty notificacio.registreLlibreNom)}
+                                            {
+                                                field: 'registreOficinaNom', // TODO
+                                                label: t(
+                                                    'page.notificacio.detail.dades.enviaments.registre.registreOficinaNom'
+                                                ),
+                                            },
+                                            {
+                                                field: 'registreLlibreNom', // TODO
+                                                label: t(
+                                                    'page.notificacio.detail.dades.enviaments.registre.registreLlibreNom'
+                                                ),
+                                            },
+                                        ]}
+                                        fields={apiCurrentFields}
+                                        data={enviament}
+                                        sx={{ mb: 1 }}
+                                    /> // TODO: s'ha de posar un boto de justificant despres de sa taula Linia 868 de notificacioInfo.jsp
+                                ) : (
+                                    <Typography>
+                                        {t(
+                                            'page.notificacio.detail.dades.enviaments.registre.registreLlibreNom'
+                                        )}
+                                    </Typography>
+                                );
+                            },
+                        },
+                        {
+                            field: 'certificacio',
+                            label: t(
+                                'page.notificacio.detail.dades.enviaments.registre.certificacio'
+                            ),
+                            valueRenderer: () => {
+                                return enviament?.notificaCertificacioData ? (
+                                    <FieldsDataCard
+                                        rows={[
+                                            {
+                                                field: 'notificaCertificacioData',
+                                                label: t(
+                                                    'page.notificacio.detail.dades.enviaments.registre.notificaCertificacioData'
+                                                ),
+                                            },
+                                            {
+                                                field: 'notificaCertificacioMime',
+                                                label: t(
+                                                    'page.notificacio.detail.dades.enviaments.registre.notificaCertificacioMime'
+                                                ),
+                                            },
+                                            {
+                                                field: 'notificaCertificacioOrigen',
+                                                label: t(
+                                                    'page.notificacio.detail.dades.enviaments.registre.notificaCertificacioOrigen'
+                                                ),
+                                            },
+                                            {
+                                                field: 'notificaCertificacioMetadades',
+                                                label: t(
+                                                    'page.notificacio.detail.dades.enviaments.registre.notificaCertificacioMetadades'
+                                                ),
+                                            },
+                                            {
+                                                field: 'notificaCertificacioCsv',
+                                                label: t(
+                                                    'page.notificacio.detail.dades.enviaments.registre.notificaCertificacioCsv'
+                                                ),
+                                            },
+                                            {
+                                                field: 'notificaCertificacioTipus',
+                                                label: t(
+                                                    'page.notificacio.detail.dades.enviaments.registre.notificaCertificacioTipus'
+                                                ),
+                                            },
+                                            {
+                                                field: 'notificaCertificacioArxiuTipus',
+                                                label: t(
+                                                    'page.notificacio.detail.dades.enviaments.registre.notificaCertificacioArxiuTipus'
+                                                ),
+                                            },
+                                            {
+                                                field: 'notificaCertificacioNumSeguiment',
+                                                label: t(
+                                                    'page.notificacio.detail.dades.enviaments.registre.notificaCertificacioNumSeguiment'
+                                                ),
+                                            },
+                                        ]}
+                                        fields={apiCurrentFields}
+                                        data={enviament}
+                                        sx={{ mb: 1 }}
+                                    /> // TODO: s'ha de posar un boto de justificant despres de sa taula Linia 960 de notificacioInfo.jsp
+                                ) : (
+                                    <Typography>
+                                        {t(
+                                            'page.notificacio.detail.dades.enviaments.registre.noCertificacio'
+                                        )}
+                                    </Typography>
+                                );
+                            },
+                        },
+                    ]}
+                    fields={apiCurrentFields}
+                    data={enviament}
+                    sx={{ mb: 1 }}
+                />
+            ))}
+        </>
+    );
+};
+
+const NotificacioDetailDialogTabDades: React.FC<PropsTabDades> = (props) => {
+    const { notificacio, apiCurrentFields } = props;
     const { t } = useTranslation();
     const procedimentTipusField = apiCurrentFields?.find((f) => f?.name === 'procedimentTipus');
 
     return (
-        <>
+        <Box sx={{ height: '100%', overflowY: 'auto', minHeight: 0 }}>
             <FieldsDataCard
                 title={t('page.notificacio.detail.dades.title')}
                 rows={[
@@ -130,26 +446,59 @@ const NotificacioDetailDialogTabDades: React.FC<{
                         field: 'concepte',
                     },
                     {
-                        field: 'idioma',
+                        field: 'descripcio',
                     },
                     {
-                        field: 'createdBy',
+                        field: 'idioma',
                     },
                     {
                         field: 'createdDate',
                     },
                     {
+                        field: 'createdBy', // TODO
+                        valueRenderer: () => {
+                            return (
+                                <>
+                                    {notificacio.tipusUsuari === 'INTERFICIE_WEB' ? (
+                                        <Typography>{`${notificacio.createdBy.nom} (${notificacio.createdBy.codi}`}</Typography>
+                                    ) : (
+                                        <>
+                                            <Typography>
+                                                {` Aplicacio: ${notificacio.createdBy.nom} (${notificacio.createdBy.codi}`}
+                                            </Typography>
+                                            <Typography>
+                                                {` Usuari: ${notificacio.usuariNom} (${notificacio.usuariCodi}`}
+                                            </Typography>
+                                        </>
+                                    )}
+                                </>
+                            );
+                        },
+                    },
+                    {
                         field: 'enviadaDate',
+                    },
+                    {
+                        field: 'enviamentDataProgramada',
+                    },
+                    {
+                        field: 'estatDate',
+                    },
+                    {
+                        field: 'estatProcessatDate',
                     },
                     {
                         field: 'caducitat',
                         formatOptions: { noTime: true },
                     },
                     {
+                        field: 'caducitatOriginal',
+                    },
+                    {
                         field: 'retard',
                     },
                     {
-                        field: 'estat',
+                        field: 'estat', // TODO
                         valueRenderer: (_value: any, formattedValue: string) => {
                             return (
                                 <>
@@ -162,7 +511,7 @@ const NotificacioDetailDialogTabDades: React.FC<{
                                                 fontSize: 16,
                                             }}
                                         >
-                                            schedule
+                                            rocket_launch
                                         </Icon>
                                         {formattedValue}
                                     </Typography>
@@ -175,14 +524,42 @@ const NotificacioDetailDialogTabDades: React.FC<{
                 data={notificacio}
                 sx={{ mb: 1 }}
             />
+
+            {/* TODO: Condicio del botó justificant
+            ${!notificacio.hasEnviamentsPendents || notificacio.estat == 'FINALITZADA_AMB_ERRORS'} */}
             <Box sx={{ textAlign: 'right' }}>
                 <Button variant="outlined" startIcon={<Icon>file_download</Icon>}>
                     {t('page.notificacio.detail.dades.justificant')}
                 </Button>
             </Box>
-            <NotificacioDetailDialogTabDocuments id={id} />
-            <NotificacioDetailDialogTabEnviaments id={id} />
-        </>
+
+            <TableGrup
+                notificacio={notificacio}
+                apiCurrentFields={apiCurrentFields}
+            />
+
+            <TableDocuments
+                apiCurrentFields={apiCurrentFields}
+                notificacio={notificacio}
+            />
+
+            {notificacio?.operadorPostalInfo && (
+                <>
+                    <TableOperadorPostal
+                        apiCurrentFields={apiCurrentFields}
+                        notificacio={notificacio}
+                    />
+                    <TableCie
+                        apiCurrentFields={apiCurrentFields}
+                        notificacio={notificacio}
+                    />
+                    <TableEnviaments
+                        apiCurrentFields={apiCurrentFields}
+                        notificacio={notificacio}
+                    />
+                </>
+            )}
+        </Box>
     );
 };
 
