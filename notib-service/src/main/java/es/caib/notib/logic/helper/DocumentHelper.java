@@ -9,6 +9,7 @@ import es.caib.notib.logic.intf.dto.DocumentValidDto;
 import es.caib.notib.logic.intf.dto.SignatureInfoDto;
 import es.caib.notib.logic.intf.dto.notificacio.Document;
 import es.caib.notib.logic.intf.util.MimeUtils;
+import es.caib.notib.logic.utils.SignatureUtil;
 import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.repository.DocumentRepository;
 import es.caib.plugins.arxiu.api.DocumentContingut;
@@ -180,6 +181,12 @@ public class DocumentHelper {
         var contingut = Base64.decodeBase64(document.getContingutBase64());
         var mediaType = MimeUtils.getMimeTypeFromContingut(document.getArxiuNom(), contingut);
         var isPdf = MediaType.APPLICATION_PDF_VALUE.equals(mediaType);
+        try {
+            validarFirma = SignatureUtil.checkIfSignedAttached(contingut, mediaType);
+        } catch (Exception ex) {
+            dto.setErrorFirma(true);
+            dto.setErrorFirmaMsg(ex.getMessage());
+        }
         if (isPdf && isValidaFirmaRestEnabled() && validarFirma) {
             SignatureInfoDto signatureInfo = pluginHelper.detectSignedAttachedUsingValidateSignaturePlugin(contingut, document.getArxiuNom(), mediaType);
             if (signatureInfo.isError()) {

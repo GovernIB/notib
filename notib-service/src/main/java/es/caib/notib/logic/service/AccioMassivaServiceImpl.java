@@ -166,7 +166,7 @@ public class AccioMassivaServiceImpl implements AccioMassivaService {
         accioEntity.setDataInici(new Date());
         FitxerDto fitxer = null;
         try {
-            fitxer = enviamentService.exportacio(accio.getEntitatId(), accio.getSeleccio(), accio.getFormat());
+            fitxer = enviamentService.exportacio(accio);
             for (var element :  accioEntity.getElements()) {
                 element.actualitzar();
             }

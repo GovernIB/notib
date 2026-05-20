@@ -185,7 +185,7 @@ public class EmailNotificacioHelperTest {
 		Mockito.when(enviamentMock.getUuid()).thenReturn("48bd0894-0a40-48e1-8ffb-8f2c6c11f0d0");
 		Mockito.when(enviamentMock.getNotificaEstatData()).thenReturn(new Date());
 
-		var text = emailNotificacioHelper.getMailHtmlBody(enviamentMock);
+		var text = emailNotificacioHelper.getMailHtmlBody(enviamentMock, true, true);
 		System.out.println(text);
 
 	}
@@ -235,7 +235,7 @@ public class EmailNotificacioHelperTest {
 		Mockito.when(enviamentMock.getTitular()).thenReturn(persona);
 		Mockito.when(enviamentMock.getNotificaReferencia()).thenReturn("48bd0894-0a40-48e1-8ffb-8f2c6c11f0d0");
 		// When
-		String resposta = emailNotificacioHelper.prepararEnvioEmailNotificacio(enviamentMock);
+		String resposta = emailNotificacioHelper.prepararEnvioEmailNotificacio(enviamentMock, false);
 		
 		// Then
 		Mockito.verify(grupRepository, Mockito.times(0)).findByCodiAndEntitat(Mockito.anyString(), Mockito.any(EntitatEntity.class));

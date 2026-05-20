@@ -3,6 +3,7 @@ package es.caib.notib.logic.intf.util;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.AcroFields;
 import com.itextpdf.text.pdf.PdfArray;
 import com.itextpdf.text.pdf.PdfDictionary;
 import com.itextpdf.text.pdf.PdfName;
@@ -14,10 +15,18 @@ import com.itextpdf.text.pdf.parser.PdfImageObject;
 import com.itextpdf.text.pdf.parser.PdfReaderContentParser;
 import com.itextpdf.text.pdf.parser.RenderListener;
 import com.itextpdf.text.pdf.parser.TextRenderInfo;
+import com.itextpdf.text.pdf.security.PdfPKCS7;
+import es.caib.notib.logic.intf.exception.NotFoundException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -46,6 +55,72 @@ public class PdfUtils extends PdfReader {
             maxRightMarginOk = maxRightMarginOk || checkRightMargin(pageNumber, requiredRightMargin);
             loopAnnotations(pageNumber);
         }
+    }
+
+    public static int getNumberOfSignaturesInPDF(byte[] contingut) throws Exception {
+
+        File tempFile = null;
+        try {
+            tempFile = File.createTempFile("tempFile", ".tmp");
+            tempFile.deleteOnExit();
+            // Write the byte array to the temporary file
+            try (var fos = new FileOutputStream(tempFile)) {
+                fos.write(contingut);
+
+                try (FileInputStream is = new FileInputStream(tempFile)) {
+                    return PdfUtils.getNumberOfSignaturesInPDF(is);
+                } catch (IOException ex) {
+                    var msg = "No s'ha trobat el fitxer " + tempFile.getAbsolutePath();
+                    log.error(msg, ex);
+                    throw new Exception(msg, ex);
+                }
+            }
+        } catch (Exception ex) {
+            var msg = "[PdfUtils] Error obtinguent el nombre de signatures del PDF";
+            log.error(msg, ex);
+            throw new Exception(msg, ex);
+        } finally {
+            if (tempFile != null) {
+                tempFile.delete();
+            }
+        }
+    }
+
+    public static int getNumberOfSignaturesInPDF(InputStream pdfis) {
+
+        try {
+            PdfReader reader;
+            try {
+                reader = new PdfReader(pdfis);
+            } catch (IOException e1) {
+                throw new IOException("Error llegint PDF firmat: " + e1.getMessage());
+            }
+            return getNumberOfSignaturesInPDF(reader);
+        } catch (Throwable e) {
+            log.error("Error desconegut intentant obtenir numero de firmes d'un PDF: " + e.getMessage());
+            return 0;
+        }
+    }
+
+    public static int getNumberOfSignaturesInPDF(PdfReader reader) {
+
+        var af = reader.getAcroFields();
+        var names = af.getSignatureNames();
+        if (names == null || names.isEmpty()) {
+            return 0;
+        }
+        // Calculam només les firmes sense els Segells de Temps
+        var totalNomesFirmes = 0;
+        String name;
+        PdfPKCS7 pk;
+        for (int i = names.size() - 1; i >= 0; i--) {
+            name = names.get(i);
+            pk = af.verifySignature(name);
+            if (!pk.isTsp()) {
+                totalNomesFirmes++;
+            }
+        }
+        return totalNomesFirmes;
     }
 
     public boolean versionGreaterThan(String version) {

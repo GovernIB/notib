@@ -63,6 +63,7 @@ import es.caib.notib.logic.plugin.cie.CiePluginJms;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.logic.intf.util.DatesUtils;
+import es.caib.notib.logic.utils.SignatureUtil;
 import es.caib.notib.persist.entity.CallbackEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
@@ -92,6 +93,7 @@ import es.caib.plugins.arxiu.api.Document;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
+import org.fundaciobit.pluginsib.utils.signature.SignatureCommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -2111,14 +2113,46 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			var info = pluginHelper.detectSignedAttachedUsingValidateSignaturePlugin(contingut, nom, contentType);
-			return info;
+			var teSignatura = SignatureUtil.checkIfSignedAttached(contingut, contentType);
+			return teSignatura ? pluginHelper.detectSignedAttachedUsingValidateSignaturePlugin(contingut, nom, contentType) : SignatureInfoDto.builder().build();
 		} catch (Exception ex) {
-			log.error("Error detectant la signatura", ex);
-			throw ex;
+			return SignatureInfoDto.builder().error(true).errorMsg(ex.getMessage()).build();
 		} finally {
 			metricsHelper.fiMetrica(timer);
+
 		}
+//		try {
+//			try {
+//				SignatureCommonUtils.getXAdESMode(contingut, false);
+//			} catch (Exception ex) {
+//				log.error("XADES error ", ex);
+//				var error = "No es pot determinar el mode de signatura";
+//				if (ex.getMessage().contains(error) || Arrays.toString(ex.getStackTrace()).contains(error)) {
+//					NotibLogger.getInstance().info("XADES error: " + ex.getMessage(), log, LoggingTipus.VALIDATE_SIGNATURE);
+//					return SignatureInfoDto.builder().build();
+//				}
+//			}
+//			try {
+//				SignatureCommonUtils.getCAdESMode(contingut);
+//			} catch (Exception ex) {
+//				var error = "Malformed content";
+//				if (ex.getMessage().contains(error) || Arrays.toString(ex.getStackTrace()).contains(error)) {
+//					NotibLogger.getInstance().info("CADES error: " + ex.getMessage(), log, LoggingTipus.VALIDATE_SIGNATURE);
+//					return SignatureInfoDto.builder().build();
+//				}
+//			}
+//			var numSignatures = PdfUtils.getNumberOfSignaturesInPDF(contingut);
+//			if ("application/pdf".equals(contentType) && numSignatures <= 0) {
+//				return SignatureInfoDto.builder().build();
+//			}
+//			var info = pluginHelper.detectSignedAttachedUsingValidateSignaturePlugin(contingut, nom, contentType);
+//			return info;
+//		} catch (Exception ex) {
+//			log.error("Error detectant la signatura", ex);
+//			return SignatureInfoDto.builder().error(true).errorMsg(ex.getMessage()).build();
+//		} finally {
+//			metricsHelper.fiMetrica(timer);
+//		}
     }
 
 	@Override

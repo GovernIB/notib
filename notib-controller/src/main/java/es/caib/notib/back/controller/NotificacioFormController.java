@@ -427,11 +427,11 @@ public class NotificacioFormController extends BaseUserController {
         var nom = fitxer.getOriginalFilename();
         var content = fitxer.getBytes();
         var contentType = fitxer.getContentType();
-        var contingutBase64 = Base64.encodeBase64String(content);
+//        var contingutBase64 = Base64.encodeBase64String(content);
         var firma = FirmaValid.builder().nom(nom).mida(fitxer.getSize()).mediaType(fitxer.getContentType()).build();
-        if (!FileHelper.isPdf(contingutBase64)) {
-            return DocumentValidacio.builder().validacioFirma(firma).build();
-        }
+//        if (!FileHelper.isPdf(contingutBase64)) {
+//            return DocumentValidacio.builder().validacioFirma(firma).build();
+//        }
         var signatureInfo = notificacioService.checkIfSignedAttached(content, nom, contentType);
         firma.setSigned(signatureInfo.isSigned());
         firma.setError(signatureInfo.isError());

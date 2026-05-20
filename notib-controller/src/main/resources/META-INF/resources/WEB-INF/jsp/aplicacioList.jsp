@@ -83,6 +83,12 @@
 						{{if activa}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
+				<th data-col-name="aplicarLimitEnviaments" data-template="#cellLimitEnviamentsActiu">
+					<spring:message code="aplicacio.list.columna.aplicar.limit.enviaments"/>
+					<script id="cellLimitEnviamentsActiu" type="text/x-jsrender">
+						{{if aplicarLimitEnviaments}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
 				<th data-col-name="headerCsrf" data-template="#cellHeaderCsrfTemplate">
 					<spring:message code="aplicacio.list.columna.header.csrf"/>
 					<script id="cellHeaderCsrfTemplate" type="text/x-jsrender">
