@@ -14,6 +14,7 @@ import es.caib.notib.logic.intf.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificaDomiciliTipusEnumDto;
 import es.caib.notib.logic.intf.dto.cie.CieCertificacioArxiuTipus;
 import es.caib.notib.logic.intf.dto.cie.CieCertificacioTipus;
+import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 import es.caib.notib.logic.intf.model.validator.TitularIncapacitatObligatoriRepresentant;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,9 +40,17 @@ import java.util.Date;
 	accessConstraints = @ResourceAccessConstraint(
 		type = ResourceAccessConstraint.ResourceAccessConstraintType.AUTHENTICATED,
 		grantedPermissions = { PermissionEnum.READ, PermissionEnum.CREATE }
-	)
+	),
+	artifacts = {
+		@ResourceArtifact(
+			type = ResourceArtifactType.REPORT,
+			code = EntregaPostalResource.REPORT_DESCARREGAR_CIE_CERTIFICACIO
+		),
+	}
 )
 public class EntregaPostalResource extends BaseResource<Long> {
+
+	public static final String REPORT_DESCARREGAR_CIE_CERTIFICACIO = "DESCARREGAR_CIE_CERTIFICACIO";
 
 	private NotificaDomiciliTipusEnumDto domiciliTipus;
 	private NotificaDomiciliConcretTipus domiciliConcretTipus;

@@ -2,6 +2,7 @@ import { Alert, Box, Button, Icon } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FieldsDataCard } from '../../components/DataCard';
+import {MuiActionReportButton} from "reactlib";
 
 const EnviamentDetailTabEntregaPostal: React.FC<{
     enviament: any;
@@ -37,9 +38,7 @@ const EnviamentDetailTabEntregaPostal: React.FC<{
                                     variant="outlined"
                                     sx={{ textTransform: 'none' }}
                                 >
-                                    {t(
-                                        'page.enviament.detail.tab.entregaPostal.cancelarEntregaPostal'
-                                    )}
+                                    {t('page.enviament.detail.tab.entregaPostal.cancelarEntregaPostal')}
                                 </Button>
                             )}
                             <Button
@@ -69,10 +68,8 @@ const EnviamentDetailTabEntregaPostal: React.FC<{
                                 label: t('page.enviament.detail.tab.entregaPostal.cieId'),
                             },
                             {
-                                field: 'entregaPostalInfo.cieDatatErrorDescripcio', // TODO CIE_DATAT_ERRDES o CIE_ERROR_DESC
-                                label: t(
-                                    'page.enviament.detail.tab.entregaPostal.cieDatatErrorDescripcio'
-                                ),
+                               field: 'entregaPostalInfo.cieDatatErrorDescripcio',
+                                label: t('page.enviament.detail.tab.entregaPostal.cieDatatErrorDescripcio'),
                             },
                             {
                                 field: 'entregaPostalInfo.cieDatatOrigen',
@@ -86,19 +83,12 @@ const EnviamentDetailTabEntregaPostal: React.FC<{
                             },
                             {
                                 field: 'entregaPostalInfo.cieDatatReceptorNom',
-                                label: t(
-                                    'page.enviament.detail.tab.entregaPostal.cieDatatReceptorNom'
-                                ),
+                                label: t('page.enviament.detail.tab.entregaPostal.cieDatatReceptorNom'),
                             },
                             {
                                 field: 'entregaPostalInfo.cieDatatNumSeguiment',
-                                label: t(
-                                    'page.enviament.detail.tab.entregaPostal.cieDatatNumSeguiment'
-                                ),
+                                label: t('page.enviament.detail.tab.entregaPostal.cieDatatNumSeguiment'),
                             },
-                            // {
-                            //     field: 'entregaPostalInfo.cieDatatErrorDescripcio', // TODO CIE_DATAT_ERRDES o CIE_ERROR_DESC
-                            // },
                         ]}
                         fields={apiCurrentFields}
                         data={enviament}
@@ -111,57 +101,54 @@ const EnviamentDetailTabEntregaPostal: React.FC<{
                                 {
                                     field: 'entregaPostalInfo.cieCertificacioData',
                                     alwaysVisible: true,
-                                    label: t(
-                                        'page.enviament.detail.tab.entregaPostal.cieCertificacioData'
-                                    ),
+                                    label: t('page.enviament.detail.tab.entregaPostal.cieCertificacioData'),
                                 },
                                 {
                                     field: 'entregaPostalInfo.cieCertificacioMime',
-                                    label: t(
-                                        'page.enviament.detail.tab.entregaPostal.cieCertificacioMime'
-                                    ),
+                                    label: t('page.enviament.detail.tab.entregaPostal.cieCertificacioMime'),
                                 },
                                 {
                                     field: 'entregaPostalInfo.cieCertificacioOrigen',
-                                    label: t(
-                                        'page.enviament.detail.tab.entregaPostal.cieCertificacioOrigen'
-                                    ),
+                                    label: t('page.enviament.detail.tab.entregaPostal.cieCertificacioOrigen'),
                                 },
                                 {
                                     field: 'entregaPostalInfo.cieCertificacioMetadades',
-                                    label: t(
-                                        'page.enviament.detail.tab.entregaPostal.cieCertificacioMetadades'
-                                    ),
+                                    label: t('page.enviament.detail.tab.entregaPostal.cieCertificacioMetadades'),
                                 },
                                 {
                                     field: 'entregaPostalInfo.cieCertificacioCsv',
-                                    label: t(
-                                        'page.enviament.detail.tab.entregaPostal.cieCertificacioCsv'
-                                    ),
+                                    label: t('page.enviament.detail.tab.entregaPostal.cieCertificacioCsv'),
                                 },
                                 {
                                     field: 'entregaPostalInfo.cieCertificacioTipus',
-                                    label: t(
-                                        'page.enviament.detail.tab.entregaPostal.cieCertificacioTipus'
-                                    ),
+                                    label: t('page.enviament.detail.tab.entregaPostal.cieCertificacioTipus'),
                                 },
                                 {
                                     field: 'entregaPostalInfo.cieCertificacioArxiuTipus',
-                                    label: t(
-                                        'page.enviament.detail.tab.entregaPostal.cieCertificacioArxiuTipus'
-                                    ),
+                                    label: t('page.enviament.detail.tab.entregaPostal.cieCertificacioArxiuTipus'),
                                 },
                                 {
                                     field: 'entregaPostalInfo.cieCertificacioNumSeguiment',
-                                    label: t(
-                                        'page.enviament.detail.tab.entregaPostal.cieCertificacioNumSeguiment'
-                                    ),
+                                    label: t('page.enviament.detail.tab.entregaPostal.cieCertificacioNumSeguiment'),
                                 },
                                 {
-                                    field: 'entregaPostalInfo.cieCertificacioArxiuNom', // TODO: Ha de descargar l'arxiu
-                                    label: t(
-                                        'page.enviament.detail.tab.entregaPostal.cieCertificacioArxiuNom'
-                                    ),
+                                    field: 'entregaPostalInfo.cieCertificacioArxiuNom',
+                                    label: t('page.enviament.detail.tab.entregaPostal.cieCertificacioArxiuNom'),
+                                    valueRenderer: (_value: any, formattedValue: string) => {
+                                        return (<Box display="flex" justifyContent="space-between">
+                                                    {formattedValue}
+                                                    <Box display="flex" justifyContent="flex-end">
+                                                        <MuiActionReportButton
+                                                            id={enviament.id}
+                                                            resourceName={"notificacioEnviamentResource"}
+                                                            report="DESCARREGAR_CIE_CERTIFICACIO"
+                                                            reportFileType="CUSTOM"
+                                                            title={t('page.enviament.detail.tab.entregaPostal.descarregarCertificacio')}
+                                                            buttonComponentProps={{ variant: 'outlined', sx: { mr: 1 } }}
+                                                            buttonIcon="download"/>
+                                                    </Box>
+                                                </Box>)
+                                    }
                                 },
                             ]}
                             fields={apiCurrentFields}

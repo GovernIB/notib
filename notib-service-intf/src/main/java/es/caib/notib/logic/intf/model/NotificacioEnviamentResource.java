@@ -78,6 +78,11 @@ import java.util.List;
 					)
 				}
 			),
+		@ResourceArtifact(
+			type = ResourceArtifactType.REPORT,
+			code = EntregaPostalResource.REPORT_DESCARREGAR_CIE_CERTIFICACIO,
+			requiresId = true
+		),
 	}
 )
 @CustomValidation.List({
@@ -92,6 +97,7 @@ public class NotificacioEnviamentResource extends BaseResource<Long> {
 	public static final String PERSPECTIVE_ENTREGA_POSTAL = "ENTREGA_POSTAL";
 	public static final String REPORT_DESCARREGAR_DIAGRAMA_STATE_MACHINE = "DESCARREGAR_DIAGRAMA_STATE_MACHINE";
 	public static final String ACTION_REFRESCAR_ESTAT_NOTIFICA = "REFRESCAR_ESTAT_NOTIFICA";
+	public static final String REPORT_DESCARREGAR_CIE_CERTIFICACIO = "DESCARREGAR_CIE_CERTIFICACIO";
 
 	@NotNull
 	private ServeiTipus serveiTipus = ServeiTipus.NORMAL;

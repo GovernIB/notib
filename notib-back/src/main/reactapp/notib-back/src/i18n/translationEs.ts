@@ -505,6 +505,7 @@ const translationEs = {
                         cieCertificacioArxiuTipus: "Tipos de archivo",
                         cieCertificacioNumSeguiment: "Núm. seguimiento",
                         cieCertificacioArxiuNom: "Documento",
+                        descarregarCertificacio: 'Descarregar'
                     },
                     registreEsdev: {
                         title: 'Registro de acontecimientos',

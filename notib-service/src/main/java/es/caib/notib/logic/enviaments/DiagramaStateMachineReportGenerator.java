@@ -28,18 +28,20 @@ public class DiagramaStateMachineReportGenerator implements BaseReadonlyResource
 	@Override
 	public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
 
-		var input = this.getClass().getClassLoader().getResourceAsStream("es/caib/notib/logic/statemachine/diagramaStateMachine.png");
+
 		var nom = "diagramaStateMachine.png";
+		var mimeType = "image/png";
+		var input = this.getClass().getClassLoader().getResourceAsStream("es/caib/notib/logic/statemachine/" + nom);
 		if (input == null) {
-			log.error("Error generant InputStream per diagramaStatemachine.png");
-			return DownloadableFile.builder().name(nom).content(new byte[]{}).contentType("image/png").build();
+			log.error("Error generant InputStream per " + nom);
+			return DownloadableFile.builder().name(nom).content(new byte[]{}).contentType(mimeType).build();
 		}
 		try {
 			var content = IOUtils.toByteArray(input);
-			return DownloadableFile.builder().name("diagramaStateMachine.png").content(content).contentType("image/png").build();
+			return DownloadableFile.builder().name(nom).content(content).contentType(mimeType).build();
 		} catch (Exception ex) {
-			log.error("Error convertint a byte[] l'InputStream per diagramaStatemachine.png");
-			return DownloadableFile.builder().name("diagramaStateMachine.png").content(new byte[]{}).contentType("image/png").build();
+			log.error("Error convertint a byte[] l'InputStream per " + nom);
+			return DownloadableFile.builder().name(nom).content(new byte[]{}).contentType(mimeType).build();
 		}
 	}
 

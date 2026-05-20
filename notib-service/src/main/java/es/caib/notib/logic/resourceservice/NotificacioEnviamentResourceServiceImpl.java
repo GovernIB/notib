@@ -3,10 +3,13 @@ package es.caib.notib.logic.resourceservice;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.enviaments.DiagramaStateMachineReportGenerator;
+import es.caib.notib.logic.enviaments.EntregaPostalCertificacioReportGenerator;
 import es.caib.notib.logic.enviaments.EntregaPostalPerspectiveApplicator;
 import es.caib.notib.logic.enviaments.RefrescarEstatNotificaActionExecutor;
 import es.caib.notib.logic.enviaments.TitularPerspectiveApplicator;
+import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
+import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
@@ -43,12 +46,15 @@ public class NotificacioEnviamentResourceServiceImpl
 	private final UserSessionHelper userSessionHelper;
 	private final AuthenticationHelper authenticationHelper;
 	private final NotibPermissionHelper notibPermissionHelper;
+	private final PluginHelper pluginHelper;
+	private final MetricsHelper metricsHelper;
 
 	@PostConstruct
 	public void init() {
 		register(NotificacioEnviamentResource.PERSPECTIVE_TITULAR, new TitularPerspectiveApplicator());
 		register(NotificacioEnviamentResource.PERSPECTIVE_ENTREGA_POSTAL, new EntregaPostalPerspectiveApplicator());
 		register(NotificacioEnviamentResource.REPORT_DESCARREGAR_DIAGRAMA_STATE_MACHINE, new DiagramaStateMachineReportGenerator());
+		register(NotificacioEnviamentResource.REPORT_DESCARREGAR_CIE_CERTIFICACIO, new EntregaPostalCertificacioReportGenerator(pluginHelper, metricsHelper));
 		register(NotificacioEnviamentResource.ACTION_REFRESCAR_ESTAT_NOTIFICA, new RefrescarEstatNotificaActionExecutor());
 	}
 
