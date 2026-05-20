@@ -11,16 +11,23 @@ import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.exception.ResourceNotCreatedException;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
+import es.caib.notib.logic.intf.dto.CallbackEstatEnumDto;
+import es.caib.notib.logic.intf.dto.NotificacioErrorTipusEnumDto;
+import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.model.*;
 import es.caib.notib.logic.intf.resourceservice.NotificacioResourceService;
+import es.caib.notib.logic.intf.util.DatesUtils;
 import es.caib.notib.logic.notificacions.DocumentPerspectiveApplicator;
 import es.caib.notib.logic.notificacions.EnviamentPerspectiveApplicator;
 import es.caib.notib.logic.notificacions.GrupPerspectiveApplicator;
 import es.caib.notib.logic.notificacions.OperadorPostalCiePerspectiveApplicator;
+import es.caib.notib.persist.entity.NotificacioEventEntity;
 import es.caib.notib.persist.resourceentity.*;
+import es.caib.notib.persist.resourcerepository.CallbackResourceRepository;
 import es.caib.notib.persist.resourcerepository.DocumentResourceRepository;
+import es.caib.notib.persist.resourcerepository.EventResourceRepository;
 import es.caib.notib.persist.resourcerepository.NotificacioEnviamentResourceRepository;
 import es.caib.notib.persist.resourcerepository.PersonaResourceRepository;
 import es.caib.notib.persist.resourcerepository.ProcedimentOrganGestorResourceRepository;
@@ -31,6 +38,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -52,14 +60,19 @@ public class NotificacioResourceServiceImpl
 	private final UserSessionHelper userSessionHelper;
 	private final AuthenticationHelper authenticationHelper;
 	private final LegacyHelper legacyHelper;
+	private final ConfigHelper configHelper;
+	private final MessageHelper messageHelper;
 	private final NotibPermissionHelper notibPermissionHelper;
 	private final NotificacioEnviamentResourceRepository notificacioEnviamentResourceRepository;
+	private final EventResourceRepository eventResourceRepository;
 	private final DocumentResourceRepository documentResourceRepository;
+	private final CallbackResourceRepository callbackResourceRepository;
 	private final PersonaResourceRepository personaResourceRepository;
 	private final ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository;
 
 	@PostConstruct
 	public void init() {
+
 		register(null, new NotificacioResourceServiceImpl.InitOnChangeLogicProcessor());
 		register(NotificacioResource.Fields.organGestor, new NotificacioResourceServiceImpl.OrganGestorOnChangeLogicProcessor());
 		register(NotificacioResource.Fields.caducitat, new NotificacioResourceServiceImpl.CaducitatOnChangeLogicProcessor());
@@ -71,7 +84,116 @@ public class NotificacioResourceServiceImpl
 	}
 
 	@Override
+	protected void afterConversion(NotificacioResourceEntity entity, NotificacioResource resource) {
+
+		var enviamentsPendentsNotifica = notificacioEnviamentResourceRepository.findEnviamentsPendentsNotificaByNotificacio(entity);
+		resource.setHasEnviamentsPendents(enviamentsPendentsNotifica != null && !enviamentsPendentsNotifica.isEmpty());
+		var llindarDies = configHelper.getConfigAsInteger("es.caib.notib.llindar.dies.enviament.remeses");
+		resource.setNotificacioAntiga(DatesUtils.isNowAfterDate(entity.getCreatedDate(), llindarDies));
+		//CALLBACKS
+		var pendents = callbackResourceRepository.findByNotificacioIdAndEstatOrderByDataDesc(entity.getId(), CallbackEstatEnumDto.PENDENT);
+		resource.setEventsCallbackPendent(entity.isTipusUsuariAplicacio() && pendents != null && !pendents.isEmpty());
+		var data = pendents != null && !pendents.isEmpty() && pendents.get(0).getData() != null ? pendents.get(0).getData() : null;
+		resource.setDataCallbackPendent(data);
+		int callbackFiReintents = 0;
+		NotificacioEnviamentResourceEntity enviament;
+		var motiuAnulacio = "";
+		var entregaPostal = false;
+		EventResourceEntity eventError;
+		CallbackResourceEntity callback;
+		List<EventResourceEntity> eventNotMovil;
+		List<EventResourceEntity> lastErrorEvent = new ArrayList<>();
+		for (var enviamentResource : entity.getEnviaments()) {
+			enviament = notificacioEnviamentResourceRepository.findById(enviamentResource.getId()).get();
+			if (entity.isComunicacioSir()) {
+				resource.setRegistreEstat(enviament.getRegistreEstat());
+			}
+			if (!entregaPostal && enviament.getEntregaPostal() != null) {
+				entregaPostal = true;
+			}
+			boolean plazoAmpliado = resource.isPlazoAmpliado();
+			resource.setPlazoAmpliado(plazoAmpliado || enviament.isPlazoAmpliado());
+			boolean anulat = resource.isAnulat();
+			resource.setAnulat(anulat || enviament.isAnulat());
+			motiuAnulacio = enviament.getMotiuAnulacio();
+			eventError = enviament.getUltimEvent();
+			if (eventError != null && eventError.isError()) {
+				lastErrorEvent.add(eventError);
+			}
+			eventNotMovil = eventResourceRepository.findLastApiCarpetaByEnviamentId(enviament.getId());
+			if (eventNotMovil != null && !eventNotMovil.isEmpty() && eventNotMovil.get(0).isError()) {
+				resource.getNotificacionsMovilErrorDesc().add(eventNotMovil.get(0).getErrorDescripcio());
+			}
+			if (enviament
+				.isSirFiPooling()) {
+				resource.setFiReintents(true);
+				resource.setFiReintentsDesc(messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + NotificacioEventTipusEnumDto.SIR_FI_POOLING));
+			}
+			callback = callbackResourceRepository.findByEnviamentIdAndEstat(enviament.getId(), CallbackEstatEnumDto.ERROR);
+			if (callback == null) {
+				continue;
+			}
+			resource.setErrorLastCallback(callback.isError());
+			resource.setCallbackFiReintents(true);
+			resource.setCallbackFiReintentsDesc(messageHelper.getMessage("callback.fi.reintents"));
+			callbackFiReintents++;
+		}
+		resource.setMotiuAnulacio(motiuAnulacio);
+		if (resource.getNotificacionsMovilErrorDesc().size() > 1) {
+			List<String> desc = new ArrayList<>();
+			desc.add(messageHelper.getMessage("api.carpeta.send.notificacio.movil.error"));
+			resource.setNotificacionsMovilErrorDesc(desc);
+		}
+		if (callbackFiReintents > 0) {
+			resource.setCallbackFiReintents(true);
+			resource.setCallbackFiReintentsDesc(messageHelper.getMessage("callback.fi.reintents"));
+		}
+		if (!lastErrorEvent.isEmpty()) {
+			String msg = "";
+			String tipus = "";
+			StringBuilder m = new StringBuilder();
+			int env = 1;
+			var fiReintents = false;
+			for (var event : lastErrorEvent) {
+
+				msg = messageHelper.getMessage("notificacio.event.fi.reintents");
+				var et = NotificacioEventTipusEnumDto.SIR_CONSULTA.equals(event.getTipus()) && event.getEnviament().isSirFiPooling() ? NotificacioEventTipusEnumDto.SIR_FI_POOLING : event.getTipus();
+				tipus = messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + et);
+				m.append("Env ").append(env).append(": ").append(msg).append(" -> ").append(tipus).append("\n");
+				env++;
+				fiReintents = fiReintents || event.getFiReintents();
+				if (entregaPostal && NotificacioEventTipusEnumDto.CIE_ENVIAMENT.equals(event.getTipus())) {
+					resource.setErrorEntregaPostal(true);
+				}
+			}
+			resource.setFiReintentsDesc(m.toString());
+			resource.setFiReintents(fiReintents);
+			resource.setNotificaErrorDescripcio(lastErrorEvent.size() > 1 ? messageHelper.getMessage("error.notificacio.enviaments") : lastErrorEvent.get(0).getErrorDescripcio());
+			// TODO S'HA DE POSAR PER TOTS ELS EVENTS
+			resource.setNotificaErrorData(lastErrorEvent.get(0).getData());
+			resource.setNoticaErrorEventTipus(lastErrorEvent.get(0).getTipus());
+			// Obtenir error dels events
+			resource.setNotificaErrorTipus(getErrorTipus(lastErrorEvent.get(0)));
+		}
+	}
+
+	private NotificacioErrorTipusEnumDto getErrorTipus(EventResourceEntity lastErrorEvent) {
+
+		if (lastErrorEvent == null || !NotificacioEstatEnumDto.ENVIADA.equals(lastErrorEvent.getNotificacio().getEstat())) {
+			return null;
+		}
+		if (NotificacioEventTipusEnumDto.SIR_CONSULTA.equals(lastErrorEvent.getTipus()) && Boolean.TRUE.equals(lastErrorEvent.getFiReintents())) {
+			return NotificacioErrorTipusEnumDto.ERROR_REINTENTS_SIR;
+		}
+		if (NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA.equals(lastErrorEvent.getTipus()) && Boolean.TRUE.equals(lastErrorEvent.getFiReintents())) {
+			return NotificacioErrorTipusEnumDto.ERROR_REINTENTS_CONSULTA;
+		}
+		return null;
+	}
+
+	@Override
 	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+
 		// Condició per a mostrar només les notificacions de l'entitat actual
 		String entitatFilter = "entitat.id:" + userSessionHelper.getCurrentEntitatId();
 		boolean isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
@@ -102,6 +224,7 @@ public class NotificacioResourceServiceImpl
 		NotificacioResourceEntity entity,
 		NotificacioResource resource,
 		Map<String, AnswerRequiredException.AnswerValue> answers) {
+
 		entity.setUsuariCodi(authenticationHelper.getCurrentUserName());
 		entity.setEntitat(userSessionHelper.getCurrentEntitat());
 		entity.setEmisorDir3Codi(entity.getEntitat().getDir3Codi());
@@ -122,6 +245,7 @@ public class NotificacioResourceServiceImpl
 		NotificacioResource resource,
 		Map<String, AnswerRequiredException.AnswerValue> answers,
 		boolean anyOrderChanged) {
+
 		List<Long> enviamentsIds = new ArrayList<>();
 		if (resource.getEnviamentsInfo() != null) {
 			resource.getEnviamentsInfo().forEach(e -> {

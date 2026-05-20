@@ -204,6 +204,14 @@ public class NotificacioEnviamentResourceEntity extends BaseAuditableResourceEnt
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private EntregaPostalResourceEntity entregaPostal;
 
+	@Setter
+	@ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH})
+	@JoinColumn(name = "ultim_event",
+				referencedColumnName = "id",
+				foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "NOTEVENT_ULTIM_EVENT_FK"))
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	protected EventResourceEntity ultimEvent;
+
 
 	@Column(table = BaseConfig.DB_PREFIX + "notificacio_env_table", name = "ultim_event_data", insertable = false, updatable = false)
 	private LocalDateTime enviatDate;

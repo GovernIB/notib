@@ -80,7 +80,7 @@ import java.util.List;
 			),
 		@ResourceArtifact(
 			type = ResourceArtifactType.REPORT,
-			code = EntregaPostalResource.REPORT_DESCARREGAR_CIE_CERTIFICACIO,
+			code = NotificacioEnviamentResource.REPORT_DESCARREGAR_CIE_CERTIFICACIO,
 			requiresId = true
 		),
 	}
@@ -221,6 +221,7 @@ public class NotificacioEnviamentResource extends BaseResource<Long> {
 	private String procedimentCodi;
 	private String titularNom;
 	private String titularNif;
+	private boolean notificat;
 
 	public String getNotificaCertificacioArxiuNom() {
 		return !StringUtils.isEmpty(notificaReferencia) ?  "certificacio_" + notificaReferencia + ".pdf" : null;

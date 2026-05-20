@@ -2,6 +2,7 @@ package es.caib.notib.persist.resourceentity;
 
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.explotacio.EnviamentOrigen;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
@@ -10,6 +11,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumD
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.model.GrupResource;
 import es.caib.notib.logic.intf.model.NotificacioResource;
+import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -231,6 +233,27 @@ public class NotificacioResourceEntity
 //	@Formula("(select (case when t.entrega_postal = 1 then 1 else 0 end) from " + BaseConfig.DB_PREFIX + "notificacio_table t where t.id = id)")
 	@Transient
 	private boolean entregaPostal;
+
+	public boolean isTipusUsuariAplicacio() {
+		return this.tipusUsuari != null && this.tipusUsuari.equals(TipusUsuariEnumDto.APLICACIO);
+	}
+
+	public boolean isComunicacioSir() {
+		if (EnviamentTipus.SIR.equals(this.getEnviamentTipus())) {
+			return true;
+		}
+
+		if (!EnviamentTipus.COMUNICACIO.equals(this.getEnviamentTipus())) {
+			return false;
+		}
+
+		for(var enviament : this.getEnviaments()) {
+			if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 	@Builder
 	public NotificacioResourceEntity(NotificacioResource resource,

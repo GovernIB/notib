@@ -32,17 +32,17 @@ import static org.junit.Assert.*;
  */
 public class ClientRestv2Test extends ClientBaseTest {
 
-	//	private static final String URL = "http://localhost:8080/notib";
-	private static final String URL = "http://localhost:8080/notibapi";
+//		private static final String URL = "http://localhost:8080/notib";
+//	private static final String URL = "http://localhost:8080/notibapi";
 //	private static final String USERNAME = "admin";
 //	private static final String PASSWORD = "admin";
-	private static final String USERNAME = "u999000";
-	private static final String PASSWORD = "u999000";
+//	private static final String USERNAME = "u999000";
+//	private static final String PASSWORD = "u999000";
 
 
-//	private static final String URL = "https://dev.caib.es/notibapi";
-//	private static final String USERNAME = "$ripea_notib";
-//	private static final String PASSWORD = "ripea_notib";
+	private static final String URL = "https://dev.caib.es/notibapi";
+	private static final String USERNAME = "$ripea_notib_dev";
+	private static final String PASSWORD = "ripea_notib_dev";
 
 	// Indicar si el servidor esta configurat en mode síncron
 	private static final boolean SYNC_MODE = false;
@@ -195,12 +195,12 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertNull(resposta.getErrorDescripcio());
 	}
 
-	//	@Test
+		@Test
 	public void testConsultaJustificant() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 
 		// When
-		RespostaConsultaJustificantEnviament resposta = client.consultaJustificantEnviament("9550bf76-a283-4f95-bb20-d9feb82218ea");
+		RespostaConsultaJustificantEnviament resposta = client.consultaJustificantEnviament("6ecd3f66-f863-4e2e-911b-efcd592ea88b");
 		if (resposta.isError()) {
 			System.out.println(">>> Reposta amb error: " + resposta.getErrorDescripcio());
 		} else {

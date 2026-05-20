@@ -6,6 +6,9 @@ import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.logic.intf.base.annotation.ResourceArtifact;
 import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
 import es.caib.notib.logic.intf.base.validation.CustomValidation;
+import es.caib.notib.logic.intf.dto.NotificacioErrorTipusEnumDto;
+import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.explotacio.EnviamentOrigen;
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
@@ -29,6 +32,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -195,6 +199,24 @@ public class NotificacioResource extends BaseResource<Long> {
 	private PagadorPostalResource operadorPostalInfo;
 	private PagadorCieResource operadorCieInfo;
 	private GrupResource grupInfo;
+	private boolean notificacioAntiga;
+	private boolean hasEnviamentsPendents;
+	private boolean eventsCallbackPendent;
+	private boolean plazoAmpliado;
+	private boolean anulat;
+	private String motiuAnulacio;
+	private Date dataCallbackPendent;
+	private NotificacioRegistreEstatEnumDto registreEstat;
+	private List<String> notificacionsMovilErrorDesc = new ArrayList<>();
+	private boolean fiReintents;
+	private String fiReintentsDesc;
+	private boolean callbackFiReintents;
+	private String callbackFiReintentsDesc;
+	private boolean errorEntregaPostal;
+	private String notificaErrorDescripcio;
+	private NotificacioErrorTipusEnumDto notificaErrorTipus;
+	private NotificacioEventTipusEnumDto noticaErrorEventTipus;
+	private Date notificaErrorData;
 
 
 	@Getter

@@ -1,10 +1,13 @@
 package es.caib.notib.logic.notificacions;
 
+import es.caib.notib.client.domini.CieEstat;
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.base.service.BaseReadonlyResourceService;
 import es.caib.notib.logic.intf.base.exception.PerspectiveApplicationException;
 import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 import es.caib.notib.logic.intf.model.NotificacioResource;
 import es.caib.notib.logic.intf.model.PersonaResource;
+import es.caib.notib.persist.resourceentity.EntregaPostalResourceEntity;
 import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
 import es.caib.notib.persist.resourceentity.PersonaResourceEntity;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +37,13 @@ public class EnviamentPerspectiveApplicator implements BaseReadonlyResourceServi
 		NotificacioEnviamentResource enviament;
 		PersonaResource persona;
 		PersonaResourceEntity personaEntity;
+		var notificat = false;
+		EnviamentEstat notificaEstat;
+		EntregaPostalResourceEntity entregaPostal;
 		for (var env : enviamentsEntity) {
+			notificaEstat = env.getNotificaEstat();
+			entregaPostal = env.getEntregaPostal();
+			notificat = EnviamentEstat.NOTIFICADA.equals(notificaEstat) || entregaPostal != null && CieEstat.NOTIFICADA.name().equals(entregaPostal.getCieEstat());;
 			persona = crearPersona(env.getTitular());
 			enviament = NotificacioEnviamentResource.builder()
 //				.estat() //TODO MIRAR QUIN VALOR HA D'ANAR
@@ -48,6 +57,8 @@ public class EnviamentPerspectiveApplicator implements BaseReadonlyResourceServi
 				.registreMotiu(env.getRegistreMotiu())
 				.sirRecepcioData(env.getSirRecepcioData())
 				.sirRegDestiData(env.getSirRegDestiData())
+				.notificaEstat(env.getNotificaEstat())
+				.notificat(notificat)
 //				.registreOficinaNom		TODO
 //				.registreLlibreNom		TODO
 				.notificaCertificacioData(env.getNotificaCertificacioData())
