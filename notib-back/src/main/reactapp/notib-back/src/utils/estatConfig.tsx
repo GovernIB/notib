@@ -16,6 +16,7 @@ export interface MapConfigItem {
     icona?: React.ReactNode;
     color?: string;
 }
+
 // es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto
 export const NOTIFICACIO_ESTAT_ENUM_MAP: Record<string, MapConfigItem> = {
     PENDENT: {
@@ -331,4 +332,30 @@ export const ENVIAMENT_ESTAT_MAP: Record<string, MapConfigItem> = {
         ...ESTAT_TRAMITACIO_ENUM_MAP.ESTAT_FICTICI,
         translationKey: 'utils.estatConfig.ENVIAMENT_ESTAT_MAP.FINALITZADA_AMB_ERRORS',
     },
+};
+
+
+/** Genera el nom de la classe CSS basat en el color de l'estat d'una fila. */
+export const getGridRowColorClass = (rowEstat: string, estatEnumMap: Record<string, any>): string => {
+    const colorEstat = estatEnumMap[rowEstat]?.color;
+    return colorEstat ? `color-${colorEstat.replace('#', '')}` : '';
+};
+
+/**
+ * Genera de manera dinàmica l'objecte d'estils per a la propietat 'sx' del DataGrid
+ * a partir de qualsevol mapa d'estats que contingui colors, per posar-ho a l'inici de la fila.
+ */
+export const generateGridRowStylesFromMap = (estatEnumMap: Record<string, any>): Record<string, any> => {
+    return Object.values(estatEnumMap).reduce(
+        (acc, estat) => {
+            const colorNet = estat?.color?.replace('#', '');
+            if (colorNet) {
+                acc[`& .MuiDataGrid-row.color-${colorNet} .MuiDataGrid-cellCheckbox`] = {
+                    borderLeft: `3px solid ${estat?.color}`,
+                };
+            }
+            return acc;
+        },
+        {} as Record<string, any>
+    );
 };

@@ -17,6 +17,11 @@ import { useNotificacioDetailDialog } from '../notificacio/NotificacioDetailDial
 import AccionsMassives, { MenuOption } from '../../components/AccionsMassives';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 import { useEnviamentDetailDialog } from './EnviamentDetailDialog';
+import {
+    ENVIAMENT_ESTAT_MAP,
+    generateGridRowStylesFromMap,
+    getGridRowColorClass,
+} from '../../utils/estatConfig';
 
 const columns = [
     {
@@ -250,6 +255,7 @@ const EnviamentGrid = () => {
         <ContentFilter />
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
+
     return (
         <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
             <MuiDataGrid
@@ -303,6 +309,10 @@ const EnviamentGrid = () => {
                         // hidden: (row) => isRolActualAdministradorLectura && !row?.plazoAmpliable,
                     },
                 ]}
+                getRowClassName={(params) =>
+                    getGridRowColorClass(params.row.notificaEstat, ENVIAMENT_ESTAT_MAP)
+                }
+                sx={generateGridRowStylesFromMap(ENVIAMENT_ESTAT_MAP)}
             />
             {enviamentDialogComponent}
             {notificacioDialogComponent}

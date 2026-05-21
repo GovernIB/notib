@@ -33,6 +33,11 @@ import AccionsMassives, { MenuOption } from '../../components/AccionsMassives';
 import ButtonDetailExpandColapse from '../../components/ButtonDetailExpandColapse';
 import { DataCommonAdditionalAction } from '../../../lib/components/mui/datacommon/MuiDataCommon';
 import { NotificacioEstatGrid } from './NotificacioEstatRender';
+import {
+    generateGridRowStylesFromMap,
+    getGridRowColorClass,
+    NOTIFICACIO_ESTAT_ENUM_MAP,
+} from '../../utils/estatConfig';
 
 const CustomDetailPanelToggle = (props: Pick<GridRenderCellParams, 'id' | 'value'>) => {
     const { id } = props;
@@ -506,6 +511,10 @@ const NotificacioGrid = () => {
                 getDetailPanelContent={({ row }) => <NotificacioGridEnviaments id={row.id} />}
                 getDetailPanelHeight={() => 'auto'}
                 getRowHeight={() => 'auto'}
+                getRowClassName={(params) =>
+                    getGridRowColorClass(params.row.estat, NOTIFICACIO_ESTAT_ENUM_MAP)
+                }
+                sx={generateGridRowStylesFromMap(NOTIFICACIO_ESTAT_ENUM_MAP)}
                 // sx={{
                 //     '& .MuiDataGrid-cell': {
                 //         alignItems: 'flex-start',
