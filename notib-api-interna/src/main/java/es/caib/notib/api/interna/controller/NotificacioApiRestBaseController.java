@@ -57,7 +57,8 @@ public abstract class NotificacioApiRestBaseController {
 	protected String extractIdentificador(HttpServletRequest request) {
 
 		var url = request.getRequestURL().toString();
-		var urlArr = url.split("/consultaEstatNotificacio|/consultaEstatEnviament|/consultaJustificantNotificacio");
+//		var urlArr = url.split("/consultaEstatNotificacio|/consultaEstatEnviament|/consultaJustificantNotificacio|/consultaJustificantNotificacioBase64");
+		var urlArr = url.split("/consultaEstatNotificacio|/consultaEstatEnviament|/consultaJustificantNotificacioBase64|/consultaJustificantNotificacio");
 		return urlArr.length > 1 ? urlArr[1].substring(1) : "";
 	}
 
