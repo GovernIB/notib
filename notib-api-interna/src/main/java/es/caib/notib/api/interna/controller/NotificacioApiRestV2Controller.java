@@ -117,8 +117,8 @@ public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseContro
 		return resposta;
 	}
 
-	@GetMapping(value = {"/consultaJustificantNotificacioBase64/**"}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public RespostaConsultaJustificantEnviament consultaJustificantV2Base64(HttpServletRequest request) {
+	@GetMapping(value = {"/consultaJustificantNotificacioRaw/**"}, produces = MediaType.APPLICATION_JSON_VALUE)
+	public RespostaConsultaJustificantEnviament consultaJustificantV2Raw(HttpServletRequest request) {
 		return consultaJustificant(request);
 	}
 
