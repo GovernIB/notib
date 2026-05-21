@@ -17,7 +17,7 @@ public interface EventResourceRepository extends BaseRepository<EventResourceEnt
 	@Query( "SELECT ne " +
 		"FROM "
 //			+ " NotificacioEventEntity ne LEFT JOIN ne.enviament n "
-		+ " NotificacioEventEntity ne "
+		+ " EventResourceEntity ne "
 		+ "WHERE "
 		+ " ne.enviament.id = :enviamentId "
 		+ " AND ne.tipus = es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.API_CARPETA "

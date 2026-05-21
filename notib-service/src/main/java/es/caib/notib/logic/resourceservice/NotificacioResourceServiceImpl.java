@@ -90,6 +90,7 @@ public class NotificacioResourceServiceImpl
 		resource.setHasEnviamentsPendents(enviamentsPendentsNotifica != null && !enviamentsPendentsNotifica.isEmpty());
 		var llindarDies = configHelper.getConfigAsInteger("es.caib.notib.llindar.dies.enviament.remeses");
 		resource.setNotificacioAntiga(DatesUtils.isNowAfterDate(entity.getCreatedDate(), llindarDies));
+		resource.setComunicacioSir(entity.isComunicacioSir());
 		//CALLBACKS
 		var pendents = callbackResourceRepository.findByNotificacioIdAndEstatOrderByDataDesc(entity.getId(), CallbackEstatEnumDto.PENDENT);
 		resource.setEventsCallbackPendent(entity.isTipusUsuariAplicacio() && pendents != null && !pendents.isEmpty());

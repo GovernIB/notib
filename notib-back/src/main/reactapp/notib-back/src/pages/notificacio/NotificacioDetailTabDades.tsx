@@ -2,6 +2,7 @@ import { Box, Button, Divider, Icon, Typography } from '@mui/material';
 import { FieldsDataCard } from '../../components/DataCard';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { NotificacioEstatDetall } from './NotificacioEstatRender';
 
 interface PropsTabDades {
     notificacio: any;
@@ -498,25 +499,9 @@ const NotificacioDetailDialogTabDades: React.FC<PropsTabDades> = (props) => {
                         field: 'retard',
                     },
                     {
-                        field: 'estat', // TODO
-                        valueRenderer: (_value: any, formattedValue: string) => {
-                            return (
-                                <>
-                                    <Typography>
-                                        <Icon
-                                            sx={{
-                                                position: 'relative',
-                                                top: 2,
-                                                mr: 0.6,
-                                                fontSize: 16,
-                                            }}
-                                        >
-                                            rocket_launch
-                                        </Icon>
-                                        {formattedValue}
-                                    </Typography>
-                                </>
-                            );
+                        field: 'estat',
+                        valueRenderer: () => {
+                            return <NotificacioEstatDetall notificacio={notificacio} />;
                         },
                     },
                 ]}
@@ -533,15 +518,9 @@ const NotificacioDetailDialogTabDades: React.FC<PropsTabDades> = (props) => {
                 </Button>
             </Box>
 
-            <TableGrup
-                notificacio={notificacio}
-                apiCurrentFields={apiCurrentFields}
-            />
+            <TableGrup notificacio={notificacio} apiCurrentFields={apiCurrentFields} />
 
-            <TableDocuments
-                apiCurrentFields={apiCurrentFields}
-                notificacio={notificacio}
-            />
+            <TableDocuments apiCurrentFields={apiCurrentFields} notificacio={notificacio} />
 
             {notificacio?.operadorPostalInfo && (
                 <>
@@ -549,10 +528,7 @@ const NotificacioDetailDialogTabDades: React.FC<PropsTabDades> = (props) => {
                         apiCurrentFields={apiCurrentFields}
                         notificacio={notificacio}
                     />
-                    <TableCie
-                        apiCurrentFields={apiCurrentFields}
-                        notificacio={notificacio}
-                    />
+                    <TableCie apiCurrentFields={apiCurrentFields} notificacio={notificacio} />
                     <TableEnviaments
                         apiCurrentFields={apiCurrentFields}
                         notificacio={notificacio}

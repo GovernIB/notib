@@ -204,6 +204,7 @@ public class NotificacioResource extends BaseResource<Long> {
 	private boolean eventsCallbackPendent;
 	private boolean plazoAmpliado;
 	private boolean anulat;
+	private boolean comunicacioSir;
 	private String motiuAnulacio;
 	private Date dataCallbackPendent;
 	private NotificacioRegistreEstatEnumDto registreEstat;

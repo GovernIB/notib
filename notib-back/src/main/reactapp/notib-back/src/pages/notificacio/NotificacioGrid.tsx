@@ -32,7 +32,7 @@ import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
 import AccionsMassives, { MenuOption } from '../../components/AccionsMassives';
 import ButtonDetailExpandColapse from '../../components/ButtonDetailExpandColapse';
 import { DataCommonAdditionalAction } from '../../../lib/components/mui/datacommon/MuiDataCommon';
-import NotificacioEstatRender from './NotificacioEstatRender';
+import { NotificacioEstatGrid } from './NotificacioEstatRender';
 
 const CustomDetailPanelToggle = (props: Pick<GridRenderCellParams, 'id' | 'value'>) => {
     const { id } = props;
@@ -135,26 +135,17 @@ const useDataGridColumns = (datagridApiRef: any) => {
             {
                 field: 'titular',
             },
-            // {
-            //     field: 'estat',
-            //     width: 80,
-            // },
             {
                 field: 'estatString',
                 width: 200,
                 renderCell: (params: any) => {
                     const estatJson = params?.formattedValue;
-                    try {
-                        const estatObjecte = JSON.parse(estatJson);
-                        return (
-                            <NotificacioEstatRender
-                                estatObjecte={estatObjecte}
-                                estatEnum={params?.row?.estat}
-                            />
-                        );
-                    } catch (error) {
-                        console.error('La cadena no és un JSON vàlid:', error);
-                    }
+                    return (
+                        <NotificacioEstatGrid
+                            estatJson={estatJson}
+                            estatEnum={params?.row?.estat}
+                        />
+                    );
                 },
             },
             {
