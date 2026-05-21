@@ -50,6 +50,19 @@ public abstract class NotificacioBaseRestClient {
 		}
 	}
 
+	public RespostaConsultaJustificantEnviament consultaJustificantEnviamentBase64(String identificador, String serviceUrl) {
+
+		try {
+			var urlAmbMetode = baseUrl + serviceUrl + "/consultaJustificantNotificacioBase64/" + identificador;
+			jerseyClient = generarClient();
+			var wt = jerseyClient.target(urlAmbMetode);
+			var json = wt.request(MediaType.APPLICATION_JSON).get(String.class);
+			return getMapper().readValue(json, RespostaConsultaJustificantEnviament.class);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
 	public boolean donarPermisConsulta(PermisConsulta permisConsulta, String serviceUrl) {
 
 		try {
