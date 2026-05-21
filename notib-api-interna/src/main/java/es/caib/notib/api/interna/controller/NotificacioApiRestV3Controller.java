@@ -118,8 +118,8 @@ public class NotificacioApiRestV3Controller extends NotificacioApiRestBaseContro
 		return resposta;
 	}
 
-	@GetMapping(value = {"/consultaJustificantNotificacioBase64/{referencia}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public RespostaConsultaJustificantEnviament consultaJustificantV2Base64(HttpServletRequest request, @PathVariable("referencia") String referencia) {
+	@GetMapping(value = {"/consultaJustificantNotificacioRaw/{referencia}"}, produces = MediaType.APPLICATION_JSON_VALUE)
+	public RespostaConsultaJustificantEnviament consultaJustificantV2Raw(HttpServletRequest request, @PathVariable("referencia") String referencia) {
 		return consultaJustificant(request);
 	}
 
