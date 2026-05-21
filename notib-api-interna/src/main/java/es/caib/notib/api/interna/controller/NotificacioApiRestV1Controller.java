@@ -109,6 +109,18 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 	@Parameter(name = "identificador", description = "Identificador de la notificació a consultar", required = true)
 	@GetMapping(value = {"/consultaJustificantNotificacio/**"}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaConsultaJustificantEnviament consultaJustificantV1(HttpServletRequest request) {
+
+		var resposta = consultaJustificant(request);
+		var contingut = resposta.getJustificant().getContingut();
+		resposta.getJustificant().setContingut(org.apache.commons.codec.binary.Base64.encodeBase64(contingut));
+		return resposta;
+	}
+
+	@Operation(summary = "Consulta el justificant de l'enviament d'una notificació", description = "Retorna el document PDF amb el justificant de l'enviament de la notificació")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Consulta realitzada correctament", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RespostaConsultaJustificantEnviament.class, description = "Justificant de l'enviament")) }) })
+	@Parameter(name = "identificador", description = "Identificador de la notificació a consultar", required = true)
+	@GetMapping(value = {"/consultaJustificantNotificacioRaw/**"}, produces = MediaType.APPLICATION_JSON_VALUE)
+	public RespostaConsultaJustificantEnviament consultaJustificantV1Raw(HttpServletRequest request) {
 		return consultaJustificant(request);
 	}
 
