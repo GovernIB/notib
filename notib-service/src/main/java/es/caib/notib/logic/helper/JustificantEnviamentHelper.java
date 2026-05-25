@@ -29,7 +29,7 @@ import java.util.Locale;
 
 /**
  * Helper per generar el justificant de la notificació electrònica
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  *
  */
@@ -39,7 +39,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 
 	private static final String ENVIAMENT_TIPUS_TEXT = "es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto.";
 
-	public byte[] generarJustificant(NotificacioDtoV2 notificacio, ProgresDescarregaDto progres) throws JustificantException {
+	public byte[] generarContingutJustificant(NotificacioDtoV2 notificacio, ProgresDescarregaDto progres) throws JustificantException {
 
 		log.debug("Generant el justificant d'enviament de la notificacio [notificacioId=" + notificacio.getId() + "]");
 		var out = new ByteArrayOutputStream();
@@ -221,7 +221,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 			log.debug(errorMessage, ex);
 		}
 	}
-	
+
 	private PdfPCell getTitolEnviament(int numEnviament, NotificacioDtoV2 notificacio, NotificacioEnviamentDtoV2 enviament) {
 
 		log.debug("Generant el títol de la taula d'enviament del justificant d'enviament de la notificació [notificacioId=" + notificacio.getId() + "]");
@@ -229,7 +229,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 		var titolEnviamentMessage = messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.titol",
 				new Object[] {
 						(EnviamentTipus.NOTIFICACIO.equals(notificacio.getEnviamentTipus()) && enviament.isPerEmail() ?  messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.titol.notificacio.email") + " " : "") + messageHelper.getMessage(ENVIAMENT_TIPUS_TEXT + notificacio.getEnviamentTipus().name()).toLowerCase(),
-						numEnviament, 
+						numEnviament,
 						notificacio.getEnviaments().size()});
 
 		var titolParagraph = new Paragraph(titolEnviamentMessage, calibriWhiteBold);
@@ -241,7 +241,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 		titolCell.setBorderColor(new BaseColor(166, 166, 166));
 		return titolCell;
 	}
-	
+
 	private PdfPCell getTitolAnnexos(Long notificacioId) {
 
 		log.debug("Generant el títol de la taula d'annexos del justificant d'enviament de la notificació [notificacioId=" + notificacioId + "]");
@@ -256,7 +256,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 		titolCell.setBorderColor(new BaseColor(166, 166, 166));
 		return titolCell;
 	}
-	
+
 	private PdfPCell getContingutEnviament(NotificacioEnviamentDtoV2 enviament, NotificacioDtoV2 notificacio) throws DocumentException {
 
 		log.debug("Generant el contingut de la taula d'enviament del justificant d'enviament de l'enviament [enviamentId=" + enviament.getId() + "]");
@@ -272,19 +272,19 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 		var dadesRegistreTable = new PdfPTable(2);
 		dadesRegistreTable.setWidthPercentage(95f);
 		dadesRegistreTable.setWidths(headingTablewidths);
-		
+
 //		## [DADES REGISTRE - NÚMERO]
 		var numRegistreMessage = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.dades.registre.numero");
 		var dadesRegistreNumeroTitleChunk = new Chunk(numRegistreMessage, calibri10);
 		var dadesRegistreNumeroContentChunk = new Chunk(enviament.getRegistreNumeroFormatat(), calibri10);
 		createNewTableContent(dadesRegistreTable, dadesRegistreNumeroTitleChunk, dadesRegistreNumeroContentChunk);
-		
+
 //		## [DADES REGISTRE - DATA]
 		var dataRegistreMessage = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.dades.registre.data");
 		var dadesRegistreDataTitleChunk = new Chunk(dataRegistreMessage, calibri10);
 		var dadesRegistreDataContentChunk = new Chunk(getDateTimeFormatted(enviament.getRegistreData()), calibri10);
 		createNewTableContent(dadesRegistreTable, dadesRegistreDataTitleChunk, dadesRegistreDataContentChunk);
-		
+
 		dadesRegistre.setSpacingBefore(5f);
 		dadesRegistre.setSpacingAfter(5f);
         dadesRegistre.add(dadesRegistreTable);
@@ -297,19 +297,19 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 	        var dadesNotificaMessage = messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.dades.notifica");
 	     	dadesNotificaTitol = new Paragraph(dadesNotificaMessage, calibri10Bold);
 	     	dadesNotificaTitol.setAlignment(Element.ALIGN_LEFT);
-	     	
+
 //	     	## [DADES NOTIFICA - CONTINGUT]
 	     	dadesNotifica = new Paragraph();
 	     	var dadesNotificaTable = new PdfPTable(2);
 	     	dadesNotificaTable.setWidthPercentage(95f);
 	     	dadesNotificaTable.setWidths(headingTablewidths);
-	     	
+
 //	     	## [DADES NOTIFICA - IDENTIFICADOR]
 	     	var dadesNotificaIdentificador = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.dades.notifica.identificador");
 	     	var dadesNotificaIdentTitleChunk = new Chunk(dadesNotificaIdentificador, calibri10);
 	     	var dadesNotificaIdentContentChunk = new Chunk(enviament.getNotificaIdentificador(), calibri10);
 			createNewTableContent(dadesNotificaTable, dadesNotificaIdentTitleChunk, dadesNotificaIdentContentChunk);
-	     
+
 //	     	## [DADES NOTIFICA - EMISOR]
 	     	var dadesNotificaEmisor = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.dades.notifica.emisor");
 	     	var dadesNotificaEmisorTitleChunk = new Chunk(dadesNotificaEmisor, calibri10);
@@ -324,7 +324,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 	     		var dadesNotificaProcedimentContentChunk = new Chunk("[" + notificacio.getProcediment().getCodi() + "] " + notificacio.getProcediment().getNom(), calibri10);
 	     		createNewTableContent(dadesNotificaTable, dadesNotificaProcedimentTitleChunk, dadesNotificaProcedimentContentChunk);
 			}
-			
+
 	     	dadesNotifica.setSpacingBefore(5f);
 	     	dadesNotifica.setSpacingAfter(5f);
 	        dadesNotifica.add(dadesNotificaTable);
@@ -366,7 +366,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 //		######## INICI DADES INTERESSATS #########
      	var dadesInteressatsTitol = new Paragraph(messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessats"), calibri10Bold);
      	dadesInteressatsTitol.setAlignment(Element.ALIGN_LEFT);
-     	
+
 //		######## INICI DADES TITULAR #########
 //     	## [DADES INTERESSATS - TITULAR]
      	var dadesInteressatsTitularTitol = new Paragraph(messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.titular"), calibri10);
@@ -374,24 +374,24 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
      	dadesInteressatsTitularTitol.setIndentationLeft(16f);
      	dadesInteressatsTitularTitol.setSpacingBefore(10f);
      	var titular = enviament.getTitular();
-     	
+
      	var dadesTitular = new Paragraph();
      	var dadesTitularTable = new PdfPTable(2);
      	dadesTitularTable.setWidthPercentage(80f);
      	dadesTitularTable.setWidths(headingTablewidths);
-     	
+
      	var titularNomMessage = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.titular.nom");
      	var dadesTitularNomTitleChunk = new Chunk(titularNomMessage, calibri10);
      	var dadesTitularNomContentChunk = new Chunk(getNomInteressat(titular), calibri10);
      	createNewTableContent(dadesTitularTable, dadesTitularNomTitleChunk, dadesTitularNomContentChunk);
-     	
+
      	if (titular.getInteressatTipus().equals(InteressatTipus.FISICA) || titular.getInteressatTipus().equals(InteressatTipus.FISICA_SENSE_NIF)) {
 	     	var titularLlintgMessage = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.titular.llinatges");
 	     	var dadesTitularLlintgTitleChunk = new Chunk(titularLlintgMessage, calibri10);
 	     	var dadesTitularLlintgContentChunk = new Chunk(titular.getLlinatges(), calibri10);
 	     	createNewTableContent(dadesTitularTable, dadesTitularLlintgTitleChunk, dadesTitularLlintgContentChunk);
      	}
-     	
+
      	if (titular.getNif() != null) {
 			var titularNifMessage = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.titular.nif");
 			if (enviament.isPerEmail()) {
@@ -431,7 +431,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
      	contingutCell.addElement(dadesInteressatsTitol);
      	contingutCell.addElement(dadesInteressatsTitularTitol);
      	contingutCell.addElement(dadesTitular);
-     	
+
 //		######## INICI DADES DESTINATARIS #########
         var numDestinatari = 1;
         for (PersonaDto destinatari : enviament.getDestinataris()) {
@@ -441,7 +441,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
          	dadesInteressatsDestinatariTitol.setAlignment(Element.ALIGN_LEFT);
          	dadesInteressatsDestinatariTitol.setIndentationLeft(16f);
          	dadesInteressatsDestinatariTitol.setSpacingBefore(10f);
-         	
+
          	var dadesDestinatari = new Paragraph();
          	PdfPTable dadesDestinatariTable = new PdfPTable(2);
          	dadesDestinatariTable.setWidthPercentage(80f);
@@ -451,7 +451,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
          	var dadesDestinatariNomTitleChunk = new Chunk(destinatariNomMessage, calibri10);
          	var dadesDestinatariNomContentChunk = new Chunk(getNomInteressat(destinatari), calibri10);
          	createNewTableContent(dadesDestinatariTable, dadesDestinatariNomTitleChunk, dadesDestinatariNomContentChunk);
-         	
+
          	if (destinatari.getInteressatTipus().equals(InteressatTipus.FISICA)) {
 	         	var destinatariLlintgMessage = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.destinatari.llinatges");
 	         	var dadesDestinatariLlintgTitleChunk = new Chunk(destinatariLlintgMessage, calibri10);
@@ -465,7 +465,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 				var dadesChunk = new Chunk(destinatari.getEmail(), calibri10);
 				createNewTableContent(dadesDestinatariTable, email, dadesChunk);
 			}
-         	
+
          	if (destinatari.getNif() != null) {
 	         	var destinatariNifMessage = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.destinatari.nif");
 	         	var dadesDestinatariNifTitleChunk = new Chunk(destinatariNifMessage, calibri10);
@@ -478,7 +478,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 	         	var dadesDestinatariDir3ContentChunk = new Chunk(destinatari.getDir3Codi(), calibri10);
 	         	createNewTableContent(dadesDestinatariTable, dadesDestinatariDir3TitleChunk, dadesDestinatariDir3ContentChunk);
          	}
-         	
+
          	dadesDestinatari.setSpacingBefore(10f);
          	contingutCell.addElement(dadesInteressatsDestinatariTitol);
          	contingutCell.addElement(dadesDestinatariTable);
@@ -637,7 +637,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
         contingutCell.setBorderColor(new BaseColor(166, 166, 166));
 		return contingutCell;
 	}
-	
+
 	private void createNewTableContent(PdfPTable table, Chunk... chunks) {
 
 //		## [TÍTOL]
@@ -646,15 +646,15 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 		listProcediment.add(new ListItem(chunks[0]));
 		procedimentTitleCell.addElement(listProcediment);
 		procedimentTitleCell.setBorder(Rectangle.NO_BORDER);
-		
+
 //		## [VALOR]
 		var procedimentContentCell = new PdfPCell();
 		procedimentContentCell.addElement(chunks[1]);
 		procedimentContentCell.setBorder(Rectangle.NO_BORDER);
 		table.addCell(procedimentTitleCell);
 		table.addCell(procedimentContentCell);
-	}	
-	
+	}
+
 	private void crearTaulaAnnexos(PdfPTable taulaAnnexos, NotificacioDtoV2 notificacio, ProgresDescarregaDto progres) throws JustificantException {
 
 		log.debug("Generant la taula de annexos del justificant d'enviament per als documents.");
@@ -691,7 +691,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 			log.debug(errorMessage, ex);
 		}
 	}
-	
+
 	private void getHeadersAnnexos(PdfPTable dadesAnnexoTable) {
 
 //		## [NOM - TÍTOL]
@@ -718,7 +718,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 		contingutCell.addElement(dadesAnnexoTitol);
 		dadesAnnexoTable.addCell(contingutCell);
 	}
-	
+
 	private void getContingutAnnexos(es.caib.notib.logic.intf.dto.notificacio.Document document, PdfPTable dadesAnnexoTable) {
 
 //		## [CONTINGUT COLUMNES]
@@ -736,14 +736,14 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 		createNewTableAnnexosContent(dadesAnnexoTable, new Chunk(document.getValidesa() != null ? document.getValidesa().toString() : "", calibri8));
 		createNewTableAnnexosContent(dadesAnnexoTable, new Chunk(document.getTipoDocumental() != null ? document.getTipoDocumental().toString() : "", calibri8));
 	}
-	
+
 	private void createNewTableAnnexosContent(PdfPTable table, Chunk chunk) {
 
 		var procedimentContentCell = new PdfPCell();
 		procedimentContentCell.addElement(chunk);
 		procedimentContentCell.setBorderWidth(0.25f);
 		table.addCell(procedimentContentCell);
-	}	
+	}
 
 	private String getNomInteressat(PersonaDto persona)  {
 

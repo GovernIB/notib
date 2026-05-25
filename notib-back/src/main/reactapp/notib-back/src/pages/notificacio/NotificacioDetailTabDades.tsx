@@ -1,8 +1,9 @@
-import { Box, Button, Divider, Icon, Typography } from '@mui/material';
+import { Box, Divider, Icon, Typography } from '@mui/material';
 import { FieldsDataCard } from '../../components/DataCard';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { NotificacioEstatDetall } from './NotificacioEstatRender';
+import {MuiActionReportButton} from "reactlib";
 
 interface PropsTabDades {
     notificacio: any;
@@ -510,13 +511,19 @@ const NotificacioDetailDialogTabDades: React.FC<PropsTabDades> = (props) => {
                 sx={{ mb: 1 }}
             />
 
-            {/* TODO: Condicio del botó justificant
-            ${!notificacio.hasEnviamentsPendents || notificacio.estat == 'FINALITZADA_AMB_ERRORS'} */}
-            <Box sx={{ textAlign: 'right' }}>
-                <Button variant="outlined" startIcon={<Icon>file_download</Icon>}>
-                    {t('page.notificacio.detail.dades.justificant')}
-                </Button>
-            </Box>
+
+            {(!notificacio?.hasEnviamentsPendents || notificacio?.estat == 'FINALITZADA_AMB_ERRORS') &&
+                <Box sx={{ textAlign: 'right' }}>
+                    <MuiActionReportButton
+                        id={notificacio?.id}
+                        resourceName={"notificacioResource"}
+                        report="DESCARREGAR_JUSTIFICANT_ENVIAMENT_NOTIFICACIO"
+                        reportFileType="CUSTOM"
+                        title={t('page.notificacio.detail.dades.justificant')}
+                        buttonComponentProps={{ variant: 'outlined', sx: { mr: 1 } }}
+                        buttonIcon="file_download"/>
+                </Box>
+            }
 
             <TableGrup notificacio={notificacio} apiCurrentFields={apiCurrentFields} />
 

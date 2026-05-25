@@ -90,6 +90,11 @@ import java.util.List;
 			type = ResourceArtifactType.PERSPECTIVE,
 			code = NotificacioResource.PERSPECTIVE_GRUP
 		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.REPORT,
+			code = NotificacioResource.REPORT_DESCARREGAR_JUSTIFICANT_NOTIFICACIO,
+			requiresId = true
+		),
 	}
 )
 @CustomValidation.List({
@@ -107,6 +112,7 @@ public class NotificacioResource extends BaseResource<Long> {
 	public static final String PERSPECTIVE_DOCUMENTS_NOTIFICACIO = "DOCUMENTS_NOTIFICACIO";
 	public static final String PERSPECTIVE_OPERADORS_CIE_POSTAL = "OPERADORS_CIE_POSTAL";
 	public static final String PERSPECTIVE_GRUP = "OPERADORS_GRUP";
+	public static final String REPORT_DESCARREGAR_JUSTIFICANT_NOTIFICACIO = "DESCARREGAR_JUSTIFICANT_ENVIAMENT_NOTIFICACIO";
 
 	@NotNull
 	private EnviamentTipus enviamentTipus;

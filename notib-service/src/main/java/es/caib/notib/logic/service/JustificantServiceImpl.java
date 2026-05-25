@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.MimeType;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -170,6 +169,7 @@ public class JustificantServiceImpl implements JustificantService {
         var progres = progresDescarrega.get(auth.getName() + "_" + sequence);
         return progres != null && progres.getProgres() < 100;
     }
+
     private FitxerDto generarJustificantEnviament(NotificacioEntity notificacio, String sequence) throws JustificantException {
 
         //## Únic procés per usuari per evitar sobrecàrrega
@@ -177,7 +177,7 @@ public class JustificantServiceImpl implements JustificantService {
         //## GENERAR JUSTIFICANT
         log.debug("Recuperant el justificant de la notificacio (notificacioId=" + notificacio.getId() + ")");
         progres.addInfo(ProgresDescarregaDto.TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.generant"));
-        var contingut = justificantEnviamentHelper.generarJustificant(conversioTipusHelper.convertir(notificacio, NotificacioDtoV2.class), progres);
+        var contingut = justificantEnviamentHelper.generarContingutJustificant(conversioTipusHelper.convertir(notificacio, NotificacioDtoV2.class), progres);
         var justificantOriginal = new FitxerDto();
         var tipus = notificacio.getEnviamentTipus();
         var tipusText = EnviamentTipus.NOTIFICACIO.equals(tipus) ? "notificació" : EnviamentTipus.COMUNICACIO.equals(tipus) ? "comunicació" : "comunicació:sir";
@@ -218,7 +218,7 @@ public class JustificantServiceImpl implements JustificantService {
         //## GENERAR JUSTIFICANT
         log.debug("Recuperant el justificant de la notificacio (enviamentId=" + enviament.getId() + ")");
         progres.addInfo(ProgresDescarregaDto.TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.generant"));
-        var contingut = justificantRecepcioSIRHelper.generarJustificant( enviament, progres);
+        var contingut = justificantRecepcioSIRHelper.generarContingutJustificant( enviament, progres);
         var justificantOriginal = new FitxerDto();
         justificantOriginal.setNom("justificant_comunicacio_sir_" + enviament.getId() + ".pdf");
         justificantOriginal.setContentType("application/pdf");

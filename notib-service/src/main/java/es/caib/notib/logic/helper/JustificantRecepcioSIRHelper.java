@@ -10,10 +10,12 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
+import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.ProgresDescarregaDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.logic.intf.exception.JustificantException;
+import es.caib.notib.logic.intf.model.NotificacioResource;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import joptsimple.internal.Strings;
@@ -28,7 +30,7 @@ import java.text.SimpleDateFormat;
 
 /**
  * Helper per generar el justificant de la notificació electrònica
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  *
  */
@@ -50,8 +52,9 @@ public class JustificantRecepcioSIRHelper extends JustificantHelper<NotificacioE
 		setParametersBold(paragraf, "[" + text + "] " + description);
 		return new ListItem(paragraf);
 	}
+
 	@SneakyThrows
-	public byte[] generarJustificant(NotificacioEnviamentEntity enviament, ProgresDescarregaDto progres) throws JustificantException {
+	public byte[] generarContingutJustificant(NotificacioEnviamentEntity enviament, ProgresDescarregaDto progres) throws JustificantException {
 
 		log.debug("Generant el justificant de recepció SIR de l'enviament [enviamentId=" + enviament.getId() + "]");
 		EntitatEntity entitat = enviament.getNotificacio().getEntitat();

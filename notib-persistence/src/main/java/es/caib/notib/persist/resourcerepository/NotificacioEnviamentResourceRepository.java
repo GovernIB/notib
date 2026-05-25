@@ -21,11 +21,11 @@ public interface NotificacioEnviamentResourceRepository extends BaseRepository<N
 	Optional<NotificacioEnviamentResourceEntity> findByNotificaReferencia(String notificaReferencia);
 
 
-	@Query(	" from NotificacioEnviamentResourceEntity " +
-		" where	notificacio = :notificacio " +
-		"	and (notificaEstat = es.caib.notib.client.domini.EnviamentEstat.NOTIB_PENDENT" +
-		"   		or notificaEstat = es.caib.notib.client.domini.EnviamentEstat.REGISTRADA)" +
-		" order by notificaEstatDataActualitzacio asc nulls first")
+	@Query(	" from NotificacioEnviamentResourceEntity e" +
+		" where	e.notificacio = :notificacio " +
+		"	and (e.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.NOTIB_PENDENT" +
+		"   		or e.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.REGISTRADA)" +
+		" order by e.notificaEstatDataActualitzacio asc nulls first")
 	List<NotificacioEnviamentResourceEntity> findEnviamentsPendentsNotificaByNotificacio(@Param("notificacio") NotificacioResourceEntity notificacio);
 
 }

@@ -40,7 +40,7 @@ public abstract class JustificantHelper<T> {
     @Autowired
     protected ConfigHelper configHelper;
 
-    public abstract byte[] generarJustificant(T notificacio, ProgresDescarregaDto progres) throws JustificantException, IOException;
+    public abstract byte[] generarContingutJustificant(T notificacio, ProgresDescarregaDto progres) throws JustificantException, IOException;
 
     @Builder
     protected static class JustificantTextKeys {

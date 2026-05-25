@@ -61,7 +61,7 @@ public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin>
 	public boolean diagnosticar(Map<String, IntegracioDiagnostic> diagnostics) throws Exception {
 
 		var enviament = enviamentRepository.findTopByRegistreNumeroFormatatNotNullOrderByIdDesc().orElseThrow();
-		var contingut =justificantEnviamentHelper.generarJustificant(conversioTipusHelper.convertir(enviament.getNotificacio(), NotificacioDtoV2.class), new ProgresDescarregaDto());
+		var contingut =justificantEnviamentHelper.generarContingutJustificant(conversioTipusHelper.convertir(enviament.getNotificacio(), NotificacioDtoV2.class), new ProgresDescarregaDto());
 		var justificantOriginal = new FitxerDto();
 		justificantOriginal.setNom("justificant_comunicacio_sir_" + enviament.getId() + ".pdf");
 		justificantOriginal.setContentType(MediaType.PDF.toString());

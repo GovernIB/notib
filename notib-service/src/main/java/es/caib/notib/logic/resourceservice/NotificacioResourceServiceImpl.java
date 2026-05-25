@@ -18,10 +18,12 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumD
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.model.*;
 import es.caib.notib.logic.intf.resourceservice.NotificacioResourceService;
+import es.caib.notib.logic.intf.service.JustificantService;
 import es.caib.notib.logic.intf.util.DatesUtils;
 import es.caib.notib.logic.notificacions.DocumentPerspectiveApplicator;
 import es.caib.notib.logic.notificacions.EnviamentPerspectiveApplicator;
 import es.caib.notib.logic.notificacions.GrupPerspectiveApplicator;
+import es.caib.notib.logic.notificacions.JusitficantEnviamentReportGenerator;
 import es.caib.notib.logic.notificacions.OperadorPostalCiePerspectiveApplicator;
 import es.caib.notib.persist.entity.NotificacioEventEntity;
 import es.caib.notib.persist.resourceentity.*;
@@ -69,6 +71,7 @@ public class NotificacioResourceServiceImpl
 	private final CallbackResourceRepository callbackResourceRepository;
 	private final PersonaResourceRepository personaResourceRepository;
 	private final ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository;
+	private final JustificantService justificantService;
 
 	@PostConstruct
 	public void init() {
@@ -81,13 +84,14 @@ public class NotificacioResourceServiceImpl
 		register(NotificacioResource.PERSPECTIVE_ENVIAMENTS_NOTIFICACIO, new EnviamentPerspectiveApplicator());
 		register(NotificacioResource.PERSPECTIVE_OPERADORS_CIE_POSTAL, new OperadorPostalCiePerspectiveApplicator());
 		register(NotificacioResource.PERSPECTIVE_GRUP, new GrupPerspectiveApplicator());
+		register(NotificacioResource.REPORT_DESCARREGAR_JUSTIFICANT_NOTIFICACIO, new JusitficantEnviamentReportGenerator(justificantService));
 	}
 
 	@Override
 	protected void afterConversion(NotificacioResourceEntity entity, NotificacioResource resource) {
 
 		var enviamentsPendentsNotifica = notificacioEnviamentResourceRepository.findEnviamentsPendentsNotificaByNotificacio(entity);
-		resource.setHasEnviamentsPendents(enviamentsPendentsNotifica != null && !enviamentsPendentsNotifica.isEmpty());
+ 		resource.setHasEnviamentsPendents(enviamentsPendentsNotifica != null && !enviamentsPendentsNotifica.isEmpty());
 		var llindarDies = configHelper.getConfigAsInteger("es.caib.notib.llindar.dies.enviament.remeses");
 		resource.setNotificacioAntiga(DatesUtils.isNowAfterDate(entity.getCreatedDate(), llindarDies));
 		resource.setComunicacioSir(entity.isComunicacioSir());
