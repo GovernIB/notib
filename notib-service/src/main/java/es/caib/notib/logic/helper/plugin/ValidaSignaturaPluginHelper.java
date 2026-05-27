@@ -99,8 +99,8 @@ public class ValidaSignaturaPluginHelper extends AbstractPluginHelper<ValidateSi
 
 				info.addParam("Document firmat", "false");
 				info.addParam("Error de firma", "false");
-				info.addParam("Missatge d'error", throwable.getMessage());
-				integracioHelper.addAccioError(info, errorDesc);
+//				info.addParam("Missatge d'error", throwable.getMessage());
+				integracioHelper.addAccioOk(info);
 				return SignatureInfoDto.builder().signed(false).error(false).build();
 			}
 			log.error("Error al detectar firma de document", e);
