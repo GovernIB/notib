@@ -22,7 +22,6 @@ public class SignatureUtil {
             try {
                 SignatureCommonUtils.getXAdESMode(contingut, false);
             } catch (Exception ex) {
-                log.error("XADES error ", ex);
                 var error = "No es pot determinar el mode de signatura";
                 if (ex.getMessage().contains(error) || Arrays.toString(ex.getStackTrace()).contains(error)) {
                     NotibLogger.getInstance().info("XADES error: " + ex.getMessage(), log, LoggingTipus.VALIDATE_SIGNATURE);
