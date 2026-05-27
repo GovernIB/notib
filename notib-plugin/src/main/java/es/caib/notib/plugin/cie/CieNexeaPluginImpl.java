@@ -544,6 +544,7 @@ public class CieNexeaPluginImpl extends AbstractSalutPlugin implements CiePlugin
     private NotificaWsV2PortType getNotificaWs(String apiKey) throws MalformedURLException, MalformedObjectNameException, InstanceNotFoundException, NamingException, RemoteException, CreateException {
 
         wsClientHelper = new WsClientHelper<>();
+        var cieHttps = Boolean.valueOf(properties.get("es.caib.notib.plugin.cie.https").toString());
         return wsClientHelper.generarClientWs(
             getClass().getResource("https://nexea.es/serviciosweb_pre/NotificaWsV2Service?wsdl"),
             properties.get("es.caib.notib.plugin.cie.url").toString(),
@@ -553,7 +554,7 @@ public class CieNexeaPluginImpl extends AbstractSalutPlugin implements CiePlugin
             null,
             Boolean.parseBoolean(properties.get("es.caib.notib.log.tipus.ENTREGA_CIE").toString()),
             true,
-            true,
+            !cieHttps,
             NotificaWsV2PortType.class,
             new ApiKeySOAPHandlerV2(apiKey));
     }

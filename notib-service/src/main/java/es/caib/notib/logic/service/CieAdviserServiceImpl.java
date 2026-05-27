@@ -146,7 +146,7 @@ public class CieAdviserServiceImpl implements CieAdviserService {
                                  Opciones opcionesSincronizarEnvio,
                                  Holder<String> codigoRespuesta,
                                  Holder<String> descripcionRespuesta,
-                                 Holder<Opciones> opcionesResultadoSincronizarEnvio) {
+                                 Holder<Opciones> opcionesResultadoSincronizarEnvio)  {
 
         var info = new IntegracioInfo(IntegracioCodi.CIE, "Sincronitzar enviament SOAP", IntegracioAccioTipusEnumDto.RECEPCIO,
                 new AccioParam("Identificador Nexea", identificador.value),
