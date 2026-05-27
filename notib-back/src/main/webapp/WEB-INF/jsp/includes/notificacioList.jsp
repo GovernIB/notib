@@ -754,7 +754,15 @@
         if (!jsonString) {
             return "";
         }
-        let json = JSON.parse(jsonString);
+        let json;
+        try {
+
+            json = JSON.parse(jsonString);
+        } catch (exception) {
+            console.error("Error al convertir el jsonString --> " +  jsonString);
+            console.error("Excepcio: " + exception);
+            return "<div>No s'ha pogut obtenir l'estat</div>";
+        }
         let html = '';
         if (json.entregaPostal) {
             html += '<span class="label ' + json.entregaPostal.label + '" title="' + json.entregaPostal.title + '" style="float: right; position: relative; top: 0px;"><span class="fa fa-envelope"></span></span>';
