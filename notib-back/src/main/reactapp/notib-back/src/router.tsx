@@ -24,6 +24,7 @@ import MonitorIntegracioGrid from './pages/integracio/MonitorIntegracioGrid';
 import CacheGrid from './pages/cache/CacheGrid';
 import ActiveMqGrid from './pages/activeMq/ActiveMqGrid';
 import MonitorSistema from './pages/monitorSistema/MonitorSistema.tsx';
+import NotificacioMassivaGrid from "./pages/notificacioMassiva/NotificacioMassivaGrid.tsx";
 
 export const router = createBrowserRouter(
     [
@@ -146,6 +147,10 @@ export const router = createBrowserRouter(
                 {
                     path: 'enviaments',
                     element: <EnviamentGrid />,
+                },
+                {
+                    path: 'notificacio/massiva',
+                    element: <NotificacioMassivaGrid />,
                 },
                 {
                     path: 'integracions',

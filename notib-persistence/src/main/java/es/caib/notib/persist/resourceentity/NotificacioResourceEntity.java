@@ -32,7 +32,7 @@ import java.util.Set;
 @Table(
 	name = BaseConfig.DB_PREFIX + "notificacio",
 	uniqueConstraints = @UniqueConstraint(columnNames = { "referencia" }))
-@SecondaryTable(name = BaseConfig.DB_PREFIX +  "notificacio_table", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
+//@SecondaryTable(name = BaseConfig.DB_PREFIX +  "notificacio_table", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Getter
 @Setter
 @NoArgsConstructor

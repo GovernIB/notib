@@ -167,6 +167,7 @@ public class NotificacioResource extends BaseResource<Long> {
 	@ResourceField(onChangeActive = true)
 	private ResourceReference<OrganGestorResource, Long> organGestor;
 	private ResourceReference<ProcedimentResource, Long> procediment;
+	@NotNull
 	private ResourceReference<DocumentResource, Long> document;
 	private ResourceReference<DocumentResource, Long> document2;
 	private ResourceReference<DocumentResource, Long> document3;

@@ -54,7 +54,7 @@ public class JusitficantEnviamentReportGenerator implements BaseReadonlyResource
 			return DownloadableFile.builder().name(justificant.getNom()).content(justificant.getContingut()).contentType(justificant.getContentType()).build();
 		} catch (Exception ex) {
 			log.error("[JusitficantEnviamentReportGenerator] Error inesperat generant contingut pel justificant de la notificacio" + notificacio.getId(), ex);
-			return DownloadableFile.builder().name("errorJustificant").content(new byte[]{}).contentType(MediaType.APPLICATION_PDF_VALUE).build();
+			return DownloadableFile.builder().name("errorJustificant.pdf").content(new byte[]{}).contentType(MediaType.APPLICATION_PDF_VALUE).build();
 		}
 	}
 

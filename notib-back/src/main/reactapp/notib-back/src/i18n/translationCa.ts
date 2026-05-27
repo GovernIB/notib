@@ -583,6 +583,25 @@ const translationCa = {
                 },
             },
         },
+        notificacioMassiva: {
+            grid: {
+                title: 'Consulta d\'enviaments massius',
+                createdDate: 'Creada el',
+                csvFilename: 'Notifiacions',
+                zipFilename: 'Documents',
+                estatValidacio: 'Validació CSV',
+                estatProces: 'Estat',
+                accions : {
+                    resum: 'Resum',
+                    descarregarResum: 'Descarregar resum',
+                    errorsValidacio: 'Errors validació',
+                    errorsExecucio: 'Errors execució',
+                    posposar: 'Posposa',
+                    reactivar: 'Reactiva',
+                    mostrarRemeses: 'Mostra remeses'
+                }
+            }
+        },
         integracio: {
             grid: {
                 title: 'Monitor de integraciones',

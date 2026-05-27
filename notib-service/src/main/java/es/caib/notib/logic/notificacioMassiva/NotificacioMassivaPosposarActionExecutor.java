@@ -1,0 +1,36 @@
+package es.caib.notib.logic.notificacioMassiva;
+
+import es.caib.notib.logic.base.service.BaseMutableResourceService;
+import es.caib.notib.logic.intf.base.exception.ActionExecutionException;
+import es.caib.notib.logic.intf.model.NotificacioMassivaResource;
+import es.caib.notib.logic.intf.service.NotificacioMassivaService;
+import es.caib.notib.persist.resourceentity.NotificacioMassivaResourceEntity;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.Serializable;
+import java.util.Map;
+
+@Slf4j
+@AllArgsConstructor
+public class NotificacioMassivaPosposarActionExecutor implements BaseMutableResourceService.ActionExecutor<NotificacioMassivaResourceEntity, Serializable, NotificacioMassivaResource> {
+
+	private final NotificacioMassivaService notificacioMassivaService;
+
+	@Override
+	public NotificacioMassivaResource exec(String code, NotificacioMassivaResourceEntity entity, Serializable params) throws ActionExecutionException {
+
+		try {
+			notificacioMassivaService.posposar(entity.getEntitat().getId(), entity.getId());
+		} catch (Exception ex) {
+			log.error("[NotificacioMassivaPosposarActionExecutor] Error posposant la notificacio massiva " + entity.getId());
+		}
+		return null;
+	}
+
+	@Override
+	public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map answers, String[] previousFieldNames, Serializable target) {
+
+	}
+
+}

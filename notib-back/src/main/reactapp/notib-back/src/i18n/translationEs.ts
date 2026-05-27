@@ -552,6 +552,25 @@ const translationEs = {
                 },
             },
         },
+        notificacioMassiva: {
+            grid: {
+                title: 'Consulta de envíos masivos',
+                createdDate: 'Creada el',
+                csvFilename: 'Notifiaciones',
+                zipFilename: 'Documentos',
+                estatValidacio: 'Validación CSV',
+                estatProces: 'Estado',
+                accions : {
+                    resum: 'Resumen',
+                    descarregarResum: 'Descargar resumen',
+                    errorsValidacio: 'Errores validación',
+                    errorsExecucio: 'Errores execución',
+                    posposar: 'Pospone',
+                    reactivar: 'Reactiva',
+                    mostrarRemeses: 'Muestra remeses'
+                }
+            }
+        },
         integracio: {
             grid: {
                 title: 'Monitor de integraciones',

@@ -67,9 +67,9 @@ const InnerApp: React.FC = () => {
         {
             id: 'nouEnviamentMassiu',
             title: t('app.menu.nouEnviamentmassiu'),
-            to: '/enviament/new',
+            to: '/notificacio/massiva/new',
             icon: 'add',
-            resourceName: 'notifiacioResource',
+            resourceName: 'notifiacioMassivaResource',
             hidden: currentRole !== ROLE_USER,
         },
         {
@@ -77,8 +77,8 @@ const InnerApp: React.FC = () => {
             title: t('app.menu.consultaEnviamentmassiu'),
             to: '/notificacio/massiva',
             icon: 'forward_to_inbox',
-            resourceName: 'notifiacioResource',
-            hidden: currentRole !== ROLE_USER,
+            resourceName: 'notificacioMassivaResource',
+            hidden: currentRole === ROLE_SUPER,
         },
     ];
     const menuGestio = [
@@ -119,7 +119,7 @@ const InnerApp: React.FC = () => {
             title: t('app.menu.accionsMassives'),
             to: '/accions/massives',
             icon: 'format_list_bulleted',
-            resourceName: 'notificacioMassivaResource',
+            resourceName: 'accioMassivaResource',
             hidden: currentRole !== ROLE_ADMIN,
         },
         {
@@ -280,7 +280,7 @@ const InnerApp: React.FC = () => {
             title: t('app.menu.enviamentMassiu'),
             icon: 'dashboard',
             children: menuEnviamentMassiu,
-            hidden: currentRole !== ROLE_USER,
+            hidden: currentRole === ROLE_SUPER,
         },
         {
             id: 'gestio',

@@ -52,7 +52,7 @@ const EnviamentDetailTabNotifica: React.FC<{
                     <MuiActionReportButton
                         resourceName="notificacioEnviamentResource"
                         action="REFRESCAR_ESTAT_NOTIFICA"
-                        id={enviament.id}
+                        id={enviament?.id}
                         title={t('page.enviament.detail.tab.notifica.refrescar')}
                         buttonComponentProps={{ variant: 'outlined', sx: { mr: 1 } }}
                         buttonIcon="refresh"
