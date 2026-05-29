@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.apache.tika.utils.StringUtils;
 
 import java.util.List;
 
@@ -53,5 +54,11 @@ public class NotificacioMassivaInfoDto extends NotificacioMassivaDataDto {
         private String errorsExecucio;
         private boolean cancelada;
         private String estat;
+
+		public String getNomComplert() {
+
+			var nif = !StringUtils.isEmpty(cifNif) ? " - " + cifNif : "";
+			return nombre + " " + apellidos +  nif;
+		}
     }
 }

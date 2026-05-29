@@ -1,4 +1,4 @@
-import {Box, Grid, Icon, IconButton} from '@mui/material';
+import {Box, Chip, Grid, Icon, IconButton} from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -13,10 +13,15 @@ import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 import {useGridApiRef} from "@mui/x-data-grid-pro";
 import {DataCommonAdditionalAction} from "../../../lib/components/mui/datacommon/MuiDataCommon.tsx";
+import Typography from "@mui/material/Typography";
+import { useNotificacioMassivaResumDialog } from './NotificacioMassivaResumDialog';
+import {useNavigate} from "react-router-dom";
 
 const useDataGridColumns = (datagridApiRef: any) => {
-    const { t } = useTranslation();
 
+    const { t } = useTranslation();
+    const iconOk= React.cloneElement(<Icon>check</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center"} });
+    const iconError= React.cloneElement(<Icon>close</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center" } });
     const columns: MuiDataGridColDef[] = React.useMemo(
         () => [
             {
@@ -30,19 +35,17 @@ const useDataGridColumns = (datagridApiRef: any) => {
                 flex: 1,
                 renderCell: (params: any) => {
                     return (
-                        <>
-                            {params.row.csvFilename}
-                            <Box sx={{ display: 'flex', justifyContent: 'end' }}>
-                                <MuiActionReportButton
-                                    id={params?.id}
-                                    resourceName={"notificacioMassivaResource"}
-                                    report="DESCARREGAR_FITXER_CSV_NOTIFICACIO_MASSIVA"
-                                    reportFileType="CUSTOM"
-                                    title={''}
-                                    buttonComponentProps={{ variant: 'outlined', sx: { mr: 1 } }}
-                                    buttonIcon="file_download"/>
-                            </Box>
-                        </>
+                        <Box sx={{ display: 'flex', alignItems:'center', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                            <Typography>{params.row.csvFilename}</Typography>
+                            <MuiActionReportButton
+                                id={params?.id}
+                                resourceName={"notificacioMassivaResource"}
+                                report="DESCARREGAR_FITXER_CSV_NOTIFICACIO_MASSIVA"
+                                reportFileType="CUSTOM"
+                                title={t('page.notificacioMassiva.grid.csvTooltip')}
+                                iconComponentProps={{fontSize: '10px', color:'primary'}}
+                                icon="file_download"/>
+                        </Box>
                     );
                 },
             },
@@ -52,31 +55,100 @@ const useDataGridColumns = (datagridApiRef: any) => {
                 flex: 1,
                 renderCell: (params: any) => {
                     return (
-                        <>
-                            {params.row.zipFilename}
-                            <Box >
-                                <MuiActionReportButton
-                                    id={params?.id}
-                                    resourceName={"notificacioMassivaResource"}
-                                    report="DESCARREGAR_FITXER_ZIP_NOTIFICACIO_MASSIVA"
-                                    reportFileType="CUSTOM"
-                                    title={''}
-                                    buttonComponentProps={{ variant: 'outlined', sx: { mr: 1 } }}
-                                    buttonIcon="file_download"/>
-                            </Box>
-                        </>
+                        <Box sx={{ display: 'flex', alignItems:'center', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                            <Typography>{params.row.zipFilename}</Typography>
+                            <MuiActionReportButton
+                                id={params?.id}
+                                resourceName={"notificacioMassivaResource"}
+                                report="DESCARREGAR_FITXER_ZIP_NOTIFICACIO_MASSIVA"
+                                reportFileType="CUSTOM"
+                                title={t('page.notificacioMassiva.grid.zipTooltip')}
+                                iconComponentProps={{fontSize: '10px', color:'primary'}}
+                                icon="file_download"/>
+                        </Box>
                     );
                 },
             },
             {
                 field: 'estatValidacio',
                 headerName: t('page.notificacioMassiva.grid.estatValidacio'),
-                flex: 0.6,
+                flex: 1,
+                renderCell: (params: any) => {
+
+                    const labelText = t(`page.notificacioMassiva.grid.estats.${params.row.estatValidacio}`);
+                    const totalNotificacions = params.row.totalNotificacions;
+                    const notificacionsValidades = params.row.notificacionsValidades;
+                    const descarregar = (
+                        <MuiActionReportButton
+                            id={params?.id}
+                            resourceName={"notificacioMassivaResource"}
+                            report="DESCARREGAR_FITXER_ERRORS_VALIDACIO_NOTIFICACIO_MASSIVA"
+                            reportFileType="CUSTOM"
+                            title={t('page.notificacioMassiva.grid.zipTooltip')}
+                            iconComponentProps={{fontSize: '10px', color:'primary'}}
+                            icon="file_download"/>);
+
+                    switch (params.row.estatValidacio) {
+                        case "PENDENT":
+                            return (<Chip label={`${labelText} [${totalNotificacions}]`} variant="outlined"/>)
+                        case "FINALITZAT_AMB_ERRORS": {
+                            return (
+                                <Box display="flex" alignItems="center" justifyContent="space-between" width="100%" gap={1}>
+                                    <Chip label= {<>{labelText} [{iconOk} {notificacionsValidades}{" / "}{iconError} {totalNotificacions - notificacionsValidades}]</>} color="warning"/>
+                                    {descarregar}
+                                </Box>);
+                        }
+                        case "FINALITZAT":
+                            return (<Chip label={<>{labelText} {"["}{iconOk} {notificacionsValidades}{"]"}</>} color="success"/>);
+                        case "ERRONIA":
+                            return (
+                                <Box display="flex" alignItems="center" justifyContent="space-between" width="100%" gap={1}>
+                                    <Chip label={<>{labelText} {"["}{iconError} {totalNotificacions}{"]"}</>} color="error"/>
+                                    {descarregar}
+                                </Box>);
+                        default:
+                            return <Chip label={labelText} />;
+                    }
+                }
             },
             {
                 field: 'estatProces',
                 headerName: t('page.notificacioMassiva.grid.estatProces'),
-                flex: 0.6,
+                flex: 1,
+                renderCell: (params: any) => {
+
+                    const labelText = t(`page.notificacioMassiva.grid.estats.${params.row.estatProces}`);
+                    const iconCancelada= React.cloneElement(<Icon>block</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center", ml: 0.1 } });
+                    const notificacionsProcessades = params.row.notificacionsProcessades;
+                    const notificacionsProcessadesAmbError = params.row.notificacionsProcessadesAmbError;
+                    const notificacionsValidades = params.row.notificacionsValidades;
+                    const notificacionsCancelades = params.row.notificacionsCancelades;
+                    const progress = params.row.progress;
+                    switch (params.row.estatProces) {
+                        case "PENDENT":
+                            return <Chip label={labelText + ` [${notificacionsValidades}]`} variant="outlined" />;
+                        case "EN_PROCES":
+                            return (<Chip color="info" label={<>{labelText} ({progress}%){' '}[{iconOk} {notificacionsProcessades}]</>}/>);
+                        case "EN_PROCES_AMB_ERRORS":
+                            return (<Chip color="warning" label={<>{labelText} ({progress}%){' '}[{iconOk} {notificacionsProcessades} / {iconError} {notificacionsProcessadesAmbError}]</>}/>);
+                        case "FINALITZAT":
+                            return (<Chip color="success" label={<>{labelText} [{iconOk} {notificacionsProcessades}]</>}/>);
+                        case "FINALITZAT_AMB_ERRORS":
+                            return (<Chip color="warning" label={<>{labelText} [{iconOk} {notificacionsProcessades} / {iconError} {notificacionsProcessadesAmbError}]</>}/>);
+                        case "ERRONIA":
+                            return (<Chip color="error" label={<>{labelText} [{iconError} {notificacionsValidades}]</>}/>);
+                        case "CANCELADA":
+                            return (<Chip color="warning" label={<>{labelText} [{iconOk} {notificacionsProcessades}] [{iconCancelada} {notificacionsCancelades}]</>}/>);
+                        case "FINALITZAT_PARCIAL":
+                            return (<Chip color="info" label={<>{labelText} [{iconOk} {notificacionsProcessades} / {notificacionsProcessadesAmbError}] [{iconCancelada} {notificacionsCancelades}]</>}/>);
+                        default:
+                            return <Chip label={labelText} />;
+                    }
+                }
+            },
+            {
+                field: 'createdBy',
+                headerName: t('page.notificacioMassiva.grid.createdBy'),
             },
 
         ],
@@ -111,7 +183,7 @@ const ContentFilter: React.FC = () => {
         <Grid container spacing={1}>
             <GridFormField size={1.75} name="dataIniciInici" />
             <GridFormField size={1.75} name="dataIniciFi" />
-            <GridFormField size={2.5} name="estatProces" />
+            <GridFormField size={2.5} name="estatProces" label={t('page.notificacioMassiva.grid.estatProces')} />
 
             <Grid size={0.5} sx={{ textAlign: 'center' }}>
                 <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
@@ -126,6 +198,7 @@ export const NotifiacioMassivaGrid = () => {
 
     const { t } = useTranslation();
     const springFilterBuilder = useSpringFilterBuilder();
+    const { dialogComponent, onDetailClick } = useNotificacioMassivaResumDialog();
     const filterDataGridProps = useDatagridFilterProps(
         'notificacioMassivaResource',
         'FILTER_NOTIFICACIO_MASSIVA',
@@ -174,16 +247,17 @@ export const NotifiacioMassivaGrid = () => {
         undefined,
     );
 
-    const rowAdditionalActions = () => {
+    const rowAdditionalActions = (row) => {
 
-        const { artifactAction: apiAction } = useResourceApiService('notificacioMassivaResource');
+        const { artifactAction: apiAction, isReady } = useResourceApiService('notificacioMassivaResource');
+        const navigate = useNavigate();
         const listActions: DataCommonAdditionalAction[] = [
             {
                 label: t('page.notificacioMassiva.grid.accions.resum'),
                 title: t('page.notificacioMassiva.grid.accions.resum'),
                 icon: 'info',
                 showInMenu: true,
-                onClick: (id) => console.error(`En construcció: ${id}`),
+                onClick: (id)=> onDetailClick(id),
             },
             {
                 label: t('page.notificacioMassiva.grid.accions.descarregarResum'),
@@ -211,7 +285,7 @@ export const NotifiacioMassivaGrid = () => {
                 title: t('page.notificacioMassiva.grid.accions.posposar'),
                 icon: 'access_time',
                 showInMenu: true,
-                onClick: (id) => apiAction(id, { code: 'POSPOSAR_NOTIFICACIO_MASSIVA', data: { id } }),// posposarAccioMassiva(id),
+                onClick: (id) => isReady && apiAction(id, { code: 'POSPOSAR_NOTIFICACIO_MASSIVA'}),// posposarAccioMassiva(id),
             },
             {
                 label: t('page.notificacioMassiva.grid.accions.reactivar'),
@@ -221,11 +295,21 @@ export const NotifiacioMassivaGrid = () => {
                 onClick: (id) => reactivarAccioMassiva(id),
             },
             {
-                label: t('page.notificacioMassiva.grid.accions.mostrarRemeses'),
-                title: t('page.notificacioMassiva.grid.accions.mostrarRemeses'),
+                label: t('page.notificacioMassiva.grid.accions.mostrarRemeses.label'),
+                title: t('page.notificacioMassiva.grid.accions.mostrarRemeses.label'),
                 icon: 'list',
                 showInMenu: true,
-                onClick: (id) => console.error(`En construcció: ${id}`),
+                onClick: (id, row) => {
+                    const msg1 = t('page.notificacioMassiva.grid.accions.mostrarRemeses.msg1');
+                    const msg2 = t('page.notificacioMassiva.grid.accions.mostrarRemeses.msg2');
+                    const dt = new Date(row.createdDate);
+                    const formatted = new Intl.DateTimeFormat('ca-ES', {
+                        year: 'numeric', month: '2-digit', day: '2-digit',
+                        hour: '2-digit', minute: '2-digit'
+                    }).format(dt);
+                    const titolMassiva = ` ${msg1} ${formatted} - ${row.csvFilename} (${msg2}: ${row.createdBy})`;
+                    navigate(`/notificacions?notificacioMassiva=${id}`, { replace: true, state: { titolMassiva: titolMassiva }  });
+                },
             }
         ];
 
@@ -239,8 +323,8 @@ export const NotifiacioMassivaGrid = () => {
                 resourceName="notificacioMassivaResource"
                 columns={columns}
                 paginationActive
-                // persistentStateActive // TODO DESCOMENTAR ABANS DE PUJAR
-                // persistentStateClearPageSortPropsOnTopLevelRouteChange
+                persistentStateActive
+                persistentStateClearPageSortPropsOnTopLevelRouteChange
                 {...filterDataGridProps}
                 {...pageSizeOptionsDataGridProps}
                 toolbarType="upper"
@@ -248,7 +332,9 @@ export const NotifiacioMassivaGrid = () => {
                 rowAdditionalActions={rowAdditionalActions()}
                 rowUpdateLink="form/{{id}}"
             />
+            {dialogComponent}
         </GridPage>
+
     );
 };
 

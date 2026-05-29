@@ -1,14 +1,8 @@
 package es.caib.notib.persist.resourceentity;
 
 import es.caib.notib.logic.intf.base.config.BaseConfig;
-import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaEstatDto;
-import es.caib.notib.logic.intf.model.EntitatResource;
 import es.caib.notib.logic.intf.model.NotificacioMassivaResource;
-import es.caib.notib.logic.intf.model.NotificacioResource;
-import es.caib.notib.logic.intf.model.PagadorPostalResource;
-import es.caib.notib.persist.entity.EntitatEntity;
-import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,8 +21,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
-import javax.persistence.UniqueConstraint;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

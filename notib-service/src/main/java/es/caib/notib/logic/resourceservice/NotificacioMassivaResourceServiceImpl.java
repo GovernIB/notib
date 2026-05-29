@@ -14,6 +14,7 @@ import es.caib.notib.logic.notificacioMassiva.NotificacioMassivaErrorsExecucioRe
 import es.caib.notib.logic.notificacioMassiva.NotificacioMassivaErrorsValidacioReportGenerator;
 import es.caib.notib.logic.notificacioMassiva.NotificacioMassivaPosposarActionExecutor;
 import es.caib.notib.logic.notificacioMassiva.NotificacioMassivaReactivarActionExecutor;
+import es.caib.notib.logic.notificacioMassiva.NotificacioMassivaResumPerspectiveApplicator;
 import es.caib.notib.logic.notificacioMassiva.NotificacioMassivaResumReportGenerator;
 import es.caib.notib.logic.notificacioMassiva.NotificacioMassivaZipNotificacioReportGenerator;
 import es.caib.notib.persist.resourceentity.NotificacioMassivaResourceEntity;
@@ -50,6 +51,7 @@ public class NotificacioMassivaResourceServiceImpl
 		register(NotificacioMassivaResource.REPORT_DESCARREGAR_ERRORS_EXECUCIO_NOTIFICACIO_MASSIVA, new NotificacioMassivaErrorsExecucioReportGenerator(notificacioMassivaService));
 		register(NotificacioMassivaResource.ACTION_POSPOSAR_NOTIFICACIO_MASSIVA, new NotificacioMassivaPosposarActionExecutor(notificacioMassivaService));
 		register(NotificacioMassivaResource.ACTION_REACTIVAR_NOTIFICACIO_MASSIVA, new NotificacioMassivaReactivarActionExecutor(notificacioMassivaService));
+		register(NotificacioMassivaResource.PERSPECTIVE_RESUM_NOTIFACIO_MASSIVA, new NotificacioMassivaResumPerspectiveApplicator(notificacioMassivaService));
 	}
 
 	@Override

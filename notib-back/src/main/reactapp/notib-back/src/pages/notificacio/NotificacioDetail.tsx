@@ -38,7 +38,6 @@ const NotificacioDetailDialogContent: React.FC<{ id: any }> = (props) => {
             }).then(setNotificacio);
         }
     }, [apiIsReady, id]);
-
     const tabs = [
         {
             id: 'tabDades',
@@ -75,6 +74,7 @@ const NotificacioDetailDialogContent: React.FC<{ id: any }> = (props) => {
         //     hidden: !isVisibleStateMachine,
         // },
     ];
+
 
     return (
         <Box sx={{ height: '650px', minHeight: 0 }}>

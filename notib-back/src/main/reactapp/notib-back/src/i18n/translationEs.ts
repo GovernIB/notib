@@ -558,8 +558,11 @@ const translationEs = {
                 createdDate: 'Creada el',
                 csvFilename: 'Notifiaciones',
                 zipFilename: 'Documentos',
+                csvTooltip: 'Descarregar fitxer CSV',
+                zipTooltip: 'Descarregar document ZIP',
                 estatValidacio: 'Validación CSV',
                 estatProces: 'Estado',
+                createdBy: 'Creada por',
                 accions : {
                     resum: 'Resumen',
                     descarregarResum: 'Descargar resumen',
@@ -567,7 +570,47 @@ const translationEs = {
                     errorsExecucio: 'Errores execución',
                     posposar: 'Pospone',
                     reactivar: 'Reactiva',
-                    mostrarRemeses: 'Muestra remeses'
+                    mostrarRemeses: {
+                        label: 'Muestra remesas',
+                        msg1: 'Envío masivo del',
+                        msg2: 'Usuario'
+                    }
+                },
+                estats: {
+                    PENDENT: 'Pendiente',
+                    EN_PROCES: 'En procso',
+                    EN_PROCES_AMB_ERRORS: 'En procos con errores',
+                    FINALITZAT: 'Finalitzat',
+                    FINALITZAT_AMB_ERRORS: 'Finalizado con errores',
+                    ERRONIA: 'Errónia',
+                    CANCELADA: 'Cancelada',
+                    FINALITZAT_PARCIAL: 'Finalizado parcial'
+                },
+            },
+            detall: {
+                title: 'Detalle de la notificación masiva',
+                dades: {
+                    title: 'Dades',
+                    csvFilename: 'Fitxer CSV amb els enviaments',
+                    zipFilename: 'Fitxer ZIP amb els documents adjunts',
+                    caducitat: 'Caducitat',
+                    createdDate: 'Creada el',
+                    email: 'Email',
+                    createdBy: 'Creada per',
+                },
+                resum: {
+                    title: 'Resum',
+                    enviamentTipus: 'Tipo de envío',
+                    codiDir3UnidadRemisora: 'Unidad remisora',
+                    concepto: 'Concepto',
+                    descripcio: 'Descripción',
+                    prioridadServicio: 'Prioriad servicio',
+                    nomComplert: 'Interesado',
+                    errores: 'Errores validación',
+                    errorsExecucio: 'Errores ejecución',
+                    cancelada: 'Cancelada',
+                    interssatSenseNif: " - Interessat sense NIF",
+                    noRows: "Sin filas"
                 }
             }
         },

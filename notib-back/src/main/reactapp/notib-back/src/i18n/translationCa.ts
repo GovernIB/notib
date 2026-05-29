@@ -310,7 +310,7 @@ const translationCa = {
         },
         notificacio: {
             grid: {
-                title: 'Remeses',
+                title: 'Consulta de remeses',
                 detall: 'Detall',
                 new: {
                     title: 'Nou enviament',
@@ -477,7 +477,7 @@ const translationCa = {
         },
         enviament: {
             grid: {
-                title: 'Enviaments',
+                title: 'Consulta d\'enviaments',
                 detalls: 'Detalls',
                 remesa: 'Remesa',
                 anular: 'Anul·lar',
@@ -589,8 +589,11 @@ const translationCa = {
                 createdDate: 'Creada el',
                 csvFilename: 'Notifiacions',
                 zipFilename: 'Documents',
+                csvTooltip: 'Descarregar fitxer CSV',
+                zipTooltip: 'Descarregar document ZIP',
                 estatValidacio: 'Validació CSV',
                 estatProces: 'Estat',
+                createdBy: 'Creada per',
                 accions : {
                     resum: 'Resum',
                     descarregarResum: 'Descarregar resum',
@@ -598,7 +601,47 @@ const translationCa = {
                     errorsExecucio: 'Errors execució',
                     posposar: 'Posposa',
                     reactivar: 'Reactiva',
-                    mostrarRemeses: 'Mostra remeses'
+                    mostrarRemeses: {
+                        label: 'Mostra remeses',
+                        msg1: 'Enviament massiu del',
+                        msg2: 'Usuari'
+                    }
+                },
+                estats: {
+                    PENDENT: 'Pendent',
+                    EN_PROCES: 'En procés',
+                    EN_PROCES_AMB_ERRORS: 'En procés amb errors',
+                    FINALITZAT: 'Finalitzat',
+                    FINALITZAT_AMB_ERRORS: 'Finalitzat amb errors',
+                    ERRONIA: 'Errònia',
+                    CANCELADA: 'Cancelada',
+                    FINALITZAT_PARCIAL: 'Finalitzat parcial'
+                }
+            },
+            detall: {
+                title: 'Detall de la notificació massiva',
+                dades: {
+                    title: 'Dades',
+                    csvFilename: 'Fitxer CSV amb els enviaments',
+                    zipFilename: 'Fitxer ZIP amb els documents adjunts',
+                    caducitat: 'Caducitat',
+                    createdDate: 'Creada el',
+                    email: 'Email',
+                    createdBy: 'Creada per',
+                },
+                resum: {
+                    title: 'Resum',
+                    enviamentTipus: 'Tipus d\'enviament',
+                    codiDir3UnidadRemisora: 'Unitat remisora',
+                    concepto: 'Concepte',
+                    descripcio: 'Descripció',
+                    prioridadServicio: 'Prioritat servei',
+                    nomComplert: 'Interessat',
+                    errores: 'Errors validació',
+                    errorsExecucio: 'Errors execució',
+                    cancelada: 'Cancelada',
+                    interssatSenseNif: " - Interessat sense NIF",
+                    noRows: "Sense files"
                 }
             }
         },

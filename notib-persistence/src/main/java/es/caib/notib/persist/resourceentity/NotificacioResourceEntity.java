@@ -12,6 +12,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.model.GrupResource;
 import es.caib.notib.logic.intf.model.NotificacioResource;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.entity.NotificacioMassivaEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -204,6 +205,15 @@ public class NotificacioResourceEntity
 		orphanRemoval = true)
 	protected Set<NotificacioEnviamentResourceEntity> enviaments = new LinkedHashSet<>();
 
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@JoinColumn(
+		name = "notificacio_massiva_id",
+		referencedColumnName = "id",
+		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "NOTIF_NOTIF_MASSIVA_FK"),
+		nullable = false)
+	protected NotificacioMassivaResourceEntity notificacioMassiva;
+
+
 	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "registre_nums", insertable = false, updatable = false)
 	@Formula("(select t.registre_nums from " + BaseConfig.DB_PREFIX + "notificacio_table t where t.id = id)")
 	private String registreNums;
@@ -261,7 +271,8 @@ public class NotificacioResourceEntity
 		OrganGestorResourceEntity organGestor,
 		ProcedimentResourceEntity procediment,
 		ProcedimentOrganGestorResourceEntity procedimentOrganGestor,
-		GrupResourceEntity grup) {
+		GrupResourceEntity grup,
+		NotificacioMassivaResourceEntity notificacioMassiva) {
 
 		this.enviamentDataProgramada = resource.getEnviamentDataProgramada();
 		this.concepte = resource.getConcepte();
@@ -299,6 +310,7 @@ public class NotificacioResourceEntity
 		this.procediment = procediment;
 		this.procedimentOrganGestor = procedimentOrganGestor;
 		this.grup = grup;
+		this.notificacioMassiva = notificacioMassiva;
 	}
 
 }

@@ -12,6 +12,7 @@ import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaEstatDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaInfoDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -84,6 +85,10 @@ import java.util.List;
 			code = NotificacioMassivaResource.ACTION_REACTIVAR_NOTIFICACIO_MASSIVA,
 			requiresId = true
 		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.PERSPECTIVE,
+			code = NotificacioMassivaResource.PERSPECTIVE_RESUM_NOTIFACIO_MASSIVA
+		),
 	}
 )
 //@CustomValidation.List({
@@ -104,9 +109,11 @@ public class NotificacioMassivaResource extends BaseResource<Long>  {
 	public static final String REPORT_DESCARREGAR_ERRORS_EXECUCIO_NOTIFICACIO_MASSIVA = "DESCARREGAR_FITXER_ERRORS_EXECUCIO_NOTIFICACIO_MASSIVA";
 	public static final String ACTION_POSPOSAR_NOTIFICACIO_MASSIVA = "POSPOSAR_NOTIFICACIO_MASSIVA";
 	public static final String ACTION_REACTIVAR_NOTIFICACIO_MASSIVA = "REACTIVAR_NOTIFICACIO_MASSIVA";
+	public static final String PERSPECTIVE_RESUM_NOTIFACIO_MASSIVA = "RESUM_NOTIFACIO_MASSIVA";
 
 	//	private final Object procesLock = new Object();
 	private LocalDateTime createdDate;
+	private String createdBy;
 	private Integer progress = 0;
 	private String csvFilename;
 	private String zipFilename;
@@ -127,6 +134,7 @@ public class NotificacioMassivaResource extends BaseResource<Long>  {
 	private ResourceReference<EntitatResource, Long> entitat;
 	private ResourceReference<PagadorPostalResource, Long> pagadorPostal;
 	private List<NotificacioResource> notificacions;
+	private List<NotificacioMassivaInfoDto.NotificacioInfo> resum;
 
 	@Getter
 	@Setter

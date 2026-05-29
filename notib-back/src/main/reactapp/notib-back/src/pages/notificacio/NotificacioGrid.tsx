@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import {Link, useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
     GridRenderCellParams,
@@ -38,6 +38,7 @@ import {
     getGridRowColorClass,
     NOTIFICACIO_ESTAT_ENUM_MAP,
 } from '../../utils/estatConfig';
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 
 const CustomDetailPanelToggle = (props: Pick<GridRenderCellParams, 'id' | 'value'>) => {
     const { id } = props;
@@ -393,7 +394,12 @@ const ContentFilter: React.FC = () => {
 };
 
 const NotificacioGrid = () => {
+
     const { t } = useTranslation();
+    const [ params ] = useSearchParams();
+    const notificacioMassiva = params?.get('notificacioMassiva');
+    const { state } = useLocation();
+    const titolMassiva = state?.titolMassiva;
     const { dialogComponent, onDetailClick } = useNotificacioDetailDialog();
     const { currentActions: apiCurrentActions } = useResourceApiService('notificacioResource');
     const isCreateLinkPresent = apiCurrentActions?.['create'] != null;
@@ -469,12 +475,12 @@ const NotificacioGrid = () => {
 
         return listActions;
     };
-
+    const navigate = useNavigate();
     return (
         <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
             <MuiDataGrid
                 datagridApiRef={datagridApiRef}
-                title={t('page.notificacio.grid.title')}
+                title={t('page.notificacio.grid.title') + titolMassiva}
                 resourceName="notificacioResource"
                 columns={columns}
                 defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
@@ -484,6 +490,7 @@ const NotificacioGrid = () => {
                 persistentStateActive
                 persistentStateClearPageSortPropsOnTopLevelRouteChange
                 {...filterDataGridProps}
+                fixedFilter={notificacioMassiva ? `notificacioMassiva.id :${notificacioMassiva}` : undefined}
                 {...pageSizeOptionsDataGridProps}
                 toolbarType="upper"
                 toolbarHideCreate
@@ -501,6 +508,14 @@ const NotificacioGrid = () => {
                         position: 2,
                         element: <MassiveActionsButton datagridApiRef={datagridApiRef} />,
                     },
+                    ...(notificacioMassiva
+                        ? [
+                            {
+                                position: 0,
+                                element: <IconButton onClick={()=> navigate('/notificacio/massiva')} sx={{mr:1}}><ArrowBackIosIcon /></IconButton>,
+                            },
+                        ]
+                        : []),
                 ]}
                 onRowClick={(params) => onDetailClick(params.id)}
                 rowActionsColumnIndex={11}

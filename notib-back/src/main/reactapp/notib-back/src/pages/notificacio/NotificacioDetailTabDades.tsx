@@ -462,14 +462,14 @@ const NotificacioDetailDialogTabDades: React.FC<PropsTabDades> = (props) => {
                             return (
                                 <>
                                     {notificacio.tipusUsuari === 'INTERFICIE_WEB' ? (
-                                        <Typography>{`${notificacio.createdBy.nom} (${notificacio.createdBy.codi}`}</Typography>
+                                        <Typography>{`${notificacio?.createdBy.nom} (${notificacio?.createdBy.codi}`}</Typography>
                                     ) : (
                                         <>
                                             <Typography>
-                                                {` Aplicacio: ${notificacio.createdBy.nom} (${notificacio.createdBy.codi}`}
+                                                {` Aplicacio: ${notificacio?.createdBy.nom} (${notificacio?.createdBy.codi}`}
                                             </Typography>
                                             <Typography>
-                                                {` Usuari: ${notificacio.usuariNom} (${notificacio.usuariCodi}`}
+                                                {` Usuari: ${notificacio?.usuariNom} (${notificacio?.usuariCodi}`}
                                             </Typography>
                                         </>
                                     )}

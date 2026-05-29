@@ -173,6 +173,7 @@ public class NotificacioResource extends BaseResource<Long> {
 	private ResourceReference<DocumentResource, Long> document3;
 	private ResourceReference<DocumentResource, Long> document4;
 	private ResourceReference<DocumentResource, Long> document5;
+	private ResourceReference<NotificacioMassivaResource, Long> notificacioMassiva;
 	/*private ResourceReference<ProcedimentOrganResource, Long> procedimentOrgan;*/
 
 	@NotNull
