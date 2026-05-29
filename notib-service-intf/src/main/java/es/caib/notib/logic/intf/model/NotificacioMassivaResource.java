@@ -144,5 +144,6 @@ public class NotificacioMassivaResource extends BaseResource<Long>  {
 		private Date dataIniciInici;
 		private Date dataIniciFi;
 		private NotificacioMassivaEstatDto estatProces;
+		private String createdBy;
 	}
 }
