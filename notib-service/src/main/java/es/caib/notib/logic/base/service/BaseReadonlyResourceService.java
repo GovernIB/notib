@@ -830,9 +830,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		}
 	}
 
-	protected void register(
-			String reportCode,
-			ReportGenerator<E, ?, ?> reportGenerator) {
+	protected void register(String reportCode, ReportGenerator<E, ?, ?> reportGenerator) {
 		if (artifactIsPresentInResourceConfig(ResourceArtifactType.REPORT, reportCode)) {
 			reportGeneratorMap.put(reportCode, reportGenerator);
 		} else {

@@ -594,6 +594,11 @@ const translationCa = {
                 estatValidacio: 'Validació CSV',
                 estatProces: 'Estat',
                 createdBy: 'Creada per',
+                llegenda: {
+                    numProcessats: "Num.enviaments processats",
+                    numErronis: "Num.enviaments erronis",
+                    numCancelats: "Num.enviaments cancelats",
+                },
                 accions : {
                     resum: 'Resum',
                     descarregarResum: 'Descarregar resum',
@@ -643,6 +648,22 @@ const translationCa = {
                     interssatSenseNif: " - Interessat sense NIF",
                     noRows: "Sense files"
                 }
+            },
+            form: {
+                title: 'Crear enviament massiu',
+                indicacions: {
+                    title: 'Indicacions per a complimentar el fitxer de dades:',
+                    indicacio1: 'El fitxer de dades ha de ser un document de text pla (CSV) amb els camps separats per punts i comes. Els fitxers amb separadors diferents fallaran (per exemple ",").',
+                    indicacio2: 'La primera fila ha de contenir la capçalera de les columnes'
+                },
+                csvFieldLabel: 'Fitxer CSV amb els enviaments',
+                csvFieldText: 'Només s\'admet format CSV. La mida màxima del document és de 2 Mb. El nombre màxim de notificacions és de 999.',
+                zipFieldLabel: 'Fitxer ZIP amb els documents adjunts',
+                zipFieldText: 'Només s\'admet format ZIP. La mida màxima del document és de 15 Mb.',
+                caducitat: 'Caducitat',
+                email: 'Email d\'avís quan finalitzi la càrrega',
+                codisEntregaPostal: 'Descarrega codis entrega postal',
+                modelCsv: 'Descarrega model de dades CSV'
             }
         },
         integracio: {

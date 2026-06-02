@@ -17,11 +17,13 @@ import Typography from "@mui/material/Typography";
 import { useNotificacioMassivaResumDialog } from './NotificacioMassivaResumDialog';
 import {useNavigate} from "react-router-dom";
 
+const iconOk= React.cloneElement(<Icon>check</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center"} });
+const iconError= React.cloneElement(<Icon>close</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center" } });
+const iconCancelada= React.cloneElement(<Icon>block</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center", ml: 0.1 } });
+
 const useDataGridColumns = (datagridApiRef: any) => {
 
     const { t } = useTranslation();
-    const iconOk= React.cloneElement(<Icon>check</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center"} });
-    const iconError= React.cloneElement(<Icon>close</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center" } });
     const columns: MuiDataGridColDef[] = React.useMemo(
         () => [
             {
@@ -118,7 +120,6 @@ const useDataGridColumns = (datagridApiRef: any) => {
                 renderCell: (params: any) => {
 
                     const labelText = t(`page.notificacioMassiva.grid.estats.${params.row.estatProces}`);
-                    const iconCancelada= React.cloneElement(<Icon>block</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center", ml: 0.1 } });
                     const notificacionsProcessades = params.row.notificacionsProcessades;
                     const notificacionsProcessadesAmbError = params.row.notificacionsProcessadesAmbError;
                     const notificacionsValidades = params.row.notificacionsValidades;
@@ -181,18 +182,25 @@ const ContentFilter: React.FC = () => {
     };
 
     return (
-        <Grid container spacing={1}>
-            <GridFormField size={1.75} name="dataIniciInici" />
-            <GridFormField size={1.75} name="dataIniciFi" />
-            <GridFormField size={2.5} name="estatProces" label={t('page.notificacioMassiva.grid.estatProces')} />
-            <GridFormField size={1.75} name="createdBy" />
+        <Box>
+            <Grid container spacing={1}>
+                <GridFormField size={1.75} name="dataIniciInici" />
+                <GridFormField size={1.75} name="dataIniciFi" />
+                <GridFormField size={2.5} name="estatProces" label={t('page.notificacioMassiva.grid.estatProces')} />
+                <GridFormField size={1.75} name="createdBy" />
 
-            <Grid size={0.5} sx={{ textAlign: 'center' }}>
-                <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
-                    <Icon>filter_alt_off</Icon>
-                </IconButton>
+                <Grid size={0.5} sx={{ textAlign: 'center' }}>
+                    <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
+                        <Icon>filter_alt_off</Icon>
+                    </IconButton>
+                </Grid>
             </Grid>
-        </Grid>
+            <Box paddingTop="15px" display="flex" justifyContent="end" fontSize="10px">
+                [<Box>{iconOk} {t('page.notificacioMassiva.grid.llegenda.numProcessats')}</Box>]
+                [<Box>{iconError} {t('page.notificacioMassiva.grid.llegenda.numErronis')}</Box>]
+                [<Box>{iconCancelada} {t('page.notificacioMassiva.grid.llegenda.numCancelats')}</Box>]
+            </Box>
+        </Box>
     );
 };
 

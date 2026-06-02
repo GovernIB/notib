@@ -9,11 +9,8 @@ import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
-import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaEstatDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaInfoDto;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -89,6 +86,14 @@ import java.util.List;
 			type = ResourceArtifactType.PERSPECTIVE,
 			code = NotificacioMassivaResource.PERSPECTIVE_RESUM_NOTIFACIO_MASSIVA
 		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.REPORT,
+			code = NotificacioMassivaResource.REPORT_DESCARREGAR_CODIS_ENTREGA_POSTAL
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.REPORT,
+			code = NotificacioMassivaResource.REPORT_DESCARREGAR_MODEL_DADES_NOTIFICACIO_MASSIVA
+		),
 	}
 )
 //@CustomValidation.List({
@@ -107,6 +112,8 @@ public class NotificacioMassivaResource extends BaseResource<Long>  {
 	public static final String REPORT_DESCARREGAR_RESUM_NOTIFICACIO_MASSIVA = "DESCARREGAR_FITXER_RESUM_NOTIFICACIO_MASSIVA";
 	public static final String REPORT_DESCARREGAR_ERRORS_VALIDACIO_NOTIFICACIO_MASSIVA = "DESCARREGAR_FITXER_ERRORS_VALIDACIO_NOTIFICACIO_MASSIVA";
 	public static final String REPORT_DESCARREGAR_ERRORS_EXECUCIO_NOTIFICACIO_MASSIVA = "DESCARREGAR_FITXER_ERRORS_EXECUCIO_NOTIFICACIO_MASSIVA";
+	public static final String REPORT_DESCARREGAR_CODIS_ENTREGA_POSTAL = "DESCARREGAR_CODIS_ENTREGA_POSTAL";
+	public static final String REPORT_DESCARREGAR_MODEL_DADES_NOTIFICACIO_MASSIVA = "DESCARREGAR_MODEL_DADES_NOTIFICACIO_MASSIVA";
 	public static final String ACTION_POSPOSAR_NOTIFICACIO_MASSIVA = "POSPOSAR_NOTIFICACIO_MASSIVA";
 	public static final String ACTION_REACTIVAR_NOTIFICACIO_MASSIVA = "REACTIVAR_NOTIFICACIO_MASSIVA";
 	public static final String PERSPECTIVE_RESUM_NOTIFACIO_MASSIVA = "RESUM_NOTIFACIO_MASSIVA";

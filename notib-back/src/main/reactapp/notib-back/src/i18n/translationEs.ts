@@ -563,6 +563,11 @@ const translationEs = {
                 estatValidacio: 'Validación CSV',
                 estatProces: 'Estado',
                 createdBy: 'Creada por',
+                llegenda: {
+                    numProcessats: "Num.envíos procesados",
+                    numErronis: "Num.envíos erronios",
+                    numCancelats: "Num.envíos cancelados",
+                },
                 accions : {
                     resum: 'Resumen',
                     descarregarResum: 'Descargar resumen',
@@ -612,6 +617,20 @@ const translationEs = {
                     interssatSenseNif: " - Interessat sense NIF",
                     noRows: "Sin filas"
                 }
+            },
+            form: {
+                title: "Crear envío masivo",
+                indicacions: {
+                    title: 'Indicaciones para la cumplimentación del fichero de datos:',
+                    indicacio1: 'El archivo de datos debe ser un fichero de texto plano (CSV) con los campos separados por puntos y comas. Los ficheros cuyos separadores sean diferentes fallarán (por ejemplo ",").',
+                    indicacio2: 'La primera fila debe contener el encabezado de las columnas.'
+                },
+                csvFieldLabel: 'Fichero CSV con los envíos',
+                csvFieldText: 'Solo se admite formato CSV. El tamaño máximo del document es de 2 Mb. El número máximo de notificaciones es de 999.',
+                zipFieldLabel: 'Fichero ZIP con los documentos adjuntos',
+                zipFieldText: 'Solo se admite formato ZIP. El tamaño máximo del document es de 15 Mb.',
+                caducitat: 'Caducidad',
+                email: 'Email de aviso cuando finalice la carga'
             }
         },
         integracio: {

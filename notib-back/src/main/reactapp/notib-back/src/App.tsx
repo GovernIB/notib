@@ -67,7 +67,7 @@ const InnerApp: React.FC = () => {
         {
             id: 'nouEnviamentMassiu',
             title: t('app.menu.nouEnviamentmassiu'),
-            to: '/notificacio/massiva/new',
+            to: '/notificacio/massiva/form',
             icon: 'add',
             resourceName: 'notifiacioMassivaResource',
             hidden: currentRole !== ROLE_USER,
@@ -95,7 +95,7 @@ const InnerApp: React.FC = () => {
             title: t('app.menu.consultaEnviamentmassiu'),
             to: '/notificacio/massiva',
             icon: 'forward_to_inbox',
-            resourceName: 'accioMassivaResource',
+            resourceName: 'notificacioMassivaResource',
             hidden: currentRole !== ROLE_ADMIN,
         },
         {
