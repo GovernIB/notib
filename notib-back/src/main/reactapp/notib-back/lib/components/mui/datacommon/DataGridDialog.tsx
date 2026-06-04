@@ -27,7 +27,7 @@ export type DataGridDialogProps = {
  * @returns referència a l'API del component MuiDataGridDialog.
  */
 export const useDataGridDialogApiRef: () => React.RefObject<DataGridDialogApi | null> = () => {
-    const gridApiRef = React.useRef<DataGridDialogApi>(null);
+    const gridApiRef = React.useRef<DataGridDialogApi | null>(null);
     return gridApiRef;
 };
 

@@ -67,8 +67,7 @@ export const MuiFormTabContent: React.FC<FormTabContentProps> = (props) => {
             id={`tabpanel-${index}`}
             aria-labelledby={`tab-${index}`}
             style={{ height: '100%' }}
-            {...other}
-        >
+            {...other}>
             {currentIndex === index && <Box sx={{ pt: 3, height: '100%' }}>{children}</Box>}
         </div>
     ) : showOnCreate ? (
@@ -119,8 +118,7 @@ export const MuiFormTabs: React.FC<FormTabsProps> = (props) => {
                     value={index}
                     onChange={handleIndexChange}
                     ref={tabsRef}
-                    sx={{ borderBottom: '1px solid ' + theme.palette.divider }}
-                >
+                    sx={{ borderBottom: '1px solid ' + theme.palette.divider }}>
                     {tabs.map((t, i) => {
                         if (typeof t === 'string') {
                             return <Tab key={i} value={i} label={t} sx={tabsHeightFix} />;

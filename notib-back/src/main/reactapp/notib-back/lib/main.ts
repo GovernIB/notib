@@ -33,13 +33,13 @@ export {
 export { useDataGridContext as useMuiDataGridContext } from './components/mui/datagrid/DataGridContext';
 export {
     DataGridDialog as MuiDataGridDialog,
-    useDataGridDialogApiRef,
+    useDataGridDialogApiRef as useMuiDataGridDialogApiRef,
 } from './components/mui/datacommon/DataGridDialog';
 export { MuiDataList } from './components/mui/datalist/MuiDataList';
 export { MuiForm } from './components/mui/form/MuiForm';
 export {
     DataFormDialog as MuiFormDialog,
-    useDataFormDialogApiRef,
+    useDataFormDialogApiRef as useMuiFormDialogApiRef,
 } from './components/mui/datacommon/DataFormDialog';
 export { MuiFormSidebar } from './components/mui/form/MuiFormSidebar';
 export { MuiFormTabs, MuiFormTabContent } from './components/mui/form/MuiFormTabs';

@@ -42,8 +42,7 @@ export const FormFieldColor: React.FC<FormFieldCustomProps> = (props) => {
                 <IconButton
                     disabled={disabled || readOnly}
                     onClick={() => (fileInputRef.current as any)?.querySelector('input').click()}
-                    size="small"
-                >
+                    size="small">
                     <Icon fontSize="small">palette</Icon>
                 </IconButton>
             </InputAdornment>

@@ -105,7 +105,14 @@ export type ResourceApiFindArgs = ResourceApiFindCommonArgs & {
 
 export type ResourceApiFindResponse = {
     rows: any[];
-    page: any;
+    page: ResourceApiFindResponsePage;
+};
+
+export type ResourceApiFindResponsePage = {
+    number: number;
+    size: number;
+    totalElements: number;
+    totalPages: number;
 };
 
 export type ResourceApiExportArgs = ResourceApiFindCommonArgs & {

@@ -484,7 +484,7 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
                     },
                     // The next prop fixes a bug in Firefox where the focus was put into the Listbox
                     // container, and then lost focus of the form completely when navigating to the next input
-                    listbox: { tabIndex: '-1' }
+                    listbox: { tabIndex: '-1' },
                 }}
                 openText={t('form.field.reference.open')}
                 closeText={t('form.field.reference.close')}
