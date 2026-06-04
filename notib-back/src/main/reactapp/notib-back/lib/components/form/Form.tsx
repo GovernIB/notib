@@ -137,8 +137,8 @@ const formDataReducer = (state: any, action: FormFieldDataAction): any => {
         case FormFieldDataActionType.FIELD_CHANGE: {
             return {
                 ...state,
-                ...payload.changes,
                 [payload.fieldName]: payload.value,
+                ...payload.changes,
             };
         }
     }
@@ -744,6 +744,22 @@ export const Form: React.FC<FormProps> = (props) => {
         handleSubmissionErrors,
     });
     const apiRef = React.useRef<FormApi>(getFormApi());
+    React.useEffect(() => {
+        apiRef.current = getFormApi();
+    }, [
+        getId,
+        getData,
+        refresh,
+        externalReset,
+        revert,
+        validate,
+        save,
+        delette,
+        focus,
+        setFieldValue,
+        setExternalModified,
+        handleSubmissionErrors,
+    ]);
     if (apiRefProp) {
         apiRefProp.current = getFormApi();
     }

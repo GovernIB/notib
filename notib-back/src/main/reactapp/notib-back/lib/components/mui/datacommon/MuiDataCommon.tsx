@@ -82,7 +82,12 @@ export const useApiDataCommon = (
     const [pageInfo, setPageInfo] = React.useState<any>();
     const [artifacts, setArtifacts] = React.useState<any[]>();
     const [error, setError] = React.useState<any>();
+    // Ref usada per a evitar problemes amb peticions de refresh concurrents.
+    // La idea és descartar totes les respostes que no pertanyin a la darrera petició enviada.
+    const lastRefreshTimestamp = React.useRef<number | null>(null);
     const refresh = () => {
+        const refreshTimestamp = Date.now();
+        lastRefreshTimestamp.current = refreshTimestamp;
         if (apiIsReady && findArgs != null) {
             const processedFindArgs = {
                 ...findArgs,
@@ -93,6 +98,9 @@ export const useApiDataCommon = (
             if (resourceFieldName == null) {
                 apiFind(processedFindArgs)
                     .then((response) => {
+                        // Si el valor guardar a lastRefreshTimestamp no és el mateix que el timestamp d'aquesta execució,
+                        // no s'ha de processar la resposta, ja que hi ha una nova petició refresh en curs.
+                        if (lastRefreshTimestamp.current !== refreshTimestamp) return;
                         setRows(response.rows);
                         setPageInfo(response.page);
                     })
@@ -104,6 +112,9 @@ export const useApiDataCommon = (
                     ...processedFindArgs,
                 })
                     .then((response) => {
+                        // Si el valor guardar a lastRefreshTimestamp no és el mateix que el timestamp d'aquesta execució,
+                        // no s'ha de processar la resposta, ja que hi ha una nova petició refresh en curs.
+                        if (lastRefreshTimestamp.current !== refreshTimestamp) return;
                         setRows(response.rows);
                         setPageInfo(response.page);
                     })
@@ -118,6 +129,9 @@ export const useApiDataCommon = (
                 };
                 apiArtifactFieldOptionsFind(args)
                     .then((response) => {
+                        // Si el valor guardar a lastRefreshTimestamp no és el mateix que el timestamp d'aquesta execució,
+                        // no s'ha de processar la resposta, ja que hi ha una nova petició refresh en curs.
+                        if (lastRefreshTimestamp.current !== refreshTimestamp) return;
                         setRows(response.rows);
                         setPageInfo(response.page);
                     })
@@ -206,7 +220,7 @@ export const useDataCommonEditable = (
     formAdditionalData: ((row?: any) => any) | any,
     toolbarCreateLink: string | undefined,
     toolbarDisableCreateLink: boolean | (() => boolean) | undefined,
-    inlineCreate: (() => void) | undefined,
+    inlineCreate: ((row?: any) => void) | undefined,
     inlineUpdate: ((id: any, row?: any, additionalData?: any) => void) | undefined,
     rowDetailLink: string | undefined,
     rowUpdateLink: string | undefined,
@@ -420,7 +434,8 @@ export const useDataCommonEditable = (
             rowLink: 'delete',
             clickTriggerDelete: true,
         });
-    isPopupEditUpdate && !rowDetailLink &&
+    isPopupEditUpdate &&
+        !rowDetailLink &&
         rowEditActions.push({
             label: t('datacommon.details.label'),
             rowLink: '!update',
@@ -469,8 +484,7 @@ export const useDataCommonEditable = (
                 formComponentProps={popupEditFormComponentProps}
                 formI18nKeys={popupEditFormI18nKeys}
                 onClose={popupEditFormDialogOnClose}
-                apiRef={dataFormDialogApiRef}
-            >
+                apiRef={dataFormDialogApiRef}>
                 {popupEditFormContent}
             </DataFormDialog>
         ) : null;

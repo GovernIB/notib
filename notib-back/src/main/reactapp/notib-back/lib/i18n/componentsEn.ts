@@ -49,6 +49,9 @@ const componentsEn = {
         refresh: {
             label: 'Refresh',
         },
+        quickfilter: {
+            label: 'Quick filter',
+        },
         toolbar: {
             error: 'An error has occurred',
         },

@@ -13,8 +13,6 @@ import { useResourceApiContext } from '../../ResourceApiContext';
 import { useFormFieldCommon } from './FormFieldText';
 
 type FormFieldEnumProps = FormFieldCustomProps & {
-    /** Opcions disponibles */
-    options?: EnumOption[];
     /** Indica si el camp permet múltiples valors */
     multiple?: boolean;
     /** Llista de les opcions que s'han d'ocultar */
@@ -45,7 +43,6 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
         readOnly,
         onChange,
         componentProps,
-        options: optionsProp,
         multiple: multipleProp,
         hiddenEnumValues,
         requestParams,
@@ -119,9 +116,7 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
         setAutocompleteInputValue(newValue);
     };
     React.useEffect(() => {
-        if (optionsProp != null) {
-            setEnumOptions(optionsProp);
-        } else if (field.options != null) {
+        if (field.options != null) {
             const optionsObj = { ...field.options };
             hiddenEnumValues?.forEach((v: any) => {
                 delete optionsObj[v];
@@ -155,7 +150,7 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
         } else {
             setEnumOptions([]);
         }
-    }, [optionsProp, field, requestParams, hiddenEnumValues, requestHref]);
+    }, [field, requestParams, hiddenEnumValues, requestHref]);
     const isRequired = required ?? field.required;
     return !autocomplete ? (
         <TextField
@@ -201,8 +196,7 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
                             : selectedText(value);
                     },
                 },
-            }}
-        >
+            }}>
             {!isRequired && !multiple && enumOptions?.find((o) => o.value == null) == null && (
                 <MenuItem key="" value="">
                     {emptyValueDescription ?? <>&nbsp;</>}
@@ -309,7 +303,7 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
                             ),
                             endAdornment: params.InputProps.endAdornment,
                         },
-                        htmlInput: params.inputProps
+                        htmlInput: params.inputProps,
                     }}
                 />
             )}

@@ -197,24 +197,21 @@ const ContentComponentDefault: React.FC<BaseAppContentComponentProps> = (props) 
                 display: 'flex',
                 flexDirection: 'column',
                 height: mainBoxHeight,
-            }}
-        >
+            }}>
             {appbarComponent}
             <div
                 style={{
                     display: 'flex',
                     flexGrow: 1,
                     minHeight: 0,
-                }}
-            >
+                }}>
                 <nav>{menuComponent}</nav>
                 <main
                     style={{
                         flexGrow: 1,
                         minWidth: 0,
                         ...(!marginsDisabled ? { margin: '16px 24px' } : null),
-                    }}
-                >
+                    }}>
                     {appReady ? childrenOrOfflineComponent : null}
                 </main>
             </div>
@@ -314,8 +311,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
                 appbarComponent={contentComponentSlots.appbar}
                 footerComponent={contentComponentSlots.footer}
                 menuComponent={contentComponentSlots.menu}
-                offlineComponent={contentComponentSlots.offline}
-            >
+                offlineComponent={contentComponentSlots.offline}>
                 {children}
             </ContentComponentDefault>
         </BaseAppContext.Provider>

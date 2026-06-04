@@ -49,10 +49,9 @@ export const GridPage: React.FC<GridPageProps> = (props) => {
             style={{
                 ...(!autoHeight
                     ? { display: 'flex', flexDirection: 'column', height: '100%' }
-                    : { }),
+                    : {}),
                 ...style,
-            }}
-        >
+            }}>
             {proceed && children}
         </div>
     );

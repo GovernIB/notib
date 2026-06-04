@@ -50,6 +50,9 @@ const componentsEs = {
         refresh: {
             label: 'Refrescar',
         },
+        quickfilter: {
+            label: 'Filtro rápido',
+        },
         toolbar: {
             error: 'Se ha producido un error',
         },

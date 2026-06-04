@@ -88,12 +88,12 @@ export const InnerFormFieldNumber: React.FC<
         readOnly,
         onChange,
         componentProps,
+        overrideTextFieldProps,
         allowNegative,
         decimalScale,
         decimalSeparator,
         thousandSeparator,
         valueIsNumericString,
-        overrideTextFieldProps,
         prefix,
         suffix,
     } = props;

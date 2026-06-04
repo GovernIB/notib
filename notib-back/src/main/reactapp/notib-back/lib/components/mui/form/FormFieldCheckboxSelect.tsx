@@ -58,8 +58,7 @@ export const FormFieldCheckboxSelect: React.FC<FormFieldCustomProps> = (props) =
                     onClose: () => setOpen(false),
                     onOpen: () => setOpen(true),
                 },
-            }}
-        >
+            }}>
             <MenuItem value={''}>&nbsp;</MenuItem>
             <MenuItem value={'true'}>{t('form.field.checkboxSelect.true')}</MenuItem>
             <MenuItem value={'false'}>{t('form.field.checkboxSelect.false')}</MenuItem>

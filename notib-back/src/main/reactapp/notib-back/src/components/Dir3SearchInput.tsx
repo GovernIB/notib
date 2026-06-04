@@ -9,7 +9,7 @@ import {
     useFormContext,
     useFilterContext,
     springFilterBuilder as filterBuilder,
-    useDataGridDialogApiRef,
+    useMuiDataGridDialogApiRef,
 } from 'reactlib';
 import GridFormField from './GridFormField';
 import { useTranslation } from 'react-i18next';
@@ -69,7 +69,7 @@ export const Dir3SearchInput: React.FC<{ name: string; required?: true }> = (pro
     const { name, required } = props;
     const [dir3Name, setDir3Name] = React.useState<string>();
     const { apiRef: formApiRef } = useFormContext();
-    const gridDialogApiRef = useDataGridDialogApiRef();
+    const gridDialogApiRef = useMuiDataGridDialogApiRef();
     const { t } = useTranslation();
 
     const dir3DialogColumns = [

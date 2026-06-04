@@ -195,7 +195,8 @@ export const Filter: React.FC<FilterProps> = (props) => {
         focus: (name?: string) => formApiRef.current?.focus(name),
         setFieldValue: (name: string, value: any) => formApiRef.current?.setFieldValue(name, value),
         setModified: (modified: boolean) => formApiRef.current?.setModified(modified),
-        handleSubmissionErrors: (error: ResourceApiError, temporalMessageTitle?: string) => formApiRef.current?.handleSubmissionErrors(error, temporalMessageTitle)
+        handleSubmissionErrors: (error: ResourceApiError, temporalMessageTitle?: string) =>
+            formApiRef.current?.handleSubmissionErrors(error, temporalMessageTitle),
     });
     const apiRef = React.useRef<FilterApi>(getFilterApi());
     if (apiRefProp) {
@@ -220,8 +221,7 @@ export const Filter: React.FC<FilterProps> = (props) => {
                     validationErrors={validationErrors}
                     apiRef={formApiRef}
                     formBlockerDisabled
-                    {...otherFormProps}
-                >
+                    {...otherFormProps}>
                     {children}
                 </Form>
             </div>

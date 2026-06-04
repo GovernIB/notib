@@ -82,8 +82,7 @@ const InnerFormFieldText: React.FC<
                     <IconButton
                         disabled={disabled || readOnly}
                         onClick={() => setPasswordVisible((v) => !v)}
-                        size="small"
-                    >
+                        size="small">
                         <Icon fontSize="small">
                             {passwordVisible ? 'visibility_off' : 'visibility'}
                         </Icon>

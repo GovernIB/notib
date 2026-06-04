@@ -39,9 +39,7 @@ export const MuiFilter: React.FC<MuiFilterProps> = (props) => {
     };
     return (
         <Filter onSpringFilterChange={handleSpringFilterChange} {...otherProps}>
-            <Box {...componentProps}>
-                {children}
-            </Box>
+            <Box {...componentProps}>{children}</Box>
         </Filter>
     );
 };

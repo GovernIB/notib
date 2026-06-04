@@ -51,8 +51,7 @@ export const BasePage: React.FC<BasePageProps> = (props) => {
             style={{
                 ...parentDivExpandHeightStyles,
                 ...style,
-            }}
-        >
+            }}>
             {toolbar}
             <div style={{ margin: '16px', minHeight: 0, ...marginsDivExpandHeightStyles }}>
                 {children}
