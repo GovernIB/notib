@@ -176,20 +176,10 @@ const MassiveActionsButton: React.FC = () => {
     return <AccionsMassives options={opcionsMenu} sizeSelection={selection?.ids?.size} />;
 };
 
-const ContentFilter: React.FC = () => {
+const ContentFilter: React.FC<{openByDefault?: boolean}> = ({openByDefault}) => {
     const filterApiRef = useFilterApiContext();
     const { t } = useTranslation();
-    const [advancedFilter, setAdvancedFilter] = React.useState(false);
-    const {apiRef, isReady} = useFormContext();
-    const [searchParams] = useSearchParams();
-    const referencia = searchParams.get('referencia');
-    React.useEffect(() => {
-        if (!isReady || !referencia) {
-            return;
-        }
-        apiRef?.current?.setFieldValue('referenciaEnviament', referencia);
-        advancedFilterClick();
-    }, [apiRef, isReady, referencia]);
+    const [advancedFilter, setAdvancedFilter] = React.useState(openByDefault ?? false);
 
     const handleButtonClick = () => {
         filterApiRef.current?.clear();
@@ -260,11 +250,15 @@ const EnviamentGrid = () => {
     const gridApiRef = useMuiDataGridApiRef();
     const { dialogComponent: enviamentDialogComponent, onDetailClick } = useEnviamentDetailDialog();
     const { dialogComponent: notificacioDialogComponent, onDetailClick: onNotificacioDetailClick } = useNotificacioDetailDialog();
+    const [searchParams] = useSearchParams();
+    const referencia = searchParams.get('referencia');
     const filterDataGridProps = useDatagridFilterProps(
         'notificacioEnviamentResource',
         'FILTER_ENVIAMENT',
         springFilterBuilder,
-        <ContentFilter />
+        <ContentFilter openByDefault={!!referencia} />,
+        undefined,
+        {referenciaEnviament: referencia}
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
