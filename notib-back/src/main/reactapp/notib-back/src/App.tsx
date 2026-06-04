@@ -69,16 +69,16 @@ const InnerApp: React.FC = () => {
             title: t('app.menu.nouEnviamentmassiu'),
             to: '/notificacio/massiva/form',
             icon: 'add',
-            resourceName: 'notifiacioMassivaResource',
+            resourceName: 'notificacioMassivaResource',
             hidden: currentRole !== ROLE_USER,
         },
         {
-            id: 'enviamentMassiu',
+                id: 'enviamentMassiu',
             title: t('app.menu.consultaEnviamentmassiu'),
             to: '/notificacio/massiva',
             icon: 'forward_to_inbox',
             resourceName: 'notificacioMassivaResource',
-            hidden: currentRole === ROLE_SUPER,
+            hidden: currentRole !== ROLE_USER,
         },
     ];
     const menuGestio = [

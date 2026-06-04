@@ -56,7 +56,7 @@ export const AccioMassivaGridEnviaments: React.FC<{ id: any, tipusElementSelecci
                         {elements.map((element) => (
                             <TableRow key={element.id}>
                                 <TableCell component="th" scope="row">
-                                    <Link to={`/${ruta}?referencia=${element.referencia}`} color="inherit" target="_blank">
+                                    <Link to={`/${ruta}?referencia=${element.referencia}`} color="#ffff" target="_blank">
                                         {element.referencia}
                                     </Link>
                                 </TableCell>

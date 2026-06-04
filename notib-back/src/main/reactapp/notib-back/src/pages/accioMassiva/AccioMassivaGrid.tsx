@@ -125,7 +125,7 @@ const useSpringFilterBuilder = () => {
     return (data: any) => {
         return filterBuilder.and(
             filterBuilder.eq('tipus', `'${data?.tipus}'`),
-            filterBuilder.eq('estat', `'${data?.estat}'`),
+            filterBuilder.like('estat', data?.estat),
             filterBuilder.like('createdBy', data?.createdBy),
             data?.dataIniciInici &&
             filterBuilder.gte('dataInici', `'${formatStartOfDay(data?.dataIniciInici)}'`),

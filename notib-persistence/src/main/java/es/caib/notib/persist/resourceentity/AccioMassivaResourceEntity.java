@@ -20,9 +20,14 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PostLoad;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -83,6 +88,81 @@ public class AccioMassivaResourceEntity extends BaseAuditableResourceEntity<Acci
 
 	@OneToMany(mappedBy = "accioMassiva", fetch = FetchType.LAZY, orphanRemoval = true, cascade={CascadeType.ALL})
 	private List<AccioMassivaElementResourceEntity> elements;
+
+	// TODO REVISAR EL TEMA DE L'ACTUALITZACIO DE L'ESTAT
+
+	@Column(name = "estat")
+	private String estat = "";
+
+	public List<AccioMassivaElementResourceEntity> getElements() { return elements; }
+
+	public void setElements(List<AccioMassivaElementResourceEntity> elements) {
+		this.elements = elements;
+		this.estat = calcularEstat();
+	}
+
+	public void addElement(AccioMassivaElementResourceEntity element) {
+		elements.add(element);
+		element.setAccioMassiva(this);
+		this.estat = calcularEstat();
+	}
+
+	public void removeElement(AccioMassivaElementResourceEntity element) {
+		elements.remove(element);
+		element.setAccioMassiva(null);
+		this.estat = calcularEstat();
+	}
+
+	@PrePersist
+	@PreUpdate
+	void updateEstatBeforeSave() {
+		this.estat = calcularEstat();
+	}
+
+	@PostLoad
+	void updateEstatAfterLoad() {
+		this.estat = calcularEstat();
+	}
+
+	private String calcularEstat() {
+		if (elements == null || elements.isEmpty()) return "";
+		boolean pendent = false, error = false, finalitzat = false;
+		for (var element : elements) {
+			if (element.getDataExecucio() == null && StringUtils.isBlank(element.getErrorDescripcio())) pendent = true;
+			else if (element.getDataExecucio() != null && !StringUtils.isBlank(element.getErrorDescripcio())) error = true;
+			else if (element.getDataExecucio() != null && StringUtils.isBlank(element.getErrorDescripcio())) finalitzat = true;
+		}
+		var parts = new ArrayList<String>();
+		if (pendent) parts.add("PENDENT");
+		if (error) parts.add("ERROR");
+		if (finalitzat) parts.add("FINALITZAT");
+		return String.join(",", parts);
+	}
+
+	public String getEstat() { return estat; }
+	public void setEstat(String estat) { this.estat = estat; }
+//
+//	private String calcularEstat() {
+//
+//		if (elements == null) {
+//			return "";
+//		}
+//		var estat = "";
+//		for (var element : elements) {
+//			if (element.getDataExecucio() == null && StringUtils.isBlank(element.getErrorDescripcio())) {
+//				estat += !estat.contains("PENDENT") ? "PENDENT" : "";
+//			}
+//			if (element.getDataExecucio() != null && !StringUtils.isBlank(element.getErrorDescripcio())) {
+//				estat += !estat.contains("ERROR") ? "ERROR" : "";
+//				// ERROR
+//			}
+//			if (element.getDataExecucio() != null && StringUtils.isBlank(element.getErrorDescripcio())) {
+//				estat += !estat.contains("FINALITZAT") ? "FINALITZAT" : "";
+//				// FINALITZAT
+//			}
+//		}
+//		return estat;
+//	}
 
 	public void setErrorDescripcio(String errorDescripcio) {
 		this.errorDescripcio = StringUtils.abbreviate(errorDescripcio, ERROR_DESC_MAX_LENGTH);

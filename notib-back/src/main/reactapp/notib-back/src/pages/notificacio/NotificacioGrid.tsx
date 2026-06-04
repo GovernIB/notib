@@ -315,10 +315,10 @@ const MassiveActionsButton: React.FC<{ datagridApiRef: React.RefObject<GridApiPr
     );
 };
 
-const ContentFilter: React.FC = () => {
+const ContentFilter: React.FC<{openByDefault?: boolean}> = ({openByDefault}) => {
     const { t } = useTranslation();
     const filterApiRef = useFilterApiContext();
-    const [advancedFilter, setAdvancedFilter] = React.useState(false);
+    const [advancedFilter, setAdvancedFilter] = React.useState(openByDefault ?? false);
 
     const handleButtonClick = () => {
         filterApiRef.current?.clear();
@@ -406,11 +406,15 @@ const NotificacioGrid = () => {
     const datagridApiRef = useGridApiRef();
     const columns = useDataGridColumns(datagridApiRef);
     const springFilterBuilder = useSpringFilterBuilder();
+    const [searchParams] = useSearchParams();
+    const referencia = searchParams.get('referencia');
     const filterDataGridProps = useDatagridFilterProps(
         'notificacioResource',
         'FILTER_NOTIFICACIO',
         springFilterBuilder,
-        <ContentFilter />
+        <ContentFilter openByDefault={!!referencia} />,
+        undefined,
+        {referencia: referencia}
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
 

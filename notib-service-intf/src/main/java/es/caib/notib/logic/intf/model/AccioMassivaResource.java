@@ -52,6 +52,7 @@ import java.util.List;
 public class AccioMassivaResource extends BaseResource<Long>  {
 
 	public static final String FILTER_CODE = "FILTER_ACCIO_MASSIVA";
+	public static final String ALTA_ACCIO_MASSIVA = "ALTA_ACCIO_MASSIVA";
 
 	private AccioMassivaTipus tipus;
 	private String createdBy;
@@ -69,6 +70,7 @@ public class AccioMassivaResource extends BaseResource<Long>  {
 	private String motiu;
 	private boolean adminEntitat;
 	private int dies;
+	private String estat;
 	private ResourceReference<AccioMassivaElementResource, Long> elements;
 
 
