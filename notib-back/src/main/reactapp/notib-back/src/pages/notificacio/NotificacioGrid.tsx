@@ -480,7 +480,7 @@ const NotificacioGrid = () => {
         <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
             <MuiDataGrid
                 datagridApiRef={datagridApiRef}
-                title={t('page.notificacio.grid.title') + titolMassiva}
+                title={t('page.notificacio.grid.title') + (titolMassiva ? titolMassiva : "")}
                 resourceName="notificacioResource"
                 columns={columns}
                 defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}

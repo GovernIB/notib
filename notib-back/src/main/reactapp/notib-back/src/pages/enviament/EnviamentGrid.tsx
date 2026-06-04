@@ -8,7 +8,7 @@ import {
     springFilterBuilder as filterBuilder,
     useMuiDataGridApiRef,
     useMuiActionReportLogic,
-    useMuiDataGridContext,
+    useMuiDataGridContext, useFormContext,
 } from 'reactlib';
 import { Grid, IconButton } from '@mui/material';
 import GridFormField, { GridButtonField } from '../../components/GridFormField';
@@ -22,6 +22,7 @@ import {
     generateGridRowStylesFromMap,
     getGridRowColorClass,
 } from '../../utils/estatConfig';
+import {useSearchParams} from "react-router-dom";
 
 const columns = [
     {
@@ -85,6 +86,7 @@ const columns = [
 ];
 
 const springFilterBuilder = (data: any) => {
+
     return filterBuilder.and(
         filterBuilder.eq('tipusEnviament', `'${data?.tipusEnviament}'`),
         filterBuilder.like('notificacioConcepte', data.notificacioConcepte),
@@ -178,6 +180,16 @@ const ContentFilter: React.FC = () => {
     const filterApiRef = useFilterApiContext();
     const { t } = useTranslation();
     const [advancedFilter, setAdvancedFilter] = React.useState(false);
+    const {apiRef, isReady} = useFormContext();
+    const [searchParams] = useSearchParams();
+    const referencia = searchParams.get('referencia');
+    React.useEffect(() => {
+        if (!isReady || !referencia) {
+            return;
+        }
+        apiRef?.current?.setFieldValue('referenciaEnviament', referencia);
+        advancedFilterClick();
+    }, [apiRef, isReady, referencia]);
 
     const handleButtonClick = () => {
         filterApiRef.current?.clear();
@@ -243,11 +255,11 @@ const ContentFilter: React.FC = () => {
 };
 
 const EnviamentGrid = () => {
+
     const { t } = useTranslation();
     const gridApiRef = useMuiDataGridApiRef();
     const { dialogComponent: enviamentDialogComponent, onDetailClick } = useEnviamentDetailDialog();
-    const { dialogComponent: notificacioDialogComponent, onDetailClick: onNotificacioDetailClick } =
-        useNotificacioDetailDialog();
+    const { dialogComponent: notificacioDialogComponent, onDetailClick: onNotificacioDetailClick } = useNotificacioDetailDialog();
     const filterDataGridProps = useDatagridFilterProps(
         'notificacioEnviamentResource',
         'FILTER_ENVIAMENT',
@@ -255,7 +267,6 @@ const EnviamentGrid = () => {
         <ContentFilter />
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
-
     return (
         <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
             <MuiDataGrid

@@ -280,7 +280,7 @@ const InnerApp: React.FC = () => {
             title: t('app.menu.enviamentMassiu'),
             icon: 'dashboard',
             children: menuEnviamentMassiu,
-            hidden: currentRole === ROLE_SUPER,
+            hidden: currentRole !== ROLE_USER,
         },
         {
             id: 'gestio',

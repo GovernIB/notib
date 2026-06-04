@@ -26,6 +26,7 @@ import ActiveMqGrid from './pages/activeMq/ActiveMqGrid';
 import MonitorSistema from './pages/monitorSistema/MonitorSistema.tsx';
 import NotificacioMassivaGrid from "./pages/notificacioMassiva/NotificacioMassivaGrid.tsx";
 import NotificacioMassivaForm from "./pages/notificacioMassiva/NotificacioMassivaForm.tsx";
+import AccioMassivaGrid from "./pages/accioMassiva/AccioMassivaGrid.tsx";
 
 export const router = createBrowserRouter(
     [
@@ -160,6 +161,10 @@ export const router = createBrowserRouter(
                             ],
                         },
                     ],
+                },
+                {
+                    path: 'accions/massives',
+                    element: <AccioMassivaGrid />,
                 },
                 {
                     path: 'integracions',

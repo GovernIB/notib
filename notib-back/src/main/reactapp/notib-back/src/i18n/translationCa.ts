@@ -583,6 +583,30 @@ const translationCa = {
                 },
             },
         },
+        accioMassiva : {
+            grid: {
+                title: 'Accions Massives',
+                tipus: 'Tipus',
+                createdDate: 'Data creació',
+                dataInici: 'Data inici',
+                dataFi: 'Data fi',
+                createdBy: 'Codi usuari',
+                okErrorPendent: 'Ok/Error/Pendent',
+                progres: 'Progrés',
+                mostarElements: 'Mostrar elements de l\'acció massiva',
+                ocultarElements: 'Ocultar elements de l\'acció massiva',
+                elements: {
+                    titol: 'Elements de l\'acció massiva',
+                    referencia: 'Referencia',
+                    data: 'Data',
+                    estat: 'Estat',
+                    errorDesc: 'Error descripció',
+                    estatFinalitzat: 'Finalitzat',
+                    estatError: 'Error',
+                    estatPendent: 'Pendent'
+                }
+            }
+        },
         notificacioMassiva: {
             grid: {
                 title: 'Consulta d\'enviaments massius',

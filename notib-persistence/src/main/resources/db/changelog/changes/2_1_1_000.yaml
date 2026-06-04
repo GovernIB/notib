@@ -353,3 +353,34 @@ databaseChangeLog:
                                     name: grup_id
                                     type: bigint
                 -   sql: "UPDATE not_notificacio n SET grup_id = (SELECT id FROM not_grup g WHERE n.GRUP_CODI = g.CODI) WHERE n.GRUP_CODI IS NOT NULL;"
+
+    -   changeSet:
+            id: 2_1_1_000-19
+            author: limit
+            changes:
+                -   addForeignKeyConstraint:
+                        baseTableName: ${db_prefix}ACCIO_MASSIVA
+                        baseColumnNames: entitat_id
+                        referencedTableName: ${db_prefix}ENTITAT
+                        referencedColumnNames: ID
+                        constraintName: ${db_prefix}ACCIO_MASSIVA_ENTITAT_FK
+    -   changeSet:
+            id: 2_1_1_000-20
+            author: limit
+            changes:
+                - addColumn:
+                      tableName: not_accio_massiva
+                      columns:
+                          - column:
+                                name: tipus_seleccionat
+                                type: varchar(20 ${varcharUnit})
+                          - column:
+                                name: motiu
+                                type: varchar(250 ${varcharUnit})
+                          - column:
+                                name: admin_entitat
+                                type: boolean
+                                defaultValue: 0
+                          - column:
+                                name: dies
+                                type: Integer

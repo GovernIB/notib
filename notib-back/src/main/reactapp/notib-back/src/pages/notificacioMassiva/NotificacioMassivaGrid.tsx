@@ -162,7 +162,7 @@ return columns;
 const useSpringFilterBuilder = () => {
     return (data: any) => {
         return filterBuilder.and(
-            filterBuilder.eq('estatProces', data?.estatProces),
+            filterBuilder.eq('estatProces', `'${data?.estatProces}'`),
             filterBuilder.like('createdBy', data?.createdBy),
             data?.dataIniciInici &&
             filterBuilder.gte('createdDate', `'${formatStartOfDay(data?.dataIniciInici)}'`),
@@ -186,7 +186,7 @@ const ContentFilter: React.FC = () => {
             <Grid container spacing={1}>
                 <GridFormField size={1.75} name="dataIniciInici" />
                 <GridFormField size={1.75} name="dataIniciFi" />
-                <GridFormField size={2.5} name="estatProces" label={t('page.notificacioMassiva.grid.estatProces')} />
+                <GridFormField size={2.5} name="estatProces" />
                 <GridFormField size={1.75} name="createdBy" />
 
                 <Grid size={0.5} sx={{ textAlign: 'center' }}>

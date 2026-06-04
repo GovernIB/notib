@@ -552,6 +552,28 @@ const translationEs = {
                 },
             },
         },
+        accioMassiva : {
+            grid: {
+                title: 'Acciones Masivas',
+                tipus: 'Tipo',
+                createdDate: 'Fecha creación',
+                dataInici: 'Fecha inicio',
+                dataFi: 'Fecha fin',
+                createdBy: 'Código usuario',
+                okErrorPendent: 'Ok/Error/Pendiente',
+                progres: 'Progreso',
+                elements: {
+                    itol: 'Elemento de la acción masiva',
+                    referencia: 'Referencia',
+                    data: 'Fecha',
+                    estat: 'Estado',
+                    errorDesc: 'Error descripción',
+                    estatFinalitzat: 'Finalitzado',
+                    estatError: 'Error',
+                    estatPendent: 'Pendiente'
+                }
+            }
+        },
         notificacioMassiva: {
             grid: {
                 title: 'Consulta de envíos masivos',

@@ -49,8 +49,9 @@ public class UsuariResourceEntity extends es.caib.notib.persist.base.entity.Base
 	private Idioma idioma;
 	@Column(name = "tema", length = 10)
 	private Tema tema;
-	@Convert(converter = NumElementsPaginaConverter.class)
+//	@Convert(converter = NumElementsPaginaConverter.class)
 	@Column(name = "num_elements_pagina_defecte", length = 3)
+	@Enumerated(EnumType.STRING)
 	private NumElementsPaginaDefecte numElementsPaginaDefecte;
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -113,23 +114,26 @@ public class UsuariResourceEntity extends es.caib.notib.persist.base.entity.Base
 		}
 	}
 
-	@Converter
-	public static class NumElementsPaginaConverter implements AttributeConverter<NumElementsPaginaDefecte, String> {
-		@Override
-		public String convertToDatabaseColumn(NumElementsPaginaDefecte attribute) {
-			return attribute != null ? String.valueOf(attribute.getElements()) : null;
-		}
-		@Override
-		public NumElementsPaginaDefecte convertToEntityAttribute(String dbData) {
-			if (dbData == null) return null;
-			int value = Integer.parseInt(dbData);
-			for (NumElementsPaginaDefecte e: NumElementsPaginaDefecte.values()) {
-				if (e.getElements() == value) {
-					return e;
-				}
-			}
-			throw new IllegalArgumentException("Unknown enum value: " + dbData);
-		}
-	}
+//	@Converter
+//	public static class NumElementsPaginaConverter implements AttributeConverter<NumElementsPaginaDefecte, String> {
+//
+//		@Override
+//		public String convertToDatabaseColumn(NumElementsPaginaDefecte attribute) {
+//			return attribute != null ? String.valueOf(attribute.getElements()) : null;
+//		}
+//
+//		@Override
+//		public NumElementsPaginaDefecte convertToEntityAttribute(String dbData) {
+//
+//			if (dbData == null) {
+//				return null;
+//			}
+//			try {
+//				return NumElementsPaginaDefecte.valueOf(dbData);
+//			} catch (Exception ex) {
+//				throw new IllegalArgumentException("[NumElementsPaginaConverter] Unknown enum value: " + dbData);
+//			}
+//		}
+//	}
 
 }
