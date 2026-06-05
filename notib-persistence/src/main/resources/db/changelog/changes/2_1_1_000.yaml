@@ -315,8 +315,8 @@ databaseChangeLog:
                         referencedTableName: NOT_NOTIFICACIO_ENV
                         referencedColumnNames: id
                         constraintName: CORREUS_AGRUPATS_ENV_ID_FK
-                -   sql: "INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE, CONFIG_GROUP_ID, CONFIG_TYPE_ID)
-                            VALUES ('es.caib.notib.enviar.correus.agrupats.cron', '0 0 21 * * *', 'Especificar l''expressió cron indicant la freqüencia en que s''han d''enviar les correus aguprats per dia', 'EMAIL', 1, 0, 'CRON', 0,
+                -   sql: "INSERT INTO NOT_CONFIG (ID, KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE, CONFIG_GROUP_ID, CONFIG_TYPE_ID)
+                            VALUES (NOT_CONFIG_SEQ.NEXTVAL, 'es.caib.notib.enviar.correus.agrupats.cron', '0 0 21 * * *', 'Especificar l''expressió cron indicant la freqüencia en que s''han d''enviar les correus aguprats per dia', 'EMAIL', 1, 0, 'CRON', 0,
                             (SELECT ID FROM NOT_CONFIG_GROUP g WHERE g.code = 'EMAIL'), (SELECT ID FROM NOT_CONFIG_TYPE t WHERE t.code = 'CRON') );"
 
     -   changeSet:
