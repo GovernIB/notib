@@ -231,8 +231,8 @@ export const useActionReportLogic = (
                 const requestArgs = {
                     id,
                     code: report,
+                    data: { ...formAdditionalDataArg, ...data },
                     fileType: reportFileType,
-                    data,
                 };
                 apiArtifactReport(id, requestArgs)
                     .then((result: any) => {
