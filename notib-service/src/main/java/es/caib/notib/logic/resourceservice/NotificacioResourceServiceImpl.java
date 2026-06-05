@@ -19,7 +19,9 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.model.*;
 import es.caib.notib.logic.intf.resourceservice.NotificacioResourceService;
 import es.caib.notib.logic.intf.service.JustificantService;
+import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.util.DatesUtils;
+import es.caib.notib.logic.notificacions.DocumentEnviatReportGenerator;
 import es.caib.notib.logic.notificacions.DocumentPerspectiveApplicator;
 import es.caib.notib.logic.notificacions.EnviamentPerspectiveApplicator;
 import es.caib.notib.logic.notificacions.GrupPerspectiveApplicator;
@@ -72,6 +74,7 @@ public class NotificacioResourceServiceImpl
 	private final PersonaResourceRepository personaResourceRepository;
 	private final ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository;
 	private final JustificantService justificantService;
+	private final NotificacioService notificacioService;
 
 	@PostConstruct
 	public void init() {
@@ -85,6 +88,7 @@ public class NotificacioResourceServiceImpl
 		register(NotificacioResource.PERSPECTIVE_OPERADORS_CIE_POSTAL, new OperadorPostalCiePerspectiveApplicator());
 		register(NotificacioResource.PERSPECTIVE_GRUP, new GrupPerspectiveApplicator());
 		register(NotificacioResource.REPORT_DESCARREGAR_JUSTIFICANT_NOTIFICACIO, new JusitficantEnviamentReportGenerator(justificantService));
+		register(NotificacioResource.REPORT_DESCARREGAR_DOCUMENT_ENVIAT, new DocumentEnviatReportGenerator(notificacioService));
 	}
 
 	@Override

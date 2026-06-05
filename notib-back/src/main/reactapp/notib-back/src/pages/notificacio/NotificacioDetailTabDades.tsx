@@ -1,9 +1,9 @@
-import { Box, Divider, Icon, Typography } from '@mui/material';
-import { FieldsDataCard } from '../../components/DataCard';
+import {Box, Divider, Icon, Typography} from '@mui/material';
+import {FieldsDataCard} from '../../components/DataCard';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { NotificacioEstatDetall } from './NotificacioEstatRender';
-import {MuiActionReportButton} from "reactlib";
+import {useTranslation} from 'react-i18next';
+import {NotificacioEstatDetall} from './NotificacioEstatRender';
+import {FormField, MuiActionReportButton} from "reactlib";
 
 interface PropsTabDades {
     notificacio: any;
@@ -54,6 +54,24 @@ const TableDocuments: React.FC<PropsTabDades> = (props) => {
                         {
                             field: 'arxiuNom',
                             label: t('page.notificacio.detail.dades.documents.nom'),
+                            valueRenderer: () => {
+                                return (
+                                    <Box display="flex" justifyContent="space-between">
+                                        {document.arxiuNom}
+                                        <Box sx={{ textAlign: 'right' }}>
+                                            <MuiActionReportButton
+                                                id={notificacio?.id}
+                                                resourceName={"notificacioResource"}
+                                                report="DESCARREGAR_DOCUMENT_ENVIAT"
+                                                reportFileType="CUSTOM"
+                                                title={t('page.notificacio.detail.dades.documents.descarregarDocument')}
+                                                buttonComponentProps={{ variant: 'outlined', sx: { mr: 1 } }}
+                                                buttonIcon="file_download"
+                                                formAdditionalData={{docId: document.id}}/>
+                                        </Box>
+                                    </Box>
+                                )
+                            }
                         },
                         {
                             field: 'normalitzat',

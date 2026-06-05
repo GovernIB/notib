@@ -95,6 +95,12 @@ import java.util.List;
 			code = NotificacioResource.REPORT_DESCARREGAR_JUSTIFICANT_NOTIFICACIO,
 			requiresId = true
 		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.REPORT,
+			code = NotificacioResource.REPORT_DESCARREGAR_DOCUMENT_ENVIAT,
+			requiresId = true,
+			formClass = NotificacioResource.DocumentParams.class
+		),
 	}
 )
 @CustomValidation.List({
@@ -113,6 +119,7 @@ public class NotificacioResource extends BaseResource<Long> {
 	public static final String PERSPECTIVE_OPERADORS_CIE_POSTAL = "OPERADORS_CIE_POSTAL";
 	public static final String PERSPECTIVE_GRUP = "OPERADORS_GRUP";
 	public static final String REPORT_DESCARREGAR_JUSTIFICANT_NOTIFICACIO = "DESCARREGAR_JUSTIFICANT_ENVIAMENT_NOTIFICACIO";
+	public static final String REPORT_DESCARREGAR_DOCUMENT_ENVIAT = "DESCARREGAR_DOCUMENT_ENVIAT";
 
 	@NotNull
 	private EnviamentTipus enviamentTipus;
@@ -253,6 +260,15 @@ public class NotificacioResource extends BaseResource<Long> {
 		private boolean nomesLesMeves;
 		private boolean errorLastCallback;
 		private boolean entregaPostal;
+	}
+
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	public static class DocumentParams implements Serializable {
+
+		private Long docId;
+
 	}
 
 }

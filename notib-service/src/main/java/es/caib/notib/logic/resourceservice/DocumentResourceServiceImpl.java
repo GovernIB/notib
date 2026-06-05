@@ -20,18 +20,14 @@ import java.util.Map;
  */
 @Slf4j
 @Service
-public class DocumentResourceServiceImpl
-	extends BaseMutableResourceService<DocumentResource, Long, DocumentResourceEntity>
-	implements DocumentResourceService {
+public class DocumentResourceServiceImpl extends BaseMutableResourceService<DocumentResource, Long, DocumentResourceEntity> implements DocumentResourceService {
 
 	/*
 	 * Com que aquest servei no s'ha d'utilitzar més que per a consultar els fields feim que no es retorni mai cap
 	 * resultat.
 	 */
 	@Override
-	protected String additionalSpringFilter(
-		String currentSpringFilter,
-		String[] namedQueries) {
+	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
 		return "id is null";
 	}
 
@@ -40,10 +36,7 @@ public class DocumentResourceServiceImpl
 	 * recurs llençam una excepció.
 	 */
 	@Override
-	protected void beforeCreateSave(
-		DocumentResourceEntity entity,
-		DocumentResource resource,
-		Map<String, AnswerRequiredException.AnswerValue> answers) {
+	protected void beforeCreateSave(DocumentResourceEntity entity, DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
 		throw new ResourceNotCreatedException(getResourceClass(), "Create is not allowed");
 	}
 

@@ -33,6 +33,7 @@ import AccionsMassives, { MenuOption } from '../../components/AccionsMassives';
 import ButtonDetailExpandColapse from '../../components/ButtonDetailExpandColapse';
 import { DataCommonAdditionalAction } from '../../../lib/components/mui/datacommon/MuiDataCommon';
 import { NotificacioEstatGrid } from './NotificacioEstatRender';
+import { useAccionsNotificacio } from '../accions/AccionsNotificacio';
 import {
     generateGridRowStylesFromMap,
     getGridRowColorClass,
@@ -418,13 +419,14 @@ const NotificacioGrid = () => {
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
 
+    const { descarregarJustificantEnviament, descarregarDocumentEnviat } = useAccionsNotificacio();
     const rowAdditionalActions = () => {
         const listActions: DataCommonAdditionalAction[] = [
             {
                 label: t('page.notificacio.grid.column.detalls'),
                 title: t('page.notificacio.grid.column.detalls'),
                 icon: 'info',
-                showInMenu: false,
+                showInMenu: true,
                 onClick: (id) => onDetailClick(id),
             },
             {
@@ -432,7 +434,7 @@ const NotificacioGrid = () => {
                 title: t('page.notificacio.grid.accions.documentEnviat'),
                 icon: 'download',
                 showInMenu: true,
-                onClick: (id) => console.error(`En construcció: ${id}`),
+                onClick: (id) => descarregarDocumentEnviat(id)
             },
             {
                 label: t('page.notificacio.grid.accions.anular'),
@@ -464,7 +466,7 @@ const NotificacioGrid = () => {
                 title: t('page.notificacio.grid.accions.justificantEnviament'),
                 icon: 'download',
                 showInMenu: true,
-                onClick: (id) => console.error(`En construcció: ${id}`),
+                onClick: (id) => descarregarJustificantEnviament(id)
                 // hidden: (row) => !row?.justificant,
             },
             {

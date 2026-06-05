@@ -427,6 +427,7 @@ const translationCa = {
                         nom: "Nom arxiu",
                         normalitzat: "Normalitzat",
                         csv: "Generar CSV",
+                        descarregarDocument: "Document enviat",
                     },
                     pagadorPostal: {
                         title: "Dades del pagador postal",

@@ -52,6 +52,7 @@ public class DocumentPerspectiveApplicator implements BaseReadonlyResourceServic
 	private DocumentResource emplenarResource(DocumentResourceEntity document) {
 
 		var docResource = new DocumentResource();
+		docResource.setId(document.getId());
 		docResource.setArxiuNom(document.getArxiuNom());
 		docResource.setNormalitzat(document.getNormalitzat());
 		docResource.setCsv(document.getCsv());

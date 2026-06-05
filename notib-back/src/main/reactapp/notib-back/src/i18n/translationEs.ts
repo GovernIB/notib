@@ -399,6 +399,7 @@ const translationEs = {
                         nom: "Nombre archivo",
                         normalitzat: "Normalizado",
                         csv: "Generar CSV",
+                        descarregarDocument: "Document enviado",
                     },
                     pagadorPostal: {
                         title: "Datos del pagador postal",
