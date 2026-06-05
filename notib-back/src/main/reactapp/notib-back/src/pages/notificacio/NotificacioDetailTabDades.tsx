@@ -67,7 +67,8 @@ const TableDocuments: React.FC<PropsTabDades> = (props) => {
                                                 title={t('page.notificacio.detail.dades.documents.descarregarDocument')}
                                                 buttonComponentProps={{ variant: 'outlined', sx: { mr: 1 } }}
                                                 buttonIcon="file_download"
-                                                formAdditionalData={{docId: document.id}}/>
+                                                formAdditionalData={{docId: document.id}}
+                                                formDialogDisabled />
                                         </Box>
                                     </Box>
                                 )
