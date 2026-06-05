@@ -221,7 +221,7 @@ databaseChangeLog:
             author: limit
             changes:
                 -   modifyDataType:
-                        tableName: NOT_NOTIFICACIO_ENV
+                        tableName: ${db_prefix}NOTIFICACIO_ENV
                         columnName: NOTIFICA_DATAT_RECNIF
                         newDataType: varchar(50 ${varcharUnit})
 
@@ -270,20 +270,20 @@ databaseChangeLog:
                                     name: procediment_id
                                     type: bigint
                 -   sql:
-                        "UPDATE NOT_NOTIFICACIO_ENV_TABLE t SET t.PROCEDIMENT_ID = (SELECT ID FROM NOT_PROCEDIMENT p WHERE p.codi = t.PROCEDIMENT_CODI_NOTIB);"
+                        "UPDATE ${db_prefix}NOTIFICACIO_ENV_TABLE t SET t.PROCEDIMENT_ID = (SELECT ID FROM ${db_prefix}PROCEDIMENT p WHERE p.codi = t.PROCEDIMENT_CODI_NOTIB);"
     -   changeSet:
             id: 2_1_1_000-15
             author: limit
             changes:
                 -   addColumn:
-                        tableName: not_usuari
+                        tableName: ${db_prefix}usuari
                         columns:
                             -   column:
                                     name: rebre_emails_agrupats
                                     type: boolean
                                     defaultValue: ${booleanFalse}
                 -   createTable:
-                        tableName: NOT_CORREUS_AGRUPATS
+                        tableName: ${db_prefix}CORREUS_AGRUPATS
                         columns:
                             -   column:
                                     name: id
@@ -291,7 +291,7 @@ databaseChangeLog:
                                     constraints:
                                         nullable: false
                                         primaryKey: true
-                                        primaryKeyName: NOT_CORREUS_AGRUPATS_PK
+                                        primaryKeyName: ${db_prefix}CORREUS_AGRUPATS_PK
                             -   column:
                                     name: enviament_id
                                     type: BIGINT
@@ -310,21 +310,21 @@ databaseChangeLog:
                                     name: createddate
                                     type: TIMESTAMP(6)
                 -   addForeignKeyConstraint:
-                        baseTableName: NOT_CORREUS_AGRUPATS
+                        baseTableName: ${db_prefix}CORREUS_AGRUPATS
                         baseColumnNames: enviament_id
-                        referencedTableName: NOT_NOTIFICACIO_ENV
+                        referencedTableName: ${db_prefix}NOTIFICACIO_ENV
                         referencedColumnNames: id
                         constraintName: CORREUS_AGRUPATS_ENV_ID_FK
-                -   sql: "INSERT INTO NOT_CONFIG (ID, KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE, CONFIG_GROUP_ID, CONFIG_TYPE_ID)
-                            VALUES (NOT_HIBERNATE_SEQ.NEXTVAL, 'es.caib.notib.enviar.correus.agrupats.cron', '0 0 21 * * *', 'Especificar l''expressió cron indicant la freqüencia en que s''han d''enviar les correus aguprats per dia', 'EMAIL', 1, 0, 'CRON', 0,
-                            (SELECT ID FROM NOT_CONFIG_GROUP g WHERE g.code = 'EMAIL'), (SELECT ID FROM NOT_CONFIG_TYPE t WHERE t.code = 'CRON') );"
+                -   sql: "INSERT INTO ${db_prefix}CONFIG (ID, KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE, CONFIG_GROUP_ID, CONFIG_TYPE_ID)
+                            VALUES (${db_prefix}HIBERNATE_SEQ.NEXTVAL, 'es.caib.notib.enviar.correus.agrupats.cron', '0 0 21 * * *', 'Especificar l''expressió cron indicant la freqüencia en que s''han d''enviar les correus aguprats per dia', 'EMAIL', 1, 0, 'CRON', 0,
+                            (SELECT ID FROM ${db_prefix}CONFIG_GROUP g WHERE g.code = 'EMAIL'), (SELECT ID FROM ${db_prefix}CONFIG_TYPE t WHERE t.code = 'CRON') );"
 
     -   changeSet:
             id: 2_1_1_000-16
             author: limit
             changes:
                 -   modifyDataType:
-                        tableName: NOT_PERSONA
+                        tableName: ${db_prefix}PERSONA
                         columnName: RAO_SOCIAL
                         newDataType: varchar(255 ${varcharUnit})
 
@@ -342,7 +342,7 @@ databaseChangeLog:
                         tableName: ${db_prefix}notificacio_env_table
                         columnName: registre_numero
                         newDataType: varchar(50 ${varcharUnit})
-                -   sql: "UPDATE not_notificacio_env_table t SET registre_numero = (SELECT registre_numero_formatat FROM NOT_NOTIFICACIO_ENV e WHERE t.id = e.id);"
+                -   sql: "UPDATE ${db_prefix}notificacio_env_table t SET registre_numero = (SELECT registre_numero_formatat FROM ${db_prefix}NOTIFICACIO_ENV e WHERE t.id = e.id);"
 
     -   changeSet:
             id: 2_1_1_000-18
@@ -354,7 +354,7 @@ databaseChangeLog:
                             -   column:
                                     name: grup_id
                                     type: bigint
-                -   sql: "UPDATE not_notificacio n SET grup_id = (SELECT id FROM not_grup g WHERE n.GRUP_CODI = g.CODI) WHERE n.GRUP_CODI IS NOT NULL;"
+                -   sql: "UPDATE ${db_prefix}notificacio n SET grup_id = (SELECT id FROM ${db_prefix}grup g WHERE n.GRUP_CODI = g.CODI) WHERE n.GRUP_CODI IS NOT NULL;"
 
     -   changeSet:
             id: 2_1_1_000-19
@@ -371,7 +371,7 @@ databaseChangeLog:
             author: limit
             changes:
                 - addColumn:
-                      tableName: not_accio_massiva
+                      tableName: ${db_prefix}accio_massiva
                       columns:
                           - column:
                                 name: tipus_seleccionat
@@ -390,6 +390,6 @@ databaseChangeLog:
             id: 2_1_1_000-21
             author: limit
             changes:
-                -   sql: "INSERT INTO NOT_CONFIG (id,POSITION, KEY, VALUE, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE, TYPE_CODE, CONFIG_GROUP_ID, CONFIG_TYPE_ID)
-                            VALUES (NOT_HIBERNATE_SEQ.NEXTVAL, 1, 'es.caib.notib.plugin.cie.https', 'true', 0, 'El WS del plugin CIE es via https', 'CIE', 'BOOL',
-                            (SELECT ID FROM NOT_CONFIG_GROUP g WHERE g.code = 'CIE'), (SELECT ID FROM NOT_CONFIG_TYPE t WHERE t.code = 'BOOL') );"
+                -   sql: "INSERT INTO ${db_prefix}CONFIG (id,POSITION, KEY, VALUE, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE, TYPE_CODE, CONFIG_GROUP_ID, CONFIG_TYPE_ID)
+                            VALUES (${db_prefix}HIBERNATE_SEQ.NEXTVAL, 1, 'es.caib.notib.plugin.cie.https', 'true', 0, 'El WS del plugin CIE es via https', 'CIE', 'BOOL',
+                            (SELECT ID FROM ${db_prefix}CONFIG_GROUP g WHERE g.code = 'CIE'), (SELECT ID FROM ${db_prefix}CONFIG_TYPE t WHERE t.code = 'BOOL') );"
