@@ -316,7 +316,7 @@ databaseChangeLog:
                         referencedColumnNames: id
                         constraintName: CORREUS_AGRUPATS_ENV_ID_FK
                 -   sql: "INSERT INTO NOT_CONFIG (ID, KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE, CONFIG_GROUP_ID, CONFIG_TYPE_ID)
-                            VALUES (HIBERNATE_SEQUENCE.NEXTVAL, 'es.caib.notib.enviar.correus.agrupats.cron', '0 0 21 * * *', 'Especificar l''expressió cron indicant la freqüencia en que s''han d''enviar les correus aguprats per dia', 'EMAIL', 1, 0, 'CRON', 0,
+                            VALUES (NOT_HIBERNATE_SEQ.NEXTVAL, 'es.caib.notib.enviar.correus.agrupats.cron', '0 0 21 * * *', 'Especificar l''expressió cron indicant la freqüencia en que s''han d''enviar les correus aguprats per dia', 'EMAIL', 1, 0, 'CRON', 0,
                             (SELECT ID FROM NOT_CONFIG_GROUP g WHERE g.code = 'EMAIL'), (SELECT ID FROM NOT_CONFIG_TYPE t WHERE t.code = 'CRON') );"
 
     -   changeSet:
@@ -391,5 +391,5 @@ databaseChangeLog:
             author: limit
             changes:
                 -   sql: "INSERT INTO NOT_CONFIG (id,POSITION, KEY, VALUE, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE, TYPE_CODE, CONFIG_GROUP_ID, CONFIG_TYPE_ID)
-                            VALUES (HIBERNATE_SEQUENCE.NEXTVAL, 1, 'es.caib.notib.plugin.cie.https', 'true', 0, 'El WS del plugin CIE es via https', 'CIE', 'BOOL',
+                            VALUES (NOT_HIBERNATE_SEQ.NEXTVAL, 1, 'es.caib.notib.plugin.cie.https', 'true', 0, 'El WS del plugin CIE es via https', 'CIE', 'BOOL',
                             (SELECT ID FROM NOT_CONFIG_GROUP g WHERE g.code = 'CIE'), (SELECT ID FROM NOT_CONFIG_TYPE t WHERE t.code = 'BOOL') );"
