@@ -4,6 +4,7 @@ import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
+import es.caib.notib.logic.enviaments.EnviarCallbackActionExecutor;
 import es.caib.notib.logic.helper.*;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
@@ -17,6 +18,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumD
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.model.*;
 import es.caib.notib.logic.intf.resourceservice.NotificacioResourceService;
+import es.caib.notib.logic.intf.service.CallbackService;
 import es.caib.notib.logic.intf.service.JustificantService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.util.DatesUtils;
@@ -77,6 +79,7 @@ public class NotificacioResourceServiceImpl
 	private final ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository;
 	private final JustificantService justificantService;
 	private final NotificacioService notificacioService;
+	private final CallbackService callbackService;
 
 	@PostConstruct
 	public void init() {
@@ -96,6 +99,7 @@ public class NotificacioResourceServiceImpl
 		register(NotificacioResource.ACTION_AMPLIAR_TERMINI, new AmpliarTerminiRemesaActionExecutor(notificacioService));
 		register(NotificacioResource.ACTION_MARCAR_PROCESSAT, new MarcarProcessatActionExecutor());
 		register(NotificacioResource.ACTION_ESBORRAR_REMESA, new EsborrarRemesaActionExecutor(notificacioService, messageHelper));
+		register(NotificacioResource.ACTION_ENVIAR_CALLBACK, new EnviarCallbackActionExecutor(callbackService));
 	}
 
 	@Override

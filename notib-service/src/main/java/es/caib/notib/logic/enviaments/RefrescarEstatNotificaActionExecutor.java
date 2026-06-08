@@ -12,10 +12,10 @@ import java.util.Map;
 
 @Slf4j
 @AllArgsConstructor
-public class RefrescarEstatNotificaActionExecutor implements BaseMutableResourceService.ActionExecutor<NotificacioEnviamentResourceEntity, Serializable, NotificacioEnviamentResource> {
+public class RefrescarEstatNotificaActionExecutor implements BaseMutableResourceService.ActionExecutor<NotificacioEnviamentResourceEntity, Serializable, String> {
 
 	@Override
-	public NotificacioEnviamentResource exec(String code, NotificacioEnviamentResourceEntity entity, Serializable params) throws ActionExecutionException {
+	public String exec(String code, NotificacioEnviamentResourceEntity entity, Serializable params) throws ActionExecutionException {
 
 		log.info("action exec");
 		return null;

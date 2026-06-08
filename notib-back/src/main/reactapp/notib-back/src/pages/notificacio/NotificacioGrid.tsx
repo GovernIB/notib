@@ -399,7 +399,7 @@ const NotificacioGrid = () => {
 
     const { descarregarJustificantEnviament, descarregarDocumentEnviat, descarregarCertificacio, anularRemesa, ampliarTermini, marcarProcessat, esborrarRemesa } = useAccionsNotificacio();
     const rowAdditionalActions = () => {
-        const listActions: DataCommonAdditionalAction[] = [
+        const listActions: DataCommonAdditionalAction[] = [ // TODO FALTEN CONDICIONS PER MOSTRAR CADA ENTRADA
             {
                 label: t('page.notificacio.grid.column.detalls'),
                 title: t('page.notificacio.grid.column.detalls'),

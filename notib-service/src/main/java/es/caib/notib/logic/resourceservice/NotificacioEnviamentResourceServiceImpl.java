@@ -58,8 +58,8 @@ public class NotificacioEnviamentResourceServiceImpl
 		register(NotificacioEnviamentResource.PERSPECTIVE_ENTREGA_POSTAL, new EntregaPostalPerspectiveApplicator());
 		register(NotificacioEnviamentResource.REPORT_DESCARREGAR_DIAGRAMA_STATE_MACHINE, new DiagramaStateMachineReportGenerator());
 		register(NotificacioEnviamentResource.REPORT_DESCARREGAR_CIE_CERTIFICACIO, new EntregaPostalCertificacioReportGenerator(pluginHelper, metricsHelper));
-		register(NotificacioEnviamentResource.ACTION_REFRESCAR_ESTAT_NOTIFICA, new RefrescarEstatNotificaActionExecutor());
 		register(NotificacioEnviamentResource.REPORT_DESCARREGAR_CERTIFICACIO_ENVIAMENT, new EnviamentCertificacioReportGenerator(notificacioService));
+		register(NotificacioEnviamentResource.ACTION_REFRESCAR_ESTAT_NOTIFICA, new RefrescarEstatNotificaActionExecutor());
 	}
 
 	@Override

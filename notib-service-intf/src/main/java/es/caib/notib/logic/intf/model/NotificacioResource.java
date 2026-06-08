@@ -151,6 +151,17 @@ import java.util.List;
 					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN})
 			}
 		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.ACTION_ENVIAR_CALLBACK,
+			requiresId = true,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN }
+				)
+			}
+		),
 	}
 )
 @CustomValidation.List({
@@ -175,6 +186,7 @@ public class NotificacioResource extends BaseResource<Long> {
 	public static final String ACTION_AMPLIAR_TERMINI = "AMPLIAR_TERMINI";
 	public static final String ACTION_MARCAR_PROCESSAT = "MARCAR_PROCESSAT";
 	public static final String ACTION_ESBORRAR_REMESA = "ESBORRAR_REMESA";
+	public static final String ACTION_ENVIAR_CALLBACK = "ENVIAR_CALLBACK";
 
 	@NotNull
 	private EnviamentTipus enviamentTipus;

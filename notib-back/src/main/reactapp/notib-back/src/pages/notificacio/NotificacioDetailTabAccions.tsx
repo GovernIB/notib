@@ -16,92 +16,82 @@ const NotificacioDetailDialogTabAccions: React.FC<{ notificacio: any }> = (props
 
     const accionsVisibles = React.useMemo(() => {
         const llistaAccions: AccioConfig[] = [
-            // ---------------- EXEMPLE ACCIONS REALS (s'han de borrar) ----------------------
-            {
-                visible: true,
-                title: t('page.enviament.detail.tab.stateMachine.descarregarDiagrama'),
-                titleButton: t('Descarregar diagrama'),
-                resourceName: 'notificacioEnviamentResource',
-                buttonIcon: 'download',
-                report: 'DESCARREGAR_DIAGRAMA_STATE_MACHINE',
-                reportFileType: 'CUSTOM',
-            },
-            {
-                visible: true,
-                title: t('page.enviament.detail.tab.notifica.refrescar'),
-                titleButton: t('Refrescar estat'),
-                resourceName: 'notificacioEnviamentResource',
-                buttonIcon: 'refresh',
-                action: 'REFRESCAR_ESTAT_NOTIFICA',
-                id: notificacio?.id,
-            },
-            // ---------------- FINAL EXEMPLE ----------------------
             {
                 // visible: notificacio.tipusUsuari == 'APLICACIO' && (notificacio.errorLastCallback || notificacio.eventsCallbackPendent),
-                // TODO: eventsCallbackPendent no existeix
+                id: notificacio?.id,
                 title: t('Envia canvi estat al client'),
                 titleButton: t(''),
                 resourceName: 'notificacioResource',
                 buttonIcon: 'send',
+                action: 'ENVIAR_CALLBACK'
             },
-            {
-                // visible: notificacio.errorEntregaPostal == true and notificacio.notificacioAntiga == false,
-                // TODO: errorEntregaPostal i notificacioAntiga no existeix
-                title: t('Reenviar la entrega postal'),
-                titleButton: t('Reenvia'),
-                resourceName: 'notificacioResource',
-                buttonIcon: 'send',
-            },
-            {
-                visible: notificacio.estat == 'PENDENT',
-                title: t('Registra notificació pendent'),
-                titleButton: t('Registra'),
-                resourceName: 'notificacioResource',
-                buttonIcon: 'send',
-            },
-            {
-                visible: notificacio.estat == 'REGISTRADA',
-                title: t('Envia notificació registrada'),
-                titleButton: t('Envia'),
-                resourceName: 'notificacioResource',
-                buttonIcon: 'send',
-            },
-            {
-                // visible: notificacio.estat == 'ENVIADA' && notificacio.notificaErrorTipus == 'ERROR_REINTENTS_CONSULTA',
-                // TODO: notificaErrorTipus no existeix
-                title: t("Reactiva consulta d'estat"),
-                titleButton: t('Reactiva'),
-                resourceName: 'notificacioResource',
-                buttonIcon: 'play_arrow',
-            },
-            {
-                // visible: notificacio.estat == 'ENVIAT_SIR' && notificacio.fiReintents,
-                // TODO: fiReintents no existeix
-                title: t('Reactiva consulta estat SIR'),
-                titleButton: t('Reactiva'),
-                resourceName: 'notificacioResource',
-                buttonIcon: 'play_arrow',
-            },
-            {
-                visible:
-                    (notificacio.estat == 'ENVIADA_AMB_ERRORS' ||
-                        notificacio.estat == 'FINALITZADA_AMB_ERRORS') &&
-                    !notificacio.justificantCreat,
-                title: t('Reactiva enviaments amb error'),
-                titleButton: t('Reactiva'),
-                resourceName: 'notificacioResource',
-                buttonIcon: 'refresh',
-            },
-            {
-                visible:
-                    (notificacio.estat == 'ENVIADA_AMB_ERRORS' ||
-                        notificacio.estat == 'FINALITZADA_AMB_ERRORS') &&
-                    !notificacio.justificantCreat,
-                title: t('Reenvia enviaments amb error'),
-                titleButton: t('Reenvia'),
-                resourceName: 'notificacioResource',
-                buttonIcon: 'refresh',
-            },
+            // {
+            //     // visible: notificacio.errorEntregaPostal == true and notificacio.notificacioAntiga == false,
+            //     // TODO: errorEntregaPostal i notificacioAntiga no existeix
+            //     title: t('Reenviar la entrega postal'),
+            //     titleButton: t('Reenvia'),
+            //     resourceName: 'notificacioResource',
+            //     buttonIcon: 'send',
+            // },
+            // {
+            //     visible: notificacio?.estat == 'PENDENT',
+            //     title: t('Registra notificació pendent'),
+            //     titleButton: t('Registra'),
+            //     resourceName: 'notificacioResource',
+            //     buttonIcon: 'send',
+            // },
+            // {
+            //     visible: notificacio?.estat == 'REGISTRADA',
+            //     title: t('Envia notificació registrada'),
+            //     titleButton: t('Envia'),
+            //     resourceName: 'notificacioResource',
+            //     buttonIcon: 'send',
+            // },
+            // {
+            //     visible: true,
+            //     title: t('page.enviament.detail.tab.notifica.refrescar'),
+            //     titleButton: t('Refrescar estat'),
+            //     resourceName: 'notificacioEnviamentResource',
+            //     buttonIcon: 'refresh',
+            //     action: 'REFRESCAR_ESTAT_NOTIFICA',
+            //     id: notificacio?.id,
+            // },
+            // {
+            //     // visible: notificacio.estat == 'ENVIADA' && notificacio.notificaErrorTipus == 'ERROR_REINTENTS_CONSULTA',
+            //     // TODO: notificaErrorTipus no existeix
+            //     title: t("Reactiva consulta d'estat"),
+            //     titleButton: t('Reactiva'),
+            //     resourceName: 'notificacioResource',
+            //     buttonIcon: 'play_arrow',
+            // },
+            // {
+            //     // visible: notificacio.estat == 'ENVIAT_SIR' && notificacio.fiReintents,
+            //     // TODO: fiReintents no existeix
+            //     title: t('Reactiva consulta estat SIR'),
+            //     titleButton: t('Reactiva'),
+            //     resourceName: 'notificacioResource',
+            //     buttonIcon: 'play_arrow',
+            // },
+            // {
+            //     visible:
+            //         (notificacio?.estat == 'ENVIADA_AMB_ERRORS' ||
+            //             notificacio?.estat == 'FINALITZADA_AMB_ERRORS') &&
+            //         !notificacio?.justificantCreat,
+            //     title: t('Reactiva enviaments amb error'),
+            //     titleButton: t('Reactiva'),
+            //     resourceName: 'notificacioResource',
+            //     buttonIcon: 'refresh',
+            // },
+            // {
+            //     visible:
+            //         (notificacio?.estat == 'ENVIADA_AMB_ERRORS' ||
+            //             notificacio?.estat == 'FINALITZADA_AMB_ERRORS') &&
+            //         !notificacio?.justificantCreat,
+            //     title: t('Reenvia enviaments amb error'),
+            //     titleButton: t('Reenvia'),
+            //     resourceName: 'notificacioResource',
+            //     buttonIcon: 'refresh',
+            // },
         ];
         return llistaAccions.filter((accio) => accio.visible !== false);
     }, [notificacio, t]);
