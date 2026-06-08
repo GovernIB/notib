@@ -307,13 +307,7 @@ const MassiveActionsButton: React.FC<{ datagridApiRef: React.RefObject<GridApiPr
         },
     ];
 
-    return (
-        <AccionsMassives
-            options={opcionsMenu}
-            sizeSelection={selection?.ids?.size}
-            datagridApiRef={datagridApiRef}
-        />
-    );
+    return (<AccionsMassives options={opcionsMenu} sizeSelection={selection?.ids?.size} datagridApiRef={datagridApiRef}/>);
 };
 
 const ContentFilter: React.FC<{openByDefault?: boolean}> = ({openByDefault}) => {
@@ -346,16 +340,12 @@ const ContentFilter: React.FC<{openByDefault?: boolean}> = ({openByDefault}) => 
                     <GridFormField
                         size={3.5}
                         name="procediment"
-                        filter={springFilterBuilder.and(
-                            springFilterBuilder.eq('tipus', `'PROCEDIMENT'`)
-                        )}
+                        filter={springFilterBuilder.and(springFilterBuilder.eq('tipus', `'PROCEDIMENT'`))}
                     />
                     <GridFormField
                         size={3.5}
                         name="servei"
-                        filter={springFilterBuilder.and(
-                            springFilterBuilder.eq('tipus', `'SERVEI'`)
-                        )}
+                        filter={springFilterBuilder.and(springFilterBuilder.eq('tipus', `'SERVEI'`))}
                     />
                     <GridFormField size={2} name="tipusUsuari" />
                     <GridFormField size={3} name="createdBy" />
@@ -365,12 +355,7 @@ const ContentFilter: React.FC<{openByDefault?: boolean}> = ({openByDefault}) => 
                     <GridFormField size={1.75} name="dataCaducitatFi" />
                     <GridButtonField size={0.5} name="nomesLesMeves" icon={'person'} hiddenLabel />
                     <GridButtonField size={0.5} name="entregaPostal" icon={'email'} hiddenLabel />
-                    <GridButtonField
-                        size={0.5}
-                        name="errorLastCallback"
-                        icon={'report_problem'}
-                        hiddenLabel
-                    />
+                    <GridButtonField size={0.5} name="errorLastCallback" icon={'report_problem'} hiddenLabel/>
                 </>
             )}
             <Grid size={0.5} sx={{ textAlign: 'center' }}>
@@ -379,15 +364,8 @@ const ContentFilter: React.FC<{openByDefault?: boolean}> = ({openByDefault}) => 
                 </IconButton>
             </Grid>
             <Grid size={0.5} sx={{ textAlign: 'center' }}>
-                <IconButton
-                    onClick={advancedFilterClick}
-                    title={t(
-                        advancedFilter ? 'comu.tancarFiltreAvançat' : 'comu.obrirFiltreAvançat'
-                    )}
-                >
-                    <Icon sx={{ transform: advancedFilter ? 'rotate(180deg)' : 'none' }}>
-                        filter_list
-                    </Icon>
+                <IconButton onClick={advancedFilterClick} title={t(advancedFilter ? 'comu.tancarFiltreAvançat' : 'comu.obrirFiltreAvançat')}>
+                    <Icon sx={{ transform: advancedFilter ? 'rotate(180deg)' : 'none' }}>filter_list</Icon>
                 </IconButton>
             </Grid>
         </Grid>
@@ -419,7 +397,7 @@ const NotificacioGrid = () => {
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
 
-    const { descarregarJustificantEnviament, descarregarDocumentEnviat } = useAccionsNotificacio();
+    const { descarregarJustificantEnviament, descarregarDocumentEnviat, descarregarCertificacio, anularRemesa, ampliarTermini, marcarProcessat, esborrarRemesa } = useAccionsNotificacio();
     const rowAdditionalActions = () => {
         const listActions: DataCommonAdditionalAction[] = [
             {
@@ -441,7 +419,7 @@ const NotificacioGrid = () => {
                 title: t('page.notificacio.grid.accions.anular'),
                 icon: 'block',
                 showInMenu: true,
-                onClick: (id) => console.error(`En construcció: ${id}`),
+                onClick: (id) => anularRemesa(id),
                 // hidden: (row) => !row.anulable,
             },
             {
@@ -449,7 +427,7 @@ const NotificacioGrid = () => {
                 title: t('page.notificacio.grid.accions.certificacio'),
                 icon: 'download',
                 showInMenu: true,
-                onClick: (id) => console.error(`En construcció: ${id}`),
+                onClick: (id) => descarregarCertificacio(id),
                 // hidden: (row) => !row.envCerData,
             },
             {
@@ -457,7 +435,7 @@ const NotificacioGrid = () => {
                 title: t('page.notificacio.grid.accions.processat'),
                 icon: 'check_circle',
                 showInMenu: true,
-                onClick: (id) => console.error(`En construcció: ${id}`),
+                onClick: (id) => marcarProcessat(id),
                 // hidden: (row) => row,
                 // if ${!isRolActualAdministradorLectura} && ((~hlpIsAdministradorEntitat() && estat == 'FINALITZADA') || permisProcessar)
             },
@@ -474,7 +452,23 @@ const NotificacioGrid = () => {
                 title: t('page.notificacio.grid.accions.ampliarTermini'),
                 icon: 'calendar_month',
                 showInMenu: true,
-                onClick: (id) => console.error(`En construcció: ${id}`),
+                onClick: (id) => ampliarTermini(id),
+                // hidden: (row) => isRolActualAdministradorLectura && !row?.plazoAmpliable,
+            },
+            {
+                label: t('page.notificacio.grid.accions.editar'),
+                title: t('page.notificacio.grid.accions.editar'),
+                icon: 'edit_icon',
+                showInMenu: true,
+                onClick: (id) => console.log("editar " + id),
+                // hidden: (row) => isRolActualAdministradorLectura && !row?.plazoAmpliable,
+            },
+            {
+                label: t('page.notificacio.grid.accions.esborrar'),
+                title: t('page.notificacio.grid.accions.esborrar'),
+                icon: 'delete_icon',
+                showInMenu: true,
+                onClick: (id) => esborrarRemesa(id),
                 // hidden: (row) => isRolActualAdministradorLectura && !row?.plazoAmpliable,
             },
         ];

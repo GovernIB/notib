@@ -12,6 +12,7 @@ import lombok.experimental.SuperBuilder;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 import java.util.List;
 
 @Data
@@ -22,7 +23,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class RespuestaAmpliarPlazoOE extends RespostaBase {
+public class RespuestaAmpliarPlazoOE extends RespostaBase implements Serializable {
 
     protected String codigoRespuesta;
     protected String descripcionRespuesta;

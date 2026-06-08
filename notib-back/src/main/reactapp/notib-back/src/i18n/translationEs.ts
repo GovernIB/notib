@@ -315,6 +315,8 @@ const translationEs = {
                     processat: "Marcar como processada",
                     justificantEnviament: "Justificante de envio",
                     ampliarTermini: "Ampliar termino",
+                    editar: "Editar",
+                    esborrar: "Borrar",
                 },
                 procediment: 'Procedimiento',
                 servei: 'Servicio',
@@ -440,6 +442,7 @@ const translationEs = {
                             notificaCertificacioTipus: "Tipos",
                             notificaCertificacioArxiuTipus: "Tipos de archivo",
                             notificaCertificacioNumSeguiment: "Núm. seguimiento",
+                            certificacioNom: 'Documento'
                         },
                     },
                 },

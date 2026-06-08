@@ -5,6 +5,7 @@ import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.enviaments.DiagramaStateMachineReportGenerator;
 import es.caib.notib.logic.enviaments.EntregaPostalCertificacioReportGenerator;
 import es.caib.notib.logic.enviaments.EntregaPostalPerspectiveApplicator;
+import es.caib.notib.logic.enviaments.EnviamentCertificacioReportGenerator;
 import es.caib.notib.logic.enviaments.RefrescarEstatNotificaActionExecutor;
 import es.caib.notib.logic.enviaments.TitularPerspectiveApplicator;
 import es.caib.notib.logic.helper.MetricsHelper;
@@ -18,6 +19,7 @@ import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
 import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 import es.caib.notib.logic.intf.resourceservice.NotificacioEnviamentResourceService;
+import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +50,7 @@ public class NotificacioEnviamentResourceServiceImpl
 	private final NotibPermissionHelper notibPermissionHelper;
 	private final PluginHelper pluginHelper;
 	private final MetricsHelper metricsHelper;
+	private final NotificacioService notificacioService;
 
 	@PostConstruct
 	public void init() {
@@ -56,6 +59,7 @@ public class NotificacioEnviamentResourceServiceImpl
 		register(NotificacioEnviamentResource.REPORT_DESCARREGAR_DIAGRAMA_STATE_MACHINE, new DiagramaStateMachineReportGenerator());
 		register(NotificacioEnviamentResource.REPORT_DESCARREGAR_CIE_CERTIFICACIO, new EntregaPostalCertificacioReportGenerator(pluginHelper, metricsHelper));
 		register(NotificacioEnviamentResource.ACTION_REFRESCAR_ESTAT_NOTIFICA, new RefrescarEstatNotificaActionExecutor());
+		register(NotificacioEnviamentResource.REPORT_DESCARREGAR_CERTIFICACIO_ENVIAMENT, new EnviamentCertificacioReportGenerator(notificacioService));
 	}
 
 	@Override

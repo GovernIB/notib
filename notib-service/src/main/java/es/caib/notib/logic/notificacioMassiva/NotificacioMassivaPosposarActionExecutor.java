@@ -13,19 +13,20 @@ import java.util.Map;
 
 @Slf4j
 @AllArgsConstructor
-public class NotificacioMassivaPosposarActionExecutor implements BaseMutableResourceService.ActionExecutor<NotificacioMassivaResourceEntity, Serializable, NotificacioMassivaResource> {
+public class NotificacioMassivaPosposarActionExecutor implements BaseMutableResourceService.ActionExecutor<NotificacioMassivaResourceEntity, Serializable, Boolean> {
 
 	private final NotificacioMassivaService notificacioMassivaService;
 
 	@Override
-	public NotificacioMassivaResource exec(String code, NotificacioMassivaResourceEntity entity, Serializable params) throws ActionExecutionException {
+	public Boolean exec(String code, NotificacioMassivaResourceEntity entity, Serializable params) throws ActionExecutionException {
 
 		try {
 			notificacioMassivaService.posposar(entity.getEntitat().getId(), entity.getId());
+			return true;
 		} catch (Exception ex) {
 			log.error("[NotificacioMassivaPosposarActionExecutor] Error posposant la notificacio massiva " + entity.getId());
+			return false;
 		}
-		return null;
 	}
 
 	@Override

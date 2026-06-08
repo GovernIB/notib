@@ -9,7 +9,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { useResourceApiService } from 'reactlib';
+import {MuiActionReportButton, useResourceApiService} from 'reactlib';
 import { useEnviamentDetailDialog } from '../enviament/EnviamentDetailDialog';
 
 export const NotificacioGridEnviaments: React.FC<{ id: any }> = (props) => {
@@ -33,7 +33,7 @@ export const NotificacioGridEnviaments: React.FC<{ id: any }> = (props) => {
     }, [apiIsReady]);
 
     // WEB-INF/jsp/includes/notificacioList.jsp:283
-    
+
     return (
         enviaments != null && (
             <TableContainer
@@ -66,19 +66,25 @@ export const NotificacioGridEnviaments: React.FC<{ id: any }> = (props) => {
                     <TableBody>
                         {enviaments.map((enviament) => (
                             <TableRow key={enviament.id}>
-                                <TableCell component="th" scope="row">
+                                <TableCell component="th" scope="row" sx={{ width: '50%'}}>
                                     {enviament.titular.description}
                                 </TableCell>
                                 <TableCell component="th" scope="row"></TableCell>
                                 <TableCell component="th" scope="row"></TableCell>
                                 <TableCell component="th" scope="row"></TableCell>
-                                <TableCell component="th" scope="row" sx={{ width: '1px' }}>
-                                    <Button
-                                        variant="outlined"
+                                <TableCell component="th" scope="row" sx={{ width: 'fit-content', display:'flex' }}>
+                                    <MuiActionReportButton
+                                        id={enviament?.id}
+                                        resourceName={"notificacioEnviamentResource"}
+                                        report="DESCARREGAR_CERTIFICACIO_ENVIAMENT"
+                                        reportFileType="CUSTOM"
+                                        title={t('page.notificacio.detail.dades.enviaments.registre.certificacio')}
+                                        buttonComponentProps={{ variant: 'outlined', sx: { mr: 1 } }}
+                                        buttonIcon="file_download"/>
+                                    <Button variant="outlined"
                                         size="small"
                                         startIcon={<Icon>info</Icon>}
-                                        onClick={() => onDetailClick(enviament.id)}
-                                    >
+                                        onClick={() => onDetailClick(enviament.id)}>
                                         Detalls
                                     </Button>
                                 </TableCell>

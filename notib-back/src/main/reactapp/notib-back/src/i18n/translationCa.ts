@@ -339,6 +339,8 @@ const translationCa = {
                     processat: "Marcar com a processat",
                     justificantEnviament: "Justificant d'enviament",
                     ampliarTermini: "Ampliar termini",
+                    editar: "Editar",
+                    esborrar: "Esborrar",
                 },
                 procediment: 'Procediment',
                 servei: 'Servei',
@@ -468,6 +470,7 @@ const translationCa = {
                             notificaCertificacioTipus: "Tipus",
                             notificaCertificacioArxiuTipus: "Tipus d'arxiu",
                             notificaCertificacioNumSeguiment: "Núm. seguiment",
+                            certificacioNom: 'Document'
                         },
                     },
                 },

@@ -4,7 +4,6 @@ import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
-import es.caib.notib.logic.enviaments.RefrescarEstatNotificaActionExecutor;
 import es.caib.notib.logic.helper.*;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
@@ -21,13 +20,17 @@ import es.caib.notib.logic.intf.resourceservice.NotificacioResourceService;
 import es.caib.notib.logic.intf.service.JustificantService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.util.DatesUtils;
+import es.caib.notib.logic.notificacions.AmpliarTerminiRemesaActionExecutor;
+import es.caib.notib.logic.notificacions.AnularRemesaActionExecutor;
+import es.caib.notib.logic.notificacions.CertificacioReportGenerator;
 import es.caib.notib.logic.notificacions.DocumentEnviatReportGenerator;
 import es.caib.notib.logic.notificacions.DocumentPerspectiveApplicator;
 import es.caib.notib.logic.notificacions.EnviamentPerspectiveApplicator;
+import es.caib.notib.logic.notificacions.EsborrarRemesaActionExecutor;
 import es.caib.notib.logic.notificacions.GrupPerspectiveApplicator;
 import es.caib.notib.logic.notificacions.JusitficantEnviamentReportGenerator;
+import es.caib.notib.logic.notificacions.MarcarProcessatActionExecutor;
 import es.caib.notib.logic.notificacions.OperadorPostalCiePerspectiveApplicator;
-import es.caib.notib.persist.entity.NotificacioEventEntity;
 import es.caib.notib.persist.resourceentity.*;
 import es.caib.notib.persist.resourcerepository.CallbackResourceRepository;
 import es.caib.notib.persist.resourcerepository.DocumentResourceRepository;
@@ -42,7 +45,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -89,6 +91,11 @@ public class NotificacioResourceServiceImpl
 		register(NotificacioResource.PERSPECTIVE_GRUP, new GrupPerspectiveApplicator());
 		register(NotificacioResource.REPORT_DESCARREGAR_JUSTIFICANT_NOTIFICACIO, new JusitficantEnviamentReportGenerator(justificantService));
 		register(NotificacioResource.REPORT_DESCARREGAR_DOCUMENT_ENVIAT, new DocumentEnviatReportGenerator(notificacioService));
+		register(NotificacioResource.REPORT_DESCARREGAR_CERTIFICACIO, new CertificacioReportGenerator(notificacioService, messageHelper));
+		register(NotificacioResource.ACTION_ANULAR_REMESA, new AnularRemesaActionExecutor(notificacioService));
+		register(NotificacioResource.ACTION_AMPLIAR_TERMINI, new AmpliarTerminiRemesaActionExecutor(notificacioService));
+		register(NotificacioResource.ACTION_MARCAR_PROCESSAT, new MarcarProcessatActionExecutor());
+		register(NotificacioResource.ACTION_ESBORRAR_REMESA, new EsborrarRemesaActionExecutor(notificacioService, messageHelper));
 	}
 
 	@Override
@@ -114,6 +121,7 @@ public class NotificacioResourceServiceImpl
 		List<EventResourceEntity> lastErrorEvent = new ArrayList<>();
 		for (var enviamentResource : entity.getEnviaments()) {
 			enviament = notificacioEnviamentResourceRepository.findById(enviamentResource.getId()).get();
+			;
 			if (entity.isComunicacioSir()) {
 				resource.setRegistreEstat(enviament.getRegistreEstat());
 			}

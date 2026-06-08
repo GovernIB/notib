@@ -4,6 +4,7 @@ import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {NotificacioEstatDetall} from './NotificacioEstatRender';
 import {FormField, MuiActionReportButton} from "reactlib";
+import {formatDate} from "../../utils/dateUtils.ts";
 
 interface PropsTabDades {
     notificacio: any;
@@ -67,8 +68,7 @@ const TableDocuments: React.FC<PropsTabDades> = (props) => {
                                                 title={t('page.notificacio.detail.dades.documents.descarregarDocument')}
                                                 buttonComponentProps={{ variant: 'outlined', sx: { mr: 1 } }}
                                                 buttonIcon="file_download"
-                                                formAdditionalData={{docId: document.id}}
-                                                formDialogDisabled />
+                                                formAdditionalData={{docId: document.id}}/>
                                         </Box>
                                     </Box>
                                 )
@@ -189,36 +189,14 @@ const TableEnviaments: React.FC<PropsTabDades> = (props) => {
                                     : nomComplet;
 
                                 return (
-                                    <Box
-                                        sx={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            flexWrap: 'wrap',
-                                            gap: 0.5,
-                                        }}
-                                    >
+                                    <Box sx={{display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 0.5,}}>
                                         <Typography>{identitatAmbNif}</Typography>
-
                                         {identitatAmbNif && email && (
                                             <Typography sx={{ mx: 0.5 }}>-</Typography>
                                         )}
-
                                         {email && (
-                                            <Box
-                                                sx={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: 0.5,
-                                                }}
-                                            >
-                                                <Icon
-                                                    sx={{
-                                                        fontSize: '1.2rem',
-                                                        color: 'action.active',
-                                                    }}
-                                                >
-                                                    email
-                                                </Icon>
+                                            <Box sx={{display: 'flex', alignItems: 'center', gap: 0.5,}}>
+                                                <Icon sx={{fontSize: '1.2rem', color: 'action.active',}}>email</Icon>
                                                 <Typography>{email}</Typography>
                                             </Box>
                                         )}
@@ -230,24 +208,12 @@ const TableEnviaments: React.FC<PropsTabDades> = (props) => {
                             field: 'enviament.destinataris',
                             label: t('page.notificacio.detail.dades.enviaments.destinataris'),
                             valueRenderer: () => {
-                                if (
-                                    !enviament?.representantsInfo ||
-                                    !Array.isArray(enviament?.representantsInfo) ||
-                                    enviament?.representantsInfo?.length === 0
-                                ) {
-                                    return (
-                                        <Typography sx={{ fontStyle: 'italic' }}>
-                                            {t(
-                                                'page.notificacio.detail.dades.enviaments.senseDestinataris'
-                                            )}
-                                        </Typography>
-                                    );
+                                if (!enviament?.representantsInfo || !Array.isArray(enviament?.representantsInfo) || enviament?.representantsInfo?.length === 0) {
+                                    return (<Typography sx={{ fontStyle: 'italic' }}>{t('page.notificacio.detail.dades.enviaments.senseDestinataris')}</Typography>);
                                 }
 
                                 return (
-                                    <Box
-                                        sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}
-                                    >
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                                         {enviament?.representantsInfo.map(
                                             (destinatari: any, index: number) => {
                                                 const { nom, llinatge1, llinatge2, nif } =
@@ -260,26 +226,11 @@ const TableEnviaments: React.FC<PropsTabDades> = (props) => {
                                                     ? `${nomComplet} (${nif})`.trim()
                                                     : nomComplet;
 
-                                                return (
-                                                    <Typography
-                                                        key={index}
-                                                        variant="body2"
-                                                        sx={{ display: 'block' }}
-                                                    >
-                                                        {identitat}
-                                                    </Typography>
-                                                );
+                                                return (<Typography key={index} variant="body2" sx={{ display: 'block' }}>{identitat}</Typography>);
                                             }
                                         )}
                                         <Divider sx={{ my: 0.5 }} />
-                                        <Typography
-                                            variant="caption"
-                                            sx={{
-                                                fontWeight: 'bold',
-                                                color: 'primary.main',
-                                                textAlign: 'right',
-                                            }}
-                                        >
+                                        <Typography variant="caption" sx={{fontWeight: 'bold', color: 'primary.main', textAlign: 'right',}}>
                                             {`Total: ${enviament?.representantsInfo?.length}`}
                                         </Typography>
                                     </Box>
@@ -299,66 +250,44 @@ const TableEnviaments: React.FC<PropsTabDades> = (props) => {
                                         rows={[
                                             {
                                                 field: 'registreNumeroFormatat',
-                                                label: t(
-                                                    'page.notificacio.detail.dades.enviaments.registre.registreNumeroFormatat'
-                                                ),
+                                                label: t('page.notificacio.detail.dades.enviaments.registre.registreNumeroFormatat')
                                             },
                                             {
                                                 field: 'registreData',
-                                                label: t(
-                                                    'page.notificacio.detail.dades.enviaments.registre.registreData'
-                                                ),
+                                                label: t('page.notificacio.detail.dades.enviaments.registre.registreData')
                                             },
                                             {
                                                 field: 'registreEstat',
-                                                label: t(
-                                                    'page.notificacio.detail.dades.enviaments.registre.registreEstat'
-                                                ),
+                                                label: t('page.notificacio.detail.dades.enviaments.registre.registreEstat')
                                             },
                                             {
                                                 field: 'sirRecepcioData',
-                                                label: t(
-                                                    'page.notificacio.detail.dades.enviaments.registre.sirRecepcioData'
-                                                ),
+                                                label: t('page.notificacio.detail.dades.enviaments.registre.sirRecepcioData')
                                             },
                                             {
                                                 field: 'registreMotiu',
-                                                label: t(
-                                                    'page.notificacio.detail.dades.enviaments.registre.registreMotiu'
-                                                ),
+                                                label: t('page.notificacio.detail.dades.enviaments.registre.registreMotiu')
                                             },
                                             {
                                                 field: 'sirRegDestiData',
-                                                label: t(
-                                                    'page.notificacio.detail.dades.enviaments.registre.sirRegDestiData'
-                                                ),
+                                                label: t('page.notificacio.detail.dades.enviaments.registre.sirRegDestiData')
                                             },
                                             //${(isRolActualAdministradorEntitat || isRolActualAdministradorOrgan)
                                             // && (not empty notificacio.registreOficinaNom || not empty notificacio.registreLlibreNom)}
                                             {
                                                 field: 'registreOficinaNom', // TODO
-                                                label: t(
-                                                    'page.notificacio.detail.dades.enviaments.registre.registreOficinaNom'
-                                                ),
+                                                label: t('page.notificacio.detail.dades.enviaments.registre.registreOficinaNom')
                                             },
                                             {
                                                 field: 'registreLlibreNom', // TODO
-                                                label: t(
-                                                    'page.notificacio.detail.dades.enviaments.registre.registreLlibreNom'
-                                                ),
+                                                label: t('page.notificacio.detail.dades.enviaments.registre.registreLlibreNom')
                                             },
                                         ]}
                                         fields={apiCurrentFields}
                                         data={enviament}
                                         sx={{ mb: 1 }}
                                     /> // TODO: s'ha de posar un boto de justificant despres de sa taula Linia 868 de notificacioInfo.jsp
-                                ) : (
-                                    <Typography>
-                                        {t(
-                                            'page.notificacio.detail.dades.enviaments.registre.registreLlibreNom'
-                                        )}
-                                    </Typography>
-                                );
+                                ) : (<Typography>{t('page.notificacio.detail.dades.enviaments.registre.registreLlibreNom')}</Typography>);
                             },
                         },
                         {
@@ -372,64 +301,62 @@ const TableEnviaments: React.FC<PropsTabDades> = (props) => {
                                         rows={[
                                             {
                                                 field: 'notificaCertificacioData',
-                                                label: t(
-                                                    'page.notificacio.detail.dades.enviaments.registre.notificaCertificacioData'
-                                                ),
+                                                label: t('page.notificacio.detail.dades.enviaments.registre.notificaCertificacioData'),
+                                                valueRenderer: (_value: any) => formatDate(_value)
                                             },
                                             {
                                                 field: 'notificaCertificacioMime',
-                                                label: t(
-                                                    'page.notificacio.detail.dades.enviaments.registre.notificaCertificacioMime'
-                                                ),
+                                                label: t('page.notificacio.detail.dades.enviaments.registre.notificaCertificacioMime'),
                                             },
                                             {
                                                 field: 'notificaCertificacioOrigen',
-                                                label: t(
-                                                    'page.notificacio.detail.dades.enviaments.registre.notificaCertificacioOrigen'
-                                                ),
+                                                label: t('page.notificacio.detail.dades.enviaments.registre.notificaCertificacioOrigen'),
                                             },
                                             {
                                                 field: 'notificaCertificacioMetadades',
-                                                label: t(
-                                                    'page.notificacio.detail.dades.enviaments.registre.notificaCertificacioMetadades'
-                                                ),
+                                                label: t('page.notificacio.detail.dades.enviaments.registre.notificaCertificacioMetadades'),
                                             },
                                             {
                                                 field: 'notificaCertificacioCsv',
-                                                label: t(
-                                                    'page.notificacio.detail.dades.enviaments.registre.notificaCertificacioCsv'
-                                                ),
+                                                label: t('page.notificacio.detail.dades.enviaments.registre.notificaCertificacioCsv'),
                                             },
                                             {
                                                 field: 'notificaCertificacioTipus',
-                                                label: t(
-                                                    'page.notificacio.detail.dades.enviaments.registre.notificaCertificacioTipus'
-                                                ),
+                                                label: t('page.notificacio.detail.dades.enviaments.registre.notificaCertificacioTipus'),
                                             },
                                             {
                                                 field: 'notificaCertificacioArxiuTipus',
-                                                label: t(
-                                                    'page.notificacio.detail.dades.enviaments.registre.notificaCertificacioArxiuTipus'
-                                                ),
+                                                label: t('page.notificacio.detail.dades.enviaments.registre.notificaCertificacioArxiuTipus'),
                                             },
                                             {
                                                 field: 'notificaCertificacioNumSeguiment',
-                                                label: t(
-                                                    'page.notificacio.detail.dades.enviaments.registre.notificaCertificacioNumSeguiment'
-                                                ),
+                                                label: t('page.notificacio.detail.dades.enviaments.registre.notificaCertificacioNumSeguiment'),
                                             },
+                                            {
+                                                label: t('page.notificacio.detail.dades.enviaments.registre.certificacioNom'),
+                                                valueRenderer: (_value: any) => {
+                                                    return (
+                                                        <Box sx={{display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                                                            <Typography>{'certifciacio_' + enviament?.notificaReferencia + ".pdf"}</Typography>
+                                                            <MuiActionReportButton
+                                                                id={enviament?.id}
+                                                                resourceName={"notificacioEnviamentResource"}
+                                                                report="DESCARREGAR_CERTIFICACIO_ENVIAMENT"
+                                                                reportFileType="CUSTOM"
+                                                                title={t('page.notificacio.detail.dades.enviaments.registre.certificacio')}
+                                                                buttonComponentProps={{ variant: 'outlined', sx: { mr: 1 } }}
+                                                                buttonIcon="file_download"/>
+                                                        </Box>
+                                                    );
+                                                }
+                                            }
                                         ]}
                                         fields={apiCurrentFields}
                                         data={enviament}
                                         sx={{ mb: 1 }}
-                                    /> // TODO: s'ha de posar un boto de justificant despres de sa taula Linia 960 de notificacioInfo.jsp
-                                ) : (
-                                    <Typography>
-                                        {t(
-                                            'page.notificacio.detail.dades.enviaments.registre.noCertificacio'
-                                        )}
-                                    </Typography>
-                                );
+                                    />
+
+                                ) : (<Typography>{t('page.notificacio.detail.dades.enviaments.registre.noCertificacio')}</Typography>);
                             },
                         },
                     ]}
@@ -530,7 +457,6 @@ const NotificacioDetailDialogTabDades: React.FC<PropsTabDades> = (props) => {
                 sx={{ mb: 1 }}
             />
 
-
             {(!notificacio?.hasEnviamentsPendents || notificacio?.estat == 'FINALITZADA_AMB_ERRORS') &&
                 <Box sx={{ textAlign: 'right' }}>
                     <MuiActionReportButton
@@ -543,24 +469,15 @@ const NotificacioDetailDialogTabDades: React.FC<PropsTabDades> = (props) => {
                         buttonIcon="file_download"/>
                 </Box>
             }
-
             <TableGrup notificacio={notificacio} apiCurrentFields={apiCurrentFields} />
-
             <TableDocuments apiCurrentFields={apiCurrentFields} notificacio={notificacio} />
-
             {notificacio?.operadorPostalInfo && (
                 <>
-                    <TableOperadorPostal
-                        apiCurrentFields={apiCurrentFields}
-                        notificacio={notificacio}
-                    />
+                    <TableOperadorPostal apiCurrentFields={apiCurrentFields} notificacio={notificacio}/>
                     <TableCie apiCurrentFields={apiCurrentFields} notificacio={notificacio} />
-                    <TableEnviaments
-                        apiCurrentFields={apiCurrentFields}
-                        notificacio={notificacio}
-                    />
                 </>
             )}
+            <TableEnviaments apiCurrentFields={apiCurrentFields} notificacio={notificacio}/>
         </Box>
     );
 };

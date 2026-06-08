@@ -4,11 +4,12 @@ import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaDto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Getter
 @Setter
-public class AmpliacionPlazoDto {
+public class AmpliacionPlazoDto implements Serializable {
 
     private Long notificacioId;
     private Long enviamentId;

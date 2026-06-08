@@ -83,6 +83,11 @@ import java.util.List;
 			code = NotificacioEnviamentResource.REPORT_DESCARREGAR_CIE_CERTIFICACIO,
 			requiresId = true
 		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.REPORT,
+			code = NotificacioEnviamentResource.REPORT_DESCARREGAR_CERTIFICACIO_ENVIAMENT,
+			requiresId = true
+		),
 	}
 )
 @CustomValidation.List({
@@ -98,6 +103,7 @@ public class NotificacioEnviamentResource extends BaseResource<Long> {
 	public static final String REPORT_DESCARREGAR_DIAGRAMA_STATE_MACHINE = "DESCARREGAR_DIAGRAMA_STATE_MACHINE";
 	public static final String ACTION_REFRESCAR_ESTAT_NOTIFICA = "REFRESCAR_ESTAT_NOTIFICA";
 	public static final String REPORT_DESCARREGAR_CIE_CERTIFICACIO = "DESCARREGAR_CIE_CERTIFICACIO";
+	public static final String REPORT_DESCARREGAR_CERTIFICACIO_ENVIAMENT = "DESCARREGAR_CERTIFICACIO_ENVIAMENT";
 
 	@NotNull
 	private ServeiTipus serveiTipus = ServeiTipus.NORMAL;

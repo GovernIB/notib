@@ -1,4 +1,4 @@
-package es.caib.notib.logic.intf.dto.anular;
+package es.caib.notib.logic.intf.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,16 +7,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.List;
 
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Anulacio implements Serializable {
+public class MarcarProcessat implements Serializable {
 
-    protected List<String> identificadors;
-    protected String motiu;
-    protected Long accioMassiva;
+	private String motiu;
 }

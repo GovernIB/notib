@@ -74,13 +74,23 @@ import java.util.List;
 		@ResourceArtifact(
 			type = ResourceArtifactType.ACTION,
 			code = NotificacioMassivaResource.ACTION_POSPOSAR_NOTIFICACIO_MASSIVA,
-			requiresId = true
+			requiresId = true,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN})
+			}
 
 		),
 		@ResourceArtifact(
 			type = ResourceArtifactType.ACTION,
 			code = NotificacioMassivaResource.ACTION_REACTIVAR_NOTIFICACIO_MASSIVA,
-			requiresId = true
+			requiresId = true,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN})
+			}
 		),
 		@ResourceArtifact(
 			type = ResourceArtifactType.PERSPECTIVE,

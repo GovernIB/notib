@@ -3,11 +3,12 @@ package es.caib.notib.logic.intf.dto.anular;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Getter
 @Setter
-public class AnularDto {
+public class AnularDto implements Serializable {
 
     private Long notificacioId;
     private Long enviamentId;

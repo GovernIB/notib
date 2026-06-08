@@ -1,24 +1,26 @@
 package es.caib.notib.logic.intf.model;
 
-import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
-import es.caib.notib.logic.intf.base.annotation.ResourceArtifact;
-import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
-import es.caib.notib.logic.intf.base.validation.CustomValidation;
-import es.caib.notib.logic.intf.dto.NotificacioErrorTipusEnumDto;
-import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
-import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
-import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
-import es.caib.notib.logic.intf.dto.explotacio.EnviamentOrigen;
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
+import es.caib.notib.logic.intf.base.annotation.ResourceArtifact;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.annotation.ResourceField;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
+import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
+import es.caib.notib.logic.intf.base.validation.CustomValidation;
+import es.caib.notib.logic.intf.dto.AmpliacionPlazoDto;
+import es.caib.notib.logic.intf.dto.MarcarProcessat;
+import es.caib.notib.logic.intf.dto.NotificacioErrorTipusEnumDto;
+import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
+import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
+import es.caib.notib.logic.intf.dto.anular.Anulacio;
+import es.caib.notib.logic.intf.dto.explotacio.EnviamentOrigen;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.model.validator.NotificacioProcedimentNotNull;
 import es.caib.notib.logic.intf.model.validator.PrimerEnviamentCodiDir3ObligatoriEnviamentTipusSir;
@@ -101,6 +103,54 @@ import java.util.List;
 			requiresId = true,
 			formClass = NotificacioResource.DocumentParams.class
 		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.REPORT,
+			code = NotificacioResource.REPORT_DESCARREGAR_CERTIFICACIO,
+			requiresId = true
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.ACTION_ANULAR_REMESA,
+			requiresId = true,
+			formClass = Anulacio.class,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN})
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.ACTION_AMPLIAR_TERMINI,
+			requiresId = true,
+			formClass = AmpliacionPlazoDto.class,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN})
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.ACTION_MARCAR_PROCESSAT,
+			requiresId = true,
+			formClass = MarcarProcessat.class,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN})
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.ACTION_ESBORRAR_REMESA,
+			requiresId = true,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN})
+			}
+		),
 	}
 )
 @CustomValidation.List({
@@ -120,6 +170,11 @@ public class NotificacioResource extends BaseResource<Long> {
 	public static final String PERSPECTIVE_GRUP = "OPERADORS_GRUP";
 	public static final String REPORT_DESCARREGAR_JUSTIFICANT_NOTIFICACIO = "DESCARREGAR_JUSTIFICANT_ENVIAMENT_NOTIFICACIO";
 	public static final String REPORT_DESCARREGAR_DOCUMENT_ENVIAT = "DESCARREGAR_DOCUMENT_ENVIAT";
+	public static final String REPORT_DESCARREGAR_CERTIFICACIO = "DESCARREGAR_CERTIFICACIO";
+	public static final String ACTION_ANULAR_REMESA = "ANULAR_REMESA";
+	public static final String ACTION_AMPLIAR_TERMINI = "AMPLIAR_TERMINI";
+	public static final String ACTION_MARCAR_PROCESSAT = "MARCAR_PROCESSAT";
+	public static final String ACTION_ESBORRAR_REMESA = "ESBORRAR_REMESA";
 
 	@NotNull
 	private EnviamentTipus enviamentTipus;
@@ -268,7 +323,6 @@ public class NotificacioResource extends BaseResource<Long> {
 	public static class DocumentParams implements Serializable {
 
 		private Long docId;
-
 	}
 
 }

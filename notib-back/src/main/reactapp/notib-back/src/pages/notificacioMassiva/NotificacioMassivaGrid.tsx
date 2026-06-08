@@ -239,23 +239,6 @@ export const NotifiacioMassivaGrid = () => {
         'DESCARREGAR_FITXER_ERRORS_EXECUCIO_NOTIFICACIO_MASSIVA',
         'CUSTOM'
     );
-    //
-    // const { exec: posposarAccioMassiva } = useMuiActionReportLogic(
-    //     'notificacioMassivaResource',
-    //     'POSPOSAR_NOTIFICACIO_MASSIVA',
-    //     // undefined,
-    //     // undefined,
-    //     // true,
-    //     // "missatge confirmacio",
-    //     // undefined,
-    // );
-
-
-    const { exec: reactivarAccioMassiva } = useMuiActionReportLogic(
-        'notificacioMassivaResource',
-        'REACTIVAR_NOTIFICACIO_MASSIVA',
-        undefined,
-    );
 
     const rowAdditionalActions = (row) => {
 
@@ -302,7 +285,7 @@ export const NotifiacioMassivaGrid = () => {
                 title: t('page.notificacioMassiva.grid.accions.reactivar   '),
                 icon: 'bolt',
                 showInMenu: true,
-                onClick: (id) => reactivarAccioMassiva(id),
+                onClick: (id) => isReady && apiAction(id, { code: 'REACTIVAR_NOTIFICACIO_MASSIVA'}),
             },
             {
                 label: t('page.notificacioMassiva.grid.accions.mostrarRemeses.label'),

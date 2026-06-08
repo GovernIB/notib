@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Icon } from '@mui/material';
+import {Alert, Box, Button, Icon, Typography} from '@mui/material';
 import React from 'react';
 import { FieldsDataCard } from '../../components/DataCard';
 import { useTranslation } from 'react-i18next';
@@ -157,8 +157,21 @@ const EnviamentDetailTabNotifica: React.FC<{
 
                         {
                             field: 'notificaCertificacioArxiuNom',
-                            // TODO: S'ha de poder descargar el certificat
-                            //<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/certificacioDescarregar"/>"
+                            valueRenderer: (_value: any) => {
+                                return (
+                                    <Box sx={{display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                                        <Typography>{'certifciacio_' + enviament?.notificaReferencia + ".pdf"}</Typography>
+                                        <MuiActionReportButton
+                                            id={enviament?.id}
+                                            resourceName={"notificacioEnviamentResource"}
+                                            report="DESCARREGAR_CERTIFICACIO_ENVIAMENT"
+                                            reportFileType="CUSTOM"
+                                            title={t('page.notificacio.detail.dades.enviaments.registre.certificacio')}
+                                            buttonComponentProps={{ variant: 'outlined', sx: { mr: 1 } }}
+                                            buttonIcon="file_download"/>
+                                    </Box>
+                                );
+                            }
                         },
                     ]}
                     fields={apiCurrentFields}

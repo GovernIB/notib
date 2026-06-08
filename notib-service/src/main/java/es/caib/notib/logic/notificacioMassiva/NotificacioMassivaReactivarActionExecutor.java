@@ -15,19 +15,20 @@ import java.util.Map;
 
 @Slf4j
 @AllArgsConstructor
-public class NotificacioMassivaReactivarActionExecutor implements BaseMutableResourceService.ActionExecutor<NotificacioMassivaResourceEntity, Serializable, NotificacioMassivaResource> {
+public class NotificacioMassivaReactivarActionExecutor implements BaseMutableResourceService.ActionExecutor<NotificacioMassivaResourceEntity, Serializable, Boolean> {
 
 	private final NotificacioMassivaService notificacioMassivaService;
 
 	@Override
-	public NotificacioMassivaResource exec(String code, NotificacioMassivaResourceEntity entity, Serializable params) throws ActionExecutionException {
+	public Boolean exec(String code, NotificacioMassivaResourceEntity entity, Serializable params) throws ActionExecutionException {
 
 		try {
 			notificacioMassivaService.posposar(entity.getEntitat().getId(), entity.getId());
+			return true;
 		} catch (Exception ex) {
 			log.error("[NotificacioMassivaReactivarActionExecutor] Error reactivant la notificacio massiva " + entity.getId());
+			return false;
 		}
-		return null;
 	}
 
 	@Override

@@ -61,6 +61,7 @@ public class EnviamentPerspectiveApplicator implements BaseReadonlyResourceServi
 				.notificat(notificat)
 //				.registreOficinaNom		TODO
 //				.registreLlibreNom		TODO
+				.notificaReferencia(env.getNotificaReferencia())
 				.notificaCertificacioData(env.getNotificaCertificacioData())
 				.notificaCertificacioMime(env.getNotificaCertificacioMime())
 				.notificaCertificacioOrigen(env.getNotificaCertificacioOrigen())
@@ -70,7 +71,7 @@ public class EnviamentPerspectiveApplicator implements BaseReadonlyResourceServi
 				.notificaCertificacioArxiuTipus(env.getNotificaCertificacioArxiuTipus())
 				.notificaCertificacioNumSeguiment(env.getNotificaCertificacioNumSeguiment())
 				.build();
-
+			enviament.setId(env.getId());
 			enviaments.add(enviament);
 
 			var representantsEntity = env.getDestinataris();
