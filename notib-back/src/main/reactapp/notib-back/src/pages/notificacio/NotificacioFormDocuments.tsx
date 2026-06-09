@@ -143,7 +143,7 @@ const NotificacioFormDocument: React.FC<{
     );
 };
 
-const NotificacioFormDocuments: React.FC = () => {
+export const NotificacioFormDocuments: React.FC = () => {
     const { t } = useTranslation();
     const { data, apiRef: formApiRef } = useFormContext();
     const documentsInfo = data?.documentsInfo;

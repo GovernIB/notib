@@ -44,11 +44,18 @@ import java.util.List;
 @NoArgsConstructor
 @ResourceConfig(
 	descriptionField = "id",
-	accessConstraints = @ResourceAccessConstraint(
+	accessConstraints = {
+		@ResourceAccessConstraint(
 		type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-		roles = {BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER},
+		roles = {BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ADMIN_LECTURA, BaseConfig.ROLE_ORGAN},
 		grantedPermissions = {PermissionEnum.READ}
 	),
+		@ResourceAccessConstraint(
+			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+			roles = {BaseConfig.ROLE_USER},
+			grantedPermissions = {PermissionEnum.READ}
+		)
+	},
 	artifacts = {
 		@ResourceArtifact(
 			type = ResourceArtifactType.FILTER,

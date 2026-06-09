@@ -4,7 +4,6 @@ import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.intf.base.exception.ActionExecutionException;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
-import es.caib.notib.logic.intf.dto.MarcarProcessat;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
 import lombok.AllArgsConstructor;

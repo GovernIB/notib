@@ -310,11 +310,19 @@ const translationEs = {
                 },
                 accions: {
                     documentEnviat: "Documento enviado",
-                    anular: "Anular",
+                    anular: {
+                        botoTitle: "Anular",
+                        modalTitle: "Anulación",
+                        noReposta: "Error inesperado al anular",
+                        noExecutades: "Identificadores de envíos no ejecutados: ",
+                        repostesError: "Envíos con error de anulación: "
+                    },
                     certificacio: "Certificación",
                     processat: "Marcar como processada",
+                    processatTitle: "Marcar como procesada",
                     justificantEnviament: "Justificante de envio",
                     ampliarTermini: "Ampliar termino",
+                    ampliarTerminiTitle: "Ampliación de plazo",
                     editar: "Editar",
                     esborrar: "Borrar",
                 },
@@ -448,6 +456,7 @@ const translationEs = {
                 },
                 accions: {
                     noAccions: "No hay acciones disponibles para este envio",
+                    enviarCallback: 'Envia canvio de estado al cliente'
                 },
             },
         },
@@ -885,6 +894,8 @@ const translationEs = {
         filtrar: 'Filtrar',
         obrirFiltreAvançat: 'Abrir filtro avanzado',
         tancarFiltreAvançat: 'Cerrar filtro avanzado',
+        guardar: 'Guarda',
+        cancelar: 'Cancela'
     },
 };
 

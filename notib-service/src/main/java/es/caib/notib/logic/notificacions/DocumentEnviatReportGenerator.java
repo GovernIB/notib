@@ -35,7 +35,7 @@ public class DocumentEnviatReportGenerator implements BaseReadonlyResourceServic
 		ConfigHelper.setEntitatCodi(entity.getEntitat().getCodi());
 		resource.setId(entity.getId());
 		ResourceReference<DocumentResource, Long> document = new ResourceReference<>();
-		document.setId(params.getDocId());
+		document.setId(params.getDocId() != null ? params.getDocId() : entity.getDocument().getId());
 		resource.setDocument(document);
 		return List.of(resource);
 	}
@@ -47,12 +47,12 @@ public class DocumentEnviatReportGenerator implements BaseReadonlyResourceServic
 		try {
 			var document = notificacioService.getDocumentArxiu(notificacio.getId(), notificacio.getDocument().getId());
 			if (document.getContingut() == null || document.getContingut().length == 0) {
-				log.error("[JusitficantEnviamentReportGenerator] Error generant contingut pel justificant de la notificacio" + notificacio.getId());
+				log.error("[DocumentEnviatReportGenerator] Error generant el document enviat de la notificacio" + notificacio.getId());
 				return DownloadableFile.builder().name(document.getNom()).content(new byte[]{}).contentType(document.getContentType()).build();
 			}
 			return DownloadableFile.builder().name(document.getNom()).content(document.getContingut()).contentType(document.getContentType()).build();
 		} catch (Exception ex) {
-			log.error("[JusitficantEnviamentReportGenerator] Error inesperat generant contingut pel justificant de la notificacio" + notificacio.getId(), ex);
+			log.error("[DocumentEnviatReportGenerator] Error inesperat generant el document enviat de la notificacio" + notificacio.getId(), ex);
 			return DownloadableFile.builder().name("error_document_adjunt.pdf").content(new byte[]{}).contentType(MediaType.APPLICATION_PDF_VALUE).build();
 		}
 	}

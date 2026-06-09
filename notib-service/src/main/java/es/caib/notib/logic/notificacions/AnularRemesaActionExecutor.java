@@ -7,12 +7,15 @@ import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.dto.anular.Anulacio;
 import es.caib.notib.logic.intf.dto.anular.AnularDto;
 import es.caib.notib.logic.intf.dto.anular.RespostaAnular;
+import es.caib.notib.logic.intf.model.NotificacioResource;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -24,15 +27,15 @@ public class AnularRemesaActionExecutor implements BaseMutableResourceService.Ac
 	@Override
 	public RespostaAnular exec(String code, NotificacioResourceEntity entity, AnularDto params) throws ActionExecutionException {
 
-		log.info("anualcio action exec");
-		return null;
-//		try {
-//			return notificacioService.anular(params);
-//		} catch (Exception ex) {
-//			var msg = "Error inesperat anulant la remesa ";
-//			log.error("[AnularRemesaActionExecutor] " + msg + "amb id " + entity.getId());
-//			return RespostaAnular.builder().error(true).descripcioResposta(msg + ex.getMessage()).build();
-//		}
+		try {
+			params.setNotificacioId(entity.getId());
+			var foo = 1/0;
+ 			return notificacioService.anular(params);
+		} catch (Exception ex) {
+			var msg = "Error inesperat anulant la remesa ";
+			log.error("[AnularRemesaActionExecutor] " + msg + "amb id " + entity.getId() + " - " + ex.getMessage());
+			throw new ActionExecutionException(NotificacioResource.class, entity.getId(), "-1", msg + ex.getMessage());
+		}
 	}
 
 	@Override

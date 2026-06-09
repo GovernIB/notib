@@ -97,7 +97,7 @@ public class NotificacioResourceServiceImpl
 		register(NotificacioResource.REPORT_DESCARREGAR_CERTIFICACIO, new CertificacioReportGenerator(notificacioService, messageHelper));
 		register(NotificacioResource.ACTION_ANULAR_REMESA, new AnularRemesaActionExecutor(notificacioService));
 		register(NotificacioResource.ACTION_AMPLIAR_TERMINI, new AmpliarTerminiRemesaActionExecutor(notificacioService));
-		register(NotificacioResource.ACTION_MARCAR_PROCESSAT, new MarcarProcessatActionExecutor());
+		register(NotificacioResource.ACTION_MARCAR_PROCESSAT, new MarcarProcessatActionExecutor(notificacioService));
 		register(NotificacioResource.ACTION_ESBORRAR_REMESA, new EsborrarRemesaActionExecutor(notificacioService, messageHelper));
 		register(NotificacioResource.ACTION_ENVIAR_CALLBACK, new EnviarCallbackActionExecutor(callbackService));
 	}
@@ -322,6 +322,7 @@ public class NotificacioResourceServiceImpl
 	 * del mètode springFilterWithReadPermission().
 	 */
 	public void checkCreatePermission(NotificacioResourceEntity entity) {
+
 		NotibPermissionHelper.IdsToCheckNotificacioPermission ids = notibPermissionHelper.getIdsToCheckNotificacioPermission(
 			notibPermissionHelper.getOrganGestorNotificacioCreatePermission(entity.getEnviamentTipus()),
 			notibPermissionHelper.getProcedimentNotificacioCreatePermission(entity.getEnviamentTipus()));
@@ -332,9 +333,7 @@ public class NotificacioResourceServiceImpl
 			(procedimentId != null && ids.getProcedimentNoComuIds().contains(procedimentId)) || // b)
 			(procedimentOrganGestorId != null && ids.getProcedimentComuOrganGestorIds().contains(procedimentOrganGestorId)); // c) o d)
 		if (!permissionGranted) {
-			throw new ResourceNotCreatedException(
-				NotificacioResource.class,
-				"Not allowed to create notification. Permission check failed.");
+			throw new ResourceNotCreatedException(NotificacioResource.class, "Not allowed to create notification. Permission check failed.");
 		}
 	}
 

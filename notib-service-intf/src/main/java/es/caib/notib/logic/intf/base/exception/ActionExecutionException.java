@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 /**
  * Excepció que es llança quan falla l'execució d'una acció.
- * 
+ *
  * @author Límit Tecnologies
  */
 @Getter
@@ -16,6 +16,7 @@ public class ActionExecutionException extends RuntimeException {
 	private final Serializable id;
 	private final String code;
 	private final String errorMessage;
+
 
 	public ActionExecutionException(
 			Class<?> resourceClass,

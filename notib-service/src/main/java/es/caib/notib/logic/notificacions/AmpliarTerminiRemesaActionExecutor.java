@@ -33,6 +33,6 @@ public class AmpliarTerminiRemesaActionExecutor implements BaseMutableResourceSe
 
 	@Override
 	public void onChange(Serializable id, AmpliacionPlazoDto previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, AmpliacionPlazoDto target) {
-
+		log.info("change");
 	}
 }

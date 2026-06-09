@@ -20,6 +20,7 @@ import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.anular.Anulacio;
+import es.caib.notib.logic.intf.dto.anular.AnularDto;
 import es.caib.notib.logic.intf.dto.explotacio.EnviamentOrigen;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.model.validator.NotificacioProcedimentNotNull;
@@ -112,7 +113,7 @@ import java.util.List;
 			type = ResourceArtifactType.ACTION,
 			code = NotificacioResource.ACTION_ANULAR_REMESA,
 			requiresId = true,
-			formClass = Anulacio.class,
+			formClass = AnularDto.class,
 			accessConstraints = {
 				@ResourceAccessConstraint(
 					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
@@ -138,7 +139,7 @@ import java.util.List;
 			accessConstraints = {
 				@ResourceAccessConstraint(
 					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN})
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN})
 			}
 		),
 		@ResourceArtifact(
@@ -241,7 +242,7 @@ public class NotificacioResource extends BaseResource<Long> {
 	@ResourceField(onChangeActive = true)
 	private ResourceReference<OrganGestorResource, Long> organGestor;
 	private ResourceReference<ProcedimentResource, Long> procediment;
-	@NotNull
+//	@NotNull
 	private ResourceReference<DocumentResource, Long> document;
 	private ResourceReference<DocumentResource, Long> document2;
 	private ResourceReference<DocumentResource, Long> document3;

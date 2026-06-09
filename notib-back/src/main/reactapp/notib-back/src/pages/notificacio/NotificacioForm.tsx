@@ -77,7 +77,7 @@ const ProcedimentServeiField: React.FC = () => {
     }
 };
 
-const NotificacioFormContent: React.FC = () => {
+export const NotificacioFormContent: React.FC = () => {
     const { t } = useTranslation();
     return (
         <Grid container spacing={2}>

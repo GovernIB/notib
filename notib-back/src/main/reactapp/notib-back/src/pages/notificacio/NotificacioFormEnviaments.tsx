@@ -233,7 +233,7 @@ const NotificacioFormEnviament: React.FC<{
     );
 };
 
-const NotificacioFormEnviaments: React.FC = () => {
+export const NotificacioFormEnviaments: React.FC = () => {
     const { t } = useTranslation();
     const { data, apiRef: formApiRef } = useFormContext();
     const enviamentsInfo = data?.enviamentsInfo;

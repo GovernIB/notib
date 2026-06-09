@@ -1,10 +1,10 @@
 package es.caib.notib.logic.intf.dto;
 
-import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaDto;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -18,4 +18,6 @@ public class AmpliacionPlazoDto implements Serializable {
     private List<Long> notificacionsId;
     private List<Long> enviamentsId;
     private Long accioMassiva;
+
+	private Date caducitat;
 }

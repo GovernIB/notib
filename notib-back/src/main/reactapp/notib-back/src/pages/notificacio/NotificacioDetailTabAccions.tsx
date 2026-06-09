@@ -13,14 +13,13 @@ interface AccioConfig extends Record<string, any> {
 const NotificacioDetailDialogTabAccions: React.FC<{ notificacio: any }> = (props) => {
     const { notificacio } = props;
     const { t } = useTranslation();
-
     const accionsVisibles = React.useMemo(() => {
         const llistaAccions: AccioConfig[] = [
             {
-                // visible: notificacio.tipusUsuari == 'APLICACIO' && (notificacio.errorLastCallback || notificacio.eventsCallbackPendent),
+                visible: notificacio?.tipusUsuari === 'APLICACIO' && (notificacio?.errorLastCallback || notificacio?.eventsCallbackPendent),
                 id: notificacio?.id,
-                title: t('Envia canvi estat al client'),
-                titleButton: t(''),
+                title: t('page.notificacio.detail.accions.enviarCallback'),
+                titleButton: t('page.notificacio.detail.accions.enviarCallback'),
                 resourceName: 'notificacioResource',
                 buttonIcon: 'send',
                 action: 'ENVIAR_CALLBACK'
