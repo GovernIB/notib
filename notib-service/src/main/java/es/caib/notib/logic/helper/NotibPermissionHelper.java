@@ -125,6 +125,27 @@ public class NotibPermissionHelper {
 	}
 
 	/**
+	 * Verifica si es te el permís sobre l'entitat especificada.
+	 *
+	 * @param entitatId
+	 *            id de l'entitat sobre la qual es vol comprovar el permís.
+	 * @param permission
+	 *            el permís que es vol comprovar.
+	 * @return true si es tenen permisos o false en cas contrari.
+	 */
+	public boolean entitatPermissionAllowed(Long entitatId, Permission permission) {
+		if (entitatId != null) {
+			return aclHelper.anyPermissionGranted(
+				AclHelper.ENTITAT_CLASS,
+				entitatId,
+				List.of(permission),
+				aclHelper.getCurrentUserSids().toArray(Sid[]::new));
+		} else {
+			return false;
+		}
+	}
+
+	/**
 	 * Verifica si es te el permís especificat sobre l'entitat actual.
 	 *
 	 * @param permission
@@ -132,11 +153,25 @@ public class NotibPermissionHelper {
 	 * @return true si es tenen permisos o false en cas contrari.
 	 */
 	public boolean currentEntitatPermissionAllowed(Permission permission) {
-		Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
-		if (currentEntitatId != null) {
+		return entitatPermissionAllowed(
+			userSessionHelper.getCurrentEntitatId(),
+			permission);
+	}
+
+	/**
+	 * Verifica si es te el permís sobre l'òrgan gestor especificat.
+	 *
+	 * @param organGestorId
+	 *            id de l'òrgan gestor sobre el qual es vol comprovar el permís.
+	 * @param permission
+	 *            el permís que es vol comprovar.
+	 * @return true si es tenen permisos o false en cas contrari.
+	 */
+	public boolean organGestorPermissionAllowed(Long organGestorId, Permission permission) {
+		if (organGestorId != null) {
 			return aclHelper.anyPermissionGranted(
-				AclHelper.ENTITAT_CLASS,
-				currentEntitatId,
+				AclHelper.ORGAN_GESTOR_CLASS,
+				organGestorId,
 				List.of(permission),
 				aclHelper.getCurrentUserSids().toArray(Sid[]::new));
 		} else {
@@ -152,16 +187,9 @@ public class NotibPermissionHelper {
 	 * @return true si es tenen permisos o false en cas contrari.
 	 */
 	public boolean currentOrganGestorPermissionAllowed(Permission permission) {
-		Long currentOrganGestorId = userSessionHelper.getCurrentOrganGestorId();
-		if (currentOrganGestorId != null) {
-			return aclHelper.anyPermissionGranted(
-				AclHelper.ORGAN_GESTOR_CLASS,
-				currentOrganGestorId,
-				List.of(permission),
-				aclHelper.getCurrentUserSids().toArray(Sid[]::new));
-		} else {
-			return false;
-		}
+		return organGestorPermissionAllowed(
+			userSessionHelper.getCurrentOrganGestorId(),
+			permission);
 	}
 
 	/**
