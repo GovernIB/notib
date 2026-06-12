@@ -315,14 +315,28 @@ const translationEs = {
                         modalTitle: "Anulación",
                         noReposta: "Error inesperado al anular",
                         noExecutades: "Identificadores de envíos no ejecutados: ",
-                        repostesError: "Envíos con error de anulación: "
+                        respostesError: "Envíos con error de anulación: ",
+                        ok: "Anulación realizada correctamente"
                     },
                     certificacio: "Certificación",
                     processat: "Marcar como processada",
                     processatTitle: "Marcar como procesada",
                     justificantEnviament: "Justificante de envio",
-                    ampliarTermini: "Ampliar termino",
-                    ampliarTerminiTitle: "Ampliación de plazo",
+                    ampliarTermini: {
+                        botoTitle: "Ampliar plazo",
+                        modalTitle: "Ampliación de plazo",
+                        noReposta: "Error inesperando ampliando plazo",
+                        noExecutades: "Identificadores de envíos no ejecutados: ",
+                        ok: "Ampliación de plazo realizada correctamente"
+                    },
+                    registrar: {
+                        title: "Registrar notificación pendente",
+                        button: "Registra",
+                        noReposta: "Error inesperado al ejecutar la acción de registrar",
+                        noExecutades: "Identificadores de remeses no ejecutadas: ",
+                        repostesError: "Remeses con error al enviar a registrar: ",
+                        ok: "La remesa s'ha enviat a registrar",
+                    },
                     editar: "Editar",
                     esborrar: "Borrar",
                 },
@@ -455,8 +469,40 @@ const translationEs = {
                     },
                 },
                 accions: {
+                    success: "Acción enviada a ejecutar correctamente",
+                    error: "Error al enviar a ejecutar la acción. Consultar la pestaña de eventos per má información",
                     noAccions: "No hay acciones disponibles para este envio",
-                    enviarCallback: 'Envia canvio de estado al cliente'
+                    enviarCallback: 'Envia canvio de estado al cliente',
+                    enviarEntregaPostal: 'Reenviar la entrega postal',
+                    enviarEntregaPostalButton: 'Reenvía la entrega postal',
+                    registrar: {
+                        title: "Registrar notificación pendiente",
+                        button: "Registra",
+                        noReposta: "Error inesperado al ejectuar la acción de registrar",
+                        noExecutades: "Identificadores de remesas no ejecutadas: ",
+                        repostesError: "Remesas con error al enviar a registrar: ",
+                        ok: "La remesa s'ha enviado a registrar"
+                    },
+                    enviarNotifica: {
+                        title: "Envía notificación registrada a Notific@",
+                        button: "Envía"
+                    },
+                    reactivarEstatNotifica: {
+                        title: 'Reactivar estado de Notific@',
+                        button: 'Reactivar estado'
+                    },
+                    reactivarSir: {
+                        title: 'Reactivar consulta SIR',
+                        button: 'Reactiva'
+                    },
+                    reactivarErrors: {
+                        title: 'Reactiva envíos con error',
+                        button: 'Reactiva'
+                    },
+                    reenviaErrors: {
+                        title: 'Reenvía envíos con error',
+                        button: 'Reenvía'
+                    }
                 },
             },
         },
@@ -489,7 +535,11 @@ const translationEs = {
                         certificacio: 'Certificación',
                         noEnviat: 'Este envío todavía no ha sido enviado',
                         notificacioNoEnviat: 'Esta notificación no ha sido enviada a Notific@',
-                        refrescar: 'Refrescar estado',
+                        refrescarEstat: {
+                            titleButton: 'Refrescar estado',
+                            success: "Estado del envío refrescado con éxito",
+                            error: "Error refrescando el estado del envío",
+                        },
                     },
                     registre: {
                         title: 'Registro',
@@ -508,7 +558,16 @@ const translationEs = {
                         cieDatatReceptorNom: "Receptor nombre",
                         cieDatatNumSeguiment: "Núm. seguimiento",
                         cieErroni: "L'entrega CIE no es podrà donar d'alta ja que dona errors al crear-la al CIE",
-                        refrescarEstat: 'Refrescar estado',
+                        refrescarEstat: {
+                            titleButton: 'Refrescar estado',
+                            success: "Estado del envío postal refrescado con éxito",
+                            error: "Error refrescando el estado del envío postal",
+                        },
+                        cancelar: {
+                            titleButton: 'Cancelar',
+                            success: "Envío postal enviado a cancelar con éxito",
+                            error: "Error cancelando el envío postal",
+                        },
                         cancelarEntregaPostal: "Cancelar entrega postal",
                         certificacio: "Certificación",
                         cieCertificacioData: "Data",

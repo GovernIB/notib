@@ -33,13 +33,12 @@ public class NotificacioTableHelper {
     private NotificacioTableViewRepository notificacioTableViewRepository;
     @Autowired
     private NotificacioMassivaRepository notificacioMassivaRepository;
-//    @Autowired
-//    private EnviamentTableHelper enviamentTableHelper;
     @Autowired
     private EnviamentTableRepository enviamentTableRepository;
 
+
     @Transactional(propagation = Propagation.MANDATORY)
-    public void crearRegistre(NotificacioEntity notificacio){
+    public NotificacioTableEntity crearRegistre(NotificacioEntity notificacio){
 
         log.info(String.format("[NOTIF-TABLE] Cream el registre de la notificacio [Id: %d]", notificacio.getId()));
         try {
@@ -98,10 +97,11 @@ public class NotificacioTableHelper {
                     .entregaPostal(entregaPostal)
                     .perActualitzar(true)
                     .build();
-            notificacioTableViewRepository.save(tableViewItem);
+            return notificacioTableViewRepository.save(tableViewItem);
         } catch (Exception ex) {
             log.error("No ha estat possible crear la informació de la notificació " + notificacio.getId(), ex);
-        }
+        	return null;
+		}
     }
 
     @Transactional(propagation = Propagation.MANDATORY)

@@ -339,14 +339,21 @@ const translationCa = {
                         modalTitle: "Anul·lació",
                         noReposta: "Error inesperat al anular",
                         noExecutades: "Identificadors d'enviaments no executats: ",
-                        repostesError: "Enviaments amb error de anul·lació: "
+                        respostesError: "Enviaments amb error de anul·lació: ",
+                        ok: "Anul·lació realitzada correctament"
                     },
                     certificacio: "Certificacio",
                     processat: "Marcar com a processat",
                     processatTitle: "Marcar com a processat",
                     justificantEnviament: "Justificant d'enviament",
-                    ampliarTermini: "Ampliar termini",
-                    ampliarTerminiTitle: "Ampliació de termini",
+                    ampliarTermini: {
+                        botoTitle: "Ampliar termini",
+                        modalTitle: "Ampliació de termini",
+                        noReposta: "Error inesperat ampliant termini",
+                        noExecutades: "Identificadors d'enviaments no executats: ",
+                        respostaError: "Error al ampliar el termini: ",
+                        ok: "Ampliació de termini realitzada correctament"
+                    },
                     editar: "Editar",
                     esborrar: "Esborrar",
                 },
@@ -483,8 +490,41 @@ const translationCa = {
                     },
                 },
                 accions: {
+                    success: "Acció enviada a executar correctament",
+                    error: "Error al enviar a executar l'acció. Consultar la pipella d'esdeveniments per més informació",
                     noAccions: "No hi ha accions disponibles per a aquest enviament",
-                    enviarCallback: 'Envia canvi estat al client'
+                    enviarCallback: "Envia canvi estat al client",
+                    enviarEntregaPostal: "Reenviar la entrega postal",
+                    enviarEntregaPostalButton: 'Reenvia la entrega postal',
+
+                    registrar: {
+                        title: "Registrar notificació pendent",
+                        button: "Registra",
+                        noReposta: "Error inesperat al executar la acció de registrar",
+                        noExecutades: "Identificadors de remeses no executades: ",
+                        repostesError: "Remeses amb error al enviar a registrar: ",
+                        ok: "La remesa s'ha enviat a registrar"
+                    },
+                    enviarNotifica: {
+                        title: "Envia notificació registrada a Notific@",
+                        button: "Envia"
+                    },
+                    reactivarEstatNotifica: {
+                        title: 'Reactivar estat de Notific@',
+                        button: 'Reactivar estat'
+                    },
+                    reactivarSir: {
+                        title: 'Reactivar consulta SIR',
+                        button: 'Reactiva'
+                    },
+                    reactivarErrors: {
+                        title: 'Reactiva enviaments amb error',
+                        button: 'Reactiva'
+                    },
+                    reenviarErrors: {
+                        title: 'Reenviar enviaments amb error',
+                        button: 'Reenvia'
+                    }
                 },
             },
         },
@@ -517,7 +557,11 @@ const translationCa = {
                         certificacio: 'Certificació',
                         noEnviat: 'Aquest enviament encara no ha estat enviat',
                         notificacioNoEnviat: 'Aquesta notificació no ha estat enviada a Notific@',
-                        refrescar: 'Refrescar estat',
+                        refrescarEstat: {
+                            titleButton: 'Refrescar estat',
+                            success: "Estat de l'enviament refrescat amb èxit",
+                            error: "Error refrescant l'estat de l'enviament",
+                        },
                     },
                     registre: {
                         title: 'Registre',
@@ -538,7 +582,16 @@ const translationCa = {
                         cieDatatNumSeguiment: 'Núm. seguiment',
                         cieErroni:
                             "L'entrega CIE no es podrà donar d'alta ja que dona errors al crear-la al CIE",
-                        refrescarEstat: 'Refrescar estat',
+                        refrescarEstat: {
+                            titleButton: 'Refresca estat',
+                            success: "Estat de l'enviament postal refrescat amb èxit",
+                            error: "Error refrescant l'estat de l'enviament postal",
+                        },
+                        cancelar: {
+                            titleButton: 'Cancelar',
+                            success: "Enviament postal enviat a cancelar",
+                            error: "Error cancelant l'enviament postal",
+                        },
                         cancelarEntregaPostal: 'Cancelar entrega postal',
                         certificacio: 'Certificació',
                         cieCertificacioData: 'Data',

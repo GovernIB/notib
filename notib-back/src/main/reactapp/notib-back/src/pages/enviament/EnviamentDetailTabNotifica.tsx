@@ -2,7 +2,7 @@ import {Alert, Box, Button, Icon, Typography} from '@mui/material';
 import React from 'react';
 import { FieldsDataCard } from '../../components/DataCard';
 import { useTranslation } from 'react-i18next';
-import { MuiActionReportButton } from 'reactlib';
+import {MuiActionReportButton, useBaseAppContext} from 'reactlib';
 
 const EnviamentDetailTabNotifica: React.FC<{
     enviament: any;
@@ -11,6 +11,7 @@ const EnviamentDetailTabNotifica: React.FC<{
 }> = (props) => {
     const { enviament, apiCurrentFields, isRolActualAdministradorLectura } = props;
     const { t } = useTranslation();
+    const { temporalMessageShow } = useBaseAppContext();
 
     const renderAlertEstat = () => {
         if (enviament?.notificaEstat === 'PENDENT') {
@@ -23,39 +24,52 @@ const EnviamentDetailTabNotifica: React.FC<{
             );
         }
     };
+    const isAlertVisible = Boolean(renderAlertEstat);
     const renderContingutRefrescar = () => {
+
         // Cas NO PENDENT
         const isCasEspecialSir =
             (enviament?.tipusEnviament === 'COMUNICACIO' || enviament?.tipusEnviament === 'SIR') &&
             enviament?.titularInfo?.interessatTipus === 'ADMINISTRACIO';
-
         const potRefrescar = !isRolActualAdministradorLectura;
         // Si és el cas de SIR i pot refrescar
         if (isCasEspecialSir && potRefrescar) {
             return (
                 <Box display="flex" justifyContent="flex-end">
-                    <Button
-                        startIcon={<Icon>refresh</Icon>}
-                        variant="outlined"
-                        // onClick={handleRefrescarSir} // TODO: S'ha de fer sa logica d'aquest boto
-                    >
-                        {t('page.enviament.detail.tab.notifica.refrescar')}
-                    </Button>
+                    <MuiActionReportButton
+                        resourceName="notificacioEnviamentResource"
+                        action="REFRESCAR_ESTAT_SIR"
+                        id={enviament?.id}
+                        title={t('page.enviament.detail.tab.notifica.refrescarEstat.titleButton')}
+                        buttonComponentProps={{ variant: 'outlined', sx: { mr: 1 } }}
+                        buttonIcon="refresh"
+                        onSuccess={resposta => {
+                            const msg = resposta?.ok ? "success" : "error";
+                            temporalMessageShow(null, t('page.enviament.detail.tab.notifica.refrescarEstat.' + msg), msg);
+                        }}
+                        onError={error => temporalMessageShow(null, error?.message, "error")}
+                    />
                 </Box>
             );
         }
 
         // Cas general: Botó de refrescar estàndard
-        if (potRefrescar) {
+
+        if (potRefrescar && !isAlertVisible) {
             return (
                 <Box display="flex" justifyContent="flex-end">
                     <MuiActionReportButton
                         resourceName="notificacioEnviamentResource"
                         action="REFRESCAR_ESTAT_NOTIFICA"
                         id={enviament?.id}
-                        title={t('page.enviament.detail.tab.notifica.refrescar')}
+                        title={t('page.enviament.detail.tab.notifica.refrescarEstat.titleButton')}
                         buttonComponentProps={{ variant: 'outlined', sx: { mr: 1 } }}
                         buttonIcon="refresh"
+                        onSuccess={resposta => {
+                            const msg = resposta?.ok ? "success" : "error";
+                            temporalMessageShow(null, t('page.enviament.detail.tab.notifica.refrescarEstat.' + msg), msg);
+                        }}
+                        onError={error => temporalMessageShow(null, error?.message, "error")}
                     />
                 </Box>
             );
@@ -66,7 +80,7 @@ const EnviamentDetailTabNotifica: React.FC<{
         <Box sx={{ height: '100%', overflowY: 'auto', minHeight: 0 }}>
             {renderContingutRefrescar()}
             {renderAlertEstat()}
-            <FieldsDataCard
+            {!isAlertVisible && <FieldsDataCard
                 title={t('page.enviament.detail.tab.notifica.datat')}
                 rows={[
                     {
@@ -118,7 +132,7 @@ const EnviamentDetailTabNotifica: React.FC<{
                 fields={apiCurrentFields}
                 data={enviament}
                 sx={{ mb: 1 }}
-            />
+            />}
             {enviament?.notificaCertificacioData && (
                 <FieldsDataCard
                     title={t('page.enviament.detail.tab.notifica.certificacio')}

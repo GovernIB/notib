@@ -2,11 +2,14 @@ package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
+import es.caib.notib.logic.enviaments.CancelarEntregaPostalActionExecutor;
 import es.caib.notib.logic.enviaments.DiagramaStateMachineReportGenerator;
 import es.caib.notib.logic.enviaments.EntregaPostalCertificacioReportGenerator;
 import es.caib.notib.logic.enviaments.EntregaPostalPerspectiveApplicator;
 import es.caib.notib.logic.enviaments.EnviamentCertificacioReportGenerator;
+import es.caib.notib.logic.enviaments.RefrescarEstatEntregaPostalActionExecutor;
 import es.caib.notib.logic.enviaments.RefrescarEstatNotificaActionExecutor;
+import es.caib.notib.logic.enviaments.RefrescarEstatSirActionExecutor;
 import es.caib.notib.logic.enviaments.TitularPerspectiveApplicator;
 import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
@@ -59,7 +62,10 @@ public class NotificacioEnviamentResourceServiceImpl
 		register(NotificacioEnviamentResource.REPORT_DESCARREGAR_DIAGRAMA_STATE_MACHINE, new DiagramaStateMachineReportGenerator());
 		register(NotificacioEnviamentResource.REPORT_DESCARREGAR_CIE_CERTIFICACIO, new EntregaPostalCertificacioReportGenerator(pluginHelper, metricsHelper));
 		register(NotificacioEnviamentResource.REPORT_DESCARREGAR_CERTIFICACIO_ENVIAMENT, new EnviamentCertificacioReportGenerator(notificacioService));
-		register(NotificacioEnviamentResource.ACTION_REFRESCAR_ESTAT_NOTIFICA, new RefrescarEstatNotificaActionExecutor());
+		register(NotificacioEnviamentResource.ACTION_REFRESCAR_ESTAT_NOTIFICA, new RefrescarEstatNotificaActionExecutor(notificacioService));
+		register(NotificacioEnviamentResource.ACTION_REFRESCAR_ESTAT_SIR, new RefrescarEstatSirActionExecutor(notificacioService));
+		register(NotificacioEnviamentResource.ACTION_REFRESCAR_ESTAT_ENTREGA_POSTAL, new RefrescarEstatEntregaPostalActionExecutor(notificacioService));
+		register(NotificacioEnviamentResource.ACTION_CANCELAR_ENTREGA_POSTAL, new CancelarEntregaPostalActionExecutor(notificacioService));
 	}
 
 	@Override
@@ -112,6 +118,8 @@ public class NotificacioEnviamentResourceServiceImpl
 		resource.setNotificacioOrganGestor(ResourceReference.toResourceReference(organGestor.getId(), organGestor.getCodiNom()));
 		resource.setNotificacioProcediment(ResourceReference.toResourceReference(procediment.getId(), procediment.getNom()));
 		resource.setReferenciaNotificacio(entity.getNotificacio().getReferencia());
+		resource.setAnulable(entity.isAnulable());
+		resource.setNotificacioEstat(entity.getNotificacio().getEstat());
 		var titular = entity.getTitular();
 		resource.setTitular(ResourceReference.toResourceReference(titular.getId(), titular.getNomSencerNif()));
 	}

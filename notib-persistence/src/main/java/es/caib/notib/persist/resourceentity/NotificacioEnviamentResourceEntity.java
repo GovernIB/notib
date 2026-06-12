@@ -1,5 +1,6 @@
 package es.caib.notib.persist.resourceentity;
 
+import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.ServeiTipus;
@@ -14,6 +15,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
@@ -253,6 +255,21 @@ public class NotificacioEnviamentResourceEntity extends BaseAuditableResourceEnt
 	@Column(table = BaseConfig.DB_PREFIX + "notificacio_env_table", name = "titular_nif", insertable = false, updatable = false)
 	private String titularNif;
 
+	@Transient
+	private boolean cieEstatFinal;
+	@Transient
+	private boolean anulable;
+
+	public boolean isCieEstatFinal() {
+		return entregaPostal != null && entregaPostal.isCieEstatFinal();
+	}
+
+	public boolean isAnulable() {
+		return anulat && !StringUtils.isEmpty(notificaReferencia) && !isNotificaEstatFinal() && !cieEstatFinal
+			&& (entregaPostal == null || entregaPostal.getCieEstat() == null
+			|| CieEstat.ENVIADO_CI.equals(entregaPostal.getCieEstat()) || CieEstat.ERROR.equals(entregaPostal.getCieEstat())
+			&& notificacio.getOrganGestor().getEntregaCie().getPagadorCie().isCieExtern());
+	}
 
 	@Builder
 	public NotificacioEnviamentResourceEntity(NotificacioEnviamentResource resource, NotificacioResourceEntity notificacio, PersonaResourceEntity titular) {

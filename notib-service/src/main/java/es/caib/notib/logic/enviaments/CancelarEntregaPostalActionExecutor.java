@@ -4,8 +4,8 @@ import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.intf.base.exception.ActionExecutionException;
 import es.caib.notib.logic.intf.dto.RespostaActionExecutor;
 import es.caib.notib.logic.intf.model.NotificacioResource;
-import es.caib.notib.logic.intf.service.CallbackService;
-import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
+import es.caib.notib.logic.intf.service.NotificacioService;
+import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,21 +14,19 @@ import java.util.Map;
 
 @Slf4j
 @AllArgsConstructor
-public class EnviarCallbackActionExecutor implements BaseMutableResourceService.ActionExecutor<NotificacioResourceEntity, Serializable, RespostaActionExecutor> {
+public class CancelarEntregaPostalActionExecutor implements BaseMutableResourceService.ActionExecutor<NotificacioEnviamentResourceEntity, Serializable, RespostaActionExecutor> {
 
-	private final CallbackService callbackService;
+	private NotificacioService notificacioService;
 
 	@Override
-	public RespostaActionExecutor exec(String code, NotificacioResourceEntity entity, Serializable params) throws ActionExecutionException {
+	public RespostaActionExecutor exec(String code, NotificacioEnviamentResourceEntity entity, Serializable params) throws ActionExecutionException {
 
 		try {
-			var ok = callbackService.reintentarCallback(entity.getId());
+			var ok = notificacioService.cancelarEntregaPostal(entity.getId());
 			return RespostaActionExecutor.builder().ok(ok).build();
 		} catch (Exception ex) {
-			log.error("[EnviarCallbackActionExecutor] Error enviant el callback per la notificacio " + entity.getId());
-
-			var msg = "Error inesperat enviant el callback ";
-			log.error("[EnviarCallbackActionExecutor] " + msg + "per la notificacio " + entity.getId());
+			var msg = "Error inesperat cancelant l'entrega postal ";
+			log.error("[CancelarEntregaPostalActionExecutor] " + msg + "per l'enviament' " + entity.getId());
 			throw new ActionExecutionException(NotificacioResource.class, entity.getId(), "-1", msg + ": " + ex.getMessage());
 		}
 	}

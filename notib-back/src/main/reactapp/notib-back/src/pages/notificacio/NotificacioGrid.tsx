@@ -40,9 +40,6 @@ import {
     NOTIFICACIO_ESTAT_ENUM_MAP,
 } from '../../utils/estatConfig';
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import NotificacioForm, {NotificacioFormContent} from "./NotificacioForm.tsx";
-import NotificacioFormEnviaments from "./NotificacioFormEnviaments.tsx";
-import NotificacioFormDocuments from "./NotificacioFormDocuments.tsx";
 
 const CustomDetailPanelToggle = (props: Pick<GridRenderCellParams, 'id' | 'value'>) => {
     const { id } = props;
@@ -379,6 +376,7 @@ const NotificacioGrid = () => {
 
     const { t } = useTranslation();
     const [ params ] = useSearchParams();
+    const { currentRole} = useNotibContext();
     const notificacioMassiva = params?.get('notificacioMassiva');
     const { state } = useLocation();
     const titolMassiva = state?.titolMassiva;
@@ -407,6 +405,11 @@ const NotificacioGrid = () => {
             ampliarTermini, ampliarTerminiDialog,
             marcarProcessat, marcarProcessatDialog,
             esborrarRemesa } = useAccionsNotificacio();
+
+    const mostrarEditarBorrar = (estat : string, currentRole : string | undefined ) => {
+        return currentRole === 'NOT_ADMIN_LECTURA' || (estat !== 'PENDENT' && estat !== 'REGISTRADA');
+    }
+
     const rowAdditionalActions = () => {
         const listActions: DataCommonAdditionalAction[] = [ // TODO FALTEN CONDICIONS PER MOSTRAR CADA ENTRADA
             {
@@ -414,7 +417,7 @@ const NotificacioGrid = () => {
                 title: t('page.notificacio.grid.column.detalls'),
                 icon: 'info',
                 showInMenu: true,
-                onClick: (id) => onDetailClick(id),
+                onClick: id => onDetailClick(id),
             },
             {
                 label: t('page.notificacio.grid.accions.documentEnviat'),
@@ -429,16 +432,16 @@ const NotificacioGrid = () => {
                 icon: 'block',
                 showInMenu: true,
                 action: 'ANULAR_REMESA',
-                onClick: (id,) => anularRemesa(id, t('page.notificacio.grid.accions.anular.modalTitle')),
-                // hidden: (row) => !row.anulable,
+                onClick: id => anularRemesa(id, t('page.notificacio.grid.accions.anular.modalTitle')),
+                hidden: row => !row.anulable,
             },
             {
                 label: t('page.notificacio.grid.accions.certificacio'),
                 title: t('page.notificacio.grid.accions.certificacio'),
                 icon: 'download',
                 showInMenu: true,
-                onClick: (id) => descarregarCertificacio(id),
-                // hidden: (row) => !row.envCerData,
+                onClick: id => descarregarCertificacio(id),
+                hidden: row => !row.envCerData,
             },
             {
                 label: t('page.notificacio.grid.accions.processat'),
@@ -446,26 +449,25 @@ const NotificacioGrid = () => {
                 icon: 'check_circle',
                 showInMenu: true,
                 action: 'MARCAR_PROCESSAT',
-                onClick: (id) => marcarProcessat(id, t('page.notificacio.grid.accions.processatTitle')),
-                // hidden: (row) => row,
-                // if ${!isRolActualAdministradorLectura} && ((~hlpIsAdministradorEntitat() && estat == 'FINALITZADA') || permisProcessar)
+                onClick: id => marcarProcessat(id, t('page.notificacio.grid.accions.processatTitle')),
+                hidden: row => !(currentRole !== 'NOT_ADMIN_LECTURA' && ((currentRole === 'NOT_ADMIN' && row.estat === 'FINALITZADA') || row.permisProcessar)),
             },
             {
                 label: t('page.notificacio.grid.accions.justificantEnviament'),
                 title: t('page.notificacio.grid.accions.justificantEnviament'),
                 icon: 'download',
                 showInMenu: true,
-                onClick: (id) => descarregarJustificantEnviament(id)
-                // hidden: (row) => !row?.justificant,
+                onClick: (id) => descarregarJustificantEnviament(id),
+                hidden: (row) => row?.justificant,
             },
             {
-                label: t('page.notificacio.grid.accions.ampliarTermini'),
-                title: t('page.notificacio.grid.accions.ampliarTermini'),
+                label: t('page.notificacio.grid.accions.ampliarTermini.botoTitle'),
+                title: t('page.notificacio.grid.accions.ampliarTermini.botoTitle'),
                 icon: 'calendar_month',
                 showInMenu: true,
                 action: 'AMPLIAR_TERMINI',
-                onClick: (id, row) => ampliarTermini(id, t('page.notificacio.grid.accions.ampliarTerminiTitle'), {caducitat: row.caducitat}),
-                // hidden: (row) => isRolActualAdministradorLectura && !row?.plazoAmpliable,
+                onClick: (id, row) => ampliarTermini(id, t('page.notificacio.grid.accions.ampliarTermini.modalTitle'), {caducitat: row.caducitat}),
+                hidden: row => currentRole === 'NOT_ADMIN_LECTURA'  || row?.entregaPostal || row?.estat !== 'ENVIADA',
             },
             // {
             //     label: t('page.notificacio.grid.accions.editar'),
@@ -474,7 +476,7 @@ const NotificacioGrid = () => {
             //     showInMenu: true,
             //     // onClick: (id) => console.log("editar " + id),
             //     clickShowUpdateDialog: true
-            //     // hidden: (row) => isRolActualAdministradorLectura && !row?.plazoAmpliable,
+            //     // hidden: (row) => mostrarEditarBorrar(row?.estat, currentRole),
             // },
             {
                 label: t('page.notificacio.grid.accions.esborrar'),
@@ -482,13 +484,14 @@ const NotificacioGrid = () => {
                 icon: 'delete_icon',
                 showInMenu: true,
                 onClick: (id) => esborrarRemesa(id),
-                // hidden: (row) => isRolActualAdministradorLectura && !row?.plazoAmpliable,
+                hidden: (row) => mostrarEditarBorrar(row?.estat, currentRole),
             },
         ];
 
         return listActions;
     };
     const navigate = useNavigate();
+
     return (
         <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
             <MuiDataGrid
@@ -499,12 +502,13 @@ const NotificacioGrid = () => {
                 defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
                 paginationActive
                 popupEditUpdateActive={true}
-                popupEditFormContent={<><NotificacioFormContent /><NotificacioFormEnviaments /><NotificacioFormDocuments /></>}
+                // popupEditFormContent={<><NotificacioFormContent /><NotificacioFormEnviaments /><NotificacioFormDocuments /></>}
                 selectionActive
                 rowUpdateLink="form/{{id}}"
+                rowUpdateShowInMenu
                 persistentStateActive
                 rowHideDeleteButton
-                // rowHideUpdateButton
+                rowHideUpdateButton={params => mostrarEditarBorrar(params.estat, currentRole)}
                 persistentStateClearPageSortPropsOnTopLevelRouteChange
                 {...filterDataGridProps}
                 fixedFilter={notificacioMassiva ? `notificacioMassiva.id :${notificacioMassiva}` : undefined}

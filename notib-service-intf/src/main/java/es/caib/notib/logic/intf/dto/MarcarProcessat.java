@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Getter
@@ -15,5 +16,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class MarcarProcessat implements Serializable {
 
+	@NotNull
 	private String motiu;
 }

@@ -1,9 +1,9 @@
 package es.caib.notib.logic.intf.model;
 
+import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.ServeiTipus;
-import es.caib.notib.logic.intf.EntregaPostalResource;
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
 import es.caib.notib.logic.intf.base.annotation.ResourceArtifact;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
@@ -16,6 +16,7 @@ import es.caib.notib.logic.intf.base.validation.CustomValidation;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.model.validator.TitularIncapacitatObligatoriRepresentant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,6 +24,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.util.Strings;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -91,7 +93,40 @@ import java.util.List;
 			accessConstraints = {
 				@ResourceAccessConstraint(
 					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER }
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN, BaseConfig.ROLE_USER }
+				)
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioEnviamentResource.ACTION_REFRESCAR_ESTAT_SIR,
+			requiresId = true,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN, BaseConfig.ROLE_USER }
+				)
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioEnviamentResource.ACTION_REFRESCAR_ESTAT_ENTREGA_POSTAL,
+			requiresId = true,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN, BaseConfig.ROLE_USER }
+				)
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioEnviamentResource.ACTION_CANCELAR_ENTREGA_POSTAL,
+			requiresId = true,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN, BaseConfig.ROLE_USER }
 				)
 			}
 		),
@@ -111,6 +146,9 @@ public class NotificacioEnviamentResource extends BaseResource<Long> {
 	public static final String REPORT_DESCARREGAR_CIE_CERTIFICACIO = "DESCARREGAR_CIE_CERTIFICACIO";
 	public static final String REPORT_DESCARREGAR_CERTIFICACIO_ENVIAMENT = "DESCARREGAR_CERTIFICACIO_ENVIAMENT";
 	public static final String ACTION_REFRESCAR_ESTAT_NOTIFICA = "REFRESCAR_ESTAT_NOTIFICA";
+	public static final String ACTION_REFRESCAR_ESTAT_SIR = "REFRESCAR_ESTAT_SIR";
+	public static final String ACTION_REFRESCAR_ESTAT_ENTREGA_POSTAL = "REFRESCAR_ESTAT_ENTREGA_POSTAL";
+	public static final String ACTION_CANCELAR_ENTREGA_POSTAL = "CANCELAR_ENTREGA_POSTAL";
 
 	@NotNull
 	private ServeiTipus serveiTipus = ServeiTipus.NORMAL;
@@ -235,6 +273,9 @@ public class NotificacioEnviamentResource extends BaseResource<Long> {
 	private String titularNom;
 	private String titularNif;
 	private boolean notificat;
+	private boolean anulable;
+	private boolean cieEstatFinal;
+	private NotificacioEstatEnumDto notificacioEstat;
 
 	public String getNotificaCertificacioArxiuNom() {
 		return !StringUtils.isEmpty(notificaReferencia) ?  "certificacio_" + notificaReferencia + ".pdf" : null;

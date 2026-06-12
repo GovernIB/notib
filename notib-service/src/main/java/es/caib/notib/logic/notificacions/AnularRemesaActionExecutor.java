@@ -28,8 +28,9 @@ public class AnularRemesaActionExecutor implements BaseMutableResourceService.Ac
 	public RespostaAnular exec(String code, NotificacioResourceEntity entity, AnularDto params) throws ActionExecutionException {
 
 		try {
-			params.setNotificacioId(entity.getId());
-			var foo = 1/0;
+			if (params.getEnviamentId() == null) {
+				params.setNotificacioId(entity.getId());
+			}
  			return notificacioService.anular(params);
 		} catch (Exception ex) {
 			var msg = "Error inesperat anulant la remesa ";

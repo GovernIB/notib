@@ -176,7 +176,7 @@ public abstract class NotificacioTableMapper {
             not.setEnvCerData(dto.getEnvCerData());
             not.setEstatString(dto.getEstatString());
 //            not.setEstatJson(dto.getEstatJson());
-            var rNums = registreNums.substring(0, registreNums.length()-2);
+            var rNums = !registreNums.toString().isEmpty() ? registreNums.substring(0, registreNums.length()-2) : "";
             if (rNums.length() > 2000) {
                 rNums = rNums.substring(0, 2000) + "...";
             }
@@ -189,6 +189,7 @@ public abstract class NotificacioTableMapper {
             NotibLogger.getInstance().info("Guardar a not_table -> " + (fi - inici), log, LoggingTipus.EFICIENCIA_TAULA_REMESES);
             NotibLogger.getInstance().info("Actualitzar notificacio -> " + (fi - iniciActualitzar), log, LoggingTipus.EFICIENCIA_TAULA_REMESES);
         } catch (Exception ex) {
+			log.error("[NotificacioTableMapper] Error actualitzant la notificacio " + not.getId(), ex);
             // TODO: Si no es pot actualitzar, no es fa res. Es calcularà en cada consulta com fins ara!
         }
     }

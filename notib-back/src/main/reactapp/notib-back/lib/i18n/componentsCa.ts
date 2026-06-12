@@ -27,6 +27,9 @@ const componentsCa = {
         update: {
             label: 'Modificar',
         },
+        editar: {
+            label: 'Editar',
+        },
         delete: {
             label: 'Esborrar',
             single: {

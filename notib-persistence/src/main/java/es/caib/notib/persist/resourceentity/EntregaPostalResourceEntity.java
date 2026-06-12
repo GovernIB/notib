@@ -3,7 +3,7 @@ package es.caib.notib.persist.resourceentity;
 import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EntregaPostalVia;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
-import es.caib.notib.logic.intf.EntregaPostalResource;
+import es.caib.notib.logic.intf.model.EntregaPostalResource;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificaDomiciliTipusEnumDto;
@@ -198,5 +198,16 @@ public class EntregaPostalResourceEntity extends BaseAuditableResourceEntity<Ent
 
 	public String getCieCertificacioArxiuNom() {
 		return "certificacio_postal_" + cieId + ".pdf";
+	}
+
+	public boolean isCieEstatFinal() {
+
+		return cieEstat != null && (CieEstat.NOTIFICADA.equals(cieEstat)
+			|| CieEstat.CANCELADO.equals(cieEstat)
+			|| CieEstat.EXTRAVIADA.equals(cieEstat)
+			|| CieEstat.SIN_INFORMACION.equals(cieEstat)
+			|| CieEstat.REHUSADA.equals(cieEstat)
+			|| CieEstat.ERROR.equals(cieEstat)
+			|| CieEstat.DEVUELTO.equals(cieEstat));
 	}
 }

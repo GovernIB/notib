@@ -5,7 +5,12 @@ import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.enviaments.EnviarCallbackActionExecutor;
-import es.caib.notib.logic.helper.*;
+import es.caib.notib.logic.notificacions.EnviarEntregaPostalActionExecutor;
+import es.caib.notib.logic.helper.ConfigHelper;
+import es.caib.notib.logic.helper.LegacyHelper;
+import es.caib.notib.logic.helper.MessageHelper;
+import es.caib.notib.logic.helper.NotibPermissionHelper;
+import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.exception.ResourceNotCreatedException;
@@ -16,7 +21,11 @@ import es.caib.notib.logic.intf.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
-import es.caib.notib.logic.intf.model.*;
+import es.caib.notib.logic.intf.model.DocumentResource;
+import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
+import es.caib.notib.logic.intf.model.NotificacioResource;
+import es.caib.notib.logic.intf.model.OrganGestorResource;
+import es.caib.notib.logic.intf.model.PersonaResource;
 import es.caib.notib.logic.intf.resourceservice.NotificacioResourceService;
 import es.caib.notib.logic.intf.service.CallbackService;
 import es.caib.notib.logic.intf.service.JustificantService;
@@ -28,12 +37,24 @@ import es.caib.notib.logic.notificacions.CertificacioReportGenerator;
 import es.caib.notib.logic.notificacions.DocumentEnviatReportGenerator;
 import es.caib.notib.logic.notificacions.DocumentPerspectiveApplicator;
 import es.caib.notib.logic.notificacions.EnviamentPerspectiveApplicator;
+import es.caib.notib.logic.notificacions.EnviarNotificaActionExecutor;
 import es.caib.notib.logic.notificacions.EsborrarRemesaActionExecutor;
 import es.caib.notib.logic.notificacions.GrupPerspectiveApplicator;
 import es.caib.notib.logic.notificacions.JusitficantEnviamentReportGenerator;
 import es.caib.notib.logic.notificacions.MarcarProcessatActionExecutor;
 import es.caib.notib.logic.notificacions.OperadorPostalCiePerspectiveApplicator;
-import es.caib.notib.persist.resourceentity.*;
+import es.caib.notib.logic.notificacions.ReactivarAmbErrorActionExecutor;
+import es.caib.notib.logic.notificacions.ReactivarConsultaSirActionExecutor;
+import es.caib.notib.logic.notificacions.ReenviarAmbErrorActionExecutor;
+import es.caib.notib.logic.notificacions.ReactivarEstatNotificaActionExecutor;
+import es.caib.notib.logic.notificacions.RegistrarRemesaActionExecutor;
+import es.caib.notib.persist.resourceentity.CallbackResourceEntity;
+import es.caib.notib.persist.resourceentity.DocumentResourceEntity;
+import es.caib.notib.persist.resourceentity.EventResourceEntity;
+import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
+import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
+import es.caib.notib.persist.resourceentity.PersonaResourceEntity;
+import es.caib.notib.persist.resourceentity.ProcedimentOrganGestorResourceEntity;
 import es.caib.notib.persist.resourcerepository.CallbackResourceRepository;
 import es.caib.notib.persist.resourcerepository.DocumentResourceRepository;
 import es.caib.notib.persist.resourcerepository.EventResourceRepository;
@@ -50,7 +71,12 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -100,16 +126,25 @@ public class NotificacioResourceServiceImpl
 		register(NotificacioResource.ACTION_MARCAR_PROCESSAT, new MarcarProcessatActionExecutor(notificacioService));
 		register(NotificacioResource.ACTION_ESBORRAR_REMESA, new EsborrarRemesaActionExecutor(notificacioService, messageHelper));
 		register(NotificacioResource.ACTION_ENVIAR_CALLBACK, new EnviarCallbackActionExecutor(callbackService));
+		register(NotificacioResource.ACTION_ENVIAR_ENTREGA_POSTAL, new EnviarEntregaPostalActionExecutor(notificacioService));
+		register(NotificacioResource.ACTION_REGISTRAR_REMESA, new RegistrarRemesaActionExecutor(notificacioService));
+		register(NotificacioResource.ACTION_ENVIAR_NOTIFICA, new EnviarNotificaActionExecutor(notificacioService));
+		register(NotificacioResource.ACTION_REACTIVAR_ESTAT_NOTIFICA, new ReactivarEstatNotificaActionExecutor(notificacioService));
+		register(NotificacioResource.ACTION_REACTIVAR_CONSULTA_SIR, new ReactivarConsultaSirActionExecutor(notificacioService));
+		register(NotificacioResource.ACTION_REACTIVAR_AMB_ERRORS, new ReactivarAmbErrorActionExecutor(notificacioService));
+		register(NotificacioResource.ACTION_REENVIAR_AMB_ERRORS, new ReenviarAmbErrorActionExecutor(notificacioService));
 	}
 
 	@Override
-	protected void afterConversion(NotificacioResourceEntity entity, NotificacioResource resource) {
+	public void afterConversion(NotificacioResourceEntity entity, NotificacioResource resource) {
 
 		var enviamentsPendentsNotifica = notificacioEnviamentResourceRepository.findEnviamentsPendentsNotificaByNotificacio(entity);
  		resource.setHasEnviamentsPendents(enviamentsPendentsNotifica != null && !enviamentsPendentsNotifica.isEmpty());
 		var llindarDies = configHelper.getConfigAsInteger("es.caib.notib.llindar.dies.enviament.remeses");
 		resource.setNotificacioAntiga(DatesUtils.isNowAfterDate(entity.getCreatedDate(), llindarDies));
 		resource.setComunicacioSir(entity.isComunicacioSir());
+		resource.setPermisProcessar(hasPermisProcessar(entity));
+//		legacyHelper.actualitzarColumnaEstat(entity);
 		//CALLBACKS
 		var pendents = callbackResourceRepository.findByNotificacioIdAndEstatOrderByDataDesc(entity.getId(), CallbackEstatEnumDto.PENDENT);
 		resource.setEventsCallbackPendent(entity.isTipusUsuariAplicacio() && pendents != null && !pendents.isEmpty());
@@ -198,6 +233,10 @@ public class NotificacioResourceServiceImpl
 		}
 	}
 
+	private boolean hasPermisProcessar(NotificacioResourceEntity notificacio) {
+		return notibPermissionHelper.organGestorPermissionAllowed(notificacio.getOrganGestor().getId(), es.caib.notib.logic.intf.acl.ExtendedPermission.PROCESSAR);
+	}
+
 	private NotificacioErrorTipusEnumDto getErrorTipus(EventResourceEntity lastErrorEvent) {
 
 		if (lastErrorEvent == null || !NotificacioEstatEnumDto.ENVIADA.equals(lastErrorEvent.getNotificacio().getEstat())) {
@@ -260,6 +299,7 @@ public class NotificacioResourceServiceImpl
 		}
 	}
 
+
 	@Override
 	public void afterCreateSave(
 		NotificacioResourceEntity entity,
@@ -274,8 +314,9 @@ public class NotificacioResourceServiceImpl
 				enviamentsIds.add(enviamentId);
 			});
 		}
-		legacyHelper.altaNotificacio(entity.getId(), enviamentsIds);
-	}
+		legacyHelper.altaNotificacio(entity.getId(), enviamentsIds);	}
+
+
 
 	/*
 	 * Condició en format Spring Filter per a mostrar només les notificacions sobre les que es tenen permisos. Les

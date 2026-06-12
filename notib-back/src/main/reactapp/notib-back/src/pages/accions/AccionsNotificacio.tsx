@@ -1,11 +1,7 @@
-import {FormApi, useBaseAppContext, useMuiActionReportLogic} from 'reactlib';
-import React, {useState} from "react";
+import {useBaseAppContext, useMuiActionReportLogic} from 'reactlib';
 import Grid from "@mui/material/Grid";
 import GridFormField from "../../components/GridFormField.tsx";
 import {useTranslation} from "react-i18next";
-import {useFormDialog} from "../../../lib/components/mui/form/FormDialog.tsx";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
 import {TemporalMessageSeverity} from "../../../lib/components/BaseAppContext.tsx";
 
 export const useAccionsNotificacio = () => {
@@ -34,7 +30,7 @@ export const useAccionsNotificacio = () => {
     const botons = [{value: true, text: t('comu.guardar'), icon: 'save', componentProps: { variant: 'contained' }},
         {value: false, text: t('comu.cancelar'), componentProps: { variant: 'outlined' }}];
 
-    const { messageDialogShow, temporalMessageShow } = useBaseAppContext();
+    const { temporalMessageShow } = useBaseAppContext();
     const { exec: anularRemesa, formDialogComponent: anularRemesaDialog } = useMuiActionReportLogic(
         'notificacioResource',
         'ANULAR_REMESA',
@@ -62,7 +58,7 @@ export const useAccionsNotificacio = () => {
                 msg += t('page.notificacio.grid.accions.anular.respostesError');
                 resposta.respostes.forEach(r => {
                     if (r.error) {
-                        msg += "Identificador: " + r.identificador + " Error: " + r.codiReposta + " " + r.descripcioResposta + ", ";
+                        msg += " Identificador: " + r.identificador + " Error: " + r.codiReposta + " - " + r.descripcioResposta + ", ";
                     }
                 });
                 if (msg.length > 0) {
@@ -77,6 +73,7 @@ export const useAccionsNotificacio = () => {
                 resposta.noExecutades.forEach(r => msg += r + ", ");
                 msg = msg.substring(0, msg.length -2);
             }
+            msg = !msg ? t('page.notificacio.grid.accions.anular.ok') : msg;
             temporalMessageShow(null, msg, severity);
         },
         undefined,
@@ -95,8 +92,8 @@ export const useAccionsNotificacio = () => {
         undefined,
         undefined,
         (<Grid container spacing={2}>
-            <GridFormField size={12} name="caducitat" required readOnly disabled/>
-            <GridFormField size={12} name="dies" type="date" required /> {/*TODO caducitat que no mostri la hora*/}
+            <GridFormField size={12} name="caducitat" required readOnly disabled/> {/*TODO caducitat que no mostri la hora*/}
+            <GridFormField size={12} name="dies"  required />
             <GridFormField size={12} name="motiu" type="textarea" required />
         </Grid>),
         undefined,
@@ -104,7 +101,32 @@ export const useAccionsNotificacio = () => {
         botons,
         undefined,
         undefined,
-        undefined,
+        resposta => {
+            if (!resposta) {
+                temporalMessageShow(null, t('page.notificacio.grid.accions.ampliarTermini.noReposta'), "error");
+                return;
+            }
+            let severity : TemporalMessageSeverity = "success";
+            let msg = "";
+            if (!resposta.ok) {
+                msg += t('page.notificacio.grid.accions.ampliarTermini.respostaError');
+                severity = "error";
+                msg += resposta.descripcionRespuesta ? resposta.descripcionRespuesta : resposta;
+                if (resposta.descripcions && resposta.descripcions.lengths > 0) {
+                    resposta.descripcions.forEach(r => msg += r + ", ");
+                    msg = msg.substring(0, msg.length -2);
+                }
+            }
+            if (resposta.noExecutades && resposta.noExecutades.length > 0) {
+                severity = severity === "success" ? "warning" : severity;
+                msg = msg.length > 0 ? "\n" + msg : msg;
+                msg += t('page.notificacio.grid.accions.ampliarTermini.noExecutades');
+                resposta.noExecutades.forEach(r => msg += r + ", ");
+                msg = msg.substring(0, msg.length -2);
+            }
+            msg = !msg ? t('page.notificacio.grid.accions.ampliarTermini.ok') : msg;
+            temporalMessageShow(null, msg, severity);
+        },
         undefined,
         undefined,
         true,

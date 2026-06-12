@@ -315,7 +315,7 @@ public class RegistrePluginMockImpl extends AbstractSalutPlugin implements Regis
 
 //		ClassLoader classLoader = getClass().getClassLoader();
 //		File file = new File(classLoader.getResource("es/caib/notib/plugin/caib/registre/registre.txt").getFile());
-		File file = new File(getSequenciaPath());
+			File file = new File(getSequenciaPath());
 
 		try (Scanner scanner = new Scanner(file)) {
 

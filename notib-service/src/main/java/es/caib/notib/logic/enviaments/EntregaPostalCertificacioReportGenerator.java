@@ -4,7 +4,7 @@ import es.caib.notib.logic.base.service.BaseReadonlyResourceService;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.PluginHelper;
-import es.caib.notib.logic.intf.EntregaPostalResource;
+import es.caib.notib.logic.intf.model.EntregaPostalResource;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.exception.ReportGenerationException;
 import es.caib.notib.logic.intf.base.model.DownloadableFile;
@@ -13,8 +13,6 @@ import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;

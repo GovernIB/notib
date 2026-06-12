@@ -19,7 +19,6 @@ import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
-import es.caib.notib.logic.intf.dto.anular.Anulacio;
 import es.caib.notib.logic.intf.dto.anular.AnularDto;
 import es.caib.notib.logic.intf.dto.explotacio.EnviamentOrigen;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -163,6 +162,83 @@ import java.util.List;
 				)
 			}
 		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.ACTION_ENVIAR_ENTREGA_POSTAL,
+			requiresId = true,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN }
+				)
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.ACTION_REGISTRAR_REMESA,
+			requiresId = true,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN }
+				)
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.ACTION_ENVIAR_NOTIFICA,
+			requiresId = true,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN }
+				)
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.ACTION_REACTIVAR_ESTAT_NOTIFICA,
+			requiresId = true,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN }
+				)
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.ACTION_REACTIVAR_CONSULTA_SIR,
+			requiresId = true,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN }
+				)
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.ACTION_REACTIVAR_AMB_ERRORS,
+			requiresId = true,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN }
+				)
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.ACTION_REENVIAR_AMB_ERRORS,
+			requiresId = true,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN }
+				)
+			}
+		)
 	}
 )
 @CustomValidation.List({
@@ -188,6 +264,13 @@ public class NotificacioResource extends BaseResource<Long> {
 	public static final String ACTION_MARCAR_PROCESSAT = "MARCAR_PROCESSAT";
 	public static final String ACTION_ESBORRAR_REMESA = "ESBORRAR_REMESA";
 	public static final String ACTION_ENVIAR_CALLBACK = "ENVIAR_CALLBACK";
+	public static final String ACTION_ENVIAR_ENTREGA_POSTAL = "ENVIAR_ENTREGA_POSTAL";
+	public static final String ACTION_REGISTRAR_REMESA = "REGISTRAR_REMESA";
+	public static final String ACTION_ENVIAR_NOTIFICA = "ENVIAR_NOTIFICA";
+	public static final String ACTION_REACTIVAR_ESTAT_NOTIFICA = "REACTIVAR_ESTAT_NOTIFICA";
+	public static final String ACTION_REACTIVAR_CONSULTA_SIR = "REACTIVAR_CONSULTA_SIR";
+	public static final String ACTION_REACTIVAR_AMB_ERRORS = "REACTIVAR_AMB_ERRORS";
+	public static final String ACTION_REENVIAR_AMB_ERRORS = "REENVIAR_AMB_ERRORS";
 
 	@NotNull
 	private EnviamentTipus enviamentTipus;
@@ -277,6 +360,7 @@ public class NotificacioResource extends BaseResource<Long> {
 	private String registreNums;
 	private String titular;
 	private String notificaIds;
+	private boolean permisProcessar;
 
 	// Camps pel detall de remeses
 	private PagadorPostalResource operadorPostalInfo;

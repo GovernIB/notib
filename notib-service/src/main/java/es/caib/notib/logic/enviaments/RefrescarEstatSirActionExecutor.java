@@ -3,7 +3,6 @@ package es.caib.notib.logic.enviaments;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.intf.base.exception.ActionExecutionException;
 import es.caib.notib.logic.intf.dto.RespostaActionExecutor;
-import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 import es.caib.notib.logic.intf.model.NotificacioResource;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
@@ -15,7 +14,7 @@ import java.util.Map;
 
 @Slf4j
 @AllArgsConstructor
-public class RefrescarEstatNotificaActionExecutor implements BaseMutableResourceService.ActionExecutor<NotificacioEnviamentResourceEntity, Serializable, RespostaActionExecutor> {
+public class RefrescarEstatSirActionExecutor implements BaseMutableResourceService.ActionExecutor<NotificacioEnviamentResourceEntity, Serializable, RespostaActionExecutor> {
 
 	private NotificacioService notificacioService;
 
@@ -23,11 +22,11 @@ public class RefrescarEstatNotificaActionExecutor implements BaseMutableResource
 	public RespostaActionExecutor exec(String code, NotificacioEnviamentResourceEntity entity, Serializable params) throws ActionExecutionException {
 
 		try {
-			var estat = notificacioService.enviamentRefrescarEstat(entity.getNotificacio().getEntitat().getId(), entity.getId());
+			var estat = notificacioService.enviamentRefrescarEstatSir(entity.getId());
 			return RespostaActionExecutor.builder().ok(estat != null).build();
 		} catch (Exception ex) {
-			var msg = "Error inesperat refrescant l'estat de notifica ";
-			log.error("[RefrescarEstatNotificaActionExecutor] " + msg + "per l'enviament' " + entity.getId());
+			var msg = "Error inesperat refrescant l'estat SIR ";
+			log.error("[RefrescarEstatSirActionExecutor] " + msg + "per l'enviament' " + entity.getId());
 			throw new ActionExecutionException(NotificacioResource.class, entity.getId(), "-1", msg + ": " + ex.getMessage());
 		}
 	}

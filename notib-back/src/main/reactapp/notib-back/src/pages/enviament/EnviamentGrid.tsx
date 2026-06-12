@@ -23,6 +23,8 @@ import {
     getGridRowColorClass,
 } from '../../utils/estatConfig';
 import {useSearchParams} from "react-router-dom";
+import useAccionsNotificacio from "../accions/AccionsNotificacio.tsx";
+import {useNotibContext} from "../../components/NotibContext.ts";
 
 const columns = [
     {
@@ -91,46 +93,23 @@ const springFilterBuilder = (data: any) => {
         filterBuilder.eq('tipusEnviament', `'${data?.tipusEnviament}'`),
         filterBuilder.like('notificacioConcepte', data.notificacioConcepte),
         filterBuilder.eq('notificaEstat', `'${data?.notificaEstat}'`),
-        data?.dataEnviamentInici &&
-            filterBuilder.gte('enviatDate', `'${formatStartOfDay(data?.dataEnviamentInici)}'`),
-        data?.dataEnviamentFi &&
-            filterBuilder.lte('enviatDate', `'${formatEndOfDay(data?.dataEnviamentFi)}'`),
-        data?.dataCreacioInici &&
-            filterBuilder.gte('createdDate', `'${formatStartOfDay(data?.dataCreacioInici)}'`),
-        data?.dataCreacioFi &&
-            filterBuilder.lte('createdDate', `'${formatEndOfDay(data?.dataCreacioFi)}'`),
-        data?.enviamentDataProgramadaInici &&
-            filterBuilder.gte(
-                'enviamentDataProgramada',
-                `'${formatStartOfDay(data?.enviamentDataProgramadaInici)}'`
-            ),
-        data?.enviamentDataProgramadaFi &&
-            filterBuilder.lte(
-                'enviamentDataProgramada',
-                `'${formatEndOfDay(data?.enviamentDataProgramadaFi)}'`
-            ),
+        data?.dataEnviamentInici && filterBuilder.gte('enviatDate', `'${formatStartOfDay(data?.dataEnviamentInici)}'`),
+        data?.dataEnviamentFi && filterBuilder.lte('enviatDate', `'${formatEndOfDay(data?.dataEnviamentFi)}'`),
+        data?.dataCreacioInici && filterBuilder.gte('createdDate', `'${formatStartOfDay(data?.dataCreacioInici)}'`),
+        data?.dataCreacioFi && filterBuilder.lte('createdDate', `'${formatEndOfDay(data?.dataCreacioFi)}'`),
+        data?.enviamentDataProgramadaInici && filterBuilder.gte('enviamentDataProgramada', `'${formatStartOfDay(data?.enviamentDataProgramadaInici)}'`),
+        data?.enviamentDataProgramadaFi && filterBuilder.lte('enviamentDataProgramada', `'${formatEndOfDay(data?.enviamentDataProgramadaFi)}'`),
         filterBuilder.like('notificaReferencia', data.notificaReferencia),
         filterBuilder.like('grupCodi', data.grupCodi),
         filterBuilder.eq('organId', data?.organGestor?.id),
         filterBuilder.like('procedimentId', data?.procedimentServei?.id),
         filterBuilder.eq('createdBy', `'${data?.createdBy}'`),
         filterBuilder.like('notificacioDescripcio', data?.notificacioDescripcio),
-        filterBuilder.or(
-            filterBuilder.like('titularNom', data.titularNomNif),
-            filterBuilder.like('titularNif', data.titularNomNif)
-        ),
+        filterBuilder.or(filterBuilder.like('titularNom', data.titularNomNif), filterBuilder.like('titularNif', data.titularNomNif)),
         filterBuilder.like('representantsString', data?.representantsString),
         filterBuilder.like('registreNumeroFormatat', data.numRegistre),
-        data?.dataCaducitatInici &&
-            filterBuilder.gte(
-                'notificaDataCaducitat',
-                `'${formatStartOfDay(data?.dataCaducitatInici)}'`
-            ),
-        data?.dataCaducitatFi &&
-            filterBuilder.lte(
-                'notificaDataCaducitat',
-                `'${formatEndOfDay(data?.dataCaducitatFi)}'`
-            ),
+        data?.dataCaducitatInici && filterBuilder.gte('notificaDataCaducitat', `'${formatStartOfDay(data?.dataCaducitatInici)}'`),
+        data?.dataCaducitatFi && filterBuilder.lte('notificaDataCaducitat', `'${formatEndOfDay(data?.dataCaducitatFi)}'`),
         filterBuilder.like('referenciaEnviament', data.referenciaEnviament),
         filterBuilder.like('referenciaNotificacio', data.referenciaNotificacio),
         filterBuilder.like('codiCsvUuidDocument', data.codiCsvUuidDocument),
@@ -215,12 +194,7 @@ const ContentFilter: React.FC<{openByDefault?: boolean}> = ({openByDefault}) => 
                     <GridFormField size={2} name="referenciaEnviament" />
                     <GridFormField size={2} name="referenciaNotificacio" />
                     <GridFormField size={2} name="codiCsvUuidDocument" />
-                    <GridButtonField
-                        size={0.5}
-                        name="entregaPostalActiva"
-                        icon={'email'}
-                        hiddenLabel
-                    />
+                    <GridButtonField size={0.5} name="entregaPostalActiva" icon={'email'} hiddenLabel/>
                 </>
             )}
             <Grid size={0.5} sx={{ textAlign: 'center' }}>
@@ -229,15 +203,8 @@ const ContentFilter: React.FC<{openByDefault?: boolean}> = ({openByDefault}) => 
                 </IconButton>
             </Grid>
             <Grid size={0.5} sx={{ textAlign: 'center' }}>
-                <IconButton
-                    onClick={advancedFilterClick}
-                    title={t(
-                        advancedFilter ? 'comu.tancarFiltreAvançat' : 'comu.obrirFiltreAvançat'
-                    )}
-                >
-                    <Icon sx={{ transform: advancedFilter ? 'rotate(180deg)' : 'none' }}>
-                        filter_list
-                    </Icon>
+                <IconButton onClick={advancedFilterClick} title={t(advancedFilter ? 'comu.tancarFiltreAvançat' : 'comu.obrirFiltreAvançat')}>
+                    <Icon sx={{ transform: advancedFilter ? 'rotate(180deg)' : 'none' }}>filter_list</Icon>
                 </IconButton>
             </Grid>
         </Grid>
@@ -248,6 +215,7 @@ const EnviamentGrid = () => {
 
     const { t } = useTranslation();
     const gridApiRef = useMuiDataGridApiRef();
+    const { currentRole} = useNotibContext();
     const { dialogComponent: enviamentDialogComponent, onDetailClick } = useEnviamentDetailDialog();
     const { dialogComponent: notificacioDialogComponent, onDetailClick: onNotificacioDetailClick } = useNotificacioDetailDialog();
     const [searchParams] = useSearchParams();
@@ -261,6 +229,7 @@ const EnviamentGrid = () => {
         {referenciaEnviament: referencia}
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
+    const {anularRemesa,  anularRemesaDialog, ampliarTermini, ampliarTerminiDialog } = useAccionsNotificacio();
     return (
         <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
             <MuiDataGrid
@@ -268,6 +237,7 @@ const EnviamentGrid = () => {
                 title={t('page.enviament.grid.title')}
                 resourceName="notificacioEnviamentResource"
                 columns={columns}
+                defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
                 paginationActive
                 selectionActive
                 persistentStateActive
@@ -288,7 +258,7 @@ const EnviamentGrid = () => {
                         label: t('page.enviament.grid.detalls'),
                         title: t('page.enviament.grid.detalls'),
                         icon: 'info',
-                        showInMenu: false,
+                        showInMenu: true,
                         onClick: (id) => onDetailClick(id),
                     },
                     {
@@ -303,24 +273,30 @@ const EnviamentGrid = () => {
                         title: t('page.enviament.grid.anular'),
                         icon: 'do_disturb',
                         showInMenu: true,
-                        // onClick: (id) => onNotificacioDetailClick(id), // TODO FALTA AFEGIR L'ACCIÓ I QUE ES MOSTRI L'ENTRADA DEL MENU SEGONS CONDICIO
+                        onClick: (id, row) => {
+                            anularRemesa(row?.notificacio?.id, t('page.notificacio.grid.accions.anular.modalTitle'), {enviamentId:id})
+                        },
+                        hidden: row => !row.isAnulable
                     },
                     {
                         label: t('page.enviament.grid.ampliarTermini'),
                         title: t('page.enviament.grid.ampliarTermini'),
                         icon: 'calendar_month',
                         showInMenu: true,
-                        // onClick: (id) => onNotificacioDetailClick(id), // TODO FALTA AFEGIR L'ACCIÓ I QUE ES MOSTRI L'ENTRADA DEL MENU SEGONS CONDICIO
-                        // hidden: (row) => isRolActualAdministradorLectura && !row?.plazoAmpliable,
+                        onClick: (id, row) => {
+                            console.log(row);
+                            ampliarTermini(row?.notificacio?.id, t('page.notificacio.grid.accions.ampliarTermini.modalTitle'), {enviamentId:id, caducitat: row.caducitat})
+                        },
+                        hidden: row => currentRole === 'NOT_ADMIN_LECTURA' || row?.entregaPostalActiva || row?.notifcacioEstat !== 'ENVIADA',
                     },
                 ]}
-                getRowClassName={(params) =>
-                    getGridRowColorClass(params.row.notificaEstat, ENVIAMENT_ESTAT_MAP)
-                }
+                getRowClassName={(params) => getGridRowColorClass(params.row.notificaEstat, ENVIAMENT_ESTAT_MAP)}
                 sx={generateGridRowStylesFromMap(ENVIAMENT_ESTAT_MAP)}
             />
             {enviamentDialogComponent}
             {notificacioDialogComponent}
+            {anularRemesaDialog}
+            {ampliarTerminiDialog}
         </GridPage>
     );
 };

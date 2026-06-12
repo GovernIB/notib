@@ -27,6 +27,9 @@ const componentsEs = {
         update: {
             label: 'Modificar',
         },
+        editar: {
+            label: 'Editar',
+        },
         delete: {
             label: 'Borrar',
             single: {

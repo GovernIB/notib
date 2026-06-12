@@ -7,11 +7,13 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.model.Dir3Resource;
 import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
+import es.caib.notib.logic.mapper.NotificacioTableMapper;
 import es.caib.notib.persist.entity.NotificacioEntity;
-import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
+import es.caib.notib.persist.repository.NotificacioTableViewRepository;
 import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
+import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import joptsimple.internal.Strings;
@@ -181,40 +183,34 @@ public class LegacyHelper {
 	 *   - Creació del registre a notificacio_table.
 	 *   - Creació de l'auditoria.
 	 *   - Alta de cada enviament a la màquina d'estats (SM) al finalitzar la transacció.
-	 * @param notificacioId
-	 *            l'identificador de la notificació
-	 * @param enviamentsIds
-	 *            la llista d'ids dels enviaments associats a la notificació
+	 * @param notificacioId l'identificador de la notificació
+	 * @param enviamentsIds la llista d'ids dels enviaments associats a la notificació
 	 */
 	public void altaNotificacio(Long notificacioId, List<Long> enviamentsIds) {
+
 		// Lògica antiga per a les notificacions
 		Optional<NotificacioEntity> notificacioEntity = notificacioRepository.findById(notificacioId);
-		if (notificacioEntity.isPresent()) {
-			// Lògica antiga per a cada enviament
-			for (Long enviamentId: enviamentsIds) {
-				Optional<NotificacioEnviamentEntity> notificacioEnviamentEntity = notificacioEnviamentRepository.findById(enviamentId);
-				if (notificacioEnviamentEntity.isPresent()) {
-					// Crea el registre a notificacio_env_table
-					enviamentTableHelper.crearRegistre(notificacioEnviamentEntity.get());
-					// Crea la informació d'auditoria
-					auditHelper.auditaEnviament(
-						notificacioEnviamentEntity.get(),
-						AuditService.TipusOperacio.CREATE,
-						"NotificacioResourceServiceImpl.saveEnviaments");
-				}
-			}
-			// Crea el registre a notificacio_table
-			notificacioTableHelper.crearRegistre(notificacioEntity.get());
-			// Crea la informació d'auditoria
-			auditHelper.auditaNotificacio(
-				notificacioEntity.get(),
-				AuditService.TipusOperacio.CREATE,
-				"NotificacioResourceServiceImpl.afterCreateSave");
-			// Dona d'alta els enviaments a la màqina d'estats al finalitzar la transacció
-			notificacioEntity.get().getEnviaments().forEach(e -> {
-				enviamentSmService.altaEnviament(e.getNotificaReferencia());
-			});
+		if (!notificacioEntity.isPresent()) {
+			return;
 		}
+		// Lògica antiga per a cada enviament
+		for (Long enviamentId: enviamentsIds) {
+			var notificacioEnviamentEntity = notificacioEnviamentRepository.findById(enviamentId);
+			if (!notificacioEnviamentEntity.isPresent()) {
+				continue;
+			}
+			// Crea el registre a notificacio_env_table
+			enviamentTableHelper.crearRegistre(notificacioEnviamentEntity.get());
+			// Crea la informació d'auditoria
+			auditHelper.auditaEnviament(notificacioEnviamentEntity.get(), AuditService.TipusOperacio.CREATE, "NotificacioResourceServiceImpl.saveEnviaments");
+		}
+		// Crea el registre a notificacio_table
+		 notificacioTableHelper.crearRegistre(notificacioEntity.get());
+
+		// Crea la informació d'auditoria
+		auditHelper.auditaNotificacio(notificacioEntity.get(), AuditService.TipusOperacio.CREATE, "NotificacioResourceServiceImpl.afterCreateSave");
+		// Dona d'alta els enviaments a la màqina d'estats al finalitzar la transacció
+		notificacioEntity.get().getEnviaments().forEach(e -> enviamentSmService.altaEnviament(e.getNotificaReferencia()));
 	}
 
 	private Dir3Resource toDir3Resource(NodeDir3 nodeDir3) {
@@ -237,6 +233,28 @@ public class LegacyHelper {
 		dir3Resource.setSir(organGestorDto.getSir() != null && organGestorDto.getSir());
 		dir3Resource.setPermetreSir(organGestorDto.isPermetreSir());
 		return dir3Resource;
+	}
+
+
+	private final NotificacioTableViewRepository notificacioTableViewRepository;
+	private final NotificacioTableMapper notificacioTableMapper;
+	private final NotificacioListHelper notificacioListHelper;
+	private final CacheHelper cacheHelper;
+
+
+	public void actualitzarColumnaEstat(NotificacioResourceEntity entity) {
+
+		var entitat = entity.getEntitat();
+		var tableEntity = notificacioTableViewRepository.findById(entity.getId()).get();
+		if (!tableEntity.isPerActualitzar()) {
+			return;
+		}
+		notificacioTableMapper.toNotificacionsTableItemDto(
+			List.of(tableEntity),
+			notificacioListHelper.getCodisProcedimentsAndOrgansAmpPermisProcessar(entitat.getId(), tableEntity.getUsuariCodi()),
+			cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi()));
+		tableEntity = notificacioTableViewRepository.save(tableEntity);
+		var reloaded =  notificacioTableViewRepository.findById(tableEntity.getId()).orElseThrow();
 	}
 
 }

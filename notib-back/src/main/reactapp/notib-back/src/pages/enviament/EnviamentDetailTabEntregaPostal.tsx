@@ -2,7 +2,7 @@ import { Alert, Box, Button, Icon } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FieldsDataCard } from '../../components/DataCard';
-import {MuiActionReportButton} from "reactlib";
+import {MuiActionReportButton, useBaseAppContext} from "reactlib";
 
 const EnviamentDetailTabEntregaPostal: React.FC<{
     enviament: any;
@@ -15,7 +15,7 @@ const EnviamentDetailTabEntregaPostal: React.FC<{
     const isPendent = !enviament?.entregaPostalInfo?.cieEstat;
     const isErroni =
         enviament?.entregaPostalInfo?.cieEstat === false && !enviament?.entregaPostalInfo?.cieId;
-
+    const { temporalMessageShow } = useBaseAppContext();
     return (
         <Box sx={{ height: '100%', overflowY: 'auto', minHeight: 0 }}>
             {isPendent ? (
@@ -31,24 +31,35 @@ const EnviamentDetailTabEntregaPostal: React.FC<{
                     )}
                     {!isRolActualAdministradorLectura && (
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                            {enviament?.entregaPostalInfo?.cieEstat == 'ENVIADO_CI' && (
-                                <Button
-                                    id="cancelarEntregaPostal"
-                                    startIcon={<Icon>close</Icon>}
-                                    variant="outlined"
-                                    sx={{ textTransform: 'none' }}
-                                >
-                                    {t('page.enviament.detail.tab.entregaPostal.cancelarEntregaPostal')}
-                                </Button>
+                            {enviament?.entregaPostalInfo?.cieEstat == 'ERROR' && (
+                                <MuiActionReportButton
+                                    resourceName="notificacioEnviamentResource"
+                                    action="CANCELAR_ENTREGA_POSTAL"
+                                    id={enviament?.id}
+                                    title={t('page.enviament.detail.tab.entregaPostal.cancelar.titleButton')}
+                                    buttonComponentProps={{ variant: 'outlined', sx: { mr: 1 } }}
+                                    buttonIcon="cancelar"
+                                    onSuccess={resposta => {
+                                        const msg = resposta?.ok ? "success" : "error";
+                                        temporalMessageShow(null, t('page.enviament.detail.tab.entregaPostal.cancelar.' + msg), msg);
+                                    }}
+                                    onError={error => temporalMessageShow(null, error?.message, "error")}
+                                />
                             )}
-                            <Button
-                                id="consultaEstatEntregaPostal"
-                                startIcon={<Icon>refresh</Icon>}
-                                variant="outlined"
-                                sx={{ textTransform: 'none' }}
-                            >
-                                {t('page.enviament.detail.tab.entregaPostal.refrescarEstat')}
-                            </Button>
+                            <MuiActionReportButton
+                                resourceName="notificacioEnviamentResource"
+                                action="REFRESCAR_ESTAT_ENTREGA_POSTAL"
+                                id={enviament?.id}
+                                title={t('page.enviament.detail.tab.entregaPostal.refrescarEstat.titleButton')}
+                                buttonComponentProps={{ variant: 'outlined', sx: { mr: 1 } }}
+                                buttonIcon="refresh"
+                                onSuccess={resposta => {
+                                    const msg = resposta?.ok ? "success" : "error";
+                                    t('page.enviament.detail.tab.entregaPostal.refrescarEstat.' + msg)
+                                    temporalMessageShow(null, t('page.enviament.detail.tab.entregaPostal.refrescarEstat.' + msg), msg);
+                                }}
+                                onError={error => temporalMessageShow(null, error?.message, "error")}
+                            />
                         </Box>
                     )}
                     <FieldsDataCard

@@ -181,6 +181,8 @@ export type MuiDataGridProps = {
     rowDetailLink?: string;
     /** Adreça que s'ha de mostrar al fer clic sobre el botó de modificar una fila */
     rowUpdateLink?: string;
+    /** Indica si el botó de update s'ha de veure dins el menú o com a icona **/
+    rowUpdateShowInMenu?: boolean;
     /** Funció que indica si l'enllaç d'una determinada fila està activa */
     isRowLinkActive?: (row: any) => boolean;
     /** Deshabilita el botó d'actualització de cada fila (por ser també una funció que reb la fila i retorna true/false) */
@@ -829,6 +831,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         rowLink,
         rowDetailLink,
         rowUpdateLink,
+        rowUpdateShowInMenu,
         isRowLinkActive,
         rowDisableUpdateButton,
         rowDisableDeleteButton,
@@ -982,6 +985,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         inlineEditActive || inlineEditUpdateActive ? inlineUpdate : undefined,
         rowDetailLink,
         rowUpdateLink,
+        rowUpdateShowInMenu,
         rowDisableUpdateButton,
         rowDisableDeleteButton,
         rowDisableDetailsButton,

@@ -1,7 +1,7 @@
 package es.caib.notib.logic.enviaments;
 
 import es.caib.notib.logic.base.service.BaseReadonlyResourceService;
-import es.caib.notib.logic.intf.EntregaPostalResource;
+import es.caib.notib.logic.intf.model.EntregaPostalResource;
 import es.caib.notib.logic.intf.base.exception.PerspectiveApplicationException;
 import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;

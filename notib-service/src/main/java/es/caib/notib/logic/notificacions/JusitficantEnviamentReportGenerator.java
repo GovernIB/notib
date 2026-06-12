@@ -1,26 +1,17 @@
 package es.caib.notib.logic.notificacions;
 
 import es.caib.notib.logic.base.service.BaseReadonlyResourceService;
-import es.caib.notib.logic.helper.ConfigHelper;
-import es.caib.notib.logic.helper.JustificantHelper;
-import es.caib.notib.logic.helper.MetricsHelper;
-import es.caib.notib.logic.helper.PluginHelper;
-import es.caib.notib.logic.intf.EntregaPostalResource;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.exception.ReportGenerationException;
 import es.caib.notib.logic.intf.base.model.DownloadableFile;
 import es.caib.notib.logic.intf.base.model.ReportFileType;
-import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 import es.caib.notib.logic.intf.model.NotificacioResource;
 import es.caib.notib.logic.intf.service.JustificantService;
-import es.caib.notib.logic.service.JustificantServiceImpl;
-import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
 import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.List;

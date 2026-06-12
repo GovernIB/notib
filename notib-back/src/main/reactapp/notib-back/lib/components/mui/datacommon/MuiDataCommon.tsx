@@ -224,6 +224,7 @@ export const useDataCommonEditable = (
     inlineUpdate: ((id: any, row?: any, additionalData?: any) => void) | undefined,
     rowDetailLink: string | undefined,
     rowUpdateLink: string | undefined,
+    rowUpdateShowInMenu: boolean | undefined,
     rowDisableUpdateButton: boolean | ((row: any) => boolean) | undefined,
     rowDisableDeleteButton: boolean | ((row: any) => boolean) | undefined,
     rowDisableDetailsButton: boolean | ((row: any) => boolean) | undefined,
@@ -437,9 +438,9 @@ export const useDataCommonEditable = (
     isPopupEditUpdate &&
         !rowDetailLink &&
         rowEditActions.push({
-            label: t('datacommon.details.label'),
+            label: t('datacommon.editar.label'),
             rowLink: '!update',
-            icon: 'info',
+            icon: 'edit',
             linkTo: rowUpdateLink,
             linkState:
                 rowUpdateLink != null && formAdditionalData != null
@@ -447,6 +448,7 @@ export const useDataCommonEditable = (
                     : undefined,
             disabled: rowDisableUpdateButton || updateLinkConfigError,
             hidden: rowHideUpdateButton,
+            showInMenu: rowUpdateShowInMenu,
             clickShowUpdateDialog: rowUpdateLink == null,
         });
     rowDetailLink &&

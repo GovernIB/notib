@@ -1452,7 +1452,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			estatCalcularCampsAddicionals(enviament, estatDto);
 			return estatDto;
 		} catch (Exception ex) {
-			log.error("Error actualitant l'estat de l'enviament " + enviamentId, ex);
+			log.error("Error actualitzant l'estat de l'enviament " + enviamentId, ex);
 			return null;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -2276,6 +2276,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 				var enviament = enviamentRepository.findById(dto.getEnviamentId()).orElseThrow();
 				if (isAnulable(enviament)) {
 					identificadors.add(enviament.getNotificaReferencia());
+				} else {
+					noExecutats.add(enviament.getUuid());
 				}
 			}
 			if (isNotificacioMassiu) {
@@ -2346,6 +2348,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 				var enviament = enviamentRepository.findById(dto.getEnviamentId()).orElseThrow();
 				if (enviament.getEntregaPostal() == null && !Strings.isNullOrEmpty(enviament.getNotificaIdentificador())) {
 					identificadors.add(enviament.getNotificaReferencia());
+				} else {
+					noExecutats.add(enviament.getUuid());
 				}
 			}
 			if (isNotificacioMassiu) {

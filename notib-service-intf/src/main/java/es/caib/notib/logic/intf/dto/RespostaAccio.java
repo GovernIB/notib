@@ -5,13 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @Builder
 @AllArgsConstructor
-public class RespostaAccio<T> {
+public class RespostaAccio<T> implements Serializable {
 
     @Singular
     private List<T> executades;

@@ -3,7 +3,7 @@ import {FieldsDataCard} from '../../components/DataCard';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {NotificacioEstatDetall} from './NotificacioEstatRender';
-import {FormField, MuiActionReportButton} from "reactlib";
+import {MuiActionReportButton} from "reactlib";
 import {formatDate} from "../../utils/dateUtils.ts";
 
 interface PropsTabDades {
@@ -408,11 +408,11 @@ const NotificacioDetailDialogTabDades: React.FC<PropsTabDades> = (props) => {
                             return (
                                 <>
                                     {notificacio.tipusUsuari === 'INTERFICIE_WEB' ? (
-                                        <Typography>{`${notificacio?.createdBy.nom} (${notificacio?.createdBy.codi}`}</Typography>
+                                        <Typography>{`${notificacio?.createdBy?.nom} (${notificacio?.createdBy?.codi}`}</Typography>
                                     ) : (
                                         <>
                                             <Typography>
-                                                {` Aplicacio: ${notificacio?.createdBy.nom} (${notificacio?.createdBy.codi}`}
+                                                {` Aplicacio: ${notificacio?.createdBy?.nom} (${notificacio?.createdBy?.codi}`}
                                             </Typography>
                                             <Typography>
                                                 {` Usuari: ${notificacio?.usuariNom} (${notificacio?.usuariCodi}`}
