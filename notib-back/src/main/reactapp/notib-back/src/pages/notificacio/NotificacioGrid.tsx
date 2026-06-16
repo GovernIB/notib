@@ -1,85 +1,33 @@
 import React from 'react';
 import {Link, useLocation, useNavigate, useSearchParams} from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import {
-    GridRenderCellParams,
-    useGridApiContext,
-    useGridSelector,
-    gridDetailPanelExpandedRowsContentCacheSelector,
-    gridDetailPanelExpandedRowIdsSelector,
-    GRID_DETAIL_PANEL_TOGGLE_COL_DEF,
-    useGridApiRef,
-    GridApiPro,
-} from '@mui/x-data-grid-pro';
+import {useTranslation} from 'react-i18next';
+import {GRID_DETAIL_PANEL_TOGGLE_COL_DEF, GridApiPro, useGridApiRef,} from '@mui/x-data-grid-pro';
 import {
     GridPage,
     MuiDataGrid,
-    useResourceApiService,
-    springFilterBuilder as filterBuilder,
-    springFilterBuilder,
-    useMuiDataGridContext,
-    useMuiActionReportLogic,
-    useFilterApiContext,
     MuiDataGridColDef,
+    springFilterBuilder,
+    springFilterBuilder as filterBuilder,
+    useFilterApiContext,
+    useMuiDataGridContext,
+    useResourceApiService,
 } from 'reactlib';
-import { useNotibContext } from '../../components/NotibContext';
-import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
+import {useNotibContext} from '../../components/NotibContext';
+import {useDatagridFilterProps, useDatagridPageSizeOptionsProps} from '../../hooks/useDataGrid';
 import NotificacioGridEnviaments from './NotificacioGridEnviaments';
-import { useNotificacioDetailDialog } from './NotificacioDetailDialog';
-import { Grid, IconButton, Button, Icon, Menu, MenuItem, Chip } from '@mui/material';
-import GridFormField, { GridButtonField } from '../../components/GridFormField';
-import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
-import AccionsMassives, { MenuOption } from '../../components/AccionsMassives';
+import {useNotificacioDetailDialog} from './NotificacioDetailDialog';
+import {Button, Chip, Grid, Icon, IconButton, Menu, MenuItem} from '@mui/material';
+import GridFormField, {GridButtonField} from '../../components/GridFormField';
+import {formatEndOfDay, formatStartOfDay} from '../../utils/dateUtils';
+import AccionsMassives, {MenuOption, useAccionsMassives} from '../../components/AccionsMassives';
 import ButtonDetailExpandColapse from '../../components/ButtonDetailExpandColapse';
-import { DataCommonAdditionalAction } from '../../../lib/components/mui/datacommon/MuiDataCommon';
-import { NotificacioEstatGrid } from './NotificacioEstatRender';
-import { useAccionsNotificacio } from '../accions/AccionsNotificacio';
-import {
-    generateGridRowStylesFromMap,
-    getGridRowColorClass,
-    NOTIFICACIO_ESTAT_ENUM_MAP,
-} from '../../utils/estatConfig';
+import {DataCommonAdditionalAction} from '../../../lib/components/mui/datacommon/MuiDataCommon';
+import {NotificacioEstatGrid} from './NotificacioEstatRender';
+import {useAccionsNotificacio} from '../accions/AccionsNotificacio';
+import {generateGridRowStylesFromMap, getGridRowColorClass, NOTIFICACIO_ESTAT_ENUM_MAP,} from '../../utils/estatConfig';
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import CustomDetailPanelToggle from "../../utils/CustomDetailPanelToggle.tsx";
 
-const CustomDetailPanelToggle = (props: Pick<GridRenderCellParams, 'id' | 'value'>) => {
-    const { id } = props;
-    const { t } = useTranslation();
-    const apiRef = useGridApiContext();
-    const contentCache = useGridSelector(apiRef, gridDetailPanelExpandedRowsContentCacheSelector);
-    const hasDetail = React.isValidElement(contentCache[id]);
-    const expandedRowIds = useGridSelector(apiRef, gridDetailPanelExpandedRowIdsSelector);
-    const isExpanded = expandedRowIds.has(id);
-
-    return (
-        <IconButton
-            size="small"
-            tabIndex={-1}
-            disabled={!hasDetail}
-            title={
-                isExpanded
-                    ? t('page.notificacio.grid.column.ocultar')
-                    : t('page.notificacio.grid.column.mostrar')
-            }
-            aria-label={
-                isExpanded
-                    ? t('page.notificacio.grid.column.ocultar')
-                    : t('page.notificacio.grid.column.mostrar')
-            }
-        >
-            <Icon
-                sx={(theme) => ({
-                    transform: `rotateZ(${isExpanded ? 180 : 0}deg)`,
-                    transition: theme.transitions.create('transform', {
-                        duration: theme.transitions.duration.shortest,
-                    }),
-                })}
-                fontSize="inherit"
-            >
-                expand_more
-            </Icon>
-        </IconButton>
-    );
-};
 
 const useDataGridColumns = (datagridApiRef: any) => {
     const { t } = useTranslation();
@@ -254,56 +202,79 @@ const NotificacioAddButton: React.FC = () => {
     );
 };
 
-const MassiveActionsButton: React.FC<{ datagridApiRef: React.RefObject<GridApiPro | null> }> = ({
-    datagridApiRef,
-}) => {
-    const { selection } = useMuiDataGridContext();
+const MassiveActionsButton: React.FC<{ datagridApiRef: React.RefObject<GridApiPro | null> }> = ({datagridApiRef}) => {
 
-    const { exec: execExemple } = useMuiActionReportLogic(
-        'notificacioEnviamentResource',
-        undefined,
-        'EXPORTAR_EXCEL',
-        'CSV'
-    );
+    const { selection } = useMuiDataGridContext();
+    const { t } = useTranslation();
+    const { descarregarExcel,
+        descarregarJustificants,
+        descarregarCertificacions,
+        actualitzarEstat,
+    } = useAccionsMassives();
 
     const opcionsMenu: MenuOption[] = [
         {
-            label: 'Marcar com a processades',
+            label: t('page.accioMassiva.accions.marcarProcessades.label'),
+            tooltip: t('page.accioMassiva.accions.marcarProcessades.tooltip'),
             onClick: () => {
-                execExemple(selection?.ids);
+               console.log("processar")
             },
         },
         {
-            label: "Actualitzar l'estat",
-            onClick: () => console.log("Actualitzar l'estat"),
+            label: t('page.accioMassiva.accions.actualitzarEstat.label'),
+            tooltip: t('page.accioMassiva.accions.actualitzarEstat.tooltip'),
+            onClick: () => actualitzarEstat(selection?.ids, "NOTIFICACIO"),
         },
         {
-            label: 'Tornar a enviar les que han donat error',
+            label: t('page.accioMassiva.accions.reenviarAmbError.label'),
+            tooltip: t('page.accioMassiva.accions.reenviarAmbError.tooltip'),
             onClick: () => console.log('Tornar a enviar les que han donat error'),
         },
         {
-            label: 'Esborrar',
+            label: t('page.accioMassiva.accions.esborrar.label'),
+            tooltip: t('page.accioMassiva.accions.esborrar.tooltip'),
             onClick: () => console.log('Esborrar'),
         },
         {
-            label: 'Exporta a full de càlcul',
-            onClick: () => console.log('Exporta a full de càlcul'),
+            label: t('page.accioMassiva.accions.exportarFullCalcul.label'),
+            tooltip: t('page.accioMassiva.accions.exportarFullCalcul.tooltip'),
+            onClick: () => descarregarExcel(selection?.ids, "NOTIFICACIO"),
         },
         {
-            label: "Descarrega justificants d'enviemanet",
-            onClick: () => console.log("Descarrega justificants d'enviemanet"),
+            label: t('page.accioMassiva.accions.justificantEnviament.label'),
+            tooltip: t('page.accioMassiva.accions.justificantEnviament.tooltip'),
+            onClick: () => descarregarJustificants(selection?.ids, "NOTIFICACIO"),
         },
         {
-            label: 'Descarrega certificats de recepció',
-            onClick: () => console.log('Descarrega certificats de recepció'),
+            label: t('page.accioMassiva.accions.certificacioRecepcio.label'),
+            tooltip: t('page.accioMassiva.accions.certificacioRecepcio.tooltip'),
+            onClick: () => descarregarCertificacions(selection?.ids, "NOTIFICACIO"),
+
         },
         {
-            label: 'Anul·lar',
+            label: t('page.accioMassiva.accions.anular.label'),
+            tooltip: t('page.accioMassiva.accions.anular.labtooltipel'),
             onClick: () => console.log('Anul·lar'),
         },
         {
-            label: 'Ampliar termini',
+            label: t('page.accioMassiva.accions.ampliarTermini.label'),
+            tooltip: t('page.accioMassiva.accions.ampliarTermini.tooltip'),
             onClick: () => console.log('Ampliar termini'),
+        },
+        {
+            label: t('page.accioMassiva.accions.reactivarCanviEstat.label'),
+            tooltip: t('page.accioMassiva.accions.reactivarCanviEstat.tooltip'),
+            onClick: () => console.log("Torna a activar les consultes de canvi d'estat"),
+        },
+        {
+            label: t('page.accioMassiva.accions.reactivarCallbacks.label'),
+            tooltip: t('page.accioMassiva.accions.reactivarCallbacks.tooltip'),
+            onClick: () => console.log("Torna a activar l'enviament de callbacks"),
+        },
+        {
+            label: t('page.accioMassiva.accions.notificacionsMovil.label'),
+            tooltip: t('page.accioMassiva.accions.notificacionsMovil.tooltip'),
+            onClick: () => console.log("Envia notificacions mòvil"),
         },
     ];
 
@@ -458,7 +429,7 @@ const NotificacioGrid = () => {
                 icon: 'download',
                 showInMenu: true,
                 onClick: (id) => descarregarJustificantEnviament(id),
-                hidden: (row) => row?.justificant,
+                hidden: (row) => !row?.justificantCreat,
             },
             {
                 label: t('page.notificacio.grid.accions.ampliarTermini.botoTitle'),

@@ -5,6 +5,10 @@ import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.enviaments.EnviarCallbackActionExecutor;
+import es.caib.notib.logic.intf.service.AccioMassivaService;
+import es.caib.notib.logic.intf.service.EnviamentService;
+import es.caib.notib.logic.notificacions.ActualitzarEstatMassiuActionExecutor;
+import es.caib.notib.logic.notificacions.CertificacioMassiuReportGenerator;
 import es.caib.notib.logic.notificacions.EnviarEntregaPostalActionExecutor;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.LegacyHelper;
@@ -39,7 +43,9 @@ import es.caib.notib.logic.notificacions.DocumentPerspectiveApplicator;
 import es.caib.notib.logic.notificacions.EnviamentPerspectiveApplicator;
 import es.caib.notib.logic.notificacions.EnviarNotificaActionExecutor;
 import es.caib.notib.logic.notificacions.EsborrarRemesaActionExecutor;
+import es.caib.notib.logic.notificacions.ExportarExcelReportGenerator;
 import es.caib.notib.logic.notificacions.GrupPerspectiveApplicator;
+import es.caib.notib.logic.notificacions.JusitficantEnviamentMassiuReportGenerator;
 import es.caib.notib.logic.notificacions.JusitficantEnviamentReportGenerator;
 import es.caib.notib.logic.notificacions.MarcarProcessatActionExecutor;
 import es.caib.notib.logic.notificacions.OperadorPostalCiePerspectiveApplicator;
@@ -105,6 +111,8 @@ public class NotificacioResourceServiceImpl
 	private final ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository;
 	private final JustificantService justificantService;
 	private final NotificacioService notificacioService;
+	private final EnviamentService enviamentService;
+	private final AccioMassivaService accioMassivaService;
 	private final CallbackService callbackService;
 
 	@PostConstruct
@@ -119,8 +127,11 @@ public class NotificacioResourceServiceImpl
 		register(NotificacioResource.PERSPECTIVE_OPERADORS_CIE_POSTAL, new OperadorPostalCiePerspectiveApplicator());
 		register(NotificacioResource.PERSPECTIVE_GRUP, new GrupPerspectiveApplicator());
 		register(NotificacioResource.REPORT_DESCARREGAR_JUSTIFICANT_NOTIFICACIO, new JusitficantEnviamentReportGenerator(justificantService));
+		register(NotificacioResource.REPORT_DESCARREGAR_JUSTIFICANT_MASSIU, new JusitficantEnviamentMassiuReportGenerator(accioMassivaService, notificacioService, userSessionHelper, authenticationHelper));
 		register(NotificacioResource.REPORT_DESCARREGAR_DOCUMENT_ENVIAT, new DocumentEnviatReportGenerator(notificacioService));
+		register(NotificacioResource.REPORT_EXPORTAR_EXCEL, new ExportarExcelReportGenerator(accioMassivaService, userSessionHelper, authenticationHelper, enviamentService, notificacioService));
 		register(NotificacioResource.REPORT_DESCARREGAR_CERTIFICACIO, new CertificacioReportGenerator(notificacioService, messageHelper));
+		register(NotificacioResource.REPORT_DESCARREGAR_CERTIFICACIO_MASSIU, new CertificacioMassiuReportGenerator(accioMassivaService, notificacioService, userSessionHelper, authenticationHelper));
 		register(NotificacioResource.ACTION_ANULAR_REMESA, new AnularRemesaActionExecutor(notificacioService));
 		register(NotificacioResource.ACTION_AMPLIAR_TERMINI, new AmpliarTerminiRemesaActionExecutor(notificacioService));
 		register(NotificacioResource.ACTION_MARCAR_PROCESSAT, new MarcarProcessatActionExecutor(notificacioService));
@@ -133,6 +144,7 @@ public class NotificacioResourceServiceImpl
 		register(NotificacioResource.ACTION_REACTIVAR_CONSULTA_SIR, new ReactivarConsultaSirActionExecutor(notificacioService));
 		register(NotificacioResource.ACTION_REACTIVAR_AMB_ERRORS, new ReactivarAmbErrorActionExecutor(notificacioService));
 		register(NotificacioResource.ACTION_REENVIAR_AMB_ERRORS, new ReenviarAmbErrorActionExecutor(notificacioService));
+		register(NotificacioResource.ACTION_ACTUALITZAR_ESTAT_MASSIU, new ActualitzarEstatMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper, enviamentService));
 	}
 
 	@Override

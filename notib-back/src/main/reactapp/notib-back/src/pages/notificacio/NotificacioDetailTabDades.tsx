@@ -457,7 +457,7 @@ const NotificacioDetailDialogTabDades: React.FC<PropsTabDades> = (props) => {
                 sx={{ mb: 1 }}
             />
 
-            {(!notificacio?.hasEnviamentsPendents || notificacio?.estat == 'FINALITZADA_AMB_ERRORS') &&
+            {(notificacio?.justificantCreat && (!notificacio?.hasEnviamentsPendents || notificacio?.estat == 'FINALITZADA_AMB_ERRORS')) &&
                 <Box sx={{ textAlign: 'right' }}>
                     <MuiActionReportButton
                         id={notificacio?.id}

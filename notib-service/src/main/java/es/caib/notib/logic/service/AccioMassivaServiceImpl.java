@@ -147,10 +147,13 @@ public class AccioMassivaServiceImpl implements AccioMassivaService {
 				.build();
 			entity = accioMassivaRepository.saveAndFlush(entity);
 			AccioMassivaElementEntity elem;
+			List<AccioMassivaElementEntity> elements = new ArrayList<>();
 			for (var element : accio.getSeleccio()) {
 				elem = AccioMassivaElementEntity.builder().accioMassiva(entity).elementId(element).build();
 				accioMassivaElementRepository.saveAndFlush(elem);
+				elements.add(elem);
 			}
+			entity.setElements(elements);
 			return entity.getId();
 		} catch (Exception ex) {
 			log.error("Error creant l'accio massiva de tipus " + accio.getTipus() + " per l'entitat " + accio.getEntitatId(), ex);
@@ -178,7 +181,7 @@ public class AccioMassivaServiceImpl implements AccioMassivaService {
             accioEntity.setExcepcioStacktrace(Arrays.toString(ex.getStackTrace()));
         }
         accioEntity.setDataFi(new Date());
-        accioMassivaRepository.save(accioEntity);
+        accioMassivaRepository.saveAndFlush(accioEntity);
         return fitxer;
     }
 
@@ -218,7 +221,7 @@ public class AccioMassivaServiceImpl implements AccioMassivaService {
             accioEntity.setExcepcioStacktrace(Arrays.toString(ex.getStackTrace()));
         }
         accioEntity.setDataFi(new Date());
-        accioMassivaRepository.save(accioEntity);
+        accioMassivaRepository.saveAndFlush(accioEntity);
         return justificants;
     }
 

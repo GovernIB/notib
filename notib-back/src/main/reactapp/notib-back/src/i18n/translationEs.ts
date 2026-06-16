@@ -644,7 +644,64 @@ const translationEs = {
                     estatError: 'Error',
                     estatPendent: 'Pendiente'
                 }
-            }
+            },
+            accions: {
+                labelBoto: "Acciones masivas",
+                selectAll: "Seleccionar todo",
+                deselectAll: "Desmarcar todo",
+                executant: "Processant acció massiva",
+                marcarProcessades: {
+                    label: "Marca com procesadas",
+                    tooltip: "Marca las remesas que se encuentran en un estado final como procesadas"
+                },
+                actualitzarEstat: {
+                    label: "Actualiza el estado",
+                    tooltip: "Actualitza el estado (SIR y Notific@) de les remesas que no se encuentran en un estado final",
+                    ok: "La acción de actualitzar el estado se manado a ejecutar"
+                },
+                reenviarAmbError: {
+                    label: "Vuelve a enviar las que han dado error",
+                    tooltip: "Vuelve a enviar las remesas que han dado error durante el proceso de registro o de envio a Notifica y han agotado el número máximo de intentos"
+                },
+                esborrar: {
+                    label: "Elimina",
+                    tooltip: "Marca la remesa como elimianda y no la muestra en el listado"
+                },
+                exportarFullCalcul: {
+                    label: "Exporta a hoja de cálculo",
+                    tooltip: "Exporta el listado de remesas a un archivo de hoja de cálculo en format ods",
+                    ok: "La exportación se ha realizado con éxito"
+                },
+                justificantEnviament: {
+                    label: "Descarga justificantes de envío",
+                    tooltip: "Descarga el justificante de envío de las remesas seleccionadas",
+                    ok: "Fichero ZIP de justificantes generado con éxito"
+                },
+                certificacioRecepcio: {
+                    label: "Descarga certificaciones de recepción",
+                    tooltip: "Descarga la certificación de recepción de las remesas seleccionadas"
+                },
+                anular: {
+                    label: "Anular",
+                    tooltip: "Anula las remesas enviadas a Notfic@ que no hayan sido notificadas"
+                },
+                ampliarTermini: {
+                    label: "Ampliar plazo",
+                    tooltip: "Amplia el plazo de caducidad de las remesas seleccionadas"
+                },
+                reactivarCanviEstat: {
+                    label: "Vuelve a activar las consultas de cambio de estado",
+                    tooltip: "Vuelve a activar las consultas de cambio de estado a Notific@ o a SIR si se han egotado el nombre máximo de intentos. Esta acción vuelve a poner el contador de intentos a cero hasta que se llegue, de nuevo, al número máximo de intentos"
+                },
+                reactivarCallbacks: {
+                    label: "Vuelve a activar el envio de callbacks",
+                    tooltip: "Vuelve a activar el envio de callbacks a aplicaciones si se ha agotado el número máximo de intentos máximo. Esta acción vuelve a poner el contador de intentos a cero hasta que se llegue, de nuevo, al número máximo de intentos"
+                },
+                notificacionsMovil: {
+                    label: "Envia notificaciones móbil",
+                    tooltip: "Envia notificaciones de cambio de estado a dispositivos móbiles (PUSH)"
+                },
+            },
         },
         notificacioMassiva: {
             grid: {
@@ -850,11 +907,6 @@ const translationEs = {
             arrosegar:  "Arrastra el fichero aquí",
             amollar: "Suelta el fichero ahora ...",
             validacio: "El archivo no es válido",
-        },
-        AccionsMassives: {
-            labelBoto: "Acciones masivas",
-            selectAll: "Seleccionar todo",
-            deselectAll: "Desmarcar todo",
         },
         ButtonDetailExpandColapse: {
             expandAll: "Expandir todo",

@@ -1,7 +1,10 @@
-import { Icon, Tooltip } from '@mui/material';
+import {Icon, TextareaAutosize, Tooltip} from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { GridPage, MuiDataGrid, MuiDataGridColDef } from 'reactlib';
+import {GRID_DETAIL_PANEL_TOGGLE_COL_DEF} from "@mui/x-data-grid-pro";
+import CustomDetailPanelToggle from "../../utils/CustomDetailPanelToggle.tsx";
+import Box from "@mui/material/Box";
 
 const EnviamentDetailTabRegistreEsdev: React.FC<{ id: any }> = (props) => {
     const { id } = props;
@@ -37,6 +40,17 @@ const EnviamentDetailTabRegistreEsdev: React.FC<{ id: any }> = (props) => {
                 field: 'intents',
                 flex: 1,
             },
+            {
+                ...GRID_DETAIL_PANEL_TOGGLE_COL_DEF,
+                hideable: false,
+                sortable: false,
+                resizable: false,
+                width: 90,
+                align: 'center',
+                renderCell: (params: any) => {
+                    return (params?.row?.error && <CustomDetailPanelToggle id={params.id} value={params.value} />);
+                },
+            },
         ],
         []
     );
@@ -50,6 +64,12 @@ const EnviamentDetailTabRegistreEsdev: React.FC<{ id: any }> = (props) => {
                 columns={columns}
                 readOnly
                 toolbarHideQuickFilter
+                getDetailPanelContent={({ row }) =>
+                    (<Box sx={{ padding: '10px'}}>
+                        <TextareaAutosize style={{width:'100%', height:'100px' }}>{row.errorDescripcio}</TextareaAutosize>
+                    </Box>)
+                }
+                getDetailPanelHeight={() => 'auto'}
             />
         </GridPage>
     );

@@ -11,6 +11,8 @@ import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.OutputStream;
 import java.io.Serializable;
@@ -32,7 +34,9 @@ public class JusitficantEnviamentReportGenerator implements BaseReadonlyResource
 		return List.of(resource);
 	}
 
+
 	@Override
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
 
 		var notificacio = (NotificacioResource) data.get(0);

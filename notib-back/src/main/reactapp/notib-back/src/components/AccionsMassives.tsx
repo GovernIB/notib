@@ -1,10 +1,13 @@
 import { Box, Button, ButtonGroup, Chip, Icon, Menu, MenuItem, Tooltip } from '@mui/material';
-import { GridApiPro } from '@mui/x-data-grid-pro';
+import {GridApiPro, GridRowId} from '@mui/x-data-grid-pro';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import {useBaseAppContext, useMuiActionReportLogic, useResourceApiService} from "reactlib";
+import {ExportFileType} from "../../lib/components/ResourceApiContext.tsx";
 
 export interface MenuOption {
     label: string;
+    tooltip: string;
     onClick: () => void;
     icon?: string;
     disabled?: boolean;
@@ -21,7 +24,7 @@ const AccionsMassives: React.FC<AccionsMassivesProps> = (props) => {
     const { t } = useTranslation();
     const {
         options,
-        buttonLabel = t('component.AccionsMassives.labelBoto'),
+        buttonLabel = t('page.accioMassiva.accions.labelBoto'),
         sizeSelection,
         datagridApiRef,
     } = props;
@@ -59,12 +62,12 @@ const AccionsMassives: React.FC<AccionsMassivesProps> = (props) => {
     return (
         <>
             <ButtonGroup variant="outlined" aria-label="Basic button group">
-                <Tooltip title={t('component.AccionsMassives.selectAll')} arrow>
+                <Tooltip title={t('page.accioMassiva.accions.selectAll')} arrow>
                     <Button color="primary" onClick={handleSelectAllGlobal} >
                         <Icon fontSize='small'>check_box</Icon>
                     </Button>
                 </Tooltip>
-                <Tooltip title={t('component.AccionsMassives.deselectAll')} arrow>
+                <Tooltip title={t('page.accioMassiva.accions.deselectAll')} arrow>
                     <Button color="primary" onClick={handleDeselectAllGlobal} >
                         <Icon fontSize='small'>check_box_outline_blank</Icon>
                     </Button>
@@ -103,6 +106,7 @@ const AccionsMassives: React.FC<AccionsMassivesProps> = (props) => {
                         key={index}
                         onClick={() => handleOptionClick(option.onClick)}
                         disabled={option.disabled}
+                        title={option.tooltip}
                     >
                         {option.icon && <Icon sx={{ mr: 1 }}>{option.icon}</Icon>}
                         {option.label}
@@ -112,5 +116,79 @@ const AccionsMassives: React.FC<AccionsMassivesProps> = (props) => {
         </>
     );
 };
+
+export const iniciaDescarga = (url:string, fileName:string) => {
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link); // Limpieza
+    URL.revokeObjectURL(url);
+}
+export const iniciaDescargaBlob = (result: any) => {
+    const url = URL.createObjectURL(result.blob);
+    iniciaDescarga(url, result.fileName)
+}
+
+export const useAccionsMassives = (refresh?: () => void) => {
+
+    const { t } = useTranslation();
+    const {artifactAction: apiAction, artifactReport: apiReport} = useResourceApiService('notificacioResource');
+    const { temporalMessageShow } = useBaseAppContext();
+
+    const massiveReport = (ids:Set<any> |undefined, code:string, msg:string, seleccioTipus: string, fileType: ExportFileType) => {
+        apiReport(undefined, {code :code, fileType: fileType, data:{ ids:  [...ids], seleccioTipus: seleccioTipus}})
+            .then(response => {
+                refresh?.()
+                iniciaDescargaBlob(response)
+                temporalMessageShow(null, msg, 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            })
+    }
+
+    const massiveAction = (ids:Set<any> |undefined, code:string, msg:string, seleccioTipus: string) => {
+        apiAction(undefined, {code :code, data:{ ids:  [...ids], seleccioTipus: seleccioTipus}})
+            .then(response => {
+                refresh?.()
+                iniciaDescargaBlob(response)
+                temporalMessageShow(null, msg, 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            })
+    }
+
+    const descarregarExcel = (ids: Set<any> |undefined, seleccioTipus: string): void => {
+
+        temporalMessageShow(null, t('page.accioMassiva.accions.executant'), 'info');
+        massiveReport(ids, 'EXPORTAR_EXCEL', t('page.accioMassiva.accions.exportarFullCalcul.ok'), seleccioTipus, 'ODS');
+    }
+
+    const descarregarJustificants = (ids:Set<any> |undefined, seleccioTipus: string): void => {
+
+        temporalMessageShow(null, t('page.accioMassiva.accions.executant'), 'info');
+        massiveReport(ids, 'DESCARREGAR_JUSTIFICANT_MASSIU', t('page.accioMassiva.accions.justificantEnviament.ok'), seleccioTipus, 'CUSTOM');
+    }
+
+    const descarregarCertificacions = (ids:Set<any> |undefined, seleccioTipus: string): void => {
+
+        temporalMessageShow(null, t('page.accioMassiva.accions.executant'), 'info');
+        massiveReport(ids, 'DESCARREGAR_CERTIFICACIO_MASSIU', t('page.accioMassiva.accions.certificacioRecepcio.ok'), seleccioTipus, 'CUSTOM');
+    }
+
+    const actualitzarEstat = (ids:Set<any> |undefined, seleccioTipus: string): void => {
+        massiveAction(ids, 'ACTUALITZAR_ESTAT_MASSIU', t('page.accioMassiva.accions.actualitzarEstat.ok'), seleccioTipus);
+    }
+
+    return { descarregarExcel,
+            descarregarJustificants,
+            descarregarCertificacions,
+            actualitzarEstat,
+    }
+}
+
 
 export default AccionsMassives;

@@ -88,7 +88,7 @@ public class JustificantServiceImpl implements JustificantService {
         try {
             var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
             var enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacio.getId());
-            if (enviamentsPendents != null && !enviamentsPendents.isEmpty() && !NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(notificacio.getEstat())) {
+            if (!notificacio.isJustificantCreat() || (enviamentsPendents != null && !enviamentsPendents.isEmpty() && !NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(notificacio.getEstat()))) {
                 throw new Exception("No es pot generar el justificant d'una notificació amb enviaments pendents.");
             }
             entityComprovarHelper.comprovarEntitat(entitatId, false, true, true, false, true);

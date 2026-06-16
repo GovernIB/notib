@@ -7,14 +7,13 @@ import {
     useFilterApiContext,
     springFilterBuilder as filterBuilder,
     useMuiDataGridApiRef,
-    useMuiActionReportLogic,
     useMuiDataGridContext,
 } from 'reactlib';
 import { Grid, IconButton } from '@mui/material';
 import GridFormField, { GridButtonField } from '../../components/GridFormField';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
 import { useNotificacioDetailDialog } from '../notificacio/NotificacioDetailDialog';
-import AccionsMassives, { MenuOption } from '../../components/AccionsMassives';
+import AccionsMassives, {MenuOption, useAccionsMassives} from '../../components/AccionsMassives';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 import { useEnviamentDetailDialog } from './EnviamentDetailDialog';
 import {
@@ -118,37 +117,51 @@ const springFilterBuilder = (data: any) => {
 };
 
 const MassiveActionsButton: React.FC = () => {
-    const { selection } = useMuiDataGridContext();
 
-    const { exec: execExemple } = useMuiActionReportLogic(
-        'notificacioEnviamentResource',
-        undefined,
-        'EXPORTAR_EXCEL',
-        'CSV'
-    );
+    const { selection } = useMuiDataGridContext();
+    const { t } = useTranslation();
+    const { descarregarExcel } = useAccionsMassives();
 
     const opcionsMenu: MenuOption[] = [
         {
-            label: 'Exportar a EXCEL',
-            onClick: () => {
-                execExemple(selection?.ids);
-            },
+            label: t('page.accioMassiva.accions.exportarFullCalcul.label'),
+            tooltip: t('page.accioMassiva.accions.exportarFullCalcul.tooltip'),
+            onClick: () => descarregarExcel(selection?.ids, "ENVIAMENT"),
         },
         {
-            label: 'Tornar a enviar les que han donat error',
+            label: t('page.accioMassiva.accions.reenviarAmbError.label'),
+            tooltip: t('page.accioMassiva.accions.reenviarAmbError.tooltip'),
             onClick: () => console.log('Tornar a enviar les que han donat error'),
         },
         {
-            label: 'Actualitzar estat',
-            onClick: () => console.log('Actualitzar estat'),
+            label: t('page.accioMassiva.accions.actualitzarEstat.label'),
+            tooltip: t('page.accioMassiva.accions.actualitzarEstat.tooltip'),
+            onClick: () => console.log("Actualitzar l'estat"),
         },
         {
-            label: 'Anul·lar',
+            label: t('page.accioMassiva.accions.anular.label'),
+            tooltip: t('page.accioMassiva.accions.anular.labtooltipel'),
             onClick: () => console.log('Anul·lar'),
         },
         {
-            label: 'Ampliar termini',
+            label: t('page.accioMassiva.accions.ampliarTermini.label'),
+            tooltip: t('page.accioMassiva.accions.ampliarTermini.tooltip'),
             onClick: () => console.log('Ampliar termini'),
+        },
+        {
+            label: t('page.accioMassiva.accions.reactivarCanviEstat.label'),
+            tooltip: t('page.accioMassiva.accions.reactivarCanviEstat.tooltip'),
+            onClick: () => console.log("Torna a activar les consultes de canvi d'estat"),
+        },
+        {
+            label: t('page.accioMassiva.accions.reactivarCallbacks.label'),
+            tooltip: t('page.accioMassiva.accions.reactivarCallbacks.tooltip'),
+            onClick: () => console.log("Torna a activar l'enviament de callbacks"),
+        },
+        {
+            label: t('page.accioMassiva.accions.notificacionsMovil.label'),
+            tooltip: t('page.accioMassiva.accions.notificacionsMovil.tooltip'),
+            onClick: () => console.log("Envia notificacions mòvil"),
         },
     ];
 

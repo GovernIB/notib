@@ -671,7 +671,64 @@ const translationCa = {
                     estatError: 'Error',
                     estatPendent: 'Pendent'
                 }
-            }
+            },
+            accions: {
+                labelBoto: 'Accions massives',
+                selectAll: "Seleccionar tot",
+                deselectAll: "Desmarcar tot",
+                executant: "Processant acció massiva",
+                marcarProcessades: {
+                    label: "Marcar com a processades",
+                    tooltip: "Marca les remeses que es troben en un estat final com a processades"
+                },
+                actualitzarEstat: {
+                    label: "Actualitzar l'estat",
+                    tooltip: "Actualitza el estat (SIR i Notifica) de les remeses que no se troben en un estat final",
+                    ok: "L'acció d'actualitzar l'estat s'ha enviat a executar"
+                },
+                reenviarAmbError: {
+                    label: "Tornar a enviar les que han donat error",
+                    tooltip: "Torna a enviar les remeses que han donat error durant el procés de registre o d'enviament a Notifica i han esgotat el nombre màxim d'intents"
+                },
+                esborrar: {
+                    label: "Esborrar",
+                    tooltip: "Marca les remeses com a esborrades i no les mostra en el llistat"
+                },
+                exportarFullCalcul: {
+                    label: "Exporta a full de càlcul",
+                    tooltip: "Exporta el llistat de remeses a un fitxer de full de càlcul en format ods",
+                    ok: "La exportació s'ha realitzat amb èxit"
+                },
+                justificantEnviament: {
+                    label: "Descarrega justificants d'enviament",
+                    tooltip: "Descarrega el justificant d'enviament de les remeses seleccionades",
+                    ok: "Fitxer ZIP de justificants generat amb èxito"
+                },
+                certificacioRecepcio: {
+                    label: "Descarrega certificats de recepció",
+                    tooltip: "Descarrega la certificació de recepció de les remeses seleccionades"
+                },
+                anular: {
+                    label: "Anul·lar",
+                    tooltip: "Anul·la les remeses enviades a Notific@ que no hagin estat notificades"
+                },
+                ampliarTermini: {
+                    label: "Ampliar termini",
+                    tooltip: "Amplia el termini de caducitat de les remeses seleccionades"
+                },
+                reactivarCanviEstat: {
+                    label: "Torna a activar les consultes de canvi d'estat",
+                    tooltip: "Torna a activar les consultes de canvi d'estat a Notific@ o SIR si s'han esgotat el nombre màxim de reintents. Aquesta accio torna el contador d'intents a zero fins que es torni a arribar al número màxim d'intents"
+                },
+                reactivarCallbacks: {
+                    label: "Torna a activar l'enviament de callbacks",
+                    tooltip: "Torna a activar l'enviament de callbacks a aplicacions si s'ha esgotat el nombre màxim d'intents màxim. Aquesta acció posa el comptador d'intents a zero fins que es torni a arribar al nombre màxim d'intents"
+                },
+                notificacionsMovil: {
+                    label: "Envia notificacions mòvil",
+                    tooltip: "Envia notificacions de canvi d'estat a dispositius mòvils (PUSH)"
+                },
+            },
         },
         notificacioMassiva: {
             grid: {
@@ -878,11 +935,6 @@ const translationCa = {
             arrosegar: 'Arrossega el fitxer aquí',
             amollar: 'Amolla el fitxer ara ...',
             validacio: "L'arxiu no és vàlid",
-        },
-        AccionsMassives: {
-            labelBoto: 'Accions massives',
-            selectAll: "Seleccionar tot",
-            deselectAll: "Desmarcar tot",
         },
         ButtonDetailExpandColapse: {
             expandAll: "Expandir tots",

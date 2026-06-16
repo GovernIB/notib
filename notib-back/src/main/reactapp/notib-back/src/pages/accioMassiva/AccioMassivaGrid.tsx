@@ -183,9 +183,10 @@ export const AccioMassivaGrid = () => {
             title={t('page.accioMassiva.grid.title')}
             resourceName="accioMassivaResource"
             columns={columns}
+            defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
             paginationActive
-            // persistentStateActive
-            // persistentStateClearPageSortPropsOnTopLevelRouteChange
+            persistentStateActive
+            persistentStateClearPageSortPropsOnTopLevelRouteChange
             {...filterDataGridProps}
             {...pageSizeOptionsDataGridProps}
             toolbarType="upper"

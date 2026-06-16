@@ -19,6 +19,7 @@ import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
+import es.caib.notib.logic.intf.dto.accioMassiva.SeleccioTipus;
 import es.caib.notib.logic.intf.dto.anular.AnularDto;
 import es.caib.notib.logic.intf.dto.explotacio.EnviamentOrigen;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -99,6 +100,11 @@ import java.util.List;
 		),
 		@ResourceArtifact(
 			type = ResourceArtifactType.REPORT,
+			code = NotificacioResource.REPORT_DESCARREGAR_JUSTIFICANT_MASSIU,
+			formClass = NotificacioResource.AccioMassivaParams.class
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.REPORT,
 			code = NotificacioResource.REPORT_DESCARREGAR_DOCUMENT_ENVIAT,
 			requiresId = true,
 			formClass = NotificacioResource.DocumentParams.class
@@ -107,6 +113,16 @@ import java.util.List;
 			type = ResourceArtifactType.REPORT,
 			code = NotificacioResource.REPORT_DESCARREGAR_CERTIFICACIO,
 			requiresId = true
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.REPORT,
+			code = NotificacioResource.REPORT_DESCARREGAR_CERTIFICACIO_MASSIU,
+			formClass = NotificacioResource.AccioMassivaParams.class
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.REPORT,
+			code = NotificacioResource.REPORT_EXPORTAR_EXCEL,
+			formClass = NotificacioResource.AccioMassivaParams.class
 		),
 		@ResourceArtifact(
 			type = ResourceArtifactType.ACTION,
@@ -238,6 +254,17 @@ import java.util.List;
 					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN }
 				)
 			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.ACTION_ACTUALITZAR_ESTAT_MASSIU,
+			formClass = NotificacioResource.AccioMassivaParams.class,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN }
+				)
+			}
 		)
 	}
 )
@@ -257,8 +284,11 @@ public class NotificacioResource extends BaseResource<Long> {
 	public static final String PERSPECTIVE_OPERADORS_CIE_POSTAL = "OPERADORS_CIE_POSTAL";
 	public static final String PERSPECTIVE_GRUP = "OPERADORS_GRUP";
 	public static final String REPORT_DESCARREGAR_JUSTIFICANT_NOTIFICACIO = "DESCARREGAR_JUSTIFICANT_ENVIAMENT_NOTIFICACIO";
+	public static final String REPORT_DESCARREGAR_JUSTIFICANT_MASSIU = "DESCARREGAR_JUSTIFICANT_MASSIU";
 	public static final String REPORT_DESCARREGAR_DOCUMENT_ENVIAT = "DESCARREGAR_DOCUMENT_ENVIAT";
 	public static final String REPORT_DESCARREGAR_CERTIFICACIO = "DESCARREGAR_CERTIFICACIO";
+	public static final String REPORT_DESCARREGAR_CERTIFICACIO_MASSIU = "DESCARREGAR_CERTIFICACIO_MASSIU";
+	public static final String REPORT_EXPORTAR_EXCEL = "EXPORTAR_EXCEL";
 	public static final String ACTION_ANULAR_REMESA = "ANULAR_REMESA";
 	public static final String ACTION_AMPLIAR_TERMINI = "AMPLIAR_TERMINI";
 	public static final String ACTION_MARCAR_PROCESSAT = "MARCAR_PROCESSAT";
@@ -271,6 +301,7 @@ public class NotificacioResource extends BaseResource<Long> {
 	public static final String ACTION_REACTIVAR_CONSULTA_SIR = "REACTIVAR_CONSULTA_SIR";
 	public static final String ACTION_REACTIVAR_AMB_ERRORS = "REACTIVAR_AMB_ERRORS";
 	public static final String ACTION_REENVIAR_AMB_ERRORS = "REENVIAR_AMB_ERRORS";
+	public static final String ACTION_ACTUALITZAR_ESTAT_MASSIU = "ACTUALITZAR_ESTAT_MASSIU";
 
 	@NotNull
 	private EnviamentTipus enviamentTipus;
@@ -420,6 +451,19 @@ public class NotificacioResource extends BaseResource<Long> {
 	public static class DocumentParams implements Serializable {
 
 		private Long docId;
+	}
+
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	public static class AccioMassivaParams implements Serializable {
+
+		private List<Long> ids;
+		private SeleccioTipus seleccioTipus;
+
+		public boolean idsEmpty() {
+			return ids == null || ids.isEmpty();
+		}
 	}
 
 }
