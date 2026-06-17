@@ -1,7 +1,6 @@
 package es.caib.notib.logic.service;
 
 import es.caib.notib.logic.accionsMassives.AccionsMassivesListener;
-import es.caib.notib.logic.helper.AccioMassivaHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
@@ -22,7 +21,6 @@ import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.utils.NotibLogger;
-import es.caib.notib.persist.entity.AccioMassivaEntity;
 import es.caib.notib.persist.entity.AccioMassivaElementEntity;
 import es.caib.notib.persist.entity.AccioMassivaEntity;
 import es.caib.notib.persist.repository.AccioMassivaRepository;
@@ -375,7 +373,7 @@ public class AccioMassivaServiceImpl implements AccioMassivaService {
     @Override
 	public void executarAccio(AccioMassivaExecucio accio) {
 
-		jmsTemplate.convertAndSend(SmConstants.CUA_ACCIONS_MASSIVES, accio,
+		jmsTemplate.convertAndSend(SmConstants.CUA_ACCIONS_MASSIVES, accio.getAccioId(),
 			m -> {
 				m.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, 1000L);
 				if (configHelper.getConfigAsBoolean("es.caib.notib.log.tipus.STATE_MACHINE")) {

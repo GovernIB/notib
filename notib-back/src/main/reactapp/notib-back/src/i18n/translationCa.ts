@@ -677,6 +677,8 @@ const translationCa = {
                 selectAll: "Seleccionar tot",
                 deselectAll: "Desmarcar tot",
                 executant: "Processant acció massiva",
+                noExecutades: "Identificadors no executables: ",
+                respostesError: "Identificadors amb error: ",
                 marcarProcessades: {
                     label: "Marcar com a processades",
                     tooltip: "Marca les remeses que es troben en un estat final com a processades"
@@ -688,11 +690,13 @@ const translationCa = {
                 },
                 reenviarAmbError: {
                     label: "Tornar a enviar les que han donat error",
-                    tooltip: "Torna a enviar les remeses que han donat error durant el procés de registre o d'enviament a Notifica i han esgotat el nombre màxim d'intents"
+                    tooltip: "Torna a enviar les remeses que han donat error durant el procés de registre o d'enviament a Notifica i han esgotat el nombre màxim d'intents",
+                    ok: "L'acció de reenviar amb error s'ha executat correctament"
                 },
                 esborrar: {
                     label: "Esborrar",
-                    tooltip: "Marca les remeses com a esborrades i no les mostra en el llistat"
+                    tooltip: "Marca les remeses com a esborrades i no les mostra en el llistat",
+                    ok: "L'acció de esborrar s'ha realitzat correctament"
                 },
                 exportarFullCalcul: {
                     label: "Exporta a full de càlcul",
@@ -718,15 +722,18 @@ const translationCa = {
                 },
                 reactivarCanviEstat: {
                     label: "Torna a activar les consultes de canvi d'estat",
-                    tooltip: "Torna a activar les consultes de canvi d'estat a Notific@ o SIR si s'han esgotat el nombre màxim de reintents. Aquesta accio torna el contador d'intents a zero fins que es torni a arribar al número màxim d'intents"
+                    tooltip: "Torna a activar les consultes de canvi d'estat a Notific@ o SIR si s'han esgotat el nombre màxim de reintents. Aquesta accio torna el contador d'intents a zero fins que es torni a arribar al número màxim d'intents",
+                    ok: "La acció reactivar la consulta de canvi d'estat s'ha enviat a executar correctament"
                 },
                 reactivarCallbacks: {
                     label: "Torna a activar l'enviament de callbacks",
-                    tooltip: "Torna a activar l'enviament de callbacks a aplicacions si s'ha esgotat el nombre màxim d'intents màxim. Aquesta acció posa el comptador d'intents a zero fins que es torni a arribar al nombre màxim d'intents"
+                    tooltip: "Torna a activar l'enviament de callbacks a aplicacions si s'ha esgotat el nombre màxim d'intents màxim. Aquesta acció posa el comptador d'intents a zero fins que es torni a arribar al nombre màxim d'intents",
+                    ok: "La acció reactivar callbacks s'ha enviat a executar correctament"
                 },
                 notificacionsMovil: {
                     label: "Envia notificacions mòvil",
-                    tooltip: "Envia notificacions de canvi d'estat a dispositius mòvils (PUSH)"
+                    tooltip: "Envia notificacions de canvi d'estat a dispositius mòvils (PUSH)",
+                    ok: "La acció d'enviar notifiacions mòvils s'ha enviat a executar correctament"
                 },
             },
         },

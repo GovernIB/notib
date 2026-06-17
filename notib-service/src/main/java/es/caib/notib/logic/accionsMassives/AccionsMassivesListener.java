@@ -2,11 +2,9 @@ package es.caib.notib.logic.accionsMassives;
 
 
 import es.caib.notib.logic.helper.ConversioTipusHelper;
-import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.plugin.CarpetaPluginHelper;
 import es.caib.notib.logic.intf.dto.AmpliacionPlazoDto;
 import es.caib.notib.logic.intf.dto.RespostaAccio;
-import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaDto;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaElement;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
 import es.caib.notib.logic.intf.dto.accioMassiva.SeleccioTipus;

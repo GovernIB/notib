@@ -265,6 +265,83 @@ import java.util.List;
 					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN }
 				)
 			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.ACTION_REENVIAR_AMB_ERROR_MASSIU,
+			formClass = NotificacioResource.AccioMassivaParams.class,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN }
+				)
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.ACTION_ESBORRAR_MASSIU,
+			formClass = NotificacioResource.AccioMassivaParams.class,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN }
+				)
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.ACTION_REACTIVAR_CONSULTES_CANVI_ESTAT_MASSIU,
+			formClass = NotificacioResource.AccioMassivaParams.class,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN }
+				)
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.ACTION_REACTIVAR_CALLBACKS_MASSIU,
+			formClass = NotificacioResource.AccioMassivaParams.class,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN }
+				)
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.ACTION_ENVIAR_NOTIFICACIONS_MOVIL_MASSIU,
+			formClass = NotificacioResource.AccioMassivaParams.class,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN }
+				)
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.ACTION_ENVIAR_NOTIFICACIONS_MOVIL_MASSIU,
+			formClass = NotificacioResource.AccioMassivaParams.class,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN }
+				)
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.ACTION_MARCAR_PROCESSAT_MASSIU,
+			formClass = MarcarProcessat.class,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN }
+				)
+			}
 		)
 	}
 )
@@ -302,6 +379,14 @@ public class NotificacioResource extends BaseResource<Long> {
 	public static final String ACTION_REACTIVAR_AMB_ERRORS = "REACTIVAR_AMB_ERRORS";
 	public static final String ACTION_REENVIAR_AMB_ERRORS = "REENVIAR_AMB_ERRORS";
 	public static final String ACTION_ACTUALITZAR_ESTAT_MASSIU = "ACTUALITZAR_ESTAT_MASSIU";
+	public static final String ACTION_REENVIAR_AMB_ERROR_MASSIU = "REENVIAR_AMB_ERROR_MASSIU";
+	public static final String ACTION_ESBORRAR_MASSIU = "ESBORRAR_MASSIU";
+	public static final String ACTION_REACTIVAR_CONSULTES_CANVI_ESTAT_MASSIU = "REACTIVAR_CONSULTES_CANVI_ESTAT_MASSIU";
+	public static final String ACTION_REACTIVAR_CALLBACKS_MASSIU = "REACTIVAR_CALLBACKS_MASSIU";
+	public static final String ACTION_ENVIAR_NOTIFICACIONS_MOVIL_MASSIU = "ENVIAR_NOTIFICACIONS_MOVIL_MASSIU";
+	public static final String ACTION_MARCAR_PROCESSAT_MASSIU = "MARCAR_PROCESSAT_MASSIU";
+	public static final String ACTION_ANULAR_MASSIU = "ANULAR_MASSIU";
+	public static final String ACTION_AMPLIAR_TERMINI_MASSIU = "AMPLIAR_TERMINI_MASSIU";
 
 	@NotNull
 	private EnviamentTipus enviamentTipus;
@@ -443,6 +528,7 @@ public class NotificacioResource extends BaseResource<Long> {
 		private boolean nomesLesMeves;
 		private boolean errorLastCallback;
 		private boolean entregaPostal;
+		private boolean deleted;
 	}
 
 	@Getter

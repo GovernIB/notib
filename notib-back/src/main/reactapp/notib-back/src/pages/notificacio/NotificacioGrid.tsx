@@ -8,7 +8,7 @@ import {
     MuiDataGridColDef,
     springFilterBuilder,
     springFilterBuilder as filterBuilder,
-    useFilterApiContext,
+    useFilterApiContext, useMuiDataGridApiRef,
     useMuiDataGridContext,
     useResourceApiService,
 } from 'reactlib';
@@ -139,6 +139,7 @@ const useSpringFilterBuilder = () => {
             filterBuilder.eq('procediment.id', data?.procediment?.id),
             filterBuilder.eq('procediment.id', data?.servei?.id),
             filterBuilder.eq('tipusUsuari', `'${data?.tipusUsuari}'`),
+            filterBuilder.eq('deleted',  0),
             filterBuilder.eq('createdBy', `'${data?.createdBy}'`),
             filterBuilder.like('referencia', data?.referencia),
             filterBuilder.like('registreNums', data?.registreNumeroSortida),
@@ -202,7 +203,7 @@ const NotificacioAddButton: React.FC = () => {
     );
 };
 
-const MassiveActionsButton: React.FC<{ datagridApiRef: React.RefObject<GridApiPro | null> }> = ({datagridApiRef}) => {
+const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null> }> = ({apiRef}) => {
 
     const { selection } = useMuiDataGridContext();
     const { t } = useTranslation();
@@ -210,15 +211,19 @@ const MassiveActionsButton: React.FC<{ datagridApiRef: React.RefObject<GridApiPr
         descarregarJustificants,
         descarregarCertificacions,
         actualitzarEstat,
+        reenviarAmbError,
+        esborrarMassiu,
+        reactivarConsulesCanviEstatMassiu,
+        reactivarCallbacksMassiu,
+        enviarNotificacionsMovilMassiu,
+        marcarProcessatMassiu,
     } = useAccionsMassives();
 
     const opcionsMenu: MenuOption[] = [
         {
             label: t('page.accioMassiva.accions.marcarProcessades.label'),
             tooltip: t('page.accioMassiva.accions.marcarProcessades.tooltip'),
-            onClick: () => {
-               console.log("processar")
-            },
+            onClick: () => marcarProcessatMassiu(selection?.ids, "NOTIFICACIO"),
         },
         {
             label: t('page.accioMassiva.accions.actualitzarEstat.label'),
@@ -228,12 +233,12 @@ const MassiveActionsButton: React.FC<{ datagridApiRef: React.RefObject<GridApiPr
         {
             label: t('page.accioMassiva.accions.reenviarAmbError.label'),
             tooltip: t('page.accioMassiva.accions.reenviarAmbError.tooltip'),
-            onClick: () => console.log('Tornar a enviar les que han donat error'),
+            onClick: () => reenviarAmbError(selection?.ids, "NOTIFICACIO"),
         },
         {
             label: t('page.accioMassiva.accions.esborrar.label'),
             tooltip: t('page.accioMassiva.accions.esborrar.tooltip'),
-            onClick: () => console.log('Esborrar'),
+            onClick: () => esborrarMassiu(selection?.ids, "NOTIFICACIO", apiRef),
         },
         {
             label: t('page.accioMassiva.accions.exportarFullCalcul.label'),
@@ -264,21 +269,21 @@ const MassiveActionsButton: React.FC<{ datagridApiRef: React.RefObject<GridApiPr
         {
             label: t('page.accioMassiva.accions.reactivarCanviEstat.label'),
             tooltip: t('page.accioMassiva.accions.reactivarCanviEstat.tooltip'),
-            onClick: () => console.log("Torna a activar les consultes de canvi d'estat"),
+            onClick: () => reactivarConsulesCanviEstatMassiu(selection?.ids, "NOTIFICACIO"),
         },
         {
             label: t('page.accioMassiva.accions.reactivarCallbacks.label'),
             tooltip: t('page.accioMassiva.accions.reactivarCallbacks.tooltip'),
-            onClick: () => console.log("Torna a activar l'enviament de callbacks"),
+            onClick: () => reactivarCallbacksMassiu(selection?.ids, "NOTIFICACIO"),
         },
         {
             label: t('page.accioMassiva.accions.notificacionsMovil.label'),
             tooltip: t('page.accioMassiva.accions.notificacionsMovil.tooltip'),
-            onClick: () => console.log("Envia notificacions mòvil"),
+            onClick: () => enviarNotificacionsMovilMassiu(selection?.ids, "NOTIFICACIO"),
         },
     ];
 
-    return (<AccionsMassives options={opcionsMenu} sizeSelection={selection?.ids?.size} datagridApiRef={datagridApiRef}/>);
+    return (<AccionsMassives options={opcionsMenu} sizeSelection={selection?.ids?.size}/>);
 };
 
 const ContentFilter: React.FC<{openByDefault?: boolean}> = ({openByDefault}) => {
@@ -355,6 +360,7 @@ const NotificacioGrid = () => {
     const { currentActions: apiCurrentActions } = useResourceApiService('notificacioResource');
     const isCreateLinkPresent = apiCurrentActions?.['create'] != null;
     const datagridApiRef = useGridApiRef();
+    const apiRef = useMuiDataGridApiRef();
     const columns = useDataGridColumns(datagridApiRef);
     const springFilterBuilder = useSpringFilterBuilder();
     const [searchParams] = useSearchParams();
@@ -467,6 +473,7 @@ const NotificacioGrid = () => {
         <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
             <MuiDataGrid
                 datagridApiRef={datagridApiRef}
+                apiRef={apiRef}
                 title={t('page.notificacio.grid.title') + (titolMassiva ? titolMassiva : "")}
                 resourceName="notificacioResource"
                 columns={columns}
@@ -498,7 +505,7 @@ const NotificacioGrid = () => {
                         : []),
                     {
                         position: 2,
-                        element: <MassiveActionsButton datagridApiRef={datagridApiRef} />,
+                        element: <MassiveActionsButton apiRef={apiRef} />,
                     },
                     ...(notificacioMassiva
                         ? [

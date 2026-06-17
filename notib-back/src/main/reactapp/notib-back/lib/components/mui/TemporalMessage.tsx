@@ -64,7 +64,7 @@ export const TemporalMessage: React.FC<TemporalMessageProps> = (props) => {
                 severity={severity ?? 'info'}
                 sx={{ width: '100%' }}>
                 {title && <AlertTitle>{title}</AlertTitle>}
-                {message}
+                <span style={{ whiteSpace: "pre-line" }}>{message}</span>
                 {additionalComponents}
             </Alert>
         </Snackbar>

@@ -1,9 +1,10 @@
-import { Box, Button, ButtonGroup, Chip, Icon, Menu, MenuItem, Tooltip } from '@mui/material';
-import {GridApiPro, GridRowId} from '@mui/x-data-grid-pro';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import {useBaseAppContext, useMuiActionReportLogic, useResourceApiService} from "reactlib";
+import {Box, Button, ButtonGroup, Chip, Icon, Menu, MenuItem, Tooltip} from '@mui/material';
+import React, {RefObject} from 'react';
+import {useTranslation} from 'react-i18next';
+import {useBaseAppContext, useResourceApiService} from "reactlib";
 import {ExportFileType} from "../../lib/components/ResourceApiContext.tsx";
+import {TemporalMessageSeverity} from "../../lib/components/BaseAppContext.tsx";
+import {GridApiPro} from "@mui/x-data-grid-pro";
 
 export interface MenuOption {
     label: string;
@@ -17,7 +18,6 @@ interface AccionsMassivesProps {
     options: MenuOption[];
     buttonLabel?: string;
     sizeSelection?: number;
-    datagridApiRef?: React.RefObject<GridApiPro | null>;
 }
 
 const AccionsMassives: React.FC<AccionsMassivesProps> = (props) => {
@@ -26,7 +26,6 @@ const AccionsMassives: React.FC<AccionsMassivesProps> = (props) => {
         options,
         buttonLabel = t('page.accioMassiva.accions.labelBoto'),
         sizeSelection,
-        datagridApiRef,
     } = props;
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -149,16 +148,40 @@ export const useAccionsMassives = (refresh?: () => void) => {
             })
     }
 
-    const massiveAction = (ids:Set<any> |undefined, code:string, msg:string, seleccioTipus: string) => {
+    const massiveAction = (ids:Set<any> |undefined, code:string, msg:string, seleccioTipus: string, ...apiRef : any[]) => {
         apiAction(undefined, {code :code, data:{ ids:  [...ids], seleccioTipus: seleccioTipus}})
-            .then(response => {
+            .then(resposta => {
                 refresh?.()
-                iniciaDescargaBlob(response)
-                temporalMessageShow(null, msg, 'success');
+                if (!resposta || resposta.ok || resposta.errors?.length === 0 && resposta.noExecutables?.length === 0 ) {
+                    temporalMessageShow(null, msg, 'success');
+                    return;
+                }
+                let severity : TemporalMessageSeverity = "success";
+                msg = "";
+                if (resposta.errors?.length > 0) {
+                    msg += t('page.accioMassiva.accions.respostesError') + "\n";
+                    resposta.errors.forEach(r => msg += r.id + " -  Error: " + r.errorDesc + "\n");
+                    if (msg.length > 0) {
+                        severity = "error";
+                    }
+                }
+                if (resposta.noExecutables?.length > 0) {
+                    severity = severity === "success" ? "warning" : severity;
+                    msg = msg.length > 0 ? "\n" + msg : msg;
+                    msg += t('page.accioMassiva.accions.noExecutades');
+                    resposta.noExecutables.forEach(r => msg += (r.referencia ? r.referencia  : r.id) + ", ");
+                    msg = msg.substring(0, msg.length -2);
+                }
+                temporalMessageShow(null, msg, severity);
+
             })
             .catch((error) => {
                 temporalMessageShow(null, error?.message, 'error');
-            })
+            }).finally(() => {
+                if (code === 'ESBORRAR_MASSIU') {
+                    apiRef[0].current.refresh();
+                }
+            });
     }
 
     const descarregarExcel = (ids: Set<any> |undefined, seleccioTipus: string): void => {
@@ -180,13 +203,50 @@ export const useAccionsMassives = (refresh?: () => void) => {
     }
 
     const actualitzarEstat = (ids:Set<any> |undefined, seleccioTipus: string): void => {
+        temporalMessageShow(null, t('page.accioMassiva.accions.executant'), 'info');
         massiveAction(ids, 'ACTUALITZAR_ESTAT_MASSIU', t('page.accioMassiva.accions.actualitzarEstat.ok'), seleccioTipus);
+    }
+
+    const reenviarAmbError = (ids:Set<any> |undefined, seleccioTipus: string): void => {
+        temporalMessageShow(null, t('page.accioMassiva.accions.executant'), 'info');
+        massiveAction(ids, 'REENVIAR_AMB_ERROR_MASSIU', t('page.accioMassiva.accions.reenviarAmbError.ok'), seleccioTipus);
+    }
+
+    const esborrarMassiu = (ids:Set<any> |undefined, seleccioTipus: string, apiRef : RefObject<GridApiPro> | null): void => {
+        temporalMessageShow(null, t('page.accioMassiva.accions.executant'), 'info');
+        massiveAction(ids, 'ESBORRAR_MASSIU', t('page.accioMassiva.accions.esborrar.ok'), seleccioTipus, apiRef);
+    }
+
+    const reactivarConsulesCanviEstatMassiu = (ids:Set<any> |undefined, seleccioTipus: string): void => {
+        temporalMessageShow(null, t('page.accioMassiva.accions.executant'), 'info');
+        massiveAction(ids, 'REACTIVAR_CONSULTES_CANVI_ESTAT_MASSIU', t('page.accioMassiva.accions.reactivarCanviEstat.ok'), seleccioTipus);
+    }
+
+    const reactivarCallbacksMassiu = (ids:Set<any> |undefined, seleccioTipus: string): void => {
+        temporalMessageShow(null, t('page.accioMassiva.accions.executant'), 'info');
+        massiveAction(ids, 'REACTIVAR_CALLBACKS_MASSIU', t('page.accioMassiva.accions.reactivarCallbacks.ok'), seleccioTipus);
+    }
+
+    const enviarNotificacionsMovilMassiu = (ids:Set<any> |undefined, seleccioTipus: string): void => {
+        temporalMessageShow(null, t('page.accioMassiva.accions.executant'), 'info');
+        massiveAction(ids, 'ENVIAR_NOTIFICACIONS_MOVIL_MASSIU', t('page.accioMassiva.accions.notificacionsMovil.ok'), seleccioTipus);
+    }
+
+    const marcarProcessatMassiu = (ids:Set<any> |undefined, seleccioTipus: string): void => {
+        temporalMessageShow(null, t('page.accioMassiva.accions.executant'), 'info');
+        massiveAction(ids, 'MARCAR_PROCESSAT_MASSIU', t('page.accioMassiva.accions.notificacionsMovil.ok'), seleccioTipus);
     }
 
     return { descarregarExcel,
             descarregarJustificants,
             descarregarCertificacions,
             actualitzarEstat,
+            reenviarAmbError,
+            esborrarMassiu,
+            reactivarConsulesCanviEstatMassiu,
+            reactivarCallbacksMassiu,
+            enviarNotificacionsMovilMassiu,
+        marcarProcessatMassiu,
     }
 }
 

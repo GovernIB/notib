@@ -650,6 +650,8 @@ const translationEs = {
                 selectAll: "Seleccionar todo",
                 deselectAll: "Desmarcar todo",
                 executant: "Processant acció massiva",
+                noExecutades: "Identificadores no ejecutables: ",
+                respostesError: "Identificadores con error: ",
                 marcarProcessades: {
                     label: "Marca com procesadas",
                     tooltip: "Marca las remesas que se encuentran en un estado final como procesadas"
@@ -661,11 +663,13 @@ const translationEs = {
                 },
                 reenviarAmbError: {
                     label: "Vuelve a enviar las que han dado error",
-                    tooltip: "Vuelve a enviar las remesas que han dado error durante el proceso de registro o de envio a Notifica y han agotado el número máximo de intentos"
+                    tooltip: "Vuelve a enviar las remesas que han dado error durante el proceso de registro o de envio a Notifica y han agotado el número máximo de intentos",
+                    ok: "La acción reenviar con error se ejecutado correctamente",
                 },
                 esborrar: {
                     label: "Elimina",
-                    tooltip: "Marca la remesa como elimianda y no la muestra en el listado"
+                    tooltip: "Marca la remesa como elimianda y no la muestra en el listado",
+                    ok: "La acción de eliminar se ha realizado correctamente"
                 },
                 exportarFullCalcul: {
                     label: "Exporta a hoja de cálculo",
@@ -691,15 +695,18 @@ const translationEs = {
                 },
                 reactivarCanviEstat: {
                     label: "Vuelve a activar las consultas de cambio de estado",
-                    tooltip: "Vuelve a activar las consultas de cambio de estado a Notific@ o a SIR si se han egotado el nombre máximo de intentos. Esta acción vuelve a poner el contador de intentos a cero hasta que se llegue, de nuevo, al número máximo de intentos"
+                    tooltip: "Vuelve a activar las consultas de cambio de estado a Notific@ o a SIR si se han egotado el nombre máximo de intentos. Esta acción vuelve a poner el contador de intentos a cero hasta que se llegue, de nuevo, al número máximo de intentos",
+                    ok: "La acción de reactivar la consulta de cambio de estado se ha mandado a ejectuar correctamente"
                 },
                 reactivarCallbacks: {
                     label: "Vuelve a activar el envio de callbacks",
-                    tooltip: "Vuelve a activar el envio de callbacks a aplicaciones si se ha agotado el número máximo de intentos máximo. Esta acción vuelve a poner el contador de intentos a cero hasta que se llegue, de nuevo, al número máximo de intentos"
+                    tooltip: "Vuelve a activar el envio de callbacks a aplicaciones si se ha agotado el número máximo de intentos máximo. Esta acción vuelve a poner el contador de intentos a cero hasta que se llegue, de nuevo, al número máximo de intentos",
+                    ok: "La acción de reactivar los callbacks se ha mandado a ejectuar correctamente"
                 },
                 notificacionsMovil: {
                     label: "Envia notificaciones móbil",
-                    tooltip: "Envia notificaciones de cambio de estado a dispositivos móbiles (PUSH)"
+                    tooltip: "Envia notificaciones de cambio de estado a dispositivos móbiles (PUSH)",
+                    ok: "La acción de enviar notifiaciones móbil se ha mandado a ejectuar correctamente"
                 },
             },
         },

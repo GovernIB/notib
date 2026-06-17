@@ -5,11 +5,6 @@ import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.enviaments.EnviarCallbackActionExecutor;
-import es.caib.notib.logic.intf.service.AccioMassivaService;
-import es.caib.notib.logic.intf.service.EnviamentService;
-import es.caib.notib.logic.notificacions.ActualitzarEstatMassiuActionExecutor;
-import es.caib.notib.logic.notificacions.CertificacioMassiuReportGenerator;
-import es.caib.notib.logic.notificacions.EnviarEntregaPostalActionExecutor;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.LegacyHelper;
 import es.caib.notib.logic.helper.MessageHelper;
@@ -31,28 +26,39 @@ import es.caib.notib.logic.intf.model.NotificacioResource;
 import es.caib.notib.logic.intf.model.OrganGestorResource;
 import es.caib.notib.logic.intf.model.PersonaResource;
 import es.caib.notib.logic.intf.resourceservice.NotificacioResourceService;
+import es.caib.notib.logic.intf.service.AccioMassivaService;
 import es.caib.notib.logic.intf.service.CallbackService;
+import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.JustificantService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.util.DatesUtils;
+import es.caib.notib.logic.notificacions.ActualitzarEstatMassiuActionExecutor;
 import es.caib.notib.logic.notificacions.AmpliarTerminiRemesaActionExecutor;
 import es.caib.notib.logic.notificacions.AnularRemesaActionExecutor;
+import es.caib.notib.logic.notificacions.CertificacioMassiuReportGenerator;
 import es.caib.notib.logic.notificacions.CertificacioReportGenerator;
 import es.caib.notib.logic.notificacions.DocumentEnviatReportGenerator;
 import es.caib.notib.logic.notificacions.DocumentPerspectiveApplicator;
 import es.caib.notib.logic.notificacions.EnviamentPerspectiveApplicator;
+import es.caib.notib.logic.notificacions.EnviarEntregaPostalActionExecutor;
 import es.caib.notib.logic.notificacions.EnviarNotificaActionExecutor;
+import es.caib.notib.logic.notificacions.EnviarNotificacionsMovilMassiuActionExecutor;
+import es.caib.notib.logic.notificacions.EsborrarMassiuActionExecutor;
 import es.caib.notib.logic.notificacions.EsborrarRemesaActionExecutor;
 import es.caib.notib.logic.notificacions.ExportarExcelReportGenerator;
 import es.caib.notib.logic.notificacions.GrupPerspectiveApplicator;
 import es.caib.notib.logic.notificacions.JusitficantEnviamentMassiuReportGenerator;
 import es.caib.notib.logic.notificacions.JusitficantEnviamentReportGenerator;
 import es.caib.notib.logic.notificacions.MarcarProcessatActionExecutor;
+import es.caib.notib.logic.notificacions.MarcarProcessatMassiuActionExecutor;
 import es.caib.notib.logic.notificacions.OperadorPostalCiePerspectiveApplicator;
 import es.caib.notib.logic.notificacions.ReactivarAmbErrorActionExecutor;
+import es.caib.notib.logic.notificacions.ReactivarCallbacksMassiuActionExecutor;
 import es.caib.notib.logic.notificacions.ReactivarConsultaSirActionExecutor;
-import es.caib.notib.logic.notificacions.ReenviarAmbErrorActionExecutor;
+import es.caib.notib.logic.notificacions.ReactivarConsultesCanviEstatMassiuActionExecutor;
 import es.caib.notib.logic.notificacions.ReactivarEstatNotificaActionExecutor;
+import es.caib.notib.logic.notificacions.ReenviarAmbErrorActionExecutor;
+import es.caib.notib.logic.notificacions.ReenviarAmbErrorMassiuActionExecutor;
 import es.caib.notib.logic.notificacions.RegistrarRemesaActionExecutor;
 import es.caib.notib.persist.resourceentity.CallbackResourceEntity;
 import es.caib.notib.persist.resourceentity.DocumentResourceEntity;
@@ -145,6 +151,12 @@ public class NotificacioResourceServiceImpl
 		register(NotificacioResource.ACTION_REACTIVAR_AMB_ERRORS, new ReactivarAmbErrorActionExecutor(notificacioService));
 		register(NotificacioResource.ACTION_REENVIAR_AMB_ERRORS, new ReenviarAmbErrorActionExecutor(notificacioService));
 		register(NotificacioResource.ACTION_ACTUALITZAR_ESTAT_MASSIU, new ActualitzarEstatMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper, enviamentService));
+		register(NotificacioResource.ACTION_REENVIAR_AMB_ERROR_MASSIU, new ReenviarAmbErrorMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper, enviamentService));
+		register(NotificacioResource.ACTION_ESBORRAR_MASSIU, new EsborrarMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper, enviamentService));
+		register(NotificacioResource.ACTION_REACTIVAR_CONSULTES_CANVI_ESTAT_MASSIU, new ReactivarConsultesCanviEstatMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper, enviamentService));
+		register(NotificacioResource.ACTION_REACTIVAR_CALLBACKS_MASSIU, new ReactivarCallbacksMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper, enviamentService));
+		register(NotificacioResource.ACTION_ENVIAR_NOTIFICACIONS_MOVIL_MASSIU, new EnviarNotificacionsMovilMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper, enviamentService));
+		register(NotificacioResource.ACTION_MARCAR_PROCESSAT_MASSIU, new MarcarProcessatMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper));
 	}
 
 	@Override
@@ -267,28 +279,26 @@ public class NotificacioResourceServiceImpl
 	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
 
 		// Condició per a mostrar només les notificacions de l'entitat actual
-		String entitatFilter = "entitat.id:" + userSessionHelper.getCurrentEntitatId();
-		boolean isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
-		boolean isRoleAdminLectura = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN_LECTURA);
-		boolean isRoleAdminOrgan = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN);
+		var entitatFilter = "entitat.id:" + userSessionHelper.getCurrentEntitatId();
+		var isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
+		var isRoleAdminLectura = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN_LECTURA);
+		var isRoleAdminOrgan = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN);
 		if ((isRoleAdmin && notibPermissionHelper.currentEntitatPermissionAllowed(ExtendedPermission.PERM2)) ||
 			(isRoleAdminLectura && notibPermissionHelper.currentEntitatPermissionAllowed(ExtendedPermission.PERMX))) {
 			return entitatFilter;
-		} else if (isRoleAdminOrgan && notibPermissionHelper.currentOrganGestorPermissionAllowed(BasePermission.ADMINISTRATION)) {
-			return entitatFilter + " and organGestor.id:" + userSessionHelper.getCurrentOrganGestorId();
-		} else {
-			// Condició per a mostrar només les notificacions amb permís de lectura
-			NotibPermissionHelper.IdsToCheckNotificacioPermission ids = notibPermissionHelper.getIdsToCheckNotificacioPermission(
-				BasePermission.READ,
-				BasePermission.READ);
-			List<String> andConditions = new ArrayList<>();
-			andConditions.add(entitatFilter);
-			String permissionFilter = springFilterWithReadPermission(ids, "");
-			if (!permissionFilter.isEmpty()) {
-				andConditions.add("(" + permissionFilter + ")");
-			}
-			return String.join(" and ", andConditions);
 		}
+		if (isRoleAdminOrgan && notibPermissionHelper.currentOrganGestorPermissionAllowed(BasePermission.ADMINISTRATION)) {
+			return entitatFilter + " and organGestor.id:" + userSessionHelper.getCurrentOrganGestorId();
+		}
+		// Condició per a mostrar només les notificacions amb permís de lectura
+		var ids = notibPermissionHelper.getIdsToCheckNotificacioPermission(BasePermission.READ, BasePermission.READ);
+		List<String> andConditions = new ArrayList<>();
+		andConditions.add(entitatFilter);
+		var permissionFilter = springFilterWithReadPermission(ids, "");
+		if (!permissionFilter.isEmpty()) {
+			andConditions.add("(" + permissionFilter + ")");
+		}
+		return String.join(" and ", andConditions);
 	}
 
 	@Override

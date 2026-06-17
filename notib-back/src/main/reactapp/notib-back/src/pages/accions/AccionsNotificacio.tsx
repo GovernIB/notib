@@ -55,14 +55,13 @@ export const useAccionsNotificacio = () => {
             let severity : TemporalMessageSeverity = "success";
             let msg = "";
             if (resposta.respostes && resposta.respostes.length > 0) {
-                msg += t('page.notificacio.grid.accions.anular.respostesError');
+                msg += t('page.notificacio.grid.accions.anular.respostesError') + "\n";
                 resposta.respostes.forEach(r => {
                     if (r.error) {
-                        msg += " Identificador: " + r.identificador + " Error: " + r.codiReposta + " - " + r.descripcioResposta + ", ";
+                        msg += r.identificador + " - Error: " + r.codiReposta + " - " + r.descripcioResposta + "\n";
                     }
                 });
                 if (msg.length > 0) {
-                    msg = msg.substring(0, msg.length -2);
                     severity = "error";
                 }
             }
@@ -134,7 +133,8 @@ export const useAccionsNotificacio = () => {
 
     const { exec: marcarProcessat, formDialogComponent: marcarProcessatDialog } = useMuiActionReportLogic(
         'notificacioResource',
-        'MARCAR_PROCESSAT',  undefined,
+        'MARCAR_PROCESSAT',
+        undefined,
         undefined,
         undefined,
         undefined,

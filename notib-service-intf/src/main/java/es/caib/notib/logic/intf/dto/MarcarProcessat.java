@@ -1,5 +1,6 @@
 package es.caib.notib.logic.intf.dto;
 
+import es.caib.notib.logic.intf.model.NotificacioResource;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +15,7 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MarcarProcessat implements Serializable {
+public class MarcarProcessat extends NotificacioResource.AccioMassivaParams implements Serializable {
 
 	@NotNull
 	private String motiu;
