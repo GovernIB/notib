@@ -33,6 +33,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -385,6 +388,13 @@ public class AccioMassivaServiceImpl implements AccioMassivaService {
 					}
 					ActiveMqServiceImpl.afegirJob(SmConstants.CUA_ACCIONS_MASSIVES, mida);
 				}
+				var auth = SecurityContextHolder.getContext().getAuthentication();
+				m.setStringProperty("principal", auth.getName());
+				var roles = auth.getAuthorities().stream()
+					.filter(a -> a instanceof GrantedAuthority)
+					.map(a -> (a).getAuthority()).collect(Collectors.joining(","));
+				m.setStringProperty("roles", roles);
+
 				return m;
 			});
 	}

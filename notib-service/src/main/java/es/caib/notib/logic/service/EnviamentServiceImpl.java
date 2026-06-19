@@ -997,13 +997,13 @@ public class EnviamentServiceImpl implements EnviamentService {
 			return;
 		}
 		// si l'enviament esta pendent de refrescar estat a notifica
+		var accioMassiva = accioMassivaRepository.findById(accioMassivaId).orElseThrow();
 		if (enviament.isPendentRefrescarEstatNotifica()) {
 			var parametres = ParametresSm.builder().enviamentUuid(enviament.getUuid()).accioMassivaId(accioMassivaId).build();
 			enviamentSmService.consultaRetry(parametres);
 			return;
 		}
 		if (accioMassivaId != null) {
-			var accioMassiva = accioMassivaRepository.findById(accioMassivaId).orElseThrow();
 			var estat = enviament.getNotificacio().isComunicacioSir() ? enviament.getRegistreEstat().name() : enviament.getNotificaEstat().name();
 			accioMassiva.getElement(enviamentId).actualitzar("L'enviament no s'ha actualitzat perquè no es troba en un estat enviat. Estat:  " + estat, "");
 		}
@@ -1011,19 +1011,22 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 	@Transactional
 	@Override
-	public void activarCallback(Long enviamentId) {
+	public void activarCallback(Long enviamentId, Long accioMassivaId) {
 
 		var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+		var accioMassiva = accioMassivaRepository.findById(accioMassivaId).orElseThrow();
 		if (!enviament.getNotificacio().isTipusUsuariAplicacio()) {
-			var text = String.format("[callback] No es pot reactivar el callback de l'enviment [id=%d] (Tipus usuari = %s)", enviamentId, enviament.getNotificacio().getTipusUsuari().toString());
+			var text = String.format("[Callback] No es pot reactivar el callback de l'enviment [id=%d] (Tipus usuari = %s)", enviamentId, enviament.getNotificacio().getTipusUsuari());
 			log.info(text);
+			accioMassiva.getElement(enviamentId).actualitzar(text, "");
 			return;
 		}
 		var event = notificacioEventRepository.findEventCallbackAmbFiReintentsByEnviamentId(enviamentId);
 		if (event == null) {
+			accioMassiva.getElement(enviamentId).actualitzar("No s'ha trobat cap event per aquest enviament", "");
 			return;
 		}
-		log.info(String.format("[callback] Reactivam callback de l'enviment [id=%d]", enviamentId));
+		log.info(String.format("[Callback] Reactivam callback de l'enviment [id=%d]", enviamentId));
 
 		callbackHelper.reactivarCallback(enviament);
 		event.setFiReintents(false);

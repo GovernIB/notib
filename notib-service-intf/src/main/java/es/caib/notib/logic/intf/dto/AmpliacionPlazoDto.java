@@ -1,5 +1,6 @@
 package es.caib.notib.logic.intf.dto;
 
+import es.caib.notib.logic.intf.model.NotificacioResource;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +11,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class AmpliacionPlazoDto implements Serializable {
+public class AmpliacionPlazoDto extends NotificacioResource.AccioMassivaParams implements Serializable {
 
     private Long notificacioId;
     private Long enviamentId;

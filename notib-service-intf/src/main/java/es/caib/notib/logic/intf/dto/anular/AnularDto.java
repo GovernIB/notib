@@ -1,5 +1,6 @@
 package es.caib.notib.logic.intf.dto.anular;
 
+import es.caib.notib.logic.intf.model.NotificacioResource;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,7 +10,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class AnularDto implements Serializable {
+public class AnularDto extends NotificacioResource.AccioMassivaParams implements Serializable {
 
     private Long notificacioId;
     private Long enviamentId;

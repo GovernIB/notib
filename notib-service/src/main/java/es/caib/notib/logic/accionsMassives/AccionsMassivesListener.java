@@ -23,6 +23,10 @@ import org.springframework.jms.annotation.JmsListener;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,8 +73,21 @@ public class AccionsMassivesListener {
 
 		accioEntity.setDataInici(new Date());
 		RespostaAccio<AccioMassivaElement> resposta;
-//        List<String> errors;
+
+		var principal = message.getStringProperty("principal");
+		var rolesStr = message.getStringProperty("roles");
 		try {
+
+			if (principal != null) {
+				List<GrantedAuthority> authorities = rolesStr == null || rolesStr.isBlank()
+					? List.of() :  Arrays.stream(rolesStr.split(","))
+					.map(SimpleGrantedAuthority::new)
+					.map(a -> (GrantedAuthority) a)
+					.collect(Collectors.toList());
+
+				var auth = new UsernamePasswordAuthenticationToken(principal, "N/A", authorities);
+				SecurityContextHolder.getContext().setAuthentication(auth);
+			}
 			var error = false;
 			Set<Long> seleccio = new HashSet<>(accio.getSeleccio());
             /* Les seguents accions no passen per la cua:
@@ -114,7 +131,7 @@ public class AccionsMassivesListener {
 				case TORNA_ACTIVAR_CALLBACK:
 					for(var enviamentId : seleccio) {
 						try {
-							enviamentService.activarCallback(enviamentId);
+							enviamentService.activarCallback(enviamentId, accioEntity.getId());
 							accioEntity.getElement(enviamentId).actualitzar();
 						} catch (Exception ex) {
 							error = true;
@@ -221,20 +238,28 @@ public class AccionsMassivesListener {
 						accioEntity.setDataFi(new Date());
 						break;
 					}
+					var isSeleccioEnviament = SeleccioTipus.ENVIAMENT.equals(accio.getTipusElementSeleccionat());
+					if (isSeleccioEnviament) {
+						var enviaments = enviamentRepository.findAllById(seleccio);
+						seleccio = enviaments.stream().map(NotificacioEnviamentEntity::getNotificacio).map(n -> n.getId()).collect(Collectors.toSet());
+					}
+					var posicio = 0;
 					for (Long notificacioId : seleccio) {
 						try {
 							var respostaAccio = notificacioService.reenviarNotificaionsMovil(notificacioId);
-							if (!respostaAccio.getErrors().isEmpty()) {
-								for (var r : respostaAccio.getErrors()) {
-									accioEntity.getElement(notificacioId).actualitzar(r.getErrorDescripcio(), r.getErrorStackTrace());
-								}
-							} else {
+							if (respostaAccio.getErrors().isEmpty()) {
 								accioEntity.getElement(notificacioId).actualitzar();
+							} else {
+								for (var r : respostaAccio.getErrors()) {
+									var element = isSeleccioEnviament ? accioEntity.getElementAt(posicio) : accioEntity.getElement(notificacioId);
+									element.actualitzar(r.getErrorDescripcio(), r.getErrorStackTrace());
+								}
 							}
 						} catch (Exception e) {
 							error = true;
 							accioEntity.getElement(notificacioId).actualitzar(e.getMessage(), Arrays.toString(e.getStackTrace()));
 						}
+						posicio++;
 					}
 					accioEntity.setDataFi(new Date());
 					break;
@@ -249,6 +274,8 @@ public class AccionsMassivesListener {
 			accioEntity.setError(true);
 			accioEntity.setErrorDescripcio(ex.getMessage());
 			accioEntity.setExcepcioStacktrace(Arrays.toString(ex.getStackTrace()));
+		} finally {
+			SecurityContextHolder.clearContext();
 		}
 //        accioEntity.setDataFi(new Date());
 		accioMassivaRepository.save(accioEntity);

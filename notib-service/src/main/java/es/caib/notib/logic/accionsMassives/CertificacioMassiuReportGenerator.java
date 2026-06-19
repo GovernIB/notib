@@ -1,4 +1,4 @@
-package es.caib.notib.logic.notificacions;
+package es.caib.notib.logic.accionsMassives;
 
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseReadonlyResourceService;
@@ -32,7 +32,7 @@ import java.util.zip.ZipOutputStream;
 
 @Slf4j
 @RequiredArgsConstructor
-public class JusitficantEnviamentMassiuReportGenerator implements BaseReadonlyResourceService.ReportGenerator<NotificacioResourceEntity, NotificacioResource.AccioMassivaParams, NotificacioResource.AccioMassivaParams> {
+public class CertificacioMassiuReportGenerator implements BaseReadonlyResourceService.ReportGenerator<NotificacioResourceEntity, NotificacioResource.AccioMassivaParams, NotificacioResource.AccioMassivaParams> {
 
 	private final AccioMassivaService accioMassivaService;
 	private final NotificacioService notificacioService;
@@ -44,7 +44,7 @@ public class JusitficantEnviamentMassiuReportGenerator implements BaseReadonlyRe
 
 
 		if (params == null || params.idsEmpty()) {
-			throw new ReportGenerationException(NotificacioResource.class, null, "Error", "La selecció no pot ser buida");
+			throw new ReportGenerationException(NotificacioResource.class, null, "Error", "La selecció no pot ser buidas");
 		}
 		var max = notificacioService.getMaxAccionesMassives();
 		if (params.getIds() != null && params.getIds().size() > max) {
@@ -61,14 +61,14 @@ public class JusitficantEnviamentMassiuReportGenerator implements BaseReadonlyRe
 		var params = (NotificacioResource.AccioMassivaParams) data.get(0);
 		var sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		var date = sdf.format(new Date()).replace(":", "_");
-		var nom = "justificantsMassiu_" + date + ".zip";
+		var nom = "certificacionsMassives_" + date + ".zip";
 		var mediaType = "application/zip";
 		try {
 			var entitatActual = userSessionHelper.getCurrentEntitatId();
 			boolean isAdminEntitat = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
 			var accio = AccioMassivaExecucio.builder()
 				.isAdminEntitat(isAdminEntitat)
-				.tipus(AccioMassivaTipus.DESCARREGA_JUSTIFICANT_ENVIAMENT)
+				.tipus(AccioMassivaTipus.DESCARREGA_CERTIFICAT_RECEPCIO)
 				.tipusElementSeleccionat(params.getSeleccioTipus())
 				.entitatId(entitatActual)
 				.seleccio(params.getIds())
@@ -76,23 +76,25 @@ public class JusitficantEnviamentMassiuReportGenerator implements BaseReadonlyRe
 				.build();
 			var accioId = accioMassivaService.altaAccioMassiva(accio);
 			accio.setAccioId(accioId);
-			var justificants = accioMassivaService.descarregarJustificant(accio);
-			if (justificants == null || justificants.isEmpty()) {
-				log.error("[JusitficantEnviamentMassiuReportGenerator] Error generant contingut per la descarrega massiva de justifcants");
+			var certificacions = accioMassivaService.descarregarCertificacio(accioId);
+			if (certificacions == null || certificacions.isEmpty()) {
+				log.error("[CertificacioMassiuReportGenerator] Error generant contingut per la descarrega massiva de certificacions");
 				return DownloadableFile.builder().name(nom).content(new byte[]{}).contentType(mediaType).build();
 			}
 			try (var baos = new ByteArrayOutputStream(); var zos = new ZipOutputStream(baos)) {
-				for (var just : justificants) {
-					var entry = new ZipEntry(StringUtils.stripAccents(just.getNom()));
-					entry.setSize(just.getContingut().length);
-					zos.putNextEntry(entry);
-					zos.write(just.getContingut());
-					zos.closeEntry();
+				for (var notCerts : certificacions) {
+					for (var certificacio : notCerts) {
+						ZipEntry entry = new ZipEntry(StringUtils.stripAccents(certificacio.getNom()));
+						entry.setSize(certificacio.getContingut().length);
+						zos.putNextEntry(entry);
+						zos.write(certificacio.getContingut());
+						zos.closeEntry();
+					}
 				}
 				return DownloadableFile.builder().name(nom).content(baos.toByteArray()).contentType(mediaType).build();
 			}
 		} catch (Exception ex) {
-			log.error("[JusitficantEnviamentMassiuReportGenerator] Error inesperat generant contingut per la descarrega massiva de justifcants", ex);
+			log.error("[CertificacioMassiuReportGenerator] Error inesperat generant contingut per la descarrega massiva de certificacions", ex);
 			return DownloadableFile.builder().name(nom).content(new byte[]{}).contentType(mediaType).build();
 		}
 	}

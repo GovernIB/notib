@@ -654,7 +654,8 @@ const translationEs = {
                 respostesError: "Identificadores con error: ",
                 marcarProcessades: {
                     label: "Marca com procesadas",
-                    tooltip: "Marca las remesas que se encuentran en un estado final como procesadas"
+                    tooltip: "Marca las remesas que se encuentran en un estado final como procesadas",
+                    ok: "La acción de ampliar plazo se ha mandado a ejectuar correctamente"
                 },
                 actualitzarEstat: {
                     label: "Actualiza el estado",
@@ -687,11 +688,13 @@ const translationEs = {
                 },
                 anular: {
                     label: "Anular",
-                    tooltip: "Anula las remesas enviadas a Notfic@ que no hayan sido notificadas"
+                    tooltip: "Anula las remesas enviadas a Notfic@ que no hayan sido notificadas",
+                    ok: "La acción de anular se ha mandado a ejectuar correctamente"
                 },
                 ampliarTermini: {
                     label: "Ampliar plazo",
-                    tooltip: "Amplia el plazo de caducidad de las remesas seleccionadas"
+                    tooltip: "Amplia el plazo de cad-ucidad de las remesas seleccionadas",
+                    ok: "La acción de ampliar plazo se ha mandado a ejectuar correctamente"
                 },
                 reactivarCanviEstat: {
                     label: "Vuelve a activar las consultas de cambio de estado",

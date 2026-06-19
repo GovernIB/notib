@@ -32,33 +32,36 @@ import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.JustificantService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.util.DatesUtils;
-import es.caib.notib.logic.notificacions.ActualitzarEstatMassiuActionExecutor;
+import es.caib.notib.logic.accionsMassives.ActualitzarEstatMassiuActionExecutor;
+import es.caib.notib.logic.accionsMassives.AmpliarTerminiMassiuActionExecutor;
 import es.caib.notib.logic.notificacions.AmpliarTerminiRemesaActionExecutor;
+import es.caib.notib.logic.accionsMassives.AnularMassiuActionExecutor;
 import es.caib.notib.logic.notificacions.AnularRemesaActionExecutor;
-import es.caib.notib.logic.notificacions.CertificacioMassiuReportGenerator;
+import es.caib.notib.logic.accionsMassives.CertificacioMassiuReportGenerator;
 import es.caib.notib.logic.notificacions.CertificacioReportGenerator;
 import es.caib.notib.logic.notificacions.DocumentEnviatReportGenerator;
 import es.caib.notib.logic.notificacions.DocumentPerspectiveApplicator;
 import es.caib.notib.logic.notificacions.EnviamentPerspectiveApplicator;
 import es.caib.notib.logic.notificacions.EnviarEntregaPostalActionExecutor;
 import es.caib.notib.logic.notificacions.EnviarNotificaActionExecutor;
-import es.caib.notib.logic.notificacions.EnviarNotificacionsMovilMassiuActionExecutor;
-import es.caib.notib.logic.notificacions.EsborrarMassiuActionExecutor;
+import es.caib.notib.logic.accionsMassives.EnviarNotificacionsMovilMassiuActionExecutor;
+import es.caib.notib.logic.accionsMassives.EsborrarMassiuActionExecutor;
 import es.caib.notib.logic.notificacions.EsborrarRemesaActionExecutor;
 import es.caib.notib.logic.notificacions.ExportarExcelReportGenerator;
 import es.caib.notib.logic.notificacions.GrupPerspectiveApplicator;
-import es.caib.notib.logic.notificacions.JusitficantEnviamentMassiuReportGenerator;
+import es.caib.notib.logic.accionsMassives.JusitficantEnviamentMassiuReportGenerator;
 import es.caib.notib.logic.notificacions.JusitficantEnviamentReportGenerator;
 import es.caib.notib.logic.notificacions.MarcarProcessatActionExecutor;
-import es.caib.notib.logic.notificacions.MarcarProcessatMassiuActionExecutor;
+import es.caib.notib.logic.accionsMassives.MarcarProcessatMassiuActionExecutor;
+import es.caib.notib.logic.notificacions.NotificacioDetallPerspectiveApplicator;
 import es.caib.notib.logic.notificacions.OperadorPostalCiePerspectiveApplicator;
 import es.caib.notib.logic.notificacions.ReactivarAmbErrorActionExecutor;
 import es.caib.notib.logic.notificacions.ReactivarCallbacksMassiuActionExecutor;
 import es.caib.notib.logic.notificacions.ReactivarConsultaSirActionExecutor;
-import es.caib.notib.logic.notificacions.ReactivarConsultesCanviEstatMassiuActionExecutor;
+import es.caib.notib.logic.accionsMassives.ReactivarConsultesCanviEstatMassiuActionExecutor;
 import es.caib.notib.logic.notificacions.ReactivarEstatNotificaActionExecutor;
 import es.caib.notib.logic.notificacions.ReenviarAmbErrorActionExecutor;
-import es.caib.notib.logic.notificacions.ReenviarAmbErrorMassiuActionExecutor;
+import es.caib.notib.logic.accionsMassives.ReenviarAmbErrorMassiuActionExecutor;
 import es.caib.notib.logic.notificacions.RegistrarRemesaActionExecutor;
 import es.caib.notib.persist.resourceentity.CallbackResourceEntity;
 import es.caib.notib.persist.resourceentity.DocumentResourceEntity;
@@ -130,6 +133,7 @@ public class NotificacioResourceServiceImpl
 		register(NotificacioResource.Fields.caducitatDiesNaturals, new NotificacioResourceServiceImpl.CaducitatOnChangeLogicProcessor());
 		register(NotificacioResource.PERSPECTIVE_DOCUMENTS_NOTIFICACIO, new DocumentPerspectiveApplicator());
 		register(NotificacioResource.PERSPECTIVE_ENVIAMENTS_NOTIFICACIO, new EnviamentPerspectiveApplicator());
+		register(NotificacioResource.PERSPECTIVE_NOTIFICACIO_DETALL, new NotificacioDetallPerspectiveApplicator(notificacioEnviamentResourceRepository, configHelper, callbackResourceRepository, eventResourceRepository, messageHelper, notibPermissionHelper));
 		register(NotificacioResource.PERSPECTIVE_OPERADORS_CIE_POSTAL, new OperadorPostalCiePerspectiveApplicator());
 		register(NotificacioResource.PERSPECTIVE_GRUP, new GrupPerspectiveApplicator());
 		register(NotificacioResource.REPORT_DESCARREGAR_JUSTIFICANT_NOTIFICACIO, new JusitficantEnviamentReportGenerator(justificantService));
@@ -157,123 +161,125 @@ public class NotificacioResourceServiceImpl
 		register(NotificacioResource.ACTION_REACTIVAR_CALLBACKS_MASSIU, new ReactivarCallbacksMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper, enviamentService));
 		register(NotificacioResource.ACTION_ENVIAR_NOTIFICACIONS_MOVIL_MASSIU, new EnviarNotificacionsMovilMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper, enviamentService));
 		register(NotificacioResource.ACTION_MARCAR_PROCESSAT_MASSIU, new MarcarProcessatMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper));
+		register(NotificacioResource.ACTION_ANULAR_MASSIU, new AnularMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper));
+		register(NotificacioResource.ACTION_AMPLIAR_TERMINI_MASSIU, new AmpliarTerminiMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper));
 	}
 
-	@Override
-	public void afterConversion(NotificacioResourceEntity entity, NotificacioResource resource) {
+//	@Override
+//	public void afterConversion(NotificacioResourceEntity entity, NotificacioResource resource) {
 
-		var enviamentsPendentsNotifica = notificacioEnviamentResourceRepository.findEnviamentsPendentsNotificaByNotificacio(entity);
- 		resource.setHasEnviamentsPendents(enviamentsPendentsNotifica != null && !enviamentsPendentsNotifica.isEmpty());
-		var llindarDies = configHelper.getConfigAsInteger("es.caib.notib.llindar.dies.enviament.remeses");
-		resource.setNotificacioAntiga(DatesUtils.isNowAfterDate(entity.getCreatedDate(), llindarDies));
-		resource.setComunicacioSir(entity.isComunicacioSir());
-		resource.setPermisProcessar(hasPermisProcessar(entity));
-//		legacyHelper.actualitzarColumnaEstat(entity);
-		//CALLBACKS
-		var pendents = callbackResourceRepository.findByNotificacioIdAndEstatOrderByDataDesc(entity.getId(), CallbackEstatEnumDto.PENDENT);
-		resource.setEventsCallbackPendent(entity.isTipusUsuariAplicacio() && pendents != null && !pendents.isEmpty());
-		var data = pendents != null && !pendents.isEmpty() && pendents.get(0).getData() != null ? pendents.get(0).getData() : null;
-		resource.setDataCallbackPendent(data);
-		int callbackFiReintents = 0;
-		NotificacioEnviamentResourceEntity enviament;
-		var motiuAnulacio = "";
-		var entregaPostal = false;
-		EventResourceEntity eventError;
-		CallbackResourceEntity callback;
-		List<EventResourceEntity> eventNotMovil;
-		List<EventResourceEntity> lastErrorEvent = new ArrayList<>();
-		for (var enviamentResource : entity.getEnviaments()) {
-			enviament = notificacioEnviamentResourceRepository.findById(enviamentResource.getId()).get();
-			;
-			if (entity.isComunicacioSir()) {
-				resource.setRegistreEstat(enviament.getRegistreEstat());
-			}
-			if (!entregaPostal && enviament.getEntregaPostal() != null) {
-				entregaPostal = true;
-			}
-			boolean plazoAmpliado = resource.isPlazoAmpliado();
-			resource.setPlazoAmpliado(plazoAmpliado || enviament.isPlazoAmpliado());
-			boolean anulat = resource.isAnulat();
-			resource.setAnulat(anulat || enviament.isAnulat());
-			motiuAnulacio = enviament.getMotiuAnulacio();
-			eventError = enviament.getUltimEvent();
-			if (eventError != null && eventError.isError()) {
-				lastErrorEvent.add(eventError);
-			}
-			eventNotMovil = eventResourceRepository.findLastApiCarpetaByEnviamentId(enviament.getId());
-			if (eventNotMovil != null && !eventNotMovil.isEmpty() && eventNotMovil.get(0).isError()) {
-				resource.getNotificacionsMovilErrorDesc().add(eventNotMovil.get(0).getErrorDescripcio());
-			}
-			if (enviament
-				.isSirFiPooling()) {
-				resource.setFiReintents(true);
-				resource.setFiReintentsDesc(messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + NotificacioEventTipusEnumDto.SIR_FI_POOLING));
-			}
-			callback = callbackResourceRepository.findByEnviamentIdAndEstat(enviament.getId(), CallbackEstatEnumDto.ERROR);
-			if (callback == null) {
-				continue;
-			}
-			resource.setErrorLastCallback(callback.isError());
-			resource.setCallbackFiReintents(true);
-			resource.setCallbackFiReintentsDesc(messageHelper.getMessage("callback.fi.reintents"));
-			callbackFiReintents++;
-		}
-		resource.setMotiuAnulacio(motiuAnulacio);
-		if (resource.getNotificacionsMovilErrorDesc().size() > 1) {
-			List<String> desc = new ArrayList<>();
-			desc.add(messageHelper.getMessage("api.carpeta.send.notificacio.movil.error"));
-			resource.setNotificacionsMovilErrorDesc(desc);
-		}
-		if (callbackFiReintents > 0) {
-			resource.setCallbackFiReintents(true);
-			resource.setCallbackFiReintentsDesc(messageHelper.getMessage("callback.fi.reintents"));
-		}
-		if (!lastErrorEvent.isEmpty()) {
-			String msg = "";
-			String tipus = "";
-			StringBuilder m = new StringBuilder();
-			int env = 1;
-			var fiReintents = false;
-			for (var event : lastErrorEvent) {
-
-				msg = messageHelper.getMessage("notificacio.event.fi.reintents");
-				var et = NotificacioEventTipusEnumDto.SIR_CONSULTA.equals(event.getTipus()) && event.getEnviament().isSirFiPooling() ? NotificacioEventTipusEnumDto.SIR_FI_POOLING : event.getTipus();
-				tipus = messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + et);
-				m.append("Env ").append(env).append(": ").append(msg).append(" -> ").append(tipus).append("\n");
-				env++;
-				fiReintents = fiReintents || event.getFiReintents();
-				if (entregaPostal && NotificacioEventTipusEnumDto.CIE_ENVIAMENT.equals(event.getTipus())) {
-					resource.setErrorEntregaPostal(true);
-				}
-			}
-			resource.setFiReintentsDesc(m.toString());
-			resource.setFiReintents(fiReintents);
-			resource.setNotificaErrorDescripcio(lastErrorEvent.size() > 1 ? messageHelper.getMessage("error.notificacio.enviaments") : lastErrorEvent.get(0).getErrorDescripcio());
-			// TODO S'HA DE POSAR PER TOTS ELS EVENTS
-			resource.setNotificaErrorData(lastErrorEvent.get(0).getData());
-			resource.setNoticaErrorEventTipus(lastErrorEvent.get(0).getTipus());
-			// Obtenir error dels events
-			resource.setNotificaErrorTipus(getErrorTipus(lastErrorEvent.get(0)));
-		}
-	}
-
-	private boolean hasPermisProcessar(NotificacioResourceEntity notificacio) {
-		return notibPermissionHelper.organGestorPermissionAllowed(notificacio.getOrganGestor().getId(), es.caib.notib.logic.intf.acl.ExtendedPermission.PROCESSAR);
-	}
-
-	private NotificacioErrorTipusEnumDto getErrorTipus(EventResourceEntity lastErrorEvent) {
-
-		if (lastErrorEvent == null || !NotificacioEstatEnumDto.ENVIADA.equals(lastErrorEvent.getNotificacio().getEstat())) {
-			return null;
-		}
-		if (NotificacioEventTipusEnumDto.SIR_CONSULTA.equals(lastErrorEvent.getTipus()) && Boolean.TRUE.equals(lastErrorEvent.getFiReintents())) {
-			return NotificacioErrorTipusEnumDto.ERROR_REINTENTS_SIR;
-		}
-		if (NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA.equals(lastErrorEvent.getTipus()) && Boolean.TRUE.equals(lastErrorEvent.getFiReintents())) {
-			return NotificacioErrorTipusEnumDto.ERROR_REINTENTS_CONSULTA;
-		}
-		return null;
-	}
+//		var enviamentsPendentsNotifica = notificacioEnviamentResourceRepository.findEnviamentsPendentsNotificaByNotificacio(entity);
+// 		resource.setHasEnviamentsPendents(enviamentsPendentsNotifica != null && !enviamentsPendentsNotifica.isEmpty());
+//		var llindarDies = configHelper.getConfigAsInteger("es.caib.notib.llindar.dies.enviament.remeses");
+//		resource.setNotificacioAntiga(DatesUtils.isNowAfterDate(entity.getCreatedDate(), llindarDies));
+//		resource.setComunicacioSir(entity.isComunicacioSir());
+//		resource.setPermisProcessar(hasPermisProcessar(entity));
+////		legacyHelper.actualitzarColumnaEstat(entity);
+//		//CALLBACKS
+//		var pendents = callbackResourceRepository.findByNotificacioIdAndEstatOrderByDataDesc(entity.getId(), CallbackEstatEnumDto.PENDENT);
+//		resource.setEventsCallbackPendent(entity.isTipusUsuariAplicacio() && pendents != null && !pendents.isEmpty());
+//		var data = pendents != null && !pendents.isEmpty() && pendents.get(0).getData() != null ? pendents.get(0).getData() : null;
+//		resource.setDataCallbackPendent(data);
+//		int callbackFiReintents = 0;
+//		NotificacioEnviamentResourceEntity enviament;
+//		var motiuAnulacio = "";
+//		var entregaPostal = false;
+//		EventResourceEntity eventError;
+//		CallbackResourceEntity callback;
+//		List<EventResourceEntity> eventNotMovil;
+//		List<EventResourceEntity> lastErrorEvent = new ArrayList<>();
+//		for (var enviamentResource : entity.getEnviaments()) {
+//			enviament = notificacioEnviamentResourceRepository.findById(enviamentResource.getId()).get();
+//			;
+//			if (entity.isComunicacioSir()) {
+//				resource.setRegistreEstat(enviament.getRegistreEstat());
+//			}
+//			if (!entregaPostal && enviament.getEntregaPostal() != null) {
+//				entregaPostal = true;
+//			}
+//			boolean plazoAmpliado = resource.isPlazoAmpliado();
+//			resource.setPlazoAmpliado(plazoAmpliado || enviament.isPlazoAmpliado());
+//			boolean anulat = resource.isAnulat();
+//			resource.setAnulat(anulat || enviament.isAnulat());
+//			motiuAnulacio = enviament.getMotiuAnulacio();
+//			eventError = enviament.getUltimEvent();
+//			if (eventError != null && eventError.isError()) {
+//				lastErrorEvent.add(eventError);
+//			}
+//			eventNotMovil = eventResourceRepository.findLastApiCarpetaByEnviamentId(enviament.getId());
+//			if (eventNotMovil != null && !eventNotMovil.isEmpty() && eventNotMovil.get(0).isError()) {
+//				resource.getNotificacionsMovilErrorDesc().add(eventNotMovil.get(0).getErrorDescripcio());
+//			}
+//			if (enviament
+//				.isSirFiPooling()) {
+//				resource.setFiReintents(true);
+//				resource.setFiReintentsDesc(messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + NotificacioEventTipusEnumDto.SIR_FI_POOLING));
+//			}
+//			callback = callbackResourceRepository.findByEnviamentIdAndEstat(enviament.getId(), CallbackEstatEnumDto.ERROR);
+//			if (callback == null) {
+//				continue;
+//			}
+//			resource.setErrorLastCallback(callback.isError());
+//			resource.setCallbackFiReintents(true);
+//			resource.setCallbackFiReintentsDesc(messageHelper.getMessage("callback.fi.reintents"));
+//			callbackFiReintents++;
+//		}
+//		resource.setMotiuAnulacio(motiuAnulacio);
+//		if (resource.getNotificacionsMovilErrorDesc().size() > 1) {
+//			List<String> desc = new ArrayList<>();
+//			desc.add(messageHelper.getMessage("api.carpeta.send.notificacio.movil.error"));
+//			resource.setNotificacionsMovilErrorDesc(desc);
+//		}
+//		if (callbackFiReintents > 0) {
+//			resource.setCallbackFiReintents(true);
+//			resource.setCallbackFiReintentsDesc(messageHelper.getMessage("callback.fi.reintents"));
+//		}
+//		if (!lastErrorEvent.isEmpty()) {
+//			String msg = "";
+//			String tipus = "";
+//			StringBuilder m = new StringBuilder();
+//			int env = 1;
+//			var fiReintents = false;
+//			for (var event : lastErrorEvent) {
+//
+//				msg = messageHelper.getMessage("notificacio.event.fi.reintents");
+//				var et = NotificacioEventTipusEnumDto.SIR_CONSULTA.equals(event.getTipus()) && event.getEnviament().isSirFiPooling() ? NotificacioEventTipusEnumDto.SIR_FI_POOLING : event.getTipus();
+//				tipus = messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto." + et);
+//				m.append("Env ").append(env).append(": ").append(msg).append(" -> ").append(tipus).append("\n");
+//				env++;
+//				fiReintents = fiReintents || event.getFiReintents();
+//				if (entregaPostal && NotificacioEventTipusEnumDto.CIE_ENVIAMENT.equals(event.getTipus())) {
+//					resource.setErrorEntregaPostal(true);
+//				}
+//			}
+//			resource.setFiReintentsDesc(m.toString());
+//			resource.setFiReintents(fiReintents);
+//			resource.setNotificaErrorDescripcio(lastErrorEvent.size() > 1 ? messageHelper.getMessage("error.notificacio.enviaments") : lastErrorEvent.get(0).getErrorDescripcio());
+//			// TODO S'HA DE POSAR PER TOTS ELS EVENTS
+//			resource.setNotificaErrorData(lastErrorEvent.get(0).getData());
+//			resource.setNoticaErrorEventTipus(lastErrorEvent.get(0).getTipus());
+//			// Obtenir error dels events
+//			resource.setNotificaErrorTipus(getErrorTipus(lastErrorEvent.get(0)));
+//		}
+//	}
+//
+//	private boolean hasPermisProcessar(NotificacioResourceEntity notificacio) {
+//		return notibPermissionHelper.organGestorPermissionAllowed(notificacio.getOrganGestor().getId(), es.caib.notib.logic.intf.acl.ExtendedPermission.PROCESSAR);
+//	}
+//
+//	private NotificacioErrorTipusEnumDto getErrorTipus(EventResourceEntity lastErrorEvent) {
+//
+//		if (lastErrorEvent == null || !NotificacioEstatEnumDto.ENVIADA.equals(lastErrorEvent.getNotificacio().getEstat())) {
+//			return null;
+//		}
+//		if (NotificacioEventTipusEnumDto.SIR_CONSULTA.equals(lastErrorEvent.getTipus()) && Boolean.TRUE.equals(lastErrorEvent.getFiReintents())) {
+//			return NotificacioErrorTipusEnumDto.ERROR_REINTENTS_SIR;
+//		}
+//		if (NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA.equals(lastErrorEvent.getTipus()) && Boolean.TRUE.equals(lastErrorEvent.getFiReintents())) {
+//			return NotificacioErrorTipusEnumDto.ERROR_REINTENTS_CONSULTA;
+//		}
+//		return null;
+//	}
 
 	@Override
 	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {

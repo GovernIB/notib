@@ -34,6 +34,7 @@ const NotificacioDetailDialogContent: React.FC<{ id: any }> = (props) => {
                     'DOCUMENTS_NOTIFICACIO',
                     'OPERADORS_CIE_POSTAL',
                     'OPERADORS_GRUP',
+                    'NOTIFICACIO_DETALL'
                 ],
             }).then(setNotificacio);
         }

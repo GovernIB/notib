@@ -88,4 +88,7 @@ public class AccioMassivaEntity  extends NotibAuditable<Long> {
     public AccioMassivaElementEntity getElement(Long elementId) {
         return elements.stream().filter(x -> x.getElementId().equals(elementId)).findFirst().orElse(null);
     }
+    public AccioMassivaElementEntity getElementAt(int posicio) {
+        return elements.get(posicio);
+    }
 }

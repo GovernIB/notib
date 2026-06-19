@@ -1,13 +1,14 @@
-package es.caib.notib.logic.notificacions;
+package es.caib.notib.logic.accionsMassives;
 
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.ActionExecutionException;
-import es.caib.notib.logic.intf.dto.RespostaActionExecutor;
+import es.caib.notib.logic.intf.dto.RespostaAccio;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaTipus;
+import es.caib.notib.logic.intf.dto.accioMassiva.SeleccioTipus;
 import es.caib.notib.logic.intf.model.NotificacioResource;
 import es.caib.notib.logic.intf.service.AccioMassivaService;
 import es.caib.notib.logic.intf.service.EnviamentService;
@@ -16,39 +17,45 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 @AllArgsConstructor
-public class MarcarProcessatMassiuActionExecutor implements BaseMutableResourceService.ActionExecutor<NotificacioResourceEntity, NotificacioResource.AccioMassivaParams, RespostaActionExecutor> {
+public class ReenviarAmbErrorMassiuActionExecutor implements BaseMutableResourceService.ActionExecutor<NotificacioResourceEntity, NotificacioResource.AccioMassivaParams, RespostaAccio> {
 
 	private final AccioMassivaService accioMassivaService;
 	private final UserSessionHelper userSessionHelper;
 	private final AuthenticationHelper authenticationHelper;
+	private final EnviamentService enviamentService;
 
 	@Override
-	public RespostaActionExecutor exec(String code, NotificacioResourceEntity entity, NotificacioResource.AccioMassivaParams params) throws ActionExecutionException {
+	public RespostaAccio exec(String code, NotificacioResourceEntity entity, NotificacioResource.AccioMassivaParams params) throws ActionExecutionException {
 
 		if (params == null || params.idsEmpty()) {
 			throw new ActionExecutionException(NotificacioResource.class, null, "-1", "La selecció no pot ser buida");
+		}
+		if (SeleccioTipus.NOTIFICACIO.equals(params.getSeleccioTipus())) {
+			Set<Long> ids = enviamentService.findIdsByNotificacioIds(params.getIds());
+			params.setIds(new ArrayList<>(ids));
 		}
 		try {
 			var entitatActual = userSessionHelper.getCurrentEntitatId();
 			boolean isAdminEntitat = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
 			var accio = AccioMassivaExecucio.builder()
 							.isAdminEntitat(isAdminEntitat)
-							.tipus(AccioMassivaTipus.MARCAR_PROCESSADES)
-							.tipusElementSeleccionat(params.getSeleccioTipus())
+							.tipus(AccioMassivaTipus.TORNA_ENVIAR_AMB_ERROR)
+							.tipusElementSeleccionat(SeleccioTipus.ENVIAMENT)
 							.entitatId(entitatActual)
 							.seleccio(params.getIds())
 							.build();
 			var accioId = accioMassivaService.altaAccioMassiva(accio);
 			accio.setAccioId(accioId);
-			accioMassivaService.executarAccio(accio);
-			return RespostaActionExecutor.builder().ok(true).build();
+			return accioMassivaService.reactivarErrors(accio);
 		} catch (Exception ex) {
-			var msg = "Error inesperat al marcar coma a processat";
-			log.error("[ProcessarMassiuActionExecutor] " + msg);
+			var msg = "Error inesperat al reenviar les remeses amb error";
+			log.error("[ReenviarAmbErrorMassiuActionExecutor] " + msg);
 			throw new ActionExecutionException(NotificacioResource.class, null, "-1", msg + ": " + ex.getMessage());
 		}
 	}

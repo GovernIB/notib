@@ -129,8 +129,8 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 
 	@Override
 	@RolesAllowed("**")
-	public void activarCallback(Long enviamentId) {
-		getDelegateService().activarCallback(enviamentId);
+	public void activarCallback(Long enviamentId, Long accioMassivaId) {
+		getDelegateService().activarCallback(enviamentId, accioMassivaId);
 	}
 
 	@Override

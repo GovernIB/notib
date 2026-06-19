@@ -148,7 +148,7 @@ const componentsCa = {
                 message: "Estau segur que voleu executar l'acció {{action}}?",
             },
             success: 'Acció executada correctament',
-            error: "Error executant l'acció",
+            error: "Error executant la acció",
         },
         report: {
             success: 'Informe generat correctament',

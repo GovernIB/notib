@@ -1,11 +1,11 @@
-package es.caib.notib.logic.notificacions;
+package es.caib.notib.logic.accionsMassives;
 
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.ActionExecutionException;
-import es.caib.notib.logic.intf.dto.RespostaAccio;
+import es.caib.notib.logic.intf.dto.RespostaActionExecutor;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaTipus;
 import es.caib.notib.logic.intf.dto.accioMassiva.SeleccioTipus;
@@ -23,7 +23,7 @@ import java.util.Set;
 
 @Slf4j
 @AllArgsConstructor
-public class EsborrarMassiuActionExecutor implements BaseMutableResourceService.ActionExecutor<NotificacioResourceEntity, NotificacioResource.AccioMassivaParams, RespostaAccio> {
+public class ReactivarConsultesCanviEstatMassiuActionExecutor implements BaseMutableResourceService.ActionExecutor<NotificacioResourceEntity, NotificacioResource.AccioMassivaParams, RespostaActionExecutor> {
 
 	private final AccioMassivaService accioMassivaService;
 	private final UserSessionHelper userSessionHelper;
@@ -31,28 +31,32 @@ public class EsborrarMassiuActionExecutor implements BaseMutableResourceService.
 	private final EnviamentService enviamentService;
 
 	@Override
-	public RespostaAccio exec(String code, NotificacioResourceEntity entity, NotificacioResource.AccioMassivaParams params) throws ActionExecutionException {
+	public RespostaActionExecutor exec(String code, NotificacioResourceEntity entity, NotificacioResource.AccioMassivaParams params) throws ActionExecutionException {
 
 		if (params == null || params.idsEmpty()) {
 			throw new ActionExecutionException(NotificacioResource.class, null, "-1", "La selecció no pot ser buida");
+		}
+		if (SeleccioTipus.NOTIFICACIO.equals(params.getSeleccioTipus())) {
+			Set<Long> ids = enviamentService.findIdsByNotificacioIds(params.getIds());
+			params.setIds(new ArrayList<>(ids));
 		}
 		try {
 			var entitatActual = userSessionHelper.getCurrentEntitatId();
 			boolean isAdminEntitat = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
 			var accio = AccioMassivaExecucio.builder()
 							.isAdminEntitat(isAdminEntitat)
-							.tipus(AccioMassivaTipus.ESBORRAR)
-							.tipusElementSeleccionat(SeleccioTipus.NOTIFICACIO)
+							.tipus(AccioMassivaTipus.TORNA_ACTIVAR_CONSULTES_CANVI_ESTAT)
+							.tipusElementSeleccionat(SeleccioTipus.ENVIAMENT)
 							.entitatId(entitatActual)
 							.seleccio(params.getIds())
 							.build();
 			var accioId = accioMassivaService.altaAccioMassiva(accio);
 			accio.setAccioId(accioId);
-			var noEsborrades = accioMassivaService.esborrarNotificacions(accio);
-			return RespostaAccio.builder().noExecutables(noEsborrades).build();
+			accioMassivaService.executarAccio(accio);
+			return RespostaActionExecutor.builder().ok(true).build();
 		} catch (Exception ex) {
-			var msg = "Error inesperat esborrant les remeses";
-			log.error("[EsborrarMassiuActionExecutor] " + msg);
+			var msg = "Error inesperat reactivar les consultes de canvi d'estat";
+			log.error("[ReactivarConsultesCanviEstatMassiuActionExecutor] " + msg);
 			throw new ActionExecutionException(NotificacioResource.class, null, "-1", msg + ": " + ex.getMessage());
 		}
 	}

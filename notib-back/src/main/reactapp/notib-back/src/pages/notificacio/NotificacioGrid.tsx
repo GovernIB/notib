@@ -8,7 +8,8 @@ import {
     MuiDataGridColDef,
     springFilterBuilder,
     springFilterBuilder as filterBuilder,
-    useFilterApiContext, useMuiDataGridApiRef,
+    useFilterApiContext,
+    useMuiDataGridApiRef,
     useMuiDataGridContext,
     useResourceApiService,
 } from 'reactlib';
@@ -206,6 +207,8 @@ const NotificacioAddButton: React.FC = () => {
 const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null> }> = ({apiRef}) => {
 
     const { selection } = useMuiDataGridContext();
+    const { currentRole} = useNotibContext();
+    let amagarEntrada = currentRole === 'tothom' || currentRole === 'NOT_ADMIN_LECTURA';
     const { t } = useTranslation();
     const { descarregarExcel,
         descarregarJustificants,
@@ -216,14 +219,16 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
         reactivarConsulesCanviEstatMassiu,
         reactivarCallbacksMassiu,
         enviarNotificacionsMovilMassiu,
-        marcarProcessatMassiu,
+        marcarProcessatMassiu, marcarProcessatMassiuDialog,
+        anularRemesaMassiu, anularRemesaMassiuDialog,
+        ampliarTerminiMassiu, ampliarTerminiMassiuDialog
     } = useAccionsMassives();
 
     const opcionsMenu: MenuOption[] = [
         {
             label: t('page.accioMassiva.accions.marcarProcessades.label'),
             tooltip: t('page.accioMassiva.accions.marcarProcessades.tooltip'),
-            onClick: () => marcarProcessatMassiu(selection?.ids, "NOTIFICACIO"),
+            onClick: () => marcarProcessatMassiu(null, t('page.accioMassiva.accions.marcarProcessades.label'), {ids: [...selection?.ids], seleccioTipus: "NOTIFICACIO"})
         },
         {
             label: t('page.accioMassiva.accions.actualitzarEstat.label'),
@@ -258,32 +263,41 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
         },
         {
             label: t('page.accioMassiva.accions.anular.label'),
-            tooltip: t('page.accioMassiva.accions.anular.labtooltipel'),
-            onClick: () => console.log('Anul·lar'),
+            tooltip: t('page.accioMassiva.accions.anular.label.tooltip'),
+            onClick: () => anularRemesaMassiu(null, t('page.accioMassiva.accions.anular.label'), {ids: [...selection?.ids], seleccioTipus: "NOTIFICACIO"})
         },
         {
             label: t('page.accioMassiva.accions.ampliarTermini.label'),
             tooltip: t('page.accioMassiva.accions.ampliarTermini.tooltip'),
-            onClick: () => console.log('Ampliar termini'),
+            onClick: () => ampliarTerminiMassiu(null, t('page.accioMassiva.accions.ampliarTermini.label'), {ids: [...selection?.ids], seleccioTipus: "NOTIFICACIO"})
         },
-        {
-            label: t('page.accioMassiva.accions.reactivarCanviEstat.label'),
-            tooltip: t('page.accioMassiva.accions.reactivarCanviEstat.tooltip'),
-            onClick: () => reactivarConsulesCanviEstatMassiu(selection?.ids, "NOTIFICACIO"),
-        },
-        {
-            label: t('page.accioMassiva.accions.reactivarCallbacks.label'),
-            tooltip: t('page.accioMassiva.accions.reactivarCallbacks.tooltip'),
-            onClick: () => reactivarCallbacksMassiu(selection?.ids, "NOTIFICACIO"),
-        },
-        {
-            label: t('page.accioMassiva.accions.notificacionsMovil.label'),
-            tooltip: t('page.accioMassiva.accions.notificacionsMovil.tooltip'),
-            onClick: () => enviarNotificacionsMovilMassiu(selection?.ids, "NOTIFICACIO"),
-        },
+        ...(amagarEntrada ? [] : [
+            { type: 'divider' },
+            {
+                label: t('page.accioMassiva.accions.reactivarCanviEstat.label'),
+                tooltip: t('page.accioMassiva.accions.reactivarCanviEstat.tooltip'),
+                onClick: () => reactivarConsulesCanviEstatMassiu(selection?.ids, "NOTIFICACIO"),
+            },
+            {
+                label: t('page.accioMassiva.accions.reactivarCallbacks.label'),
+                tooltip: t('page.accioMassiva.accions.reactivarCallbacks.tooltip'),
+                onClick: () => reactivarCallbacksMassiu(selection?.ids, "NOTIFICACIO"),
+            },
+            {
+                label: t('page.accioMassiva.accions.notificacionsMovil.label'),
+                tooltip: t('page.accioMassiva.accions.notificacionsMovil.tooltip'),
+                onClick: () => enviarNotificacionsMovilMassiu(selection?.ids, "NOTIFICACIO"),
+            }]
+        )
     ];
 
-    return (<AccionsMassives options={opcionsMenu} sizeSelection={selection?.ids?.size}/>);
+    return (<>
+            <AccionsMassives options={opcionsMenu} apiRef= {apiRef} resource={"notificacioResource"} sizeSelection={selection?.ids?.size}/>
+            {marcarProcessatMassiuDialog}
+            {anularRemesaMassiuDialog}
+            {ampliarTerminiMassiuDialog}
+        </>
+    )
 };
 
 const ContentFilter: React.FC<{openByDefault?: boolean}> = ({openByDefault}) => {
@@ -468,7 +482,6 @@ const NotificacioGrid = () => {
         return listActions;
     };
     const navigate = useNavigate();
-
     return (
         <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
             <MuiDataGrid
@@ -505,7 +518,7 @@ const NotificacioGrid = () => {
                         : []),
                     {
                         position: 2,
-                        element: <MassiveActionsButton apiRef={apiRef} />,
+                        element: <MassiveActionsButton apiRef={datagridApiRef}/>,
                     },
                     ...(notificacioMassiva
                         ? [

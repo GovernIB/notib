@@ -1,4 +1,4 @@
-package es.caib.notib.logic.notificacions;
+package es.caib.notib.logic.accionsMassives;
 
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;

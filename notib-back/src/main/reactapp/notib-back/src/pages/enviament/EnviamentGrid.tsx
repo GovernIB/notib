@@ -24,6 +24,7 @@ import {
 import {useSearchParams} from "react-router-dom";
 import useAccionsNotificacio from "../accions/AccionsNotificacio.tsx";
 import {useNotibContext} from "../../components/NotibContext.ts";
+import {GridApiPro, useGridApiRef} from "@mui/x-data-grid-pro";
 
 const columns = [
     {
@@ -116,11 +117,21 @@ const springFilterBuilder = (data: any) => {
     );
 };
 
-const MassiveActionsButton: React.FC = () => {
+const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null> }> = ({apiRef}) => {
 
     const { selection } = useMuiDataGridContext();
     const { t } = useTranslation();
-    const { descarregarExcel } = useAccionsMassives();
+    const { currentRole} = useNotibContext();
+    let amagarEntrada = currentRole === 'tothom' || currentRole === 'NOT_ADMIN_LECTURA';
+    const { descarregarExcel,
+        actualitzarEstat,
+        reenviarAmbError,
+        reactivarConsulesCanviEstatMassiu,
+        reactivarCallbacksMassiu,
+        enviarNotificacionsMovilMassiu,
+        anularRemesaMassiu, anularRemesaMassiuDialog,
+        ampliarTerminiMassiu, ampliarTerminiMassiuDialog
+    } = useAccionsMassives();
 
     const opcionsMenu: MenuOption[] = [
         {
@@ -131,41 +142,49 @@ const MassiveActionsButton: React.FC = () => {
         {
             label: t('page.accioMassiva.accions.reenviarAmbError.label'),
             tooltip: t('page.accioMassiva.accions.reenviarAmbError.tooltip'),
-            onClick: () => console.log('Tornar a enviar les que han donat error'),
+            onClick: () => reenviarAmbError(selection?.ids, "ENVIAMENT"),
         },
         {
             label: t('page.accioMassiva.accions.actualitzarEstat.label'),
             tooltip: t('page.accioMassiva.accions.actualitzarEstat.tooltip'),
-            onClick: () => console.log("Actualitzar l'estat"),
+            onClick: () => actualitzarEstat(selection?.ids, "ENVIAMENT"),
         },
         {
             label: t('page.accioMassiva.accions.anular.label'),
             tooltip: t('page.accioMassiva.accions.anular.labtooltipel'),
-            onClick: () => console.log('Anul·lar'),
+            onClick: () => anularRemesaMassiu(null, t('page.accioMassiva.accions.anular.label'), {ids: [...selection?.ids], seleccioTipus: "ENVIAMENT"})
         },
         {
             label: t('page.accioMassiva.accions.ampliarTermini.label'),
             tooltip: t('page.accioMassiva.accions.ampliarTermini.tooltip'),
-            onClick: () => console.log('Ampliar termini'),
+            onClick: () => ampliarTerminiMassiu(null, t('page.accioMassiva.accions.ampliarTermini.label'), {ids: [...selection?.ids], seleccioTipus: "ENVIAMENT"})
         },
-        {
-            label: t('page.accioMassiva.accions.reactivarCanviEstat.label'),
-            tooltip: t('page.accioMassiva.accions.reactivarCanviEstat.tooltip'),
-            onClick: () => console.log("Torna a activar les consultes de canvi d'estat"),
-        },
-        {
-            label: t('page.accioMassiva.accions.reactivarCallbacks.label'),
-            tooltip: t('page.accioMassiva.accions.reactivarCallbacks.tooltip'),
-            onClick: () => console.log("Torna a activar l'enviament de callbacks"),
-        },
-        {
-            label: t('page.accioMassiva.accions.notificacionsMovil.label'),
-            tooltip: t('page.accioMassiva.accions.notificacionsMovil.tooltip'),
-            onClick: () => console.log("Envia notificacions mòvil"),
-        },
+        ...(amagarEntrada ? [] : [
+            { type: 'divider' },
+            {
+                label: t('page.accioMassiva.accions.reactivarCanviEstat.label'),
+                tooltip: t('page.accioMassiva.accions.reactivarCanviEstat.tooltip'),
+                onClick: () => reactivarConsulesCanviEstatMassiu(selection?.ids, "ENVIAMENT"),
+            },
+            {
+                label: t('page.accioMassiva.accions.reactivarCallbacks.label'),
+                tooltip: t('page.accioMassiva.accions.reactivarCallbacks.tooltip'),
+                onClick: () => reactivarCallbacksMassiu(selection?.ids, "ENVIAMENT"),
+            },
+            {
+                label: t('page.accioMassiva.accions.notificacionsMovil.label'),
+                tooltip: t('page.accioMassiva.accions.notificacionsMovil.tooltip'),
+                onClick: () => enviarNotificacionsMovilMassiu(selection?.ids, "ENVIAMENT"),
+            }]
+        )
     ];
 
-    return <AccionsMassives options={opcionsMenu} sizeSelection={selection?.ids?.size} />;
+    return (<>
+            <AccionsMassives options={opcionsMenu} apiRef= {apiRef} resource={"notificacioEnviamentResource"} sizeSelection={selection?.ids?.size}/>
+            {anularRemesaMassiuDialog}
+            {ampliarTerminiMassiuDialog}
+        </>
+    )
 };
 
 const ContentFilter: React.FC<{openByDefault?: boolean}> = ({openByDefault}) => {
@@ -232,6 +251,7 @@ const EnviamentGrid = () => {
     const { dialogComponent: enviamentDialogComponent, onDetailClick } = useEnviamentDetailDialog();
     const { dialogComponent: notificacioDialogComponent, onDetailClick: onNotificacioDetailClick } = useNotificacioDetailDialog();
     const [searchParams] = useSearchParams();
+    const datagridApiRef = useGridApiRef();
     const referencia = searchParams.get('referencia');
     const filterDataGridProps = useDatagridFilterProps(
         'notificacioEnviamentResource',
@@ -246,6 +266,7 @@ const EnviamentGrid = () => {
     return (
         <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
             <MuiDataGrid
+                datagridApiRef={datagridApiRef}
                 apiRef={gridApiRef}
                 title={t('page.enviament.grid.title')}
                 resourceName="notificacioEnviamentResource"
@@ -261,7 +282,7 @@ const EnviamentGrid = () => {
                 toolbarElementsWithPositions={[
                     {
                         position: 2,
-                        element: <MassiveActionsButton />,
+                        element: <MassiveActionsButton apiRef={datagridApiRef} />,
                     },
                 ]}
                 onRowClick={(params) => onDetailClick(params.id)}

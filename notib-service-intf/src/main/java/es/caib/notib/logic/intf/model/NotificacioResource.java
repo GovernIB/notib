@@ -94,6 +94,10 @@ import java.util.List;
 			code = NotificacioResource.PERSPECTIVE_GRUP
 		),
 		@ResourceArtifact(
+			type = ResourceArtifactType.PERSPECTIVE,
+			code = NotificacioResource.PERSPECTIVE_NOTIFICACIO_DETALL
+		),
+		@ResourceArtifact(
 			type = ResourceArtifactType.REPORT,
 			code = NotificacioResource.REPORT_DESCARREGAR_JUSTIFICANT_NOTIFICACIO,
 			requiresId = true
@@ -342,6 +346,28 @@ import java.util.List;
 					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN }
 				)
 			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.ACTION_ANULAR_MASSIU,
+			formClass = AnularDto.class,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN }
+				)
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.ACTION_AMPLIAR_TERMINI_MASSIU,
+			formClass = AmpliacionPlazoDto.class,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN }
+				)
+			}
 		)
 	}
 )
@@ -360,6 +386,7 @@ public class NotificacioResource extends BaseResource<Long> {
 	public static final String PERSPECTIVE_DOCUMENTS_NOTIFICACIO = "DOCUMENTS_NOTIFICACIO";
 	public static final String PERSPECTIVE_OPERADORS_CIE_POSTAL = "OPERADORS_CIE_POSTAL";
 	public static final String PERSPECTIVE_GRUP = "OPERADORS_GRUP";
+	public static final String PERSPECTIVE_NOTIFICACIO_DETALL = "NOTIFICACIO_DETALL";
 	public static final String REPORT_DESCARREGAR_JUSTIFICANT_NOTIFICACIO = "DESCARREGAR_JUSTIFICANT_ENVIAMENT_NOTIFICACIO";
 	public static final String REPORT_DESCARREGAR_JUSTIFICANT_MASSIU = "DESCARREGAR_JUSTIFICANT_MASSIU";
 	public static final String REPORT_DESCARREGAR_DOCUMENT_ENVIAT = "DESCARREGAR_DOCUMENT_ENVIAT";

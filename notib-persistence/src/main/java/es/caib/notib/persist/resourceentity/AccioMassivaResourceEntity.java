@@ -52,10 +52,10 @@ public class AccioMassivaResourceEntity extends BaseAuditableResourceEntity<Acci
 	@Enumerated(EnumType.STRING)
 	private AccioMassivaTipus tipus;
 	@Column(name = "data_inici")
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date dataInici;
 	@Column(name = "data_fi")
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date dataFi;
 	@Column(name = "error")
 	private Boolean error;

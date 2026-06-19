@@ -681,7 +681,8 @@ const translationCa = {
                 respostesError: "Identificadors amb error: ",
                 marcarProcessades: {
                     label: "Marcar com a processades",
-                    tooltip: "Marca les remeses que es troben en un estat final com a processades"
+                    tooltip: "Marca les remeses que es troben en un estat final com a processades",
+                    ok: "La acció marcar com a processat s'ha enviat a executar correctament"
                 },
                 actualitzarEstat: {
                     label: "Actualitzar l'estat",
@@ -714,11 +715,13 @@ const translationCa = {
                 },
                 anular: {
                     label: "Anul·lar",
-                    tooltip: "Anul·la les remeses enviades a Notific@ que no hagin estat notificades"
+                    tooltip: "Anul·la les remeses enviades a Notific@ que no hagin estat notificades",
+                    ok: "La acció anul·lar s'ha enviat a executar correctament"
                 },
                 ampliarTermini: {
                     label: "Ampliar termini",
-                    tooltip: "Amplia el termini de caducitat de les remeses seleccionades"
+                    tooltip: "Amplia el termini de caducitat de les remeses seleccionades",
+                    ok: "La acció ampliar termini s'ha enviat a executar correctament"
                 },
                 reactivarCanviEstat: {
                     label: "Torna a activar les consultes de canvi d'estat",

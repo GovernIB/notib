@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.logic.intf.service;
 
@@ -31,7 +31,7 @@ import java.util.Set;
 /**
  * Declaració dels mètodes per a la consulta de notificacions i dels
  * destinataris i events associats.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface EnviamentService {
@@ -39,7 +39,7 @@ public interface EnviamentService {
 
 	/**
 	 * Consulta la llista d'ids dels enviaments segons el filtre.
-	 * 
+	 *
 	 * @param entitatId Atribut id de l'entitat.
 	 * @param filtre Filtre per a la consulta.
 	 * @return La llista amb els ids dels expedients.
@@ -50,20 +50,20 @@ public interface EnviamentService {
 
 	/**
 	 * Consulta dels enviaments d'una entitat realitzats d'una notificació.
-	 * 
+	 *
 	 * @param entitatId Identificador de l'entitat de la que es vol consultar els enviaments
 	 * @param filtre Filtre per a la consulta
 	 * @param paginacio
 	 * @return Pàgina d'enviaments
-	 * 
+	 *
 	 * @throws ParseException
 	 */
 	@PreAuthorize("isAuthenticated()")
 	PaginaDto<NotEnviamentTableItemDto> enviamentFindByEntityAndFiltre(Long entitatId, RolEnumDto rol, String organGestorCodi, String usuariCodi, NotificacioEnviamentFiltreDto filtre, PaginacioParamsDto paginacio) throws ParseException;
-	
+
 	/**
 	 * Consulta dels enviaments d'una notificació.
-	 * 
+	 *
 	 * @param notificacioId Atribut id de la notificació.
 	 * @return els destinataris trobats.
 	 */
@@ -81,7 +81,7 @@ public interface EnviamentService {
 
 	/**
 	 * Consulta d'un enviament donat el seu id.
-	 * 
+	 *
 	 * @param enviamentId Atribut id de l'enviament.
 	 * @return el destinatari trobat.
 	 */
@@ -90,7 +90,7 @@ public interface EnviamentService {
 
 	/**
 	 * Consulta dels events d'una notificació.
-	 * 
+	 *
 	 * @param notificacioId Atribut id de la notificació.
 	 * @return els events trobats.
 	 */
@@ -100,7 +100,7 @@ public interface EnviamentService {
 
 	/**
 	 * Genera un fitxer d'exportació amb la informació dels expedients.
-	 * 
+	 *
 	 * @param entitatId Atribut id de l'entitat.
 	 * @param format Format pel fitxer d'exportació ("ODS" o "CSV").
 	 * @return El fitxer resultant de l'exportació.
@@ -116,7 +116,7 @@ public interface EnviamentService {
 
 	/**
 	 * Obté les el justificant del registre.
-	 * 
+	 *
 	 * @param enviamentId id de l'enviament registrat.
 	 * @return document justificant descarregat.
 	 */
@@ -125,18 +125,18 @@ public interface EnviamentService {
 
 	/**
 	 * Reactiva les consultes d'estat a Notific@
-	 * 
+	 *
 	 * @param enviaments Llistat de atributs id dels enviaments
 	 */
 	@PreAuthorize("isAuthenticated()")
 	void reactivaConsultes(Set<Long> enviaments);
-	
+
 	/**
 	 * Reactiva les consultes d'estat a SIR
 	 */
 	@PreAuthorize("isAuthenticated()")
 	void reactivaSir(AccioMassivaExecucio accio);
-	
+
 	@PreAuthorize("hasRole('NOT_CARPETA') or hasRole('NOT_SUPER')")
 	Resposta findEnviaments(ApiConsulta consulta);
 
@@ -156,7 +156,7 @@ public interface EnviamentService {
 	 * @param enviamentId id de l'enviament.
 	 */
 	@PreAuthorize("isAuthenticated()")
-	void activarCallback(Long enviamentId);
+	void activarCallback(Long enviamentId, Long accioMassivaId);
 
 	/**
 	 * Envia un event de callback de als enviament indicat

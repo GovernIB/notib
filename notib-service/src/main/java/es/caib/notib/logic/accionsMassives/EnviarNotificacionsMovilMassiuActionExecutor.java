@@ -1,4 +1,4 @@
-package es.caib.notib.logic.notificacions;
+package es.caib.notib.logic.accionsMassives;
 
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
@@ -36,10 +36,10 @@ public class EnviarNotificacionsMovilMassiuActionExecutor implements BaseMutable
 		if (params == null || params.idsEmpty()) {
 			throw new ActionExecutionException(NotificacioResource.class, null, "-1", "La selecció no pot ser buida");
 		}
-		if (!SeleccioTipus.NOTIFICACIO.equals(params.getSeleccioTipus())) {
-			Set<Long> ids = enviamentService.findIdsByNotificacioIds(params.getIds());
-			params.setIds(new ArrayList<>(ids));
-		}
+//		if (!SeleccioTipus.NOTIFICACIO.equals(params.getSeleccioTipus())) {
+//			Set<Long> ids = enviamentService.findIdsByNotificacioIds(params.getIds());
+//			params.setIds(new ArrayList<>(ids));
+//		}
 		try {
 			var entitatActual = userSessionHelper.getCurrentEntitatId();
 			boolean isAdminEntitat = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
