@@ -160,6 +160,10 @@ export const useAccionsNotificacio = () => {
         'notificacioResource',
         'ESBORRAR_REMESA',
     );
+    const { exec: recuperarRemesa } = useMuiActionReportLogic(
+        'notificacioResource',
+        'RECUPERAR_REMESA',
+    );
 
     return { descarregarJustificantEnviament,
              descarregarDocumentEnviat,
@@ -167,7 +171,9 @@ export const useAccionsNotificacio = () => {
              anularRemesa, anularRemesaDialog,
              ampliarTermini, ampliarTerminiDialog,
              marcarProcessat, marcarProcessatDialog,
-             esborrarRemesa };
+             esborrarRemesa,
+             recuperarRemesa
+    };
 };
 
 export default useAccionsNotificacio;

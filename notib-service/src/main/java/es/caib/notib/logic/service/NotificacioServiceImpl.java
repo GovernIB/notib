@@ -420,15 +420,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (notificacioEntity == null || notificacioTableEntity == null) {
 				throw new NotFoundException(notificacioId, NotificacioEntity.class, "No s'ha trobat cap notificació amb l'id especificat");
 			}
-
-
 			notificacioEntity.setDeleted(false);
 			notificacioTableEntity.setDeleted(false);
 			notificacioRepository.saveAndFlush(notificacioEntity);
 			notificacioTableViewRepository.saveAndFlush(notificacioTableEntity);
-
 			restuararEnviamentsStateMachine(notificacioEntity.getEnviaments());
-
 			NotibLogger.getInstance().info("La notificació s'ha recuperat correctament (notificacioId=" + notificacioId + ")", log, LoggingTipus.TAULA_REMESES);
 		} finally {
 			metricsHelper.fiMetrica(timer);

@@ -15,7 +15,7 @@ import java.util.Map;
 
 @Slf4j
 @AllArgsConstructor
-public class EsborrarRemesaActionExecutor implements BaseMutableResourceService.ActionExecutor<NotificacioResourceEntity, Serializable, RespostaActionExecutor> {
+public class RecuperarRemesaActionExecutor implements BaseMutableResourceService.ActionExecutor<NotificacioResourceEntity, Serializable, RespostaActionExecutor> {
 
 	private NotificacioService notificacioService;
 	private MessageHelper messageHelper;
@@ -24,13 +24,14 @@ public class EsborrarRemesaActionExecutor implements BaseMutableResourceService.
 	public RespostaActionExecutor exec(String code, NotificacioResourceEntity entity, Serializable params) throws ActionExecutionException {
 
 		try {
-			notificacioService.delete(entity.getEntitat().getId(), entity.getId());
+			notificacioService.restore(entity.getEntitat().getId(), entity.getId());
 			return RespostaActionExecutor.builder().ok(true).build();
 		} catch (Exception ex) {
-			log.error("[EsborrarRemesaActionExecutor] Hi ha hagut un error esborrant la remesa", ex);
+			log.error("[RecuperarRemesaActionExecutor] Hi ha hagut un error recuperant la remesa", ex);
 			return RespostaActionExecutor.builder().ok(false).build();
 		}
 	}
+
 
 	@Override
 	public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, Serializable target) {

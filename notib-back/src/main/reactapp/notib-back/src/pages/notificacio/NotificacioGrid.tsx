@@ -96,12 +96,7 @@ const useDataGridColumns = (datagridApiRef: any) => {
                 width: 200,
                 renderCell: (params: any) => {
                     const estatJson = params?.formattedValue;
-                    return (
-                        <NotificacioEstatGrid
-                            estatJson={estatJson}
-                            estatEnum={params?.row?.estat}
-                        />
-                    );
+                    return (<NotificacioEstatGrid estatJson={estatJson} estatEnum={params?.row?.estat}/>);
                 },
             },
             {
@@ -122,17 +117,15 @@ const useDataGridColumns = (datagridApiRef: any) => {
     return columns;
 };
 
-const useSpringFilterBuilder = () => {
+const useSpringFilterBuilder = (notificacionsEsborrades: any) => {
     const { currentUser } = useNotibContext();
     return (data: any) => {
         return filterBuilder.and(
             filterBuilder.eq('enviamentTipus', `'${data?.enviamentTipus}'`),
             filterBuilder.like('concepte', data.concepte),
             filterBuilder.eq('estat', `'${data?.estat}'`),
-            data?.dataIniciInici &&
-                filterBuilder.gte('createdDate', `'${formatStartOfDay(data?.dataIniciInici)}'`),
-            data?.dataIniciFi &&
-                filterBuilder.lte('createdDate', `'${formatEndOfDay(data?.dataIniciFi)}'`),
+            data?.dataIniciInici && filterBuilder.gte('createdDate', `'${formatStartOfDay(data?.dataIniciInici)}'`),
+            data?.dataIniciFi && filterBuilder.lte('createdDate', `'${formatEndOfDay(data?.dataIniciFi)}'`),
             filterBuilder.like('titular', data?.interessat),
             filterBuilder.like('numExpedient', data.numExpedient),
             filterBuilder.like('notificaIds', data.identificadorNotifica),
@@ -140,18 +133,15 @@ const useSpringFilterBuilder = () => {
             filterBuilder.eq('procediment.id', data?.procediment?.id),
             filterBuilder.eq('procediment.id', data?.servei?.id),
             filterBuilder.eq('tipusUsuari', `'${data?.tipusUsuari}'`),
-            filterBuilder.eq('deleted',  0),
+            filterBuilder.eq('deleted',  notificacionsEsborrades ? true : false),
             filterBuilder.eq('createdBy', `'${data?.createdBy}'`),
             filterBuilder.like('referencia', data?.referencia),
             filterBuilder.like('registreNums', data?.registreNumeroSortida),
-            data?.dataCaducitatInici &&
-                filterBuilder.gte('caducitat', `'${formatStartOfDay(data?.dataCaducitatInici)}'`),
-            data?.dataCaducitatFi &&
-                filterBuilder.lte('caducitat', `'${formatEndOfDay(data?.dataCaducitatFi)}'`),
+            data?.dataCaducitatInici && filterBuilder.gte('caducitat', `'${formatStartOfDay(data?.dataCaducitatInici)}'`),
+            data?.dataCaducitatFi && filterBuilder.lte('caducitat', `'${formatEndOfDay(data?.dataCaducitatFi)}'`),
             data?.nomesLesMeves && filterBuilder.eq('createdBy', `'${currentUser.codi}'`),
             data?.entregaPostal && filterBuilder.eq('entregaPostal', `'${data.entregaPostal}'`),
-            data?.errorLastCallback &&
-                filterBuilder.eq('errorLastCallback', `'${data.errorLastCallback}'`)
+            data?.errorLastCallback && filterBuilder.eq('errorLastCallback', `'${data.errorLastCallback}'`)
         );
     };
 };
@@ -369,14 +359,16 @@ const NotificacioGrid = () => {
     const { currentRole} = useNotibContext();
     const notificacioMassiva = params?.get('notificacioMassiva');
     const { state } = useLocation();
-    const titolMassiva = state?.titolMassiva;
+    let titolSecundari = state?.titolMassiva;
+    const notificacionsEsborrades = params?.get('esborrades');
+    titolSecundari = notificacionsEsborrades ? t('page.notificacio.grid.notificacionsEsborrades.title') : titolSecundari;
     const { dialogComponent, onDetailClick } = useNotificacioDetailDialog();
     const { currentActions: apiCurrentActions } = useResourceApiService('notificacioResource');
     const isCreateLinkPresent = apiCurrentActions?.['create'] != null;
     const datagridApiRef = useGridApiRef();
     const apiRef = useMuiDataGridApiRef();
     const columns = useDataGridColumns(datagridApiRef);
-    const springFilterBuilder = useSpringFilterBuilder();
+    const springFilterBuilder = useSpringFilterBuilder(notificacionsEsborrades);
     const [searchParams] = useSearchParams();
     const referencia = searchParams.get('referencia');
     const filterDataGridProps = useDatagridFilterProps(
@@ -395,10 +387,11 @@ const NotificacioGrid = () => {
             anularRemesa,  anularRemesaDialog,
             ampliarTermini, ampliarTerminiDialog,
             marcarProcessat, marcarProcessatDialog,
-            esborrarRemesa } = useAccionsNotificacio();
+            esborrarRemesa,
+            recuperarRemesa} = useAccionsNotificacio();
 
     const mostrarEditarBorrar = (estat : string, currentRole : string | undefined ) => {
-        return currentRole === 'NOT_ADMIN_LECTURA' || (estat !== 'PENDENT' && estat !== 'REGISTRADA');
+        return currentRole === 'NOT_ADMIN_LECTURA' || (estat !== 'PENDENT' && estat !== 'REGISTRADA') || notificacionsEsborrades;
     }
 
     const rowAdditionalActions = () => {
@@ -415,7 +408,8 @@ const NotificacioGrid = () => {
                 title: t('page.notificacio.grid.accions.documentEnviat'),
                 icon: 'download',
                 showInMenu: true,
-                onClick: (id) => descarregarDocumentEnviat(id)
+                onClick: (id) => descarregarDocumentEnviat(id),
+                hidden: notificacionsEsborrades
             },
             {
                 label: t('page.notificacio.grid.accions.anular.botoTitle'),
@@ -424,7 +418,7 @@ const NotificacioGrid = () => {
                 showInMenu: true,
                 action: 'ANULAR_REMESA',
                 onClick: id => anularRemesa(id, t('page.notificacio.grid.accions.anular.modalTitle')),
-                hidden: row => !row.anulable,
+                hidden: row => !row.anulable || notificacionsEsborrades,
             },
             {
                 label: t('page.notificacio.grid.accions.certificacio'),
@@ -432,7 +426,7 @@ const NotificacioGrid = () => {
                 icon: 'download',
                 showInMenu: true,
                 onClick: id => descarregarCertificacio(id),
-                hidden: row => !row.envCerData,
+                hidden: row => !row.envCerData || notificacionsEsborrades,
             },
             {
                 label: t('page.notificacio.grid.accions.processat'),
@@ -449,7 +443,7 @@ const NotificacioGrid = () => {
                 icon: 'download',
                 showInMenu: true,
                 onClick: (id) => descarregarJustificantEnviament(id),
-                hidden: (row) => !row?.justificantCreat,
+                hidden: (row) => !row?.justificantCreat || notificacionsEsborrades,
             },
             {
                 label: t('page.notificacio.grid.accions.ampliarTermini.botoTitle'),
@@ -458,7 +452,7 @@ const NotificacioGrid = () => {
                 showInMenu: true,
                 action: 'AMPLIAR_TERMINI',
                 onClick: (id, row) => ampliarTermini(id, t('page.notificacio.grid.accions.ampliarTermini.modalTitle'), {caducitat: row.caducitat}),
-                hidden: row => currentRole === 'NOT_ADMIN_LECTURA'  || row?.entregaPostal || row?.estat !== 'ENVIADA',
+                hidden: row => currentRole === 'NOT_ADMIN_LECTURA'  || row?.entregaPostal || row?.estat !== 'ENVIADA'|| notificacionsEsborrades,
             },
             // {
             //     label: t('page.notificacio.grid.accions.editar'),
@@ -477,6 +471,14 @@ const NotificacioGrid = () => {
                 onClick: (id) => esborrarRemesa(id),
                 hidden: (row) => mostrarEditarBorrar(row?.estat, currentRole),
             },
+            {
+                label: t('page.notificacio.grid.notificacionsEsborrades.recuperar'),
+                title: t('page.notificacio.grid.notificacionsEsborrades.recuperar'),
+                icon: 'replay',
+                showInMenu: true,
+                onClick: (id) => recuperarRemesa(id),
+                hidden: !notificacionsEsborrades,
+            },
         ];
 
         return listActions;
@@ -487,7 +489,7 @@ const NotificacioGrid = () => {
             <MuiDataGrid
                 datagridApiRef={datagridApiRef}
                 apiRef={apiRef}
-                title={t('page.notificacio.grid.title') + (titolMassiva ? titolMassiva : "")}
+                title={t('page.notificacio.grid.title') + (titolSecundari || "")}
                 resourceName="notificacioResource"
                 columns={columns}
                 defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}

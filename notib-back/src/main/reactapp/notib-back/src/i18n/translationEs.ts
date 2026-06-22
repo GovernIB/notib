@@ -342,6 +342,10 @@ const translationEs = {
                 },
                 procediment: 'Procedimiento',
                 servei: 'Servicio',
+                notificacionsEsborrades: {
+                    title: " eliminadas",
+                    recuperar: "Recuperar"
+                }
             },
             form: {
                 title: {

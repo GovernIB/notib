@@ -173,6 +173,16 @@ import java.util.List;
 		),
 		@ResourceArtifact(
 			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.ACTION_RECUPERAR_REMESA,
+			requiresId = true,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN})
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
 			code = NotificacioResource.ACTION_ENVIAR_CALLBACK,
 			requiresId = true,
 			accessConstraints = {
@@ -397,6 +407,7 @@ public class NotificacioResource extends BaseResource<Long> {
 	public static final String ACTION_AMPLIAR_TERMINI = "AMPLIAR_TERMINI";
 	public static final String ACTION_MARCAR_PROCESSAT = "MARCAR_PROCESSAT";
 	public static final String ACTION_ESBORRAR_REMESA = "ESBORRAR_REMESA";
+	public static final String ACTION_RECUPERAR_REMESA = "RECUPERAR_REMESA";
 	public static final String ACTION_ENVIAR_CALLBACK = "ENVIAR_CALLBACK";
 	public static final String ACTION_ENVIAR_ENTREGA_POSTAL = "ENVIAR_ENTREGA_POSTAL";
 	public static final String ACTION_REGISTRAR_REMESA = "REGISTRAR_REMESA";

@@ -101,9 +101,9 @@ const InnerApp: React.FC = () => {
         {
             id: 'notificacionsEsborrades',
             title: t('app.menu.notificacioEsborrades'),
-            to: '/notificacionsEsborrades',
+            to: '/notificacions?esborrades=true',
             icon: 'delete_outline',
-            resourceName: 'notifiacioResource',
+            resourceName: 'notificacioResource',
             hidden: currentRole !== ROLE_ADMIN,
         },
         {

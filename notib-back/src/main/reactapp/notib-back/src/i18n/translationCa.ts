@@ -359,6 +359,10 @@ const translationCa = {
                 },
                 procediment: 'Procediment',
                 servei: 'Servei',
+                notificacionsEsborrades: {
+                    title: ' esborrades',
+                    recuperar: "Recuperar"
+                }
             },
             form: {
                 title: {
