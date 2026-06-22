@@ -339,7 +339,8 @@ public class CieAdviserServiceImpl implements CieAdviserService {
                 var entregaPostal = enviament.getEntregaPostal();
                 updateCodiEntitatPerInfoAndConfig(info, enviament);
                 if (entregaPostal.isCieEstatFinal()) {
-                    var msg = "[CIE ADVISER] L'enviament amb identificador " + identificador + " ha rebut un callback de l'adviser de tipus " + tipoEntrega + " quan ja es troba en estat final.";
+                    var msg = "[CIE ADVISER] L'enviament amb identificador " + identificador + " ha rebut un callback de l'adviser de tipus " + tipoEntrega
+                            + " quan ja es troba en estat final. Estat actual " + entregaPostal.getCieEstat() + ". Nou estat: " + sincronizarEnvio.getEstado();
                     NotibLogger.getInstance().info(msg, log, LoggingTipus.ENTREGA_CIE);
                     setResultadoEnvio(resultadoSincronizarEnvio, ResultatEnviamentEnum.OK);
                     // DATAT
@@ -373,7 +374,8 @@ public class CieAdviserServiceImpl implements CieAdviserService {
                     }
                     comandaListener.enviarAvis(enviament, AvisTipus.INFO);
                 } else {
-                    NotibLogger.getInstance().info("[CIE ADVISER] Entrega postal " + identificador + " no esta en estat final. Estat: " + entregaPostal.getCieEstat(), log, LoggingTipus.ENTREGA_CIE);
+                    NotibLogger.getInstance().info("[CIE ADVISER] Entrega postal " + identificador + " no esta en estat final. Estat actual: " + entregaPostal.getCieEstat()
+                            + ". Nou estat: " + sincronizarEnvio.getEstado(), log, LoggingTipus.ENTREGA_CIE);
                     var receptorNombre = receptor != null ? receptor.getNombreReceptor() : null;
                     var receptorNif = receptor != null ? receptor.getNifReceptor() : null;
 //                var cieEstat = getCieEstat(estado);
