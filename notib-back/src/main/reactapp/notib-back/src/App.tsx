@@ -85,9 +85,9 @@ const InnerApp: React.FC = () => {
         {
             id: 'notificacionsError',
             title: t('app.menu.errorRegistre'),
-            to: '/notificacionsError',
+            to: '/notificacions?errorRegistre=true',
             icon: 'error',
-            resourceName: 'notifiacioResource',
+            resourceName: 'notificacioResource',
             hidden: currentRole !== ROLE_ADMIN,
         },
         {

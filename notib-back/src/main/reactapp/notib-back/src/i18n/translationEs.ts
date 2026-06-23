@@ -25,8 +25,8 @@ const translationEs = {
             nouEnviamentmassiu: "Nuevo envío masivo",
             consultaEnviamentmassiu: "Consulta envíos masivos",
             gestio: "Gestión",
-            errorRegistre: "Notificación con error de registro",
-            notificacioEsborrades: "Notificaciones borradas",
+            errorRegistre: "Remesas con error de registro",
+            notificacioEsborrades: "Remesas eliminadas",
             callbackPendent: "Callback pendiente",
             accionsMassives: "Consulta acciones masivas",
             permisosUsuari: "Permisos de usuario",
@@ -345,6 +345,9 @@ const translationEs = {
                 notificacionsEsborrades: {
                     title: " eliminadas",
                     recuperar: "Recuperar"
+                },
+                notificacionsErrorRegistre: {
+                    title: " con error de registro",
                 }
             },
             form: {
@@ -403,6 +406,7 @@ const translationEs = {
                     notificacio: 'Detalles de la notificación',
                     comunicacio: 'Detalles de la comunicación',
                     sir: 'Detalles de la comunicación SIR',
+                    erroRegistre: "Detalles de la excepción"
                 },
                 tab: {
                     dades: 'Datos',
@@ -411,6 +415,11 @@ const translationEs = {
                     registreEsdev: 'Registro de acontecimientos',
                     accions: 'Acciones',
                     historic: 'Histórico',
+                },
+                errorRegistre: {
+                    data: "Fecha",
+                    tipus: "Tipo",
+                    error: "Error descripción"
                 },
                 dades: {
                     title: 'Datos de la notificación',
@@ -660,6 +669,11 @@ const translationEs = {
                     label: "Marca com procesadas",
                     tooltip: "Marca las remesas que se encuentran en un estado final como procesadas",
                     ok: "La acción de ampliar plazo se ha mandado a ejectuar correctamente"
+                },
+                reintentarRegistre: {
+                    label: "Reintentar registro",
+                    tooltip: "Reseta los intentos de registro",
+                    ok: "La acción de reintentar registro se ha mandado a ejecutar correctamente"
                 },
                 actualitzarEstat: {
                     label: "Actualiza el estado",

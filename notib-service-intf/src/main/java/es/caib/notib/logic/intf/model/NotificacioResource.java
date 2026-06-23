@@ -282,6 +282,17 @@ import java.util.List;
 		),
 		@ResourceArtifact(
 			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.ACTION_REINTENTAR_REGISTRE_MASSIU,
+			formClass = NotificacioResource.AccioMassivaParams.class,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN }
+				)
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
 			code = NotificacioResource.ACTION_REENVIAR_AMB_ERROR_MASSIU,
 			formClass = NotificacioResource.AccioMassivaParams.class,
 			accessConstraints = {
@@ -425,6 +436,7 @@ public class NotificacioResource extends BaseResource<Long> {
 	public static final String ACTION_MARCAR_PROCESSAT_MASSIU = "MARCAR_PROCESSAT_MASSIU";
 	public static final String ACTION_ANULAR_MASSIU = "ANULAR_MASSIU";
 	public static final String ACTION_AMPLIAR_TERMINI_MASSIU = "AMPLIAR_TERMINI_MASSIU";
+	public static final String ACTION_REINTENTAR_REGISTRE_MASSIU = "REINTENTAR_REGISTRE_MASSIU";
 
 	@NotNull
 	private EnviamentTipus enviamentTipus;

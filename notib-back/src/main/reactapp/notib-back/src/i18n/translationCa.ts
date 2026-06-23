@@ -26,8 +26,8 @@ const translationCa = {
             nouEnviamentmassiu: "Nou enviament massiu",
             consultaEnviamentmassiu: "Consulta enviaments massius",
             gestio: "Gestió",
-            errorRegistre: "Notificació amb error de registre",
-            notificacioEsborrades: "Notificacions esborrades",
+            errorRegistre: "Remeses amb error de registre",
+            notificacioEsborrades: "Remeses esborrades",
             callbackPendent: "Callback pendent",
             accionsMassives: "Consulta accions massives",
             permisosUsuari: "Permisos d'usuari",
@@ -362,6 +362,9 @@ const translationCa = {
                 notificacionsEsborrades: {
                     title: ' esborrades',
                     recuperar: "Recuperar"
+                },
+                notificacionsErrorRegistre: {
+                    title: " amb error de registre",
                 }
             },
             form: {
@@ -424,6 +427,12 @@ const translationCa = {
                     notificacio: 'Detalls de la notificació',
                     comunicacio: 'Detalls de la comunicació',
                     sir: 'Detalls de la comunicació SIR',
+                    erroRegistre: "Detalls de la excepció"
+                },
+                errorRegistre: {
+                    data: "Data",
+                    tipus: "Tipus",
+                    error: "Error descripció"
                 },
                 tab: {
                     dades: 'Dades',
@@ -687,6 +696,11 @@ const translationCa = {
                     label: "Marcar com a processades",
                     tooltip: "Marca les remeses que es troben en un estat final com a processades",
                     ok: "La acció marcar com a processat s'ha enviat a executar correctament"
+                },
+                reintentarRegistre: {
+                    label: "Reintentar registre",
+                    tooltip: "Reseteja els intents de registre",
+                    ok: "La acció de reintentar registre s'ha enviat a executar correctament"
                 },
                 actualitzarEstat: {
                     label: "Actualitzar l'estat",

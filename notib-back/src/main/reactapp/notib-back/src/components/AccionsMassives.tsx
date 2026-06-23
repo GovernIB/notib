@@ -33,7 +33,6 @@ const AccionsMassives: React.FC<AccionsMassivesProps> = (props) => {
         sizeSelection,
         apiRef
     } = props;
-
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
 
@@ -250,9 +249,13 @@ export const useAccionsMassives = (refresh?: () => void) => {
         massiveAction(ids, 'ENVIAR_NOTIFICACIONS_MOVIL_MASSIU', t('page.accioMassiva.accions.notificacionsMovil.ok'), seleccioTipus);
     }
 
+    const reintentarRegistre = (ids: Set<any> | undefined, seleccioTipus: string): void => {
+        temporalMessageShow(null, t('page.accioMassiva.accions.executant'), 'info');
+        massiveAction(ids, 'REINTENTAR_REGISTRE_MASSIU', t('page.accioMassiva.accions.reintentarRegistre.ok'), seleccioTipus);
+    }
+
     const botons = [{value: true, text: t('comu.guardar'), icon: 'save', componentProps: {variant: 'contained'}},
         {value: false, text: t('comu.cancelar'), componentProps: {variant: 'outlined'}}];
-
 
     const {exec: marcarProcessatMassiu, formDialogComponent: marcarProcessatMassiuDialog} = useMuiActionReportLogic(
         'notificacioResource',
@@ -343,7 +346,6 @@ export const useAccionsMassives = (refresh?: () => void) => {
         true,
     );
 
-
     return {
         descarregarExcel,
         descarregarJustificants,
@@ -356,7 +358,8 @@ export const useAccionsMassives = (refresh?: () => void) => {
         enviarNotificacionsMovilMassiu,
         marcarProcessatMassiu, marcarProcessatMassiuDialog,
         anularRemesaMassiu, anularRemesaMassiuDialog,
-        ampliarTerminiMassiu, ampliarTerminiMassiuDialog
+        ampliarTerminiMassiu, ampliarTerminiMassiuDialog,
+        reintentarRegistre
     }
 }
 

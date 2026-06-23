@@ -79,7 +79,6 @@ const NotificacioDetailTabRegistreEsdev: React.FC<{ id: any }> = (props) => {
                 getDetailPanelHeight={() => 'auto'}
                 toolbarHideQuickFilter
             />
-            <Box>foo</Box>
         </GridPage>
     );
 };
