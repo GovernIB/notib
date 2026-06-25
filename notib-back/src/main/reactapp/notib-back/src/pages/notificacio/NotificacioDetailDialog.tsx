@@ -3,14 +3,14 @@ import { useMuiContentDialog, useCloseDialogButtons } from 'reactlib';
 import NotificacioDetailDialogContent from './NotificacioDetail.tsx';
 import RemesesErrorRegistreDialogContent from "./RemesesErrorRegistreDetail.tsx";
 
-export const useNotificacioDetailDialog = () => {
+export const useNotificacioDetailDialog = (notificacionsEsborrades: boolean) => {
 
     const { t } = useTranslation();
     const [dialogShow, dialogComponent] = useMuiContentDialog();
     const defaultDialogButtons = useCloseDialogButtons();
     const handleDetailButtonClick = (id: any) => {
         dialogShow(t('page.notificacio.detail.title.notificacio'),
-            <NotificacioDetailDialogContent id={id} />,
+            <NotificacioDetailDialogContent id={id} notificacionsEsborrades={notificacionsEsborrades}/>,
             defaultDialogButtons, { maxWidth: 'lg', fullWidth: true,}
         ).catch(() => null);
     };

@@ -2,24 +2,12 @@ import React from 'react';
 import {Link, useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import {GRID_DETAIL_PANEL_TOGGLE_COL_DEF, GridApiPro, useGridApiRef,} from '@mui/x-data-grid-pro';
-import {
-    GridPage,
-    MuiDataGrid,
-    MuiDataGridColDef,
-    springFilterBuilder,
-    springFilterBuilder as filterBuilder,
-    useFilterApiContext,
-    useMuiDataGridApiRef,
-    useMuiDataGridContext,
-    useResourceApiService,
-} from 'reactlib';
+import {GridPage, MuiDataGrid, MuiDataGridColDef, useMuiDataGridApiRef, useMuiDataGridContext, useResourceApiService,} from 'reactlib';
 import {useNotibContext} from '../../components/NotibContext';
 import {useDatagridFilterProps, useDatagridPageSizeOptionsProps} from '../../hooks/useDataGrid';
 import NotificacioGridEnviaments from './NotificacioGridEnviaments';
 import {useNotificacioDetailDialog, useRemesesErrorRegistreDetailDialog} from './NotificacioDetailDialog';
-import {Button, Chip, Grid, Icon, IconButton, Menu, MenuItem} from '@mui/material';
-import GridFormField, {GridButtonField} from '../../components/GridFormField';
-import {formatEndOfDay, formatStartOfDay} from '../../utils/dateUtils';
+import {Button, Chip, Icon, IconButton, Menu, MenuItem} from '@mui/material';
 import AccionsMassives, {MenuOption, useAccionsMassives} from '../../components/AccionsMassives';
 import ButtonDetailExpandColapse from '../../components/ButtonDetailExpandColapse';
 import {DataCommonAdditionalAction} from '../../../lib/components/mui/datacommon/MuiDataCommon';
@@ -28,11 +16,11 @@ import {useAccionsNotificacio} from '../accions/AccionsNotificacio';
 import {generateGridRowStylesFromMap, getGridRowColorClass, NOTIFICACIO_ESTAT_ENUM_MAP,} from '../../utils/estatConfig';
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import CustomDetailPanelToggle from "../../utils/CustomDetailPanelToggle.tsx";
+import ContentFilter, {useSpringFilterBuilder} from "./NotificacioFiltre.tsx";
 
+const useDataGridColumns = (datagridApiRef: any, notificacionsEsborrades: boolean, notificacioErrorRegistre: boolean) => {
 
-const useDataGridColumns = (datagridApiRef: any) => {
     const { t } = useTranslation();
-
     const columns: MuiDataGridColDef[] = React.useMemo(
         () => [
             {
@@ -41,52 +29,45 @@ const useDataGridColumns = (datagridApiRef: any) => {
                 renderHeader: () => null,
                 renderCell: (params: any) => {
                     const letter = params.value?.substring(0, 1);
-                    return <Chip label={letter} size="small" title={params.formattedValue} />;
-                },
+                    return <Chip label={letter} size="small" title={params.formattedValue}/>;
+                }
             },
             {
                 field: 'createdDate',
-                width: 110,
-
             },
             {
                 field: 'enviadaDate',
-                width: 100,
+                width: 155,
             },
-            {
+            ...(notificacioErrorRegistre || notificacionsEsborrades ? [] : [{
                 field: 'registreNums',
                 width: 130,
-            },
-            {
+            }
+            ]),
+            ...(notificacioErrorRegistre ? [] : [{
                 field: 'organGestor',
                 width: 180,
-            },
+            }]),
             {
                 field: 'procediment',
+                flex:1,
                 width: 180,
                 renderCell: (params: any) => {
                     const letter = params.row.procediment != null ? 'P' : 'S';
-                    const title =
-                        letter === 'P'
-                            ? t('page.notificacio.grid.procediment')
-                            : t('page.notificacio.grid.servei');
-                    return (
-                        <>
-                            <Chip label={letter} size="small" title={title} sx={{ mr: 1 }} />
-                            {params.formattedValue}
-                        </>
-                    );
+                    const title = letter === 'P' ? t('page.notificacio.grid.procediment') : t('page.notificacio.grid.servei');
+                    return (<><Chip label={letter} size="small" title={title} sx={{ mr: 1 }} />{params.formattedValue}</>);
                 },
             },
-            {
+            ...(notificacioErrorRegistre ? [] : [{
                 field: 'numExpedient',
                 width: 130,
-            },
+            }]),
             {
                 field: 'concepte',
+                flex:1,
                 width: 120,
             },
-            {
+            ...(notificacioErrorRegistre ? [] : [{
                 field: 'createdBy',
             },
             {
@@ -99,7 +80,7 @@ const useDataGridColumns = (datagridApiRef: any) => {
                     const estatJson = params?.formattedValue;
                     return (<NotificacioEstatGrid estatJson={estatJson} estatEnum={params?.row?.estat}/>);
                 },
-            },
+            }]),
             {
                 ...GRID_DETAIL_PANEL_TOGGLE_COL_DEF,
                 hideable: false,
@@ -113,38 +94,9 @@ const useDataGridColumns = (datagridApiRef: any) => {
                 ),
             },
         ],
-        []
+        [datagridApiRef, notificacionsEsborrades, notificacioErrorRegistre, t]
     );
     return columns;
-};
-
-const useSpringFilterBuilder = () => {
-
-    const { currentUser } = useNotibContext();
-    return (data: any) => {
-        filterBuilder.and(
-            filterBuilder.eq('enviamentTipus', `'${data?.enviamentTipus}'`),
-            filterBuilder.like('concepte', data.concepte),
-            filterBuilder.eq('estat', `'${data?.estat}'`),
-            data?.dataIniciInici && filterBuilder.gte('createdDate', `'${formatStartOfDay(data?.dataIniciInici)}'`),
-            data?.dataIniciFi && filterBuilder.lte('createdDate', `'${formatEndOfDay(data?.dataIniciFi)}'`),
-            filterBuilder.like('titular', data?.interessat),
-            filterBuilder.like('numExpedient', data.numExpedient),
-            filterBuilder.like('notificaIds', data.identificadorNotifica),
-            filterBuilder.eq('organGestor.id', data?.organGestor?.id),
-            filterBuilder.eq('procediment.id', data?.procediment?.id),
-            filterBuilder.eq('procediment.id', data?.servei?.id),
-            filterBuilder.eq('tipusUsuari', `'${data?.tipusUsuari}'`),
-            filterBuilder.eq('createdBy', `'${data?.createdBy}'`),
-            filterBuilder.like('referencia', data?.referencia),
-            filterBuilder.like('registreNums', data?.registreNumeroSortida),
-            data?.dataCaducitatInici && filterBuilder.gte('caducitat', `'${formatStartOfDay(data?.dataCaducitatInici)}'`),
-            data?.dataCaducitatFi && filterBuilder.lte('caducitat', `'${formatEndOfDay(data?.dataCaducitatFi)}'`),
-            data?.nomesLesMeves && filterBuilder.eq('createdBy', `'${currentUser.codi}'`),
-            data?.entregaPostal && filterBuilder.eq('entregaPostal', `'${data.entregaPostal}'`),
-            data?.errorLastCallback && filterBuilder.eq('errorLastCallback', `'${data.errorLastCallback}'`)
-        );
-    };
 };
 
 const NotificacioAddButton: React.FC = () => {
@@ -218,9 +170,8 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
                 label: t('page.accioMassiva.accions.reintentarRegistre.label'),
                 tooltip: t('page.accioMassiva.accions.reintentarRegistre.tooltip'),
                 onClick: () => reintentarRegistre(selection?.ids, "NOTIFICACIO")
-            },
-
-        ] : [
+            },]
+            : [
             {
                 label: t('page.accioMassiva.accions.marcarProcessades.label'),
                 tooltip: t('page.accioMassiva.accions.marcarProcessades.tooltip'),
@@ -297,64 +248,8 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
     )
 };
 
-const ContentFilter: React.FC<{openByDefault?: boolean}> = ({openByDefault}) => {
-
-    const { t } = useTranslation();
-    const filterApiRef = useFilterApiContext();
-    const [advancedFilter, setAdvancedFilter] = React.useState(openByDefault ?? false);
-    const handleButtonClick = () => filterApiRef.current?.clear();
-    const advancedFilterClick = () => setAdvancedFilter(!advancedFilter);
-
-    return (
-        <Grid container spacing={1}>
-            <GridFormField size={2} name="enviamentTipus" />
-            <GridFormField size={advancedFilter ? 4 : 2.5} name="concepte" />
-            <GridFormField size={2.5} name="estat" />
-            <GridFormField size={1.75} name="dataIniciInici" />
-            <GridFormField size={1.75} name="dataIniciFi" />
-
-            {advancedFilter && (
-                <>
-                    <GridFormField size={2} name="interessat" />
-                    <GridFormField size={2} name="numExpedient" />
-                    <GridFormField size={2} name="identificadorNotifica" />
-                    <GridFormField size={6} name="organGestor" />
-                    <GridFormField
-                        size={3.5}
-                        name="procediment"
-                        filter={springFilterBuilder.and(springFilterBuilder.eq('tipus', `'PROCEDIMENT'`))}
-                    />
-                    <GridFormField
-                        size={3.5}
-                        name="servei"
-                        filter={springFilterBuilder.and(springFilterBuilder.eq('tipus', `'SERVEI'`))}
-                    />
-                    <GridFormField size={2} name="tipusUsuari" />
-                    <GridFormField size={3} name="createdBy" />
-                    <GridFormField size={3} name="referencia" />
-                    <GridFormField size={2.5} name="registreNumeroSortida" />
-                    <GridFormField size={1.75} name="dataCaducitatInici" />
-                    <GridFormField size={1.75} name="dataCaducitatFi" />
-                    <GridButtonField size={0.5} name="nomesLesMeves" icon={'person'} hiddenLabel />
-                    <GridButtonField size={0.5} name="entregaPostal" icon={'email'} hiddenLabel />
-                    <GridButtonField size={0.5} name="errorLastCallback" icon={'report_problem'} hiddenLabel/>
-                </>
-            )}
-            <Grid size={0.5} sx={{ textAlign: 'center' }}>
-                <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
-                    <Icon>filter_alt_off</Icon>
-                </IconButton>
-            </Grid>
-            <Grid size={0.5} sx={{ textAlign: 'center' }}>
-                <IconButton onClick={advancedFilterClick} title={t(advancedFilter ? 'comu.tancarFiltreAvançat' : 'comu.obrirFiltreAvançat')}>
-                    <Icon sx={{ transform: advancedFilter ? 'rotate(180deg)' : 'none' }}>filter_list</Icon>
-                </IconButton>
-            </Grid>
-        </Grid>
-    );
-};
-
-const NotificacioGrid = () => {
+type NotificacioGridParams = { notificacionsEsborrades?: boolean; notificacionsErrorRegistre?: boolean; };
+const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorRegistre = false}: NotificacioGridParams) => {
 
     const { t } = useTranslation();
     const [ params ] = useSearchParams();
@@ -362,17 +257,15 @@ const NotificacioGrid = () => {
     const notificacioMassiva = params?.get('notificacioMassiva');
     const { state } = useLocation();
     let titolSecundari = state?.titolMassiva;
-    const notificacionsEsborrades = params?.get('esborrades');
-    const notificacionsErrorRegistre : boolean | null = Boolean(params?.get('errorRegistre'));
     titolSecundari = notificacionsEsborrades ? t('page.notificacio.grid.notificacionsEsborrades.title') : titolSecundari;
     titolSecundari = notificacionsErrorRegistre ? t('page.notificacio.grid.notificacionsErrorRegistre.title') : titolSecundari;
-    const { dialogComponent, onDetailClick } = useNotificacioDetailDialog();
+    const { dialogComponent, onDetailClick } = useNotificacioDetailDialog(notificacionsEsborrades);
     const { dialogComponentErrorRegistre, onDetailClickErrorRegistre } = useRemesesErrorRegistreDetailDialog();
     const { currentActions: apiCurrentActions } = useResourceApiService('notificacioResource');
     const isCreateLinkPresent = apiCurrentActions?.['create'] != null;
     const datagridApiRef = useGridApiRef();
     const apiRef = useMuiDataGridApiRef();
-    const columns = useDataGridColumns(datagridApiRef);
+    const columns = useDataGridColumns(datagridApiRef, notificacionsEsborrades, notificacionsErrorRegistre);
     const springFilterBuilder = useSpringFilterBuilder();
     const [searchParams] = useSearchParams();
     const referencia = searchParams.get('referencia');
@@ -380,7 +273,7 @@ const NotificacioGrid = () => {
         'notificacioResource',
         'FILTER_NOTIFICACIO',
         springFilterBuilder,
-        <ContentFilter openByDefault={!!referencia} />,
+        <ContentFilter openByDefault={!!referencia} notificacionsEsborrades={notificacionsEsborrades} notificacionsErrorRegistre={notificacionsErrorRegistre} />,
         undefined,
         {referencia: referencia}
     );
@@ -504,13 +397,13 @@ const NotificacioGrid = () => {
                 paginationActive
                 popupEditUpdateActive={true}
                 // popupEditFormContent={<><NotificacioFormContent /><NotificacioFormEnviaments /><NotificacioFormDocuments /></>}
-                selectionActive
+                selectionActive={!notificacionsEsborrades ? true : undefined}
                 rowUpdateLink="form/{{id}}"
                 rowUpdateShowInMenu
+                persistentStateClearPageSortPropsOnTopLevelRouteChange
                 persistentStateActive
                 rowHideDeleteButton
                 rowHideUpdateButton={params => (mostrarEditarBorrar(params.estat, currentRole) || noEsTaulaRemeses)}
-                persistentStateClearPageSortPropsOnTopLevelRouteChange
                 {...filterDataGridProps}
                 fixedFilter={fixedFilter}
                 {...pageSizeOptionsDataGridProps}

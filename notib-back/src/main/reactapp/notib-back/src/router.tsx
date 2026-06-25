@@ -136,7 +136,7 @@ export const router = createBrowserRouter(
                 {
                     path: 'notificacions',
                     children: [
-                        { index: true, element: <NotificacioGrid /> },
+                        { index: true, element: <NotificacioGrid notificacionsEsborrades={false} notificacionsErrorRegistre={false} /> },
                         {
                             path: 'form',
                             children: [
@@ -145,6 +145,14 @@ export const router = createBrowserRouter(
                             ],
                         },
                     ],
+                },
+                {
+                    path: 'notificacionsEsborrades',
+                    element: <NotificacioGrid notificacionsEsborrades={true} notificacionsErrorRegistre={false}/>
+                },
+                {
+                    path: 'notificacionsErrorRegistre',
+                    element: <NotificacioGrid notificacionsErrorRegistre={true} notificacionsEsborrades={false}/>
                 },
                 {
                     path: 'enviaments',

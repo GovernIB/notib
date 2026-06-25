@@ -83,9 +83,9 @@ const InnerApp: React.FC = () => {
     ];
     const menuGestio = [
         {
-            id: 'notificacionsError',
+            id: 'notificacionsErrorRegistre',
             title: t('app.menu.errorRegistre'),
-            to: '/notificacions?errorRegistre=true',
+            to: '/notificacionsErrorRegistre',
             icon: 'error',
             resourceName: 'notificacioResource',
             hidden: currentRole !== ROLE_ADMIN,
@@ -101,7 +101,7 @@ const InnerApp: React.FC = () => {
         {
             id: 'notificacionsEsborrades',
             title: t('app.menu.notificacioEsborrades'),
-            to: '/notificacions?esborrades=true',
+            to: '/notificacionsEsborrades',
             icon: 'delete_outline',
             resourceName: 'notificacioResource',
             hidden: currentRole !== ROLE_ADMIN,
@@ -298,10 +298,9 @@ const InnerApp: React.FC = () => {
         },
     ];
     const theme = useTheme();
-    const bgColor = mode === 'light' ? theme.palette.background.paper : undefined;
-    const textColor = bgColor ? theme.palette.getContrastText(bgColor) : undefined;
-    const currentRoleSuperOrEntitatSelected =
-        currentRole === ROLE_SUPER || currentEntitatId != null;
+    const bgColor= mode === 'light' ? theme.palette.background.paper : undefined;
+    const textColor= bgColor ? theme.palette.getContrastText(bgColor) : undefined;
+    const currentRoleSuperOrEntitatSelected= currentRole === ROLE_SUPER || currentEntitatId != null;
     return (
         mode && (
             <BaseApp
