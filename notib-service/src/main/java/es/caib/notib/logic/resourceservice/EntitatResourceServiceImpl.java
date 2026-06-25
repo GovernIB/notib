@@ -145,46 +145,30 @@ public class EntitatResourceServiceImpl
 		}
 		/**
 		 * Es mira si es tenen permisos per a crear un tipus de remesa.Es verifica si es te el permís corresponent
-		 * sobre algun òrgan gestor, sobre algun procediment/servei o sobre alguna combinació procediment/servei -
-		 * òrgan gestor.
+		 * sobre algun òrgan gestor, sobre algun procediment/servei o sobre alguna combinació procediment/servei - òrgan gestor.
 		 *
-		 * @param permisOrgansGestors
-		 *            el permís sobre els òrgans gestors que es vol comprovar.
-		 * @param permisProcediments
-		 *            el permís sobre els procediments/serveis que es vol comprovar.
-		 * @param isServei
-		 *            false si es volen consultar els procediments, true si es volen consultar els serveis o null si és
-		 *            volen consultar tant procediments com serveis.
-		 * @param isComunicacio
-		 *            indica si s'està comprovant una comunicació.
+		 * @param permisOrgansGestors el permís sobre els òrgans gestors que es vol comprovar.
+		 * @param permisProcediments el permís sobre els procediments/serveis que es vol comprovar.
+		 * @param isServei false si es volen consultar els procediments, true si es volen consultar els serveis o null si és volen consultar tant procediments com serveis.
+		 * @param isComunicacio indica si s'està comprovant una comunicació.
 		 * @return true si es tenen permisos per a crear el tipus de remesa o false en cas contrari.
 		 */
-		private boolean checkPermisRemesa(
-			Permission permisOrgansGestors,
-			Permission permisProcediments,
-			Boolean isServei,
-			boolean isComunicacio) {
-			// Si no té permís sobre cap òrgan gestor → fora
-			if (notibPermissionHelper.organGestorIdsWithPermissionRecursive(permisOrgansGestors).isEmpty()) {
-				return false;
+		private boolean checkPermisRemesa(Permission permisOrgansGestors, Permission permisProcediments, Boolean isServei, boolean isComunicacio) {
+
+			// Si té permís sobre algun òrgan gestor
+			if (!notibPermissionHelper.organGestorIdsWithPermissionRecursive(permisOrgansGestors).isEmpty()) {
+				return true;
 			}
-			// Si és comunicació, comprovam si té permís per a fer comunicacions sense procediment sobre algun òrgan
-			// gestor.
-			if (isComunicacio && !notibPermissionHelper.
-				organGestorIdsWithPermissionRecursive(ExtendedPermission.PERM7).
-				isEmpty()) {
+			// Si és comunicació, comprovam si té permís per a fer comunicacions sense procediment sobre algun òrgan gestor.
+			if (isComunicacio && !notibPermissionHelper.organGestorIdsWithPermissionRecursive(ExtendedPermission.PERM7).isEmpty()) {
 				return true;
 			}
 			// Comprovam si es tenen permisos sobre algun procediment/servei no comú
-			if (!notibPermissionHelper.
-				procedimentServeiNoComuIdsWithPermission(permisProcediments, isServei).
-				isEmpty()) {
+			if (!notibPermissionHelper.procedimentServeiNoComuIdsWithPermission(permisProcediments, isServei).isEmpty()) {
 				return true;
 			}
 			// Comprovam si es tenen permisos sobre algun procediment/servei comú
-			return !notibPermissionHelper.
-				procedimentServeiComuOrganGestorIdsWithPermission(permisProcediments, isServei).
-				isEmpty();
+			return !notibPermissionHelper.procedimentServeiComuOrganGestorIdsWithPermission(permisProcediments, isServei).isEmpty();
 		}
 	}
 

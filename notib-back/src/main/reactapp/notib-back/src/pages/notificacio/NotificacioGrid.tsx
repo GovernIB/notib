@@ -163,7 +163,6 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
     } = useAccionsMassives();
 
     const ids = selection?.ids ?? [];
-
     const opcionsMenu: MenuOption[] = [
         ...(notificacionsErrorRegistre ? [
             {
@@ -292,7 +291,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
         return currentRole === 'NOT_ADMIN_LECTURA' || (estat !== 'PENDENT' && estat !== 'REGISTRADA');
     }
 
-    const noEsTaulaRemeses = !!(notificacionsEsborrades || notificacionsErrorRegistre);
+    const noEsTaulaRemeses = (notificacionsEsborrades || notificacionsErrorRegistre);
     const rowAdditionalActions: DataCommonAdditionalAction[] = [
             {
                 label: t('page.notificacio.grid.column.detalls'),
@@ -411,40 +410,26 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                 toolbarHideCreate
                 toolbarCreateLink="form"
                 toolbarElementsWithPositions={[
-                    ...(isCreateLinkPresent
-                        ? [
-                              {
-                                  position: 2,
-                                  element: <NotificacioAddButton />,
-                              },
-                          ]
-                        : []),
+                    ...(isCreateLinkPresent ? [{ position: 2, element: <NotificacioAddButton /> }] : []),
                     ...(notificacionsEsborrades ? []
                         : [{
                             position: 2,
                             element: <MassiveActionsButton apiRef={datagridApiRef} notificacionsErrorRegistre={notificacionsErrorRegistre}/>,
                         }]),
-                    ...(notificacioMassiva
-                        ? [
-                            {
-                                position: 0,
-                                element: <IconButton onClick={()=> navigate('/notificacio/massiva')} sx={{mr:1}}><ArrowBackIosIcon /></IconButton>,
-                            },
-                        ]
-                        : []),
+                    ...(!notificacioMassiva ? []
+                        : [{
+                            position: 0,
+                            element: <IconButton onClick={()=> navigate('/notificacio/massiva')} sx={{mr:1}}><ArrowBackIosIcon /></IconButton>,
+                        }]),
                 ]}
                 onRowClick={(params) => notificacionsErrorRegistre ? onDetailClickErrorRegistre(params.id) : onDetailClick(params.id)}
                 rowActionsColumnIndex={11}
-                rowActionsColumnProps={{
-                    width: 90,
-                }}
+                rowActionsColumnProps={{ width: 90 }}
                 rowAdditionalActions={rowAdditionalActions}
                 getDetailPanelContent={({ row }) => <NotificacioGridEnviaments id={row.id} />}
                 getDetailPanelHeight={() => 'auto'}
                 getRowHeight={() => 'auto'}
-                getRowClassName={(params) =>
-                    getGridRowColorClass(params.row.estat, NOTIFICACIO_ESTAT_ENUM_MAP)
-                }
+                getRowClassName={(params) => getGridRowColorClass(params.row.estat, NOTIFICACIO_ESTAT_ENUM_MAP)}
                 sx={generateGridRowStylesFromMap(NOTIFICACIO_ESTAT_ENUM_MAP)}
             />
             {dialogComponent}
