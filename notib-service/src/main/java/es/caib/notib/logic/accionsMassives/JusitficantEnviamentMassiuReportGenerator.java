@@ -3,6 +3,7 @@ package es.caib.notib.logic.accionsMassives;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseReadonlyResourceService;
 import es.caib.notib.logic.helper.UserSessionHelper;
+import es.caib.notib.logic.intf.AccioMassivaParams;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.exception.ReportGenerationException;
@@ -32,7 +33,7 @@ import java.util.zip.ZipOutputStream;
 
 @Slf4j
 @RequiredArgsConstructor
-public class JusitficantEnviamentMassiuReportGenerator implements BaseReadonlyResourceService.ReportGenerator<NotificacioResourceEntity, NotificacioResource.AccioMassivaParams, NotificacioResource.AccioMassivaParams> {
+public class JusitficantEnviamentMassiuReportGenerator implements BaseReadonlyResourceService.ReportGenerator<NotificacioResourceEntity, AccioMassivaParams, AccioMassivaParams> {
 
 	private final AccioMassivaService accioMassivaService;
 	private final NotificacioService notificacioService;
@@ -40,7 +41,7 @@ public class JusitficantEnviamentMassiuReportGenerator implements BaseReadonlyRe
 	private final AuthenticationHelper authenticationHelper;
 
 	@Override
-	public List<NotificacioResource.AccioMassivaParams> generateData(String code, NotificacioResourceEntity entity, NotificacioResource.AccioMassivaParams params) throws ReportGenerationException {
+	public List<AccioMassivaParams> generateData(String code, NotificacioResourceEntity entity, AccioMassivaParams params) throws ReportGenerationException {
 
 
 		if (params == null || params.idsEmpty()) {
@@ -58,7 +59,7 @@ public class JusitficantEnviamentMassiuReportGenerator implements BaseReadonlyRe
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
 
-		var params = (NotificacioResource.AccioMassivaParams) data.get(0);
+		var params = (AccioMassivaParams) data.get(0);
 		var sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		var date = sdf.format(new Date()).replace(":", "_");
 		var nom = "justificantsMassiu_" + date + ".zip";
@@ -99,7 +100,7 @@ public class JusitficantEnviamentMassiuReportGenerator implements BaseReadonlyRe
 
 
 	@Override
-	public void onChange(Serializable id, NotificacioResource.AccioMassivaParams previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, NotificacioResource.AccioMassivaParams target) {
+	public void onChange(Serializable id, AccioMassivaParams previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, AccioMassivaParams target) {
 
 	}
 }

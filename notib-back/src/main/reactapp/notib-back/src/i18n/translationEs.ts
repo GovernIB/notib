@@ -27,7 +27,7 @@ const translationEs = {
             gestio: "Gestión",
             errorRegistre: "Remesas con error de registro",
             notificacioEsborrades: "Remesas eliminadas",
-            callbackPendent: "Callback pendiente",
+            callbackPendent: "Callback pendientes",
             accionsMassives: "Consulta acciones masivas",
             permisosUsuari: "Permisos de usuario",
         },
@@ -853,10 +853,28 @@ const translationEs = {
                 title: "Monitor ActiveMQ"
             },
         },
-        callbacksError: {
-            grid: {
-                title: "Notificaciones con error en el último callback "
+        callbacks: {
+            pendents: {
+                grid: {
+                    title: "Callbacks pendientes",
+                    accions: {
+                        enviar: {
+                            title: "Enviar"
+                        },
+                        pausar: {
+                            title: "Pausar"
+                        },
+                        activar: {
+                            title: "Activar"
+                        }
+                    }
+                },
             },
+            error: {
+                grid: {
+                    title: "Notificaciones con error en el último callback",
+                },
+            }
         },
         monitorSistema :{
             tab : {

@@ -109,7 +109,7 @@ const InnerApp: React.FC = () => {
         {
             id: 'callbackPendent',
             title: t('app.menu.callbackPendent'),
-            to: '/callback',
+            to: '/callbacks',
             icon: 'pending_actions',
             resourceName: 'callbackResource',
             hidden: currentRole !== ROLE_ADMIN,

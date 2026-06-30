@@ -146,14 +146,14 @@ const iniciaDescargaBlob = (result: any) => {
     iniciaDescarga(url, result.fileName)
 }
 
-export const useAccionsMassives = (refresh?: () => void) => {
+export const useAccionsMassives = ( resource: string, refresh?: () => void) => {
 
     const {t} = useTranslation();
-    const {artifactAction: apiAction, artifactReport: apiReport} = useResourceApiService('notificacioResource');
+    const {artifactAction: apiAction, artifactReport: apiReport} = useResourceApiService(resource);
     const {temporalMessageShow} = useBaseAppContext();
 
 
-    const massiveReport = (ids: Set<any> | undefined, code: string, msg: string, seleccioTipus: string, fileType: ExportFileType) => {
+    const massiveReport = (ids: Set<any> | undefined, code: string, msg: string, seleccioTipus: string | null, fileType: ExportFileType) => {
         apiReport(undefined, {code: code, fileType: fileType, data: {ids: [...ids], seleccioTipus: seleccioTipus}})
             .then(response => {
                 refresh?.()
@@ -165,7 +165,7 @@ export const useAccionsMassives = (refresh?: () => void) => {
             })
     }
 
-    const massiveAction = (ids: Set<any> | undefined, code: string, msg: string, seleccioTipus: string, ...apiRef: any[]) => {
+    const massiveAction = (ids: Set<any> | undefined, code: string, msg: string, seleccioTipus: string | null, ...apiRef: any[]) => {
         apiAction(undefined, {code: code, data: {ids: [...ids], seleccioTipus: seleccioTipus}})
             .then(resposta => {
                 refresh?.()
@@ -249,7 +249,7 @@ export const useAccionsMassives = (refresh?: () => void) => {
         massiveAction(ids, 'ENVIAR_NOTIFICACIONS_MOVIL_MASSIU', t('page.accioMassiva.accions.notificacionsMovil.ok'), seleccioTipus);
     }
 
-    const reintentarRegistre = (ids: Set<any> | undefined, seleccioTipus: string): void => {
+    const reintentarRegistre = (ids: Set<any> | undefined, seleccioTipus: string | null): void => {
         temporalMessageShow(null, t('page.accioMassiva.accions.executant'), 'info');
         massiveAction(ids, 'REINTENTAR_REGISTRE_MASSIU', t('page.accioMassiva.accions.reintentarRegistre.ok'), seleccioTipus);
     }
@@ -346,6 +346,21 @@ export const useAccionsMassives = (refresh?: () => void) => {
         true,
     );
 
+    const enviarCallbacksPendentsMassiu = (ids: Set<any> | undefined): void => {
+        temporalMessageShow(null, t('page.accioMassiva.accions.executant'), 'info');
+        massiveAction(ids, 'ENVIAR_CALLBACK_PENDENT_MASSIU', t('page.callbacks.pendents.accionsMassives.enviarPendents.ok'), null);
+    }
+
+    const pausarCallbacksPendentsMassiu = (ids: Set<any> | undefined): void => {
+        temporalMessageShow(null, t('page.accioMassiva.accions.executant'), 'info');
+        massiveAction(ids, 'PAUSAR_CALLBACK_PENDENT_MASSIU', t('page.callbacks.pendents.accionsMassives.pausarPendents.ok'), null);
+    }
+
+    const activarCallbacksPendentsMassiu = (ids: Set<any> | undefined): void => {
+        temporalMessageShow(null, t('page.accioMassiva.accions.executant'), 'info');
+        massiveAction(ids, 'ACTIVAR_CALLBACK_PENDENT_MASSIU', t('page.callbacks.pendents.accionsMassives.activarPendents.ok'), null);
+    }
+
     return {
         descarregarExcel,
         descarregarJustificants,
@@ -359,7 +374,10 @@ export const useAccionsMassives = (refresh?: () => void) => {
         marcarProcessatMassiu, marcarProcessatMassiuDialog,
         anularRemesaMassiu, anularRemesaMassiuDialog,
         ampliarTerminiMassiu, ampliarTerminiMassiuDialog,
-        reintentarRegistre
+        reintentarRegistre,
+        enviarCallbacksPendentsMassiu,
+        pausarCallbacksPendentsMassiu,
+        activarCallbacksPendentsMassiu
     }
 }
 

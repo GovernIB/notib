@@ -152,7 +152,7 @@ public class NotificacioResourceServiceImpl
 		register(NotificacioResource.ACTION_REACTIVAR_AMB_ERRORS, new ReactivarAmbErrorActionExecutor(notificacioService));
 		register(NotificacioResource.ACTION_REENVIAR_AMB_ERRORS, new ReenviarAmbErrorActionExecutor(notificacioService));
 		register(NotificacioResource.ACTION_ACTUALITZAR_ESTAT_MASSIU, new ActualitzarEstatMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper, enviamentService));
-		register(NotificacioResource.ACTION_REINTENTAR_REGISTRE_MASSIU, new ReactivarRegistreMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper, enviamentService));
+		register(NotificacioResource.ACTION_REINTENTAR_REGISTRE_MASSIU, new ReactivarRegistreMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper));
 		register(NotificacioResource.ACTION_REENVIAR_AMB_ERROR_MASSIU, new ReenviarAmbErrorMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper, enviamentService));
 		register(NotificacioResource.ACTION_ESBORRAR_MASSIU, new EsborrarMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper, enviamentService));
 		register(NotificacioResource.ACTION_REACTIVAR_CONSULTES_CANVI_ESTAT_MASSIU, new ReactivarConsultesCanviEstatMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper, enviamentService));

@@ -3,6 +3,7 @@ package es.caib.notib.logic.accionsMassives;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.helper.UserSessionHelper;
+import es.caib.notib.logic.intf.AccioMassivaParams;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.ActionExecutionException;
 import es.caib.notib.logic.intf.dto.RespostaActionExecutor;
@@ -23,7 +24,7 @@ import java.util.Set;
 
 @Slf4j
 @AllArgsConstructor
-public class EnviarNotificacionsMovilMassiuActionExecutor implements BaseMutableResourceService.ActionExecutor<NotificacioResourceEntity, NotificacioResource.AccioMassivaParams, RespostaActionExecutor> {
+public class EnviarNotificacionsMovilMassiuActionExecutor implements BaseMutableResourceService.ActionExecutor<NotificacioResourceEntity, AccioMassivaParams , RespostaActionExecutor> {
 
 	private final AccioMassivaService accioMassivaService;
 	private final UserSessionHelper userSessionHelper;
@@ -31,7 +32,7 @@ public class EnviarNotificacionsMovilMassiuActionExecutor implements BaseMutable
 	private final EnviamentService enviamentService;
 
 	@Override
-	public RespostaActionExecutor exec(String code, NotificacioResourceEntity entity, NotificacioResource.AccioMassivaParams params) throws ActionExecutionException {
+	public RespostaActionExecutor exec(String code, NotificacioResourceEntity entity, AccioMassivaParams params) throws ActionExecutionException {
 
 		if (params == null || params.idsEmpty()) {
 			throw new ActionExecutionException(NotificacioResource.class, null, "-1", "La selecció no pot ser buida");
@@ -62,7 +63,7 @@ public class EnviarNotificacionsMovilMassiuActionExecutor implements BaseMutable
 	}
 
 	@Override
-	public void onChange(Serializable id, NotificacioResource.AccioMassivaParams previous, String fieldName, Object fieldValue, Map answers, String[] previousFieldNames, NotificacioResource.AccioMassivaParams target) {
+	public void onChange(Serializable id, AccioMassivaParams previous, String fieldName, Object fieldValue, Map answers, String[] previousFieldNames, AccioMassivaParams target) {
 
 	}
 

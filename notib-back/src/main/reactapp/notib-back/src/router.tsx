@@ -27,6 +27,7 @@ import MonitorSistema from './pages/monitorSistema/MonitorSistema.tsx';
 import NotificacioMassivaGrid from "./pages/notificacioMassiva/NotificacioMassivaGrid.tsx";
 import NotificacioMassivaForm from "./pages/notificacioMassiva/NotificacioMassivaForm.tsx";
 import AccioMassivaGrid from "./pages/accioMassiva/AccioMassivaGrid.tsx";
+import CallbackPendentsGrid from "./pages/callbacks/CallbackPendentsGrid.tsx";
 
 export const router = createBrowserRouter(
     [
@@ -196,12 +197,10 @@ export const router = createBrowserRouter(
                         { index: true, element: <ActiveMqGrid /> },
                     ],
                 },
-                // {
-                //     path: 'callbacksError',
-                //     children: [
-                //         { index: true, element: <NotificacioGrid /> },
-                //     ],
-                // },
+                {
+                    path: 'callbacks',
+                    element: <CallbackPendentsGrid />
+                },
                 {
                     path: 'monitorSistema',
                     children: [

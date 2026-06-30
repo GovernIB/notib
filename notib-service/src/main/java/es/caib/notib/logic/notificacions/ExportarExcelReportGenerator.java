@@ -3,6 +3,7 @@ package es.caib.notib.logic.notificacions;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseReadonlyResourceService;
 import es.caib.notib.logic.helper.UserSessionHelper;
+import es.caib.notib.logic.intf.AccioMassivaParams;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.exception.ReportGenerationException;
@@ -29,7 +30,7 @@ import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
-public class ExportarExcelReportGenerator implements BaseReadonlyResourceService.ReportGenerator<NotificacioResourceEntity, NotificacioResource.AccioMassivaParams, NotificacioResource.AccioMassivaParams> {
+public class ExportarExcelReportGenerator implements BaseReadonlyResourceService.ReportGenerator<NotificacioResourceEntity, AccioMassivaParams , AccioMassivaParams > {
 
 	private final AccioMassivaService accioMassivaService;
 	private final UserSessionHelper userSessionHelper;
@@ -38,7 +39,7 @@ public class ExportarExcelReportGenerator implements BaseReadonlyResourceService
 	private final NotificacioService notificacioService;
 
 	@Override
-	public List<NotificacioResource.AccioMassivaParams> generateData(String code, NotificacioResourceEntity entity, NotificacioResource.AccioMassivaParams params) throws ReportGenerationException {
+	public List<AccioMassivaParams > generateData(String code, NotificacioResourceEntity entity, AccioMassivaParams params) throws ReportGenerationException {
 
 		if (params == null || params.idsEmpty()) {
 			throw new ReportGenerationException(NotificacioResource.class, null, "Error", "La selecció no pot ser buida");
@@ -59,7 +60,7 @@ public class ExportarExcelReportGenerator implements BaseReadonlyResourceService
 	@Override
 	public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
 
-		var params = (NotificacioResource.AccioMassivaParams) data.get(0);
+		var params = (AccioMassivaParams) data.get(0);
 		try {
 			var entitatActual = userSessionHelper.getCurrentEntitatId();
 			boolean isAdminEntitat = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
@@ -87,7 +88,7 @@ public class ExportarExcelReportGenerator implements BaseReadonlyResourceService
 	}
 
 	@Override
-	public void onChange(Serializable id, NotificacioResource.AccioMassivaParams previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, NotificacioResource.AccioMassivaParams target) {
+	public void onChange(Serializable id, AccioMassivaParams previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, AccioMassivaParams target) {
 
 	}
 }

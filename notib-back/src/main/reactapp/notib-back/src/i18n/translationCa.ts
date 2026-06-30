@@ -28,7 +28,7 @@ const translationCa = {
             gestio: "Gestió",
             errorRegistre: "Remeses amb error de registre",
             notificacioEsborrades: "Remeses esborrades",
-            callbackPendent: "Callback pendent",
+            callbackPendent: "Callback pendents",
             accionsMassives: "Consulta accions massives",
             permisosUsuari: "Permisos d'usuari",
         },
@@ -756,6 +756,7 @@ const translationCa = {
                     tooltip: "Envia notificacions de canvi d'estat a dispositius mòvils (PUSH)",
                     ok: "La acció d'enviar notifiacions mòvils s'ha enviat a executar correctament"
                 },
+
             },
         },
         notificacioMassiva: {
@@ -881,10 +882,42 @@ const translationCa = {
                 title: 'Monitor ActiveMQ',
             },
         },
-        callbacksError: {
-            grid: {
-                title: "Notificacions amb error a l'últim callback",
+        callbacks: {
+            pendents: {
+                grid: {
+                    title: "Callbacks pendents",
+                    accions: {
+                        enviar: {
+                            title: "Enviar"
+                        },
+                        pausar: {
+                            title: "Pausar"
+                        },
+                        activar: {
+                            title: "Activar"
+                        }
+                    }
+                },
+                accionsMassives: {
+                    enviarPendents: {
+                        label: "Enviar",
+                        ok: "La acció d'enviar els callbacks s'ha enviat a executar correctament"
+                    },
+                    pausarPendents: {
+                        label: "Pausar",
+                        ok: "La acció de pausar els callbacks s'ha enviat a executar correctament"
+                    },
+                    activarPendents: {
+                        label: "Activar",
+                        ok: "La acció d'activar els callbacks s'ha enviat a executar correctament"
+                    },
+                }
             },
+            error: {
+                grid: {
+                    title: "Notificacions amb error a l'últim callback",
+                },
+            }
         },
         monitorSistema: {
             tab: {

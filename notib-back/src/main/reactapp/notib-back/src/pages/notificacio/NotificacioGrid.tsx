@@ -160,7 +160,7 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
         anularRemesaMassiu, anularRemesaMassiuDialog,
         ampliarTerminiMassiu, ampliarTerminiMassiuDialog,
         reintentarRegistre
-    } = useAccionsMassives();
+    } = useAccionsMassives("notificacioResource");
 
     const ids = selection?.ids ?? [];
     const opcionsMenu: MenuOption[] = [

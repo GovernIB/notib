@@ -75,6 +75,7 @@ const ContentFilter: React.FC = () => {
 };
 
 export const AvisGrid = () => {
+
     const { t } = useTranslation();
     const filterDataGridProps = useDatagridFilterProps(
         'avisResource',

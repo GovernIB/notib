@@ -2,6 +2,7 @@ package es.caib.notib.logic.intf.model;
 
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
+import es.caib.notib.logic.intf.AccioMassivaParams;
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
 import es.caib.notib.logic.intf.base.annotation.ResourceArtifact;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
@@ -38,6 +39,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static es.caib.notib.logic.intf.model.NotificacioResource.ACTION_ANULAR_REMESA;
 
 /**
  * Informació d'una notificació.
@@ -105,7 +108,7 @@ import java.util.List;
 		@ResourceArtifact(
 			type = ResourceArtifactType.REPORT,
 			code = NotificacioResource.REPORT_DESCARREGAR_JUSTIFICANT_MASSIU,
-			formClass = NotificacioResource.AccioMassivaParams.class
+			formClass = AccioMassivaParams.class
 		),
 		@ResourceArtifact(
 			type = ResourceArtifactType.REPORT,
@@ -121,16 +124,16 @@ import java.util.List;
 		@ResourceArtifact(
 			type = ResourceArtifactType.REPORT,
 			code = NotificacioResource.REPORT_DESCARREGAR_CERTIFICACIO_MASSIU,
-			formClass = NotificacioResource.AccioMassivaParams.class
+			formClass = AccioMassivaParams.class
 		),
 		@ResourceArtifact(
 			type = ResourceArtifactType.REPORT,
 			code = NotificacioResource.REPORT_EXPORTAR_EXCEL,
-			formClass = NotificacioResource.AccioMassivaParams.class
+			formClass = AccioMassivaParams.class
 		),
 		@ResourceArtifact(
 			type = ResourceArtifactType.ACTION,
-			code = NotificacioResource.ACTION_ANULAR_REMESA,
+			code = ACTION_ANULAR_REMESA,
 			requiresId = true,
 			formClass = AnularDto.class,
 			accessConstraints = {
@@ -272,7 +275,7 @@ import java.util.List;
 		@ResourceArtifact(
 			type = ResourceArtifactType.ACTION,
 			code = NotificacioResource.ACTION_ACTUALITZAR_ESTAT_MASSIU,
-			formClass = NotificacioResource.AccioMassivaParams.class,
+			formClass = AccioMassivaParams.class,
 			accessConstraints = {
 				@ResourceAccessConstraint(
 					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
@@ -283,7 +286,7 @@ import java.util.List;
 		@ResourceArtifact(
 			type = ResourceArtifactType.ACTION,
 			code = NotificacioResource.ACTION_REINTENTAR_REGISTRE_MASSIU,
-			formClass = NotificacioResource.AccioMassivaParams.class,
+			formClass = AccioMassivaParams.class,
 			accessConstraints = {
 				@ResourceAccessConstraint(
 					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
@@ -294,7 +297,7 @@ import java.util.List;
 		@ResourceArtifact(
 			type = ResourceArtifactType.ACTION,
 			code = NotificacioResource.ACTION_REENVIAR_AMB_ERROR_MASSIU,
-			formClass = NotificacioResource.AccioMassivaParams.class,
+			formClass = AccioMassivaParams.class,
 			accessConstraints = {
 				@ResourceAccessConstraint(
 					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
@@ -305,7 +308,7 @@ import java.util.List;
 		@ResourceArtifact(
 			type = ResourceArtifactType.ACTION,
 			code = NotificacioResource.ACTION_ESBORRAR_MASSIU,
-			formClass = NotificacioResource.AccioMassivaParams.class,
+			formClass = AccioMassivaParams.class,
 			accessConstraints = {
 				@ResourceAccessConstraint(
 					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
@@ -316,7 +319,7 @@ import java.util.List;
 		@ResourceArtifact(
 			type = ResourceArtifactType.ACTION,
 			code = NotificacioResource.ACTION_REACTIVAR_CONSULTES_CANVI_ESTAT_MASSIU,
-			formClass = NotificacioResource.AccioMassivaParams.class,
+			formClass = AccioMassivaParams.class,
 			accessConstraints = {
 				@ResourceAccessConstraint(
 					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
@@ -327,7 +330,7 @@ import java.util.List;
 		@ResourceArtifact(
 			type = ResourceArtifactType.ACTION,
 			code = NotificacioResource.ACTION_REACTIVAR_CALLBACKS_MASSIU,
-			formClass = NotificacioResource.AccioMassivaParams.class,
+			formClass = AccioMassivaParams.class,
 			accessConstraints = {
 				@ResourceAccessConstraint(
 					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
@@ -338,7 +341,7 @@ import java.util.List;
 		@ResourceArtifact(
 			type = ResourceArtifactType.ACTION,
 			code = NotificacioResource.ACTION_ENVIAR_NOTIFICACIONS_MOVIL_MASSIU,
-			formClass = NotificacioResource.AccioMassivaParams.class,
+			formClass = AccioMassivaParams.class,
 			accessConstraints = {
 				@ResourceAccessConstraint(
 					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
@@ -349,7 +352,7 @@ import java.util.List;
 		@ResourceArtifact(
 			type = ResourceArtifactType.ACTION,
 			code = NotificacioResource.ACTION_ENVIAR_NOTIFICACIONS_MOVIL_MASSIU,
-			formClass = NotificacioResource.AccioMassivaParams.class,
+			formClass = AccioMassivaParams.class,
 			accessConstraints = {
 				@ResourceAccessConstraint(
 					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
@@ -587,19 +590,6 @@ public class NotificacioResource extends BaseResource<Long> {
 	public static class DocumentParams implements Serializable {
 
 		private Long docId;
-	}
-
-	@Getter
-	@Setter
-	@NoArgsConstructor
-	public static class AccioMassivaParams implements Serializable {
-
-		private List<Long> ids;
-		private SeleccioTipus seleccioTipus;
-
-		public boolean idsEmpty() {
-			return ids == null || ids.isEmpty();
-		}
 	}
 
 }
