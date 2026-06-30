@@ -45,7 +45,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @ResourceConfig(
-	descriptionField = "id",
+//	descriptionField = "id",
 	accessConstraints = {
 		@ResourceAccessConstraint(
 		type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,

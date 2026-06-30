@@ -895,6 +895,9 @@ const translationCa = {
                         },
                         activar: {
                             title: "Activar"
+                        },
+                        esborrar: {
+                            title: "Esborrar"
                         }
                     }
                 },
@@ -910,6 +913,10 @@ const translationCa = {
                     activarPendents: {
                         label: "Activar",
                         ok: "La acció d'activar els callbacks s'ha enviat a executar correctament"
+                    },
+                    esborrarPendents: {
+                        label: "Esborrar",
+                        ok: "La acció d'esborrar els callbacks s'ha enviat a executar correctament"
                     },
                 }
             },

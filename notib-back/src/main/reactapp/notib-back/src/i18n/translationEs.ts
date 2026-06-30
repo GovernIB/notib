@@ -866,7 +866,28 @@ const translationEs = {
                         },
                         activar: {
                             title: "Activar"
+                        },
+                        esborrar: {
+                            title: "Eliminar"
                         }
+                    },
+                    accionsMassives: {
+                        enviarPendents: {
+                            label: "Enviar",
+                            ok: "La acción de enviar los callbacks se ha enviado a ejecutar correctamente"
+                        },
+                        pausarPendents: {
+                            label: "Pausar",
+                            ok: "La acción de pausar los callbacks se ha enviado a ejecutar correctamente"
+                        },
+                        activarPendents: {
+                            label: "Activar",
+                            ok: "La acción de activar los callbacks se ha enviado a ejecutar correctamente"
+                        },
+                        esborrarPendents: {
+                            label: "Eliminar",
+                            ok: "La acción de eliminar los callbacks se ha enviado a ejecutar correctamente"
+                        },
                     }
                 },
             },

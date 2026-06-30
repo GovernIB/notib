@@ -1,4 +1,12 @@
-import {GridPage, MuiDataGrid, MuiDataGridColDef, springFilterBuilder as filterBuilder, useFilterApiContext, useMuiDataGridContext} from "reactlib";
+import {
+    GridPage,
+    MuiDataGrid,
+    MuiDataGridColDef,
+    springFilterBuilder as filterBuilder,
+    useFilterApiContext,
+    useMuiDataGridContext,
+    useResourceApiService
+} from "reactlib";
 import {useTranslation} from "react-i18next";
 import Box from "@mui/material/Box";
 import {Link} from "react-router-dom";
@@ -12,17 +20,16 @@ import {useAccionsCallbacks} from "../accions/AccionsCallbacks.tsx";
 import {GridApiPro, useGridApiRef} from "@mui/x-data-grid-pro";
 import {useNotibContext} from "../../components/NotibContext.ts";
 import AccionsMassives, {MenuOption, useAccionsMassives} from "../../components/AccionsMassives.tsx";
-import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 
 
 const columns: MuiDataGridColDef[] = [
     {
         field: 'usuariCodi',
-        flex: 2,
+        flex: 2.5,
     },
     {
         field: 'endpoint',
-        flex: 4,
+        flex: 4.5,
     },
     {
         field: 'intents',
@@ -31,11 +38,11 @@ const columns: MuiDataGridColDef[] = [
     },
     {
         field: 'dataCreacio',
-        flex: 2,
+        flex: 2.5,
     },
     {
         field: 'ultimIntent',
-        flex: 2,
+        flex: 2.5,
     },
     {
         field: 'properIntent',
@@ -89,16 +96,21 @@ const ContentFilter: React.FC = () => {
     );
 };
 
-const useSpringFilterBuilder = () => {
+const useSpringFilterBuilder = (maxRetries: number | null) => {
+
+    console.log(maxRetries);
     return (data: any) => {
+        console.log(data?.fiReintents);
         return filterBuilder.and(
             filterBuilder.like('usuariCodi', data?.usuariCodi),
-            filterBuilder.like('notificacioReferencia', `'${data?.notificacioReferencia}'`),
-            data?.dataIniciInici && filterBuilder.gte('dataCreacio', `'${formatStartOfDay(data?.dataCreacioInici)}'`),
-            data?.dataIniciFi && filterBuilder.lte('dataCreacio', `'${formatEndOfDay(data?.dataCreacioFinal)}'`),
-            data?.dataUltimIntentInici && filterBuilder.gte('dataInici', `'${formatStartOfDay(data?.dataUltimIntentInici)}'`),
-            data?.dataUltimIntentFi && filterBuilder.lte('dataInici', `'${formatEndOfDay(data?.dataUltimIntentFi)}'`),
-            filterBuilder.eq('estat', data?.estat),
+            filterBuilder.like('notificacio.referencia', data?.notificacioReferencia),
+            data?.dataCreacioInici && filterBuilder.gte('dataCreacio', `'${formatStartOfDay(data?.dataCreacioInici)}'`),
+            data?.dataCreacioFinal && filterBuilder.lte('dataCreacio', `'${formatEndOfDay(data?.dataCreacioFinal)}'`),
+            data?.dataUltimIntentInici && filterBuilder.gte('ultimIntent', `'${formatStartOfDay(data?.dataUltimIntentInici)}'`),
+            data?.dataUltimIntentFinal && filterBuilder.lte('ultimIntent', `'${formatEndOfDay(data?.dataUltimIntentFinal)}'`),
+            filterBuilder.eq('estat', `'${data?.estat}'`),
+            data?.fiReintents === "true" && filterBuilder.gte('intents', maxRetries),
+            data?.fiReintents === "false" && filterBuilder.lt('intents', maxRetries),
         );
     };
 };
@@ -110,7 +122,8 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
     const {
         enviarCallbacksPendentsMassiu,
         pausarCallbacksPendentsMassiu,
-        activarCallbacksPendentsMassiu
+        activarCallbacksPendentsMassiu,
+        esborrarCallbacksPendentsMassiu
     } = useAccionsMassives("callbackResource");
 
     const opcionsMenu: MenuOption[] = [
@@ -129,24 +142,45 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
             tooltip: t('page.callbacks.pendents.grid.accions.activar.title'),
             onClick: () => activarCallbacksPendentsMassiu(selection?.ids)
         },
-    ];
-
-    return (<AccionsMassives options={opcionsMenu} apiRef={apiRef} resource={"callbackResource"} sizeSelection={selection?.ids?.size}/>
-    )
+        {
+            label: t('page.callbacks.pendents.grid.accions.esborrar.title'),
+            tooltip: t('page.callbacks.pendents.grid.accions.esborrar.title'),
+            onClick: () => esborrarCallbacksPendentsMassiu(selection?.ids)
+        }
+    ]
+    return (<AccionsMassives options={opcionsMenu} apiRef={apiRef} resource={"callbackResource"} sizeSelection={selection?.ids?.size}/>)
 }
 
 const CallbackPendentsGrid = () => {
 
     const { t } = useTranslation();
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
-    const springFilterBuilder = useSpringFilterBuilder();
-    const datagridApiRef = useGridApiRef();
+    const { isReady: apiIsReady, find: apiFind } = useResourceApiService('configResource');
+    const [maxRetries, setMaxRetries] = React.useState(null);
+    React.useEffect(() => {
+        const fetchParams = async () => {
+            if (!apiIsReady) {
+                return;
+            }
+
+            try {
+                const args = { filter: "key: 'es.caib.notib.tasca.callback.pendents.notifica.events.intents.max'", unpaged: true };
+                const resposta = await apiFind(args);
+                setMaxRetries(resposta?.rows?.[0]?.value ?? null);
+            } catch (error) {
+                console.error('Error obtinguent el maxim nombre de reintents:', error);
+            }
+        };
+        fetchParams();
+    }, [apiIsReady, apiFind]);
+    const springFilterBuilder = useSpringFilterBuilder(maxRetries);
     const filterDataGridProps = useDatagridFilterProps(
         'callbackResource',
         'FILTER_CALLBACK_PENDENTS',
         springFilterBuilder,
         <ContentFilter />
     );
+    const datagridApiRef = useGridApiRef();
 
     const {
         enviarCallbackPendent,

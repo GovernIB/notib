@@ -7,8 +7,10 @@ import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
+import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import es.caib.notib.logic.intf.dto.CallbackEstatEnumDto;
+import es.caib.notib.logic.intf.dto.CallbackEstatError;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -104,6 +106,17 @@ import java.util.Date;
 				)
 			}
 		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = CallbackResource.ACTION_ESBORRAR_CALLBACK_PENDENT_MASSIU,
+			formClass = AccioMassivaParams.class,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN }
+				)
+			}
+		),
 	}
 )
 public class CallbackResource extends BaseResource<Long> {
@@ -116,10 +129,11 @@ public class CallbackResource extends BaseResource<Long> {
 	public static final String ACTION_ENVIAR_CALLBACK_PENDENT_MASSIU = "ENVIAR_CALLBACK_PENDENT_MASSIU";
 	public static final String ACTION_PAUSAR_CALLBACK_PENDENT_MASSIU = "PAUSAR_CALLBACK_PENDENT_MASSIU";
 	public static final String ACTION_ACTIVAR_CALLBACK_PENDENT_MASSIU = "ACTIVAR_CALLBACK_PENDENT_MASSIU";
+	public static final String ACTION_ESBORRAR_CALLBACK_PENDENT_MASSIU = "ESBORRAR_CALLBACK_PENDENT_MASSIU";
 
 	private String usuariCodi;
-	private Long notificacioId;
-	private Long enviamentId;
+//	private Long notificacioId;
+//	private Long enviamentId;
 	private Date dataCreacio;
 	private Date ultimIntent;
 	private Date properIntent;
@@ -133,6 +147,9 @@ public class CallbackResource extends BaseResource<Long> {
 	private String notificacioReferencia;
 	private int maxIntents;
 
+	private ResourceReference<NotificacioResource, Long> notificacio;
+	private ResourceReference<NotificacioEnviamentResource, Long> enviament;
+
 
 	@Getter
 	@Setter
@@ -140,11 +157,13 @@ public class CallbackResource extends BaseResource<Long> {
 	public static class CallbackPendentsFilter implements Serializable {
 
 		private String usuariCodi;
+		private String notificacioReferencia;
 		private Date dataCreacioInici;
 		private Date dataCreacioFinal;
 		private Date dataUltimIntentInici;
 		private Date dataUltimIntentFinal;
-		private CallbackEstatEnumDto estat;
+		private CallbackEstatError estat;
 		private boolean fiReintents;
+		private int maxReintents;
 	}
 }

@@ -12,6 +12,10 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -33,10 +37,10 @@ public class CallbackResourceEntity extends BaseResourceEntity<CallbackResource>
 
 	@Column(name = "usuari_codi", length = 64, nullable = false)
 	private String usuariCodi;
-	@Column(name = "notificacio_id", nullable = false)
-	private Long notificacioId;
-	@Column(name = "enviament_id", nullable = false)
-	private Long enviamentId;
+//	@Column(name = "notificacio_id", nullable = false)
+//	private Long notificacioId;
+//	@Column(name = "enviament_id", nullable = false)
+//	private Long enviamentId;
 	@Column(name = "data_creacio", nullable = false)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date dataCreacio;
@@ -58,12 +62,28 @@ public class CallbackResourceEntity extends BaseResourceEntity<CallbackResource>
 	@Column(name = "pausat", nullable = false)
 	private boolean pausat;
 
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(
+		name = "notificacio_id",
+		referencedColumnName = "id",
+		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "CALLBACK_ENV_FK"),
+		nullable = false)
+	private NotificacioResourceEntity notificacio;
+
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(
+		name = "enviament_id",
+		referencedColumnName = "id",
+		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "CALLBACK_NOT_FK"),
+		nullable = false)
+	private NotificacioEnviamentResourceEntity enviament;
+
 	@Builder
 	public CallbackResourceEntity(CallbackResource resource)  {
 
 		usuariCodi = resource.getUsuariCodi();
-		notificacioId = resource.getNotificacioId();
-		enviamentId = resource.getEnviamentId();
+//		notificacioId = resource.getNotificacioId();
+//		enviamentId = resource.getEnviamentId();
 		dataCreacio = resource.getDataCreacio();
 		ultimIntent = resource.getUltimIntent();
 		data = resource.getData();

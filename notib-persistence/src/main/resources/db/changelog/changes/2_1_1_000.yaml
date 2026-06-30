@@ -407,3 +407,22 @@ databaseChangeLog:
                                     constraints:
                                         nullable: false
                                     defaultValue: 1
+
+
+    -   changeSet:
+            id: 2_1_1_000-23
+            author: limit
+            changes:
+                -   addForeignKeyConstraint:
+                        baseTableName: ${db_prefix}CALLBACK
+                        baseColumnNames: notificacio_id
+                        referencedTableName: ${db_prefix}NOTIFICACIO
+                        referencedColumnNames: id
+                        constraintName: ${db_prefix}CALLBACK_NOT_FK
+
+                -   addForeignKeyConstraint:
+                        baseTableName: ${db_prefix}CALLBACK
+                        baseColumnNames: enviament_id
+                        referencedTableName: ${db_prefix}NOTIFICACIO_ENV
+                        referencedColumnNames: id
+                        constraintName: ${db_prefix}CALLBACK_ENV_FK
