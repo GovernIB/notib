@@ -141,7 +141,7 @@ const NotificacioAddButton: React.FC = () => {
     );
 };
 
-const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null>, notificacionsErrorRegistre: boolean | null }> = ({apiRef, notificacionsErrorRegistre}) => {
+const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null>, notificacionsErrorRegistre: boolean | null, refresh: () => void }> = ({apiRef, notificacionsErrorRegistre, refresh}) => {
 
     const { selection } = useMuiDataGridContext();
     const { currentRole} = useNotibContext();
@@ -160,7 +160,7 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
         anularRemesaMassiu, anularRemesaMassiuDialog,
         ampliarTerminiMassiu, ampliarTerminiMassiuDialog,
         reintentarRegistre
-    } = useAccionsMassives("notificacioResource");
+    } = useAccionsMassives("notificacioResource", refresh);
 
     const ids = selection?.ids ?? [];
     const opcionsMenu: MenuOption[] = [
@@ -189,7 +189,7 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
             {
                 label: t('page.accioMassiva.accions.esborrar.label'),
                 tooltip: t('page.accioMassiva.accions.esborrar.tooltip'),
-                onClick: () => esborrarMassiu(selection?.ids, "NOTIFICACIO", apiRef),
+                onClick: () => esborrarMassiu(selection?.ids, "NOTIFICACIO"),
             },
             {
                 label: t('page.accioMassiva.accions.exportarFullCalcul.label'),
@@ -383,10 +383,12 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
     const filtreEsborrades = notificacionsEsborrades ? `deleted :${true}` : `deleted :${false}`;
     const filtreErrorRegistre = notificacionsErrorRegistre ? "estat : 'PENDENT' and registreEnviamentIntent >: 3" : "";
     const fixedFilter = filtreEsborrades + (filtreMassiva ? " and " + filtreMassiva : "")  + (filtreErrorRegistre ? " and " + filtreErrorRegistre : "");
+    const [reloadKey, setReloadKey] = React.useState(0);
+    const refreshGrid = React.useCallback((refresh) => setReloadKey(k => k + 1), []);
     return (
         <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
             <MuiDataGrid
-                key={`${currentRole}-${notificacionsEsborrades}-${notificacionsErrorRegistre}`}
+                key={`${currentRole}-${notificacionsEsborrades}-${notificacionsErrorRegistre}-${reloadKey}`}
                 datagridApiRef={datagridApiRef}
                 apiRef={apiRef}
                 title={t('page.notificacio.grid.title') + (titolSecundari || "")}
@@ -414,7 +416,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                     ...(notificacionsEsborrades ? []
                         : [{
                             position: 2,
-                            element: <MassiveActionsButton apiRef={datagridApiRef} notificacionsErrorRegistre={notificacionsErrorRegistre}/>,
+                            element: <MassiveActionsButton apiRef={datagridApiRef} notificacionsErrorRegistre={notificacionsErrorRegistre} refresh={refreshGrid}/>,
                         }]),
                     ...(!notificacioMassiva ? []
                         : [{

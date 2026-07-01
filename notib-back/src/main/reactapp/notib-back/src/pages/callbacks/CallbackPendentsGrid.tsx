@@ -98,9 +98,7 @@ const ContentFilter: React.FC = () => {
 
 const useSpringFilterBuilder = (maxRetries: number | null) => {
 
-    console.log(maxRetries);
     return (data: any) => {
-        console.log(data?.fiReintents);
         return filterBuilder.and(
             filterBuilder.like('usuariCodi', data?.usuariCodi),
             filterBuilder.like('notificacio.referencia', data?.notificacioReferencia),
@@ -115,7 +113,7 @@ const useSpringFilterBuilder = (maxRetries: number | null) => {
     };
 };
 
-const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null>}> = ({apiRef}) => {
+const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null>, refresh: () => void}> = ({apiRef, refresh}) => {
 
     const {selection} = useMuiDataGridContext();
     const {t} = useTranslation();
@@ -124,7 +122,7 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
         pausarCallbacksPendentsMassiu,
         activarCallbacksPendentsMassiu,
         esborrarCallbacksPendentsMassiu
-    } = useAccionsMassives("callbackResource");
+    } = useAccionsMassives("callbackResource", refresh);
 
     const opcionsMenu: MenuOption[] = [
         {
@@ -216,10 +214,12 @@ const CallbackPendentsGrid = () => {
     ];
     const {currentRole} = useNotibContext();
     let amagarEntrada = currentRole === 'tothom' || currentRole === 'NOT_ADMIN_LECTURA';
-
+    const [reloadKey, setReloadKey] = React.useState(0);
+    const refreshGrid = React.useCallback(() => setReloadKey(k => k + 1), []);
     return (
         <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
             <MuiDataGrid
+                key={reloadKey}
                 title={t('page.callbacks.pendents.grid.title')}
                 resourceName="callbackResource"
                 datagridApiRef={datagridApiRef}
@@ -228,8 +228,8 @@ const CallbackPendentsGrid = () => {
                 paginationActive
                 selectionActive
                 rowHideUpdateButton
-                // persistentStateActive
-                // persistentStateClearPageSortPropsOnTopLevelRouteChange
+                persistentStateActive
+                persistentStateClearPageSortPropsOnTopLevelRouteChange
                {...filterDataGridProps}
                {...pageSizeOptionsDataGridProps}
                 toolbarType="upper"
@@ -238,7 +238,7 @@ const CallbackPendentsGrid = () => {
                     ...(amagarEntrada ? []
                         : [{
                             position: 2,
-                            element: <MassiveActionsButton apiRef={datagridApiRef}/>,
+                            element: <MassiveActionsButton apiRef={datagridApiRef} refresh={refreshGrid}/>,
                         }])
                 ]}
             />

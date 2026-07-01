@@ -152,11 +152,10 @@ export const useAccionsMassives = ( resource: string, refresh?: () => void) => {
     const {artifactAction: apiAction, artifactReport: apiReport} = useResourceApiService(resource);
     const {temporalMessageShow} = useBaseAppContext();
 
-
     const massiveReport = (ids: Set<any> | undefined, code: string, msg: string, seleccioTipus: string | null, fileType: ExportFileType) => {
         apiReport(undefined, {code: code, fileType: fileType, data: {ids: [...ids], seleccioTipus: seleccioTipus}})
             .then(response => {
-                refresh?.()
+                // refresh?.()
                 iniciaDescargaBlob(response)
                 temporalMessageShow(null, msg, 'success');
             })
@@ -165,10 +164,13 @@ export const useAccionsMassives = ( resource: string, refresh?: () => void) => {
             })
     }
 
-    const massiveAction = (ids: Set<any> | undefined, code: string, msg: string, seleccioTipus: string | null, ...apiRef: any[]) => {
+    const massiveAction = (ids: Set<any> | undefined, code: string, msg: string, seleccioTipus: string | null, mustRefresh: boolean = false) => {
         apiAction(undefined, {code: code, data: {ids: [...ids], seleccioTipus: seleccioTipus}})
             .then(resposta => {
-                refresh?.()
+
+                if (mustRefresh) {
+                    refresh?.()
+                }
                 if (!resposta || resposta.ok || resposta.errors?.length === 0 && resposta.noExecutables?.length === 0) {
                     temporalMessageShow(null, msg, 'success');
                     return;
@@ -194,11 +196,7 @@ export const useAccionsMassives = ( resource: string, refresh?: () => void) => {
             })
             .catch((error) => {
                 temporalMessageShow(null, error?.message, 'error');
-            }).finally(() => {
-            if (code === 'ESBORRAR_MASSIU') {
-                apiRef[0].current.refresh();
-            }
-        });
+            })
     }
 
     const descarregarExcel = (ids: Set<any> | undefined, seleccioTipus: string): void => {
@@ -229,9 +227,9 @@ export const useAccionsMassives = ( resource: string, refresh?: () => void) => {
         massiveAction(ids, 'REENVIAR_AMB_ERROR_MASSIU', t('page.accioMassiva.accions.reenviarAmbError.ok'), seleccioTipus);
     }
 
-    const esborrarMassiu = (ids: Set<any> | undefined, seleccioTipus: string, apiRef: RefObject<GridApiPro> | null): void => {
+    const esborrarMassiu = (ids: Set<any> | undefined, seleccioTipus: string): void => {
         temporalMessageShow(null, t('page.accioMassiva.accions.executant'), 'info');
-        massiveAction(ids, 'ESBORRAR_MASSIU', t('page.accioMassiva.accions.esborrar.ok'), seleccioTipus, apiRef);
+        massiveAction(ids, 'ESBORRAR_MASSIU', t('page.accioMassiva.accions.esborrar.ok'), seleccioTipus, true);
     }
 
     const reactivarConsulesCanviEstatMassiu = (ids: Set<any> | undefined, seleccioTipus: string): void => {
@@ -348,22 +346,22 @@ export const useAccionsMassives = ( resource: string, refresh?: () => void) => {
 
     const enviarCallbacksPendentsMassiu = (ids: Set<any> | undefined): void => {
         temporalMessageShow(null, t('page.accioMassiva.accions.executant'), 'info');
-        massiveAction(ids, 'ENVIAR_CALLBACK_PENDENT_MASSIU', t('page.callbacks.pendents.accionsMassives.enviarPendents.ok'), null);
+        massiveAction(ids, 'ENVIAR_CALLBACK_PENDENT_MASSIU', t('page.callbacks.pendents.accionsMassives.enviarPendents.ok'), null, true);
     }
 
     const pausarCallbacksPendentsMassiu = (ids: Set<any> | undefined): void => {
         temporalMessageShow(null, t('page.accioMassiva.accions.executant'), 'info');
-        massiveAction(ids, 'PAUSAR_CALLBACK_PENDENT_MASSIU', t('page.callbacks.pendents.accionsMassives.pausarPendents.ok'), null);
+        massiveAction(ids, 'PAUSAR_CALLBACK_PENDENT_MASSIU', t('page.callbacks.pendents.accionsMassives.pausarPendents.ok'), null, true);
     }
 
     const activarCallbacksPendentsMassiu = (ids: Set<any> | undefined): void => {
         temporalMessageShow(null, t('page.accioMassiva.accions.executant'), 'info');
-        massiveAction(ids, 'ACTIVAR_CALLBACK_PENDENT_MASSIU', t('page.callbacks.pendents.accionsMassives.activarPendents.ok'), null);
+        massiveAction(ids, 'ACTIVAR_CALLBACK_PENDENT_MASSIU', t('page.callbacks.pendents.accionsMassives.activarPendents.ok'), null, true);
     }
 
     const esborrarCallbacksPendentsMassiu = (ids: Set<any> | undefined): void => {
         temporalMessageShow(null, t('page.accioMassiva.accions.executant'), 'info');
-        massiveAction(ids, 'ESBORRAR_CALLBACK_PENDENT_MASSIU', t('page.callbacks.pendents.accionsMassives.activarPendents.ok'), null);
+        massiveAction(ids, 'ESBORRAR_CALLBACK_PENDENT_MASSIU', t('page.callbacks.pendents.accionsMassives.activarPendents.ok'), null, true);
     }
 
     return {
