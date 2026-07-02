@@ -35,7 +35,8 @@ export const useSpringFilterBuilder = () => {
     };
 };
 
-const ContentFilter: React.FC<{openByDefault?: boolean, notificacionsEsborrades: boolean, notificacionsErrorRegistre: boolean}> = ({openByDefault, notificacionsEsborrades, notificacionsErrorRegistre}) => {
+const ContentFilter: React.FC<{openByDefault?: boolean, notificacionsEsborrades: boolean, notificacionsErrorRegistre: boolean, notificacionsCallbackError: boolean }> =
+                    ({openByDefault, notificacionsEsborrades, notificacionsErrorRegistre, notificacionsCallbackError}) => {
 
     const { t } = useTranslation();
     const filterApiRef = useFilterApiContext();
@@ -76,6 +77,25 @@ const ContentFilter: React.FC<{openByDefault?: boolean, notificacionsEsborrades:
                 <GridFormField size={4} name="createdBy" />
                 <GridFormField size={2} name="dataIniciInici" />
                 <GridFormField size={2} name="dataIniciFi" />
+                <Grid size={0.5} sx={{ textAlign: 'center' }}>
+                    <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
+                        <Icon>filter_alt_off</Icon>
+                    </IconButton>
+                </Grid>
+            </Grid>
+        );
+    }
+
+    if (notificacionsCallbackError) {
+        return (
+            <Grid container spacing={1}>
+                <GridFormField size={3.5} name="procediment" filter={springFilterBuilder.and(springFilterBuilder.eq('tipus', `'PROCEDIMENT'`))}/>
+                <GridFormField size={3.5} name="servei" filter={springFilterBuilder.and(springFilterBuilder.eq('tipus', `'SERVEI'`))}/>
+                <GridFormField size={4} name="concepte" />
+                <GridFormField size={2} name="dataIniciInici" />
+                <GridFormField size={2} name="dataIniciFi" />
+                <GridFormField size={2} name="estat" />
+                <GridFormField size={4} name="createdBy" />
                 <Grid size={0.5} sx={{ textAlign: 'center' }}>
                     <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
                         <Icon>filter_alt_off</Icon>

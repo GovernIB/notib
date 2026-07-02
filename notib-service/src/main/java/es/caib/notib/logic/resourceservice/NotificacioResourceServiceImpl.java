@@ -60,6 +60,7 @@ import es.caib.notib.logic.notificacions.ReactivarConsultaSirActionExecutor;
 import es.caib.notib.logic.notificacions.ReactivarEstatNotificaActionExecutor;
 import es.caib.notib.logic.notificacions.RecuperarRemesaActionExecutor;
 import es.caib.notib.logic.notificacions.ReenviarAmbErrorActionExecutor;
+import es.caib.notib.logic.notificacions.ReenviarCallbacksMassiuActionExecutor;
 import es.caib.notib.logic.notificacions.RegistrarRemesaActionExecutor;
 import es.caib.notib.persist.resourceentity.DocumentResourceEntity;
 import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
@@ -157,6 +158,7 @@ public class NotificacioResourceServiceImpl
 		register(NotificacioResource.ACTION_ESBORRAR_MASSIU, new EsborrarMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper, enviamentService));
 		register(NotificacioResource.ACTION_REACTIVAR_CONSULTES_CANVI_ESTAT_MASSIU, new ReactivarConsultesCanviEstatMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper, enviamentService));
 		register(NotificacioResource.ACTION_REACTIVAR_CALLBACKS_MASSIU, new ReactivarCallbacksMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper, enviamentService));
+		register(NotificacioResource.ACTION_REENVIAR_CALLBACKS_MASSIU, new ReenviarCallbacksMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper, enviamentService));
 		register(NotificacioResource.ACTION_ENVIAR_NOTIFICACIONS_MOVIL_MASSIU, new EnviarNotificacionsMovilMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper, enviamentService));
 		register(NotificacioResource.ACTION_MARCAR_PROCESSAT_MASSIU, new MarcarProcessatMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper));
 		register(NotificacioResource.ACTION_ANULAR_MASSIU, new AnularMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper));
@@ -167,6 +169,10 @@ public class NotificacioResourceServiceImpl
 	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
 
 		// Condició per a mostrar només les notificacions de l'entitat actual
+		var isRolSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);
+		if (isRolSuper) {
+			return "";
+		}
 		var entitatFilter = "entitat.id:" + userSessionHelper.getCurrentEntitatId();
 		var isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
 		var isRoleAdminLectura = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN_LECTURA);

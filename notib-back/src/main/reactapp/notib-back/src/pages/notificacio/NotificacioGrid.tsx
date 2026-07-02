@@ -6,7 +6,7 @@ import {GridPage, MuiDataGrid, MuiDataGridColDef, useMuiDataGridApiRef, useMuiDa
 import {useNotibContext} from '../../components/NotibContext';
 import {useDatagridFilterProps, useDatagridPageSizeOptionsProps} from '../../hooks/useDataGrid';
 import NotificacioGridEnviaments from './NotificacioGridEnviaments';
-import {useNotificacioDetailDialog, useRemesesErrorRegistreDetailDialog} from './NotificacioDetailDialog';
+import {useNotificacioDetailDialog, useRemesesErrorCallbackDetailDialog, useRemesesErrorRegistreDetailDialog} from './NotificacioDetailDialog';
 import {Button, Chip, Icon, IconButton, Menu, MenuItem} from '@mui/material';
 import AccionsMassives, {MenuOption, useAccionsMassives} from '../../components/AccionsMassives';
 import ButtonDetailExpandColapse from '../../components/ButtonDetailExpandColapse';
@@ -18,12 +18,13 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import CustomDetailPanelToggle from "../../utils/CustomDetailPanelToggle.tsx";
 import ContentFilter, {useSpringFilterBuilder} from "./NotificacioFiltre.tsx";
 
-const useDataGridColumns = (datagridApiRef: any, notificacionsEsborrades: boolean, notificacioErrorRegistre: boolean) => {
+const useDataGridColumns = (datagridApiRef: any, notificacionsEsborrades: boolean, notificacioErrorRegistre: boolean, notificacioCallbackError: boolean ) => {
 
+    const noEsTaulaRemeses = notificacionsEsborrades || notificacioErrorRegistre || notificacioCallbackError;
     const { t } = useTranslation();
     const columns: MuiDataGridColDef[] = React.useMemo(
         () => [
-            {
+            ...(notificacioCallbackError ? [] : [{
                 field: 'enviamentTipus',
                 width: 40,
                 renderHeader: () => null,
@@ -34,17 +35,18 @@ const useDataGridColumns = (datagridApiRef: any, notificacionsEsborrades: boolea
             },
             {
                 field: 'createdDate',
-            },
+                width: 155,
+            }]),
             {
                 field: 'enviadaDate',
                 width: 155,
             },
-            ...(notificacioErrorRegistre || notificacionsEsborrades ? [] : [{
+            ...(noEsTaulaRemeses ? [] : [{
                 field: 'registreNums',
                 width: 130,
             }
             ]),
-            ...(notificacioErrorRegistre ? [] : [{
+            ...(notificacioErrorRegistre || notificacioCallbackError ? [] : [{
                 field: 'organGestor',
                 width: 180,
             }]),
@@ -58,7 +60,7 @@ const useDataGridColumns = (datagridApiRef: any, notificacionsEsborrades: boolea
                     return (<><Chip label={letter} size="small" title={title} sx={{ mr: 1 }} />{params.formattedValue}</>);
                 },
             },
-            ...(notificacioErrorRegistre ? [] : [{
+            ...(notificacioErrorRegistre || notificacioCallbackError ? [] : [{
                 field: 'numExpedient',
                 width: 130,
             }]),
@@ -68,22 +70,23 @@ const useDataGridColumns = (datagridApiRef: any, notificacionsEsborrades: boolea
                 width: 120,
             },
             ...(notificacioErrorRegistre ? [] : [{
+                flex: 1,
                 field: 'createdBy',
             },
-            {
-                field: 'titular',
-            },
+                ...(notificacioCallbackError ? [] : [{
+                    field: 'titular',
+                }]),
             {
                 field: 'estatString',
-                width: 200,
+                width: 225,
                 renderCell: (params: any) => {
                     const estatJson = params?.formattedValue;
                     return (<NotificacioEstatGrid estatJson={estatJson} estatEnum={params?.row?.estat}/>);
                 },
             }]),
-            {
+            ...(noEsTaulaRemeses ? [] : [{
                 ...GRID_DETAIL_PANEL_TOGGLE_COL_DEF,
-                hideable: false,
+                hideable: noEsTaulaRemeses,
                 sortable: false,
                 resizable: false,
                 width: 90,
@@ -92,9 +95,9 @@ const useDataGridColumns = (datagridApiRef: any, notificacionsEsborrades: boolea
                 renderCell: (params: any) => (
                     <CustomDetailPanelToggle id={params.id} value={params.value} />
                 ),
-            },
+            }]),
         ],
-        [datagridApiRef, notificacionsEsborrades, notificacioErrorRegistre, t]
+        [datagridApiRef, notificacionsEsborrades, notificacioErrorRegistre, notificacioCallbackError, t]
     );
     return columns;
 };
@@ -141,7 +144,11 @@ const NotificacioAddButton: React.FC = () => {
     );
 };
 
-const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null>, notificacionsErrorRegistre: boolean | null, refresh: () => void }> = ({apiRef, notificacionsErrorRegistre, refresh}) => {
+const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null>,
+                                       notificacionsErrorRegistre: boolean | null,
+                                       notificacionsCallbackError: boolean | null,
+                                       refresh: () => void }>
+                                       = ({apiRef, notificacionsErrorRegistre, notificacionsCallbackError, refresh}) => {
 
     const { selection } = useMuiDataGridContext();
     const { currentRole} = useNotibContext();
@@ -159,7 +166,8 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
         marcarProcessatMassiu, marcarProcessatMassiuDialog,
         anularRemesaMassiu, anularRemesaMassiuDialog,
         ampliarTerminiMassiu, ampliarTerminiMassiuDialog,
-        reintentarRegistre
+        reintentarRegistre,
+        reenviarCallbacksMassiu
     } = useAccionsMassives("notificacioResource", refresh);
 
     const ids = selection?.ids ?? [];
@@ -169,9 +177,15 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
                 label: t('page.accioMassiva.accions.reintentarRegistre.label'),
                 tooltip: t('page.accioMassiva.accions.reintentarRegistre.tooltip'),
                 onClick: () => reintentarRegistre(selection?.ids, "NOTIFICACIO")
-            },]
-            : [
-            {
+            }]
+            : notificacionsCallbackError ? [
+                {
+                    label: t('page.callbacks.error.accionsMassives.reenviar.label'),
+                    tooltip: t('page.callbacks.error.accionsMassives.reenviar.label'),
+                    onClick: () => reenviarCallbacksMassiu(selection?.ids, "NOTIFICACIO")
+                }]
+            :
+            [{
                 label: t('page.accioMassiva.accions.marcarProcessades.label'),
                 tooltip: t('page.accioMassiva.accions.marcarProcessades.tooltip'),
                 onClick: () => marcarProcessatMassiu(null, t('page.accioMassiva.accions.marcarProcessades.label'), {ids: ids, seleccioTipus: "NOTIFICACIO"})
@@ -247,8 +261,8 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
     )
 };
 
-type NotificacioGridParams = { notificacionsEsborrades?: boolean; notificacionsErrorRegistre?: boolean; };
-const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorRegistre = false}: NotificacioGridParams) => {
+type NotificacioGridParams = { notificacionsEsborrades?: boolean; notificacionsErrorRegistre?: boolean; notificacionsCallbackError?: boolean };
+const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorRegistre = false, notificacionsCallbackError= false}: NotificacioGridParams) => {
 
     const { t } = useTranslation();
     const [ params ] = useSearchParams();
@@ -258,13 +272,15 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
     let titolSecundari = state?.titolMassiva;
     titolSecundari = notificacionsEsborrades ? t('page.notificacio.grid.notificacionsEsborrades.title') : titolSecundari;
     titolSecundari = notificacionsErrorRegistre ? t('page.notificacio.grid.notificacionsErrorRegistre.title') : titolSecundari;
+    titolSecundari = notificacionsCallbackError ? t('page.notificacio.grid.notificacionsCallbackError.title') : titolSecundari;
     const { dialogComponent, onDetailClick } = useNotificacioDetailDialog(notificacionsEsborrades);
     const { dialogComponentErrorRegistre, onDetailClickErrorRegistre } = useRemesesErrorRegistreDetailDialog();
+    const { dialogComponentErrorCallback, onDetailClickErrorCallback } = useRemesesErrorCallbackDetailDialog();
     const { currentActions: apiCurrentActions } = useResourceApiService('notificacioResource');
     const isCreateLinkPresent = apiCurrentActions?.['create'] != null;
     const datagridApiRef = useGridApiRef();
     const apiRef = useMuiDataGridApiRef();
-    const columns = useDataGridColumns(datagridApiRef, notificacionsEsborrades, notificacionsErrorRegistre);
+    const columns = useDataGridColumns(datagridApiRef, notificacionsEsborrades, notificacionsErrorRegistre, notificacionsCallbackError);
     const springFilterBuilder = useSpringFilterBuilder();
     const [searchParams] = useSearchParams();
     const referencia = searchParams.get('referencia');
@@ -272,7 +288,11 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
         'notificacioResource',
         'FILTER_NOTIFICACIO',
         springFilterBuilder,
-        <ContentFilter openByDefault={!!referencia} notificacionsEsborrades={notificacionsEsborrades} notificacionsErrorRegistre={notificacionsErrorRegistre} />,
+        <ContentFilter openByDefault={!!referencia}
+                       notificacionsEsborrades={notificacionsEsborrades}
+                       notificacionsErrorRegistre={notificacionsErrorRegistre}
+                       notificacionsCallbackError={notificacionsCallbackError}
+        />,
         undefined,
         {referencia: referencia}
     );
@@ -291,14 +311,16 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
         return currentRole === 'NOT_ADMIN_LECTURA' || (estat !== 'PENDENT' && estat !== 'REGISTRADA');
     }
 
-    const noEsTaulaRemeses = (notificacionsEsborrades || notificacionsErrorRegistre);
+    const noEsTaulaRemeses = (notificacionsEsborrades || notificacionsErrorRegistre || notificacionsCallbackError);
     const rowAdditionalActions: DataCommonAdditionalAction[] = [
             {
                 label: t('page.notificacio.grid.column.detalls'),
                 title: t('page.notificacio.grid.column.detalls'),
                 icon: 'info',
-                showInMenu: true,
-                onClick: id => notificacionsErrorRegistre ? onDetailClickErrorRegistre(id) : onDetailClick(id),
+                showInMenu: !notificacionsCallbackError,
+                onClick: id => notificacionsErrorRegistre ? onDetailClickErrorRegistre(id)
+                                    : notificacionsCallbackError ? onDetailClickErrorCallback(id)
+                                    : onDetailClick(id),
             },
             {
                 label: t('page.notificacio.grid.accions.documentEnviat'),
@@ -380,15 +402,22 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
         ];
     const navigate = useNavigate();
     const filtreMassiva = notificacioMassiva ? `notificacioMassiva.id :${notificacioMassiva}` : undefined
-    const filtreEsborrades = notificacionsEsborrades ? `deleted :${true}` : `deleted :${false}`;
+    const filtreEsborrades = notificacionsEsborrades ? `deleted:${true}` : `deleted:${false}`;
     const filtreErrorRegistre = notificacionsErrorRegistre ? "estat : 'PENDENT' and registreEnviamentIntent >: 3" : "";
-    const fixedFilter = filtreEsborrades + (filtreMassiva ? " and " + filtreMassiva : "")  + (filtreErrorRegistre ? " and " + filtreErrorRegistre : "");
+    const filtreCallbackError = notificacionsCallbackError ? "errorLastCallback:true" : "";
+    const fixedFilter = filtreEsborrades + (filtreMassiva ? " and " + filtreMassiva : "")  + (filtreErrorRegistre ? " and " + filtreErrorRegistre : "")
+                                + (filtreCallbackError ? " and " + filtreCallbackError : "");
     const [reloadKey, setReloadKey] = React.useState(0);
-    const refreshGrid = React.useCallback((refresh) => setReloadKey(k => k + 1), []);
+    const refreshGrid = React.useCallback(() => setReloadKey(k => k + 1), []);
+
+    const detailPanelProps = !noEsTaulaRemeses ? {
+                getDetailPanelContent: ({ row }: any) => (<NotificacioGridEnviaments id={row.id} />),
+                getDetailPanelHeight: () => 'auto',
+            } : {};
     return (
         <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
             <MuiDataGrid
-                key={`${currentRole}-${notificacionsEsborrades}-${notificacionsErrorRegistre}-${reloadKey}`}
+                key={`${currentRole}-${notificacionsEsborrades}-${notificacionsErrorRegistre}-${notificacionsCallbackError}-${reloadKey}`}
                 datagridApiRef={datagridApiRef}
                 apiRef={apiRef}
                 title={t('page.notificacio.grid.title') + (titolSecundari || "")}
@@ -401,8 +430,8 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                 selectionActive={!notificacionsEsborrades ? true : undefined}
                 rowUpdateLink="form/{{id}}"
                 rowUpdateShowInMenu
-                persistentStateClearPageSortPropsOnTopLevelRouteChange
-                persistentStateActive
+                // persistentStateClearPageSortPropsOnTopLevelRouteChange
+                // persistentStateActive
                 rowHideDeleteButton
                 rowHideUpdateButton={params => (mostrarEditarBorrar(params.estat, currentRole) || noEsTaulaRemeses)}
                 {...filterDataGridProps}
@@ -416,7 +445,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                     ...(notificacionsEsborrades ? []
                         : [{
                             position: 2,
-                            element: <MassiveActionsButton apiRef={datagridApiRef} notificacionsErrorRegistre={notificacionsErrorRegistre} refresh={refreshGrid}/>,
+                            element: <MassiveActionsButton apiRef={datagridApiRef} notificacionsErrorRegistre={notificacionsErrorRegistre} notificacionsCallbackError={notificacionsCallbackError} refresh={refreshGrid}/>,
                         }]),
                     ...(!notificacioMassiva ? []
                         : [{
@@ -428,14 +457,14 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                 rowActionsColumnIndex={11}
                 rowActionsColumnProps={{ width: 90 }}
                 rowAdditionalActions={rowAdditionalActions}
-                getDetailPanelContent={({ row }) => <NotificacioGridEnviaments id={row.id} />}
-                getDetailPanelHeight={() => 'auto'}
+                {...detailPanelProps}
                 getRowHeight={() => 'auto'}
                 getRowClassName={(params) => getGridRowColorClass(params.row.estat, NOTIFICACIO_ESTAT_ENUM_MAP)}
                 sx={generateGridRowStylesFromMap(NOTIFICACIO_ESTAT_ENUM_MAP)}
             />
             {dialogComponent}
             {dialogComponentErrorRegistre}
+            {dialogComponentErrorCallback}
             {anularRemesaDialog}
             {ampliarTerminiDialog}
             {marcarProcessatDialog}

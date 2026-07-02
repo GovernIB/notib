@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { useMuiContentDialog, useCloseDialogButtons } from 'reactlib';
 import NotificacioDetailDialogContent from './NotificacioDetail.tsx';
 import RemesesErrorRegistreDialogContent from "./RemesesErrorRegistreDetail.tsx";
+import RemesesErrorCallbackDialogContent from "./RemesesErrorCallbackDetail.tsx";
 
 export const useNotificacioDetailDialog = (notificacionsEsborrades: boolean) => {
 
@@ -29,4 +30,19 @@ export const useRemesesErrorRegistreDetailDialog = () => {
         ).catch(() => null);
     };
     return { dialogComponentErrorRegistre, onDetailClickErrorRegistre: handleDetailButtonClick };
+}
+
+
+export const useRemesesErrorCallbackDetailDialog = () => {
+
+    const { t } = useTranslation();
+    const [dialogShow, dialogComponentErrorCallback] = useMuiContentDialog();
+    const defaultDialogButtons = useCloseDialogButtons();
+    const handleDetailButtonClick = (id: any) => {
+        dialogShow(t('page.notificacio.detail.title.erroRegistre'),
+            <RemesesErrorCallbackDialogContent id={id} />,
+            defaultDialogButtons, { maxWidth: 'lg', fullWidth: true,}
+        ).catch(() => null);
+    };
+    return { dialogComponentErrorCallback, onDetailClickErrorCallback: handleDetailButtonClick };
 }

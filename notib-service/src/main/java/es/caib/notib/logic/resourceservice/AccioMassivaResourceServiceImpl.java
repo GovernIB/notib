@@ -1,17 +1,24 @@
 package es.caib.notib.logic.resourceservice;
 
 import com.google.common.base.Strings;
+import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
+import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
+import es.caib.notib.logic.intf.base.config.BaseConfig;
+import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
 import es.caib.notib.logic.intf.model.AccioMassivaResource;
 import es.caib.notib.logic.intf.resourceservice.AccioMassivaResourceService;
 import es.caib.notib.persist.resourceentity.AccioMassivaResourceEntity;
 import es.caib.notib.persist.resourcerepository.UsuariResourceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementació del servei d'accions massives.
@@ -25,6 +32,8 @@ public class AccioMassivaResourceServiceImpl extends BaseMutableResourceService<
 
 	private final UserSessionHelper userSessionHelper;
 	private final UsuariResourceRepository usuariRepository;
+	private final AuthenticationHelper authenticationHelper;
+	private final NotibPermissionHelper notibPermissionHelper;
 
 	@PostConstruct
 	public void init() {
@@ -70,9 +79,19 @@ public class AccioMassivaResourceServiceImpl extends BaseMutableResourceService<
 	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
 
 		// Condició per a mostrar només les notificacions de l'entitat actual
-		String entitatFilter = "entitat.id:" + userSessionHelper.getCurrentEntitatId();
-		return entitatFilter;
+		var isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
+		var isRoleAdminLectura = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN_LECTURA);
+		var isRoleAdminOrgan = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN);
+		var entitatFilter = "entitat.id:" + userSessionHelper.getCurrentEntitatId();
+		if ((isRoleAdmin && notibPermissionHelper.currentEntitatPermissionAllowed(ExtendedPermission.PERM2)) ||
+			(isRoleAdminLectura && notibPermissionHelper.currentEntitatPermissionAllowed(ExtendedPermission.PERMX))) {
+			return entitatFilter;
+		}
 
+		if (isRoleAdminOrgan && notibPermissionHelper.currentOrganGestorPermissionAllowed(BasePermission.ADMINISTRATION)) {
+			return entitatFilter + " and organGestor.id:" + userSessionHelper.getCurrentOrganGestorId();
+		}
+		return "";
 	}
 
 

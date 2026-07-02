@@ -141,14 +141,6 @@ const InnerApp: React.FC = () => {
             hidden: currentRole !== ROLE_SUPER,
         },
         {
-            id: 'avisos',
-            title: t('app.menu.avisos'),
-            to: '/avisos',
-            icon: 'notifications',
-            resourceName: 'avisResource',
-            hidden: currentRole !== ROLE_SUPER,
-        },
-        {
             id: 'propietats',
             title: t('app.menu.propietats'),
             to: '/propietats',
@@ -213,6 +205,24 @@ const InnerApp: React.FC = () => {
             hidden: currentRole !== ROLE_ADMIN,
         },
         {
+            id: 'caches',
+            title: t('app.menu.cache'),
+            to: '/caches',
+            icon: 'sd_storage',
+            resourceName: 'cacheResource',
+            hidden: currentRole !== ROLE_SUPER,
+        }
+    ];
+    const menuMonitoritza = [
+        {
+            id: 'notificacionsCallbackError',
+            title: t('app.menu.notificacionsCallbacksError'),
+            to: '/notificacionsCallbackError',
+            icon: 'running_with_errors',
+            resourceName: 'notificacioResource',
+            hidden: currentRole !== ROLE_SUPER,
+        },
+        {
             id: 'integracions',
             title: t('app.menu.integracions'),
             to: '/integracions',
@@ -221,11 +231,12 @@ const InnerApp: React.FC = () => {
             hidden: currentRole !== ROLE_SUPER,
         },
         {
-            id: 'caches',
-            title: t('app.menu.cache'),
-            to: '/caches',
-            icon: 'sd_storage',
-            resourceName: 'cacheResource',
+            id: 'monitorSistema',
+            title: t('app.menu.monitorSistema'),
+            to: '/monitorSistema',
+            icon: 'monitor_heart',
+            // resourceName: 'threadInfoResource',
+            // resourceName: 'integracioResource',
             hidden: currentRole !== ROLE_SUPER,
         },
         {
@@ -236,23 +247,7 @@ const InnerApp: React.FC = () => {
             resourceName: 'activeMqResource',
             hidden: currentRole !== ROLE_SUPER,
         },
-        // {
-        //     id: 'callbacksError',
-        //     title: t('app.menu.callbacksError'),
-        //     to: '/notificacions',
-        //     icon: 'running_with_errors',
-        //     resourceName: 'notificacioResource',
-        //     hidden: currentRole !== ROLE_SUPER,
-        // },
-        {
-            id: 'monitorSistema',
-            title: t('app.menu.monitorSistema'),
-            to: '/monitorSistema',
-            icon: 'monitor_heart',
-            // resourceName: 'threadInfoResource',
-            // resourceName: 'integracioResource',
-            hidden: currentRole !== ROLE_SUPER,
-        },
+
     ];
     const menuEntries = [
         {
@@ -267,6 +262,7 @@ const InnerApp: React.FC = () => {
             to: '/notificacions',
             icon: 'mail',
             resourceName: 'notificacioResource',
+            hidden: currentRole === ROLE_SUPER,
         },
         {
             id: 'enviaments',
@@ -290,11 +286,26 @@ const InnerApp: React.FC = () => {
             hidden: currentRole !== ROLE_ADMIN,
         },
         {
+            id: 'monitoritza',
+            title: t('app.menu.monitoritza'),
+            icon: 'monitor',
+            children: menuMonitoritza,
+            hidden: currentRole !== ROLE_SUPER,
+        },
+        {
             id: 'config',
             title: t('app.menu.config'),
             icon: 'settings',
             children: menuConfig,
             hidden: currentRole === ROLE_USER,
+        },
+        {
+            id: 'avisos',
+            title: t('app.menu.avisos'),
+            to: '/avisos',
+            icon: 'notifications',
+            resourceName: 'avisResource',
+            hidden: currentRole !== ROLE_SUPER,
         },
     ];
     const theme = useTheme();

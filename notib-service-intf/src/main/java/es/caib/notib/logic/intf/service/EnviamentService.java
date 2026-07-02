@@ -161,10 +161,10 @@ public interface EnviamentService {
 	/**
 	 * Envia un event de callback de als enviament indicat
 	 *
-	 * @param notificacions id de l'enviament.
+	 * @param enviaments ids dels enviaments.
 	 */
 	@PreAuthorize("isAuthenticated()")
-	List<Long> enviarCallback(Set<Long> notificacions, Long accioMassivaId) throws Exception;
+	List<Long> enviarCallback(Set<Long> enviaments, Long accioMassivaId) throws Exception;
 
 	@PreAuthorize("isAuthenticated()")
 	ArxiuDto getCertificacioPostalArxiu(Long enviamentId);

@@ -156,6 +156,10 @@ export const router = createBrowserRouter(
                     element: <NotificacioGrid notificacionsErrorRegistre={true} notificacionsEsborrades={false}/>
                 },
                 {
+                    path: 'notificacionsCallbackError',
+                    element: <NotificacioGrid notificacionsErrorRegistre={false} notificacionsEsborrades={false} notificacionsCallbackError={true}/>
+                },
+                {
                     path: 'enviaments',
                     element: <EnviamentGrid />,
                 },

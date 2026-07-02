@@ -364,6 +364,11 @@ export const useAccionsMassives = ( resource: string, refresh?: () => void) => {
         massiveAction(ids, 'ESBORRAR_CALLBACK_PENDENT_MASSIU', t('page.callbacks.pendents.accionsMassives.activarPendents.ok'), null, true);
     }
 
+    const reenviarCallbacksMassiu = (ids: Set<any> | undefined, seleccioTipus: string): void => {
+        temporalMessageShow(null, t('page.accioMassiva.accions.executant'), 'info');
+        massiveAction(ids, 'REENVIAR_CALLBACKS_MASSIU', t('page.callbacks.error.accionsMassives.reenviar.ok'), seleccioTipus, true);
+    }
+
     return {
         descarregarExcel,
         descarregarJustificants,
@@ -381,7 +386,8 @@ export const useAccionsMassives = ( resource: string, refresh?: () => void) => {
         enviarCallbacksPendentsMassiu,
         pausarCallbacksPendentsMassiu,
         activarCallbacksPendentsMassiu,
-        esborrarCallbacksPendentsMassiu
+        esborrarCallbacksPendentsMassiu,
+        reenviarCallbacksMassiu
     }
 }
 

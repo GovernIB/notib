@@ -127,6 +127,7 @@ public class AccionsMassivesListener {
 					} catch (Exception ex) {
 						error = true;
 					}
+					accioEntity.setDataFi(new Date());
 					break;
 				case TORNA_ACTIVAR_CALLBACK:
 					for(var enviamentId : seleccio) {

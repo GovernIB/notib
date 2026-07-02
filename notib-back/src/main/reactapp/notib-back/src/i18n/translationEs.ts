@@ -5,6 +5,7 @@ const translationEs = {
         menu: {
             home: 'Inicio',
             config: 'Configuración',
+            monitoritza: 'Monitoriza',
             entitats: 'Entidades',
             avisos: 'Avisos',
             propietats: 'Propiedades',
@@ -20,7 +21,7 @@ const translationEs = {
             integracions: 'Integraciones',
             cache: "Cache de aplicaciones",
             activemq: "Monitor ActiveMQ",
-            callbacksError: "Notificaciones callback erroneas",
+            notificacionsCallbacksError: "Notificaciones callback erroneas",
             enviamentMassiu: "Envíos masivos",
             nouEnviamentmassiu: "Nuevo envío masivo",
             consultaEnviamentmassiu: "Consulta envíos masivos",
@@ -348,6 +349,9 @@ const translationEs = {
                 },
                 notificacionsErrorRegistre: {
                     title: " con error de registro",
+                },
+                notificacionsCallbackError: {
+                    title: " amb error en el último l'últim callback",
                 }
             },
             form: {
@@ -417,6 +421,11 @@ const translationEs = {
                     historic: 'Histórico',
                 },
                 errorRegistre: {
+                    data: "Fecha",
+                    tipus: "Tipo",
+                    error: "Error descripción"
+                },
+                errorCallback: {
                     data: "Fecha",
                     tipus: "Tipo",
                     error: "Error descripción"
@@ -895,6 +904,12 @@ const translationEs = {
                 grid: {
                     title: "Notificaciones con error en el último callback",
                 },
+                accionsMassives: {
+                    reenviar: {
+                        label: "Reintenta callback",
+                        ok: "Se han reenviado los callbacks con error"
+                    }
+                }
             }
         },
         monitorSistema :{

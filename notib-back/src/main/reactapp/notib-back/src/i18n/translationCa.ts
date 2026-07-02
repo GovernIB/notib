@@ -5,6 +5,7 @@ const translationCa = {
         menu: {
             home: 'Inici',
             config: 'Configuració',
+            monitoritza: 'Monitoritza',
             entitats: 'Entitats',
             avisos: 'Avisos',
             propietats: 'Propietats',
@@ -20,7 +21,7 @@ const translationCa = {
             integracions: 'Integracions',
             cache: "Cache d'aplicacions",
             activemq: 'Monitor ActiveMQ',
-            callbacksError: 'Notificacions callback erronies',
+            notificacionsCallbacksError: 'Notificacions callback erronies',
             monitorSistema: 'Monitor de sistema',
             enviamentMassiu: "Enviaments massius",
             nouEnviamentmassiu: "Nou enviament massiu",
@@ -365,6 +366,9 @@ const translationCa = {
                 },
                 notificacionsErrorRegistre: {
                     title: " amb error de registre",
+                },
+                notificacionsCallbackError: {
+                    title: " amb error a l'últim callback",
                 }
             },
             form: {
@@ -430,6 +434,11 @@ const translationCa = {
                     erroRegistre: "Detalls de la excepció"
                 },
                 errorRegistre: {
+                    data: "Data",
+                    tipus: "Tipus",
+                    error: "Error descripció"
+                },
+                errorCallback: {
                     data: "Data",
                     tipus: "Tipus",
                     error: "Error descripció"
@@ -924,6 +933,12 @@ const translationCa = {
                 grid: {
                     title: "Notificacions amb error a l'últim callback",
                 },
+                accionsMassives: {
+                    reenviar: {
+                        label: "Reintenta callback",
+                        ok: "S'han reenviat els callbacks amb errror"
+                    }
+                }
             }
         },
         monitorSistema: {

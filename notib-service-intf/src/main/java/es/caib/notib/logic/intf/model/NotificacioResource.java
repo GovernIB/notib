@@ -65,7 +65,7 @@ import static es.caib.notib.logic.intf.model.NotificacioResource.ACTION_ANULAR_R
 	accessConstraints = {
 		@ResourceAccessConstraint(
 			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-			roles = { BaseConfig.ROLE_ADMIN },
+			roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_SUPER },
 			grantedPermissions = { PermissionEnum.READ }
 		),
 		@ResourceAccessConstraint(
@@ -340,6 +340,17 @@ import static es.caib.notib.logic.intf.model.NotificacioResource.ACTION_ANULAR_R
 		),
 		@ResourceArtifact(
 			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.ACTION_REENVIAR_CALLBACKS_MASSIU,
+			formClass = AccioMassivaParams.class,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_SUPER }
+				)
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
 			code = NotificacioResource.ACTION_ENVIAR_NOTIFICACIONS_MOVIL_MASSIU,
 			formClass = AccioMassivaParams.class,
 			accessConstraints = {
@@ -435,6 +446,7 @@ public class NotificacioResource extends BaseResource<Long> {
 	public static final String ACTION_ESBORRAR_MASSIU = "ESBORRAR_MASSIU";
 	public static final String ACTION_REACTIVAR_CONSULTES_CANVI_ESTAT_MASSIU = "REACTIVAR_CONSULTES_CANVI_ESTAT_MASSIU";
 	public static final String ACTION_REACTIVAR_CALLBACKS_MASSIU = "REACTIVAR_CALLBACKS_MASSIU";
+	public static final String ACTION_REENVIAR_CALLBACKS_MASSIU = "REENVIAR_CALLBACKS_MASSIU";
 	public static final String ACTION_ENVIAR_NOTIFICACIONS_MOVIL_MASSIU = "ENVIAR_NOTIFICACIONS_MOVIL_MASSIU";
 	public static final String ACTION_MARCAR_PROCESSAT_MASSIU = "MARCAR_PROCESSAT_MASSIU";
 	public static final String ACTION_ANULAR_MASSIU = "ANULAR_MASSIU";

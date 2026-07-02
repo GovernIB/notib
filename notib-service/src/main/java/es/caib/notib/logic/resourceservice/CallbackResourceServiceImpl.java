@@ -87,6 +87,10 @@ public class CallbackResourceServiceImpl extends BaseMutableResourceService<Call
 	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
 
 		// Condició per a mostrar només els callbackss de l'entitat actual
+		var isRoleSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);
+		if (isRoleSuper) {
+			return "";
+		}
 		var entitatFilter = "notificacio.entitat.id:" + userSessionHelper.getCurrentEntitatId();
 		var estatFilter = " and (estat: 'PENDENT' or error: true)";
 		var isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);

@@ -1035,9 +1035,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 	}
 
 	@Override
-	public List<Long> enviarCallback(Set<Long> notificacions, Long accioMassivaId) throws Exception {
+	public List<Long> enviarCallback(Set<Long> enviaments, Long accioMassivaId) throws Exception {
 
-		var callbacks = callbackRepository.findByNotificacioIdIn(notificacions);
+		var callbacks = callbackRepository.findByEnviamentIdIn(enviaments);
 		List<Long> enviamentsAmbError = new ArrayList<>();
 		boolean isError;
 		for (var callback : callbacks) {
