@@ -2,9 +2,9 @@ import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {GridPage, MuiDataGrid, MuiDataGridColDef, useBaseAppContext, useMuiDataGridApiRef, useResourceApiService,} from 'reactlib';
 import {Badge, Button, Icon} from "@mui/material";
-import {GridApiPro, GridRowSelectionModel, useGridApiRef} from "@mui/x-data-grid-pro";
+import {GridApiPro, useGridApiRef} from "@mui/x-data-grid-pro";
 
-const useCacheAction = (refresh?: () => void, apiRef: React.RefObject<GridApiPro | null>) => {
+const useCacheAction = (apiRef: React.RefObject<GridApiPro | null>, refresh?: () => void) => {
 
     const { t } = useTranslation();
     const { isReady: apiIsReady, artifactAction: apiAction } = useResourceApiService('cacheResource');
@@ -56,7 +56,7 @@ export const CacheGrid = () => {
     const datagridApiRef = useGridApiRef();
     const columns = useDataGridColumns(gridApiRef);
     const [selectedRows, setSelectedRows] = React.useState<Set<string | number>>(new Set());
-    const { restart, restartAll } = useCacheAction(gridApiRef?.current?.refresh, datagridApiRef);
+    const { restart, restartAll } = useCacheAction(datagridApiRef, gridApiRef?.current?.refresh);
 
     const accions = [
         {
