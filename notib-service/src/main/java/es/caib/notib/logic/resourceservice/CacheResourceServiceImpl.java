@@ -1,12 +1,16 @@
 package es.caib.notib.logic.resourceservice;
 
-import es.caib.notib.logic.base.service.BaseNoDatabaseMutableResourceService;
+import es.caib.notib.logic.base.service.BaseMutableResourceService;
+import es.caib.notib.logic.cacheable.BuidarCacheActionExecutor;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
+import es.caib.notib.logic.intf.base.exception.ResourceNotFoundException;
 import es.caib.notib.logic.intf.model.CacheResource;
 import es.caib.notib.logic.intf.resourceservice.CacheResourceService;
+import es.caib.notib.logic.intf.service.CacheService;
 import es.caib.notib.persist.base.entity.NoDatabaseResourceEntity;
+import es.caib.notib.persist.resourceentity.CacheResourceEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -14,6 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,14 +32,22 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CacheResourceServiceImpl extends BaseNoDatabaseMutableResourceService<CacheResource, String> implements CacheResourceService {
+public class CacheResourceServiceImpl extends BaseMutableResourceService<CacheResource, String, CacheResourceEntity> implements CacheResourceService {
 
 	private final MetricsHelper metricsHelper;
 	private final CacheHelper cacheHelper;
 	private final MessageHelper messageHelper;
+	private final CacheService cacheService;
+
+	@PostConstruct
+	public void init() {
+
+		register(CacheResource.ACTION_BUIDAR_CACHE, new BuidarCacheActionExecutor(cacheService));
+	}
 
 	@Override
-	protected Page<NoDatabaseResourceEntity<CacheResource, String>> entityRepositoryFindEntities(String quickFilter, String filter, String[] namedQueries, Pageable pageable) {
+//	protected Page<NoDatabaseResourceEntity<CacheResource, String>> entityRepositoryFindEntities(String quickFilter, String filter, String[] namedQueries, Pageable pageable) {
+	public Page<CacheResource> findPage(String quickFilter, String filter, String[] namedQueries, String[] perspectives, Pageable pageable) {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
@@ -44,6 +57,7 @@ public class CacheResourceServiceImpl extends BaseNoDatabaseMutableResourceServi
 			CacheResource cache;
 			for (var cacheValue : cachesValues) {
 				cache = new CacheResource();
+				cache.setId(cacheValue);
 				cache.setCodi(cacheValue);
 				cache.setDescripcio(messageHelper.getMessage("es.caib.notib.ehcache." + cacheValue));
 				cache.setLocalHeapSize(cacheHelper.getCacheSize(cacheValue));
@@ -61,11 +75,21 @@ public class CacheResourceServiceImpl extends BaseNoDatabaseMutableResourceServi
 				return c1Pos.compareTo(c2Pos);
 			});
 			Page<CacheResource> page = new PageImpl<>(caches, pageable, caches.size());
-			var resultat =  page.map(this::toResourceEntity);
-			return resultat;
+//			var resultat =  page.map(this::toResourceEntity);
+			return page;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
+	}
+
+	@Override
+	public CacheResource getOne(String id, String[] perspectives) throws ResourceNotFoundException {
+		return null;
+	}
+
+	@Override
+	public boolean isEntityRepositoryOptional() {
+		return true;
 	}
 
 	private NoDatabaseResourceEntity<CacheResource, String> toResourceEntity(CacheResource resource) {

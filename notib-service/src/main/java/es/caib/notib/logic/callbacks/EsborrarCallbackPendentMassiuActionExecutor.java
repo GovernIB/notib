@@ -1,7 +1,7 @@
 package es.caib.notib.logic.callbacks;
 
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
-import es.caib.notib.logic.intf.AccioMassivaParams;
+import es.caib.notib.logic.intf.model.AccioMassivaParams;
 import es.caib.notib.logic.intf.base.exception.ActionExecutionException;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.dto.callback.CallbackResposta;

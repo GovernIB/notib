@@ -15,10 +15,4 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(BaseConfig.API_PATH + "/caches")
 public class CacheResourceController extends BaseMutableResourceController<CacheResource, String> {
-
-	@Override
-	public ResponseEntity<CacheResource> delete(String id) {
-
-		return null;
-	}
 }

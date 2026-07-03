@@ -1,7 +1,7 @@
 package es.caib.notib.logic.callbacks;
 
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
-import es.caib.notib.logic.intf.AccioMassivaParams;
+import es.caib.notib.logic.intf.model.AccioMassivaParams;
 import es.caib.notib.logic.intf.base.exception.ActionExecutionException;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.dto.callback.CallbackResposta;
@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 @Slf4j
 @AllArgsConstructor

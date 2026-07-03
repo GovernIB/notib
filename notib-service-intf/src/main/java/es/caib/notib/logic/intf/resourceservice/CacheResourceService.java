@@ -1,5 +1,6 @@
 package es.caib.notib.logic.intf.resourceservice;
 
+import es.caib.notib.logic.intf.base.service.MutableResourceService;
 import es.caib.notib.logic.intf.base.service.ReadonlyResourceService;
 import es.caib.notib.logic.intf.model.CacheResource;
 
@@ -8,5 +9,5 @@ import es.caib.notib.logic.intf.model.CacheResource;
  *
  * @author Límit Tecnologies
  */
-public interface CacheResourceService extends ReadonlyResourceService<CacheResource, String> {
+public interface CacheResourceService extends MutableResourceService<CacheResource, String> {
 }

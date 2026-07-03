@@ -9,11 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import java.io.Serializable;
-import java.util.List;
-
 @SuppressWarnings("serial")
 @Getter
 @Setter
@@ -26,7 +21,7 @@ import java.util.List;
             @ResourceArtifact(
                     type = ResourceArtifactType.ACTION,
                     code = BackGroundTaskResource.ACTION_RESTART_TASK,
-                    formClass = BackGroundTaskResource.MassiveRestartTaskForm.class),
+                    formClass = SeleccioStringForm.class),
         })
 public class BackGroundTaskResource extends BaseResource<String> {
 
@@ -39,12 +34,4 @@ public class BackGroundTaskResource extends BaseResource<String> {
 	private String properaExecucio;
 	private String observacions;
 
-    @Getter
-    @Setter
-    public static class MassiveRestartTaskForm implements Serializable {
-		@NotNull
-        @NotEmpty
-        private List<String> ids;
-        private boolean massivo = false;
-    }
 }

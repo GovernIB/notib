@@ -50,8 +50,6 @@ public class CallbackResourceServiceImpl extends BaseMutableResourceService<Call
 	private final UserSessionHelper userSessionHelper;
 	private final AuthenticationHelper authenticationHelper;
 	private final NotibPermissionHelper notibPermissionHelper;
-	private Map<Long, Date> mapProperIntent;
-
 
 	@PostConstruct
 	public void init() {

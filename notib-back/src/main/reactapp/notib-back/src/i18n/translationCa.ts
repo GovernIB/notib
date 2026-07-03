@@ -885,6 +885,12 @@ const translationCa = {
             grid: {
                 title: "Cache d'aplicacions",
             },
+            accions: {
+                buidarMassiuOk: "Caches buidades correctament",
+                buidarOk: "Cache buidada correctament",
+                buidar: "Buidar cache",
+                buidarMassiu: "Buidar caches"
+            }
         },
         activemq: {
             grid: {

@@ -3,13 +3,12 @@ package es.caib.notib.logic.accionsMassives;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.helper.UserSessionHelper;
-import es.caib.notib.logic.intf.AccioMassivaParams;
+import es.caib.notib.logic.intf.model.AccioMassivaParams;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.ActionExecutionException;
 import es.caib.notib.logic.intf.dto.RespostaActionExecutor;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaExecucio;
 import es.caib.notib.logic.intf.dto.accioMassiva.AccioMassivaTipus;
-import es.caib.notib.logic.intf.dto.accioMassiva.SeleccioTipus;
 import es.caib.notib.logic.intf.model.NotificacioResource;
 import es.caib.notib.logic.intf.service.AccioMassivaService;
 import es.caib.notib.logic.intf.service.EnviamentService;
@@ -18,9 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.Set;
 
 @Slf4j
 @AllArgsConstructor

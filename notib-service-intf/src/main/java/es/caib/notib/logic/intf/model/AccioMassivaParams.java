@@ -1,4 +1,4 @@
-package es.caib.notib.logic.intf;
+package es.caib.notib.logic.intf.model;
 
 import es.caib.notib.logic.intf.dto.accioMassiva.SeleccioTipus;
 import lombok.Getter;

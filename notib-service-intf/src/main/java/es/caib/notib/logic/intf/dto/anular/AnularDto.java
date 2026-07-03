@@ -1,6 +1,6 @@
 package es.caib.notib.logic.intf.dto.anular;
 
-import es.caib.notib.logic.intf.AccioMassivaParams;
+import es.caib.notib.logic.intf.model.AccioMassivaParams;
 import lombok.Getter;
 import lombok.Setter;
 

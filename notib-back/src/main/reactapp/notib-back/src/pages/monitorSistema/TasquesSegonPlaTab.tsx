@@ -10,14 +10,13 @@ import {
 import { Badge, Button, Icon } from '@mui/material';
 
 const useTaskAction = (refresh?: () => void) => {
+
     const { t } = useTranslation();
-    const { isReady: apiIsReady, artifactAction: apiAction } =
-        useResourceApiService('backGroundTaskResource');
+    const { isReady: apiIsReady, artifactAction: apiAction } = useResourceApiService('backGroundTaskResource');
     const { temporalMessageShow } = useBaseAppContext();
 
-    const restart = (id: any) => {
-        restartAll([id], false);
-    };
+    const restart = (id: any) => restartAll([id], false);
+
     const restartAll = (ids: any[], massivo: boolean = true) => {
         apiAction(undefined, { code: 'RESTART_TASK', data: { ids } })
             .then(() => {
@@ -30,9 +29,7 @@ const useTaskAction = (refresh?: () => void) => {
                     'success'
                 );
             })
-            .catch((error) => {
-                temporalMessageShow(null, error?.message, 'error');
-            });
+            .catch((error) => temporalMessageShow(null, error?.message, 'error'));
     };
 
     return {
@@ -43,6 +40,7 @@ const useTaskAction = (refresh?: () => void) => {
 };
 
 const TasquesSegonPlaTab: React.FC = () => {
+
     const sortModelTasques: any[] = [{ field: 'id', sort: 'asc' }];
     const gridApiRef = useMuiDataGridApiRef();
     const { t } = useTranslation();

@@ -8,6 +8,7 @@ import es.caib.notib.logic.intf.base.exception.ActionExecutionException;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.exception.ResourceNotFoundException;
 import es.caib.notib.logic.intf.model.BackGroundTaskResource;
+import es.caib.notib.logic.intf.model.SeleccioStringForm;
 import es.caib.notib.logic.intf.monitor.MonitorTascaEstat;
 import es.caib.notib.logic.intf.monitor.MonitorTascaInfo;
 import es.caib.notib.logic.intf.resourceservice.BackGroundTaskResourceService;
@@ -40,7 +41,7 @@ public class BackGroundTaskResourceServiceImpl extends BaseMutableResourceServic
 
     @PostConstruct
     public void init() {
-    	register(BackGroundTaskResource.ACTION_RESTART_TASK,	new RestartTaskActionExecutor());
+    	register(BackGroundTaskResource.ACTION_RESTART_TASK, new RestartTaskActionExecutor());
     }
 
 	@Override
@@ -91,10 +92,10 @@ public class BackGroundTaskResourceServiceImpl extends BaseMutableResourceServic
 		return null;
 	}
 
-	private class RestartTaskActionExecutor implements ActionExecutor<BackGroundTaskResourceEntity, BackGroundTaskResource.MassiveRestartTaskForm, Serializable> {
+	private class RestartTaskActionExecutor implements ActionExecutor<BackGroundTaskResourceEntity, SeleccioStringForm, Serializable> {
 
 		@Override
-		public Serializable exec(String code, BackGroundTaskResourceEntity entity, BackGroundTaskResource.MassiveRestartTaskForm params) throws ActionExecutionException {
+		public Serializable exec(String code, BackGroundTaskResourceEntity entity, SeleccioStringForm params) throws ActionExecutionException {
 			try {
 				if (params.getIds()!=null) {
 					for (String id: params.getIds()) {
@@ -104,15 +105,16 @@ public class BackGroundTaskResourceServiceImpl extends BaseMutableResourceServic
 					schedulingConfig.restartSchedulledTasks(); //TODO s'ha comentant el restart per id. Revisar si cal afegir el restart by id
 				}
 				return "{\"resultat\": \"OK\"}";
-			} catch (Exception e) {
-				excepcioLogHelper.addExcepcio("/backGroundTask/"+entity.getId()+"/RestartTaskActionExecutor", e);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
+			} catch (Exception ex) {
+//				excepcioLogHelper.addExcepcio("/backGroundTask/"+entity.getId()+"/RestartTaskActionExecutor", e);
+				var msg = "Error inesperat resetejant les tasques ";
+				log.error("[RestartTaskActionExecutor] " + msg + " - " + ex.getMessage());
+				throw new ActionExecutionException(getResourceClass(), null, code, msg + " - " + ex.getMessage());
 			}
 		}
 
 		@Override
-		public void onChange(Serializable id, BackGroundTaskResource.MassiveRestartTaskForm previous, String fieldName, Object fieldValue,
-							 Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, BackGroundTaskResource.MassiveRestartTaskForm target) {}
+		public void onChange(Serializable id, SeleccioStringForm previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, SeleccioStringForm target) {}
 	}
 
 	@Override

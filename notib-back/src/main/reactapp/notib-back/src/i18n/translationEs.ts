@@ -856,6 +856,12 @@ const translationEs = {
             grid: {
                 title: "Cache de aplicaciones"
             },
+            accions: {
+                buidarMassiuOk: "Caches vaciadas correctamente",
+                buidarOk: "Cache vaciada correctamente",
+                buidar: "Vaciar cache",
+                buidarMassiu: "Vaciar caches"
+            }
         },
         activemq: {
             grid: {
