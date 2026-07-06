@@ -28,6 +28,7 @@ import NotificacioMassivaGrid from "./pages/notificacioMassiva/NotificacioMassiv
 import NotificacioMassivaForm from "./pages/notificacioMassiva/NotificacioMassivaForm.tsx";
 import AccioMassivaGrid from "./pages/accioMassiva/AccioMassivaGrid.tsx";
 import CallbackPendentsGrid from "./pages/callbacks/CallbackPendentsGrid.tsx";
+import Metriques from "./pages/metriques/Metriques.tsx";
 
 export const router = createBrowserRouter(
     [
@@ -191,9 +192,11 @@ export const router = createBrowserRouter(
                 },
                 {
                     path: 'caches',
-                    children: [
-                        { index: true, element: <CacheGrid /> },
-                    ],
+                    element: <CacheGrid />
+                },
+                {
+                    path: 'metriques',
+                    element: <Metriques />
                 },
                 {
                     path: 'activemq',

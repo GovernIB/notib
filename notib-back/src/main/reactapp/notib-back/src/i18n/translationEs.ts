@@ -31,6 +31,7 @@ const translationEs = {
             callbackPendent: "Callback pendientes",
             accionsMassives: "Consulta acciones masivas",
             permisosUsuari: "Permisos de usuario",
+            metriques: "Métricas"
         },
     },
     page: {
@@ -942,6 +943,22 @@ const translationEs = {
                     restartSelectOk: "Reiniciadas correctamente",
                 },
             }
+        },
+        metriques: {
+            title: "Métricas",
+            llegenda: {
+                title: "Leyenda",
+                numExecTempsMig: "Número de ejecuciones x Tiempo medio de una ejecución (ms)",
+                tempsMigExcecuio: "Tiempo medio de una ejecución (ms)",
+                tempsMaxim: "Tiempo máximo (ms)"
+            },
+            excecucions: "ejecuciones",
+            generics: "Genéricos",
+            frequencia: "Frequéncia",
+            mitjana: "Mediana",
+            duracio: "Duración",
+            percentils: "Percentils",
+            exportaJson: "Exporta"
         },
         notFound: {
             title: 'Página no encontrada',

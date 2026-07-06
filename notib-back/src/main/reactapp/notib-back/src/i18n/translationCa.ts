@@ -32,6 +32,7 @@ const translationCa = {
             callbackPendent: "Callback pendents",
             accionsMassives: "Consulta accions massives",
             permisosUsuari: "Permisos d'usuari",
+            metriques: "Mètriques",
         },
     },
     page: {
@@ -971,6 +972,22 @@ const translationCa = {
                     restartSelectOk: 'Reiniciades correctament',
                 },
             },
+        },
+        metriques: {
+            title: "Mètriques",
+            llegenda: {
+                title: "Llegenda",
+                numExecTempsMig: "Número d'execucions x Temps mig d'una execució (ms)",
+                tempsMigExcecuio: "Temps mig d'una execució (ms)",
+                tempsMaxim: "Temps màxim (ms)"
+            },
+            excecucions: "execucions",
+            generics: "Genèrics",
+            frequencia: "Freqüència",
+            mitjana: "Mitjana",
+            duracio: "Duració",
+            percentils: "Percentils",
+            exportaJson: "Exporta"
         },
         notFound: {
             title: 'Pàgina no trobada',

@@ -32,26 +32,18 @@ const getAuthConfig = () => ({
 });
 
 export const getEnvApiUrl = () => {
+
     const envApiPublicUrl = envVar('VITE_API_PUBLIC_URL', envVars);
     const envApiUrl = envVar('VITE_API_URL', envVars);
     if (envApiPublicUrl || envApiUrl) {
         return envApiPublicUrl ?? envApiUrl;
-    } else {
-        const envApiBaseUrl = envVar('VITE_API_BASE_URL', envVars);
-        const envApiSuffix = envVar('VITE_API_SUFFIX', envVars) ?? '/api';
-        if (envApiBaseUrl) {
-            return envApiBaseUrl + envApiSuffix;
-        } else {
-            return (
-                window.location.protocol +
-                '//' +
-                window.location.host +
-                ':' +
-                window.location.port +
-                envApiSuffix
-            );
-        }
     }
+    const envApiBaseUrl = envVar('VITE_API_BASE_URL', envVars);
+    const envApiSuffix = envVar('VITE_API_SUFFIX', envVars) ?? '/api';
+    if (envApiBaseUrl) {
+        return envApiBaseUrl + envApiSuffix;
+    }
+    return (window.location.protocol + '//' + window.location.host + ':' + window.location.port + envApiSuffix);
 };
 
 const isAuthUrlPresent = envVar('VITE_AUTH_URL', envVars) != null;
@@ -228,6 +220,14 @@ const InnerApp: React.FC = () => {
             to: '/integracions',
             icon: 'build',
             resourceName: 'monitorIntegracioResource',
+            hidden: currentRole !== ROLE_SUPER,
+        },
+        {
+            id: 'metriques',
+            title: t('app.menu.metriques'),
+            to: '/metriques',
+            icon: 'bar_chart',
+            resourceName: 'metriquesResource',
             hidden: currentRole !== ROLE_SUPER,
         },
         {

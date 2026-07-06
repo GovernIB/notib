@@ -46,7 +46,6 @@ public class CacheResourceServiceImpl extends BaseMutableResourceService<CacheRe
 	}
 
 	@Override
-//	protected Page<NoDatabaseResourceEntity<CacheResource, String>> entityRepositoryFindEntities(String quickFilter, String filter, String[] namedQueries, Pageable pageable) {
 	public Page<CacheResource> findPage(String quickFilter, String filter, String[] namedQueries, String[] perspectives, Pageable pageable) {
 
 		var timer = metricsHelper.iniciMetrica();
