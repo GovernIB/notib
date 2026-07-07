@@ -20,11 +20,7 @@ public class DownloadableFile {
 	private byte[] content;
 
 	public Long getContentLength() {
-		if (content != null) {
-			return Long.valueOf(content.length);
-		} else {
-			return null;
-		}
+		return content != null ? Long.valueOf(content.length) : null;
 	}
 
 }

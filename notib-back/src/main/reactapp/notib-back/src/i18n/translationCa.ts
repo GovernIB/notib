@@ -987,7 +987,8 @@ const translationCa = {
             mitjana: "Mitjana",
             duracio: "Duració",
             percentils: "Percentils",
-            exportaJson: "Exporta"
+            exportaJson: "Exporta",
+            importaJson: "Importa"
         },
         notFound: {
             title: 'Pàgina no trobada',

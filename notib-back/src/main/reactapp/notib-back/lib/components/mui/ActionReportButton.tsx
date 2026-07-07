@@ -11,7 +11,7 @@ import {
 } from '../AppButtons';
 import { useBaseAppContext, DialogButton } from '../BaseAppContext';
 import { ExportFileType } from '../ResourceApiContext';
-import { useResourceApiService } from '../ResourceApiProvider';
+import {ResourceApiActionArgs, useResourceApiService} from '../ResourceApiProvider';
 import { useFormDialog, FormDialogSubmitFn, FormDialogCloseFn } from './form/FormDialog';
 
 export type ActionReportCustomButtonProps = {
@@ -206,55 +206,56 @@ export const useActionReportLogic = (
     } = useResourceApiService(resourceName);
     const execAction: FormDialogSubmitFn = (id: any, data: any) =>
         new Promise((resolve, reject) => {
-            if (action != null) {
-                const requestArgs = {
-                    id,
-                    code: action,
-                    data: { ...formAdditionalDataArg, ...data },
-                };
-                apiArtifactAction(id, requestArgs)
-                    .then((result: any) => {
-                        if (onSuccess) {
-                            onSuccess(result);
-                        } else {
-                            temporalMessageShow(null, t('actionreport.action.success'), 'success');
-                        }
-                        resolve(formDialogResultProcessor?.(result));
-                    })
-                    .catch((error) => {
-                        onError?.(error);
-                        reject(error);
-                    });
-            } else {
+            if (action == null) {
                 console.error("Couldn't exec action without code");
+                return;
             }
+            const requestArgs = {
+                id,
+                code: action,
+                data: {...formAdditionalDataArg, ...data},
+            };
+            apiArtifactAction(id, requestArgs)
+                .then((result: any) => {
+                    if (onSuccess) {
+                        onSuccess(result);
+                    } else {
+                        temporalMessageShow(null, t('actionreport.action.success'), 'success');
+                    }
+                    resolve(formDialogResultProcessor?.(result));
+                })
+                .catch((error) => {
+                    onError?.(error);
+                    reject(error);
+                });
         });
     const generateReport: FormDialogSubmitFn = (id: any, data: any) =>
         new Promise((resolve, reject) => {
-            if (report != null) {
-                const requestArgs = {
-                    id,
-                    code: report,
-                    data: { ...formAdditionalDataArg, ...data },
-                    fileType: reportFileType,
-                };
-                apiArtifactReport(id, requestArgs)
-                    .then((result: any) => {
-                        saveAs?.(result.blob, result.fileName);
-                        if (onSuccess) {
-                            onSuccess(result);
-                        } else {
-                            temporalMessageShow(null, t('actionreport.report.success'), 'success');
-                        }
-                        resolve(formDialogResultProcessor?.(result));
-                    })
-                    .catch((error) => {
-                        onError?.(error);
-                        reject(error);
-                    });
-            } else {
+            if (report == null) {
                 console.error("Couldn't generate report without code");
+                return;
             }
+            const requestArgs = {
+                id,
+                code : report,
+                data: {...formAdditionalDataArg, ...data},
+                fileType: reportFileType,
+            };
+            apiArtifactReport(id, requestArgs)
+                .then((result: any) => {
+                    const blob = result?.blob instanceof Blob ? result.blob : new Blob([JSON.stringify(result.blob, null, 2)], {type: "application/json; charset=utf-8"});
+                    saveAs?.(blob, result.fileName);
+                    if (onSuccess) {
+                        onSuccess(result);
+                    } else {
+                        temporalMessageShow(null, t('actionreport.report.success'), 'success');
+                    }
+                    resolve(formDialogResultProcessor?.(result));
+                })
+                .catch((error) => {
+                    onError?.(error);
+                    reject(error);
+                });
         });
     const [formDialogShow, formDialogComponent, formDialogClose] = useFormDialog(
         resourceName,

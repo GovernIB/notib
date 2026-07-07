@@ -1,10 +1,12 @@
 import {useTranslation} from "react-i18next";
 import Box from "@mui/material/Box";
-import React from "react";
+import React, {useRef} from "react";
 import {MuiActionReportButton, useResourceApiService} from "reactlib";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { BarChart } from '@mui/x-charts';
+import Button from "@mui/material/Button";
+import Icon from "@mui/material/Icon";
 
 export function MetriquesBars({ items }) {
 
@@ -33,16 +35,12 @@ export function MetriquesBars({ items }) {
     const charts = [];
 
     let llegendaTitle = t('page.metriques.llegenda.title');
-    charts.push({labels: xLabels, data: uData, title: llegendaTitle});
+    charts.push({labels: xLabels, data: uData, title: llegendaTitle, noDetall: true});
     for (let i in timersList) {
         let timer = timersList[i];
-        let index = timer.name.lastIndexOf('.');
-        let classTimer = timer.name.substring(0, index);
-        let metricNameTimer = timer.name.substring(index + 1);
         let pes = Math.round(timer.weight * 100) / 100;
         let mitja = Math.round(timer.mean * 100) / 100;
         let maxim = Math.round(timer.max * 100) / 100;
-        let nomSeccio = "timers-generics";
         let item = items.timers[timer.name];
         let frequencia = getFrequency(item);
         let duracio = getDuracio(item);
@@ -59,7 +57,7 @@ export function MetriquesBars({ items }) {
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap', gap: 2 }}>
             {charts.map((c, idx) => (
-                <Box key={idx} sx={{ flex: '1 1 420px' }}>
+                <Box key={idx}>
                     <MetriquesBarsChart item={c} />
                 </Box>
             ))}
@@ -111,7 +109,6 @@ function getPercentil(timerData) {
     return percentils;
 }
 
-
 export function MetriquesBarsChart({ item }) {
 
     const { t } = useTranslation();
@@ -155,7 +152,7 @@ export function MetriquesBarsChart({ item }) {
                     />
                 </Box>
             </Paper>
-            {open && (
+            {open && !item.noDetall && (
                 <Paper sx={{ p: 2, display:'flex' }}>
                     <Box sx={{ width: '100%', height: 250, overflow: 'visible', cursor: 'pointer' }}>
                         <BarChart
@@ -196,21 +193,47 @@ export const Metriques = () => {
         }
         apiGetOne("metriques").then((resposta) => setMetriques(JSON.parse(resposta?.metriques)));
     }, [apiIsReady, apiGetOne]);
-    return (
-        <Box>
-            {t("page.metriques.title")}
-            <Box sx={{ textAlign: 'right' }}>
+    return (<>
+        <Box sx={{display: "flex", justifyContent: "space-between", marginBottom: "15px"}}>
+            <Typography variant="h6">{t("page.metriques.title")}</Typography>
+            <Box sx={{textAlign: "right", width: "220px", display: "flex", justifyContent: "space-between"}}>
+                <ImportJsonButton onRead={(content) => setMetriques(JSON.parse(content))}/>
                 <MuiActionReportButton
                     resourceName={"metriquesResource"}
                     report="DESCARREGAR_METRIQUES_JSON"
                     reportFileType="CUSTOM"
-                    title={t('page.metriques.exporta')}
-                    buttonComponentProps={{ variant: 'outlined', sx: { mr: 1 } }}
+                    title={t('page.metriques.exportaJson')}
+                    buttonComponentProps={{variant: "contained",size:"small"}}
                     buttonIcon="file_download"/>
             </Box>
-            <MetriquesBars items={metriques} />
         </Box>
+            <MetriquesBars items={metriques}/>
+    </>
     );
 };
+
+export const ImportJsonButton = ({ onRead }: { onRead: (content: string) => void })=> {
+
+    const { t } = useTranslation();
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const onPickFile = () => fileInputRef.current?.click();
+
+    const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            const content = String(reader.result ?? "");
+            onRead(content);
+        };
+        reader.readAsText(file);
+    };
+
+    return (<>
+            <input ref={fileInputRef} type="file" accept="application/json,.json" style={{ display: "none" }} onChange={onFileChange}/>
+            <Button variant="contained" startIcon={<Icon>upload</Icon>} size="small" onClick={onPickFile}>{t("page.metriques.importaJson")}</Button>
+    </>);
+}
 
 export default Metriques;

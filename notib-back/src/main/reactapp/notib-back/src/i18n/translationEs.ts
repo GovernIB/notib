@@ -958,7 +958,8 @@ const translationEs = {
             mitjana: "Mediana",
             duracio: "Duración",
             percentils: "Percentils",
-            exportaJson: "Exporta"
+            exportaJson: "Exporta",
+            importaJson: "Importa"
         },
         notFound: {
             title: 'Página no encontrada',
