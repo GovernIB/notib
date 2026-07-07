@@ -29,6 +29,7 @@ import NotificacioMassivaForm from "./pages/notificacioMassiva/NotificacioMassiv
 import AccioMassivaGrid from "./pages/accioMassiva/AccioMassivaGrid.tsx";
 import CallbackPendentsGrid from "./pages/callbacks/CallbackPendentsGrid.tsx";
 import Metriques from "./pages/metriques/Metriques.tsx";
+import PermisosUsuariGrid from "./pages/usuaris/PermisosUsuariGrid.tsx";
 
 export const router = createBrowserRouter(
     [
@@ -207,6 +208,10 @@ export const router = createBrowserRouter(
                 {
                     path: 'callbacks',
                     element: <CallbackPendentsGrid />
+                },
+                {
+                    path: 'usuaris',
+                    element: <PermisosUsuariGrid />
                 },
                 {
                     path: 'monitorSistema',

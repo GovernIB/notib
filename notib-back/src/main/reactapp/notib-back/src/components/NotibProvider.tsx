@@ -9,7 +9,7 @@ import {
     ROLE_PREFIX,
     ROLE_SUPER,
     ROLE_ADMIN,
-    ROLE_ADMIN_CONSULTA,
+    ROLE_ADMIN_LECTURA,
     ROLE_ORGAN,
     ROLE_USER,
 } from './NotibContext';
@@ -17,7 +17,7 @@ import {
 const ALLOWED_ROLES = [
     ROLE_SUPER,
     ROLE_ADMIN,
-    ROLE_ADMIN_CONSULTA,
+    ROLE_ADMIN_LECTURA,
     ROLE_ORGAN,
     ROLE_USER,
 ].reverse();

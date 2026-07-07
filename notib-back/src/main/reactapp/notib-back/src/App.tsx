@@ -11,7 +11,7 @@ import notibLogoDark from './assets/notib_logo_dark.png';
 import { BaseApp } from './components/BaseApp';
 import DrassanaFooter from './components/DrassanaFooter';
 import NotibProvider from './components/NotibProvider';
-import { useNotibContext, ROLE_SUPER, ROLE_ADMIN, ROLE_USER } from './components/NotibContext';
+import {useNotibContext, ROLE_SUPER, ROLE_ADMIN, ROLE_USER, ROLE_ADMIN_LECTURA} from './components/NotibContext';
 import theme from './theme';
 
 export const envVars = {
@@ -117,10 +117,10 @@ const InnerApp: React.FC = () => {
         {
             id: 'permisosUsuari',
             title: t('app.menu.permisosUsuari'),
-            to: '/permisos',
+            to: '/usuaris',
             icon: 'group',
-            resourceName: '',
-            hidden: currentRole !== ROLE_ADMIN,
+            resourceName: 'usuariResource',
+            hidden: currentRole !== ROLE_ADMIN || currentRole !== ROLE_ADMIN_LECTURA,
         },
     ];
     const menuConfig = [

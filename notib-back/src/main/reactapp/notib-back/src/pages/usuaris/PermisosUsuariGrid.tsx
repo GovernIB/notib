@@ -1,59 +1,44 @@
-import { Grid, Icon, IconButton } from '@mui/material';
+import {Grid, Icon, IconButton} from '@mui/material';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
-import {
-    GridPage,
-    MuiDataGrid,
-    MuiDataGridColDef,
-    springFilterBuilder as filterBuilder,
-    useFilterApiContext,
-} from 'reactlib';
+import {useTranslation} from 'react-i18next';
+import {GridPage, MuiDataGrid, MuiDataGridColDef, springFilterBuilder as filterBuilder, useFilterApiContext,} from 'reactlib';
 import GridFormField from '../../components/GridFormField';
-import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
-import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
+import {useDatagridFilterProps, useDatagridPageSizeOptionsProps} from '../../hooks/useDataGrid';
 
 const columns: MuiDataGridColDef[] = [
     {
-        field: 'entitat',
+        field: 'codi',
         flex: 2,
     },
     {
-        field: 'assumpte',
+        field: 'nom',
         flex: 4,
     },
-    {
-        field: 'dataInici',
-        fieldType: 'date',
-        flex: 1,
-    },
-    {
-        field: 'dataFinal',
-        fieldType: 'date',
-        flex: 1,
-    },
-    {
-        field: 'avisNivell',
-        flex: 0.6,
-    },
-    {
-        field: 'actiu',
-        flex: 0.6,
-        type: 'boolean',
-    },
+    // {
+    //     field: 'dataInici',
+    //     fieldType: 'date',
+    //     flex: 1,
+    // },
+    // {
+    //     field: 'dataFinal',
+    //     fieldType: 'date',
+    //     flex: 1,
+    // },
+    // {
+    //     field: 'avisNivell',
+    //     flex: 0.6,
+    // },
+    // {
+    //     field: 'actiu',
+    //     flex: 0.6,
+    //     type: 'boolean',
+    // },
 ];
 
-const springFilterBuilder = (data: any) => {
-    return filterBuilder.and(
-        filterBuilder.eq('entitat.id', data?.entitat?.id),
-        filterBuilder.like('assumpte', data.assumpte),
-        data?.dataInici && filterBuilder.gte('dataInici', `'${formatStartOfDay(data?.dataInici)}'`),
-        data?.dataFinal && filterBuilder.lte('dataFinal', `'${formatEndOfDay(data?.dataFinal)}'`),
-        filterBuilder.eq('avisNivell', `'${data?.avisNivell}'`),
-        filterBuilder.eq('actiu', `'${data?.actiu}'`)
-    );
-};
+const springFilterBuilder = (data: any) => filterBuilder.and(filterBuilder.like('codi', data.codi));
 
 const ContentFilter: React.FC = () => {
+
     const { t } = useTranslation();
     const filterApiRef = useFilterApiContext();
     const handleButtonClick = () => {
@@ -61,12 +46,7 @@ const ContentFilter: React.FC = () => {
     };
     return (
         <Grid container spacing={2}>
-            <GridFormField size={2} name="entitat" />
-            <GridFormField size={4} name="assumpte" />
-            <GridFormField size={1.5} name="dataInici" />
-            <GridFormField size={1.5} name="dataFinal" />
-            <GridFormField size={1.5} name="avisNivell" />
-            <GridFormField size={1} name="actiu" />
+            <GridFormField size={2} name="codi" />
             <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
                 <Icon>filter_alt_off</Icon>
             </IconButton>
@@ -74,12 +54,12 @@ const ContentFilter: React.FC = () => {
     );
 };
 
-export const AvisGrid = () => {
+export const PermisosUsuariGrid = () => {
 
     const { t } = useTranslation();
     const filterDataGridProps = useDatagridFilterProps(
-        'avisResource',
-        'FILTER_AVIS',
+        'usuariResource',
+        'FILTER_USUARI_PERMIS',
         springFilterBuilder,
         <ContentFilter />
     );
@@ -88,7 +68,7 @@ export const AvisGrid = () => {
         <GridPage>
             <MuiDataGrid
                 title={t('page.avisos.grid.title')}
-                resourceName="avisResource"
+                resourceName="usuariResource"
                 columns={columns}
                 paginationActive
                 persistentStateActive
@@ -96,12 +76,10 @@ export const AvisGrid = () => {
                 {...filterDataGridProps}
                 {...pageSizeOptionsDataGridProps}
                 toolbarType="upper"
-                toolbarBulkDelete
-                toolbarCreateLink="form"
-                rowUpdateLink="form/{{id}}"
+                rowHideUpdateButton
             />
         </GridPage>
     );
 };
 
-export default AvisGrid;
+export default PermisosUsuariGrid;
