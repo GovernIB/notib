@@ -16,4 +16,5 @@ public class SeleccioStringForm implements Serializable {
 		@NotEmpty
 		private List<String> ids;
 		private boolean massivo = false;
+		private String codi;
 }

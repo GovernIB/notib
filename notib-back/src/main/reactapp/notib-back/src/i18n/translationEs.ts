@@ -866,8 +866,19 @@ const translationEs = {
         },
         activemq: {
             grid: {
-                title: "Monitor ActiveMQ"
+                title: "Monitor ActiveMQ",
+                missatges: "Mensajes",
+                buidar: "Vaciar",
+                buidarOk: "La cola se ha vaciado correctamente"
             },
+            detail: {
+                title: "Mensajes cola ",
+                esborrar: "Eliminar",
+                esborrarOk: "Mensaje eliminado correctamente",
+                esborrarError: "Error eliminando el eensaje"
+            },
+            descargarJobScheduler: "JobScheduler JSON"
+
         },
         callbacks: {
             pendents: {

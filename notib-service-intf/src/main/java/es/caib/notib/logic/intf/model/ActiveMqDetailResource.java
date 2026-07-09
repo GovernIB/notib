@@ -14,6 +14,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
+import java.util.Date;
+
+
 @Builder
 @Getter
 @Setter
@@ -40,7 +43,7 @@ import lombok.experimental.FieldNameConstants;
 		),
 		@ResourceArtifact(
 			type = ResourceArtifactType.ACTION,
-			code = ActiveMqResource.ACTION_BUIDAR_CUA,
+			code = ActiveMqDetailResource.ACTION_ESBORRAR_MISSATGE,
 			formClass = SeleccioStringForm.class,
 			accessConstraints = {
 				@ResourceAccessConstraint(
@@ -51,19 +54,12 @@ import lombok.experimental.FieldNameConstants;
 		)
 	}
 )
-public class ActiveMqResource extends BaseResource<String> {
+public class ActiveMqDetailResource extends BaseResource<String> {
 
-	public static final String REPORT_DESCARREGAR_JOB_SCHEDULER_JSON = "DESCARREGAR_JOB_SCHEDULER_JSON";
-	public static final String ACTION_BUIDAR_CUA = "BUIDAR_CUA";
+	public static final String ACTION_ESBORRAR_MISSATGE = "ESBORRAR_MISSATGE";
 
-	private String nom;
-	private String descripcio;
-	private long mida;
-	private long consumersCount;
-	private long enqueueCount;
-	private long dequeueCount;
-	private long forwardCount;
-	private long inFlightCount;
-	private long expiredCount;
-	private long storeMessageSize;
+	private String id;
+	private String uuid;
+	private String notificacioUuId;
+	private Date data;
 }

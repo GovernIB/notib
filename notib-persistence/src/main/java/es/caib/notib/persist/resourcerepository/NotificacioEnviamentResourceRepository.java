@@ -20,6 +20,9 @@ public interface NotificacioEnviamentResourceRepository extends BaseRepository<N
 
 	Optional<NotificacioEnviamentResourceEntity> findByNotificaReferencia(String notificaReferencia);
 
+	@Query(value = "from NotificacioEnviamentResourceEntity where notificaReferencia = :enviamentUuid")
+	Optional<NotificacioEnviamentEntity> findByUuid(@Param("enviamentUuid") String enviamentUuid);
+
 
 	@Query(	" from NotificacioEnviamentResourceEntity e" +
 		" where	e.notificacio = :notificacio " +

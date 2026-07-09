@@ -896,7 +896,17 @@ const translationCa = {
         activemq: {
             grid: {
                 title: 'Monitor ActiveMQ',
+                missatges: "Missatges",
+                buidar: "Buidar",
+                buidarOk: "La cua s'ha buidat correctament"
             },
+            detail: {
+                title: "Missatges cua ",
+                esborrar: "Esborrar",
+                esborrarOk: "Missatge esborrat correctament",
+                esborrarError: "Error esborrant el missatge"
+            },
+            descargarJobScheduler: "JobScheduler JSON"
         },
         callbacks: {
             pendents: {

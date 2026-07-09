@@ -73,9 +73,7 @@ public class CacheResourceServiceImpl extends BaseMutableResourceService<CacheRe
 				}
 				return c1Pos.compareTo(c2Pos);
 			});
-			Page<CacheResource> page = new PageImpl<>(caches, pageable, caches.size());
-//			var resultat =  page.map(this::toResourceEntity);
-			return page;
+			return new PageImpl<>(caches, pageable, caches.size());
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -89,10 +87,6 @@ public class CacheResourceServiceImpl extends BaseMutableResourceService<CacheRe
 	@Override
 	public boolean isEntityRepositoryOptional() {
 		return true;
-	}
-
-	private NoDatabaseResourceEntity<CacheResource, String> toResourceEntity(CacheResource resource) {
-		return new NoDatabaseResourceEntity<>(resource.getCodi(), resource);
 	}
 
 	private static final Map<String, Integer> ordreCaches;
