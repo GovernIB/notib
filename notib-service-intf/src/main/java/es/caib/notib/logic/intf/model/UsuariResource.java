@@ -34,13 +34,7 @@ import java.util.Date;
 	accessConstraints = @ResourceAccessConstraint(
 		type = ResourceAccessConstraint.ResourceAccessConstraintType.AUTHENTICATED,
 		grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE }
-	),
-	artifacts = {
-		@ResourceArtifact(
-			type = ResourceArtifactType.FILTER,
-			code = UsuariResource.FILTER_CODE,
-			formClass = UsuariResource.UsuariResourceFilter.class)
-	}
+	)
 )
 public class UsuariResource extends BaseResource<String> {
 
@@ -48,27 +42,27 @@ public class UsuariResource extends BaseResource<String> {
 
 	@NotNull
 	@Size(max = 64)
-	private String codi;
+	protected String codi;
 	@Size(max = 100)
-	private String nom;
+	protected String nom;
 	@Size(max = 40)
-	private String nif;
+	protected String nif;
 	@Size(max = 100)
-	private String llinatges;
+	protected String llinatges;
 	@Size(max = 200)
-	private String nomSencer;
+	protected String nomSencer;
 	@Size(max = 200)
-	private String email;
+	protected String email;
 	@Size(max = 200)
-	private String emailAlt;
-	private boolean rebreEmailsNotificacio = true;
-	private boolean rebreEmailsNotificacioCreats = true;
+	protected String emailAlt;
+	protected boolean rebreEmailsNotificacio = true;
+	protected boolean rebreEmailsNotificacioCreats = true;
 	@Size(max = 40)
-	private String ultimRol;
-	private Long ultimaEntitat;
-	private Idioma idioma;
-	private Tema tema;
-	private NumElementsPaginaDefecte numElementsPaginaDefecte;
+	protected String ultimRol;
+	protected Long ultimaEntitat;
+	protected Idioma idioma;
+	protected Tema tema;
+	protected NumElementsPaginaDefecte numElementsPaginaDefecte;
 	protected ResourceReference<EntitatResource, Long> entitatDefecte;
 	protected ResourceReference<OrganGestorResource, Long> organDefecte;
 	protected ResourceReference<ProcedimentResource, Long> procedimentDefecte;

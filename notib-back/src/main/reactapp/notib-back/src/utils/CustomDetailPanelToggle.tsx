@@ -5,13 +5,15 @@ import {
     useGridApiContext,
     useGridSelector
 } from "@mui/x-data-grid-pro";
-import {useTranslation} from "react-i18next";
 import React from "react";
 import {Icon, IconButton} from "@mui/material";
 
-const CustomDetailPanelToggle = (props: Pick<GridRenderCellParams, 'id' | 'value'>) => {
-    const { id } = props;
-    const { t } = useTranslation();
+
+type CustomDetailPanelToggleProps = Pick<GridRenderCellParams, 'id' | 'value'> & { msgMostrar: string; msgOcultar: string; };
+
+
+const CustomDetailPanelToggle = ({id, value, msgMostrar, msgOcultar}: CustomDetailPanelToggleProps) => {
+
     const apiRef = useGridApiContext();
     const contentCache = useGridSelector(apiRef, gridDetailPanelExpandedRowsContentCacheSelector);
     const hasDetail = React.isValidElement(contentCache[id]);
@@ -23,8 +25,8 @@ const CustomDetailPanelToggle = (props: Pick<GridRenderCellParams, 'id' | 'value
             size="small"
             tabIndex={-1}
             disabled={!hasDetail}
-            title={isExpanded ? t('page.notificacio.grid.column.ocultar') : t('page.notificacio.grid.column.mostrar')}
-            aria-label={isExpanded ? t('page.notificacio.grid.column.ocultar') : t('page.notificacio.grid.column.mostrar')}
+            title={isExpanded ? msgOcultar : msgMostrar}
+            aria-label={isExpanded ? msgOcultar : msgMostrar}
         >
             <Icon
                 sx={(theme) => ({

@@ -210,7 +210,7 @@ export const router = createBrowserRouter(
                     element: <CallbackPendentsGrid />
                 },
                 {
-                    path: 'usuaris',
+                    path: 'permisosUsuari',
                     element: <PermisosUsuariGrid />
                 },
                 {

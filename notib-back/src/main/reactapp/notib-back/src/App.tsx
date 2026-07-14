@@ -117,10 +117,10 @@ const InnerApp: React.FC = () => {
         {
             id: 'permisosUsuari',
             title: t('app.menu.permisosUsuari'),
-            to: '/usuaris',
+            to: '/permisosUsuari',
             icon: 'group',
-            resourceName: 'usuariResource',
-            hidden: currentRole !== ROLE_ADMIN || currentRole !== ROLE_ADMIN_LECTURA,
+            resourceName: 'usuariPermisResource',
+            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA,
         },
     ];
     const menuConfig = [

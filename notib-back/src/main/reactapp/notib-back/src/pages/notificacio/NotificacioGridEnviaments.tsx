@@ -13,53 +13,32 @@ import {MuiActionReportButton, useResourceApiService} from 'reactlib';
 import { useEnviamentDetailDialog } from '../enviament/EnviamentDetailDialog';
 
 export const NotificacioGridEnviaments: React.FC<{ id: any }> = (props) => {
+
     const { id } = props;
     const { t } = useTranslation();
-    const { isReady: apiIsReady, find: apiFind } = useResourceApiService(
-        'notificacioEnviamentResource'
-    );
+    const { isReady: apiIsReady, find: apiFind } = useResourceApiService('notificacioEnviamentResource');
     const { dialogComponent, onDetailClick } = useEnviamentDetailDialog();
     const [enviaments, setEnviaments] = React.useState<any[]>();
     React.useEffect(() => {
-        if (apiIsReady) {
-            const args = {
-                filter: 'notificacio.id:' + id,
-                unpaged: true,
-            };
-            apiFind(args).then((response) => {
-                setEnviaments(response.rows);
-            });
+        if (!apiIsReady) {
+            return;
         }
+        const args = {filter: 'notificacio.id:' + id, unpaged: true};
+        apiFind(args).then((response) => setEnviaments(response.rows));
     }, [apiIsReady]);
 
     // WEB-INF/jsp/includes/notificacioList.jsp:283
 
     return (
         enviaments != null && (
-            <TableContainer
-                component={Paper}
-                elevation={2}
-                sx={{
-                    mx: 2,
-                    my: 2,
-                    width: 'calc(100% - 32px)',
-                }}
-            >
+            <TableContainer component={Paper} elevation={2} sx={{mx: 2, my: 2, width: 'calc(100% - 32px)',}}>
                 <Table size="small" aria-label="simple table">
                     <TableHead>
                         <TableRow>
-                            <TableCell>
-                                {t('page.notificacio.grid.enviament.column.interessat')}
-                            </TableCell>
-                            <TableCell>
-                                {t('page.notificacio.grid.enviament.column.representant')}
-                            </TableCell>
-                            <TableCell>
-                                {t('page.notificacio.grid.enviament.column.estatPostal')}
-                            </TableCell>
-                            <TableCell>
-                                {t('page.notificacio.grid.enviament.column.estatTelematica')}
-                            </TableCell>
+                            <TableCell>{t('page.notificacio.grid.enviament.column.interessat')}</TableCell>
+                            <TableCell>{t('page.notificacio.grid.enviament.column.representant')}</TableCell>
+                            <TableCell>{t('page.notificacio.grid.enviament.column.estatPostal')}</TableCell>
+                            <TableCell>{t('page.notificacio.grid.enviament.column.estatTelematica')}</TableCell>
                             <TableCell></TableCell>
                         </TableRow>
                     </TableHead>

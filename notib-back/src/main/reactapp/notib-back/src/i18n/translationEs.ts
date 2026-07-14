@@ -972,6 +972,22 @@ const translationEs = {
             exportaJson: "Exporta",
             importaJson: "Importa"
         },
+        usuaris: {
+            permisos: {
+                grid: {
+                    title: "Permisos d'usuari",
+                    organsPermisDirecte: "Órganos con permiso directo",
+                    organsPermisHeredat: "Órganos con los permisos heredados del padre",
+                    procedimentPermisDirecte: "Procedimientos con permiso directo",
+                    procedimentPermisOrgan: "Procedimientos con permiso por órgano",
+                    columnes: {
+                        nom: "Nombre",
+                        tipus: "Tipo",
+                        principal: "Principal",
+                    }
+                }
+            }
+        },
         notFound: {
             title: 'Página no encontrada',
             toHome: 'Ir al inicio',

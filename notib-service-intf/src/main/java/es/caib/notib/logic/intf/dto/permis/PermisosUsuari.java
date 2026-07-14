@@ -7,13 +7,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PermisosUsuari {
+public class PermisosUsuari implements Serializable {
 
     private String permisosOrgans;
     private String permisosProcediment;

@@ -93,7 +93,10 @@ const useDataGridColumns = (datagridApiRef: any, notificacionsEsborrades: boolea
                 align: 'center',
                 renderHeader: () => <ButtonDetailExpandColapse datagridApiRef={datagridApiRef} />,
                 renderCell: (params: any) => (
-                    <CustomDetailPanelToggle id={params.id} value={params.value} />
+                    <CustomDetailPanelToggle id={params.id}
+                                             value={params.value}
+                                             msgMostrar={t('page.notificacio.grid.column.mostrar')}
+                                             msgOcultar={t('page.notificacio.grid.column.ocultar')} />
                 ),
             }]),
         ],

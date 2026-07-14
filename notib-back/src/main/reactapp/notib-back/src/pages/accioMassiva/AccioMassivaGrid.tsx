@@ -1,61 +1,16 @@
 import {GridPage, MuiDataGrid, MuiDataGridColDef, springFilterBuilder as filterBuilder, useFilterApiContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import React from "react";
-import {
-    GRID_DETAIL_PANEL_TOGGLE_COL_DEF, gridDetailPanelExpandedRowIdsSelector,
-    gridDetailPanelExpandedRowsContentCacheSelector,
-    GridRenderCellParams,
-    useGridApiContext,
-    useGridApiRef,
-    useGridSelector
-} from "@mui/x-data-grid-pro";
+import {GRID_DETAIL_PANEL_TOGGLE_COL_DEF, useGridApiRef} from "@mui/x-data-grid-pro";
 import {useDatagridFilterProps, useDatagridPageSizeOptionsProps} from "../../hooks/useDataGrid.tsx";
 import {formatEndOfDay, formatStartOfDay} from "../../utils/dateUtils.ts";
 import {Box, Chip, Grid, Icon, IconButton} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import AccioMassivaGridEnviaments from "./AccioMassivaGridElements.tsx";
+import CustomDetailPanelToggle from "../../utils/CustomDetailPanelToggle.tsx";
 
-const CustomDetailPanelToggle = (props: Pick<GridRenderCellParams, 'id' | 'value'>) => {
-    const { id } = props;
-    const { t } = useTranslation();
-    const apiRef = useGridApiContext();
-    const contentCache = useGridSelector(apiRef, gridDetailPanelExpandedRowsContentCacheSelector);
-    const hasDetail = React.isValidElement(contentCache[id]);
-    const expandedRowIds = useGridSelector(apiRef, gridDetailPanelExpandedRowIdsSelector);
-    const isExpanded = expandedRowIds.has(id);
 
-    return (
-        <IconButton
-            size="small"
-            tabIndex={-1}
-            disabled={!hasDetail}
-            title={
-                isExpanded
-                    ? t('page.accioMassiva.grid.ocultarElements')
-                    : t('page.accioMassiva.grid.mostarElements')
-            }
-            aria-label={
-                isExpanded
-                    ? t('page.accioMassiva.grid.ocultarElements')
-                    : t('page.accioMassiva.grid.mostarElements')
-            }
-        >
-            <Icon
-                sx={(theme) => ({
-                    transform: `rotateZ(${isExpanded ? 180 : 0}deg)`,
-                    transition: theme.transitions.create('transform', {
-                        duration: theme.transitions.duration.shortest,
-                    }),
-                })}
-                fontSize="inherit"
-            >
-                expand_more
-            </Icon>
-        </IconButton>
-    );
-};
-
-const useDataGridColumns = (datagridApiRef: any) => {
+const useDataGridColumns = () => {
 
     const { t } = useTranslation();
     const columns: MuiDataGridColDef[] = React.useMemo(
@@ -112,7 +67,11 @@ const useDataGridColumns = (datagridApiRef: any) => {
                 align: 'center',
                 // renderHeader: () => <ButtonDetailExpandColapse datagridApiRef={datagridApiRef} />,
                 renderCell: (params: any) => (
-                    <CustomDetailPanelToggle id={params.id} value={params.value} />
+                    <CustomDetailPanelToggle id={params.id}
+                                             value={params.value}
+                                             msgMostrar={t('page.accioMassiva.grid.mostarElements')}
+                                             msgOcultar={t('page.accioMassiva.grid.ocultarElements')} />
+
                 ),
             },
         ],
@@ -167,8 +126,7 @@ const ContentFilter: React.FC = () => {
 export const AccioMassivaGrid = () => {
 
     const { t } = useTranslation();
-    const datagridApiRef = useGridApiRef();
-    const columns = useDataGridColumns(datagridApiRef);
+    const columns = useDataGridColumns();
     const springFilterBuilder = useSpringFilterBuilder();
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     const filterDataGridProps = useDatagridFilterProps(

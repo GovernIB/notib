@@ -1000,6 +1000,22 @@ const translationCa = {
             exportaJson: "Exporta",
             importaJson: "Importa"
         },
+        usuaris: {
+            permisos: {
+                grid: {
+                    title: "Permisos d'usuari",
+                    organsPermisDirecte: "Òrgans amb permís directe",
+                    organsPermisHeredat: "Òrgans amb permisos heredats del pare",
+                    procedimentPermisDirecte: "Procediments amb permís directe",
+                    procedimentPermisOrgan: "Procediments amb permís per òrgan",
+                    columnes: {
+                        nom: "Nombre",
+                        tipus: "Tipo",
+                        principal: "Principal",
+                    }
+                }
+            }
+        },
         notFound: {
             title: 'Pàgina no trobada',
             toHome: "Anar a l'inici",
