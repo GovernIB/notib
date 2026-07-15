@@ -982,6 +982,7 @@ const translationEs = {
                     procedimentPermisOrgan: "Procedimientos con permiso por órgano",
                     columnes: {
                         nom: "Nombre",
+                        organGestor: "Órgano gestor",
                         tipus: "Tipo",
                         principal: "Principal",
                     }

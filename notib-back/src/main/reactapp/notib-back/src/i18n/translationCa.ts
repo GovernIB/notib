@@ -1009,8 +1009,9 @@ const translationCa = {
                     procedimentPermisDirecte: "Procediments amb permís directe",
                     procedimentPermisOrgan: "Procediments amb permís per òrgan",
                     columnes: {
-                        nom: "Nombre",
-                        tipus: "Tipo",
+                        nom: "Nom",
+                        organGestor: "Òrgan gestor",
+                        tipus: "Tipus",
                         principal: "Principal",
                     }
                 }

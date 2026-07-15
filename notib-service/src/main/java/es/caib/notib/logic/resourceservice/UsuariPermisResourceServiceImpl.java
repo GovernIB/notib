@@ -42,7 +42,6 @@ public class UsuariPermisResourceServiceImpl extends BaseMutableResourceService<
 	public void init() {
 
 		register(UsuariPermisResource.ACTION_GET_PERMISOS_USUARI, new PermisosUsuariActionExecutor(usuariService, userSessionHelper));
-		register(UsuariPermisResource.REPORT_EXPORTAR_PERMISOS_USUARI, new PermisosUsuariActionExecutor(usuariService, userSessionHelper));
 	}
 
 	@Override

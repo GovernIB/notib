@@ -7,13 +7,15 @@ import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Icon from "@mui/material/Icon";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
+import {exportarGridToExcel, gridRegistry} from "../../utils/gridToExcel.tsx";
+import Button from "@mui/material/Button";
 
 const COLUMN_HEADER_HEIGHT = 56;
 const ROW_HEIGHT = 52;
 
 type PermisRow = {
-    id: string;              // grid row id (unique)
-    procedimentCodi: string; // the map key
+    id: string;
+    procedimentCodi: string;
     principal: string;
     organNom?: string;
     tipus?: string;
@@ -24,7 +26,93 @@ type PermisRow = {
     comunicacioSir: boolean;
     comuns: boolean;
     administration: boolean;
-    // add whatever PermisDto flags your columns need
+    fill?: string;
+};
+
+type ProcSerOrganRow = {
+    id: string;
+
+    codiValor: string;
+    organGestorNom: string;
+    tipus: string;
+    principal: string;
+
+    administrador: boolean;
+    read: boolean;
+    processar: boolean;
+    administration: boolean;
+    comuns: boolean;
+    notificacio: boolean;
+    comunicacio: boolean;
+    comunicacioSir: boolean;
+    comunicacioSenseProcediment: boolean;
+};
+
+const crearRowsOrgansFills = (
+    fillsMap: Record<string, string[]>,     // organsFills
+    permisMap: Record<string, any[] | any>  // organsMap (procedimentCodi -> permis list or obj list)
+): PermisRow[] => {
+    const rows: PermisRow[] = [];
+
+    for (const [procedimentCodi, fills] of Object.entries(fillsMap ?? {})) {
+        if (!Array.isArray(fills) || fills.length === 0) continue;
+
+        const permisArr = permisMap?.[procedimentCodi];
+        const permisList = Array.isArray(permisArr) ? permisArr : permisArr ? [permisArr] : [];
+        const permis = permisList[0];
+
+        if (!permis) continue;
+
+        for (const [index, fill] of fills.entries()) {
+            rows.push({
+                id: `${procedimentCodi}-${fill}-${index}`,
+                procedimentCodi,
+                fill,
+                organNom: permis.organNom,
+                tipus: permis.tipus,
+                principal: permis.principal,
+
+                read: !!permis.read,
+                write: !!permis.write,
+                notificacio: !!permis.notificacio,
+                comunicacio: !!permis.comunicacio,
+                comunicacioSir: !!permis.comunicacioSir,
+                comuns: !!permis.comuns,
+                administration: !!permis.administration,
+            });
+        }
+    }
+    return rows;
+};
+
+
+const crearRowsProcSerOrgan = (procSerOrgan: any[] | undefined | null): ProcSerOrganRow[] => {
+
+    const list = Array.isArray(procSerOrgan) ? procSerOrgan : [];
+    return list.map((procSer, index) => {
+        const p = procSer?.permis ?? {};
+        const cv = procSer?.codiValor ?? {};
+
+        return {
+            id: `${cv?.id ?? p?.id ?? "x"}-${index}`,
+            codiValor: cv?.valor ?? "",
+            organGestorNom: `${cv?.organGestor ?? ""} - ${cv?.organNom ?? ""}`.trim(),
+
+            tipus: p?.tipus ?? "",
+            principal: p?.principal ?? "",
+
+            administrador: !!p?.administrador,
+            read: !!p?.read,
+            processar: !!p?.processar,
+            administration: !!p?.administration,
+
+            comuns: !!p?.comuns,
+            notificacio: !!p?.notificacio,
+            comunicacio: !!p?.comunicacio,
+            comunicacioSir: !!p?.comunicacioSir,
+            comunicacioSenseProcediment: !!p?.comunicacioSenseProcediment,
+        };
+    });
 };
 
 
@@ -55,6 +143,8 @@ export const PermisosUsuariDetail: React.FC<{id: any}> = (props) => {
     const [organsRows, setOrgansRows] = React.useState<PermisRow[]>([]);
     const [organsFillsRows, setOrgansFillsRows] = React.useState<PermisRow[]>([]);
     const [procedimentRows, setProcedimentRows] = React.useState<PermisRow[]>([]);
+    const [procSerOrganRows, setProcSerOrganRows] = React.useState<PermisRow[]>([]);
+
 
     React.useEffect(() => {
         if (!apiIsReady) {
@@ -73,29 +163,64 @@ export const PermisosUsuariDetail: React.FC<{id: any}> = (props) => {
                 setProcedimentRows(rows);
                 raw = permisos?.organsFills;
                 map = typeof raw === "string" ? (raw ? JSON.parse(raw) : {}) : (raw ?? {});
-                rows = crearRows(map);
+                rows = crearRowsOrgansFills(raw, map);
                 setOrgansFillsRows(rows);
+                raw = permisos?.procSerOrgan;
+                const procSerOrgan = typeof raw === "string" ? (raw ? JSON.parse(raw) : []) : (raw ?? []);
+                setProcSerOrganRows(procSerOrgan);
             })
             .catch((error) => { console.error(error); });
     }, [apiIsReady, apiAction, id]);
 
-    const boolIcon = (params: any) =>
-        params.value ? <Icon color="success">check</Icon> : null;
+    const boolIcon = (params: any) => params.value ? <Icon color="success">check</Icon> : null;
 
     const columns: GridColDef[] = [
         { field: "organNom", headerName: t('page.usuaris.permisos.grid.columnes.nom'), flex: 1 },
+        { field: "organGestor", headerName: t('page.usuaris.permisos.grid.columnes.organGestor'), flex: 1 },
         { field: "tipus", headerName: t('page.usuaris.permisos.grid.columnes.tipus'), flex: 1 },
         { field: "principal", headerName: t('page.usuaris.permisos.grid.columnes.principal'), flex: 1 },
         { field: "administrador", headerName: "", width: 60, align: "center", renderHeader: () => <Icon>person_add_alt_1</Icon>, renderCell: boolIcon },
         { field: "read", headerName: "", width: 60, align: "center", renderHeader: () => <Icon>search</Icon>, renderCell: boolIcon },
         { field: "processar", headerName: "", width: 60, align: "center", renderHeader: () => <Icon>check_box</Icon>, renderCell: boolIcon },
-        { field: "administration", headerName: "", width: 60, align: "center", renderHeader: () => <Icon>settings</Icon>, renderCell: boolIcon },
         { field: "comuns", headerName: "", width: 60, align: "center", renderHeader: () => <Icon>public</Icon>, renderCell: boolIcon },
         { field: "notificacio", headerName: "", width: 60, align: "center", renderHeader: () => <Icon>gavel</Icon>, renderCell: boolIcon },
         { field: "comunicacio", headerName: "", width: 60, align: "center", renderHeader: () => <MailOutlineIcon/>, renderCell: boolIcon },
         { field: "comunicacioSir", headerName: "", width: 60, align: "center", renderHeader: () => <Icon>email</Icon>, renderCell: boolIcon },
         { field: "comunicacioSenseProcediment", headerName: "", width: 60, align: "center", renderHeader: () => <Icon>send</Icon>, renderCell: boolIcon },
     ];
+
+    const columnsProcSerOrgan: GridColDef[] = [
+        { field: "codiValor", headerName: t("page.usuaris.permisos.grid.columnes.nom"), flex: 1 },
+        { field: "organGestorNom", headerName: t("page.usuaris.permisos.grid.columnes.organGestor"), flex: 1 },
+        { field: "tipus", headerName: t("page.usuaris.permisos.grid.columnes.tipus"), flex: 1 },
+        { field: "principal", headerName: t("page.usuaris.permisos.grid.columnes.principal"), flex: 1 },
+
+        { field: "administrador", headerName: "", width: 60, align: "center", renderHeader: () => <Icon>person_add_alt_1</Icon>, renderCell: boolIcon },
+        { field: "read", headerName: "", width: 60, align: "center", renderHeader: () => <Icon>search</Icon>, renderCell: boolIcon },
+        { field: "processar", headerName: "", width: 60, align: "center", renderHeader: () => <Icon>check_box</Icon>, renderCell: boolIcon },
+        { field: "administration", headerName: "", width: 60, align: "center", renderHeader: () => <Icon>settings</Icon>, renderCell: boolIcon },
+        { field: "comuns", headerName: "", width: 60, align: "center", renderHeader: () => <Icon>public</Icon>, renderCell: boolIcon },
+        { field: "notificacio", headerName: "", width: 60, align: "center", renderHeader: () => <Icon>gavel</Icon>, renderCell: boolIcon },
+        { field: "comunicacio", headerName: "", width: 60, align: "center", renderHeader: () => <MailOutlineIcon />, renderCell: boolIcon },
+        { field: "comunicacioSir", headerName: "", width: 60, align: "center", renderHeader: () => <Icon>email</Icon>, renderCell: boolIcon },
+        { field: "comunicacioSenseProcediment", headerName: "", width: 60, align: "center", renderHeader: () => <Icon>send</Icon>, renderCell: boolIcon },
+    ];
+
+    React.useEffect(() => {
+        gridRegistry.set(`${id}-organs`, { columns, rows: organsRows });
+        return () => { gridRegistry.delete(`${id}-organs`); };
+    }, [id, organsRows, columns])
+
+    React.useEffect(() => {
+        gridRegistry.set(`${id}-organsFills`, { columns, rows: organsFillsRows });
+        return () => { gridRegistry.delete(`${id}-organsFills`);}
+    }, [id, organsFillsRows, columns]);
+
+    React.useEffect(() => {
+        gridRegistry.set(`${id}-procediment`, { columns, rows: procedimentRows });
+        return () => { gridRegistry.delete(`${id}-procediment`);}
+    }, [id, procedimentRows, columns]);
+
     //
     // select DISTINCT nac.ID,  nac.CLASS, entry.sid, entry.ACL_OBJECT_IDENTITY
     // from NOT_ACL_OBJECT_IDENTITY oi JOIN NOT_acl_entry entry ON oi.Id = entry.ACL_OBJECT_IDENTITY
@@ -110,6 +235,16 @@ export const PermisosUsuariDetail: React.FC<{id: any}> = (props) => {
 
     return (
         <Box sx={{ mt:5, mb:5 }}>
+            <Box sx={{ display: "flex", justifyContent: "flex-end", width: "100%" }}>
+                <Button variant="contained"
+                    sx={{ mr: 5}}
+                    onClick={() => {
+                        exportarGridToExcel([`${String(id)}-organs`, `${String(id)}-organsFills`, `${String(id)}-procediment`],
+                                    "permisos_usuari_" + id + ".xlsx");
+                    }}>
+                    Exportar
+                </Button>
+            </Box>
             <Typography variant="subtitle1" sx={{ mb: 1, ml:2 }}>{t('page.usuaris.permisos.grid.organsPermisDirecte')}</Typography>
             <DataGridPro rows={organsRows}
                          columns={columns}
@@ -118,6 +253,7 @@ export const PermisosUsuariDetail: React.FC<{id: any}> = (props) => {
                          columnHeaderHeight={COLUMN_HEADER_HEIGHT}
                          rowHeight={ROW_HEIGHT}
                          className="permisos-detail-grid"
+                         columnVisibilityModel={{organGestor: false}}
                          sx={{
                              height: COLUMN_HEADER_HEIGHT + procedimentRows.length * ROW_HEIGHT,
                              '& .MuiDataGrid-row:not(:first-of-type)': {
@@ -158,6 +294,7 @@ export const PermisosUsuariDetail: React.FC<{id: any}> = (props) => {
                              columnHeaderHeight={COLUMN_HEADER_HEIGHT}
                              rowHeight={ROW_HEIGHT}
                              className="permisos-detail-grid"
+                             columnVisibilityModel={{organGestor: false}}
                              sx={{
                                  height: COLUMN_HEADER_HEIGHT + procedimentRows.length * ROW_HEIGHT,
                                  '& .MuiDataGrid-row:not(:first-of-type)': {
@@ -174,19 +311,19 @@ export const PermisosUsuariDetail: React.FC<{id: any}> = (props) => {
 
             <Box sx={{mb: 7}}>
                 {showProcedimentPermisOrgan && (
-                    <DataGridPro rows={procedimentRows}
-                                 columns={columns}
-                                 pagination={false}
-                                 hideFooter
-                                 columnHeaderHeight={COLUMN_HEADER_HEIGHT}
-                                 rowHeight={ROW_HEIGHT}
-                                 className="permisos-detail-grid"
-                                 sx={{
-                                     height: COLUMN_HEADER_HEIGHT + procedimentRows.length * ROW_HEIGHT,
-                                     '& .MuiDataGrid-row:not(:first-of-type)': {
-                                         border: 'none',
-                                     }
-                                 }} />
+                    <DataGridPro
+                        rows={procSerOrganRows}
+                        columns={columnsProcSerOrgan}
+                        pagination={false}
+                        hideFooter
+                        columnHeaderHeight={COLUMN_HEADER_HEIGHT}
+                        rowHeight={ROW_HEIGHT}
+                        className="permisos-detail-grid"
+                        sx={{
+                            height: COLUMN_HEADER_HEIGHT + procSerOrganRows.length * ROW_HEIGHT,
+                            '& .MuiDataGrid-row:not(:first-of-type)': { border: 'none' },
+                        }}
+                    />
                 )}
             </Box>
 
