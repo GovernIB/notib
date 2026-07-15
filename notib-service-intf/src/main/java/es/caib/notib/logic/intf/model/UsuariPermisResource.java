@@ -42,17 +42,6 @@ import java.io.Serializable;
 					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ADMIN_LECTURA, BaseConfig.ROLE_ORGAN }
 				)
 			}
-		),
-		@ResourceArtifact(
-			type = ResourceArtifactType.REPORT,
-			code = UsuariPermisResource.REPORT_EXPORTAR_PERMISOS_USUARI,
-			formClass = UsuariPermisResource.PermisUsuariForm.class,
-			accessConstraints = {
-				@ResourceAccessConstraint(
-					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ADMIN_LECTURA, BaseConfig.ROLE_ORGAN }
-				)
-			}
 		)
 	}
 
@@ -61,7 +50,6 @@ public class UsuariPermisResource extends UsuariResource {
 
 	public static final String FILTER_CODE = "FILTER_USUARI_PERMIS";
 	public static final String ACTION_GET_PERMISOS_USUARI = "GET_PERMISOS_USUARI";
-	public static final String REPORT_EXPORTAR_PERMISOS_USUARI = "EXPORTAR_PERMISOS_USUARI";
 
 
 	@Getter

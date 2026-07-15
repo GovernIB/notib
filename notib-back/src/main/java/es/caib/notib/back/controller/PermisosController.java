@@ -79,7 +79,7 @@ public class PermisosController extends BaseUserController {
             var entitatActual = getEntitatActualComprovantPermisos(request);
             var filtre = getFiltreCommand(request).asDto();
             var organGestorCodi = filtre.getOrganGestor();
-            if (isAdminOrgan && entitatActual != null && Strings.isNullOrEmpty(organGestorCodi)) {
+            if (isAdminOrgan && entitatActual != null && StringUtils.isEmpty(organGestorCodi)) {
                 var organGestorActual = getOrganGestorActual(request);
                 organGestorCodi = organGestorActual.getCodi();
             }
