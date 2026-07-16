@@ -168,24 +168,15 @@ const useCurrentRole = () => {
     };
 };
 
-const useCurrentEntitat = (
-    currentUserId: string | undefined,
-    currentRole: string | undefined,
-    currentRoleReady: boolean
-) => {
-    const { httpHeaders: apiHttpHeaders, setHttpHeaders: apiSetHttpHeaders } =
-        useResourceApiContext();
-    const {
-        isReady: apiIsReady,
-        find: apiFind,
-        getOne: apiGetOne,
-    } = useResourceApiService('entitatResource');
+const useCurrentEntitat = (currentUserId: string | undefined, currentRole: string | undefined, currentRoleReady: boolean) => {
+
+    const { httpHeaders: apiHttpHeaders, setHttpHeaders: apiSetHttpHeaders } = useResourceApiContext();
+    const {isReady: apiIsReady, find: apiFind, getOne: apiGetOne} = useResourceApiService('entitatResource');
     const [entitatsAvailable, setEntitatsAvailable] = React.useState<any[]>();
     const [currentEntitatId, setCurrentEntitatId] = React.useState<number>();
     const [currentEntitatLoading, setCurrentEntitatLoading] = React.useState<boolean>();
     const [currentEntitat, setCurrentEntitat] = React.useState<any>();
-    const { getValue: sessionSessionGetValue, setValue: sessionSessionSetValue } =
-        useSessionStorage(currentUserId, 'currentSession');
+    const { getValue: sessionSessionGetValue, setValue: sessionSessionSetValue } = useSessionStorage(currentUserId, 'currentSession');
     React.useEffect(() => {
         if (apiIsReady && currentRoleReady && currentRole != null) {
             setCurrentEntitatId(undefined);

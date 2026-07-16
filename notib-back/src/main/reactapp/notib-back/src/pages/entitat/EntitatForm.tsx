@@ -27,50 +27,45 @@ import GridFormField from '../../components/GridFormField';
 import { useTabParam } from '../../hooks/useSearchParams';
 
 const useEntitatId = () => {
+
     const { id: paramId } = useParams();
     const location = useLocation();
     const { isReady, currentEntitatId } = useNotibContext();
     const isCurrentPathname = location.pathname.endsWith('current');
     const id = isCurrentPathname ? currentEntitatId : paramId != null ? parseInt(paramId) : paramId;
-    return {
-        isReady: isCurrentPathname ? isReady : true,
-        id,
-        hiddenBackButton: isCurrentPathname,
+    return {isReady: isCurrentPathname ? isReady : true, id, hiddenBackButton: isCurrentPathname,
     };
 };
 
 const CustomToolbar: React.FC = () => {
+
     const theme = useTheme();
     const { id, data } = useFormContext();
-    const { isReady: apiIsReady, fieldDownload: apiFieldDownload } =
-        useResourceApiService('entitatResource');
+    const { isReady: apiIsReady, fieldDownload: apiFieldDownload } = useResourceApiService('entitatResource');
     const { getTokenParsed } = useAuthContext();
     const [logoUrl, setLogoUrl] = React.useState<string>();
     const [tokenParsed, setTokenParsed] = React.useState<any>();
     const dataIsReady = data != null;
     const backgroundColor = data?.colorFons ?? '#fff';
+    React.useEffect(() => setTokenParsed(getTokenParsed()), []);
     React.useEffect(() => {
-        setTokenParsed(getTokenParsed());
-    }, []);
-    React.useEffect(() => {
-        if (apiIsReady && dataIsReady) {
-            if (data.logoCapsalera) {
-                const args = { fieldName: 'logoCapsalera' };
-                apiFieldDownload(id, args).then((blobFileName) => {
-                    setLogoUrl(URL.createObjectURL(blobFileName.blob));
-                });
-            } else {
-                setLogoUrl(goibLogoLight);
-            }
+
+        if (!apiIsReady || !dataIsReady) {
+            return;
         }
-    }, [apiIsReady, dataIsReady]);
-    React.useEffect(() => {
-        if (data.logoCapsalera) {
-            setLogoUrl(`data:image/png;base64,${data.logoCapsalera.content}`);
-        } else {
+        if (!data.logoCapsalera) {
             setLogoUrl(goibLogoLight);
+            return;
         }
+        const args = { fieldName: 'logoCapsalera' };
+        apiFieldDownload(id, args).then((blobFileName) => setLogoUrl(URL.createObjectURL(blobFileName.blob)));
+
+    }, [apiIsReady, dataIsReady]);
+
+    React.useEffect(() => {
+            setLogoUrl(data.logoCapsalera ? `data:image/png;base64,${data.logoCapsalera.content}` : goibLogoLight);
     }, [data?.logoCapsalera]);
+
     return (
         <Toolbar component={Paper} square sx={{ backgroundColor: backgroundColor }}>
             {logoUrl && (
@@ -78,19 +73,10 @@ const CustomToolbar: React.FC = () => {
                     alt="logo"
                     src={logoUrl}
                     height={49}
-                    style={{
-                        paddingLeft: '8px',
-                        paddingRight: '29px',
-                        borderRight: '1px solid ' + theme.palette.divider,
-                    }}
+                    style={{paddingLeft: '8px', paddingRight: '29px', borderRight: '1px solid ' + theme.palette.divider,}}
                 />
             )}
-            <img
-                alt="logo2"
-                src={notibLogoLight}
-                height={49}
-                style={{ paddingLeft: '24px', verticalAlign: 'middle' }}
-            />
+            <img alt="logo2" src={notibLogoLight} height={49} style={{ paddingLeft: '24px', verticalAlign: 'middle' }}/>
             <div style={{ flexGrow: 1 }} />
             {tokenParsed && <TextAvatar text={tokenParsed.name} />}
         </Toolbar>
@@ -101,9 +87,7 @@ const EntitatFormTabPersonalitzar: React.FC = () => {
     const { t } = useTranslation();
     return (
         <Paper variant="outlined" sx={{ p: 2, pt: 1 }}>
-            <Typography variant="h6" gutterBottom>
-                {t('page.entitats.form.personalitzar.capsalera')}
-            </Typography>
+            <Typography variant="h6" gutterBottom>{t('page.entitats.form.personalitzar.capsalera')}</Typography>
             <Grid container spacing={2} sx={{ mt: 2 }}>
                 <GridFormField size={6} name="logoCapsalera" accept="image/jpeg" />
                 <GridFormField size={3} name="colorLletra" type="color" />
@@ -136,6 +120,7 @@ const EntitatFormTabDades: React.FC = () => {
 };
 
 const EntitatFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
+
     const { setSubtitle } = props;
     const { t } = useTranslation();
     const { data } = useFormContext();
@@ -143,6 +128,7 @@ const EntitatFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> 
     React.useEffect(() => {
         setSubtitle(data?.codi + ', ' + data?.nom);
     }, [data]);
+
     const tipusDocsTabLabel = (
         <Badge badgeContent={data.tipusDocCount} color="primary">
             {t('page.entitats.form.tabs.tipusDocs')}
@@ -187,6 +173,7 @@ const EntitatFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> 
 };
 
 export const EntitatForm: React.FC = () => {
+
     const { t } = useTranslation();
     const { isReady, id, hiddenBackButton } = useEntitatId();
     const [subtitle, setSubtitle] = React.useState<string>();
@@ -196,11 +183,7 @@ export const EntitatForm: React.FC = () => {
                 <MuiForm
                     resourceName="entitatResource"
                     id={id}
-                    title={
-                        id != null
-                            ? t('page.entitats.form.titleUpdate')
-                            : t('page.entitats.form.titleCreate')
-                    }
+                    title={id != null ? t('page.entitats.form.titleUpdate') : t('page.entitats.form.titleCreate')}
                     hiddenBackButton={hiddenBackButton ? true : undefined}
                     toolbarSubtitle={id != null ? subtitle : undefined}
                     createLink="./{{id}}"

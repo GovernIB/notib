@@ -1,7 +1,7 @@
 import {GridPage, MuiDataGrid, MuiDataGridColDef, springFilterBuilder as filterBuilder, useFilterApiContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import React from "react";
-import {GRID_DETAIL_PANEL_TOGGLE_COL_DEF, useGridApiRef} from "@mui/x-data-grid-pro";
+import {GRID_DETAIL_PANEL_TOGGLE_COL_DEF} from "@mui/x-data-grid-pro";
 import {useDatagridFilterProps, useDatagridPageSizeOptionsProps} from "../../hooks/useDataGrid.tsx";
 import {formatEndOfDay, formatStartOfDay} from "../../utils/dateUtils.ts";
 import {Box, Chip, Grid, Icon, IconButton} from "@mui/material";
@@ -65,10 +65,8 @@ const useDataGridColumns = () => {
                 resizable: false,
                 width: 90,
                 align: 'center',
-                // renderHeader: () => <ButtonDetailExpandColapse datagridApiRef={datagridApiRef} />,
                 renderCell: (params: any) => (
-                    <CustomDetailPanelToggle id={params.id}
-                                             value={params.value}
+                    <CustomDetailPanelToggle id={params.id} value={params.value}
                                              msgMostrar={t('page.accioMassiva.grid.mostarElements')}
                                              msgOcultar={t('page.accioMassiva.grid.ocultarElements')} />
 

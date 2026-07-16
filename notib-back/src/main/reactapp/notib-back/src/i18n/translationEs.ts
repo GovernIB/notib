@@ -271,6 +271,10 @@ const translationEs = {
                 title: 'Operadores postales',
                 popupResourceTitle: 'operador postal',
             },
+            form: {
+                titleCreate: "Crear operador postal",
+                titleUpdate: "Modificar operador postal",
+            },
         },
         pagadorCie: {
             grid: {
@@ -1017,7 +1021,8 @@ const translationEs = {
         RoleSelector: {
             role: {
                 NOT_SUPER: 'Superadministrador',
-                NOT_ADMIN: 'Administrador',
+                NOT_ADMIN: 'Administrador Entitat',
+                NOT_ADMIN_LECTURA: "Administrador (lectura)",
                 tothom: 'Usuario',
             },
         },

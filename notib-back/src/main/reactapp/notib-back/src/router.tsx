@@ -9,12 +9,11 @@ import ServeiGrid from './pages/servei/ServeiGrid';
 import ServeiForm from './pages/servei/ServeiForm';
 import AvisGrid from './pages/avis/AvisGrid';
 import AvisForm from './pages/avis/AvisForm';
-import Grups from './pages/Grups';
+import Grups from './pages/grup/Grups.tsx';
 import OrganGrid from './pages/organ/OrganGrid';
 import OrganForm from './pages/organ/OrganForm';
 import PagadorCieGrid from './pages/pagadorCie/PagadorCieGrid';
 import PagadorCieForm from './pages/pagadorCie/PagadorCieForm';
-import PagadorsPostals from './pages/PagadorsPostals';
 import NotificacioGrid from './pages/notificacio/NotificacioGrid';
 import NotificacioForm from './pages/notificacio/NotificacioForm';
 import EnviamentGrid from './pages/enviament/EnviamentGrid';
@@ -30,6 +29,8 @@ import AccioMassivaGrid from "./pages/accioMassiva/AccioMassivaGrid.tsx";
 import CallbackPendentsGrid from "./pages/callbacks/CallbackPendentsGrid.tsx";
 import Metriques from "./pages/metriques/Metriques.tsx";
 import PermisosUsuariGrid from "./pages/usuaris/PermisosUsuariGrid.tsx";
+import PagadorPostalForm from "./pages/pagadorPostal/PagadorPostalForm.tsx";
+import PagadorsPostalsGrid from "./pages/pagadorPostal/PagadorsPostalsGrid.tsx";
 
 export const router = createBrowserRouter(
     [
@@ -120,8 +121,17 @@ export const router = createBrowserRouter(
                     ],
                 },
                 {
-                    path: 'pagadorspostals',
-                    element: <PagadorsPostals />,
+                    path: 'pagadorspostal',
+                    children: [
+                        { index: true, element: <PagadorsPostalsGrid /> },
+                        {
+                            path: 'form',
+                            children: [
+                                { index: true, element: <PagadorPostalForm /> },
+                                { path: ':id', element: <PagadorPostalForm /> },
+                            ],
+                        },
+                    ]
                 },
                 {
                     path: 'pagadorscie',
@@ -134,7 +144,7 @@ export const router = createBrowserRouter(
                                 { path: ':id', element: <PagadorCieForm /> },
                             ],
                         },
-                    ],
+                    ]
                 },
                 {
                     path: 'notificacions',

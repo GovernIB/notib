@@ -10,6 +10,7 @@ import { useTabParam } from '../../hooks/useSearchParams';
 import GridFormField from '../../components/GridFormField';
 
 const PagadorCieFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
+
     const { setSubtitle } = props;
     const { t } = useTranslation();
     const { data } = useFormContext();
@@ -61,23 +62,19 @@ const PagadorCieFormContent: React.FC<{ setSubtitle: (subtitle: string) => void 
 };
 
 export const PagadorCieForm: React.FC = () => {
+
     const { t } = useTranslation();
     const { id } = useParams();
     const [subtitle, setSubtitle] = React.useState<string>();
-
+    const isUpdate = id != null;
     return (
         <FormPage>
             <MuiForm
                 resourceName="pagadorCieResource"
-                id={id != null ? parseInt(id) : id}
-                title={
-                    id != null
-                        ? t('page.pagadorCie.form.titleUpdate')
-                        : t('page.pagadorCie.form.titleCreate')
-                }
-                toolbarSubtitle={id != null ? subtitle : undefined}
+                id={isUpdate ? Number.parseInt(id) : id}
+                title={isUpdate ? t('page.pagadorCie.form.titleUpdate') : t('page.pagadorCie.form.titleCreate')}
+                toolbarSubtitle={isUpdate ? subtitle : undefined}
                 createLink="./{{id}}"
-                //updateLink="../../"
                 componentProps={{ style: { height: '100%' } }}
                 commonFieldComponentProps={{ size: 'small' }}
             >

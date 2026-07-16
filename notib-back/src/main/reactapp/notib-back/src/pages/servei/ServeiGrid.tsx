@@ -67,11 +67,7 @@ const columns: MuiDataGridColDef[] = [
         renderCell: (params: any) => {
             return (
                 <LinkToTab id={params.id} tab={1}>
-                    <Chip
-                        label={params.value}
-                        color={params.value ? 'primary' : undefined}
-                        size="small"
-                    />
+                    <Chip label={params.value} color={params.value ? 'primary' : undefined} size="small"/>
                 </LinkToTab>
             );
         },
@@ -82,11 +78,7 @@ const columns: MuiDataGridColDef[] = [
         renderCell: (params: any) => {
             return (
                 <LinkToTab id={params.id} tab={2}>
-                    <Chip
-                        label={params.value}
-                        color={params.value ? 'primary' : undefined}
-                        size="small"
-                    />
+                    <Chip label={params.value} color={params.value ? 'primary' : undefined} size="small"/>
                 </LinkToTab>
             );
         },
@@ -102,17 +94,15 @@ const springFilterBuilder = (data: any) => {
         data?.comu && filterBuilder.eq('comu', `'${data.comu}'`),
         data?.entregaCieActiva ? filterBuilder.neq('entregaCie', null) : undefined,
         data?.manual && filterBuilder.eq('manual', `'${data.manual}'`),
-        data?.requireDirectPermission &&
-            filterBuilder.eq('requireDirectPermission', `'${data.requireDirectPermission}'`)
+        data?.requireDirectPermission && filterBuilder.eq('requireDirectPermission', `'${data.requireDirectPermission}'`)
     );
 };
 
 const ContentFilter: React.FC = () => {
+
     const { t } = useTranslation();
     const filterApiRef = useFilterApiContext();
-    const handleButtonClick = () => {
-        filterApiRef.current?.clear();
-    };
+    const handleButtonClick = () => filterApiRef.current?.clear();
     return (
         <Grid container spacing={2}>
             <GridFormField size={1} name="codi" />
@@ -122,12 +112,7 @@ const ContentFilter: React.FC = () => {
             <GridButtonField size={0.5} name="comu" icon={'public'} hiddenLabel />
             <GridButtonField size={0.5} name="entregaCieActiva" icon={'email'} hiddenLabel />
             <GridButtonField size={0.5} name="manual" icon={'sync'} hiddenLabel />
-            <GridButtonField
-                size={0.5}
-                name="requireDirectPermission"
-                icon={'gpp_good'}
-                hiddenLabel
-            />
+            <GridButtonField size={0.5} name="requireDirectPermission" icon={'gpp_good'} hiddenLabel/>
             <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
                 <Icon>filter_alt_off</Icon>
             </IconButton>
@@ -136,6 +121,7 @@ const ContentFilter: React.FC = () => {
 };
 
 export const ProcedimentGrid = () => {
+
     const { t } = useTranslation();
     const { currentEntitatId } = useNotibContext();
     const filterDataGridProps = useDatagridFilterProps(

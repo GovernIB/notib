@@ -25,11 +25,18 @@ import javax.validation.constraints.NotNull;
 @FieldNameConstants
 @ResourceConfig(
 		descriptionField = EntitatTipusDocumentResource.Fields.tipusDocument,
-		accessConstraints = @ResourceAccessConstraint(
+		accessConstraints = {
+			@ResourceAccessConstraint(
 				type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
 				roles = { BaseConfig.ROLE_SUPER, BaseConfig.ROLE_ADMIN },
 				grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
-		)
+			),
+			@ResourceAccessConstraint(
+				type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+				roles = { BaseConfig.ROLE_ADMIN_LECTURA },
+				grantedPermissions = { PermissionEnum.READ }
+			),
+		}
 )
 public class EntitatTipusDocumentResource extends BaseResource<Long> {
 

@@ -23,7 +23,7 @@ import {
 } from '../../utils/estatConfig';
 import {useSearchParams} from "react-router-dom";
 import useAccionsNotificacio from "../accions/AccionsNotificacio.tsx";
-import {useNotibContext} from "../../components/NotibContext.ts";
+import {ROLE_ADMIN_LECTURA, useNotibContext} from "../../components/NotibContext.ts";
 import {GridApiPro, useGridApiRef} from "@mui/x-data-grid-pro";
 
 const columns = [
@@ -117,11 +117,12 @@ const springFilterBuilder = (data: any) => {
     );
 };
 
-const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null> }> = ({apiRef}) => {
+const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null>, refresh: () => void }> = ({apiRef, refresh}) => {
 
     const { selection } = useMuiDataGridContext();
     const { t } = useTranslation();
     const { currentRole} = useNotibContext();
+    const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
     let amagarEntrada = currentRole === 'tothom' || currentRole === 'NOT_ADMIN_LECTURA';
     const { descarregarExcel,
         actualitzarEstat,
@@ -131,9 +132,15 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
         enviarNotificacionsMovilMassiu,
         anularRemesaMassiu, anularRemesaMassiuDialog,
         ampliarTerminiMassiu, ampliarTerminiMassiuDialog
-    } = useAccionsMassives();
+    } = useAccionsMassives("notificacioResource", refresh);
 
-    const opcionsMenu: MenuOption[] = [
+    const opcionsMenu: MenuOption[] = isRoleAdminLectura ? [
+        {
+            label: t('page.accioMassiva.accions.exportarFullCalcul.label'),
+            tooltip: t('page.accioMassiva.accions.exportarFullCalcul.tooltip'),
+            onClick: () => descarregarExcel(selection?.ids, "ENVIAMENT"),
+        }
+    ] : [
         {
             label: t('page.accioMassiva.accions.exportarFullCalcul.label'),
             tooltip: t('page.accioMassiva.accions.exportarFullCalcul.tooltip'),
@@ -249,9 +256,11 @@ const EnviamentGrid = () => {
     const gridApiRef = useMuiDataGridApiRef();
     const { currentRole} = useNotibContext();
     const { dialogComponent: enviamentDialogComponent, onDetailClick } = useEnviamentDetailDialog();
-    const { dialogComponent: notificacioDialogComponent, onDetailClick: onNotificacioDetailClick } = useNotificacioDetailDialog();
+    const { dialogComponent: notificacioDialogComponent, onDetailClick: onNotificacioDetailClick } = useEnviamentDetailDialog();
     const [searchParams] = useSearchParams();
     const datagridApiRef = useGridApiRef();
+    const [reloadKey, setReloadKey] = React.useState(0);
+    const refreshGrid = React.useCallback(() => setReloadKey(k => k + 1), []);
     const referencia = searchParams.get('referencia');
     const filterDataGridProps = useDatagridFilterProps(
         'notificacioEnviamentResource',
@@ -266,6 +275,7 @@ const EnviamentGrid = () => {
     return (
         <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
             <MuiDataGrid
+                key={`${reloadKey}`}
                 datagridApiRef={datagridApiRef}
                 apiRef={gridApiRef}
                 title={t('page.enviament.grid.title')}
@@ -282,7 +292,7 @@ const EnviamentGrid = () => {
                 toolbarElementsWithPositions={[
                     {
                         position: 2,
-                        element: <MassiveActionsButton apiRef={datagridApiRef} />,
+                        element: <MassiveActionsButton apiRef={datagridApiRef} refresh={refreshGrid} />,
                     },
                 ]}
                 onRowClick={(params) => onDetailClick(params.id)}

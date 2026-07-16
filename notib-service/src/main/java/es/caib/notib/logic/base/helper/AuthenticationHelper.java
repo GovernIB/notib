@@ -19,8 +19,7 @@ public class AuthenticationHelper {
 	 * @return el nom de l'usuari actual.
 	 */
 	public String getCurrentUserName() {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		return auth.getName();
+		return SecurityContextHolder.getContext().getAuthentication().getName();
 	}
 
 	/**
@@ -29,37 +28,34 @@ public class AuthenticationHelper {
 	 * @return la llista de rols.
 	 */
 	public String[] getCurrentUserRoles() {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		return auth.getAuthorities().stream().
-				map(GrantedAuthority::getAuthority).
-				toArray(String[]::new);
+
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		return auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).toArray(String[]::new);
 	}
 
 	/**
 	 * Retorna true si l'usuari actual te el rol especificat.
 	 *
-	 * @param role
-	 *            el rol a verificar.
+	 * @param role el rol a verificar.
 	 * @return true si l'usuari actual te el rol especificat i false en cas contrari.
 	 */
 	public boolean isCurrentUserInRole(String role) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		return auth.getAuthorities().stream().
-				anyMatch(ga -> ga.getAuthority().equals(role));
+
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		return auth.getAuthorities().stream().anyMatch(ga -> ga.getAuthority().equals(role));
 	}
 
 	/**
 	 * Retorna true si l'usuari de l'objecte d'autenticació te el rol especificat.
 	 *
-	 * @param auth
-	 *            l'objecte d'autenticació.
-	 * @param role
-	 *            el rol a verificar.
+	 * @param auth l'objecte d'autenticació.
+	 * @param role el rol a verificar.
 	 * @return true si l'usuari actual te el rol especificat i false en cas contrari.
 	 */
 	public boolean isCurrentUserInRole(Authentication auth, String role) {
-		boolean isInRole = false;
-		for (GrantedAuthority ga: auth.getAuthorities()) {
+
+		var isInRole = false;
+		for (var ga: auth.getAuthorities()) {
 			if (ga != null && ga.getAuthority().equals(role)) {
 				isInRole = true;
 				break;

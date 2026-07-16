@@ -21,11 +21,18 @@ import lombok.experimental.FieldNameConstants;
 @NoArgsConstructor
 @FieldNameConstants
 @ResourceConfig(
-	accessConstraints = @ResourceAccessConstraint(
-		type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-		roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_SUPER },
-		grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
-	)
+	accessConstraints = {
+		@ResourceAccessConstraint(
+			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+			roles = { BaseConfig.ROLE_ADMIN },
+			grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
+		),
+		@ResourceAccessConstraint(
+			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+			roles = { BaseConfig.ROLE_ADMIN_LECTURA },
+			grantedPermissions = { PermissionEnum.READ }
+		)
+	}
 )
 public class ProcedimentGrupResource extends BaseResource<Long> {
 

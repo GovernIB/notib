@@ -34,11 +34,18 @@ import java.util.Date;
 @ResourceConfig(
 	descriptionField = PagadorCieResource.Fields.nom,
 	quickFilterFields = { PagadorCieResource.Fields.nom },
-	accessConstraints = @ResourceAccessConstraint(
-		type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-		roles = { BaseConfig.ROLE_ADMIN },
-		grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
-	),
+	accessConstraints = {
+		@ResourceAccessConstraint(
+			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+			roles = { BaseConfig.ROLE_ADMIN },
+			grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
+		),
+		@ResourceAccessConstraint(
+			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+			roles = { BaseConfig.ROLE_ADMIN_LECTURA },
+			grantedPermissions = { PermissionEnum.READ }
+		)
+	},
 	artifacts = {
 		@ResourceArtifact(
 			type = ResourceArtifactType.FILTER,

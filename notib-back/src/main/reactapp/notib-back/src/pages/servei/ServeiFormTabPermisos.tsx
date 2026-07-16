@@ -8,9 +8,9 @@ import PermissionGridSwitch from '../../components/PermissionGridSwitch';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 
 const PermissionForm: React.FC = () => {
+
     const { t } = useTranslation();
     const { apiRef } = useFormContext();
-
     const doFieldChange = (targetValue: boolean) => {
         const permisos = [
             'adminAllowed',
@@ -20,10 +20,7 @@ const PermissionForm: React.FC = () => {
             'perm8Allowed',
             'perm7Allowed',
         ];
-
-        permisos.forEach((nomPermis) => {
-            apiRef?.current?.setFieldValue?.(nomPermis, targetValue);
-        });
+        permisos.forEach((nomPermis) => apiRef?.current?.setFieldValue?.(nomPermis, targetValue));
     };
 
     const sidGrantedAuthorityEnumOptions = [
@@ -48,14 +45,7 @@ const PermissionForm: React.FC = () => {
                 size={3}
             />
             <GridFormField size={9} name="sidName" />
-
-            <PermissionGridSwitch
-                name="selectAll"
-                label={'Seleccionar tots'}
-                icon={<Icon>toggle_on</Icon>}
-                size={12}
-                onChange={doFieldChange}
-            />
+            <PermissionGridSwitch name="selectAll" label={'Seleccionar tots'} icon={<Icon>toggle_on</Icon>} size={12} onChange={doFieldChange}/>
             <Grid size={1} />
             <PermissionGridSwitch
                 name="adminAllowed"
@@ -112,18 +102,15 @@ const PermissionForm: React.FC = () => {
     );
 };
 const ServeiFormTabPermisos: React.FC = () => {
+
     const { t } = useTranslation();
-    const { id } = useFormContext();
+    const { id, data } = useFormContext();
     const permissionEntries = [
         {
             headerName: t('page.serveis.form.permisos.consultaAllowed'),
             field: 'readAllowed',
             renderHeader: () => (
-                <Tooltip
-                    title={t('page.serveis.form.permisos.consultaAllowedTooltip')}
-                    arrow
-                    placement="top"
-                >
+                <Tooltip title={t('page.serveis.form.permisos.consultaAllowedTooltip')} arrow placement="top">
                     <Icon>search</Icon>
                 </Tooltip>
             ),
@@ -134,11 +121,7 @@ const ServeiFormTabPermisos: React.FC = () => {
             headerName: t('page.serveis.form.permisos.procesAllowed'),
             field: 'perm4Allowed',
             renderHeader: () => (
-                <Tooltip
-                    title={t('page.serveis.form.permisos.procesAllowedTooltip')}
-                    arrow
-                    placement="top"
-                >
+                <Tooltip title={t('page.serveis.form.permisos.procesAllowedTooltip')} arrow placement="top">
                     <Icon>check_box</Icon>
                 </Tooltip>
             ),
@@ -149,11 +132,7 @@ const ServeiFormTabPermisos: React.FC = () => {
             headerName: t('page.serveis.form.permisos.gestioAllowed'),
             field: 'adminAllowed',
             renderHeader: () => (
-                <Tooltip
-                    title={t('page.serveis.form.permisos.gestioAllowedTooltip')}
-                    arrow
-                    placement="top"
-                >
+                <Tooltip title={t('page.serveis.form.permisos.gestioAllowedTooltip')} arrow placement="top">
                     <Icon>settings</Icon>
                 </Tooltip>
             ),
@@ -164,11 +143,7 @@ const ServeiFormTabPermisos: React.FC = () => {
             headerName: t('page.serveis.form.permisos.notificacioAllowed'),
             field: 'perm5Allowed',
             renderHeader: () => (
-                <Tooltip
-                    title={t('page.serveis.form.permisos.notificacioAllowedTooltip')}
-                    arrow
-                    placement="top"
-                >
+                <Tooltip title={t('page.serveis.form.permisos.notificacioAllowedTooltip')} arrow placement="top">
                     <Icon>gavel</Icon>
                 </Tooltip>
             ),
@@ -179,11 +154,7 @@ const ServeiFormTabPermisos: React.FC = () => {
             headerName: t('page.serveis.form.permisos.comunicacioAllowed'),
             field: 'perm8Allowed',
             renderHeader: () => (
-                <Tooltip
-                    title={t('page.serveis.form.permisos.comunicacioAllowedTooltip')}
-                    arrow
-                    placement="top"
-                >
+                <Tooltip title={t('page.serveis.form.permisos.comunicacioAllowedTooltip')} arrow placement="top">
                     <MailOutlineIcon />
                 </Tooltip>
             ),
@@ -194,26 +165,21 @@ const ServeiFormTabPermisos: React.FC = () => {
             headerName: t('page.serveis.form.permisos.comunicacioSirAllowed'),
             field: 'perm7Allowed',
             renderHeader: () => (
-                <Tooltip
-                    title={t('page.serveis.form.permisos.comunicacioSirAllowedTooltip')}
-                    arrow
-                    placement="top"
-                >
+                <Tooltip title={t('page.serveis.form.permisos.comunicacioSirAllowedTooltip')} arrow placement="top">
                     <Icon>email</Icon>
                 </Tooltip>
             ),
             flex: 0.5,
             type: 'boolean',
-        },
+        }
     ];
-    return (
-        <PermissionGrid
-            resourceName="procedimentResource"
-            id={id}
-            permissionEntries={permissionEntries}
-            permissionForm={<PermissionForm />}
-        />
-    );
+    return (<PermissionGrid
+                resourceName="procedimentResource"
+                id={id}
+                permissionEntries={permissionEntries}
+                permissionForm={<PermissionForm />}
+                withOrganGestor={data.comu}
+    />);
 };
 
 export default ServeiFormTabPermisos;

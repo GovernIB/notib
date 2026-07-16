@@ -31,11 +31,18 @@ import javax.validation.constraints.Size;
 @ResourceConfig(
 	descriptionField = GrupResource.Fields.codi,
 	quickFilterFields = { GrupResource.Fields.codi, GrupResource.Fields.nom },
-	accessConstraints = @ResourceAccessConstraint(
-		type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-		roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_SUPER },
-		grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
-	)
+	accessConstraints = {
+		@ResourceAccessConstraint(
+			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+			roles = {BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_SUPER},
+			grantedPermissions = {PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE}
+		),
+		@ResourceAccessConstraint(
+			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+			roles = { BaseConfig.ROLE_ADMIN_LECTURA },
+			grantedPermissions = { PermissionEnum.READ }
+		)
+	}
 )
 public class GrupResource extends BaseResource<Long> {
 

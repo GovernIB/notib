@@ -46,6 +46,7 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 	@Value("${es.caib.notib.security.mappableRoles:" +
 			BaseConfig.ROLE_SUPER + "," +
 			BaseConfig.ROLE_ADMIN + "," +
+			BaseConfig.ROLE_ADMIN_LECTURA + "," +
 			BaseConfig.ROLE_CARPETA + "," +
 			BaseConfig.ROLE_APL + "," +
 			BaseConfig.ROLE_USER + "}")

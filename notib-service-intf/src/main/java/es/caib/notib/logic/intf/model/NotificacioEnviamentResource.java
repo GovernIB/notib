@@ -48,10 +48,10 @@ import java.util.List;
 //	descriptionField = "id",
 	accessConstraints = {
 		@ResourceAccessConstraint(
-		type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-		roles = {BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ADMIN_LECTURA, BaseConfig.ROLE_ORGAN},
-		grantedPermissions = {PermissionEnum.READ}
-	),
+			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+			roles = {BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ADMIN_LECTURA, BaseConfig.ROLE_ORGAN},
+			grantedPermissions = {PermissionEnum.READ}
+		),
 		@ResourceAccessConstraint(
 			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
 			roles = {BaseConfig.ROLE_USER},

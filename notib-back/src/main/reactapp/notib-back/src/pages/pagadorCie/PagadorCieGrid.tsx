@@ -33,33 +33,25 @@ const columns = [
     },
     {
         field: 'fullaCount',
+        flex: 1,
         renderCell: (params: any) => {
             return (
                 <LinkToTab id={params.id} tab={1}>
-                    <Chip
-                        label={params.value}
-                        color={params.value ? 'primary' : undefined}
-                        size="small"
-                    />
+                    <Chip label={params.value} color={params.value ? 'primary' : undefined} size="small"/>
                 </LinkToTab>
             );
-        },
-        flex: 1,
+        }
     },
     {
         field: 'sobreCount',
+        flex: 1,
         renderCell: (params: any) => {
             return (
                 <LinkToTab id={params.id} tab={2}>
-                    <Chip
-                        label={params.value}
-                        color={params.value ? 'primary' : undefined}
-                        size="small"
-                    />
+                    <Chip label={params.value} color={params.value ? 'primary' : undefined} size="small"/>
                 </LinkToTab>
             );
         },
-        flex: 1,
     },
 ];
 
@@ -68,27 +60,16 @@ const springFilterBuilder = (data: any) => {
         filterBuilder.like('nom', data.nom),
         filterBuilder.eq('organEmisor.id', data?.organGestorEmissor?.id), //TODO: Revisar aquest filtre, el backend no te aquest camp a l'entity
         filterBuilder.eq('organGestor.id', data?.organGestorPagador?.id),
-        data?.contracteDataVigInici &&
-            filterBuilder.gte(
-                'contracteDataVig',
-                `'${formatStartOfDay(data?.contracteDataVigInici)}'`
-            ),
-        data?.contracteDataVigFinal &&
-            filterBuilder.lte(
-                'contracteDataVig',
-                `'${formatEndOfDay(data?.contracteDataVigFinal)}'`
-            )
+        data?.contracteDataVigInici && filterBuilder.gte('contracteDataVig', `'${formatStartOfDay(data?.contracteDataVigInici)}'`),
+        data?.contracteDataVigFinal && filterBuilder.lte('contracteDataVig', `'${formatEndOfDay(data?.contracteDataVigFinal)}'`)
     );
 };
 
 const ContentFilter: React.FC = () => {
+
     const { t } = useTranslation();
     const filterApiRef = useFilterApiContext();
-
-    const handleButtonClick = () => {
-        filterApiRef.current?.clear();
-    };
-
+    const handleButtonClick = () => filterApiRef.current?.clear();
     return (
         <Grid container spacing={2}>
             <GridFormField size={2} name="nom" />
@@ -106,6 +87,7 @@ const ContentFilter: React.FC = () => {
 };
 
 export const PagadorCieGrid: React.FC = () => {
+
     const { t } = useTranslation();
     const filterDataGridProps = useDatagridFilterProps(
         'pagadorCieResource',
@@ -114,7 +96,6 @@ export const PagadorCieGrid: React.FC = () => {
         <ContentFilter />
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
-
     return (
         <GridPage>
             <MuiDataGrid

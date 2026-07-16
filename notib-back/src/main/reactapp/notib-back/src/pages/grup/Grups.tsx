@@ -2,8 +2,9 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import { GridPage, MuiDataGrid } from 'reactlib';
-import { useDatagridPageSizeOptionsProps } from '../hooks/useDataGrid';
-import GridFormField from '../components/GridFormField';
+import { useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid.tsx';
+import GridFormField from '../../components/GridFormField.tsx';
+import {ROLE_ADMIN_LECTURA, useNotibContext} from "../../components/NotibContext.ts";
 
 const columns = [
     {
@@ -26,7 +27,10 @@ const GrupForm: React.FC = () => {
 };
 
 export const Grups: React.FC = () => {
+
     const { t } = useTranslation();
+    const { currentRole } = useNotibContext();
+    const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
         <GridPage>
@@ -42,6 +46,7 @@ export const Grups: React.FC = () => {
                 popupEditActive
                 popupEditFormContent={<GrupForm />}
                 popupEditFormDialogResourceTitle={t('page.grups.grid.popupResourceTitle')}
+                rowHideUpdateButton={isRoleAdminLectura}
             />
         </GridPage>
     );

@@ -1,14 +1,11 @@
-import {Alert, Box, Button, Icon, Typography} from '@mui/material';
+import {Alert, Box, Typography} from '@mui/material';
 import React from 'react';
-import { FieldsDataCard } from '../../components/DataCard';
-import { useTranslation } from 'react-i18next';
+import {FieldsDataCard} from '../../components/DataCard';
+import {useTranslation} from 'react-i18next';
 import {MuiActionReportButton, useBaseAppContext} from 'reactlib';
 
-const EnviamentDetailTabNotifica: React.FC<{
-    enviament: any;
-    apiCurrentFields: any[] | undefined;
-    isRolActualAdministradorLectura?: boolean;
-}> = (props) => {
+const EnviamentDetailTabNotifica: React.FC<{ enviament: any; apiCurrentFields: any[] | undefined; isRolActualAdministradorLectura?: boolean; }> = (props) => {
+
     const { enviament, apiCurrentFields, isRolActualAdministradorLectura } = props;
     const { t } = useTranslation();
     const { temporalMessageShow } = useBaseAppContext();
@@ -17,9 +14,7 @@ const EnviamentDetailTabNotifica: React.FC<{
         if (enviament?.notificaEstat === 'PENDENT') {
             return (
                 <Alert severity="warning" sx={{ mb: 1, mt: 2 }}>
-                    {enviament?.perEmail
-                        ? t('page.enviament.detail.tab.notifica.noEnviat')
-                        : t('page.enviament.detail.tab.notifica.notificacioNoEnviat')}
+                    {enviament?.perEmail ? t('page.enviament.detail.tab.notifica.noEnviat') : t('page.enviament.detail.tab.notifica.notificacioNoEnviat')}
                 </Alert>
             );
         }
@@ -28,9 +23,7 @@ const EnviamentDetailTabNotifica: React.FC<{
     const renderContingutRefrescar = () => {
 
         // Cas NO PENDENT
-        const isCasEspecialSir =
-            (enviament?.tipusEnviament === 'COMUNICACIO' || enviament?.tipusEnviament === 'SIR') &&
-            enviament?.titularInfo?.interessatTipus === 'ADMINISTRACIO';
+        const isCasEspecialSir = (enviament?.tipusEnviament === 'COMUNICACIO' || enviament?.tipusEnviament === 'SIR') && enviament?.titularInfo?.interessatTipus === 'ADMINISTRACIO';
         const potRefrescar = !isRolActualAdministradorLectura;
         // Si és el cas de SIR i pot refrescar
         if (isCasEspecialSir && potRefrescar) {
@@ -93,9 +86,7 @@ const EnviamentDetailTabNotifica: React.FC<{
                     },
                     {
                         field: 'plazoAmpliado',
-                        valueRenderer: (_value: any, formattedValue: string) => {
-                            return _value === true ? formattedValue : undefined;
-                        },
+                        valueRenderer: (_value: any, formattedValue: string) => _value === true ? formattedValue : undefined,
                     },
                     {
                         field: 'sirRecepcioData',
@@ -168,7 +159,6 @@ const EnviamentDetailTabNotifica: React.FC<{
                         {
                             field: 'notificaCertificacioNumSeguiment',
                         },
-
                         {
                             field: 'notificaCertificacioArxiuNom',
                             valueRenderer: (_value: any) => {

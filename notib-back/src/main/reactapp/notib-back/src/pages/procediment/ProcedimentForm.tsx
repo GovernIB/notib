@@ -10,6 +10,7 @@ import GridFormField from '../../components/GridFormField';
 import { useTabParam } from '../../hooks/useSearchParams';
 
 const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
+
     const { setSubtitle } = props;
     const { t } = useTranslation();
     const { data } = useFormContext();
@@ -17,21 +18,9 @@ const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void
     React.useEffect(() => {
         setSubtitle(data?.codi + ', ' + data?.nom);
     }, [data]);
-    const grupsTabLabel = (
-        <Badge badgeContent={data.grupCount} color="primary">
-            {t('page.procediments.form.tabs.grups')}
-        </Badge>
-    );
-    const permisosTabLabel = (
-        <Badge badgeContent={data.aclEntryCount} color="primary">
-            {t('page.procediments.form.tabs.permisos')}
-        </Badge>
-    );
-    const tabs = [
-        t('page.procediments.form.tabs.dades'),
-        { label: grupsTabLabel },
-        { label: permisosTabLabel },
-    ];
+    const grupsTabLabel = (<Badge badgeContent={data.grupCount} color="primary">{t('page.procediments.form.tabs.grups')}</Badge>);
+    const permisosTabLabel = (<Badge badgeContent={data.aclEntryCount} color="primary">{t('page.procediments.form.tabs.permisos')}</Badge>);
+    const tabs = [t('page.procediments.form.tabs.dades'), { label: grupsTabLabel }, { label: permisosTabLabel }];
     return (
         <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1, 2]} initialIndex={initialTab}>
             <MuiFormTabContent index={0} showOnCreate>
@@ -39,16 +28,8 @@ const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void
                     <GridFormField size={3} name="codi" />
                     <GridFormField size={9} name="nom" />
                     <GridFormField size={6} name="retard" />
-                    <GridFormField
-                        size={6}
-                        name="caducitat"
-                        componentProps={{ helperText: 'En dies naturals' }}
-                    />
-                    <GridFormField
-                        size={9}
-                        name="organGestor"
-                        disabled={data?.fieldOrganGestorDisabled}
-                    />
+                    <GridFormField size={6} name="caducitat" componentProps={{ helperText: 'En dies naturals' }}/>
+                    <GridFormField size={9} name="organGestor" disabled={data?.fieldOrganGestorDisabled}/>
                     <GridFormField size={3} name="comu" />
                     {!data?.fieldEntregaCieHidden && (
                         <>

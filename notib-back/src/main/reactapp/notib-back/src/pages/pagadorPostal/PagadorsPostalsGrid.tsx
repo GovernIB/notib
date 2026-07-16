@@ -9,9 +9,9 @@ import {
     springFilterBuilder as filterBuilder,
     useFilterApiContext,
 } from 'reactlib';
-import GridFormField from '../components/GridFormField';
-import { formatEndOfDay, formatStartOfDay } from '../utils/dateUtils';
-import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../hooks/useDataGrid';
+import GridFormField from '../../components/GridFormField.tsx';
+import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils.ts';
+import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid.tsx';
 
 const columns = [
     {
@@ -41,31 +41,13 @@ const springFilterBuilder = (data: any) => {
         filterBuilder.like('nom', data.nom),
         filterBuilder.eq('organGestor.id', data?.organGestor?.id),
         filterBuilder.like('contracteNum', data.contracteNum),
-        data?.contracteDataVigInici &&
-            filterBuilder.gte(
-                'contracteDataVig',
-                `'${formatStartOfDay(data?.contracteDataVigInici)}'`
-            ),
-        data?.contracteDataVigFinal &&
-            filterBuilder.lte(
-                'contracteDataVig',
-                `'${formatEndOfDay(data?.contracteDataVigFinal)}'`
-            ),
+        data?.contracteDataVigInici && filterBuilder.gte('contracteDataVig', `'${formatStartOfDay(data?.contracteDataVigInici)}'`),
+        data?.contracteDataVigFinal && filterBuilder.lte('contracteDataVig', `'${formatEndOfDay(data?.contracteDataVigFinal)}'`),
         filterBuilder.like('facturacioClientCodi', data.facturacioClientCodi)
     );
 };
 
-const PagadorPostalForm: React.FC = () => {
-    return (
-        <Grid container spacing={2}>
-            <GridFormField size={12} name="nom" />
-            <GridFormField size={12} name="organGestor" />
-            <GridFormField size={4} name="contracteNum" />
-            <GridFormField size={4} name="facturacioClientCodi" />
-            <GridFormField size={4} name="contracteDataVig" />
-        </Grid>
-    );
-};
+
 
 const ContentFilter: React.FC = () => {
     const { t } = useTranslation();
@@ -91,7 +73,8 @@ const ContentFilter: React.FC = () => {
     );
 };
 
-export const PagadorsPostals: React.FC = () => {
+export const PagadorsPostalsGrid: React.FC = () => {
+
     const { t } = useTranslation();
     const filterDataGridProps = useDatagridFilterProps(
         'pagadorPostalResource',
@@ -103,6 +86,21 @@ export const PagadorsPostals: React.FC = () => {
 
     return (
         <GridPage>
+            {/*<MuiDataGrid*/}
+            {/*    title={t('page.pagadorPostal.grid.title')}*/}
+            {/*    resourceName="pagadorPostalResource"*/}
+            {/*    columns={columns}*/}
+            {/*    paginationActive*/}
+            {/*    persistentStateActive*/}
+            {/*    persistentStateClearPageSortPropsOnTopLevelRouteChange*/}
+            {/*    {...filterDataGridProps}*/}
+            {/*    {...pageSizeOptionsDataGridProps}*/}
+            {/*    toolbarType="upper"*/}
+            {/*    popupEditActive*/}
+            {/*    popupEditFormContent={<PagadorPostalForm />}*/}
+            {/*    popupEditFormDialogResourceTitle={t('page.pagadorPostal.grid.popupResourceTitle')}*/}
+            {/*    rowHideUpdateButton={isRoleAdminLectura}*/}
+            {/*/>*/}
             <MuiDataGrid
                 title={t('page.pagadorPostal.grid.title')}
                 resourceName="pagadorPostalResource"
@@ -113,12 +111,12 @@ export const PagadorsPostals: React.FC = () => {
                 {...filterDataGridProps}
                 {...pageSizeOptionsDataGridProps}
                 toolbarType="upper"
-                popupEditActive
-                popupEditFormContent={<PagadorPostalForm />}
-                popupEditFormDialogResourceTitle={t('page.pagadorPostal.grid.popupResourceTitle')}
+                toolbarCreateLink="form"
+                rowLink="form/{{id}}"
+                rowUpdateLink="form/{{id}}"
             />
         </GridPage>
     );
 };
 
-export default PagadorsPostals;
+export default PagadorsPostalsGrid;

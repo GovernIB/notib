@@ -3,7 +3,7 @@ import {Link, useLocation, useNavigate, useSearchParams} from 'react-router-dom'
 import {useTranslation} from 'react-i18next';
 import {GRID_DETAIL_PANEL_TOGGLE_COL_DEF, GridApiPro, useGridApiRef,} from '@mui/x-data-grid-pro';
 import {GridPage, MuiDataGrid, MuiDataGridColDef, useMuiDataGridApiRef, useMuiDataGridContext, useResourceApiService,} from 'reactlib';
-import {useNotibContext} from '../../components/NotibContext';
+import { ROLE_ADMIN, ROLE_ADMIN_LECTURA, useNotibContext} from '../../components/NotibContext';
 import {useDatagridFilterProps, useDatagridPageSizeOptionsProps} from '../../hooks/useDataGrid';
 import NotificacioGridEnviaments from './NotificacioGridEnviaments';
 import {useNotificacioDetailDialog, useRemesesErrorCallbackDetailDialog, useRemesesErrorRegistreDetailDialog} from './NotificacioDetailDialog';
@@ -155,8 +155,10 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
 
     const { selection } = useMuiDataGridContext();
     const { currentRole} = useNotibContext();
-    let amagarEntrada = currentRole === 'tothom' || currentRole === 'NOT_ADMIN_LECTURA';
+    const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
+    const amagarEntrada = currentRole === 'tothom';
     const { t } = useTranslation();
+
     const { descarregarExcel,
         descarregarJustificants,
         descarregarCertificacions,
@@ -174,7 +176,24 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
     } = useAccionsMassives("notificacioResource", refresh);
 
     const ids = selection?.ids ?? [];
-    const opcionsMenu: MenuOption[] = [
+    const opcionsMenu: MenuOption[] = isRoleAdminLectura && !notificacionsErrorRegistre ? [
+        {
+            label: t('page.accioMassiva.accions.exportarFullCalcul.label'),
+            tooltip: t('page.accioMassiva.accions.exportarFullCalcul.tooltip'),
+            onClick: () => descarregarExcel(selection?.ids, "NOTIFICACIO"),
+        },
+        {
+            label: t('page.accioMassiva.accions.justificantEnviament.label'),
+            tooltip: t('page.accioMassiva.accions.justificantEnviament.tooltip'),
+            onClick: () => descarregarJustificants(selection?.ids, "NOTIFICACIO"),
+        },
+        {
+            label: t('page.accioMassiva.accions.certificacioRecepcio.label'),
+            tooltip: t('page.accioMassiva.accions.certificacioRecepcio.tooltip'),
+            onClick: () => descarregarCertificacions(selection?.ids, "NOTIFICACIO"),
+
+        },
+    ] :  [
         ...(notificacionsErrorRegistre ? [
             {
                 label: t('page.accioMassiva.accions.reintentarRegistre.label'),
@@ -191,6 +210,7 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
             [{
                 label: t('page.accioMassiva.accions.marcarProcessades.label'),
                 tooltip: t('page.accioMassiva.accions.marcarProcessades.tooltip'),
+                disabled: true,
                 onClick: () => marcarProcessatMassiu(null, t('page.accioMassiva.accions.marcarProcessades.label'), {ids: ids, seleccioTipus: "NOTIFICACIO"})
             },
             {
@@ -270,6 +290,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
     const { t } = useTranslation();
     const [ params ] = useSearchParams();
     const { currentRole} = useNotibContext();
+    const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
     const notificacioMassiva = params?.get('notificacioMassiva');
     const { state } = useLocation();
     let titolSecundari = state?.titolMassiva;
@@ -280,7 +301,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
     const { dialogComponentErrorRegistre, onDetailClickErrorRegistre } = useRemesesErrorRegistreDetailDialog();
     const { dialogComponentErrorCallback, onDetailClickErrorCallback } = useRemesesErrorCallbackDetailDialog();
     const { currentActions: apiCurrentActions } = useResourceApiService('notificacioResource');
-    const isCreateLinkPresent = apiCurrentActions?.['create'] != null;
+    const isCreateLinkPresent = !isRoleAdminLectura && apiCurrentActions?.['create'] != null;
     const datagridApiRef = useGridApiRef();
     const apiRef = useMuiDataGridApiRef();
     const columns = useDataGridColumns(datagridApiRef, notificacionsEsborrades, notificacionsErrorRegistre, notificacionsCallbackError);
@@ -310,8 +331,8 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
             esborrarRemesa,
             recuperarRemesa} = useAccionsNotificacio();
 
-    const mostrarEditarBorrar = (estat : string, currentRole : string | undefined ) => {
-        return currentRole === 'NOT_ADMIN_LECTURA' || (estat !== 'PENDENT' && estat !== 'REGISTRADA');
+    const mostrarEditarBorrar = (estat : string) => {
+            return isRoleAdminLectura || (estat !== 'PENDENT' && estat !== 'REGISTRADA');
     }
 
     const noEsTaulaRemeses = (notificacionsEsborrades || notificacionsErrorRegistre || notificacionsCallbackError);
@@ -357,7 +378,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                 showInMenu: true,
                 action: 'MARCAR_PROCESSAT',
                 onClick: id => marcarProcessat(id, t('page.notificacio.grid.accions.processatTitle')),
-                hidden: row => !(currentRole !== 'NOT_ADMIN_LECTURA' && ((currentRole === 'NOT_ADMIN' && row.estat === 'FINALITZADA')
+                hidden: row => !(!isRoleAdminLectura && ((currentRole === ROLE_ADMIN && row.estat === 'FINALITZADA')
                                     || row.permisProcessar)) || noEsTaulaRemeses
             },
             {
@@ -375,7 +396,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                 showInMenu: true,
                 action: 'AMPLIAR_TERMINI',
                 onClick: (id, row) => ampliarTermini(id, t('page.notificacio.grid.accions.ampliarTermini.modalTitle'), {caducitat: row.caducitat}),
-                hidden: row => currentRole === 'NOT_ADMIN_LECTURA'  || row?.entregaPostal || row?.estat !== 'ENVIADA' || noEsTaulaRemeses
+                hidden: row => isRoleAdminLectura || row?.entregaPostal || row?.estat !== 'ENVIADA' || noEsTaulaRemeses
             },
             // {
             //     label: t('page.notificacio.grid.accions.editar'),
@@ -392,16 +413,16 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                 icon: 'delete_icon',
                 showInMenu: true,
                 onClick: (id) => esborrarRemesa(id),
-                hidden: (row) => mostrarEditarBorrar(row?.estat, currentRole) || noEsTaulaRemeses
+                hidden: (row) => mostrarEditarBorrar(row?.estat) || noEsTaulaRemeses
             },
-            {
+            ...(isRoleAdminLectura ? [] : [{
                 label: t('page.notificacio.grid.notificacionsEsborrades.recuperar'),
                 title: t('page.notificacio.grid.notificacionsEsborrades.recuperar'),
                 icon: 'replay',
                 showInMenu: true,
                 onClick: (id) => recuperarRemesa(id),
                 hidden: (!notificacionsEsborrades || notificacionsErrorRegistre)
-            },
+            }])
         ];
     const navigate = useNavigate();
     const filtreMassiva = notificacioMassiva ? `notificacioMassiva.id :${notificacioMassiva}` : undefined
@@ -436,7 +457,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                 // persistentStateClearPageSortPropsOnTopLevelRouteChange
                 // persistentStateActive
                 rowHideDeleteButton
-                rowHideUpdateButton={params => (mostrarEditarBorrar(params.estat, currentRole) || noEsTaulaRemeses)}
+                rowHideUpdateButton={params => (mostrarEditarBorrar(params.estat) || noEsTaulaRemeses)}
                 {...filterDataGridProps}
                 fixedFilter={fixedFilter}
                 {...pageSizeOptionsDataGridProps}
@@ -445,7 +466,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                 toolbarCreateLink="form"
                 toolbarElementsWithPositions={[
                     ...(isCreateLinkPresent ? [{ position: 2, element: <NotificacioAddButton /> }] : []),
-                    ...(notificacionsEsborrades ? []
+                    ...(notificacionsEsborrades || (isRoleAdminLectura && notificacionsErrorRegistre) ? []
                         : [{
                             position: 2,
                             element: <MassiveActionsButton apiRef={datagridApiRef} notificacionsErrorRegistre={notificacionsErrorRegistre} notificacionsCallbackError={notificacionsCallbackError} refresh={refreshGrid}/>,
