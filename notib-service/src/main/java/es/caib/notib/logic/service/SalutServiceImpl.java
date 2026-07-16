@@ -29,7 +29,6 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.io.InputStream;
@@ -56,13 +55,10 @@ import java.util.stream.Collectors;
 public class SalutServiceImpl implements SalutService {
 
     private final JdbcTemplate jdbcTemplate;
-    private final RestTemplate restTemplate;
     private final PluginHelper pluginHelper;
     private final MissatgeSalutMapper missatgeSalutMapper;
     private final AvisRepository avisRepository;
     private final CustomHealthIndicator healthIndicator;
-
-    private static final int MAX_CONNECTION_RETRY = 3;
 
     @Override
     public List<IntegracioInfo> getIntegracions() {
@@ -103,9 +99,11 @@ public class SalutServiceImpl implements SalutService {
 	}
 
     @Override
-    public SalutInfo checkSalut(String versio, String performanceUrl) {
+    public SalutInfo checkSalut(String versio, Long latenciaHttpMs) {
 
-        var estatSalut = checkEstatSalut(performanceUrl);   // Estat
+        var estatSalut = new EstatSalut()
+                .estat(EstatSalutEnum.UP)
+                .latencia(latenciaHttpMs != null ? latenciaHttpMs.intValue() : null);   // Estat
         var salutDatabase = checkDatabase();                // Base de dades
         var integracions = checkIntegracions();             // Integracions
         var missatges = checkMissatges();                   // Missatges
@@ -158,30 +156,6 @@ public class SalutServiceImpl implements SalutService {
             throw new RuntimeException(e);
         }
 
-    }
-
-    private EstatSalut checkEstatSalut(String performanceUrl) {
-
-        Instant start = Instant.now();
-        EstatSalutEnum estat = EstatSalutEnum.UP;
-//        try {
-//            executePerformanceTest();
-//        } catch (Exception e) {}
-        String response = null;
-        for (int i = 1; i <= MAX_CONNECTION_RETRY; i++) {
-            try {
-                restTemplate.getForObject(performanceUrl, String.class);
-                break;
-            } catch (Exception e) {
-//                if (i == MAX_CONNECTION_RETRY) {
-//                    estat = EstatSalutEnum.DOWN; // After 3 connection failed attempts
-//                }
-            }
-        }
-        Instant end = Instant.now();
-        Integer latency = (int) Duration.between(start, end).toMillis();
-
-		return new EstatSalut().estat(estat).latencia(latency);
     }
 
 	private EstatSalut checkDatabase() {

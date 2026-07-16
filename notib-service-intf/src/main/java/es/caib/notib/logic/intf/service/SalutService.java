@@ -18,7 +18,7 @@ public interface SalutService {
 	List<SubsistemaInfo> getSubsistemes();
 	@PreAuthorize("hasRole('NOT_COM')")
 	List<ContextInfo> getContexts(String baseUrl);
-	SalutInfo checkSalut(String versio, String performanceUrl);
+	SalutInfo checkSalut(String versio, Long latenciaHttpMs);
 	Health checkHealthIndicator();
 
 }
