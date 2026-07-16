@@ -36,8 +36,8 @@ public class SalutService extends AbstractService<es.caib.notib.logic.intf.servi
 
     @Override
 	@PermitAll
-    public SalutInfo checkSalut(String versio, String performanceUrl) {
-        return getDelegateService().checkSalut(versio, performanceUrl);
+    public SalutInfo checkSalut(String versio, Long latenciaHttpMs) {
+        return getDelegateService().checkSalut(versio, latenciaHttpMs);
     }
 
     @Override

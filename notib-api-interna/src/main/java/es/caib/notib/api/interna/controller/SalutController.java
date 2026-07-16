@@ -6,14 +6,14 @@ import es.caib.comanda.ms.salut.helper.MonitorHelper;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.SalutService;
 import es.caib.notib.logic.intf.util.DatesUtils;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.actuate.health.Health;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.ServletContext;
@@ -24,6 +24,8 @@ import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
@@ -34,8 +36,10 @@ public class SalutController {
     private final ServletContext servletContext;
     private final SalutService salutService;
     private final AplicacioService aplicacioService;
+    private final MeterRegistry meterRegistry;
 
     private ManifestInfo manifestInfo;
+    private final AtomicReference<LatenciaSnapshot> darreraLatenciaSnapshot = new AtomicReference<>(new LatenciaSnapshot(0, 0));
 
 	@PreAuthorize("hasRole('NOT_COM')")
     @GetMapping("/info")
@@ -67,14 +71,41 @@ public class SalutController {
     public SalutInfo health(HttpServletRequest request) throws IOException {
 
         var manifestInfo = getManifestInfo();
-        return salutService.checkSalut(manifestInfo.getVersion(), request.getRequestURL().toString() + "Performance");
+        return salutService.checkSalut(manifestInfo.getVersion(), calcularLatenciaHttpMs());
     }
 
-    @ResponseBody
-    @GetMapping("/salutPerformance")
-    public Health healthCheck() {
+    /**
+     * Latència mitjana de les peticions HTTP ateses per aquesta aplicació (mètrica
+     * "http.server.requests" de Micrometer) des de l'anterior consulta de salut, enlloc
+     * de fer una crida HTTP a un endpoint propi només per mesurar-ne el temps de resposta.
+     * Els comptadors de Micrometer són acumulatius des de l'arrencada, així que es
+     * guarda l'últim valor llegit per calcular només la diferència ("delta") del període.
+     */
+    private Long calcularLatenciaHttpMs() {
 
-        return Health.up().build();
+        long totalCount = 0;
+        long totalTimeNanos = 0;
+        for (Timer timer : meterRegistry.find("http.server.requests").timers()) {
+            totalCount += timer.count();
+            totalTimeNanos += (long) timer.totalTime(TimeUnit.NANOSECONDS);
+        }
+
+        var anterior = darreraLatenciaSnapshot.getAndSet(new LatenciaSnapshot(totalCount, totalTimeNanos));
+        long deltaCount = totalCount - anterior.count;
+        long deltaTimeNanos = totalTimeNanos - anterior.totalTimeNanos;
+
+        return deltaCount > 0 ? TimeUnit.NANOSECONDS.toMillis(deltaTimeNanos) / deltaCount : null;
+    }
+
+    private static final class LatenciaSnapshot {
+
+        private final long count;
+        private final long totalTimeNanos;
+
+        private LatenciaSnapshot(long count, long totalTimeNanos) {
+            this.count = count;
+            this.totalTimeNanos = totalTimeNanos;
+        }
     }
 
     private ManifestInfo getManifestInfo() throws IOException {
