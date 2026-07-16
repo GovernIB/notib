@@ -116,7 +116,7 @@ volumes:
 
 services:
   notib:
-    image: notib:2.0.12
+    image: notib:2.1.1
     ports:
       - "${APP_PORT:-8080}:8080"
       - "${DEBUG_PORT:-8787}:8787"
