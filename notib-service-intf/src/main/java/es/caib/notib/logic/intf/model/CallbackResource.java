@@ -28,11 +28,18 @@ import java.util.Date;
 @NoArgsConstructor
 @FieldNameConstants
 @ResourceConfig(
-	accessConstraints = { @ResourceAccessConstraint(
-		type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-		roles = { BaseConfig.ROLE_ADMIN }, // TODO REPASSAR ACCES PER ADMIN LECTURA I ORGAN
-		grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.DELETE }
-	)},
+	accessConstraints = {
+		@ResourceAccessConstraint(
+			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+			roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN},
+			grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.DELETE }
+		),
+		@ResourceAccessConstraint(
+			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+			roles = { BaseConfig.ROLE_ADMIN_LECTURA },
+			grantedPermissions = { PermissionEnum.READ }
+		)
+	},
 	artifacts = {
 		@ResourceArtifact(
 			type = ResourceArtifactType.FILTER,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+import {useTranslation} from 'react-i18next';
 import Table from '@mui/material/Table';
 import TableHead from '@mui/material/TableHead';
 import TableBody from '@mui/material/TableBody';
@@ -8,127 +8,88 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import Paper from '@mui/material/Paper';
 import Switch from '@mui/material/Switch';
-import { useFormContext, useResourceApiService, useBaseAppContext } from 'reactlib';
+import {useBaseAppContext, useFormContext, useResourceApiService} from 'reactlib';
+import {ROLE_ADMIN_LECTURA, useNotibContext} from "../../components/NotibContext.ts";
 
 const ProcedimentFormTabGrups: React.FC = () => {
+
     const { t } = useTranslation();
+    const { currentRole } = useNotibContext();
+    const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
     const { id, apiRef: formApiRef } = useFormContext();
     const {
         isReady: procedimentGrupApiIsReady,
         find: procedimentGrupApiFind,
         create: procedimentGrupApiCreate,
-        delete: procedimentGrupApiDelete,
+        delete: procedimentGrupApiDelete
     } = useResourceApiService('procedimentGrupResource');
     const { isReady: grupApiIsReady, find: grupApiFind } = useResourceApiService('grupResource');
     const { temporalMessageShow } = useBaseAppContext();
     const [grupRows, setGrupRows] = React.useState<any[]>();
     const [procedimentGrupRows, setProcedimentGrupRows] = React.useState<any[]>();
     const refreshProcedimentGrupRows = () => {
-        const args = {
-            filter: 'procediment.id:' + id,
-            unpaged: true,
-        };
-        procedimentGrupApiFind(args).then((response) => {
-            setProcedimentGrupRows(response.rows);
-        });
+        const args = {filter: 'procediment.id:' + id, unpaged: true,};
+        procedimentGrupApiFind(args).then((response) => setProcedimentGrupRows(response.rows));
     };
+
     React.useEffect(() => {
         if (procedimentGrupApiIsReady) {
             refreshProcedimentGrupRows();
         }
     }, [procedimentGrupApiIsReady]);
+
     React.useEffect(() => {
-        if (grupApiIsReady) {
-            const args = {
-                unpaged: true,
-            };
-            grupApiFind(args).then((response) => {
-                setGrupRows(response.rows);
-            });
+        if (!grupApiIsReady) {
+            return;
         }
+        const args = { unpaged: true};
+        grupApiFind(args).then((response) => setGrupRows(response.rows));
     }, [grupApiIsReady]);
+
     const hanldleSwitchOnChange = (grupId: any, checked: boolean) => {
         const found = procedimentGrupRows?.find((r) => r.grup.id === grupId);
         if (checked) {
-            if (!found) {
-                const data = {
-                    procediment: { id },
-                    grup: { id: grupId },
-                };
-                procedimentGrupApiCreate({ data })
-                    .then(() => {
-                        refreshProcedimentGrupRows();
-                        formApiRef.current?.refresh();
-                        temporalMessageShow(
-                            null,
-                            t('page.procediments.form.grups.enable.success'),
-                            'success'
-                        );
-                    })
-                    .catch((error) => {
-                        temporalMessageShow(
-                            t('page.procediments.form.grups.enable.error'),
-                            error.message,
-                            'error'
-                        );
-                    });
-            }
-        } else {
             if (found) {
-                procedimentGrupApiDelete(found.id)
-                    .then(() => {
-                        refreshProcedimentGrupRows();
-                        formApiRef.current?.refresh();
-                        temporalMessageShow(
-                            null,
-                            t('page.procediments.form.grups.disable.success'),
-                            'success'
-                        );
-                    })
-                    .catch((error) => {
-                        temporalMessageShow(
-                            t('page.procediments.form.grups.disable.error'),
-                            error.message,
-                            'error'
-                        );
-                    });
+                return;
             }
+            const data = {procediment: { id }, grup: { id: grupId }};
+            procedimentGrupApiCreate({ data }).then(() => {
+                refreshProcedimentGrupRows();
+                formApiRef.current?.refresh();
+                temporalMessageShow(null, t('page.procediments.form.grups.enable.success'), 'success');
+            })
+            .catch((error) => temporalMessageShow(t('page.procediments.form.grups.enable.error'), error.message, 'error'));
+            return;
         }
+        if (!found) {
+            return;
+        }
+        procedimentGrupApiDelete(found.id).then(() => {
+            refreshProcedimentGrupRows();
+            formApiRef.current?.refresh();
+            temporalMessageShow(null, t('page.procediments.form.grups.disable.success'), 'success');
+        })
+        .catch((error) => temporalMessageShow(t('page.procediments.form.grups.disable.error'), error.message, 'error'));
     };
     return (
-        grupRows &&
-        procedimentGrupRows && (
+        grupRows && procedimentGrupRows && (
             <TableContainer component={Paper} variant="outlined">
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                     <TableHead>
                         <TableRow>
-                            <TableCell>
-                                {t('page.procediments.form.grups.tableColumn.grup')}
-                            </TableCell>
-                            <TableCell align="right">
-                                {t('page.procediments.form.grups.tableColumn.actiu')}
-                            </TableCell>
+                            <TableCell>{t('page.procediments.form.grups.tableColumn.grup')}</TableCell>
+                            <TableCell align="right">{t('page.procediments.form.grups.tableColumn.actiu')}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {grupRows.map((gr) => {
-                            const checked = procedimentGrupRows.some(
-                                (pgr) => pgr.grup.id === gr.id
-                            );
+                            const checked = procedimentGrupRows.some((pgr) => pgr.grup.id === gr.id);
                             return (
-                                <TableRow
-                                    key={gr.id}
-                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                    <TableCell component="th" scope="row">
-                                        {gr.nom}
-                                    </TableCell>
+                                <TableRow key={gr.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                                    <TableCell component="th" scope="row">{gr.nom}</TableCell>
                                     <TableCell align="right">
-                                        <Switch
-                                            size="small"
-                                            defaultChecked={checked}
-                                            onChange={(event) =>
-                                                hanldleSwitchOnChange(gr.id, event.target.checked)
-                                            }
+                                        <Switch size="small" defaultChecked={checked} disabled={isRoleAdminLectura}
+                                            onChange={(event) => hanldleSwitchOnChange(gr.id, event.target.checked)}
                                         />
                                     </TableCell>
                                 </TableRow>

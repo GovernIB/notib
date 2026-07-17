@@ -15,6 +15,7 @@ import {
 import GridFormField from '../../components/GridFormField';
 import { Box, Icon, IconButton } from '@mui/material';
 import GridToolbarButton from '../../components/GridToolbarButton';
+import {ROLE_ADMIN_LECTURA, useNotibContext} from "../../components/NotibContext.ts";
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -53,15 +54,12 @@ const EntitatFormTabAplicacionsFormContent: React.FC = () => {
     );
 };
 
-const ContentFilter: React.FC<{
-    filterApiRef: FilterApiRef;
-    gridApiRef: MuiDataGridApiRef;
-}> = (props) => {
+const ContentFilter: React.FC<{ filterApiRef: FilterApiRef; gridApiRef: MuiDataGridApiRef; }> = (props) => {
+
     const { filterApiRef, gridApiRef } = props;
     const { t } = useTranslation();
-    const handleButtonClick = () => {
-        filterApiRef.current?.clear();
-    };
+    const { currentRole } = useNotibContext();
+    const handleButtonClick = () => filterApiRef.current?.clear();;
     return (
         <Grid container spacing={2}>
             <GridFormField size={2} name="usuariCodi" />
@@ -72,7 +70,7 @@ const ContentFilter: React.FC<{
                     <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
                         <Icon>filter_alt_off</Icon>
                     </IconButton>
-                    <GridToolbarButton gridApiRef={gridApiRef} />
+                    <GridToolbarButton gridApiRef={gridApiRef} hideCreateButton={currentRole === ROLE_ADMIN_LECTURA} />
                 </Box>
             </Grid>
         </Grid>
@@ -80,6 +78,7 @@ const ContentFilter: React.FC<{
 };
 
 const EntitatFormTabAplicacionsFilter: React.FC<{ gridApiRef: MuiDataGridApiRef }> = (props) => {
+
     const { gridApiRef } = props;
     const filterApiRef = useFilterApiRef();
     const springFilterBuilder = (data: any) => {
@@ -104,12 +103,13 @@ const EntitatFormTabAplicacionsFilter: React.FC<{ gridApiRef: MuiDataGridApiRef 
 };
 
 const EntitatFormTabAplicacions: React.FC = () => {
+
     const { t } = useTranslation();
+    const { currentRole } = useNotibContext();
+    const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
     const { id, apiRef: formApiRef } = useFormContext();
     const gridApiRef = useMuiDataGridApiRef();
-    const handleDataGridRowChanges = () => {
-        formApiRef.current?.refresh();
-    };
+    const handleDataGridRowChanges = () => formApiRef.current?.refresh();
     return (
         <MuiDataGrid
             apiRef={gridApiRef}
@@ -127,6 +127,7 @@ const EntitatFormTabAplicacions: React.FC = () => {
             popupEditFormContent={<EntitatFormTabAplicacionsFormContent />}
             onRowCreate={handleDataGridRowChanges}
             onRowDelete={handleDataGridRowChanges}
+            rowHideUpdateButton={isRoleAdminLectura}
         />
     );
 };

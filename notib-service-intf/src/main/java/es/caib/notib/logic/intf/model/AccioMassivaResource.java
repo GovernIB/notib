@@ -32,7 +32,12 @@ import java.util.List;
 	accessConstraints = {
 		@ResourceAccessConstraint(
 			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-			roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ADMIN_LECTURA, BaseConfig.ROLE_ORGAN,  },
+			roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN,  },
+			grantedPermissions = { PermissionEnum.READ, PermissionEnum.CREATE}
+		),
+		@ResourceAccessConstraint(
+			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+			roles = { BaseConfig.ROLE_ADMIN_LECTURA },
 			grantedPermissions = { PermissionEnum.READ, PermissionEnum.CREATE}
 		),
 		@ResourceAccessConstraint(

@@ -16,6 +16,7 @@ import GridToolbarButton from '../../components/GridToolbarButton';
 import PermissionGridSwitch from '../../components/PermissionGridSwitch';
 
 const PermissionForm: React.FC = () => {
+
     const { t } = useTranslation();
     const sidGrantedAuthorityEnumOptions = [
         {
@@ -38,27 +39,10 @@ const PermissionForm: React.FC = () => {
                 size={3}
             />
             <GridFormField size={9} name="sidName" />
-
-            <PermissionGridSwitch
-                name="perm0Allowed"
-                label={t('page.entitats.form.permisos.usuariAllowed')}
-                size={12}
-            />
-            <PermissionGridSwitch
-                name="perm2Allowed"
-                label={t('page.entitats.form.permisos.admEntitatAllowed')}
-                size={12}
-            />
-            <PermissionGridSwitch
-                name="permXAllowed"
-                label={t('page.entitats.form.permisos.admLecturaAllowed')}
-                size={12}
-            />
-            <PermissionGridSwitch
-                name="perm3Allowed"
-                label={t('page.entitats.form.permisos.aplicacioAllowed')}
-                size={12}
-            />
+            <PermissionGridSwitch name="perm0Allowed" label={t('page.entitats.form.permisos.usuariAllowed')} size={12}/>
+            <PermissionGridSwitch name="perm2Allowed" label={t('page.entitats.form.permisos.admEntitatAllowed')} size={12}/>
+            <PermissionGridSwitch name="permXAllowed" label={t('page.entitats.form.permisos.admLecturaAllowed')} size={12}/>
+            <PermissionGridSwitch name="perm3Allowed" label={t('page.entitats.form.permisos.aplicacioAllowed')} size={12}/>
         </Grid>
     );
 };
@@ -92,31 +76,13 @@ const ContentFilter: React.FC<{
                 options={sidGrantedAuthorityEnumOptions}
             />
             <GridFormField size={5} name="sidName" />
-            <GridFormField
-                size={1}
-                name="perm0Allowed"
-                label={t('page.entitats.form.permisos.usuariAllowed')}
-            />
-            <GridFormField
-                size={1.2}
-                name="perm2Allowed"
-                label={t('page.entitats.form.permisos.admEntitatAllowed')}
-            />
-            <GridFormField
-                size={1.2}
-                name="permXAllowed"
-                label={t('page.entitats.form.permisos.admLecturaAllowed')}
-            />
-            <GridFormField
-                size={1.2}
-                name="perm3Allowed"
-                label={t('page.entitats.form.permisos.aplicacioAllowed')}
-            />
+            <GridFormField size={1} name="perm0Allowed" label={t('page.entitats.form.permisos.usuariAllowed')}/>
+            <GridFormField size={1.2} name="perm2Allowed" label={t('page.entitats.form.permisos.admEntitatAllowed')}/>
+            <GridFormField size={1.2} name="permXAllowed" label={t('page.entitats.form.permisos.admLecturaAllowed')}/>
+            <GridFormField size={1.2} name="perm3Allowed" label={t('page.entitats.form.permisos.aplicacioAllowed')}/>
             <Grid size={1.4}>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
-                        <Icon>filter_alt_off</Icon>
-                    </IconButton>
+                    <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}><Icon>filter_alt_off</Icon></IconButton>
                     <GridToolbarButton gridApiRef={gridApiRef} />
                 </Box>
             </Grid>
@@ -125,6 +91,7 @@ const ContentFilter: React.FC<{
 };
 
 const EntitatGridFilter: React.FC<{ gridApiRef: MuiDataGridApiRef }> = (props) => {
+
     const { gridApiRef } = props;
     const filterApiRef = useFilterApiRef();
     // TODO: Falta aclarar com es pot filtrar de forma correcte a la bbdd,
@@ -154,6 +121,7 @@ const EntitatGridFilter: React.FC<{ gridApiRef: MuiDataGridApiRef }> = (props) =
 };
 
 const EntitatFormTabPermisos: React.FC = () => {
+
     const { t } = useTranslation();
     const { id } = useFormContext();
     const gridApiRef = useMuiDataGridApiRef();

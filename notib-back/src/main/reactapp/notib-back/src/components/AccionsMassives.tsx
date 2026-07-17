@@ -106,11 +106,7 @@ const AccionsMassives: React.FC<AccionsMassivesProps> = (props) => {
                 open={open}
                 keepMounted
                 onClose={handleClose}
-                slotProps={{
-                    list: {
-                        'aria-labelledby': 'basic-button',
-                    },
-                }}
+                slotProps={{list: {'aria-labelledby': 'basic-button'}}}
             >
                 {options.map((option, index) => (
                     ('type' in option && (option as any).type === 'divider')

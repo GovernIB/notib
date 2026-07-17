@@ -16,6 +16,7 @@ import {DataCommonAdditionalAction} from "../../../lib/components/mui/datacommon
 import Typography from "@mui/material/Typography";
 import { useNotificacioMassivaResumDialog } from './NotificacioMassivaResumDialog';
 import {useNavigate} from "react-router-dom";
+import {ROLE_ADMIN_LECTURA, useNotibContext} from "../../components/NotibContext.ts";
 
 const iconOk= React.cloneElement(<Icon>check</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center"} });
 const iconError= React.cloneElement(<Icon>close</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center" } });
@@ -240,10 +241,12 @@ export const NotifiacioMassivaGrid = () => {
         'CUSTOM'
     );
 
-    const rowAdditionalActions = (row) => {
+    const rowAdditionalActions = () => {
 
         const { artifactAction: apiAction, isReady } = useResourceApiService('notificacioMassivaResource');
         const navigate = useNavigate();
+        const { currentRole} = useNotibContext();
+        const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
         const listActions: DataCommonAdditionalAction[] = [
             {
                 label: t('page.notificacioMassiva.grid.accions.resum'),
@@ -273,7 +276,7 @@ export const NotifiacioMassivaGrid = () => {
                 showInMenu: true,
                 onClick: (id) => descarregarErrorsExecucio(id),
             },
-            {
+            ...(isRoleAdminLectura ? [] : [{
                 label: t('page.notificacioMassiva.grid.accions.posposar'),
                 title: t('page.notificacioMassiva.grid.accions.posposar'),
                 icon: 'access_time',
@@ -286,7 +289,7 @@ export const NotifiacioMassivaGrid = () => {
                 icon: 'bolt',
                 showInMenu: true,
                 onClick: (id) => isReady && apiAction(id, { code: 'REACTIVAR_NOTIFICACIO_MASSIVA'}),
-            },
+            }]),
             {
                 label: t('page.notificacioMassiva.grid.accions.mostrarRemeses.label'),
                 title: t('page.notificacioMassiva.grid.accions.mostrarRemeses.label'),

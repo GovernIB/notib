@@ -31,12 +31,10 @@ type PermisRow = {
 
 type ProcSerOrganRow = {
     id: string;
-
     codiValor: string;
     organGestorNom: string;
     tipus: string;
     principal: string;
-
     administrador: boolean;
     read: boolean;
     processar: boolean;
@@ -48,21 +46,19 @@ type ProcSerOrganRow = {
     comunicacioSenseProcediment: boolean;
 };
 
-const crearRowsOrgansFills = (
-    fillsMap: Record<string, string[]>,     // organsFills
-    permisMap: Record<string, any[] | any>  // organsMap (procedimentCodi -> permis list or obj list)
-): PermisRow[] => {
+const crearRowsOrgansFills = (fillsMap: Record<string, string[]>, permisMap: Record<string, any[] | any>): PermisRow[] => {
+
     const rows: PermisRow[] = [];
-
     for (const [procedimentCodi, fills] of Object.entries(fillsMap ?? {})) {
-        if (!Array.isArray(fills) || fills.length === 0) continue;
-
+        if (!Array.isArray(fills) || fills.length === 0) {
+            continue;
+        }
         const permisArr = permisMap?.[procedimentCodi];
         const permisList = Array.isArray(permisArr) ? permisArr : permisArr ? [permisArr] : [];
         const permis = permisList[0];
-
-        if (!permis) continue;
-
+        if (!permis) {
+            continue;
+        }
         for (const [index, fill] of fills.entries()) {
             rows.push({
                 id: `${procedimentCodi}-${fill}-${index}`,
@@ -92,7 +88,6 @@ const crearRowsProcSerOrgan = (procSerOrgan: any[] | undefined | null): ProcSerO
     return list.map((procSer, index) => {
         const p = procSer?.permis ?? {};
         const cv = procSer?.codiValor ?? {};
-
         return {
             id: `${cv?.id ?? p?.id ?? "x"}-${index}`,
             codiValor: cv?.valor ?? "",
@@ -143,14 +138,12 @@ export const PermisosUsuariDetail: React.FC<{id: any}> = (props) => {
     const [organsRows, setOrgansRows] = React.useState<PermisRow[]>([]);
     const [organsFillsRows, setOrgansFillsRows] = React.useState<PermisRow[]>([]);
     const [procedimentRows, setProcedimentRows] = React.useState<PermisRow[]>([]);
-    const [procSerOrganRows, setProcSerOrganRows] = React.useState<PermisRow[]>([]);
-
+    const [procSerOrganRows, setProcSerOrganRows] = React.useState<ProcSerOrganRow[]>([]);
 
     React.useEffect(() => {
         if (!apiIsReady) {
             return;
         }
-
         apiAction(undefined, { code: "GET_PERMISOS_USUARI", data: { codi: id } })
             .then(permisos => {
                 let raw = permisos?.permisosOrgans;
@@ -166,7 +159,7 @@ export const PermisosUsuariDetail: React.FC<{id: any}> = (props) => {
                 rows = crearRowsOrgansFills(raw, map);
                 setOrgansFillsRows(rows);
                 raw = permisos?.procSerOrgan;
-                const procSerOrgan = typeof raw === "string" ? (raw ? JSON.parse(raw) : []) : (raw ?? []);
+                const procSerOrgan = crearRowsProcSerOrgan(raw);
                 setProcSerOrganRows(procSerOrgan);
             })
             .catch((error) => { console.error(error); });
@@ -194,7 +187,6 @@ export const PermisosUsuariDetail: React.FC<{id: any}> = (props) => {
         { field: "organGestorNom", headerName: t("page.usuaris.permisos.grid.columnes.organGestor"), flex: 1 },
         { field: "tipus", headerName: t("page.usuaris.permisos.grid.columnes.tipus"), flex: 1 },
         { field: "principal", headerName: t("page.usuaris.permisos.grid.columnes.principal"), flex: 1 },
-
         { field: "administrador", headerName: "", width: 60, align: "center", renderHeader: () => <Icon>person_add_alt_1</Icon>, renderCell: boolIcon },
         { field: "read", headerName: "", width: 60, align: "center", renderHeader: () => <Icon>search</Icon>, renderCell: boolIcon },
         { field: "processar", headerName: "", width: 60, align: "center", renderHeader: () => <Icon>check_box</Icon>, renderCell: boolIcon },

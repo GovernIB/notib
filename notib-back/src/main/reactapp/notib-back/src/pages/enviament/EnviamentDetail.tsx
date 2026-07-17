@@ -10,25 +10,19 @@ import EnviamentDetailTabRegistre from './EnviamentDetailTabRegistre';
 import EnviamentDetailTabEntregaPostal from './EnviamentDetailTabEntregaPostal';
 import EnviamentDetailTabHistoric from './EnviamentDetailTabHistoric';
 import EnviamentDetailTabStateMachine from './EnviamentDetailTabStateMachine';
-import { useNotibContext } from '../../components/NotibContext';
+import {ROLE_ADMIN, ROLE_ADMIN_LECTURA, ROLE_ORGAN, useNotibContext} from '../../components/NotibContext';
 
 const EnviamentDetailDialogContent: React.FC<{ id: any }> = (props) => {
+
     const { id } = props;
     const { t } = useTranslation();
     const [enviament, setEnviament] = React.useState<any>();
     const { currentRole } = useNotibContext();
-    const isRolActualAdministradorLectura = currentRole === 'NOT_ADMIN_LECTURA';
-    const isVisibleHistoric =
-        currentRole === 'NOT_ADMIN' ||
-        currentRole === 'NOT_ADMIN_LECTURA' ||
-        currentRole === 'NOT_ORGAN';
-    const isVisibleStateMachine = currentRole === 'NOT_ADMIN';
+    const isRolActualAdministradorLectura = currentRole === ROLE_ADMIN_LECTURA;
+    const isVisibleHistoric = currentRole === ROLE_ADMIN || currentRole === ROLE_ADMIN_LECTURA || currentRole === ROLE_ORGAN;
+    const isVisibleStateMachine = currentRole === ROLE_ADMIN;
 
-    const {
-        isReady: apiIsReady,
-        getOne: apiGetOne,
-        currentFields: apiCurrentFields,
-    } = useResourceApiService('notificacioEnviamentResource');
+    const {isReady: apiIsReady, getOne: apiGetOne, currentFields: apiCurrentFields,} = useResourceApiService('notificacioEnviamentResource');
 
     React.useEffect(() => {
         if (apiIsReady) {
@@ -40,43 +34,22 @@ const EnviamentDetailDialogContent: React.FC<{ id: any }> = (props) => {
         {
             id: 'tabDades',
             label: t('page.enviament.detail.tab.dades.title'),
-            content: (
-                <EnviamentDetailTabDades
-                    enviament={enviament}
-                    apiCurrentFields={apiCurrentFields}
-                />
-            ),
+            content: (<EnviamentDetailTabDades enviament={enviament} apiCurrentFields={apiCurrentFields}/>),
         },
         {
             id: 'tabNotifica',
             label: t('page.enviament.detail.tab.notifica.title'),
-            content: (
-                <EnviamentDetailTabNotifica
-                    enviament={enviament}
-                    apiCurrentFields={apiCurrentFields}
-                    isRolActualAdministradorLectura={isRolActualAdministradorLectura}
-                />
-            ),
+            content: (<EnviamentDetailTabNotifica enviament={enviament} apiCurrentFields={apiCurrentFields} isRolActualAdministradorLectura={isRolActualAdministradorLectura}/>),
         },
         {
             id: 'tabRegistre',
             label: t('page.enviament.detail.tab.registre.title'),
-            content: (
-                <EnviamentDetailTabRegistre
-                    enviament={enviament}
-                    apiCurrentFields={apiCurrentFields}
-                />
-            ),
+            content: (<EnviamentDetailTabRegistre enviament={enviament} apiCurrentFields={apiCurrentFields}/>),
         },
         {
             id: 'tabEntregaPostal',
             label: t('page.enviament.detail.tab.entregaPostal.title'),
-            content: (
-                <EnviamentDetailTabEntregaPostal
-                    enviament={enviament}
-                    apiCurrentFields={apiCurrentFields}
-                    isRolActualAdministradorLectura={isRolActualAdministradorLectura}
-                />
+            content: (<EnviamentDetailTabEntregaPostal enviament={enviament} apiCurrentFields={apiCurrentFields} isRolActualAdministradorLectura={isRolActualAdministradorLectura}/>
             ),
             hidden: !enviament?.entregaPostalInfo,
         },

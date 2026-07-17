@@ -18,7 +18,7 @@ import {formatEndOfDay, formatStartOfDay} from "../../utils/dateUtils.ts";
 import {DataCommonAdditionalAction} from "../../../lib/components/mui/datacommon/MuiDataCommon.tsx";
 import {useAccionsCallbacks} from "../accions/AccionsCallbacks.tsx";
 import {GridApiPro, useGridApiRef} from "@mui/x-data-grid-pro";
-import {useNotibContext} from "../../components/NotibContext.ts";
+import {ROLE_ADMIN_LECTURA, ROLE_USER, useNotibContext} from "../../components/NotibContext.ts";
 import AccionsMassives, {MenuOption, useAccionsMassives} from "../../components/AccionsMassives.tsx";
 
 
@@ -60,7 +60,7 @@ const columns: MuiDataGridColDef[] = [
         field: 'notificacioReferencia',
         flex: 4,
         renderCell: params => {
-            return <Link to={`/notificacions?referencia=${params.row.notificacioReferencia}`} color="#ffff" target="_blank">{params.row.notificacioReferencia}</Link>
+            return <Link to={`/notificacions?referencia=${params.row.notificacioReferencia}`} style={{ color: '#fff' }} target="_blank">{params.row.notificacioReferencia}</Link>
         }
     },
 ];
@@ -160,7 +160,6 @@ const CallbackPendentsGrid = () => {
             if (!apiIsReady) {
                 return;
             }
-
             try {
                 const args = { filter: "key: 'es.caib.notib.tasca.callback.pendents.notifica.events.intents.max'", unpaged: true };
                 const resposta = await apiFind(args);
@@ -186,12 +185,16 @@ const CallbackPendentsGrid = () => {
         activarCallbackPendent
     } = useAccionsCallbacks();
 
+    const {currentRole} = useNotibContext();
+    let amagarEntrada = currentRole === ROLE_USER || currentRole === ROLE_ADMIN_LECTURA;
+    let isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
     const rowAdditionalActions: DataCommonAdditionalAction[] = [
         {
             label: t('page.callbacks.pendents.grid.accions.enviar.title'),
             title: t('page.callbacks.pendents.grid.accions.enviar.title'),
             icon: 'send',
             showInMenu: true,
+            hidden: isRoleAdminLectura,
             onClick: id => enviarCallbackPendent(id),
         },
         {
@@ -200,7 +203,7 @@ const CallbackPendentsGrid = () => {
             icon: 'pause',
             showInMenu: true,
             onClick: id => pausarCallbackPendent(id),
-            hidden: row => row.pausat
+            hidden: row => row.pausat || isRoleAdminLectura
         },
         {
             label: t('page.callbacks.pendents.grid.accions.activar.title'),
@@ -208,12 +211,10 @@ const CallbackPendentsGrid = () => {
             icon: 'play_arrow',
             showInMenu: true,
             onClick: id => activarCallbackPendent(id),
-            hidden: row => !row.pausat
+            hidden: row => !row.pausat || isRoleAdminLectura
         }
 
     ];
-    const {currentRole} = useNotibContext();
-    let amagarEntrada = currentRole === 'tothom' || currentRole === 'NOT_ADMIN_LECTURA';
     const [reloadKey, setReloadKey] = React.useState(0);
     const refreshGrid = React.useCallback(() => setReloadKey(k => k + 1), []);
     return (

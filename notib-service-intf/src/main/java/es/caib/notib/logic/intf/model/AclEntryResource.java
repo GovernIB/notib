@@ -37,6 +37,11 @@ import java.util.Base64;
 						type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
 						roles = { BaseConfig.ROLE_SUPER, BaseConfig.ROLE_ADMIN },
 						grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
+				),
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN_LECTURA },
+					grantedPermissions = { PermissionEnum.READ }
 				)
 		},
 		artifacts = {

@@ -107,6 +107,7 @@ const PermissionForm: React.FC<{ comu: boolean }> = (props) => {
 };
 
 const ProcedimentFormTabPermisos: React.FC = () => {
+
     const { t } = useTranslation();
     const { id, data } = useFormContext();
     const permissionEntries = [
@@ -114,11 +115,7 @@ const ProcedimentFormTabPermisos: React.FC = () => {
             headerName: t('page.procediments.form.permisos.consultaAllowed'),
             field: 'readAllowed',
             renderHeader: () => (
-                <Tooltip
-                    title={t('page.procediments.form.permisos.consultaAllowedTooltip')}
-                    arrow
-                    placement="top"
-                >
+                <Tooltip title={t('page.procediments.form.permisos.consultaAllowedTooltip')} arrow placement="top">
                     <Icon>search</Icon>
                 </Tooltip>
             ),
@@ -129,11 +126,7 @@ const ProcedimentFormTabPermisos: React.FC = () => {
             headerName: t('page.procediments.form.permisos.procesAllowed'),
             field: 'perm4Allowed',
             renderHeader: () => (
-                <Tooltip
-                    title={t('page.procediments.form.permisos.procesAllowedTooltip')}
-                    arrow
-                    placement="top"
-                >
+                <Tooltip title={t('page.procediments.form.permisos.procesAllowedTooltip')} arrow placement="top">
                     <Icon>check_box</Icon>
                 </Tooltip>
             ),
@@ -144,11 +137,7 @@ const ProcedimentFormTabPermisos: React.FC = () => {
             headerName: t('page.procediments.form.permisos.gestioAllowed'),
             field: 'adminAllowed',
             renderHeader: () => (
-                <Tooltip
-                    title={t('page.procediments.form.permisos.gestioAllowedTooltip')}
-                    arrow
-                    placement="top"
-                >
+                <Tooltip title={t('page.procediments.form.permisos.gestioAllowedTooltip')} arrow placement="top">
                     <Icon>settings</Icon>
                 </Tooltip>
             ),
@@ -159,11 +148,7 @@ const ProcedimentFormTabPermisos: React.FC = () => {
             headerName: t('page.procediments.form.permisos.notificacioAllowed'),
             field: 'perm5Allowed',
             renderHeader: () => (
-                <Tooltip
-                    title={t('page.procediments.form.permisos.notificacioAllowedTooltip')}
-                    arrow
-                    placement="top"
-                >
+                <Tooltip title={t('page.procediments.form.permisos.notificacioAllowedTooltip')} arrow placement="top">
                     <Icon>gavel</Icon>
                 </Tooltip>
             ),
@@ -174,11 +159,7 @@ const ProcedimentFormTabPermisos: React.FC = () => {
             headerName: t('page.procediments.form.permisos.comunicacioAllowed'),
             field: 'perm8Allowed',
             renderHeader: () => (
-                <Tooltip
-                    title={t('page.procediments.form.permisos.comunicacioAllowedTooltip')}
-                    arrow
-                    placement="top"
-                >
+                <Tooltip title={t('page.procediments.form.permisos.comunicacioAllowedTooltip')} arrow placement="top">
                     <MailOutlineIcon />
                 </Tooltip>
             ),
@@ -189,17 +170,13 @@ const ProcedimentFormTabPermisos: React.FC = () => {
             headerName: t('page.procediments.form.permisos.comunicacioSirAllowed'),
             field: 'perm7Allowed',
             renderHeader: () => (
-                <Tooltip
-                    title={t('page.procediments.form.permisos.comunicacioSirAllowedTooltip')}
-                    arrow
-                    placement="top"
-                >
+                <Tooltip title={t('page.procediments.form.permisos.comunicacioSirAllowedTooltip')} arrow placement="top">
                     <Icon>email</Icon>
                 </Tooltip>
             ),
             flex: 0.5,
             type: 'boolean',
-        },
+        }
     ];
     return (
         <PermissionGrid
@@ -208,6 +185,7 @@ const ProcedimentFormTabPermisos: React.FC = () => {
             permissionEntries={permissionEntries}
             permissionForm={<PermissionForm comu={data.comu} />}
             withOrganGestor={data.comu}
+
         />
     );
 };

@@ -9,9 +9,13 @@ import TableContainer from '@mui/material/TableContainer';
 import Paper from '@mui/material/Paper';
 import Switch from '@mui/material/Switch';
 import { useFormContext, useResourceApiService, useBaseAppContext } from 'reactlib';
+import {ROLE_ADMIN_LECTURA, useNotibContext} from "../../components/NotibContext.ts";
 
 const ServeiFormTabGrups: React.FC = () => {
+
     const { t } = useTranslation();
+    const { currentRole } = useNotibContext();
+    const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
     const { id, apiRef: formApiRef } = useFormContext();
     const {
         isReady: procedimentGrupApiIsReady,
@@ -24,76 +28,46 @@ const ServeiFormTabGrups: React.FC = () => {
     const [grupRows, setGrupRows] = React.useState<any[]>();
     const [procedimentGrupRows, setProcedimentGrupRows] = React.useState<any[]>();
     const refreshProcedimentGrupRows = () => {
-        const args = {
-            filter: 'procediment.id:' + id,
-            unpaged: true,
-        };
-        procedimentGrupApiFind(args).then((response) => {
-            setProcedimentGrupRows(response.rows);
-        });
+        const args = {filter: 'procediment.id:' + id, unpaged: true};
+        procedimentGrupApiFind(args).then((response) => setProcedimentGrupRows(response.rows))
     };
+
     React.useEffect(() => {
         if (procedimentGrupApiIsReady) {
             refreshProcedimentGrupRows();
         }
     }, [procedimentGrupApiIsReady]);
+
     React.useEffect(() => {
-        if (grupApiIsReady) {
-            const args = {
-                unpaged: true,
-            };
-            grupApiFind(args).then((response) => {
-                setGrupRows(response.rows);
-            });
+        if (!grupApiIsReady) {
+            return;
         }
+        const args = {unpaged: true,};
+        grupApiFind(args).then((response) => setGrupRows(response.rows));
     }, [grupApiIsReady]);
+
     const hanldleSwitchOnChange = (grupId: any, checked: boolean) => {
         const found = procedimentGrupRows?.find((r) => r.grup.id === grupId);
         if (checked) {
-            if (!found) {
-                const data = {
-                    procediment: { id },
-                    grup: { id: grupId },
-                };
-                procedimentGrupApiCreate({ data })
-                    .then(() => {
-                        refreshProcedimentGrupRows();
-                        formApiRef.current?.refresh();
-                        temporalMessageShow(
-                            null,
-                            t('page.serveis.form.grups.enable.success'),
-                            'success'
-                        );
-                    })
-                    .catch((error) => {
-                        temporalMessageShow(
-                            t('page.serveis.form.grups.enable.error'),
-                            error.message,
-                            'error'
-                        );
-                    });
-            }
-        } else {
             if (found) {
-                procedimentGrupApiDelete(found.id)
-                    .then(() => {
-                        refreshProcedimentGrupRows();
-                        formApiRef.current?.refresh();
-                        temporalMessageShow(
-                            null,
-                            t('page.serveis.form.grups.disable.success'),
-                            'success'
-                        );
-                    })
-                    .catch((error) => {
-                        temporalMessageShow(
-                            t('page.serveis.form.grups.disable.error'),
-                            error.message,
-                            'error'
-                        );
-                    });
+                return;
             }
+                const data = {procediment: { id }, grup: { id: grupId },};
+            procedimentGrupApiCreate({ data }).then(() => {
+                refreshProcedimentGrupRows();
+                formApiRef.current?.refresh();
+                temporalMessageShow(null, t('page.serveis.form.grups.enable.success'), 'success');
+            }).catch((error) => temporalMessageShow(t('page.serveis.form.grups.enable.error'), error.message, 'error'));
+            return;
         }
+        if (!found) {
+            return;
+        }
+        procedimentGrupApiDelete(found.id).then(() => {
+            refreshProcedimentGrupRows();
+            formApiRef.current?.refresh();
+            temporalMessageShow(null, t('page.serveis.form.grups.disable.success'), 'success');
+        }).catch((error) => temporalMessageShow(t('page.serveis.form.grups.disable.error'), error.message, 'error'));
     };
     return (
         grupRows &&
@@ -114,19 +88,11 @@ const ServeiFormTabGrups: React.FC = () => {
                                 (pgr) => pgr.grup.id === gr.id
                             );
                             return (
-                                <TableRow
-                                    key={gr.id}
-                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                    <TableCell component="th" scope="row">
-                                        {gr.nom}
-                                    </TableCell>
+                                <TableRow key={gr.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                                    <TableCell component="th" scope="row">{gr.nom}</TableCell>
                                     <TableCell align="right">
-                                        <Switch
-                                            size="small"
-                                            defaultChecked={checked}
-                                            onChange={(event) =>
-                                                hanldleSwitchOnChange(gr.id, event.target.checked)
-                                            }
+                                        <Switch size="small" defaultChecked={checked} disabled={isRoleAdminLectura}
+                                            onChange={(event) => hanldleSwitchOnChange(gr.id, event.target.checked)}
                                         />
                                     </TableCell>
                                 </TableRow>

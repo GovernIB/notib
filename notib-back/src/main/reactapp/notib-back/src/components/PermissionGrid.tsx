@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FormField, MuiDataGrid, MuiDataGridApiRef, useFormContext } from 'reactlib';
 import { GridColumnHeaderParams } from '@mui/x-data-grid';
+import {ROLE_ADMIN_LECTURA, useNotibContext} from "./NotibContext.ts";
 
 export type PermissionGridEntry = {
     headerName: string;
@@ -24,6 +25,7 @@ const PermissionGrid: React.FC<{
     toolbarHide?: true;
     withOrganGestor?: boolean;
 }> = (props) => {
+
     const {
         resourceName,
         id,
@@ -35,6 +37,8 @@ const PermissionGrid: React.FC<{
         withOrganGestor,
     } = props;
     const { t } = useTranslation();
+    const { currentRole } = useNotibContext();
+    const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
     const { apiRef: formApiRef } = useFormContext();
     const sidGrantedAuthorityEnumOptions = [
         {
@@ -88,11 +92,7 @@ const PermissionGrid: React.FC<{
                 },
             }
         );
-        withOrganGestor && columns.push({
-            field: 'organGestor',
-            sortable: false,
-            flex: 1,
-        });
+        withOrganGestor && columns.push({field: 'organGestor', sortable: false, flex: 1});
         columns.push(
             ...permissionEntries.map((e) => ({
                 headerName: e.headerName,
@@ -106,9 +106,7 @@ const PermissionGrid: React.FC<{
         );
         return columns;
     }, [t, permissionEntries]);
-    const handleDataGridRowChanges = () => {
-        formApiRef.current?.refresh();
-    };
+    const handleDataGridRowChanges = () => formApiRef.current?.refresh();;
     return (
         <MuiDataGrid
             apiRef={apiRef}
@@ -124,6 +122,7 @@ const PermissionGrid: React.FC<{
             paginationActive
             //density="standard"
             toolbarHide={toolbarHide}
+            rowHideUpdateButton={isRoleAdminLectura}
             toolbarHideQuickFilter
             toolbarAdditionalRow={toolbarAdditionalRow}
             popupEditActive

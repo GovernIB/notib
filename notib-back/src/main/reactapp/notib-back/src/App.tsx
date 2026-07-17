@@ -54,7 +54,6 @@ const InnerApp: React.FC = () => {
     const { t } = useTranslation();
     const { mode } = useColorScheme();
     const { currentRole, currentEntitatId } = useNotibContext();
-
     const menuEnviamentMassiu = [
         {
             id: 'nouEnviamentMassiu',
@@ -80,7 +79,7 @@ const InnerApp: React.FC = () => {
             to: '/notificacionsErrorRegistre',
             icon: 'error',
             resourceName: 'notificacioResource',
-            hidden: currentRole !== ROLE_ADMIN,
+            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA,
         },
         {
             id: 'enviamentMassiu',
@@ -88,7 +87,7 @@ const InnerApp: React.FC = () => {
             to: '/notificacio/massiva',
             icon: 'forward_to_inbox',
             resourceName: 'notificacioMassivaResource',
-            hidden: currentRole !== ROLE_ADMIN,
+            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA,
         },
         {
             id: 'notificacionsEsborrades',
@@ -96,7 +95,7 @@ const InnerApp: React.FC = () => {
             to: '/notificacionsEsborrades',
             icon: 'delete_outline',
             resourceName: 'notificacioResource',
-            hidden: currentRole !== ROLE_ADMIN,
+            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
         },
         {
             id: 'callbackPendent',
@@ -104,7 +103,7 @@ const InnerApp: React.FC = () => {
             to: '/callbacks',
             icon: 'pending_actions',
             resourceName: 'callbackResource',
-            hidden: currentRole !== ROLE_ADMIN,
+            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
         },
         {
             id: 'accionsMassives',
@@ -112,7 +111,7 @@ const InnerApp: React.FC = () => {
             to: '/accions/massives',
             icon: 'format_list_bulleted',
             resourceName: 'accioMassivaResource',
-            hidden: currentRole !== ROLE_ADMIN,
+            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
         },
         {
             id: 'permisosUsuari',
@@ -120,8 +119,8 @@ const InnerApp: React.FC = () => {
             to: '/permisosUsuari',
             icon: 'group',
             resourceName: 'usuariPermisResource',
-            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA,
-        },
+            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
+        }
     ];
     const menuConfig = [
         {
@@ -130,7 +129,7 @@ const InnerApp: React.FC = () => {
             to: '/entitats',
             icon: 'layers',
             resourceName: 'entitatResource',
-            hidden: currentRole !== ROLE_SUPER,
+            hidden: currentRole !== ROLE_SUPER
         },
         {
             id: 'propietats',
@@ -138,7 +137,7 @@ const InnerApp: React.FC = () => {
             to: '/propietats',
             icon: 'settings',
             resourceName: 'configGroupResource',
-            hidden: currentRole !== ROLE_SUPER,
+            hidden: currentRole !== ROLE_SUPER
         },
         {
             id: 'currentEntitat',
@@ -146,7 +145,7 @@ const InnerApp: React.FC = () => {
             to: '/entitats/current',
             icon: 'my_location',
             resourceName: 'entitatResource',
-            hidden: currentRole !== ROLE_ADMIN,
+            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
         },
         {
             id: 'organs',
@@ -154,7 +153,7 @@ const InnerApp: React.FC = () => {
             to: '/organs',
             icon: 'account_tree',
             resourceName: 'organGestorResource',
-            hidden: currentRole !== ROLE_ADMIN,
+            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
         },
         {
             id: 'procediment',
@@ -162,7 +161,7 @@ const InnerApp: React.FC = () => {
             to: '/procediments',
             icon: 'view_timeline',
             resourceName: 'procedimentResource',
-            hidden: currentRole !== ROLE_ADMIN,
+            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
         },
         {
             id: 'servei',
@@ -170,7 +169,7 @@ const InnerApp: React.FC = () => {
             to: '/serveis',
             icon: 'miscellaneous_services',
             resourceName: 'procedimentResource',
-            hidden: currentRole !== ROLE_ADMIN,
+            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
         },
         {
             id: 'grups',
@@ -178,23 +177,23 @@ const InnerApp: React.FC = () => {
             to: '/grups',
             icon: 'group',
             resourceName: 'grupResource',
-            hidden: currentRole !== ROLE_ADMIN,
+            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
         },
         {
-            id: 'pagadorspostals',
+            id: 'pagadorspostal',
             title: t('app.menu.pagadorsPostals'),
-            to: '/pagadorspostals',
+            to: '/pagadorspostal',
             icon: 'markunread_mailbox',
-            resourceName: 'pagadorCieResource',
-            hidden: currentRole !== ROLE_ADMIN,
+            resourceName: 'pagadorPostalResource',
+            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
         },
         {
             id: 'pagadorscie',
             title: t('app.menu.pagadorsCie'),
             to: '/pagadorscie',
             icon: 'mark_as_unread',
-            resourceName: 'pagadorPostalResource',
-            hidden: currentRole !== ROLE_ADMIN,
+            resourceName: 'pagadorCieResource',
+            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
         },
         {
             id: 'caches',
@@ -254,7 +253,7 @@ const InnerApp: React.FC = () => {
             id: 'home',
             title: t('app.menu.home'),
             to: 'home',
-            icon: 'home',
+            icon: 'home'
         },
         {
             id: 'notificacions',
@@ -262,7 +261,7 @@ const InnerApp: React.FC = () => {
             to: '/notificacions',
             icon: 'mail',
             resourceName: 'notificacioResource',
-            hidden: currentRole === ROLE_SUPER,
+            hidden: currentRole === ROLE_SUPER
         },
         {
             id: 'enviaments',
@@ -270,34 +269,35 @@ const InnerApp: React.FC = () => {
             to: '/enviaments',
             icon: 'send',
             resourceName: 'notificacioEnviamentResource',
+            hidden: currentRole === ROLE_SUPER
         },
         {
             id: 'enviamentsMassius',
             title: t('app.menu.enviamentMassiu'),
             icon: 'dashboard',
             children: menuEnviamentMassiu,
-            hidden: currentRole !== ROLE_USER,
+            hidden: currentRole !== ROLE_USER
         },
         {
             id: 'gestio',
             title: t('app.menu.gestio'),
             icon: 'dashboard',
             children: menuGestio,
-            hidden: currentRole !== ROLE_ADMIN,
+            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
         },
         {
             id: 'monitoritza',
             title: t('app.menu.monitoritza'),
             icon: 'monitor',
             children: menuMonitoritza,
-            hidden: currentRole !== ROLE_SUPER,
+            hidden: currentRole !== ROLE_SUPER
         },
         {
             id: 'config',
             title: t('app.menu.config'),
             icon: 'settings',
             children: menuConfig,
-            hidden: currentRole === ROLE_USER,
+            hidden: currentRole === ROLE_USER
         },
         {
             id: 'avisos',
@@ -305,7 +305,7 @@ const InnerApp: React.FC = () => {
             to: '/avisos',
             icon: 'notifications',
             resourceName: 'avisResource',
-            hidden: currentRole !== ROLE_SUPER,
+            hidden: currentRole !== ROLE_SUPER
         },
     ];
     const theme = useTheme();

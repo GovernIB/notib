@@ -40,6 +40,18 @@ import java.io.Serializable;
 @ResourceConfig(
 	descriptionField = OrganGestorResource.Fields.codiNom,
 	quickFilterFields = { OrganGestorResource.Fields.codi, OrganGestorResource.Fields.nom },
+	accessConstraints = {
+		@ResourceAccessConstraint(
+			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+			roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN },
+			grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
+		),
+		@ResourceAccessConstraint(
+			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+			roles = { BaseConfig.ROLE_ADMIN_LECTURA },
+			grantedPermissions = { PermissionEnum.READ }
+		)
+	},
 	artifacts = {
 		@ResourceArtifact(
 			type = ResourceArtifactType.ACTION,
@@ -58,25 +70,14 @@ import java.io.Serializable;
 		),
 		@ResourceArtifact(
 			type = ResourceArtifactType.PERSPECTIVE,
-			code = OrganGestorResource.PERSPECTIVE_TREE
+			code = OrganGestorResource.PERSPECTIVE_TREE,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN, BaseConfig.ROLE_ADMIN_LECTURA }
+				)
+			}
 		),
-	},
-	accessConstraints = {
-		@ResourceAccessConstraint(
-			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-			roles = { BaseConfig.ROLE_ADMIN },
-			grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
-		),
-		@ResourceAccessConstraint(
-			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-			roles = { BaseConfig.ROLE_ADMIN_LECTURA },
-			grantedPermissions = { PermissionEnum.READ }
-		),
-		@ResourceAccessConstraint(
-			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-			roles = { BaseConfig.ROLE_ORGAN },
-			grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE }
-		)
 	}
 )
 public class OrganGestorResource extends BaseResource<Long> {

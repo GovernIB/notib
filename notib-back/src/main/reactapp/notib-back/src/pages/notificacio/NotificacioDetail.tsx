@@ -7,7 +7,7 @@ import NotificacioDetailTabRegistreEsdev from './NotificacioDetailTabRegistreEsd
 import NotificacioDetailDialogTabDades from './NotificacioDetailTabDades';
 import NotificacioDetailDialogTabAccions from './NotificacioDetailTabAccions';
 import { useResourceApiService } from 'reactlib';
-import { useNotibContext } from '../../components/NotibContext';
+import {ROLE_ADMIN_LECTURA, useNotibContext} from '../../components/NotibContext';
 
 const NotificacioDetailDialogContent: React.FC<{ id: any, notificacionsEsborrades: boolean }> = (props) => {
 
@@ -47,7 +47,7 @@ const NotificacioDetailDialogContent: React.FC<{ id: any, notificacionsEsborrade
             id: 'tabAccions',
             label: t('page.notificacio.detail.tab.accions'),
             content: <NotificacioDetailDialogTabAccions notificacio={notificacio} />,
-            hidden: notificacionsEsborrades
+            hidden: notificacionsEsborrades || currentRole === ROLE_ADMIN_LECTURA
         },
         {
             id: 'tabHistoric',
