@@ -1023,6 +1023,7 @@ const translationEs = {
                 NOT_SUPER: 'Superadministrador',
                 NOT_ADMIN: 'Administrador Entitat',
                 NOT_ADMIN_LECTURA: "Administrador (lectura)",
+                NOT_ORGAN: 'Administrador de órgano',
                 tothom: 'Usuario',
             },
         },

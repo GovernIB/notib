@@ -55,10 +55,11 @@ public class NotibPermissionHelper {
 		var isRoleUser = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_USER);
 		var isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
 		var isRoleAdminLectura = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN_LECTURA);
+		var isRoleAdminOrgan = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN);
 		Permission permission = null;
 		if (isRoleUser) {
 			permission = ExtendedPermission.PERM0;
-		} else if (isRoleAdmin) {
+		} else if (isRoleAdmin || isRoleAdminOrgan) {
 			permission = ExtendedPermission.PERM2;
 		} else if (isRoleAdminLectura) {
 			permission = ExtendedPermission.PERMX;

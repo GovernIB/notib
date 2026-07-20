@@ -15,22 +15,25 @@ type AuthProviderProps = React.PropsWithChildren & {
 };
 
 const parseJwt = (token?: string) => {
-    if (token != null) {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(
-            atob(base64)
-                .split('')
-                .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-                .join('')
-        );
-        return JSON.parse(jsonPayload);
-    } else {
+
+    console.log(token);
+    if (token == null) {
         return token;
     }
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+        atob(base64)
+            .split('')
+            .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+            .join('')
+    );
+    console.log(JSON.parse(jsonPayload));
+    return JSON.parse(jsonPayload);
 };
 
 const useTokenWatchTimeout = (callback: () => void, delay: number = 1000) => {
+
     let timeoutId: any;
     const start = (newDelay?: number) => {
         clearTimeout(timeoutId);
@@ -38,13 +41,11 @@ const useTokenWatchTimeout = (callback: () => void, delay: number = 1000) => {
     };
     const refresh = (newDelay?: number) => start(newDelay);
     const stop = () => clearTimeout(timeoutId);
-    return {
-        refresh,
-        stop,
-    };
+    return {refresh, stop,};
 };
 
 export const AuthProvider = (props: AuthProviderProps) => {
+
     const { logoutUrl, mandatory, debug, children } = props;
     const [loading, setLoading] = React.useState<boolean>(true);
     const tokenRef = React.useRef<string>(undefined);

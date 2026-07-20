@@ -31,9 +31,7 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class EntitatResourceServiceImpl
-	extends BaseMutableResourceService<EntitatResource, Long, EntitatResourceEntity>
-	implements EntitatResourceService {
+public class EntitatResourceServiceImpl extends BaseMutableResourceService<EntitatResource, Long, EntitatResourceEntity> implements EntitatResourceService {
 
 	private final AclHelper aclHelper;
 	private final UserSessionHelper userSessionHelper;
@@ -43,60 +41,32 @@ public class EntitatResourceServiceImpl
 	@PostConstruct
 	public void init() {
 		register(EntitatResource.Fields.logoCapsalera, new EntitatResourceLogoCapsaleraFieldFileManager());
-		register(
-			EntitatResource.PERSPECTIVE_PERMISSIONS,
-			new EntitatResourcePermisosPerspectiveApplicator(
-				authenticationHelper,
-				userSessionHelper,
-				notibPermissionHelper));
+		register(EntitatResource.PERSPECTIVE_PERMISSIONS, new EntitatResourcePermisosPerspectiveApplicator(authenticationHelper, userSessionHelper, notibPermissionHelper));
 	}
 
 	@Override
 	protected void afterConversion(EntitatResourceEntity entity, EntitatResource resource) {
-		resource.setAclEntryCount(
-				aclHelper.count(AclHelper.ENTITAT_CLASS, entity.getId(), null));
+		resource.setAclEntryCount(aclHelper.count(AclHelper.ENTITAT_CLASS, entity.getId(), null));
 	}
 
 	@Override
-	protected String additionalSpringFilter(
-		String currentSpringFilter,
-		String[] namedQueries) {
+	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
 		return notibPermissionHelper.entitatAdditionalSpringFilter("id");
 	}
 
 	@Override
-	protected void beforeCreateEntity(
-		EntitatResourceEntity entity,
-		EntitatResource resource,
-		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		notibPermissionHelper.entitatCheckAdminPermissionThrows(
-			getResourceClass(),
-			null,
-			null,
-			BasePermission.CREATE);
+	protected void beforeCreateEntity(EntitatResourceEntity entity, EntitatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+		notibPermissionHelper.entitatCheckAdminPermissionThrows(getResourceClass(), null, null, BasePermission.CREATE);
 	}
 
 	@Override
-	protected void beforeUpdateEntity(
-		EntitatResourceEntity entity,
-		EntitatResource resource,
-		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		notibPermissionHelper.entitatCheckAdminPermissionThrows(
-			getResourceClass(),
-			resource.getId(),
-			resource.getId(),
-			BasePermission.WRITE);
+	protected void beforeUpdateEntity(EntitatResourceEntity entity, EntitatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+		notibPermissionHelper.entitatCheckAdminPermissionThrows(getResourceClass(), resource.getId(), resource.getId(), BasePermission.WRITE);
 	}
 
 	@Override
-	protected void beforeDelete(
-		EntitatResourceEntity entity,
-		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		notibPermissionHelper.entitatCheckAdminPermissionThrows(
-			getResourceClass(),
-			entity.getId(),
-			entity.getId(),
-			BasePermission.DELETE);
+	protected void beforeDelete(EntitatResourceEntity entity, Map<String, AnswerRequiredException.AnswerValue> answers) {
+		notibPermissionHelper.entitatCheckAdminPermissionThrows(getResourceClass(), entity.getId(), entity.getId(), BasePermission.DELETE);
 	}
 
 	/**
@@ -107,41 +77,41 @@ public class EntitatResourceServiceImpl
 	 */
 	@RequiredArgsConstructor
 	public static class EntitatResourcePermisosPerspectiveApplicator implements PerspectiveApplicator<EntitatResourceEntity, EntitatResource> {
+
 		private final AuthenticationHelper authenticationHelper;
 		private final UserSessionHelper userSessionHelper;
 		private final NotibPermissionHelper notibPermissionHelper;
+
 		@Override
-		public void applySingle(
-			String code,
-			EntitatResourceEntity entity,
-			EntitatResource resource) throws PerspectiveApplicationException {
+		public void applySingle(String code, EntitatResourceEntity entity, EntitatResource resource) throws PerspectiveApplicationException {
+
 			boolean isRoleUser = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_USER);
 			Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
 			// Només els usuaris normals poden crear remeses
-			if (isRoleUser && currentEntitatId != null) {
-				resource.setCrearNotificacions(
-					checkPermisRemesa(
-						notibPermissionHelper.getOrganGestorNotificacioCreatePermission(EnviamentTipus.NOTIFICACIO),
-						notibPermissionHelper.getProcedimentNotificacioCreatePermission(EnviamentTipus.NOTIFICACIO),
-						false,
-						false));
-				resource.setCrearComunicacions(
-					checkPermisRemesa(
-						notibPermissionHelper.getOrganGestorNotificacioCreatePermission(EnviamentTipus.COMUNICACIO),
-						notibPermissionHelper.getProcedimentNotificacioCreatePermission(EnviamentTipus.COMUNICACIO),
-						null,
-						true));
-				resource.setCrearSir(
-					checkPermisRemesa(
-						notibPermissionHelper.getOrganGestorNotificacioCreatePermission(EnviamentTipus.SIR),
-						notibPermissionHelper.getProcedimentNotificacioCreatePermission(EnviamentTipus.SIR),
-						null,
-						true));
-			} else {
+			if (!isRoleUser || currentEntitatId == null) {
 				resource.setCrearNotificacions(false);
 				resource.setCrearComunicacions(false);
 				resource.setCrearSir(false);
+				return;
 			}
+			resource.setCrearNotificacions(
+				checkPermisRemesa(
+					notibPermissionHelper.getOrganGestorNotificacioCreatePermission(EnviamentTipus.NOTIFICACIO),
+					notibPermissionHelper.getProcedimentNotificacioCreatePermission(EnviamentTipus.NOTIFICACIO),
+					false,
+					false));
+			resource.setCrearComunicacions(
+				checkPermisRemesa(
+					notibPermissionHelper.getOrganGestorNotificacioCreatePermission(EnviamentTipus.COMUNICACIO),
+					notibPermissionHelper.getProcedimentNotificacioCreatePermission(EnviamentTipus.COMUNICACIO),
+					null,
+					true));
+			resource.setCrearSir(
+				checkPermisRemesa(
+					notibPermissionHelper.getOrganGestorNotificacioCreatePermission(EnviamentTipus.SIR),
+					notibPermissionHelper.getProcedimentNotificacioCreatePermission(EnviamentTipus.SIR),
+					null,
+					true));
 		}
 		/**
 		 * Es mira si es tenen permisos per a crear un tipus de remesa.Es verifica si es te el permís corresponent
@@ -176,25 +146,19 @@ public class EntitatResourceServiceImpl
 	 * FieldFileManager pel camp de logo de la capçalera.
 	 */
 	public static class EntitatResourceLogoCapsaleraFieldFileManager implements FieldFileManager<EntitatResourceEntity> {
+
 		@Override
-		public FileReference read(
-				EntitatResourceEntity entity,
-				String fieldName) {
-			byte[] content = entity.getLogoCapsalera();
-			if (content != null) {
-				return new FileReference(
-						"logo.jpg",
-						content,
-						"image/jpeg",
-						content.length);
-			} else {
-				return null;
-			}
+		public FileReference read(EntitatResourceEntity entity, String fieldName) {
+
+			var content = entity.getLogoCapsalera();
+			return content != null ? new FileReference("logo.jpg", content, "image/jpeg", content.length) : null;
 		}
+
 		@Override
 		public void save(EntitatResourceEntity entity, String fieldName, FileReference fileReference) {
 			entity.setLogoCapsalera(fileReference != null ? fileReference.getContent() : null);
 		}
+
 		@Override
 		public void delete(EntitatResourceEntity entity, String fieldName) {
 			entity.setLogoCapsalera(null);

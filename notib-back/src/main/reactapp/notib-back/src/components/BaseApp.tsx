@@ -21,11 +21,12 @@ import {
     useResourceApiContext,
     useMuiFormDialogApiRef,
 } from 'reactlib';
-import { useNotibContext, ROLE_SUPER } from './NotibContext';
+import {useNotibContext, ROLE_SUPER, ROLE_ORGAN} from './NotibContext';
 import Offline from './Offline';
 import RoleSelector from './RoleSelector';
 import EntitatSelector from './EntitatSelector';
 import { UserProfileMenu, UserProfileFormDialog } from './UserProfile';
+import OrganSelector from "./OrganSelector.tsx";
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
@@ -170,8 +171,9 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             headerAppbarBackgroundColor={appbarBackgroundColor}
             headerAppbarBackgroundImg={appbarBackgroundImg}
             headerAdditionalComponents={[
-                <RoleSelector key="role_selector" />,
+                ...(currentRole === ROLE_ORGAN ? [<OrganSelector key="organ_selector" />] : []),
                 ...(currentRole !== ROLE_SUPER ? [<EntitatSelector key="entitat_selector" />] : []),
+                <RoleSelector key="role_selector" />
             ]}
             headerAdditionalAuthComponents={[
                 <Box key="user_profile" sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>

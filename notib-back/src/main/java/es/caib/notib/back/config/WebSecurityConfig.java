@@ -47,6 +47,7 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 			BaseConfig.ROLE_SUPER + "," +
 			BaseConfig.ROLE_ADMIN + "," +
 			BaseConfig.ROLE_ADMIN_LECTURA + "," +
+			BaseConfig.ROLE_ORGAN + "," +
 			BaseConfig.ROLE_CARPETA + "," +
 			BaseConfig.ROLE_APL + "," +
 			BaseConfig.ROLE_USER + "}")

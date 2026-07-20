@@ -13,16 +13,28 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
 import org.springframework.security.acls.domain.PrincipalSid;
-import org.springframework.security.acls.model.*;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.acls.model.AccessControlEntry;
+import org.springframework.security.acls.model.Acl;
+import org.springframework.security.acls.model.MutableAcl;
+import org.springframework.security.acls.model.MutableAclService;
+import org.springframework.security.acls.model.NotFoundException;
+import org.springframework.security.acls.model.ObjectIdentity;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.acls.model.Sid;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -54,105 +66,62 @@ public class AclHelper {
 	/**
 	 * Obté la informació de l'ACL que correspon al recurs especificat.
 	 *
-	 * @param resourceClass
-	 *            la classe del recurs.
-	 * @param resourceId
-	 *            l'id del recurs.
-	 * @param sids
-	 *            els SIDs per a filtrar les ACEs que retornarà l'ACL. Si es passa null es retornaran totes les ACEs.
+	 * @param resourceClass la classe del recurs.
+	 * @param resourceId l'id del recurs.
+	 * @param sids els SIDs per a filtrar les ACEs que retornarà l'ACL. Si es passa null es retornaran totes les ACEs.
 	 * @return la informació de l'ACL o null si no està creada.
 	 */
-	public Acl get(
-			Class<?> resourceClass,
-			Serializable resourceId,
-			List<Sid> sids) {
-		return getMutableAcl(
-				resourceClass,
-				resourceId,
-				sids,
-				false);
+	public Acl get(Class<?> resourceClass, Serializable resourceId, List<Sid> sids) {
+		return getMutableAcl(resourceClass, resourceId, sids, false);
 	}
 
 	/**
 	 * Conta el nombre d'entrades de permisos d'una ACL.
 	 *
-	 * @param resourceClass
-	 *            la classe del recurs.
-	 * @param resourceId
-	 *            l'id del recurs.
-	 * @param sids
-	 *            els SIDs per a filtrar les ACEs que retornarà l'ACL. Si es passa null es contaran totes les ACEs.
+	 * @param resourceClass la classe del recurs.
+	 * @param resourceId l'id del recurs.
+	 * @param sids els SIDs per a filtrar les ACEs que retornarà l'ACL. Si es passa null es contaran totes les ACEs.
 	 * @return el nombre d'entrades de ACEs.
 	 */
-	public int count(
-			Class<?> resourceClass,
-			Serializable resourceId,
-			List<Sid> sids) {
-		Acl acl = getMutableAcl(
-				resourceClass,
-				resourceId,
-				sids,
-				false);
-		if (acl != null && acl.getEntries() != null) {
-			Map<Sid, List<AccessControlEntry>> entriesBySid = acl.getEntries().stream().
-					collect(Collectors.groupingBy(AccessControlEntry::getSid));
-			return entriesBySid.size();
-		} else {
-			return 0;
-		}
+	public int count(Class<?> resourceClass, Serializable resourceId, List<Sid> sids) {
+
+		Acl acl = getMutableAcl(resourceClass, resourceId, sids, false);
+		return acl != null && acl.getEntries() != null ? acl.getEntries().stream().collect(Collectors.groupingBy(AccessControlEntry::getSid)).size() : 0;
 	}
 
 	/**
 	 * Modifica la informació de l'ACL del recurs especificat.
 	 *
-	 * @param resourceClass
-	 *            la classe del recurs.
-	 * @param resourceId
-	 *            l'id del recurs.
-	 * @param sidName
-	 *            el nom del SID a modificar.
-	 * @param sidGrantedAuthority
-	 *            true si el nom del sid correspon a una GrantedAuthority (rol) false en cas contrari.
-	 * @param permissionsGranted
-	 *            la llista de permisos que te el SID especificat sobre el recurs.
+	 * @param resourceClass la classe del recurs.
+	 * @param resourceId l'id del recurs.
+	 * @param sidName el nom del SID a modificar.
+	 * @param sidGrantedAuthority true si el nom del sid correspon a una GrantedAuthority (rol) false en cas contrari.
+	 * @param permissionsGranted la llista de permisos que te el SID especificat sobre el recurs.
 	 */
-	public void set(
-			Class<?> resourceClass,
-			Serializable resourceId,
-			String sidName,
-			boolean sidGrantedAuthority,
-			List<PermissionEnum> permissionsGranted) {
-		Sid sid = getSid(sidName, sidGrantedAuthority);
-		MutableAcl acl = getMutableAcl(
-				resourceClass,
-				resourceId,
-				List.of(sid),
-				true);
+	public void set(Class<?> resourceClass, Serializable resourceId, String sidName, boolean sidGrantedAuthority, List<PermissionEnum> permissionsGranted) {
+
+		var sid = getSid(sidName, sidGrantedAuthority);
+		MutableAcl acl = getMutableAcl(resourceClass, resourceId, List.of(sid), true);
 		// Es recorren els permisos de l'ACL i s'esborren els que no
 		// hi han de ser. Els permisos de permissionList que ja hi son
 		// S'esborren de la llista.
 		// Es recorren girats perque cada vegada que s'esborra un ace
 		// es reorganitzen els índexos
-		List<Permission> permissionList = permissionsGranted.stream().
-				map(ExtendedPermission::fromEnumValue).
-				collect(Collectors.toList());
-		for (int i = acl.getEntries().size() - 1; i >= 0; i--) {
+		List<Permission> permissionList = permissionsGranted.stream().map(ExtendedPermission::fromEnumValue).collect(Collectors.toList());
+		for (var i = acl.getEntries().size() - 1; i >= 0; i--) {
 			AccessControlEntry ace = acl.getEntries().get(i);
-			if (ace.getSid().equals(sid)) {
-				if (permissionList.contains(ace.getPermission())) {
-					permissionList.remove(ace.getPermission());
-				} else {
-					acl.deleteAce(i);
-				}
+			if (!ace.getSid().equals(sid)) {
+				continue;
 			}
+			if (!permissionList.contains(ace.getPermission())) {
+				acl.deleteAce(i);
+				continue;
+			}
+			permissionList.remove(ace.getPermission());
 		}
 		// S'afegeixen els permisos que queden a la llista
-		for (Permission permissionItem: permissionList) {
-			acl.insertAce(
-					acl.getEntries().size(),
-					permissionItem,
-					sid,
-					true);
+		for (var permissionItem: permissionList) {
+			acl.insertAce(acl.getEntries().size(), permissionItem, sid, true);
 		}
 		mutableAclService.updateAcl(acl);
 	}
@@ -160,61 +129,33 @@ public class AclHelper {
 	/**
 	 * Esborra tots els permisos del SID sobre el recurs especificat.
 	 *
-	 * @param resourceClass
-	 *            la classe del recurs.
-	 * @param resourceId
-	 *            l'id del recurs.
-	 * @param sidName
-	 *            el nom del SID a modificar.
-	 * @param sidGrantedAuthority
-	 *            true si el nom del sid correspon a una GrantedAuthority (rol) false en cas contrari.
+	 * @param resourceClass la classe del recurs.
+	 * @param resourceId l'id del recurs.
+	 * @param sidName el nom del SID a modificar.
+	 * @param sidGrantedAuthority true si el nom del sid correspon a una GrantedAuthority (rol) false en cas contrari.
 	 */
-	public void delete(
-			Class<?> resourceClass,
-			Serializable resourceId,
-			String sidName,
-			boolean sidGrantedAuthority) {
-		set(
-				resourceClass,
-				resourceId,
-				sidName,
-				sidGrantedAuthority,
-				new ArrayList<>());
+	public void delete(Class<?> resourceClass, Serializable resourceId, String sidName, boolean sidGrantedAuthority) {
+		set(resourceClass, resourceId, sidName, sidGrantedAuthority, new ArrayList<>());
 	}
 
 	/**
 	 * Indica si es tenen permisos sobre el recurs especificat.
 	 *
-	 * @param resourceClass
-	 *            la classe del recurs.
-	 * @param resourceId
-	 *            l'id del recurs.
-	 * @param permissions
-	 *            els permísos a comprovar. Es retornarà true si el recurs te permès ALGUN dels permisos.
-	 * @param sids
-	 *            la llista de SIDs. Si no es passa cap valor s'utilitzaran els SIDs de l'usuari actual.
+	 * @param resourceClass la classe del recurs.
+	 * @param resourceId l'id del recurs.
+	 * @param permissions els permísos a comprovar. Es retornarà true si el recurs te permès ALGUN dels permisos.
+	 * @param sids la llista de SIDs. Si no es passa cap valor s'utilitzaran els SIDs de l'usuari actual.
 	 * @return true si es tenen permisos o false en cas contrari.
 	 */
-	public boolean anyPermissionGranted(
-			Class<?> resourceClass,
-			Serializable resourceId,
-			List<Permission> permissions,
-			Sid... sids) {
-		MutableAcl acl = getMutableAcl(
-				resourceClass,
-				resourceId,
-				Arrays.asList(sids),
-				false);
-		if (acl != null) {
-			try {
-				return acl.isGranted(
-						permissions,
-						sids.length > 0 ? Arrays.asList(sids) : getCurrentUserSids(),
-						true);
-			} catch (NotFoundException ex) {
-				return false;
-			}
-		} else {
+	public boolean anyPermissionGranted(Class<?> resourceClass, Serializable resourceId, List<Permission> permissions, Sid... sids) {
+
+		var acl = getMutableAcl(resourceClass, resourceId, Arrays.asList(sids), false);
+		if (acl == null) {
+			return false;
+		}
+		try {
+			return acl.isGranted(permissions, sids.length > 0 ? Arrays.asList(sids) : getCurrentUserSids(), true);
+		} catch (NotFoundException ex) {
 			return false;
 		}
 	}
@@ -222,49 +163,30 @@ public class AclHelper {
 	/**
 	 * Retorna les ids sobre les quals els SIDs especificats tenen algun permís.
 	 *
-	 * @param resourceClass
-	 *            la classe del recurs.
-	 * @param permissions
-	 *            els permísos a comprovar. Es retornaran les ids que tenen permès ALGUN dels permisos.
-	 * @param sids
-	 *            la llista de SIDs. Si no es passa cap valor s'utilitzaran els SIDs de l'usuari actual.
+	 * @param resourceClass la classe del recurs.
+	 * @param permissions els permísos a comprovar. Es retornaran les ids que tenen permès ALGUN dels permisos.
+	 * @param sids la llista de SIDs. Si no es passa cap valor s'utilitzaran els SIDs de l'usuari actual.
 	 * @return la llista d'ids.
 	 */
-	public Set<String> findIdsWithAnyPermission(
-			Class<?> resourceClass,
-			List<Permission> permissions,
-			Sid... sids) {
+	public Set<String> findIdsWithAnyPermission(Class<?> resourceClass, List<Permission> permissions, Sid... sids) {
+
 		Map<String, Object> paramsMap = new HashMap<>();
 		paramsMap.put("isTrue", true);
 		paramsMap.put("isFalse", false);
 		paramsMap.put("className", resourceClass.getName());
 		List<Sid> sidsList = sids.length > 0 ? Arrays.asList(sids) : getCurrentUserSids();
-		Optional<String> principal = sidsList.stream().
-				filter(s -> s instanceof PrincipalSid).
-				map(s -> ((PrincipalSid)s).getPrincipal()).
-				findFirst();
+		Optional<String> principal = sidsList.stream().filter(PrincipalSid.class::isInstance).map(s -> ((PrincipalSid)s).getPrincipal()).findFirst();
 		principal.ifPresent(principalSid -> paramsMap.put("principal", principal.get()));
-		List<String> grantedAuthorities = sidsList.stream().
-				filter(s -> s instanceof GrantedAuthoritySid).
-				map(s -> ((GrantedAuthoritySid)s).getGrantedAuthority()).
-				collect(Collectors.toList());
+		List<String> grantedAuthorities = sidsList.stream().filter(GrantedAuthoritySid.class::isInstance).map(s -> ((GrantedAuthoritySid)s).getGrantedAuthority()).collect(Collectors.toList());
 		if (!grantedAuthorities.isEmpty()) {
 			paramsMap.put("grantedAuthorities", grantedAuthorities);
 		}
-		boolean anyPermission = permissions != null && !permissions.isEmpty();
+		var anyPermission = permissions != null && !permissions.isEmpty();
 		if (anyPermission) {
-			paramsMap.put(
-					"masks",
-					permissions.stream().map(Permission::getMask).collect(Collectors.toSet()));
+			paramsMap.put("masks", permissions.stream().map(Permission::getMask).collect(Collectors.toSet()));
 		}
-		String query = aclConfig.getIdsWithPermissionQuery(
-				anyPermission,
-				principal.isPresent(),
-				!grantedAuthorities.isEmpty());
-		return jdbcTemplate.query(
-				query,
-				paramsMap,
-				rs -> {
+		var query = aclConfig.getIdsWithPermissionQuery(anyPermission, principal.isPresent(), !grantedAuthorities.isEmpty());
+		return jdbcTemplate.query(query, paramsMap, rs -> {
 					Set<String> ids = new HashSet<>();
 					while (rs.next()) {
 						String s = rs.getString(1);
@@ -280,44 +202,31 @@ public class AclHelper {
 	 * @return la llista de SIDs (principal + grantedAuthorities).
 	 */
 	public List<Sid> getCurrentUserSids() {
+
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth == null) {
+			return new ArrayList<>();
+		}
 		List<Sid> sids = new ArrayList<>();
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth != null) {
-			sids.add(new PrincipalSid(auth.getName()));
-			for (GrantedAuthority ga: auth.getAuthorities()) {
-				sids.add(new GrantedAuthoritySid(ga.getAuthority()));
-			}
+		sids.add(new PrincipalSid(auth.getName()));
+		for (var ga: auth.getAuthorities()) {
+			sids.add(new GrantedAuthoritySid(ga.getAuthority()));
 		}
 		return sids;
 	}
 
-	private MutableAcl getMutableAcl(
-			Class<?> resourceClass,
-			Serializable resourceId,
-			List<Sid> sids,
-			boolean createIfNotExists) {
+	private MutableAcl getMutableAcl(Class<?> resourceClass, Serializable resourceId, List<Sid> sids, boolean createIfNotExists) {
+
 		ObjectIdentity objectIdentity = new ObjectIdentityImpl(resourceClass.getName(), resourceId);
-		MutableAcl acl;
 		try {
-			acl = (sids != null) ? (MutableAcl)mutableAclService.readAclById(objectIdentity, sids) : (MutableAcl)mutableAclService.readAclById(objectIdentity);
+			return (sids != null) ? (MutableAcl)mutableAclService.readAclById(objectIdentity, sids) : (MutableAcl)mutableAclService.readAclById(objectIdentity);
 		} catch (NotFoundException ex) {
-			if (createIfNotExists) {
-				acl = mutableAclService.createAcl(objectIdentity);
-			} else {
-				acl = null;
-			}
+			return createIfNotExists ? mutableAclService.createAcl(objectIdentity) : null;
 		}
-		return acl;
 	}
 
-	private Sid getSid(
-			String name,
-			boolean grantedAuthority) {
-		if (!grantedAuthority) {
-			return new PrincipalSid(name);
-		} else {
-			return new GrantedAuthoritySid(name);
-		}
+	private Sid getSid(String name, boolean grantedAuthority) {
+		return !grantedAuthority ? new PrincipalSid(name) : new GrantedAuthoritySid(name);
 	}
 
 }

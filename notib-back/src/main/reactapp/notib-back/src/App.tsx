@@ -312,49 +312,27 @@ const InnerApp: React.FC = () => {
     const bgColor= mode === 'light' ? theme.palette.background.paper : undefined;
     const textColor= bgColor ? theme.palette.getContrastText(bgColor) : undefined;
     const currentRoleSuperOrEntitatSelected= currentRole === ROLE_SUPER || currentEntitatId != null;
+    const logoColor = mode === 'light' ? notibLogoLight : notibLogoDark;
     return (
         mode && (
             <BaseApp
                 code="NOTIB"
                 logo={mode === 'light' ? goibLogoLight : goibLogoDark}
-                logoStyle={{
-                    '& img': { height: '49px' },
-                    pl: 1,
-                    pr: '29px',
-                    borderRight: '1px solid ' + theme.palette.divider,
-                }}
-                title={
-                    <img
-                        style={{
-                            marginLeft: '8px',
-                            height: '49px',
-                            verticalAlign: 'middle',
-                        }}
-                        src={mode === 'light' ? notibLogoLight : notibLogoDark}
-                        alt="Notib"
-                    />
-                }
+                logoStyle={{'& img': { height: '49px' }, pl: 1, pr: '29px', borderRight: '1px solid ' + theme.palette.divider,}}
+                title={<img style={{ marginLeft: '8px', height: '49px', verticalAlign: 'middle' }} src={logoColor} alt="Notib"/>}
                 version={version}
                 availableLanguages={['ca', 'es']}
                 menuEntries={currentRoleSuperOrEntitatSelected ? menuEntries : undefined}
                 appbarBackgroundColor={bgColor}
                 appbarStyle={{ color: textColor }}
+                footerHeight={36}
                 footer={
                     <div style={{ height: '36px' }}>
-                        <DrassanaFooter
-                            title="NOTIB"
-                            backgroundColor="#5F5D5D"
-                            style={{ position: 'fixed', width: '100%', bottom: 0 }}
-                        />
+                        <DrassanaFooter title="NOTIB" backgroundColor="#5F5D5D" style={{ position: 'fixed', width: '100%', bottom: 0 }}/>
                     </div>
                 }
-                footerHeight={36}
             >
-                {currentRoleSuperOrEntitatSelected ? (
-                    <Outlet />
-                ) : (
-                    <Alert severity="error">{t('app.noEntitat')}</Alert>
-                )}
+                {currentRoleSuperOrEntitatSelected ? (<Outlet />) : (<Alert severity="error">{t('app.noEntitat')}</Alert>)}
             </BaseApp>
         )
     );

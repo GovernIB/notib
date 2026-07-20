@@ -67,6 +67,7 @@ public class WebMvcConfig extends BaseWebMvcConfig {
 
 	@Bean
 	public FilterRegistrationBean<SiteMeshFilter> sitemeshFilter() {
+
 		FilterRegistrationBean<SiteMeshFilter> registrationBean = new FilterRegistrationBean<>();
 		registrationBean.setFilter(new SiteMeshFilter());
 		registrationBean.addUrlPatterns("/*");
@@ -94,12 +95,9 @@ public class WebMvcConfig extends BaseWebMvcConfig {
 			addResolver(new PathResourceResolver() {
 			    @Override
 			    protected Resource getResource(String resourcePath, Resource location) throws IOException {
-				Resource requestedResource = location.createRelative(resourcePath);
-				if (requestedResource.exists() && requestedResource.isReadable()) {
-					return requestedResource;
-				} else {
-					return location.createRelative("index.html");
-				}
+
+					var requestedResource = location.createRelative(resourcePath);
+					return requestedResource.exists() && requestedResource.isReadable() ? requestedResource : location.createRelative("index.html");
 			    }
 			});
 	}
@@ -111,16 +109,17 @@ public class WebMvcConfig extends BaseWebMvcConfig {
 
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
-		registry.
-				addMapping("/**").
-				allowedOrigins("http://localhost:5173", "http://localhost:8080").
-				allowCredentials(true).
-				allowedHeaders("*").
-				allowedMethods("*");
+
+		registry.addMapping("/**")
+				.allowedOrigins("http://localhost:5173", "http://localhost:8080")
+				.allowCredentials(true)
+				.allowedHeaders("*")
+				.allowedMethods("*");
 	}
 
 	@Bean
 	public CommonsMultipartResolver multipartResolver() {
+
 		CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
 		multipartResolver.setMaxUploadSize(MAX_UPLOAD_SIZE);
 		return multipartResolver;
@@ -128,6 +127,7 @@ public class WebMvcConfig extends BaseWebMvcConfig {
 
 	@Bean
 	public LocaleResolver localeResolver() {
+
 		var localeResolver = new CustomLocaleResolver(Arrays.asList(Locale.forLanguageTag("ca"), Locale.forLanguageTag("es")));
 		localeResolver.setDefaultLocale(Locale.forLanguageTag("ca"));
 		return localeResolver;
@@ -135,6 +135,7 @@ public class WebMvcConfig extends BaseWebMvcConfig {
 
 	@Bean
 	public LocaleChangeInterceptor localeChangeInterceptor() {
+
 		var lci = new LocaleChangeInterceptor();
 		lci.setParamName("lang");
 		return lci;
@@ -142,17 +143,19 @@ public class WebMvcConfig extends BaseWebMvcConfig {
 
 	@Bean
 	public HandlerInterceptor userInterceptor() {
+
 		return new AsyncHandlerInterceptor() {
 			@Override
 			public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-				usuariResourceService.refresh();
-				return true;
+			usuariResourceService.refresh();
+			return true;
 			}
 		};
 	}
 
 	@Bean
 	public HandlerInterceptor userSessionInterceptor() {
+
 		return new AsyncHandlerInterceptor() {
 			@Override
 			public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws JsonProcessingException {
@@ -160,11 +163,11 @@ public class WebMvcConfig extends BaseWebMvcConfig {
 				String json = request.getHeader(userSessionHttpHeader);
 				if (json != null) {
 					var parsedJson = objectMapper.readValue(json, java.util.Map.class);
-					Integer entitatId = (Integer)parsedJson.get("e");
-					Integer organGestorId = (Integer)parsedJson.get("o");
-					userSession = new UserSession(
-						entitatId != null ? entitatId.longValue() : null,
-						organGestorId != null ? organGestorId.longValue() : null);
+					var entitatId = (Integer)parsedJson.get("e");
+					var organGestorId = (Integer)parsedJson.get("o");
+					var entitaLong = entitatId != null ? entitatId.longValue() : null;
+					var organLong = organGestorId != null ? organGestorId.longValue() : null;
+					userSession = new UserSession(entitaLong, organLong);
 				}
 				if (userSession != null) {
 					ThreadLocalUtil.setAttribute(ThreadLocalUtil.SESSION_KEY, userSession);
@@ -202,6 +205,7 @@ public class WebMvcConfig extends BaseWebMvcConfig {
 			"/error",
 			"/**/monitor/tasques"
 	};
+
 	private static final String[] ALL_EXCLUSIONS = {"/js/**", "/css/**", "/fonts/**", "/img/**", "/images/**", "/extensions/**", "/webjars/**", "/**/datatable/**", "/**/selection/**", "/api/rest/**", "/api/apidoc**", "/api-docs/**", "/**/api-docs/", "/api/consulta/**", "/api/services/**", "/usuari/configuracio/**"};
 	// Urls accés
 	private static final String[] PAGADORS_PATHS = { "/cie**", "/cie/**", "/operadorPostal**", "/operadorPostal/**" };
@@ -225,14 +229,19 @@ public class WebMvcConfig extends BaseWebMvcConfig {
 	}
 
 	public static class CustomLocaleResolver extends SessionLocaleResolver {
+
 		private final AcceptHeaderLocaleResolver acceptHeaderLocaleResolver;
+
 		public CustomLocaleResolver(List<Locale> supportedLocales) {
+
 			acceptHeaderLocaleResolver = new AcceptHeaderLocaleResolver();
 			acceptHeaderLocaleResolver.setSupportedLocales(supportedLocales);
 		}
+
 		@Override
 		@NotNull
 		protected Locale determineDefaultLocale(@NotNull HttpServletRequest request) {
+
 			var acceptHeaderLocale = acceptHeaderLocaleResolver.resolveLocale(request);
 			if (acceptHeaderLocale != null) {
 				return acceptHeaderLocale;

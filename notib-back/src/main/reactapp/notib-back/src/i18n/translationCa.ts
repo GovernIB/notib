@@ -1051,6 +1051,7 @@ const translationCa = {
                 NOT_SUPER: 'Superadministrador',
                 NOT_ADMIN: 'Administrador Entitat',
                 NOT_ADMIN_LECTURA: "Administrador (lectura)",
+                NOT_ORGAN: "Administrador d'òrgan",
                 tothom: 'Usuari',
             },
         },

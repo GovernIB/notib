@@ -78,11 +78,22 @@ import java.io.Serializable;
 				)
 			}
 		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.PERSPECTIVE,
+			code = OrganGestorResource.PERSPECTIVE_ADMIN_ORGAN,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ORGAN }
+				)
+			}
+		),
 	}
 )
 public class OrganGestorResource extends BaseResource<Long> {
 
 	public static final String PERSPECTIVE_TREE = "TREE";
+	public static final String PERSPECTIVE_ADMIN_ORGAN = "ADMIN_ORGANS";
 
 	public static final String DIR3_SYNC_ACTION_CODE = "DIR3_SYNC";
 	public static final String FILTER_CODE = "FILTER_ORGAN_GESTOR";

@@ -10,6 +10,7 @@ import es.caib.notib.logic.intf.base.exception.ActionExecutionException;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.model.OrganGestorDir3Sync;
 import es.caib.notib.logic.intf.model.OrganGestorResource;
+import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.persist.resourceentity.*;
 import es.caib.notib.persist.resourcerepository.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,6 +46,7 @@ class OrganGestorResourceServiceImplTest {
 	@Mock private PagadorPostalResourceRepository pagadorPostalRepo;
 	@Mock private PagadorCieResourceRepository pagadorCieRepo;
 	@Mock private EntregaCieResourceRepository entregaCieRepo;
+	@Mock private OrganGestorService organGestorService;
 
 	private OrganGestorResourceServiceImpl service;
 
@@ -60,7 +62,8 @@ class OrganGestorResourceServiceImplTest {
 			organGestorResourceRepository,
 			pagadorPostalRepo,
 			pagadorCieRepo,
-			entregaCieRepo
+			entregaCieRepo,
+			organGestorService
 		);
 	}
 

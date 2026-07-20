@@ -58,6 +58,11 @@ import java.io.Serializable;
 					roles = { BaseConfig.ROLE_ADMIN_LECTURA },
 					grantedPermissions = { PermissionEnum.READ }
 				),
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ORGAN },
+					grantedPermissions = { PermissionEnum.READ }
+				),
 		},
 		artifacts = {
 			@ResourceArtifact(

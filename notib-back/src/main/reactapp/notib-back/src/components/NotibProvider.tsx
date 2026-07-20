@@ -14,41 +14,31 @@ import {
     ROLE_USER,
 } from './NotibContext';
 
-const ALLOWED_ROLES = [
-    ROLE_SUPER,
-    ROLE_ADMIN,
-    ROLE_ADMIN_LECTURA,
-    ROLE_ORGAN,
-    ROLE_USER,
-].reverse();
+const ALLOWED_ROLES = [ROLE_SUPER, ROLE_ADMIN, ROLE_ADMIN_LECTURA, ROLE_ORGAN, ROLE_USER].reverse();
 
 const decodeJwt = (token: string) => {
+
     const payload = token.split('.')[1];
     const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
     return JSON.parse(atob(base64));
 };
 
 const useSessionStorage = (...keyParts: any[]) => {
-    const key = keyParts
-        .map((p) => (typeof p === 'object' && p !== null ? JSON.stringify(p) : String(p)))
-        .join('|');
-    const getValue = () => {
-        return sessionStorage.getItem(key);
-    };
+
+    const key = keyParts.map((p) => (typeof p === 'object' && p !== null ? JSON.stringify(p) : String(p))).join('|');
+    const getValue = () => sessionStorage.getItem(key);
     const setValue = (value: string | null) => {
-        if (value != null) {
-            sessionStorage.setItem(key, value);
-        } else {
+        if (value == null) {
             sessionStorage.removeItem(key);
+            return;
         }
+        sessionStorage.setItem(key, value);
     };
-    return {
-        getValue,
-        setValue,
-    };
+    return {getValue, setValue,};
 };
 
 const createSession = (entitatId?: number, organId?: number) => {
+
     const sessionObject = {
         ...(entitatId != null && { e: entitatId }),
         ...(organId != null && { o: organId }),
@@ -63,102 +53,86 @@ const getSessionValue = (json: string | undefined, field: string) => {
 };
 
 const useCurrentUser = () => {
-    const {
-        isReady: apiIsReady,
-        find: apiFind,
-        currentFields: apiFields,
-    } = useResourceApiService('usuariResource');
+
+    const {isReady: apiIsReady, find: apiFind, currentFields: apiFields,} = useResourceApiService('usuariResource');
     const [currentUser, setCurrentUser] = React.useState<string>();
-    const [currentUserGridPageSizeOptions, setCurrentUserGridPageSizeOptions] =
-        React.useState<number[]>();
+    const [currentUserGridPageSizeOptions, setCurrentUserGridPageSizeOptions] = React.useState<number[]>();
     React.useEffect(() => {
-        if (apiIsReady) {
-            apiFind({ unpaged: true }).then((response) => {
-                if (response.rows.length) {
-                    setCurrentUser(response.rows[0]);
-                }
-            });
-            const gridPageSizeOptionsField = apiFields?.find(
-                (f) => f.name === 'numElementsPaginaDefecte'
-            );
-            const gridPageSizeOptions =
-                gridPageSizeOptionsField != null
-                    ? Object.values(gridPageSizeOptionsField?.options).map((v: any) => parseInt(v))
-                    : [10, 20, 50, 100];
-            if (!gridPageSizeOptions.includes(-1)) {
-                gridPageSizeOptions.unshift(-1);
-            }
-            setCurrentUserGridPageSizeOptions(gridPageSizeOptions);
+        if (!apiIsReady) {
+            return;
         }
+        apiFind({ unpaged: true }).then((response) => {
+            if (response.rows.length) {
+                setCurrentUser(response.rows[0]);
+            }
+        });
+        const gridPageSizeOptionsField = apiFields?.find((f) => f.name === 'numElementsPaginaDefecte');
+        const gridPageSizeOptions = gridPageSizeOptionsField != null ? Object.values(gridPageSizeOptionsField?.options).map((v: any) => Number.parseInt(v)) : [10, 20, 50, 100];
+        if (!gridPageSizeOptions.includes(-1)) {
+            gridPageSizeOptions.unshift(-1);
+        }
+        setCurrentUserGridPageSizeOptions(gridPageSizeOptions);
     }, [apiIsReady]);
     return { currentUser, setCurrentUser, currentUserGridPageSizeOptions };
 };
 
 const useCurrentRole = () => {
-    const {
-        isReady: authIsReady,
-        getUserId: authGetUserId,
-        getToken: authGetToken,
-    } = useAuthContext();
-    const { httpHeaders: apiHttpHeaders, setHttpHeaders: apiSetHttpHeaders } =
-        useResourceApiContext();
+
+    const {isReady: authIsReady, getUserId: authGetUserId, getToken: authGetToken,} = useAuthContext();
+    const { httpHeaders: apiHttpHeaders, setHttpHeaders: apiSetHttpHeaders } = useResourceApiContext();
     const [currentUserId, setCurrentUserId] = React.useState<string>();
     const [rolesAvailable, setRolesAvailable] = React.useState<string[]>();
     const [currentRole, setCurrentRole] = React.useState<string>();
-    const { getValue: roleSessionGetValue, setValue: roleSessionSetValue } = useSessionStorage(
-        currentUserId,
-        'currentRole'
-    );
+    const { getValue: roleSessionGetValue, setValue: roleSessionSetValue } = useSessionStorage(currentUserId, 'currentRole');
     React.useEffect(() => {
         // Obté els rols disponibles del token JWT o de __AUTH_ROLES__
-        if (authIsReady) {
-            const userId = authGetUserId();
-            setCurrentUserId(userId);
-            const token = authGetToken();
-            if (token != null) {
-                const tokenDecoded = decodeJwt(token);
-                if (tokenDecoded.realm_access != null) {
-                    const realmRoles =
-                        tokenDecoded.realm_access?.roles?.filter(
-                            (r: string) => r === ROLE_USER || r.startsWith(ROLE_PREFIX)
-                        ) ?? [];
-                    const rolesAvailable = ALLOWED_ROLES.filter((a) => realmRoles.includes(a));
-                    setRolesAvailable(rolesAvailable);
-                } else {
-                    const windowAuthRoles = (window as any).__AUTH_ROLES__ ?? [];
-                    const rolesAvailable = ALLOWED_ROLES.filter((a) => windowAuthRoles.includes(a));
-                    setRolesAvailable(rolesAvailable);
-                }
-            }
+        if (!authIsReady) {
+            return;
         }
+        const userId = authGetUserId();
+        setCurrentUserId(userId);
+        const token = authGetToken();
+        if (token == null) {
+            return;
+        }
+        const tokenDecoded = decodeJwt(token);
+        if (tokenDecoded.realm_access == null) {
+            const windowAuthRoles = (window as any).__AUTH_ROLES__ ?? [];
+            const rolesAvailable = ALLOWED_ROLES.filter((a) => windowAuthRoles.includes(a));
+            setRolesAvailable(rolesAvailable);
+            return;
+        }
+        const realmRoles = tokenDecoded.realm_access?.roles?.filter((r: string) => r === ROLE_USER || r.startsWith(ROLE_PREFIX)) ?? [];
+        const rolesAvailable = ALLOWED_ROLES.filter((a) => realmRoles.includes(a));
+        setRolesAvailable(rolesAvailable);
     }, [authIsReady]);
+
     React.useEffect(() => {
         // Configura l'estat amb el rol actual si aquest encara no s'ha inicialitzat i els rols disponibles ja s'han obtingut
-        if (rolesAvailable != null && currentRole == null) {
-            const sessionValue = roleSessionGetValue();
-            const isSessionValueInRolesAvailable =
-                sessionValue != null && rolesAvailable?.includes(sessionValue);
-            if (sessionValue != null && isSessionValueInRolesAvailable) {
-                setCurrentRole(sessionValue);
-            } else if (rolesAvailable?.length && currentRole == null) {
-                setCurrentRole(rolesAvailable[0]);
-            }
+        if (rolesAvailable == null || currentRole != null) {
+            return;
+        }
+        const sessionValue = roleSessionGetValue();
+        const isSessionValueInRolesAvailable = sessionValue != null && rolesAvailable?.includes(sessionValue);
+        if (sessionValue != null && isSessionValueInRolesAvailable) {
+            setCurrentRole(sessionValue);
+        } else if (rolesAvailable?.length && currentRole == null) {
+            setCurrentRole(rolesAvailable[0]);
         }
     }, [rolesAvailable, currentRole]);
+
     React.useEffect(() => {
         // Configura el session storage i la capçalera HTTP amb el rol actual quan aquest canvia
-        if (currentRole !== undefined) {
-            roleSessionSetValue(currentRole);
-            if (currentRole) {
-                apiSetHttpHeaders([{ 'X-App-Role': currentRole }]);
-            }
+        if (currentRole === undefined) {
+            return;
+        }
+        roleSessionSetValue(currentRole);
+        if (currentRole) {
+            apiSetHttpHeaders([{ 'X-App-Role': currentRole }]);
         }
     }, [currentRole]);
-    const currentRoleFromHttpHeader = apiHttpHeaders?.find((h) => 'X-App-Role' in h)?.[
-        'X-App-Role'
-    ];
-    const roleHttpHeaderInitialized =
-        currentRole != null && currentRole === currentRoleFromHttpHeader;
+    const currentRoleFromHttpHeader = apiHttpHeaders?.find((h) => 'X-App-Role' in h)?.['X-App-Role'];
+    const roleHttpHeaderInitialized = currentRole != null && currentRole === currentRoleFromHttpHeader;
     return {
         currentUserId,
         currentRole,
@@ -177,68 +151,64 @@ const useCurrentEntitat = (currentUserId: string | undefined, currentRole: strin
     const [currentEntitatLoading, setCurrentEntitatLoading] = React.useState<boolean>();
     const [currentEntitat, setCurrentEntitat] = React.useState<any>();
     const { getValue: sessionSessionGetValue, setValue: sessionSessionSetValue } = useSessionStorage(currentUserId, 'currentSession');
+    console.log("131231")
+    const { isReady: apiIsReadyOrgan, find: apiFindOrgan, getOne: apiGetOneOrgan} = useResourceApiService('organGestorResource');
+    console.log("foo")
     React.useEffect(() => {
-        if (apiIsReady && currentRoleReady && currentRole != null) {
-            setCurrentEntitatId(undefined);
-            if (currentRole !== ROLE_SUPER) {
-                apiFind({ unpaged: true }).then((response) => {
-                    const entitatsAvailable = response.rows;
-                    setEntitatsAvailable(entitatsAvailable);
-                    const sessionValue = getSessionValue(
-                        sessionSessionGetValue() ?? undefined,
-                        'e'
-                    );
-                    const isSessionValueInEntitatsAvailable = entitatsAvailable
-                        .map((e) => e.id)
-                        .includes(sessionValue);
-                    if (isSessionValueInEntitatsAvailable) {
-                        setCurrentEntitatId(sessionValue);
-                    } else if (entitatsAvailable?.length && currentEntitatId == null) {
-                        setCurrentEntitatId(entitatsAvailable[0].id);
-                    }
-                });
-            } else {
-                setEntitatsAvailable([]);
-            }
+        if (!apiIsReady || !currentRoleReady || currentRole == null) {
+            return;
         }
-    }, [apiIsReady, currentRoleReady, currentRole]);
-    React.useEffect(() => {
-        if (currentRole != null && currentRole !== ROLE_SUPER && currentEntitatId != null) {
-            const session = createSession(currentEntitatId);
-            sessionSessionSetValue(session);
-            if (currentRole) {
-                apiSetHttpHeaders([
-                    {
-                        'X-App-Role': currentRole,
-                    },
-                    {
-                        'X-App-Session': session,
-                    },
-                ]);
+        setCurrentEntitatId(undefined);
+        if (currentRole === ROLE_SUPER) {
+            setEntitatsAvailable([]);
+            return;
+        }
+        apiFind({ unpaged: true }).then((response) => {
+            const entitatsAvailable = response.rows;
+            setEntitatsAvailable(entitatsAvailable);
+            const sessionValue = getSessionValue(sessionSessionGetValue() ?? undefined, 'e');
+            const isSessionValueInEntitatsAvailable = entitatsAvailable.map((e) => e.id).includes(sessionValue);
+            if (isSessionValueInEntitatsAvailable) {
+                setCurrentEntitatId(sessionValue);
+            } else if (entitatsAvailable?.length && currentEntitatId == null) {
+                setCurrentEntitatId(entitatsAvailable[0].id);
             }
+            console.log(currentRole);
+            if (!apiIsReadyOrgan || currentRole !== ROLE_ORGAN) {
+                return;
+            }
+            console.log(currentRole);
+            apiFindOrgan({ unpaged: true }).then((response) => {
+                console.log(response);
+            })
+        });
+    }, [apiIsReady, currentRoleReady, currentRole]);
+
+    React.useEffect(() => {
+        if (currentRole == null || currentRole === ROLE_SUPER || currentEntitatId == null) {
+            return;
+        }
+        const session = createSession(currentEntitatId);
+        sessionSessionSetValue(session);
+        if (currentRole) {
+            apiSetHttpHeaders([{'X-App-Role': currentRole,}, {'X-App-Session': session,},]);
         }
     }, [currentRole, currentEntitatId]);
+
     React.useEffect(() => {
-        if (currentEntitatId != null && apiIsReady) {
-            setCurrentEntitatLoading(true);
-            apiGetOne(currentEntitatId, { perspectives: ['PERMISSIONS'] })
-                .then(setCurrentEntitat)
-                .finally(() => setCurrentEntitatLoading(false));
+        if (currentEntitatId == null || !apiIsReady) {
+            return;
         }
+        setCurrentEntitatLoading(true);
+        apiGetOne(currentEntitatId, { perspectives: ['PERMISSIONS'] }).then(setCurrentEntitat).finally(() => setCurrentEntitatLoading(false));
     }, [currentEntitatId]);
-    const currentSessionFromHttpHeader = apiHttpHeaders?.find((h) => 'X-App-Session' in h)?.[
-        'X-App-Session'
-    ];
-    const currentEntitatIdFromHttpHeader =
-        currentSessionFromHttpHeader != null
-            ? JSON.parse(currentSessionFromHttpHeader).e
-            : undefined;
-    const entitatIdHttpHeaderInitialized =
-        currentRole === ROLE_SUPER ||
-        (currentEntitatId == null && currentEntitatIdFromHttpHeader == null) ||
-        currentEntitatId === currentEntitatIdFromHttpHeader;
-    const currentEntitatReady =
-        apiIsReady && entitatsAvailable != null && entitatIdHttpHeaderInitialized;
+
+    const currentSessionFromHttpHeader = apiHttpHeaders?.find((h) => 'X-App-Session' in h)?.['X-App-Session'];
+    const currentEntitatIdFromHttpHeader = currentSessionFromHttpHeader != null ? JSON.parse(currentSessionFromHttpHeader).e : undefined;
+    const entitatIdHttpHeaderInitialized = currentRole === ROLE_SUPER
+                                                    || (currentEntitatId == null && currentEntitatIdFromHttpHeader == null)
+                                                    || currentEntitatId === currentEntitatIdFromHttpHeader;
+    const currentEntitatReady = apiIsReady && entitatsAvailable != null && entitatIdHttpHeaderInitialized;
     return {
         currentEntitatId,
         currentEntitatReady,
@@ -250,17 +220,10 @@ const useCurrentEntitat = (currentUserId: string | undefined, currentRole: strin
 };
 
 const NotibProviderLoading: React.FC = () => {
+
     const { t } = useTranslation();
     return (
-        <Box
-            sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100vh',
-            }}
-        >
+        <Box sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh',}}>
             <CircularProgress size={70} />
             <Typography sx={{ mt: 1 }}>{t('app.loading')}</Typography>
         </Box>
@@ -268,9 +231,9 @@ const NotibProviderLoading: React.FC = () => {
 };
 
 export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
+
     const { offline: apiOffline } = useResourceApiContext();
-    const { currentUserId, currentRole, currentRoleReady, rolesAvailable, setCurrentRole } =
-        useCurrentRole();
+    const { currentUserId, currentRole, currentRoleReady, rolesAvailable, setCurrentRole } = useCurrentRole();
     const { currentUser, setCurrentUser, currentUserGridPageSizeOptions } = useCurrentUser();
     const {
         currentEntitatId,
