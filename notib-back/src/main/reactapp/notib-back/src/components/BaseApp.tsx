@@ -171,7 +171,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             headerAppbarBackgroundColor={appbarBackgroundColor}
             headerAppbarBackgroundImg={appbarBackgroundImg}
             headerAdditionalComponents={[
-                ...(currentRole === ROLE_ORGAN ? [<OrganSelector key="organ_selector" />] : []),
+                // ...(currentRole === ROLE_ORGAN ? [<OrganSelector key="organ_selector" />] : []),
                 ...(currentRole !== ROLE_SUPER ? [<EntitatSelector key="entitat_selector" />] : []),
                 <RoleSelector key="role_selector" />
             ]}

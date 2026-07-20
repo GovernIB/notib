@@ -8,20 +8,20 @@ import { useNotibContext } from './NotibContext';
 
 const OrganSelector: React.FC = () => {
 
-    const { entitatsAvailable, currentEntitatId, setCurrentEntitatId } = useNotibContext();
-    const handleEntitatChange = (event: React.ChangeEvent<HTMLInputElement>) => setCurrentEntitatId(Number(event.target.value));;
-    return !entitatsAvailable ? null : (
+    const { organsAvailable, currentOrganId, setCurrentOrganId } = useNotibContext();
+    const handleEntitatChange = (event: React.ChangeEvent<HTMLInputElement>) => setCurrentOrganId(Number(event.target.value));
+    return !organsAvailable ? null : (
         <TextField
-            value={currentEntitatId != null ? '' + currentEntitatId : ''}
+            value={currentOrganId != null ? '' + currentOrganId : ''}
             onChange={handleEntitatChange}
             size="small"
             select
             slotProps={{input: {startAdornment: (<InputAdornment position="start" sx={{ mr: 2 }}><Icon>layers</Icon></InputAdornment>)},}}
             sx={{ mr: 1 }}
         >
-            {entitatsAvailable.map(e => (
-                <MenuItem key={e.id} value={e.id}>
-                    <ListItemText>{e.nom}</ListItemText>
+            {organsAvailable.map(o => (
+                <MenuItem key={o.id} value={o.id}>
+                    <ListItemText>{o.nom}</ListItemText>
                 </MenuItem>
             ))}
         </TextField>

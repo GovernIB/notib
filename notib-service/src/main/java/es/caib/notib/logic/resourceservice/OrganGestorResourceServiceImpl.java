@@ -12,7 +12,7 @@ import es.caib.notib.logic.intf.model.OrganGestorDir3Sync;
 import es.caib.notib.logic.intf.model.OrganGestorResource;
 import es.caib.notib.logic.intf.resourceservice.OrganGestorResourceService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
-import es.caib.notib.logic.organs.AdminOrgansAmbPermisPerspectiveApplicator;
+import es.caib.notib.logic.organs.AdminOrgansAmbPermisActionExecutor;
 import es.caib.notib.persist.resourceentity.*;
 import es.caib.notib.persist.resourcerepository.*;
 import lombok.RequiredArgsConstructor;
@@ -32,9 +32,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class OrganGestorResourceServiceImpl
-	extends BaseAdminEntitatResourceServiceImpl<OrganGestorResource, OrganGestorResourceEntity>
-	implements OrganGestorResourceService {
+public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServiceImpl<OrganGestorResource, OrganGestorResourceEntity> implements OrganGestorResourceService {
 
 	private final AclHelper aclHelper;
 	private final OrganGestorSyncHelper organGestorSyncHelper;
@@ -74,7 +72,7 @@ public class OrganGestorResourceServiceImpl
 
 		register(OrganGestorResource.PERSPECTIVE_TREE, new OrganGestorResourceTreePerspectiveApplicator());
 		register(OrganGestorResource.DIR3_SYNC_ACTION_CODE, new Dir3SyncActionExecutor());
-		register(OrganGestorResource.PERSPECTIVE_ADMIN_ORGAN, new AdminOrgansAmbPermisPerspectiveApplicator(organGestorService));
+		register(OrganGestorResource.ACTION_ADMIN_ORGANS_AMB_PERMIS, new AdminOrgansAmbPermisActionExecutor(organGestorService, userSessionHelper));
 	}
 
 	/*
