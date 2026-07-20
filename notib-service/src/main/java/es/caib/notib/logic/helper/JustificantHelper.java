@@ -282,9 +282,14 @@ public abstract class JustificantHelper<T> {
 
         private String getCapsaleraLogo(String entitatCodi) {
 
-            var logoEntitat = configHelper.getConfigByEntitat(entitatCodi, "es.caib.notib.capsalera.logo");
+            var logoEntitat = configHelper.getConfigByEntitat(entitatCodi, "es.caib.notib.justificant.capsalera.logo");
+            if (!Strings.isNullOrEmpty(logoEntitat)) {
+                return getNotBlankProperty(logoEntitat);
+            }
+            logoEntitat = configHelper.getConfigByEntitat(entitatCodi, "es.caib.notib.capsalera.logo");
             return getNotBlankProperty(logoEntitat);
         }
+
 
         private InputStream getCapsaleraDefaultLogo() {
             return getClass().getResourceAsStream("/es/caib/notib/logic/justificant/govern-logo.png");
