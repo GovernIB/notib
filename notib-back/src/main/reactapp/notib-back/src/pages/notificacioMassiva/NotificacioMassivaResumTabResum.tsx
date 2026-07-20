@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { GridPage } from 'reactlib';
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
-import CancelIcon from "@mui/icons-material/Cancel";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 
@@ -15,7 +14,7 @@ interface PropsTabResum {
 const NotificacioMassivaResumDialogTabResum: React.FC<PropsTabResum> = (props) => {
 
     const { notificacio } = props;
-    notificacio?.resum.forEach((obj, i) => obj.id = i + 1);
+    notificacio?.resum.forEach((obj: any, i: number) => obj.id = i + 1);
     const { t } = useTranslation();
     const columns = [
         { field: "enviamentTipus", headerName: t('page.notificacioMassiva.detall.resum.enviamentTipus') },
@@ -43,7 +42,7 @@ const NotificacioMassivaResumDialogTabResum: React.FC<PropsTabResum> = (props) =
                             <TableCell colSpan={columns.length} align="center">t('page.notificacioMassiva.detall.resum.noRows')</TableCell>
                         </TableRow>
                     ) : (
-                        notificacio?.resum.map(row => (
+                        notificacio?.resum.map((row: any) => (
                             <TableRow key={row.id} hover>
                                 {columns.map(c => {
                                     let valor = row[c.field];

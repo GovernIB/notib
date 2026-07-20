@@ -9,11 +9,8 @@ WORKDIR /home/jboss
 
 USER root
 
-COPY notib-ear/src/main/docker/jboss/standalone-openshift.xml \
+COPY notib-ear/src/main/docker/jboss_caib/standalone-openshift.xml \
     $JBOSS_HOME/standalone/configuration/standalone-openshift.xml
-
-COPY notib-ear/src/main/docker/transformers/ \
-    $JBOSS_HOME/apps/notib/
 
 COPY notib-ear/src/main/docker/oracle/ \
     $JBOSS_HOME/modules/system/layers/base/com/oracle/main/

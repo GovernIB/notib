@@ -48,7 +48,12 @@ const EnviamentDetailTabRegistreEsdev: React.FC<{ id: any }> = (props) => {
                 width: 90,
                 align: 'center',
                 renderCell: (params: any) => {
-                    return (params?.row?.error && <CustomDetailPanelToggle id={params.id} value={params.value} />);
+                    return (params?.row?.error && <CustomDetailPanelToggle
+                        id={params.id}
+                        value={params.value}
+                        msgMostrar={t('page.notificacio.grid.column.mostrar')}
+                        msgOcultar={t('page.notificacio.grid.column.ocultar')}
+                    />);
                 },
             },
         ],
@@ -66,7 +71,7 @@ const EnviamentDetailTabRegistreEsdev: React.FC<{ id: any }> = (props) => {
                 toolbarHideQuickFilter
                 getDetailPanelContent={({ row }) =>
                     (<Box sx={{ padding: '10px'}}>
-                        <TextareaAutosize style={{width:'100%', height:'100px' }}>{row.errorDescripcio}</TextareaAutosize>
+                        <TextareaAutosize style={{width:'100%', height:'100px' }} readOnly value={row.errorDescripcio} />
                     </Box>)
                 }
                 getDetailPanelHeight={() => 'auto'}

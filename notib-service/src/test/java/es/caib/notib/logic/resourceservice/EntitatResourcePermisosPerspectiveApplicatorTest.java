@@ -66,8 +66,6 @@ public class EntitatResourcePermisosPerspectiveApplicatorTest {
 		// simulam que hi ha permisos
 		when(notibPermissionHelper.organGestorIdsWithPermissionRecursive(any()))
 			.thenReturn(List.of(1L));
-		when(notibPermissionHelper.procedimentServeiNoComuIdsWithPermission(any(), any()))
-			.thenReturn(List.of(1L));
 		applicator.applySingle("code", entity, resource);
 		assertTrue(resource.isCrearNotificacions());
 		assertTrue(resource.isCrearComunicacions());

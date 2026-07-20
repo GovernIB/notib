@@ -145,6 +145,58 @@ public class EjbClientConfig {
 	public LocalStatelessSessionProxyFactoryBean usuariResourceService() {
 		return getLocalEjbFactoyBean(UsuariResourceService.class, true);
 	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean usuariPermisResourceService() {
+		return getLocalEjbFactoyBean(UsuariPermisResourceService.class, true);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean accioMassivaResourceService() {
+		return getLocalEjbFactoyBean(AccioMassivaResourceService.class, true);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean accioMassivaElementResourceService() {
+		return getLocalEjbFactoyBean(AccioMassivaElementResourceService.class, true);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean activeMqResourceService() {
+		return getLocalEjbFactoyBean(ActiveMqResourceService.class, true);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean activeMqDetailResourceService() {
+		return getLocalEjbFactoyBean(ActiveMqDetailResourceService.class, true);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean backGroundTaskResourceService() {
+		return getLocalEjbFactoyBean(BackGroundTaskResourceService.class, true);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean cacheResourceService() {
+		return getLocalEjbFactoyBean(CacheResourceService.class, true);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean callbackResourceService() {
+		return getLocalEjbFactoyBean(CallbackResourceService.class, true);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean eventResourceService() {
+		return getLocalEjbFactoyBean(EventResourceService.class, true);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean metriquesResourceService() {
+		return getLocalEjbFactoyBean(MetriquesResourceService.class, true);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean notificacioEnviamentTableResourceService() {
+		return getLocalEjbFactoyBean(NotificacioEnviamentTableResourceService.class, true);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean notificacioMassivaResourceService() {
+		return getLocalEjbFactoyBean(NotificacioMassivaResourceService.class, true);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean threadInfoResourceService() {
+		return getLocalEjbFactoyBean(ThreadInfoResourceService.class, true);
+	}
 
 	@Bean
 	public LocalStatelessSessionProxyFactoryBean adviserService() {

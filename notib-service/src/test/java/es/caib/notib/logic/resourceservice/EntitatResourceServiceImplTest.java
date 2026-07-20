@@ -183,8 +183,6 @@ class EntitatResourceServiceImplTest {
 		when(userSessionHelper.getCurrentEntitatId()).thenReturn(1L);
 		when(notibPermissionHelper.organGestorIdsWithPermissionRecursive(any()))
 			.thenReturn(List.of(1L));
-		when(notibPermissionHelper.procedimentServeiNoComuIdsWithPermission(any(), any()))
-			.thenReturn(List.of(1L));
 		EntitatResource resource = service.getOne(
 			1L,
 			new String[] { EntitatResource.PERSPECTIVE_PERMISSIONS });
