@@ -46,8 +46,10 @@ type ProcSerOrganRow = {
     comunicacioSenseProcediment: boolean;
 };
 
-const crearRowsOrgansFills = (fillsMap: Record<string, string[]>, permisMap: Record<string, any[] | any>): PermisRow[] => {
-
+const crearRowsOrgansFills = (
+    fillsMap: Record<string, string[]>,     // organsFills
+    permisMap: Record<string, any[] | any>  // organsMap (procedimentCodi -> permis list or obj list)
+): PermisRow[] => {
     const rows: PermisRow[] = [];
     for (const [procedimentCodi, fills] of Object.entries(fillsMap ?? {})) {
         if (!Array.isArray(fills) || fills.length === 0) {

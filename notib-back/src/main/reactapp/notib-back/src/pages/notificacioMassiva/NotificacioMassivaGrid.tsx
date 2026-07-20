@@ -11,7 +11,6 @@ import {
 import GridFormField from '../../components/GridFormField';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
-import {useGridApiRef} from "@mui/x-data-grid-pro";
 import {DataCommonAdditionalAction} from "../../../lib/components/mui/datacommon/MuiDataCommon.tsx";
 import Typography from "@mui/material/Typography";
 import { useNotificacioMassivaResumDialog } from './NotificacioMassivaResumDialog';
@@ -22,7 +21,7 @@ const iconOk= React.cloneElement(<Icon>check</Icon>, { fontSize: "inherit", sx: 
 const iconError= React.cloneElement(<Icon>close</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center" } });
 const iconCancelada= React.cloneElement(<Icon>block</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center", ml: 0.1 } });
 
-const useDataGridColumns = (datagridApiRef: any) => {
+const useDataGridColumns = () => {
 
     const { t } = useTranslation();
     const columns: MuiDataGridColDef[] = React.useMemo(
@@ -216,8 +215,7 @@ export const NotifiacioMassivaGrid = () => {
         springFilterBuilder,
         <ContentFilter />
     );
-    const datagridApiRef = useGridApiRef();
-    const columns = useDataGridColumns(datagridApiRef);
+    const columns = useDataGridColumns();
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
 
     const { exec: descarregarResum } = useMuiActionReportLogic(
@@ -281,14 +279,14 @@ export const NotifiacioMassivaGrid = () => {
                 title: t('page.notificacioMassiva.grid.accions.posposar'),
                 icon: 'access_time',
                 showInMenu: true,
-                onClick: (id) => isReady && apiAction(id, { code: 'POSPOSAR_NOTIFICACIO_MASSIVA'}),// posposarAccioMassiva(id),
+                onClick: (id: any) => isReady && apiAction(id, { code: 'POSPOSAR_NOTIFICACIO_MASSIVA'}),// posposarAccioMassiva(id),
             },
             {
                 label: t('page.notificacioMassiva.grid.accions.reactivar'),
                 title: t('page.notificacioMassiva.grid.accions.reactivar   '),
                 icon: 'bolt',
                 showInMenu: true,
-                onClick: (id) => isReady && apiAction(id, { code: 'REACTIVAR_NOTIFICACIO_MASSIVA'}),
+                onClick: (id: any) => isReady && apiAction(id, { code: 'REACTIVAR_NOTIFICACIO_MASSIVA'}),
             }]),
             {
                 label: t('page.notificacioMassiva.grid.accions.mostrarRemeses.label'),

@@ -16,8 +16,12 @@ export interface MenuOption {
     disabled?: boolean;
 }
 
+export interface MenuOptionDivider {
+    type: 'divider';
+}
+
 interface AccionsMassivesProps {
-    options: MenuOption[],
+    options: (MenuOption | MenuOptionDivider)[],
     buttonLabel?: string,
     sizeSelection?: number,
     apiRef: any,
@@ -109,7 +113,7 @@ const AccionsMassives: React.FC<AccionsMassivesProps> = (props) => {
                 slotProps={{list: {'aria-labelledby': 'basic-button'}}}
             >
                 {options.map((option, index) => (
-                    ('type' in option && (option as any).type === 'divider')
+                    ('type' in option)
                         ? (<Divider key={index}/>)
                         : (<MenuItem
                             key={index}
@@ -148,7 +152,7 @@ export const useAccionsMassives = ( resource: string, refresh?: () => void) => {
     const {temporalMessageShow} = useBaseAppContext();
 
     const massiveReport = (ids: Set<any> | undefined, code: string, msg: string, seleccioTipus: string | null, fileType: ExportFileType) => {
-        apiReport(undefined, {code: code, fileType: fileType, data: {ids: [...ids], seleccioTipus: seleccioTipus}})
+        apiReport(undefined, {code: code, fileType: fileType, data: {ids: ids ? [...ids] : [], seleccioTipus: seleccioTipus}})
             .then(response => {
                 // refresh?.()
                 iniciaDescargaBlob(response)
@@ -160,7 +164,7 @@ export const useAccionsMassives = ( resource: string, refresh?: () => void) => {
     }
 
     const massiveAction = (ids: Set<any> | undefined, code: string, msg: string, seleccioTipus: string | null, mustRefresh: boolean = false) => {
-        apiAction(undefined, {code: code, data: {ids: [...ids], seleccioTipus: seleccioTipus}})
+        apiAction(undefined, {code: code, data: {ids: ids ? [...ids] : [], seleccioTipus: seleccioTipus}})
             .then(resposta => {
 
                 if (mustRefresh) {
@@ -174,7 +178,7 @@ export const useAccionsMassives = ( resource: string, refresh?: () => void) => {
                 msg = "";
                 if (resposta.errors?.length > 0) {
                     msg += t('page.accioMassiva.accions.respostesError') + "\n";
-                    resposta.errors.forEach(r => msg += r.id + " -  Error: " + r.errorDesc + "\n");
+                    resposta.errors.forEach((r: any) => msg += r.id + " -  Error: " + r.errorDesc + "\n");
                     if (msg.length > 0) {
                         severity = "error";
                     }
@@ -183,7 +187,7 @@ export const useAccionsMassives = ( resource: string, refresh?: () => void) => {
                     severity = severity === "success" ? "warning" : severity;
                     msg = msg.length > 0 ? "\n" + msg : msg;
                     msg += t('page.accioMassiva.accions.noExecutades');
-                    resposta.noExecutables.forEach(r => msg += (r.referencia ? r.referencia : r.id) + ", ");
+                    resposta.noExecutables.forEach((r: any) => msg += (r.referencia ? r.referencia : r.id) + ", ");
                     msg = msg.substring(0, msg.length - 2);
                 }
                 temporalMessageShow(null, msg, severity);

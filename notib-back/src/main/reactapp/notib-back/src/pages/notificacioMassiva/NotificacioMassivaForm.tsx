@@ -1,4 +1,4 @@
-import {FormField, FormPage, MuiActionReportButton, MuiForm, useFormApiRef} from "reactlib";
+import {FormPage, MuiActionReportButton, MuiForm, useFormApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -7,7 +7,7 @@ import GridFormField from "../../components/GridFormField.tsx";
 import React from "react";
 import {useParams} from "react-router-dom";
 
-function NumberCircle({ number, size = 40, bg = '#31708f', color = '#fff' }) {
+function NumberCircle({ number, size = 40, bg = '#31708f', color = '#fff' }: { number: string; size?: number; bg?: string; color?: string }) {
     const style = {
         width: size,
         height: size,

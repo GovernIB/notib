@@ -8,7 +8,7 @@ import { BarChart } from '@mui/x-charts';
 import Button from "@mui/material/Button";
 import Icon from "@mui/material/Icon";
 
-export function MetriquesBars({ items }) {
+export function MetriquesBars({ items }: { items: any }) {
 
     const { t } = useTranslation();
     const xLabels = [ t('page.metriques.llegenda.numExecTempsMig'),
@@ -64,7 +64,7 @@ export function MetriquesBars({ items }) {
         </Box>
     );}
 
-function getFrequency(timerData) {
+function getFrequency(timerData: any) {
     var frequency = [];
     //El valor normalment és molt petit, millor dividir per 10000
     var m1_rate_rounded = Math.round(timerData.m1_rate * 10000) / 10000;
@@ -80,7 +80,7 @@ function getFrequency(timerData) {
 }
 
 //Recupera la informació de la duració a mostrar
-function getDuracio(timerData) {
+function getDuracio(timerData: any) {
     var duracio = [];
     var min_rounded = Math.round(timerData.min * 100) / 100;
     var mean_rounded = Math.round(timerData.mean * 100) / 100;
@@ -92,7 +92,7 @@ function getDuracio(timerData) {
 }
 
 //Recupera la informació dels percentils a mostrar
-function getPercentil(timerData) {
+function getPercentil(timerData: any) {
     var percentils = [];
     var p50_rounded = Math.round(timerData.p50 * 100) / 100;
     var p75_rounded = Math.round(timerData.p75 * 100) / 100;
@@ -109,12 +109,12 @@ function getPercentil(timerData) {
     return percentils;
 }
 
-export function MetriquesBarsChart({ item }) {
+export function MetriquesBarsChart({ item }: { item: any }) {
 
     const { t } = useTranslation();
     const safeLabels = Array.isArray(item.labels) ? item.labels : null;
     const safeData = Array.isArray(item.data) ? item.data : [];
-    const yLabels = safeLabels && safeLabels.length > 0 ? safeLabels : safeData.map((_, i) => `#${i + 1}`);
+    const yLabels = safeLabels && safeLabels.length > 0 ? safeLabels : safeData.map((_: any, i: number) => `#${i + 1}`);
     const execucionsText = t('page.metriques.excecucions');
     let titol = item.title + (item.count ? " (" + item.count + " " + execucionsText + ")" : "");
     const [open, setOpen] = React.useState(false);

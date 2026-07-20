@@ -9,15 +9,15 @@ interface AccioConfig extends Record<string, any> {
     title: string;
     titleButton: string;
     resourceName: string;
-    onSucces?: (resposta) => void;
-    onError?: (error) => void;
+    onSucces?: (resposta: any) => void;
+    onError?: (error: any) => void;
 }
 
 const NotificacioDetailDialogTabAccions: React.FC<{ notificacio: any }> = (props) => {
     const { notificacio } = props;
     const { t } = useTranslation();
     const { temporalMessageShow } = useBaseAppContext();
-    const mostrarMissatgeRespostaAction = reposta => {
+    const mostrarMissatgeRespostaAction = (reposta: any) => {
         let msg = t('page.notificacio.detail.accions.success');
         let severity : TemporalMessageSeverity = "success";
         if (!reposta.ok) {
@@ -58,7 +58,7 @@ const NotificacioDetailDialogTabAccions: React.FC<{ notificacio: any }> = (props
                 resourceName: 'notificacioResource',
                 buttonIcon: 'send',
                 action: 'REGISTRAR_REMESA',
-                onSuccess: resposta => {
+                onSuccess: (resposta: any) => {
                     if (!resposta) {
                         temporalMessageShow(null, t('page.notificacio.detail.accions.registrar.noReposta'), "error");
                         return;
@@ -67,7 +67,7 @@ const NotificacioDetailDialogTabAccions: React.FC<{ notificacio: any }> = (props
                     let msg = "";
                     if (resposta.errors && resposta.errors.length > 0) {
                         msg += t('page.notificacio.detail.accions.registrar.respostesError');
-                        resposta.errors.forEach(r => {
+                        resposta.errors.forEach((r: any) => {
                             if (r.error) {
                                 msg += r.descripcioResposta + ", ";
                             }
@@ -81,7 +81,7 @@ const NotificacioDetailDialogTabAccions: React.FC<{ notificacio: any }> = (props
                         severity = severity === "success" ? "warning" : severity;
                         msg = msg.length > 0 ? "\n" + msg : msg;
                         msg += t('page.notificacio.detail.accions.registrar.noExecutades');
-                        resposta.noExecutables.forEach(r => msg += r + ", ");
+                        resposta.noExecutables.forEach((r: any) => msg += r + ", ");
                         msg = msg.substring(0, msg.length -2);
                     }
                     msg = !msg ? t('page.notificacio.detail.accions.registrar.ok') : msg;

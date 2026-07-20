@@ -51,7 +51,9 @@ export const AuthProvider = (props: AuthProviderProps) => {
     const tokenParsedRef = React.useRef<any>(undefined);
     const logConsole = useLogConsole(LOG_PREFIX);
     const isAuthenticated = !loading && tokenRef.current != null;
-    const authSrc = document.head.getElementsByTagName('script')[2].src;
+    const authSrc = Array.from(document.head.getElementsByTagName('script')).find((el) =>
+        el.src.includes('/authToken')
+    )!.src;
     const signOutUrl = authSrc.replace('/authToken', '/logout');
     const checkToken = () => {
         debug && logConsole.debug('Verificació del token iniciada');

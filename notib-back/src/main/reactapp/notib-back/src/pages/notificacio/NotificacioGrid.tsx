@@ -8,7 +8,7 @@ import {useDatagridFilterProps, useDatagridPageSizeOptionsProps} from '../../hoo
 import NotificacioGridEnviaments from './NotificacioGridEnviaments';
 import {useNotificacioDetailDialog, useRemesesErrorCallbackDetailDialog, useRemesesErrorRegistreDetailDialog} from './NotificacioDetailDialog';
 import {Button, Chip, Icon, IconButton, Menu, MenuItem} from '@mui/material';
-import AccionsMassives, {MenuOption, useAccionsMassives} from '../../components/AccionsMassives';
+import AccionsMassives, {MenuOption, MenuOptionDivider, useAccionsMassives} from '../../components/AccionsMassives';
 import ButtonDetailExpandColapse from '../../components/ButtonDetailExpandColapse';
 import {DataCommonAdditionalAction} from '../../../lib/components/mui/datacommon/MuiDataCommon';
 import {NotificacioEstatGrid} from './NotificacioEstatRender';
@@ -99,7 +99,7 @@ const useDataGridColumns = (datagridApiRef: any, notificacionsEsborrades: boolea
                                              msgOcultar={t('page.notificacio.grid.column.ocultar')} />
                 ),
             }]),
-        ],
+        ] as MuiDataGridColDef[],
         [datagridApiRef, notificacionsEsborrades, notificacioErrorRegistre, notificacioCallbackError, t]
     );
     return columns;
@@ -176,7 +176,7 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
     } = useAccionsMassives("notificacioResource", refresh);
 
     const ids = selection?.ids ?? [];
-    const opcionsMenu: MenuOption[] = isRoleAdminLectura && !notificacionsErrorRegistre ? [
+    const opcionsMenu: (MenuOption | MenuOptionDivider)[] = isRoleAdminLectura && !notificacionsErrorRegistre ? [
         {
             label: t('page.accioMassiva.accions.exportarFullCalcul.label'),
             tooltip: t('page.accioMassiva.accions.exportarFullCalcul.tooltip'),
@@ -273,7 +273,7 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
                 }]
             )
         ])
-    ];
+    ] as (MenuOption | MenuOptionDivider)[];
 
     return (<>
             <AccionsMassives options={opcionsMenu} apiRef= {apiRef} resource={"notificacioResource"} sizeSelection={selection?.ids?.size}/>
@@ -420,7 +420,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                 title: t('page.notificacio.grid.notificacionsEsborrades.recuperar'),
                 icon: 'replay',
                 showInMenu: true,
-                onClick: (id) => recuperarRemesa(id),
+                onClick: (id: any) => recuperarRemesa(id),
                 hidden: (!notificacionsEsborrades || notificacionsErrorRegistre)
             }])
         ];
@@ -436,7 +436,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
 
     const detailPanelProps = !noEsTaulaRemeses ? {
                 getDetailPanelContent: ({ row }: any) => (<NotificacioGridEnviaments id={row.id} />),
-                getDetailPanelHeight: () => 'auto',
+                getDetailPanelHeight: () => 'auto' as const,
             } : {};
     return (
         <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>

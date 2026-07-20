@@ -12,7 +12,7 @@ import {Icon, IconButton} from "@mui/material";
 type CustomDetailPanelToggleProps = Pick<GridRenderCellParams, 'id' | 'value'> & { msgMostrar: string; msgOcultar: string; };
 
 
-const CustomDetailPanelToggle = ({id, value, msgMostrar, msgOcultar}: CustomDetailPanelToggleProps) => {
+const CustomDetailPanelToggle = ({id, msgMostrar, msgOcultar}: CustomDetailPanelToggleProps) => {
 
     const apiRef = useGridApiContext();
     const contentCache = useGridSelector(apiRef, gridDetailPanelExpandedRowsContentCacheSelector);

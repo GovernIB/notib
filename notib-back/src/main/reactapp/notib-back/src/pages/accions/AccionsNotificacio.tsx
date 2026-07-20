@@ -56,7 +56,7 @@ export const useAccionsNotificacio = () => {
             let msg = "";
             if (resposta.respostes && resposta.respostes.length > 0) {
                 msg += t('page.notificacio.grid.accions.anular.respostesError') + "\n";
-                resposta.respostes.forEach(r => {
+                resposta.respostes.forEach((r: any) => {
                     if (r.error) {
                         msg += r.identificador + " - Error: " + r.codiReposta + " - " + r.descripcioResposta + "\n";
                     }
@@ -69,7 +69,7 @@ export const useAccionsNotificacio = () => {
                 severity = severity === "success" ? "warning" : severity;
                 msg = msg.length > 0 ? "\n" + msg : msg;
                 msg += t('page.notificacio.grid.accions.anular.noExecutades');
-                resposta.noExecutades.forEach(r => msg += r + ", ");
+                resposta.noExecutades.forEach((r: any) => msg += r + ", ");
                 msg = msg.substring(0, msg.length -2);
             }
             msg = !msg ? t('page.notificacio.grid.accions.anular.ok') : msg;
@@ -112,7 +112,7 @@ export const useAccionsNotificacio = () => {
                 severity = "error";
                 msg += resposta.descripcionRespuesta ? resposta.descripcionRespuesta : resposta;
                 if (resposta.descripcions && resposta.descripcions.lengths > 0) {
-                    resposta.descripcions.forEach(r => msg += r + ", ");
+                    resposta.descripcions.forEach((r: any) => msg += r + ", ");
                     msg = msg.substring(0, msg.length -2);
                 }
             }
@@ -120,7 +120,7 @@ export const useAccionsNotificacio = () => {
                 severity = severity === "success" ? "warning" : severity;
                 msg = msg.length > 0 ? "\n" + msg : msg;
                 msg += t('page.notificacio.grid.accions.ampliarTermini.noExecutades');
-                resposta.noExecutades.forEach(r => msg += r + ", ");
+                resposta.noExecutades.forEach((r: any) => msg += r + ", ");
                 msg = msg.substring(0, msg.length -2);
             }
             msg = !msg ? t('page.notificacio.grid.accions.ampliarTermini.ok') : msg;

@@ -13,7 +13,7 @@ import { Grid, IconButton } from '@mui/material';
 import GridFormField, { GridButtonField } from '../../components/GridFormField';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
 import { useNotificacioDetailDialog } from '../notificacio/NotificacioDetailDialog';
-import AccionsMassives, {MenuOption, useAccionsMassives} from '../../components/AccionsMassives';
+import AccionsMassives, {MenuOption, MenuOptionDivider, useAccionsMassives} from '../../components/AccionsMassives';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 import { useEnviamentDetailDialog } from './EnviamentDetailDialog';
 import {
@@ -134,7 +134,7 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
         ampliarTerminiMassiu, ampliarTerminiMassiuDialog
     } = useAccionsMassives("notificacioResource", refresh);
 
-    const opcionsMenu: MenuOption[] = isRoleAdminLectura ? [
+    const opcionsMenu: (MenuOption | MenuOptionDivider)[] = isRoleAdminLectura ? [
         {
             label: t('page.accioMassiva.accions.exportarFullCalcul.label'),
             tooltip: t('page.accioMassiva.accions.exportarFullCalcul.tooltip'),
@@ -159,15 +159,15 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
         {
             label: t('page.accioMassiva.accions.anular.label'),
             tooltip: t('page.accioMassiva.accions.anular.labtooltipel'),
-            onClick: () => anularRemesaMassiu(null, t('page.accioMassiva.accions.anular.label'), {ids: [...selection?.ids], seleccioTipus: "ENVIAMENT"})
+            onClick: () => anularRemesaMassiu(null, t('page.accioMassiva.accions.anular.label'), {ids: selection?.ids ? [...selection.ids] : [], seleccioTipus: "ENVIAMENT"})
         },
         {
             label: t('page.accioMassiva.accions.ampliarTermini.label'),
             tooltip: t('page.accioMassiva.accions.ampliarTermini.tooltip'),
-            onClick: () => ampliarTerminiMassiu(null, t('page.accioMassiva.accions.ampliarTermini.label'), {ids: [...selection?.ids], seleccioTipus: "ENVIAMENT"})
+            onClick: () => ampliarTerminiMassiu(null, t('page.accioMassiva.accions.ampliarTermini.label'), {ids: selection?.ids ? [...selection.ids] : [], seleccioTipus: "ENVIAMENT"})
         },
         ...(amagarEntrada ? [] : [
-            { type: 'divider' },
+            { type: 'divider' } as MenuOptionDivider,
             {
                 label: t('page.accioMassiva.accions.reactivarCanviEstat.label'),
                 tooltip: t('page.accioMassiva.accions.reactivarCanviEstat.tooltip'),
@@ -256,7 +256,7 @@ const EnviamentGrid = () => {
     const gridApiRef = useMuiDataGridApiRef();
     const { currentRole} = useNotibContext();
     const { dialogComponent: enviamentDialogComponent, onDetailClick } = useEnviamentDetailDialog();
-    const { dialogComponent: notificacioDialogComponent, onDetailClick: onNotificacioDetailClick } = useEnviamentDetailDialog();
+    const { dialogComponent: notificacioDialogComponent, onDetailClick: onNotificacioDetailClick } = useNotificacioDetailDialog(false);
     const [searchParams] = useSearchParams();
     const datagridApiRef = useGridApiRef();
     const [reloadKey, setReloadKey] = React.useState(0);
