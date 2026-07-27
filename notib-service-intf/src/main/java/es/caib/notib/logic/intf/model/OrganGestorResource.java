@@ -44,7 +44,7 @@ import java.io.Serializable;
 		@ResourceAccessConstraint(
 			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
 			roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN },
-			grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
+			grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE }
 		),
 		@ResourceAccessConstraint(
 			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,

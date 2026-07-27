@@ -24,7 +24,7 @@ import lombok.experimental.FieldNameConstants;
 	accessConstraints = {
 		@ResourceAccessConstraint(
 			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-			roles = { BaseConfig.ROLE_ADMIN },
+			roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN },
 			grantedPermissions = { PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE, PermissionEnum.DELETE }
 		),
 		@ResourceAccessConstraint(

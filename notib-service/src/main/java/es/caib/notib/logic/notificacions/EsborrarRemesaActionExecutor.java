@@ -28,7 +28,7 @@ public class EsborrarRemesaActionExecutor implements BaseMutableResourceService.
 			return RespostaActionExecutor.builder().ok(true).build();
 		} catch (Exception ex) {
 			log.error("[EsborrarRemesaActionExecutor] Hi ha hagut un error esborrant la remesa", ex);
-			return RespostaActionExecutor.builder().ok(false).build();
+			return RespostaActionExecutor.builder().ok(false).error(ex.getMessage()).build();
 		}
 	}
 

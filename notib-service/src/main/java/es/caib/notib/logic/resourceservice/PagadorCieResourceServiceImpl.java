@@ -21,9 +21,7 @@ import java.util.Map;
  */
 @Slf4j
 @Service
-public class PagadorCieResourceServiceImpl
-	extends BaseAdminEntitatResourceServiceImpl<PagadorCieResource, PagadorCieResourceEntity>
-	implements PagadorCieResourceService {
+public class PagadorCieResourceServiceImpl extends BaseAdminEntitatResourceServiceImpl<PagadorCieResource, PagadorCieResourceEntity> implements PagadorCieResourceService {
 
 	private final OrganGestorResourceRepository organGestorResourceRepository;
 
@@ -32,55 +30,39 @@ public class PagadorCieResourceServiceImpl
 		AuthenticationHelper authenticationHelper,
 		NotibPermissionHelper notibPermissionHelper,
 		OrganGestorResourceRepository organGestorResourceRepository) {
+
 		super(userSessionHelper, authenticationHelper, notibPermissionHelper);
 		this.organGestorResourceRepository = organGestorResourceRepository;
 	}
 
 	@Override
-	protected void beforeCreateSave(
-		PagadorCieResourceEntity entity,
-		PagadorCieResource resource,
-		Map<String, AnswerRequiredException.AnswerValue> answers) {
+	protected void beforeCreateSave(PagadorCieResourceEntity entity, PagadorCieResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
 		super.beforeCreateSave(entity, resource, answers);
 		updateOrgansGestors(entity, resource);
 	}
 
 	@Override
-	protected void beforeUpdateSave(
-		PagadorCieResourceEntity entity,
-		PagadorCieResource resource,
-		Map<String, AnswerRequiredException.AnswerValue> answers) {
+	protected void beforeUpdateSave(PagadorCieResourceEntity entity, PagadorCieResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
 		updateOrgansGestors(entity, resource);
 	}
 
 	@Override
-	protected void afterConversion(
-		PagadorCieResourceEntity entity,
-		PagadorCieResource resource) {
+	protected void afterConversion(PagadorCieResourceEntity entity, PagadorCieResource resource) {
+
 		// Emplena el camp organGestorEmissor del recurs a partir de l'òrgan gestor de l'entitat.
-		resource.setOrganGestorEmissor(
-			ResourceReference.toResourceReference(
-				entity.getOrganGestor().getId(),
-				entity.getOrganGestor().getNom()));
+		resource.setOrganGestorEmissor(ResourceReference.toResourceReference(entity.getOrganGestor().getId(), entity.getOrganGestor().getNom()));
 		// Emplena el camp organGestorPagador del recurs a partir del camp organismePagadorCodi de l'entitat.
 		organGestorResourceRepository.findByEntitatAndCodi(
 			entity.getEntitat(),
-			entity.getOrganismePagadorCodi()).
-			ifPresent(o -> resource.setOrganGestorPagador(
-				ResourceReference.toResourceReference(
-					o.getId(),
-					o.getNom())));
+			entity.getOrganismePagadorCodi()).ifPresent(o -> resource.setOrganGestorPagador(ResourceReference.toResourceReference(o.getId(), o.getNom())));
 	}
 
-	private void updateOrgansGestors(
-		PagadorCieResourceEntity entity,
-		PagadorCieResource resource) {
+	private void updateOrgansGestors(PagadorCieResourceEntity entity, PagadorCieResource resource) {
+
 		// Emplena el camp organGestor de l'entitat a partir del camp organGestorEmissor del recurs.
-		organGestorResourceRepository.findById(resource.getOrganGestorEmissor().getId()).
-			ifPresent(entity::setOrganGestor);
+		organGestorResourceRepository.findById(resource.getOrganGestorEmissor().getId()).ifPresent(entity::setOrganGestor);
 		// Emplena el camp organismePagadorCodi de l'entitat a partir del camp organGestorPagador del recurs.
-		organGestorResourceRepository.findById(resource.getOrganGestorPagador().getId()).
-			ifPresent(o -> entity.setOrganismePagadorCodi(o.getCodi()));
+		organGestorResourceRepository.findById(resource.getOrganGestorPagador().getId()).ifPresent(o -> entity.setOrganismePagadorCodi(o.getCodi()));
 	}
 
 }

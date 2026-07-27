@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.ejb.config;
 
@@ -64,11 +64,11 @@ public abstract class AbstractServiceEjb<S> {
 					}
 				}
 			}
-			UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+			UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
 					sessionContext.getCallerPrincipal(),
 					null,
 					authorities);
-			SecurityContextHolder.getContext().setAuthentication(authentication);
+			SecurityContextHolder.getContext().setAuthentication(auth);
 		}
 	}
 

@@ -11,7 +11,6 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,39 +39,31 @@ public class RestApiController {
 	@GetMapping
 	@Operation(summary = "Consulta l'índex de serveis de l'aplicació")
 	public ResponseEntity<CollectionModel<?>> index() {
+
 		List<Class<? extends Resource<?>>> allowedResourceClasses = resourceApiService.resourceFindAllowed();
 		List<Link> indexLinks = new ArrayList<>();
 		if (baseControllers != null) {
-			List<Link> controllerLinks = baseControllers.stream().
-					filter(bc -> bc.isVisibleInApiIndex() && isBaseControllerAllowed(bc, allowedResourceClasses)).
-					map(BaseController::getIndexLink).
-					collect(Collectors.toList());
+			List<Link> controllerLinks = baseControllers.stream()
+				.filter(bc -> bc.isVisibleInApiIndex() && isBaseControllerAllowed(bc, allowedResourceClasses))
+				.map(BaseController::getIndexLink).collect(Collectors.toList());
 			indexLinks.addAll(controllerLinks);
 		}
 		indexLinks.add(0, linkTo(ClassUtils.getUserClass(methodOn(getClass()).index())).withSelfRel());
-		CollectionModel<?> resources = CollectionModel.of(
-				Collections.emptySet(),
-				indexLinks.toArray(Link[]::new));
+		CollectionModel<?> resources = CollectionModel.of(Collections.emptySet(), indexLinks.toArray(Link[]::new));
 		return ResponseEntity.ok(resources);
 	}
 
-	private boolean isBaseControllerAllowed(
-			BaseController baseController,
-			List<Class<? extends Resource<?>>> allowedResourceClasses) {
+	private boolean isBaseControllerAllowed(BaseController baseController, List<Class<? extends Resource<?>>> allowedResourceClasses) {
+
 		if (baseController instanceof ReadonlyResourceController) {
-			Class<?> controllerResourceClass = TypeUtil.getArgumentClassFromGenericSuperclass(
-					baseController.getClass(),
-					ReadonlyResourceController.class,
-					0);
+			Class<?> controllerResourceClass = TypeUtil.getArgumentClassFromGenericSuperclass(baseController.getClass(), ReadonlyResourceController.class, 0);
 			return allowedResourceClasses.contains(controllerResourceClass);
-		} else {
-			if (!baseController.isPublic()) {
-				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-				return auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken);
-			} else {
-				return true;
-			}
 		}
+		if (baseController.isPublic()) {
+			return true;
+		}
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		return auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken);
 	}
 
 }

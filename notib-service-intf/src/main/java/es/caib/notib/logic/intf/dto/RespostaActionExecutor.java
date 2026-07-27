@@ -18,4 +18,5 @@ import java.io.Serializable;
 public class RespostaActionExecutor implements Serializable {
 
 	private boolean ok;
+	private String error;
 }

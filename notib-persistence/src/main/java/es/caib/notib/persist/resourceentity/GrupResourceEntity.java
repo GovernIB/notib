@@ -11,6 +11,7 @@ import lombok.Setter;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -25,9 +26,7 @@ import javax.persistence.Table;
 @Getter
 @Setter
 @NoArgsConstructor
-public class GrupResourceEntity
-	extends BaseAuditableResourceEntity<GrupResource>
-	implements AdminEntitatResourceEntity<GrupResource> {
+public class GrupResourceEntity extends BaseAuditableResourceEntity<GrupResource> implements AdminEntitatResourceEntity<GrupResource> {
 
 	@EqualsAndHashCode.Include
 	@Column(name = "codi", length = 64, nullable = false)
@@ -43,10 +42,16 @@ public class GrupResourceEntity
 		nullable = false)
 	protected EntitatResourceEntity entitat;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(
+		name = "organ_gestor",
+		referencedColumnName = "id",
+		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "grup_organ_fk"))
+	private OrganGestorResourceEntity organGestor;
+
 	@Builder
-	public GrupResourceEntity(
-		GrupResource resource,
-		EntitatResourceEntity entitat) {
+	public GrupResourceEntity(GrupResource resource, EntitatResourceEntity entitat) {
+
 		this.codi = resource.getCodi();
 		this.nom = resource.getNom();
 		this.entitat = entitat;

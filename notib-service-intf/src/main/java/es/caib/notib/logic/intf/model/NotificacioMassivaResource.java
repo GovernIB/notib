@@ -31,7 +31,7 @@ import java.util.List;
 	accessConstraints = {
 		@ResourceAccessConstraint(
 			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-			roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ADMIN_LECTURA, BaseConfig.ROLE_ORGAN },
+			roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ADMIN_LECTURA },
 			grantedPermissions = { PermissionEnum.READ }
 		),
 		@ResourceAccessConstraint(
@@ -78,7 +78,7 @@ import java.util.List;
 			accessConstraints = {
 				@ResourceAccessConstraint(
 					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN})
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER })
 			}
 
 		),
@@ -89,7 +89,7 @@ import java.util.List;
 			accessConstraints = {
 				@ResourceAccessConstraint(
 					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN})
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER })
 			}
 		),
 		@ResourceArtifact(

@@ -25,6 +25,9 @@ public class AdminOrgansAmbPermisActionExecutor implements BaseMutableResourceSe
 	public OrgansAmbPermis exec(String code, OrganGestorResourceEntity entity, Long params) throws ActionExecutionException {
 
 		var entitatActual = userSessionHelper.getCurrentEntitatId();
+		if (entitatActual == null) {
+			return OrgansAmbPermis.builder().build();
+		}
 		var organs = organGestorService.findAccessiblesByUsuariAndEntitatActual(entitatActual);
 		List<OrganGestorResource> organsAmbPermis = new ArrayList<>();
 		OrganGestorResource organAmbPermis;

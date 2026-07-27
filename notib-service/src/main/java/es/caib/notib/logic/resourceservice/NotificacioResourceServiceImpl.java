@@ -66,7 +66,6 @@ import es.caib.notib.persist.resourceentity.DocumentResourceEntity;
 import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
 import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
 import es.caib.notib.persist.resourceentity.PersonaResourceEntity;
-import es.caib.notib.persist.resourceentity.ProcedimentOrganGestorResourceEntity;
 import es.caib.notib.persist.resourcerepository.CallbackResourceRepository;
 import es.caib.notib.persist.resourcerepository.DocumentResourceRepository;
 import es.caib.notib.persist.resourcerepository.EventResourceRepository;
@@ -87,7 +86,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -99,9 +97,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class NotificacioResourceServiceImpl
-	extends BaseMutableResourceService<NotificacioResource, Long, NotificacioResourceEntity>
-	implements NotificacioResourceService {
+public class NotificacioResourceServiceImpl extends BaseMutableResourceService<NotificacioResource, Long, NotificacioResourceEntity> implements NotificacioResourceService {
 
 	private final UserSessionHelper userSessionHelper;
 	private final AuthenticationHelper authenticationHelper;
@@ -196,10 +192,7 @@ public class NotificacioResourceServiceImpl
 	}
 
 	@Override
-	public void beforeCreateSave(
-		NotificacioResourceEntity entity,
-		NotificacioResource resource,
-		Map<String, AnswerRequiredException.AnswerValue> answers) {
+	public void beforeCreateSave(NotificacioResourceEntity entity, NotificacioResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
 
 		entity.setUsuariCodi(authenticationHelper.getCurrentUserName());
 		entity.setEntitat(userSessionHelper.getCurrentEntitat());
@@ -217,11 +210,7 @@ public class NotificacioResourceServiceImpl
 
 
 	@Override
-	public void afterCreateSave(
-		NotificacioResourceEntity entity,
-		NotificacioResource resource,
-		Map<String, AnswerRequiredException.AnswerValue> answers,
-		boolean anyOrderChanged) {
+	public void afterCreateSave(NotificacioResourceEntity entity, NotificacioResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
 
 		List<Long> enviamentsIds = new ArrayList<>();
 		if (resource.getEnviamentsInfo() != null) {
@@ -245,33 +234,25 @@ public class NotificacioResourceServiceImpl
 	 *      l'usuari te permís sobre la combinació organ gestor - procediment de la notificació i les combinacions
 	 *      òrgan gestor - procediment son únicament dels òrgans gestors amb permís de procediments comuns.
 	 */
-	public static String springFilterWithReadPermission(
-		NotibPermissionHelper.IdsToCheckNotificacioPermission ids,
-		String fieldPrefix) {
+	public static String springFilterWithReadPermission(NotibPermissionHelper.IdsToCheckNotificacioPermission ids, String fieldPrefix) {
+
 		List<String> permissionOrConditions = new ArrayList<>();
 		// a)
-		String joinedOrganGestorIds = ids.getOrganGestorIds().stream().
-			map(String::valueOf).collect(Collectors.joining(","));
+		String joinedOrganGestorIds = ids.getOrganGestorIds().stream().map(String::valueOf).collect(Collectors.joining(","));
 		if (!joinedOrganGestorIds.isEmpty()) {
 			permissionOrConditions.add(fieldPrefix + "organGestor.id in (" + joinedOrganGestorIds + ")");
 		}
 		// b)
-		String joinedProcedimentNoComuIds = ids.getProcedimentNoComuIds().stream().
-			map(String::valueOf).collect(Collectors.joining(","));
+		String joinedProcedimentNoComuIds = ids.getProcedimentNoComuIds().stream().map(String::valueOf).collect(Collectors.joining(","));
 		if (!joinedProcedimentNoComuIds.isEmpty()) {
 			permissionOrConditions.add(fieldPrefix + "procediment.id in (" + joinedProcedimentNoComuIds + ")");
 		}
 		// c) o d)
-		String joinedProcedimentComuOrganGestorIds = ids.getProcedimentComuOrganGestorIds().stream().
-			map(String::valueOf).collect(Collectors.joining(","));
+		String joinedProcedimentComuOrganGestorIds = ids.getProcedimentComuOrganGestorIds().stream().map(String::valueOf).collect(Collectors.joining(","));
 		if (!joinedProcedimentComuOrganGestorIds.isEmpty()) {
 			permissionOrConditions.add(fieldPrefix + "procedimentOrganGestor.id in (" + joinedProcedimentComuOrganGestorIds + ")");
 		}
-		if (permissionOrConditions.isEmpty()) {
-			return "id is null";
-		} else {
-			return String.join(" or ", permissionOrConditions);
-		}
+		return !permissionOrConditions.isEmpty() ? String.join(" or ", permissionOrConditions) : "id is null";
 	}
 
 	/*
@@ -280,13 +261,13 @@ public class NotificacioResourceServiceImpl
 	 */
 	public void checkCreatePermission(NotificacioResourceEntity entity) {
 
-		NotibPermissionHelper.IdsToCheckNotificacioPermission ids = notibPermissionHelper.getIdsToCheckNotificacioPermission(
-			notibPermissionHelper.getOrganGestorNotificacioCreatePermission(entity.getEnviamentTipus()),
-			notibPermissionHelper.getProcedimentNotificacioCreatePermission(entity.getEnviamentTipus()));
-		Long organGestorId = entity.getOrganGestor().getId();
-		Long procedimentId = entity.getProcediment().getId();
-		Long procedimentOrganGestorId = entity.getProcedimentOrganGestor() != null ? entity.getProcedimentOrganGestor().getId() : null;
-		boolean permissionGranted = (organGestorId != null && ids.getOrganGestorIds().contains(organGestorId)) || // a)
+		var organPermission = notibPermissionHelper.getOrganGestorNotificacioCreatePermission(entity.getEnviamentTipus());
+		var procedimentPermission = notibPermissionHelper.getProcedimentNotificacioCreatePermission(entity.getEnviamentTipus());
+		var ids = notibPermissionHelper.getIdsToCheckNotificacioPermission(organPermission, procedimentPermission);
+		var organGestorId = entity.getOrganGestor().getId();
+		var procedimentId = entity.getProcediment().getId();
+		var procedimentOrganGestorId = entity.getProcedimentOrganGestor() != null ? entity.getProcedimentOrganGestor().getId() : null;
+		var permissionGranted = (organGestorId != null && ids.getOrganGestorIds().contains(organGestorId)) || // a)
 			(procedimentId != null && ids.getProcedimentNoComuIds().contains(procedimentId)) || // b)
 			(procedimentOrganGestorId != null && ids.getProcedimentComuOrganGestorIds().contains(procedimentOrganGestorId)); // c) o d)
 		if (!permissionGranted) {
@@ -294,18 +275,14 @@ public class NotificacioResourceServiceImpl
 		}
 	}
 
-	private Long saveEnviament(
-		NotificacioResourceEntity notificacio,
-		NotificacioEnviamentResource enviament) {
-		String uuid = UUID.randomUUID().toString();
-		NotificacioEnviamentResourceEntity enviamentNou = NotificacioEnviamentResourceEntity.builder().
-			resource(enviament).
-			notificacio(notificacio).
-			build();
+	private Long saveEnviament(NotificacioResourceEntity notificacio, NotificacioEnviamentResource enviament) {
+
+		var uuid = UUID.randomUUID().toString();
+		var enviamentNou = NotificacioEnviamentResourceEntity.builder().resource(enviament).notificacio(notificacio).build();
 		enviamentNou.setReferenciaEnviament(uuid);
 		enviamentNou.setNotificaEstat(EnviamentEstat.PENDENT);
-		NotificacioEnviamentResourceEntity enviamentCreat = notificacioEnviamentResourceRepository.saveAndFlush(enviamentNou);
-		PersonaResourceEntity titular = saveDestinatari(enviamentCreat, enviament.getTitularInfo());
+		var enviamentCreat = notificacioEnviamentResourceRepository.saveAndFlush(enviamentNou);
+		var titular = saveDestinatari(enviamentCreat, enviament.getTitularInfo());
 		enviamentCreat.setTitular(titular);
 		enviamentCreat.setReferenciaEnviament(uuid);
 		if (enviament.getRepresentantsInfo() != null) {
@@ -314,9 +291,8 @@ public class NotificacioResourceServiceImpl
 		return enviamentCreat.getId();
 	}
 
-	private void saveDocuments(
-		NotificacioResourceEntity notificacio,
-		List<DocumentResource> documents) {
+	private void saveDocuments(NotificacioResourceEntity notificacio, List<DocumentResource> documents) {
+
 		// Crea els documents associats amb la notificació a la base de dades.
 		for (int i = 0; i < documents.size(); i++) {
 			DocumentResource document = documents.get(i);
@@ -338,22 +314,15 @@ public class NotificacioResourceServiceImpl
 		}
 	}
 
-	private PersonaResourceEntity saveDestinatari(
-		NotificacioEnviamentResourceEntity enviament,
-		PersonaResource destinatari) {
+	private PersonaResourceEntity saveDestinatari(NotificacioEnviamentResourceEntity enviament, PersonaResource destinatari) {
 		// Crea el destinatari a la base de dades.
-		return personaResourceRepository.save(
-			PersonaResourceEntity.builder().
-				resource(destinatari).
-				enviament(enviament).
-				build());
+		return personaResourceRepository.save(PersonaResourceEntity.builder().resource(destinatari).enviament(enviament).build());
 	}
 
 	private void emplenarProcedimentOrganGestor(NotificacioResourceEntity entity) {
+
 		if (entity.getProcediment() != null && entity.getProcediment().isComu() && entity.getOrganGestor() != null) {
-			Optional<ProcedimentOrganGestorResourceEntity> procedimentOrganGestor = procedimentOrganGestorResourceRepository.findByProcedimentAndOrganGestor(
-				entity.getProcediment(),
-				entity.getOrganGestor());
+			var procedimentOrganGestor = procedimentOrganGestorResourceRepository.findByProcedimentAndOrganGestor(entity.getProcediment(), entity.getOrganGestor());
 			procedimentOrganGestor.ifPresent(entity::setProcedimentOrganGestor);
 		}
 	}
@@ -364,15 +333,9 @@ public class NotificacioResourceServiceImpl
 	 * Lògica onChange que s'executa al carregar el formulari.
 	 */
 	static class InitOnChangeLogicProcessor implements OnChangeLogicProcessor<NotificacioResource> {
+
 		@Override
-		public void onChange(
-			Serializable id,
-			NotificacioResource previous,
-			String fieldName,
-			Object fieldValue,
-			Map<String, AnswerRequiredException.AnswerValue> answers,
-			String[] previousFieldNames,
-			NotificacioResource target) {
+		public void onChange(Serializable id, NotificacioResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, NotificacioResource target) {
 			caducitatOnChange(previous.getCaducitatDiesNaturals(), previous, target);
 		}
 	}
@@ -382,27 +345,18 @@ public class NotificacioResourceServiceImpl
 	 * gestor i la notificació és una comunicació s'ha de posar el camp procedimentRequired a false.
 	 */
 	class OrganGestorOnChangeLogicProcessor implements OnChangeLogicProcessor<NotificacioResource> {
+
 		@Override
-		public void onChange(
-			Serializable id,
-			NotificacioResource previous,
-			String fieldName,
-			Object fieldValue,
-			Map<String, AnswerRequiredException.AnswerValue> answers,
-			String[] previousFieldNames,
-			NotificacioResource target) {
+		public void onChange(Serializable id, NotificacioResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, NotificacioResource target) {
+
 			ResourceReference<OrganGestorResource, Long> organGestor = (ResourceReference)fieldValue;
-			boolean isComunicacio = previous.getEnviamentTipus() != null &&
-				(EnviamentTipus.COMUNICACIO.equals(previous.getEnviamentTipus()) || EnviamentTipus.SIR.equals(previous.getEnviamentTipus()));
-			if (organGestor != null && isComunicacio) {
-				List<Long> organGestorIdsWithPermission = notibPermissionHelper.organGestorIdsWithPermissionRecursive(
-					ExtendedPermission.PERM7);
-				boolean hasComunicacionsSenseProcedimentPermission = organGestorIdsWithPermission.contains(
-					organGestor.getId());
-				target.setProcedimentRequired(!hasComunicacionsSenseProcedimentPermission);
-			} else {
+			var isComunicacio = previous.getEnviamentTipus() != null && (EnviamentTipus.COMUNICACIO.equals(previous.getEnviamentTipus()) || EnviamentTipus.SIR.equals(previous.getEnviamentTipus()));
+			if (organGestor == null || !isComunicacio) {
 				target.setProcedimentRequired(true);
 			}
+			List<Long> organGestorIdsWithPermission = notibPermissionHelper.organGestorIdsWithPermissionRecursive(ExtendedPermission.PERM7);
+			var hasComunicacionsSenseProcedimentPermission = organGestorIdsWithPermission.contains(organGestor.getId());
+			target.setProcedimentRequired(!hasComunicacionsSenseProcedimentPermission);
 		}
 	}
 
@@ -410,41 +364,31 @@ public class NotificacioResourceServiceImpl
 	 * Lògica onChange pel camp interessatTipus. Segons el valor d'aquest camp canvien els camps visibles / obligatoris.
 	 */
 	static class CaducitatOnChangeLogicProcessor implements OnChangeLogicProcessor<NotificacioResource> {
+
 		@Override
-		public void onChange(
-			Serializable id,
-			NotificacioResource previous,
-			String fieldName,
-			Object fieldValue,
-			Map<String, AnswerRequiredException.AnswerValue> answers,
-			String[] previousFieldNames,
-			NotificacioResource target) {
+		public void onChange(Serializable id, NotificacioResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, NotificacioResource target) {
+
 			if (NotificacioResource.Fields.caducitat.equals(fieldName)) {
-				boolean isCaducitatDiesNaturalsInPreviousFieldNames =
-					previousFieldNames != null &&
-					previousFieldNames.length > 0 &&
-					NotificacioResource.Fields.caducitatDiesNaturals.equals(previousFieldNames[0]);
+				var isCaducitatDiesNaturalsInPreviousFieldNames = previousFieldNames != null && previousFieldNames.length > 0 && NotificacioResource.Fields.caducitatDiesNaturals.equals(previousFieldNames[0]);
 				if (!isCaducitatDiesNaturalsInPreviousFieldNames) {
 					Date date = (Date) fieldValue;
 					caducitatOnChange(date, previous, target);
 				}
-			} else if (NotificacioResource.Fields.caducitatDiesNaturals.equals(fieldName)) {
-				boolean isCaducitatInPreviousFieldNames =
-					previousFieldNames != null &&
-						previousFieldNames.length > 0 &&
-						NotificacioResource.Fields.caducitat.equals(previousFieldNames[0]);
-				if (!isCaducitatInPreviousFieldNames) {
-					Integer caducitatDiesNaturals = (Integer) fieldValue;
-					caducitatOnChange(caducitatDiesNaturals, previous, target);
-				}
+				return;
+			}
+			if (!NotificacioResource.Fields.caducitatDiesNaturals.equals(fieldName)) {
+				return;
+			}
+			var isCaducitatInPreviousFieldNames = previousFieldNames != null && previousFieldNames.length > 0 && NotificacioResource.Fields.caducitat.equals(previousFieldNames[0]);
+			if (!isCaducitatInPreviousFieldNames) {
+				var caducitatDiesNaturals = (Integer) fieldValue;
+				caducitatOnChange(caducitatDiesNaturals, previous, target);
 			}
 		}
 	}
 
-	private static void caducitatOnChange(
-		Date caducitat,
-		NotificacioResource previous,
-		NotificacioResource target) {
+	private static void caducitatOnChange(Date caducitat, NotificacioResource previous, NotificacioResource target) {
+
 		Integer numDiesNaturals = null;
 		if (caducitat != null) {
 			LocalDate dataConvertida = caducitat.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
@@ -458,17 +402,11 @@ public class NotificacioResourceServiceImpl
 		}*/
 	}
 
-	private static void caducitatOnChange(
-		Integer caducitatDiesNaturals,
-		NotificacioResource previous,
-		NotificacioResource target) {
+	private static void caducitatOnChange(Integer caducitatDiesNaturals, NotificacioResource previous, NotificacioResource target) {
+
 		Date caducitat = null;
 		if (caducitatDiesNaturals != null) {
-			caducitat = Date.from(
-				LocalDate.now().
-					plusDays(caducitatDiesNaturals).
-					atStartOfDay(ZoneId.systemDefault()).
-					toInstant());
+			caducitat = Date.from(LocalDate.now().plusDays(caducitatDiesNaturals).atStartOfDay(ZoneId.systemDefault()).toInstant());
 		}
 		target.setCaducitat(caducitat);
 		/*// Només feim el canvi si la caducitat és diferent a la que ja hi havia per a evitar bucle infinit d'onChange.

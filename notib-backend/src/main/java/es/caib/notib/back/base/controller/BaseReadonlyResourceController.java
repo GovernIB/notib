@@ -395,12 +395,10 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			@RequestBody
 			final JsonNode params,
 			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException {
+
 		log.debug("Validació del formulari d'un artefacte (type={}, code={}, params={})", type, code, params);
 		Class<?> formClass = getArtifactFormClass(type, code);
-		getArtifactParamsAsObjectWithFormClass(
-				formClass,
-				params,
-				bindingResult);
+		getArtifactParamsAsObjectWithFormClass(formClass, params, bindingResult);
 		return ResponseEntity.ok().build();
 	}
 
@@ -418,15 +416,9 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			@PathVariable
 			@Parameter(description = "Nom del camp")
 			final String fieldName) {
-		log.debug("Consultant possibles valors pel camp enumerat d'un artefacte (type={}, code={}, fieldName={})",
-				type,
-				code,
-				fieldName);
-		List<FieldOption> fieldOptions = getReadonlyResourceService().artifactFieldEnumOptions(
-				type,
-				code,
-				fieldName,
-				HttpRequestUtil.getCurrentHttpRequest().get().getParameterMap());
+
+		log.debug("Consultant possibles valors pel camp enumerat d'un artefacte (type={}, code={}, fieldName={})", type, code, fieldName);
+		List<FieldOption> fieldOptions = getReadonlyResourceService().artifactFieldEnumOptions(type, code, fieldName, HttpRequestUtil.getCurrentHttpRequest().get().getParameterMap());
 		Link selfLink = linkTo(methodOn(getClass()).artifactFieldEnumOptionsFind(type, code, fieldName)).withSelfRel();
 		if (fieldOptions != null) {
 			return ResponseEntity.ok(
@@ -554,8 +546,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 
 	@Override
 	@GetMapping(value = "/artifacts/{type}/{code}/fields/{fieldName}/options/{id}")
-	@Operation(operationId = "artifactFieldOptionsGetOne", summary = "Consulta una de les opcions disponibles per a emplenar un camp de tipus ResourceReference " +
-            "que pertany al formulari d'un artefacte")
+	@Operation(operationId = "artifactFieldOptionsGetOne", summary = "Consulta una de les opcions disponibles per a emplenar un camp de tipus ResourceReference que pertany al formulari d'un artefacte")
 	@PreAuthorize("!this.forbiddenArtifactLogic() and (this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('ARTIFACT')))")
 	public <RR extends Resource<RID>, RID extends Serializable> ResponseEntity<EntityModel<RR>> artifactFieldOptionsGetOne(
 			@PathVariable
@@ -573,25 +564,10 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			@RequestParam(value = "perspective", required = false)
 			@Parameter(description = "Perspectives de la consulta")
 			final String[] perspectives) {
-		log.debug("Consultant un dels possibles valors del camp (type={}, code={}, fieldName={}, id={}, perspectives={})",
-				type,
-				code,
-				fieldName,
-				id,
-				perspectives);
-		Link singleResourceBaseSelfLink = linkTo(methodOn(getClass()).artifactFieldOptionsGetOne(
-				type,
-				code,
-				fieldName,
-				SELF_RESOURCE_ID_TOKEN,
-				null)).withSelfRel();
-		return fieldOptionsGetOne(
-				fieldName,
-				id,
-				perspectives,
-				type,
-				code,
-				singleResourceBaseSelfLink);
+
+		log.debug("Consultant un dels possibles valors del camp (type={}, code={}, fieldName={}, id={}, perspectives={})", type, code, fieldName, id, perspectives);
+		Link singleResourceBaseSelfLink = linkTo(methodOn(getClass()).artifactFieldOptionsGetOne(type, code, fieldName, SELF_RESOURCE_ID_TOKEN, null)).withSelfRel();
+		return fieldOptionsGetOne(fieldName, id, perspectives, type, code, singleResourceBaseSelfLink);
 	}
 
 	@Override
@@ -847,6 +823,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			@RequestParam(value = "perspective", required = false)
 			@Parameter(description = "Perspectives de la consulta")
 			final String[] perspectives) {
+
 		log.debug("Consultant un dels possibles valors del camp del formulari del filtre (" +
 						"code={}, fieldName={}, id={}, perspectives={})",
 				code,
@@ -887,12 +864,8 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		return readonlyResourceService;
 	}
 
-	protected <RR extends Resource<?>> EntityModel<RR> toEntityModel(
-			RR resource,
-			Link... links) {
-		return EntityModel.of(
-				resource,
-				links);
+	protected <RR extends Resource<?>> EntityModel<RR> toEntityModel(RR resource, Link... links) {
+		return EntityModel.of(resource, links);
 	}
 
 	protected <RR extends Resource<?>> PagedModel<EntityModel<RR>> toPagedModel(
@@ -924,26 +897,19 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 				links);
 	}
 
-	protected Class<? extends Serializable> getArtifactFormClass(
-			ResourceArtifactType artifactType,
-			String code) {
-		ResourceArtifact artifact = getReadonlyResourceService().artifactGetOne(
-				artifactType,
-				code);
+	protected Class<? extends Serializable> getArtifactFormClass(ResourceArtifactType artifactType, String code) {
+
+		ResourceArtifact artifact = getReadonlyResourceService().artifactGetOne(artifactType, code);
 		return artifact.isFormClassActive() ? artifact.getFormClass() : null;
 	}
 
-	protected Serializable getArtifactParamsAsObjectWithFormClass(
-			Class<?> formClass,
-			JsonNode params,
-			BindingResult bindingResult) throws JsonProcessingException, MethodArgumentNotValidException {
-		Serializable paramsObject = null;
-		if (formClass != null) {
-			paramsObject = (Serializable) JsonUtil.getInstance().fromJsonToObjectWithType(
-					params,
-					formClass);
-			validateResource(paramsObject, 1, bindingResult);
+	protected Serializable getArtifactParamsAsObjectWithFormClass(Class<?> formClass, JsonNode params, BindingResult bindingResult) throws JsonProcessingException, MethodArgumentNotValidException {
+
+		if (formClass == null) {
+			return null;
 		}
+		var	paramsObject = (Serializable) JsonUtil.getInstance().fromJsonToObjectWithType(params, formClass);
+		validateResource(paramsObject, 1, bindingResult);
 		return paramsObject;
 	}
 

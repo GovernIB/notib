@@ -44,9 +44,7 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class NotificacioEnviamentResourceServiceImpl
-	extends BaseMutableResourceService<NotificacioEnviamentResource, Long, NotificacioEnviamentResourceEntity>
-	implements NotificacioEnviamentResourceService {
+public class NotificacioEnviamentResourceServiceImpl extends BaseMutableResourceService<NotificacioEnviamentResource, Long, NotificacioEnviamentResourceEntity> implements NotificacioEnviamentResourceService {
 
 	private final UserSessionHelper userSessionHelper;
 	private final AuthenticationHelper authenticationHelper;
@@ -57,6 +55,7 @@ public class NotificacioEnviamentResourceServiceImpl
 
 	@PostConstruct
 	public void init() {
+
 		register(NotificacioEnviamentResource.PERSPECTIVE_TITULAR, new TitularPerspectiveApplicator());
 		register(NotificacioEnviamentResource.PERSPECTIVE_ENTREGA_POSTAL, new EntregaPostalPerspectiveApplicator());
 		register(NotificacioEnviamentResource.REPORT_DESCARREGAR_DIAGRAMA_STATE_MACHINE, new DiagramaStateMachineReportGenerator());
@@ -69,33 +68,29 @@ public class NotificacioEnviamentResourceServiceImpl
 	}
 
 	@Override
-	protected String additionalSpringFilter(
-		String currentSpringFilter,
-		String[] namedQueries) {
+	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+
 		// Condició per a mostrar només les notificacions de l'entitat actual
-		String entitatFilter = "notificacio.entitat.id:" + userSessionHelper.getCurrentEntitatId();
-		boolean isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
-		boolean isRoleAdminLectura = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN_LECTURA);
-		boolean isRoleAdminOrgan = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN);
+		var entitatFilter = "notificacio.entitat.id:" + userSessionHelper.getCurrentEntitatId();
+		var isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
+		var isRoleAdminLectura = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN_LECTURA);
+		var isRoleAdminOrgan = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN);
 		if ((isRoleAdmin && notibPermissionHelper.currentEntitatPermissionAllowed(ExtendedPermission.PERM2)) ||
 			(isRoleAdminLectura && notibPermissionHelper.currentEntitatPermissionAllowed(ExtendedPermission.PERMX))) {
 			return entitatFilter;
-		} else if (isRoleAdminOrgan && notibPermissionHelper.currentOrganGestorPermissionAllowed(BasePermission.ADMINISTRATION)) {
-			return entitatFilter + " and notificacio.organGestor.id:" + userSessionHelper.getCurrentOrganGestorId();
-		} else {
-			List<String> andConditions = new ArrayList<>();
-			// Condició per a mostrar només les notificacions amb permís de lectura
-			NotibPermissionHelper.IdsToCheckNotificacioPermission ids = notibPermissionHelper.getIdsToCheckNotificacioPermission(
-				BasePermission.READ,
-				BasePermission.READ);
-			String permissionFilter = NotificacioResourceServiceImpl.springFilterWithReadPermission(
-				ids,
-				"notificacio.");
-			if (!permissionFilter.isEmpty()) {
-				andConditions.add("(" + permissionFilter + ")");
-			}
-			return String.join(" and ", andConditions);
 		}
+		if (isRoleAdminOrgan && notibPermissionHelper.currentOrganGestorPermissionAllowed(BasePermission.ADMINISTRATION)) {
+			return entitatFilter + " and notificacio.organGestor.id:" + userSessionHelper.getCurrentOrganGestorId();
+		}
+
+		List<String> andConditions = new ArrayList<>();
+		// Condició per a mostrar només les notificacions amb permís de lectura
+		var ids = notibPermissionHelper.getIdsToCheckNotificacioPermission(BasePermission.READ, BasePermission.READ);
+		var permissionFilter = NotificacioResourceServiceImpl.springFilterWithReadPermission(ids, "notificacio.");
+		if (!permissionFilter.isEmpty()) {
+			andConditions.add("(" + permissionFilter + ")");
+		}
+		return String.join(" and ", andConditions);
 	}
 
 	/*
@@ -103,10 +98,7 @@ public class NotificacioEnviamentResourceServiceImpl
 	 * recurs llençam una excepció.
 	 */
 	@Override
-	protected void beforeCreateSave(
-		NotificacioEnviamentResourceEntity entity,
-		NotificacioEnviamentResource resource,
-		Map<String, AnswerRequiredException.AnswerValue> answers) {
+	protected void beforeCreateSave(NotificacioEnviamentResourceEntity entity, NotificacioEnviamentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
 		throw new ResourceNotCreatedException(getResourceClass(), "Create is not allowed");
 	}
 

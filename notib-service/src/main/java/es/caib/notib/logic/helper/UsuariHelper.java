@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.logic.helper;
 
@@ -25,13 +25,13 @@ import java.util.List;
 
 /**
  * Helper per a operacions amb usuaris.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
 @Component
 public class UsuariHelper {
- 
+
 
 	@Resource
 	private UsuariRepository usuariRepository;

@@ -32,8 +32,7 @@ import java.util.Objects;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public abstract class BaseAdminEntitatResourceServiceImpl<R extends Resource<Long>, E extends AdminEntitatResourceEntity<R>>
-	extends BaseMutableResourceService<R, Long, E> {
+public abstract class BaseAdminEntitatResourceServiceImpl<R extends Resource<Long>, E extends AdminEntitatResourceEntity<R>> extends BaseMutableResourceService<R, Long, E> {
 
 	protected final UserSessionHelper userSessionHelper;
 	protected final AuthenticationHelper authenticationHelper;
@@ -45,11 +44,12 @@ public abstract class BaseAdminEntitatResourceServiceImpl<R extends Resource<Lon
 	 */
 	@Override
 	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
-		boolean isRoleSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);
+
+		var isRoleSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);
 		if (isRoleSuper) {
 			return null;
 		}
-		Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
+		var currentEntitatId = userSessionHelper.getCurrentEntitatId();
 		return currentEntitatId != null ? "entitat.id:" + currentEntitatId : "entitat.id is null";
 	}
 
@@ -61,7 +61,8 @@ public abstract class BaseAdminEntitatResourceServiceImpl<R extends Resource<Lon
 	 */
 	@Override
 	protected void beforeCreateSave(E entity, R resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
-		EntitatResourceEntity currentEntitatResource = userSessionHelper.getCurrentEntitat();
+
+		var currentEntitatResource = userSessionHelper.getCurrentEntitat();
 		if (currentEntitatResource == null) {
 			throw new ResourceNotCreatedException(getResourceClass(), "Not allowed to create a " + getResourceClass() + " without any entitat selected in session");
 		}
@@ -77,19 +78,15 @@ public abstract class BaseAdminEntitatResourceServiceImpl<R extends Resource<Lon
 	 */
 	@Override
 	protected void beforeUpdateEntity(E entity, R resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
-		EntitatResourceEntity currentEntitatResource = userSessionHelper.getCurrentEntitat();
+
+		var currentEntitatResource = userSessionHelper.getCurrentEntitat();
 		if (currentEntitatResource == null) {
-			throw new ResourceNotUpdatedException(
-				getResourceClass(),
-				"" + entity.getId(),
-				"Not allowed to update a " + getResourceClass() + " without any entitat selected in session");
+			var msg = "Not allowed to update a " + getResourceClass() + " without any entitat selected in session";
+			throw new ResourceNotUpdatedException(getResourceClass(), "" + entity.getId(), msg);
 		}
 		if (!Objects.equals(entity.getEntitat(), currentEntitatResource)) {
-			throw new ResourceNotUpdatedException(
-				getResourceClass(),
-				"" + entity.getId(),
-				"Not allowed to update a " + getResourceClass() + " belonging to a different entitat than the one selected in the session (" +
-					"sessionEntitatId=" + currentEntitatResource.getId() + ")");
+			var msg = "Not allowed to update a " + getResourceClass() + " belonging to a different entitat than the one selected in the session (sessionEntitatId=" + currentEntitatResource.getId() + ")";
+			throw new ResourceNotUpdatedException(getResourceClass(), "" + entity.getId(), msg);
 		}
 		notibPermissionHelper.entitatCheckAdminPermissionThrows(getResourceClass(), entity.getId(), entity.getEntitat().getId(), BasePermission.WRITE);
 	}
@@ -102,9 +99,11 @@ public abstract class BaseAdminEntitatResourceServiceImpl<R extends Resource<Lon
 	 */
 	@Override
 	protected void beforeDelete(E entity, Map<String, AnswerRequiredException.AnswerValue> answers) {
-		EntitatResourceEntity currentEntitatResource = userSessionHelper.getCurrentEntitat();
+
+		var currentEntitatResource = userSessionHelper.getCurrentEntitat();
 		if (currentEntitatResource == null) {
-			throw new ResourceNotDeletedException(getResourceClass(), entity.getId() + "", "Not allowed to delete a " + getResourceClass() + " entity without any entitat selected in session");
+			var msg = "Not allowed to delete a " + getResourceClass() + " entity without any entitat selected in session";
+			throw new ResourceNotDeletedException(getResourceClass(), entity.getId() + "", msg);
 		}
 		if (!Objects.equals(entity.getEntitat(), currentEntitatResource)) {
 			String msg = "Not allowed to update a " + getResourceClass() + " belonging to a different entitat than the one selected in the session (sessionEntitatId=" + currentEntitatResource.getId() + ")";

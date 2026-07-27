@@ -1,5 +1,6 @@
 package es.caib.notib.logic.base.helper;
 
+import es.caib.notib.logic.intf.base.util.HttpRequestUtil;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,8 +43,15 @@ public class AuthenticationHelper {
 	public boolean isCurrentUserInRole(String role) {
 
 		var auth = SecurityContextHolder.getContext().getAuthentication();
-		return auth.getAuthorities().stream().anyMatch(ga -> ga.getAuthority().equals(role));
+
+		boolean result = auth.getAuthorities()
+			.stream()
+			.anyMatch(ga -> ga.getAuthority().equals(role));
+
+
+		return result;
 	}
+
 
 	/**
 	 * Retorna true si l'usuari de l'objecte d'autenticació te el rol especificat.

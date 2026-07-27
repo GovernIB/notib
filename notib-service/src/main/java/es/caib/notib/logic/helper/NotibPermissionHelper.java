@@ -46,6 +46,7 @@ public class NotibPermissionHelper {
 	 */
 	public String entitatAdditionalSpringFilter(String filterProperty) {
 
+
 		// Restringeix la consulta si no es te el rol NOT_SUPER o si no es tenen permisos sobre l'entitat del tipus de document.
 		var isRoleSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);
 		if (isRoleSuper) {

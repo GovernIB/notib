@@ -5,6 +5,7 @@ import com.nimbusds.jose.shaded.json.JSONObject;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
+import es.caib.notib.logic.intf.base.util.HttpRequestUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -239,18 +240,29 @@ public abstract class BaseWebSecurityConfig {
 	}
 
 	protected Converter<Jwt, AbstractAuthenticationToken> jwtAuthConverter() {
+
 		return jwt -> {
-			Set<GrantedAuthority> grantedAuthorities = Stream.concat(
-					new JwtGrantedAuthoritiesConverter().convert(jwt).stream(),
-					extractJwtGrantedAuthorities(jwt).stream()).
-					collect(Collectors.toCollection(HashSet::new));
+			var defaultAuthorities = new JwtGrantedAuthoritiesConverter().convert(jwt);
+			var extracted = extractJwtGrantedAuthorities(jwt);
+			Set<GrantedAuthority> grantedAuthorities = Stream.concat(defaultAuthorities.stream(), extracted.stream()).collect(Collectors.toCollection(HashSet::new));
 			filterAllowedGrantedAuthorities(grantedAuthorities);
-			return new JwtAuthenticationToken(
-					jwt,
-					grantedAuthorities,
-					getPrincipalClaimName(jwt));
+			return new JwtAuthenticationToken(jwt, grantedAuthorities, getPrincipalClaimName(jwt));
 		};
 	}
+
+//	protected Converter<Jwt, AbstractAuthenticationToken> jwtAuthConverter() {
+//		return jwt -> {
+//			Set<GrantedAuthority> grantedAuthorities = Stream.concat(
+//					new JwtGrantedAuthoritiesConverter().convert(jwt).stream(),
+//					extractJwtGrantedAuthorities(jwt).stream()).
+//					collect(Collectors.toCollection(HashSet::new));
+//			filterAllowedGrantedAuthorities(grantedAuthorities);
+//			return new JwtAuthenticationToken(
+//					jwt,
+//					grantedAuthorities,
+//					getPrincipalClaimName(jwt));
+//		};
+//	}
 
 	protected OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
 		final DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();

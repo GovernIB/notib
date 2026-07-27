@@ -63,7 +63,7 @@ import static es.caib.notib.logic.intf.model.NotificacioResource.ACTION_ANULAR_R
 	accessConstraints = {
 		@ResourceAccessConstraint(
 			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
-			roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ADMIN_LECTURA, BaseConfig.ROLE_SUPER },
+			roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ADMIN_LECTURA, BaseConfig.ROLE_ORGAN },
 			grantedPermissions = { PermissionEnum.READ }
 		),
 		@ResourceAccessConstraint(

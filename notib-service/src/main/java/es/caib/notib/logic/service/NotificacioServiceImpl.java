@@ -388,7 +388,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 					throw new ValidationException("Aquesta notificació està enviada a SIR i no es pot esborrar");
 			}
 
-			if ((enviamentsPendents == null || enviamentsPendents.isEmpty()) && !(notificacioTableEntity.getEstat().equals(NotificacioEstatEnumDto.REGISTRADA))) {
+			if ((enviamentsPendents == null || enviamentsPendents.isEmpty())
+				&& !notificacioTableEntity.getEstat().equals(NotificacioEstatEnumDto.PENDENT)
+				&& !notificacioTableEntity.getEstat().equals(NotificacioEstatEnumDto.ENVIANT)) {
 				throw new ValidationException("Aquesta notificació està enviada, per tant, no es pot esborrar");
 			}
 

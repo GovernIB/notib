@@ -28,48 +28,28 @@ public class ResourceApiService implements es.caib.notib.logic.intf.base.service
 
 	@Override
 	public void resourceRegister(Class<? extends Resource<?>> resourceClass) {
+
 		log.info("New resource registered (class={})", resourceClass);
 		registeredResources.add(resourceClass);
 	}
 
 	@Override
 	public List<Class<? extends Resource<?>>> resourceFindAllowed() {
-		return new ArrayList<>(registeredResources).stream().
-				filter(this::isResourceAllowed).
-				sorted(Comparator.comparing(Class::getSimpleName)).
-				collect(Collectors.toList());
+		return new ArrayList<>(registeredResources).stream().filter(this::isResourceAllowed).sorted(Comparator.comparing(Class::getSimpleName)).collect(Collectors.toList());
 	}
 
 	@Override
 	public ResourcePermissions permissionsCurrentUser(Class<?> resourceClass, Serializable resourceId) {
-		boolean isReadGranted = permissionHelper.checkResourcePermission(
-				resourceId,
-				resourceClass.getName(),
-				new BasePermission[] { (BasePermission)BasePermission.READ });
-		boolean isWriteGranted = permissionHelper.checkResourcePermission(
-				resourceId,
-				resourceClass.getName(),
-				new BasePermission[] { (BasePermission)BasePermission.WRITE });
-		boolean isCreateGranted = permissionHelper.checkResourcePermission(
-				resourceId,
-				resourceClass.getName(),
-				new BasePermission[] { (BasePermission)BasePermission.CREATE });
-		boolean isDeleteGranted = permissionHelper.checkResourcePermission(
-				resourceId,
-				resourceClass.getName(),
-				new BasePermission[] { (BasePermission)BasePermission.DELETE });
-		return new ResourcePermissions(
-				isReadGranted,
-				isWriteGranted,
-				isCreateGranted,
-				isDeleteGranted);
+
+		var isReadGranted = permissionHelper.checkResourcePermission(resourceId, resourceClass.getName(), new BasePermission[] { (BasePermission)BasePermission.READ });
+		var isWriteGranted = permissionHelper.checkResourcePermission(resourceId, resourceClass.getName(), new BasePermission[] { (BasePermission)BasePermission.WRITE });
+		var isCreateGranted = permissionHelper.checkResourcePermission(resourceId, resourceClass.getName(), new BasePermission[] { (BasePermission)BasePermission.CREATE });
+		var isDeleteGranted = permissionHelper.checkResourcePermission(resourceId, resourceClass.getName(), new BasePermission[] { (BasePermission)BasePermission.DELETE });
+		return new ResourcePermissions(isReadGranted, isWriteGranted, isCreateGranted, isDeleteGranted);
 	}
 
 	private boolean isResourceAllowed(Class<? extends Resource<?>> resourceClass) {
-		return permissionHelper.checkResourcePermission(
-				null,
-				resourceClass.getName(),
-				null);
+		return permissionHelper.checkResourcePermission(null, resourceClass.getName(), null);
 	}
 
 }

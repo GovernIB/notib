@@ -27,6 +27,7 @@ public abstract class BaseNoDatabaseReadonlyResourceService<R extends Resource<I
 
 	@Override
 	protected R entityToResource(NoDatabaseResourceEntity<R, ID> entity) {
+
 		R resource = entity.getResource();
 		resource.setId(entity.getId());
 		return resource;

@@ -414,52 +414,46 @@ public class AclEntryResourceServiceImpl
 	}
 
 	private void checkAclPermissionOnResource(AclEntryResource resource) {
+
 		Class<?> resourceClass = getClassFromResourceName(resource.getResourceName());
 		if (Objects.equals(resourceClass, AclHelper.ENTITAT_CLASS)) {
 			boolean permissionGranted = isAclPermissionGrantedForEntitat(resource.getResourceId());
 			if (permissionGranted) {
 				return;
 			}
-		} else if (
-			Objects.equals(resourceClass, AclHelper.ORGAN_GESTOR_CLASS) ||
-				Objects.equals(resourceClass, AclHelper.PROCEDIMENT_CLASS)) {
+		} else if (Objects.equals(resourceClass, AclHelper.ORGAN_GESTOR_CLASS) || Objects.equals(resourceClass, AclHelper.PROCEDIMENT_CLASS)) {
 			Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
 			boolean permissionGranted = isAclPermissionGrantedForEntitat(currentEntitatId);
 			if (permissionGranted) {
 				return;
 			}
 		}
-		throw new ResourceNotUpdatedException(
-			AclEntryResource.class,
-			resource.getId(),
-			"You're not allowed to update ACLs on " + resource.getResourceName() + " resources");
+		var msg = "You're not allowed to update ACLs on " + resource.getResourceName() + " resources";
+		throw new ResourceNotUpdatedException(AclEntryResource.class, resource.getId(), msg);
 	}
 
 	private boolean isAclPermissionGrantedForEntitat(Serializable entitatId) {
+
 		// Per a poder modificar les ACLs d'una entitat s'ha de tenir el rol NOT_SUPER o ser administrador d'entitat
 		// (rol NOT_ADMIN) amb permisos d'administració (PERM2) sobre l'entitat especificada.
-		boolean isRoleSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);
-		if (!isRoleSuper) {
-			boolean isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
-			if (isRoleAdmin) {
-				return aclHelper.anyPermissionGranted(
-					AclHelper.ENTITAT_CLASS,
-					entitatId,
-					List.of(ExtendedPermission.PERM2), // Permís per administrar
-					aclHelper.getCurrentUserSids().toArray(Sid[]::new));
-			}
-		} else {
+		var isRoleSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);
+		if (isRoleSuper) {
 			return true;
 		}
-		return false;
+		var isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
+		var isRoleAdminOrgan = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN);
+		if (!isRoleAdmin && !isRoleAdminOrgan) {
+			return false;
+		}
+		var sids = aclHelper.getCurrentUserSids().toArray(Sid[]::new);
+		return aclHelper.anyPermissionGranted(AclHelper.ENTITAT_CLASS, entitatId, List.of(ExtendedPermission.PERM2), sids);
 	}
 
 	/*
 	 * Si el resource pertany a un procediment comú desa els canvis als ACLs i retorna true. Si no retorna false.
 	 */
-	private boolean saveProcedimentComu(
-		AclEntryResource resource,
-		List<PermissionEnum> permissionsGranted) {
+	private boolean saveProcedimentComu(AclEntryResource resource, List<PermissionEnum> permissionsGranted) {
+
 		boolean isProcediment = AclHelper.PROCEDIMENT_CLASS.equals(getClassFromResourceName(resource.getResourceName()));
 		if (isProcediment) {
 			Optional<ProcedimentResourceEntity> procediment = procedimentResourceRepository.findById(

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.ejb.helper;
 
@@ -19,7 +19,7 @@ import java.util.List;
 
 /**
  * Helper per a operacions amb usuaris.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j

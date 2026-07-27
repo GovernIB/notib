@@ -17,6 +17,7 @@ import es.caib.notib.persist.resourceentity.*;
 import es.caib.notib.persist.resourcerepository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 
@@ -86,6 +87,10 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 		var isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
 		var isRoleAdminLectura = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN_LECTURA);
 		var isRoleAdminOrgan = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN);
+		if (isRoleAdminOrgan && notibPermissionHelper.currentOrganGestorPermissionAllowed(BasePermission.ADMINISTRATION)) {
+			var currentOrganGestorId = userSessionHelper.getCurrentOrganGestorId();
+			return superFilter + " and id: " + currentOrganGestorId;
+		}
 		if (isRoleAdmin || isRoleAdminLectura || isRoleAdminOrgan) {
 			return superFilter;
 		}
