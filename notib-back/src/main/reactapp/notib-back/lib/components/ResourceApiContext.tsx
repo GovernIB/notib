@@ -30,7 +30,8 @@ export type ResourceApiContextType = {
     indexError: Error | undefined;
     currentLanguage: string | undefined;
     refreshApiIndex: () => void;
-    getKettingClient: () => Client | undefined;
+    // getKettingClient: () => Client | undefined;
+    kettingClient?: Client;
     requestHref: (href: string, templateData?: any) => Promise<State>;
     isDebugRequests: () => boolean | undefined;
     setCurrentLanguage: (currentLanguage?: string) => void;

@@ -151,8 +151,8 @@ const useCurrentEntitat = (currentUserId: string | undefined, currentRole: strin
     const [currentEntitatLoading, setCurrentEntitatLoading] = React.useState<boolean>();
     const [currentEntitat, setCurrentEntitat] = React.useState<any>();
     const { getValue: sessionSessionGetValue, setValue: sessionSessionSetValue } = useSessionStorage(currentUserId, 'currentSession');
-    const { isReady: apiIsReadyOrgan, artifactAction: apiAction } = useResourceApiService('organGestorResource');
-    let [organsAvailable, setOrgansAvailable] = React.useState<any[]>();
+    const { isReady: apiIsReadyOrgan, artifactAction: apiAction } = useResourceApiService('organGestorResource', { enabled: currentRole === ROLE_ORGAN });
+    const [organsAvailable, setOrgansAvailable] = React.useState<any[]>([]);
     const [currentOrganId, setCurrentOrganId] = React.useState<number>();
 
     React.useEffect(() => {
@@ -179,33 +179,28 @@ const useCurrentEntitat = (currentUserId: string | undefined, currentRole: strin
             }
             apiAction(undefined, { code: 'ADMIN_ORGANS_AMB_PERMIS' }).then(resposta => {
 
-                if (!resposta?.organs) {
-                    organsAvailable = [];
-                    return;
-                }
-                organsAvailable = resposta.organs;
+                const organs = resposta.organs ?? [];
+                setOrgansAvailable(organs)
                 const organActual = getSessionValue(sessionSessionGetValue() ?? undefined, 'o');
-                setOrgansAvailable(organsAvailable)
-                const isSessionValueInOrgansAvailable = organsAvailable?.map(o => o.id).includes(sessionValue);
-                if (isSessionValueInOrgansAvailable) {
+                if (organActual != null && organs.some((o: { id: any; }) => o.id === organActual)) {
                     setCurrentOrganId(organActual);
-                } else if (organsAvailable?.length && currentEntitatId == null) {
-                    setCurrentOrganId(organsAvailable[0].id);
+                } else if (organs.length) {
+                    setCurrentOrganId(organs[0].id);
                 }
             }).catch(error => console.error(error))
         });
-    }, [apiIsReady, currentRoleReady, currentRole, organsAvailable, currentOrganId]);
+    }, [apiIsReady, apiIsReadyOrgan, currentRoleReady, currentRole]);
 
     React.useEffect(() => {
         if (currentRole == null || currentRole === ROLE_SUPER || currentEntitatId == null) {
             return;
         }
-        const session = createSession(currentEntitatId);
+        const session = createSession(currentEntitatId, currentRole === ROLE_ORGAN ? currentOrganId : undefined);
         sessionSessionSetValue(session);
         if (currentRole) {
             apiSetHttpHeaders([{'X-App-Role': currentRole,}, {'X-App-Session': session,},]);
         }
-    }, [currentRole, currentEntitatId]);
+    }, [currentRole, currentEntitatId, currentOrganId]);
 
     React.useEffect(() => {
         if (currentEntitatId == null || !apiIsReady) {
@@ -218,8 +213,8 @@ const useCurrentEntitat = (currentUserId: string | undefined, currentRole: strin
     const currentSessionFromHttpHeader = apiHttpHeaders?.find((h) => 'X-App-Session' in h)?.['X-App-Session'];
     const currentEntitatIdFromHttpHeader = currentSessionFromHttpHeader != null ? JSON.parse(currentSessionFromHttpHeader).e : undefined;
     const entitatIdHttpHeaderInitialized = currentRole === ROLE_SUPER
-                                                    || (currentEntitatId == null && currentEntitatIdFromHttpHeader == null)
-                                                    || currentEntitatId === currentEntitatIdFromHttpHeader;
+        || (currentEntitatId == null && currentEntitatIdFromHttpHeader == null)
+        || currentEntitatId === currentEntitatIdFromHttpHeader;
     const currentEntitatReady = apiIsReady && entitatsAvailable != null && entitatIdHttpHeaderInitialized;
     return {
         currentEntitatId,
@@ -229,7 +224,8 @@ const useCurrentEntitat = (currentUserId: string | undefined, currentRole: strin
         entitatsAvailable,
         setCurrentEntitatId,
         organsAvailable,
-        currentOrganId
+        currentOrganId,
+        setCurrentOrganId
     };
 };
 
@@ -257,7 +253,8 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
         entitatsAvailable,
         setCurrentEntitatId,
         organsAvailable,
-        currentOrganId
+        currentOrganId,
+        setCurrentOrganId
     } = useCurrentEntitat(currentUserId, currentRole, currentRoleReady);
     const isReady = apiOffline || (currentRoleReady && currentEntitatReady && currentUser != null);
     const contextValue = {
@@ -274,7 +271,8 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
         currentEntitat,
         currentEntitatLoading,
         organsAvailable,
-        currentOrganId
+        currentOrganId,
+        setCurrentOrganId
     };
     return (
         <NotibContext.Provider value={contextValue}>

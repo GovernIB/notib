@@ -341,10 +341,13 @@ const translationEs = {
                         noReposta: "Error inesperado al ejecutar la acción de registrar",
                         noExecutades: "Identificadores de remeses no ejecutadas: ",
                         repostesError: "Remeses con error al enviar a registrar: ",
-                        ok: "La remesa s'ha enviat a registrar",
+                        ok: "La remesa se ha enviado a registrar",
                     },
                     editar: "Editar",
-                    esborrar: "Borrar",
+                    esborrar: {
+                        title: "Eliminar",
+                        ok: "La remesa se ha eliminado correctamente"
+                    },
                 },
                 procediment: 'Procedimiento',
                 servei: 'Servicio',

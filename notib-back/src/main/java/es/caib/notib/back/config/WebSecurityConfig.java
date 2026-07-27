@@ -135,11 +135,11 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 
 	@Override
 	protected Set<String> getAllowedRoles() {
+
 		Optional<HttpServletRequest> optionalRequest = HttpRequestUtil.getCurrentHttpRequest();
 		Set<String> allowedRoles = Set.of(mappableRoles.split(","));
 		if (optionalRequest.isPresent()) {
-			// Si la petició HTTP conté la capçalera amb el rol seleccionat retorna únicament aquest rol en la llista
-			// de rols permesos.
+			// Si la petició HTTP conté la capçalera amb el rol seleccionat retorna únicament aquest rol en la llista de rols permesos.
 			HttpServletRequest request = optionalRequest.get();
 			String selectedRole = request.getHeader(selectedRoleHttpHeader);
 			if (selectedRole != null) {

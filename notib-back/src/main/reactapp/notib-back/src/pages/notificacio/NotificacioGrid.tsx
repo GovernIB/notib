@@ -332,7 +332,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
             recuperarRemesa} = useAccionsNotificacio();
 
     const mostrarEditarBorrar = (estat : string) => {
-            return isRoleAdminLectura || (estat !== 'PENDENT' && estat !== 'REGISTRADA');
+        return isRoleAdminLectura || (estat !== 'PENDENT' && estat !== 'REGISTRADA');
     }
 
     const noEsTaulaRemeses = (notificacionsEsborrades || notificacionsErrorRegistre || notificacionsCallbackError);
@@ -408,8 +408,8 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
             //     // hidden: (row) => mostrarEditarBorrar(row?.estat, currentRole),
             // },
             {
-                label: t('page.notificacio.grid.accions.esborrar'),
-                title: t('page.notificacio.grid.accions.esborrar'),
+                label: t('page.notificacio.grid.accions.esborrar.title'),
+                title: t('page.notificacio.grid.accions.esborrar.title'),
                 icon: 'delete_icon',
                 showInMenu: true,
                 onClick: (id) => esborrarRemesa(id),

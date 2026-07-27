@@ -361,7 +361,10 @@ const translationCa = {
                         ok: "Ampliació de termini realitzada correctament"
                     },
                     editar: "Editar",
-                    esborrar: "Esborrar",
+                    esborrar: {
+                        title: "Esborrar",
+                        ok: "La remesa s'ha esborrat correctament"
+                    },
                 },
                 procediment: 'Procediment',
                 servei: 'Servei',

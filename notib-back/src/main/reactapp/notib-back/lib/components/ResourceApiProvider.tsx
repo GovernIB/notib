@@ -1108,7 +1108,9 @@ const generateResourceApiMethods = (
     };
 };
 
-export const useResourceApiService = (resourceName?: string): ResourceApiService => {
+export const useResourceApiService = (resourceName?: string, options?: { enabled?: boolean }): ResourceApiService => {
+
+    const enabled = options?.enabled ?? true;
     const logConsole = useLogConsole(LOG_PREFIX);
     const {
         isReady: indexIsReady,
@@ -1175,6 +1177,9 @@ export const useResourceApiService = (resourceName?: string): ResourceApiService
         }
     };
     React.useEffect(() => {
+        if (!enabled) {
+            return;
+        }
         if (indexIsReady && indexState) {
             currentRefresh();
         }

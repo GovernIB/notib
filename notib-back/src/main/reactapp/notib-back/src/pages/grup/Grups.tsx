@@ -15,6 +15,10 @@ const columns = [
         field: 'codi',
         flex: 4,
     },
+    {
+        field: 'organGestor',
+        flex: 4,
+    }
 ];
 
 const GrupForm: React.FC = () => {

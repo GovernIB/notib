@@ -11,7 +11,7 @@ import notibLogoDark from './assets/notib_logo_dark.png';
 import { BaseApp } from './components/BaseApp';
 import DrassanaFooter from './components/DrassanaFooter';
 import NotibProvider from './components/NotibProvider';
-import {useNotibContext, ROLE_SUPER, ROLE_ADMIN, ROLE_USER, ROLE_ADMIN_LECTURA} from './components/NotibContext';
+import {useNotibContext, ROLE_SUPER, ROLE_ADMIN, ROLE_USER, ROLE_ADMIN_LECTURA, ROLE_ORGAN} from './components/NotibContext';
 import theme from './theme';
 
 export const envVars = {
@@ -61,15 +61,15 @@ const InnerApp: React.FC = () => {
             to: '/notificacio/massiva/form',
             icon: 'add',
             resourceName: 'notificacioMassivaResource',
-            hidden: currentRole !== ROLE_USER,
+            hidden: currentRole !== ROLE_USER
         },
         {
-                id: 'enviamentMassiu',
+            id: 'enviamentMassiu',
             title: t('app.menu.consultaEnviamentmassiu'),
             to: '/notificacio/massiva',
             icon: 'forward_to_inbox',
             resourceName: 'notificacioMassivaResource',
-            hidden: currentRole !== ROLE_USER,
+            hidden: currentRole !== ROLE_USER
         },
     ];
     const menuGestio = [
@@ -79,7 +79,7 @@ const InnerApp: React.FC = () => {
             to: '/notificacionsErrorRegistre',
             icon: 'error',
             resourceName: 'notificacioResource',
-            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA,
+            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
         },
         {
             id: 'enviamentMassiu',
@@ -87,7 +87,7 @@ const InnerApp: React.FC = () => {
             to: '/notificacio/massiva',
             icon: 'forward_to_inbox',
             resourceName: 'notificacioMassivaResource',
-            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA,
+            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
         },
         {
             id: 'notificacionsEsborrades',
@@ -119,7 +119,7 @@ const InnerApp: React.FC = () => {
             to: '/permisosUsuari',
             icon: 'group',
             resourceName: 'usuariPermisResource',
-            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
+            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA && currentRole !== ROLE_ORGAN
         }
     ];
     const menuConfig = [
@@ -153,7 +153,7 @@ const InnerApp: React.FC = () => {
             to: '/organs',
             icon: 'account_tree',
             resourceName: 'organGestorResource',
-            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
+            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA && currentRole !== ROLE_ORGAN
         },
         {
             id: 'procediment',
@@ -161,7 +161,7 @@ const InnerApp: React.FC = () => {
             to: '/procediments',
             icon: 'view_timeline',
             resourceName: 'procedimentResource',
-            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
+            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA && currentRole !== ROLE_ORGAN
         },
         {
             id: 'servei',
@@ -169,7 +169,7 @@ const InnerApp: React.FC = () => {
             to: '/serveis',
             icon: 'miscellaneous_services',
             resourceName: 'procedimentResource',
-            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
+            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA && currentRole !== ROLE_ORGAN
         },
         {
             id: 'grups',
@@ -177,7 +177,7 @@ const InnerApp: React.FC = () => {
             to: '/grups',
             icon: 'group',
             resourceName: 'grupResource',
-            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
+            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA && currentRole !== ROLE_ORGAN
         },
         {
             id: 'pagadorspostal',

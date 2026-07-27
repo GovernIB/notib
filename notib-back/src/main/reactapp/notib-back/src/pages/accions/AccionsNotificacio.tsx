@@ -159,6 +159,28 @@ export const useAccionsNotificacio = () => {
     const { exec: esborrarRemesa } = useMuiActionReportLogic(
         'notificacioResource',
         'ESBORRAR_REMESA',
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        botons,
+        undefined,
+        undefined,
+        resposta =>  {
+            if (!resposta || !resposta.ok) {
+                temporalMessageShow(null, resposta.error, "error");
+                return;
+            }
+        },
+        undefined,
+        undefined,
+        true,
     );
     const { exec: recuperarRemesa } = useMuiActionReportLogic(
         'notificacioResource',

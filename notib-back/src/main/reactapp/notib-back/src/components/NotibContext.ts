@@ -17,9 +17,12 @@ export type NotibContextType = {
     currentRole?: string;
     setCurrentRole: (currentRole: string | undefined) => void;
     currentEntitatId?: number;
-    setCurrentEntitatId: (currentRole: any | undefined) => void;
+    setCurrentEntitatId: (currentEntitatId: number | undefined) => void;
     currentEntitatLoading?: boolean;
     currentEntitat?: any;
+    currentOrganId?: number
+    organsAvailable?: any[];
+    setCurrentOrganId: (currentOrganId: number | undefined) => void;
 };
 
 export const NotibContext = React.createContext<NotibContextType | undefined>(undefined);
