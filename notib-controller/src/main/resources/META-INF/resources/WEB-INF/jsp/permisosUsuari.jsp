@@ -238,8 +238,8 @@
                 '</tr>' +
                 '</thead><tbody id="' + tbodyId + '" style="display:none;">';
             if (organsFillsMap.size === 0) {
-                divContingut += '<tr><td>Sense permisos</td></tr>';
-                td.append(divContingut);
+                // divContingut += '<tr><td>Sense permisos</td></tr>';
+                td.append('<tr><td>Sense permisos</td></tr>');
                 return;
             }
             let noFiles = true;

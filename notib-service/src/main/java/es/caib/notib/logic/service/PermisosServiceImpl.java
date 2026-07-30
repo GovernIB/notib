@@ -26,6 +26,7 @@ import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.ProcSerOrganRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
+import es.caib.notib.plugin.unitat.CodiValor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -124,7 +125,7 @@ public class PermisosServiceImpl implements PermisosService {
     // ÒRGANS ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
-    @Cacheable(value = "organsAmbPermis", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name())")
+//    @Cacheable(value = "organsAmbPermis", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name())")
     @Transactional(readOnly = true)
     public List<CodiValorDto> getOrgansAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
 
@@ -520,8 +521,12 @@ public class PermisosServiceImpl implements PermisosService {
         }
         // 2. Obté òrgans amb permis per comunicacions sense procediments --> Només per els permisos de COMUNICACIO i COMUNICACIO_SIR
         List<OrganGestorEntity> organsAmbPermisComunicacionsSenseProcediment = new ArrayList<>();
+        List<CodiValorDto> organsAmbPermisDirecte = null;
         if (PermisEnum.COMUNICACIO.equals(permis) || PermisEnum.COMUNICACIO_SIR.equals(permis)) {
             organsAmbPermisComunicacionsSenseProcediment = getOrgansAmbPermisComunicacionsSenseProcediment(entitat, grups);
+            if (PermisEnum.COMUNICACIO_SIR.equals(permis)) {
+                organsAmbPermisDirecte = getOrgansAmbPermisDirecte(entitat, grups, permis);
+            }
         }
         // 3. Obté procediemtns d'òrgans amb permis per organ
         var procSerAmbPermisOrgan = getProcSerAmbPermisPerOrgan(entitat, permisos, grups, incloureNoVigents, null);
@@ -558,6 +563,9 @@ public class PermisosServiceImpl implements PermisosService {
             if (incloureNoVigents || OrganGestorEstatEnum.V.equals(organ.getEstat())) {
                 o.add(CodiValorDto.builder().codi(organ.getId() + "").valor(organ.getCodi() + " - " + organ.getNom()).build());
             }
+        }
+        if (organsAmbPermisDirecte != null) {
+            o.addAll(organsAmbPermisDirecte);
         }
         Set<CodiValorDto> organsFinals = new HashSet<>(o);
         return new ArrayList<>(organsFinals);
