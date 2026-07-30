@@ -401,7 +401,18 @@ import static es.caib.notib.logic.intf.model.NotificacioResource.ACTION_ANULAR_R
 					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_USER, BaseConfig.ROLE_ORGAN }
 				)
 			}
-		)
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = NotificacioResource.REFRESCAR_ESTAT,
+			requiresId = true,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ADMIN_LECTURA, BaseConfig.ROLE_ORGAN }
+				)
+			}
+		),
 	}
 )
 @CustomValidation.List({
@@ -450,6 +461,7 @@ public class NotificacioResource extends BaseResource<Long> {
 	public static final String ACTION_ANULAR_MASSIU = "ANULAR_MASSIU";
 	public static final String ACTION_AMPLIAR_TERMINI_MASSIU = "AMPLIAR_TERMINI_MASSIU";
 	public static final String ACTION_REINTENTAR_REGISTRE_MASSIU = "REINTENTAR_REGISTRE_MASSIU";
+	public static final String REFRESCAR_ESTAT = "REFRESCAR_ESTAT";
 
 	@NotNull
 	private EnviamentTipus enviamentTipus;

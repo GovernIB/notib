@@ -1,37 +1,30 @@
 import React from 'react';
-import { EventSource } from 'eventsource';
-import { useTranslation } from 'react-i18next';
+import {EventSource} from 'eventsource';
+import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import Icon from '@mui/material/Icon';
-import Switch from '@mui/material/Switch';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import CircularProgress from '@mui/material/CircularProgress';
 import {
     GridPage,
+    MuiActionReportButton,
     MuiDataGrid,
     MuiDataGridApiRef,
-    MuiActionReportButton,
-    useBaseAppContext,
-    useResourceApiService,
-    useAuthContext,
-    useMuiDataGridApiRef,
-    springFilterBuilder as filterBuilder,
     MuiDataGridColDef,
+    springFilterBuilder as filterBuilder,
+    useAuthContext,
+    useBaseAppContext,
     useFilterApiContext,
+    useMuiDataGridApiRef,
+    useResourceApiService,
 } from 'reactlib';
 import LinkToTab from '../../components/LinkToTab';
 import GridFormField from '../../components/GridFormField';
-import {
-    useDatagridFilterProps,
-    useDatagridPageSizeOptionsProps,
-    useDatagridTreeData,
-} from '../../hooks/useDataGrid';
-import { OrganFormContent } from './OrganForm';
+import {useDatagridFilterProps, useDatagridPageSizeOptionsProps,} from '../../hooks/useDataGrid';
+import {OrganFormContent} from './OrganForm';
 
 const columns: MuiDataGridColDef[] = [
     {

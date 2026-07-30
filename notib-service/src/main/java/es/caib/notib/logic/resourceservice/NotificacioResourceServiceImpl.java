@@ -61,6 +61,7 @@ import es.caib.notib.logic.notificacions.ReactivarEstatNotificaActionExecutor;
 import es.caib.notib.logic.notificacions.RecuperarRemesaActionExecutor;
 import es.caib.notib.logic.notificacions.ReenviarAmbErrorActionExecutor;
 import es.caib.notib.logic.notificacions.ReenviarCallbacksMassiuActionExecutor;
+import es.caib.notib.logic.notificacions.RefrescarEstatActionExecutor;
 import es.caib.notib.logic.notificacions.RegistrarRemesaActionExecutor;
 import es.caib.notib.persist.resourceentity.DocumentResourceEntity;
 import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
@@ -70,8 +71,11 @@ import es.caib.notib.persist.resourcerepository.CallbackResourceRepository;
 import es.caib.notib.persist.resourcerepository.DocumentResourceRepository;
 import es.caib.notib.persist.resourcerepository.EventResourceRepository;
 import es.caib.notib.persist.resourcerepository.NotificacioEnviamentResourceRepository;
+import es.caib.notib.persist.resourcerepository.NotificacioResourceRepository;
 import es.caib.notib.persist.resourcerepository.PersonaResourceRepository;
 import es.caib.notib.persist.resourcerepository.ProcedimentOrganGestorResourceRepository;
+import liquibase.pro.packaged.E;
+import liquibase.pro.packaged.R;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.acls.domain.BasePermission;
@@ -116,6 +120,7 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 	private final EnviamentService enviamentService;
 	private final AccioMassivaService accioMassivaService;
 	private final CallbackService callbackService;
+	private final NotificacioResourceRepository notificacioResourceRepository;
 
 	@PostConstruct
 	public void init() {
@@ -159,6 +164,17 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 		register(NotificacioResource.ACTION_MARCAR_PROCESSAT_MASSIU, new MarcarProcessatMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper));
 		register(NotificacioResource.ACTION_ANULAR_MASSIU, new AnularMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper));
 		register(NotificacioResource.ACTION_AMPLIAR_TERMINI_MASSIU, new AmpliarTerminiMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper));
+		register(NotificacioResource.REFRESCAR_ESTAT, new RefrescarEstatActionExecutor(legacyHelper));
+	}
+
+	@Override
+	protected NotificacioResource entityToResource(NotificacioResourceEntity entity) {
+
+		if (entity.isPerActualitzar()) {
+			var estatString = legacyHelper.actualitzarColumnaEstat(entity);
+//			entity.setEstatString(estatString);
+		}
+		return super.entityToResource(entity);
 	}
 
 	@Override
@@ -219,9 +235,8 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 				enviamentsIds.add(enviamentId);
 			});
 		}
-		legacyHelper.altaNotificacio(entity.getId(), enviamentsIds);	}
-
-
+		legacyHelper.altaNotificacio(entity.getId(), enviamentsIds);
+	}
 
 	/*
 	 * Condició en format Spring Filter per a mostrar només les notificacions sobre les que es tenen permisos. Les

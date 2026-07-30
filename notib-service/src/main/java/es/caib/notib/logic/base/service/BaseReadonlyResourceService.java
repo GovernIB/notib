@@ -533,39 +533,30 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		return entities.stream().map(this::entityToResource).collect(Collectors.toList());
 	}
 
-	protected void applyPerspectives(
-			List<E> entities,
-			List<R> resources,
-			String[] perspectives) throws ArtifactNotFoundException {
+	protected void applyPerspectives(List<E> entities, List<R> resources, String[] perspectives) throws ArtifactNotFoundException {
+
 		Arrays.stream(perspectives).forEach(p -> {
 			PerspectiveApplicator<E, R> perspectiveApplicator = perspectiveApplicatorMap.get(p);
-			if (perspectiveApplicator != null) {
-				boolean modified = perspectiveApplicator.applyMultiple(p, entities, resources);
-				if (!modified) {
-					IntStream.range(0, entities.size()).forEach(i -> {
-						perspectiveApplicator.applySingle(
-								p,
-								entities.get(i),
-								resources.get(i));
-					});
-				}
-			} else {
+			if (perspectiveApplicator == null) {
 				throw new ArtifactNotFoundException(getResourceClass(), ResourceArtifactType.PERSPECTIVE, p);
+			}
+			var modified = perspectiveApplicator.applyMultiple(p, entities, resources);
+			if (!modified) {
+				IntStream.range(0, entities.size()).forEach(i -> {
+					perspectiveApplicator.applySingle(p, entities.get(i), resources.get(i));
+				});
 			}
 		});
 	}
 
-	protected void applyPerspectives(
-			E entity,
-			R resource,
-			String[] perspectives) {
+	protected void applyPerspectives(E entity, R resource, String[] perspectives) {
+
 		Arrays.stream(perspectives).forEach(p -> {
 			PerspectiveApplicator<E, R> perspectiveApplicator = perspectiveApplicatorMap.get(p);
-			if (perspectiveApplicator != null) {
-				perspectiveApplicator.applySingle(p, entity, resource);
-			} else {
+			if (perspectiveApplicator == null) {
 				throw new ArtifactNotFoundException(getResourceClass(), ResourceArtifactType.PERSPECTIVE, p);
 			}
+			perspectiveApplicator.applySingle(p, entity, resource);
 		});
 	}
 
@@ -575,9 +566,8 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			return Arrays.stream(resourceAnnotation.defaultSortFields()).
 					map(s -> new SortedField(s.field(), s.direction())).
 					collect(Collectors.toList());
-		} else {
-			return Collections.emptyList();
 		}
+		return Collections.emptyList();
 	}
 
 	protected void onChangeCheckIfFieldExists(Class<?> formClass, String fieldName) {

@@ -17,6 +17,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -26,6 +27,9 @@ import java.util.List;
  */
 @Eager
 public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEntity, Long> {
+
+
+	Set<EnviamentTableEntity> findByNotificacioId(Long notificacioId);
 
 	@Query("select id from EnviamentTableEntity where notificaReferencia is null")
 	List<Long> findIdsSenseReferencia();

@@ -4,7 +4,7 @@ import GridFormField from "../../components/GridFormField.tsx";
 import {useTranslation} from "react-i18next";
 import {TemporalMessageSeverity} from "../../../lib/components/BaseAppContext.tsx";
 
-export const useAccionsNotificacio = () => {
+export const useAccionsNotificacio = (refreshGrid?: () => void) => {
 
     const { t } = useTranslation();
     const { exec: descarregarJustificantEnviament } = useMuiActionReportLogic(
@@ -187,6 +187,32 @@ export const useAccionsNotificacio = () => {
         'RECUPERAR_REMESA',
     );
 
+    const { exec: refrescarEstat } = useMuiActionReportLogic(
+        'notificacioResource',
+        'REFRESCAR_ESTAT',
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        () => {
+            if (refreshGrid) {
+                refreshGrid();
+            }
+        },
+        undefined,
+        undefined,
+        true
+    );
+
     return { descarregarJustificantEnviament,
              descarregarDocumentEnviat,
              descarregarCertificacio,
@@ -194,7 +220,8 @@ export const useAccionsNotificacio = () => {
              ampliarTermini, ampliarTerminiDialog,
              marcarProcessat, marcarProcessatDialog,
              esborrarRemesa,
-             recuperarRemesa
+             recuperarRemesa,
+             refrescarEstat,
     };
 };
 

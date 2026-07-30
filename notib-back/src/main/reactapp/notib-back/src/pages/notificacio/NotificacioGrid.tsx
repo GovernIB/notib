@@ -3,7 +3,7 @@ import {Link, useLocation, useNavigate, useSearchParams} from 'react-router-dom'
 import {useTranslation} from 'react-i18next';
 import {GRID_DETAIL_PANEL_TOGGLE_COL_DEF, GridApiPro, useGridApiRef,} from '@mui/x-data-grid-pro';
 import {GridPage, MuiDataGrid, MuiDataGridColDef, useMuiDataGridApiRef, useMuiDataGridContext, useResourceApiService,} from 'reactlib';
-import { ROLE_ADMIN, ROLE_ADMIN_LECTURA, useNotibContext} from '../../components/NotibContext';
+import {ROLE_ADMIN, ROLE_ADMIN_LECTURA, ROLE_USER, useNotibContext} from '../../components/NotibContext';
 import {useDatagridFilterProps, useDatagridPageSizeOptionsProps} from '../../hooks/useDataGrid';
 import NotificacioGridEnviaments from './NotificacioGridEnviaments';
 import {useNotificacioDetailDialog, useRemesesErrorCallbackDetailDialog, useRemesesErrorRegistreDetailDialog} from './NotificacioDetailDialog';
@@ -18,7 +18,11 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import CustomDetailPanelToggle from "../../utils/CustomDetailPanelToggle.tsx";
 import ContentFilter, {useSpringFilterBuilder} from "./NotificacioFiltre.tsx";
 
-const useDataGridColumns = (datagridApiRef: any, notificacionsEsborrades: boolean, notificacioErrorRegistre: boolean, notificacioCallbackError: boolean ) => {
+const useDataGridColumns = (datagridApiRef: any,
+                                                            notificacionsEsborrades: boolean,
+                                                            notificacioErrorRegistre: boolean,
+                                                            notificacioCallbackError: boolean,
+                                                            refreshGrid: unknown) => {
 
     const noEsTaulaRemeses = notificacionsEsborrades || notificacioErrorRegistre || notificacioCallbackError;
     const { t } = useTranslation();
@@ -81,7 +85,7 @@ const useDataGridColumns = (datagridApiRef: any, notificacionsEsborrades: boolea
                 width: 225,
                 renderCell: (params: any) => {
                     const estatJson = params?.formattedValue;
-                    return (<NotificacioEstatGrid estatJson={estatJson} estatEnum={params?.row?.estat}/>);
+                    return (<NotificacioEstatGrid estatJson={estatJson} estatEnum={params?.row?.estat} notificacioId={params?.row?.id} refreshGrid={refreshGrid}/>);
                 },
             }]),
             ...(noEsTaulaRemeses ? [] : [{
@@ -113,7 +117,7 @@ const NotificacioAddButton: React.FC = () => {
     const open = Boolean(anchorEl);
     const handleClick = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);;
     const handleClose = () => setAnchorEl(null);
-    const crearAny = currentEntitat?.crearNotificacions || currentEntitat?.crearComunicacions || currentEntitat?.crearSir;
+    const crearAny = currentEntitat?.crearNotificacions || currentEntitat?.crearComunicacions || currentEntitat?.crearComunicacions;
     return (
         <>
             <Button
@@ -156,7 +160,7 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
     const { selection } = useMuiDataGridContext();
     const { currentRole} = useNotibContext();
     const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
-    const amagarEntrada = currentRole === 'tothom';
+    const amagarEntrada = currentRole === ROLE_USER;
     const { t } = useTranslation();
 
     const { descarregarExcel,
@@ -304,7 +308,9 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
     const isCreateLinkPresent = !isRoleAdminLectura && apiCurrentActions?.['create'] != null;
     const datagridApiRef = useGridApiRef();
     const apiRef = useMuiDataGridApiRef();
-    const columns = useDataGridColumns(datagridApiRef, notificacionsEsborrades, notificacionsErrorRegistre, notificacionsCallbackError);
+    const [reloadKey, setReloadKey] = React.useState(0);
+    const refreshGrid = React.useCallback(() => setReloadKey(k => k + 1), []);
+    const columns = useDataGridColumns(datagridApiRef, notificacionsEsborrades, notificacionsErrorRegistre, notificacionsCallbackError, refreshGrid);
     const springFilterBuilder = useSpringFilterBuilder();
     const [searchParams] = useSearchParams();
     const referencia = searchParams.get('referencia');
@@ -431,8 +437,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
     const filtreCallbackError = notificacionsCallbackError ? "errorLastCallback:true" : "";
     const fixedFilter = filtreEsborrades + (filtreMassiva ? " and " + filtreMassiva : "")  + (filtreErrorRegistre ? " and " + filtreErrorRegistre : "")
                                 + (filtreCallbackError ? " and " + filtreCallbackError : "");
-    const [reloadKey, setReloadKey] = React.useState(0);
-    const refreshGrid = React.useCallback(() => setReloadKey(k => k + 1), []);
+
 
     const detailPanelProps = !noEsTaulaRemeses ? {
                 getDetailPanelContent: ({ row }: any) => (<NotificacioGridEnviaments id={row.id} />),

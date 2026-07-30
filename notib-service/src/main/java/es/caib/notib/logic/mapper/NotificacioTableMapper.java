@@ -38,6 +38,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -93,6 +95,7 @@ public abstract class NotificacioTableMapper {
     @Mapping(target = "organEstat", source = "params.organEstat")
     public abstract NotificacioTableItemDto toNotificacioTableItemDto(NotificacioTableEntity not, NotificacioTableItemConversioParams params);
 
+	@Transactional
 	public List<NotificacioTableItemDto> toNotificacionsTableItemDto(List<NotificacioTableEntity> nots, @Context List<String> codis, @Context Map<String, OrganismeDto> organs) {
 
 //    public NotificacioTableItemDto mapNotificacioTableItemDtoContext(NotificacioTableEntity not, @Context List<String> codis, @Context Map<String, OrganismeDto> organs) {
@@ -121,7 +124,7 @@ public abstract class NotificacioTableMapper {
     @AfterMapping
     protected void addColumnaEstat(NotificacioTableEntity not, @MappingTarget NotificacioTableItemDto dto) {
 
-        if (not == null) {
+         if (not == null) {
             return;
         }
         if (not.isPerActualitzar()) {
@@ -142,7 +145,7 @@ public abstract class NotificacioTableMapper {
         }
         dto.setEstatString(estat);
     }
-
+	@Autowired EntityManager em;
     private void actualitzar(NotificacioTableEntity not, NotificacioTableItemDto dto) {
 
         var iniciActualitzar = System.currentTimeMillis();

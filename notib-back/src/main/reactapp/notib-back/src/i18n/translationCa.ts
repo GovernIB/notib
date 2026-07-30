@@ -461,6 +461,7 @@ const translationCa = {
                 },
                 dades: {
                     title: 'Dades de la notificació',
+                    refrescar: "Refrescar la columna estat",
                     anulada: "La remesa té un o més enviaments anul·lats",
                     errorCanviEstat: "Hi ha hagut error notificant al client del canvi d'estat...",
                     justificant: 'Justificant',

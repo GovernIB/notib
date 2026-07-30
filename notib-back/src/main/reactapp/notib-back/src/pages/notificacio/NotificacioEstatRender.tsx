@@ -5,16 +5,21 @@ import BlockIcon from '@mui/icons-material/Block';
 import WarningIcon from '@mui/icons-material/Warning';
 import ErrorIcon from '@mui/icons-material/Error';
 import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import {
     ENVIAMENT_ESTAT_MAP,
     NOTIFICACIO_ESTAT_ENUM_MAP,
     NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP,
 } from '../../utils/estatConfig';
 import { useTranslation } from 'react-i18next';
+import useAccionsNotificacio from "../accions/AccionsNotificacio.tsx";
+import {ROLE_USER, useNotibContext} from "../../components/NotibContext.ts";
 
 export type NotificacioEstatRenderProps = {
     estatJson: any;
     estatEnum: string;
+    notificacioId: number,
+    refreshGrid: any
 };
 
 // Gestió d'Entrega Postal
@@ -231,58 +236,55 @@ const DataIHistoric: React.FC<{ dataEstat: string; notificaEstats: any[] }> = (p
     );
 };
 
+
+const refrescarEstatString = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>, notificacioId: number, refrescarEstat : any) => {
+
+    event.preventDefault();
+    event.stopPropagation();
+    refrescarEstat(notificacioId);
+}
+
 // Dissenyat específicament per la cel·la del Grid de Notificacions
 export const NotificacioEstatGrid: React.FC<NotificacioEstatRenderProps> = (props) => {
-    const { estatJson, estatEnum } = props;
 
+    const { estatJson, estatEnum, notificacioId, refreshGrid } = props;
+    const { refrescarEstat } = useAccionsNotificacio(refreshGrid);
+    const { t } = useTranslation();
     let estatObjecte: any = null;
+    const { currentRole} = useNotibContext();
+    const isRoleUser = currentRole === ROLE_USER;
+    const refrescar = (<Box sx={{display: "flex", justifyContent: "flex-end"}}>
+                                    <Tooltip title={t('page.notificacio.detail.dades.refrescar')} arrow
+                                             onClick={(event) => refrescarEstatString(event, notificacioId, refrescarEstat)}>
+                                        <RefreshIcon color="info" sx={{fontSize: '16px'}}/>
+                                    </Tooltip>
+                                </Box>);
     try {
-        if (estatJson) {
-            estatObjecte = JSON.parse(estatJson);
+        if (!estatJson) {
+            return !isRoleUser ? refrescar : null;
         }
+        estatObjecte = JSON.parse(estatJson);
     } catch (error) {
         console.error('La cadena no és un JSON vàlid:', error);
     }
 
-    if (!estatObjecte) return null;
-
     return (
-        <Box
-            sx={{
-                width: '100%',
-                display: 'flex',
-                flexDirection: 'row',
-                p: 0.5,
-                alignItems: 'flex-start',
-            }}
-        >
+        <Box sx={{width: '100%', display: 'flex', flexDirection: 'row', p: 0.5, alignItems: 'flex-start',}}>
             <Box sx={{ flex: 10, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                 <RegistreEstats registreEstat={estatObjecte?.registreEstat} />
-                <EstatPrincipal
-                    estatEnum={estatEnum}
-                    nomEstat={estatObjecte?.nomEstat}
-                    anulat={estatObjecte?.anulat}
-                />
+                <EstatPrincipal estatEnum={estatEnum} nomEstat={estatObjecte?.nomEstat} anulat={estatObjecte?.anulat}/>
                 <ErrorsIAvisos
                     eventError={estatObjecte?.eventError}
                     callbackFiReintents={estatObjecte?.callbackFiReintents}
                     notificacioMovilError={estatObjecte?.notificacioMovilError}
                 />
-                <DataIHistoric
-                    dataEstat={estatObjecte?.dataEstat}
-                    notificaEstats={estatObjecte?.notificaEstats}
+                <DataIHistoric dataEstat={estatObjecte?.dataEstat} notificaEstats={estatObjecte?.notificaEstats}
                 />
             </Box>
-            <Box
-                sx={{
-                    flex: 2,
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                    alignItems: 'flex-start',
-                }}
-            >
+            <Box sx={{flex: 2, display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-start',}}>
                 <EntregaPostal entregaPostal={estatObjecte?.entregaPostal} />
             </Box>
+            {!isRoleUser && refrescar}
         </Box>
     );
 };
@@ -290,40 +292,24 @@ export const NotificacioEstatGrid: React.FC<NotificacioEstatRenderProps> = (prop
 
 // Dissenyat específicament per a les vistes de Detall de la Notificació
 export const NotificacioEstatDetall: React.FC<{ notificacio: any }> = (props) => {
+
     const { notificacio } = props;
     const { t } = useTranslation();
-
-    if (!notificacio || !notificacio.estat) return null;
-
+    if (!notificacio?.estat) {
+        return null;
+    }
     // Comprova si notificacio.enviant és true per forçar la icona i el text ENVIANT
     const estatRealEnum = notificacio?.enviant ? 'ENVIANT' : notificacio.estat;
     const configEstat = NOTIFICACIO_ESTAT_ENUM_MAP[estatRealEnum];
-
     // Condició per mostrar sub-estats d'enviaments
     const mostraSubEstats = estatRealEnum === 'FINALITZADA' || estatRealEnum === 'PROCESSADA';
 
     return (
-        <Box
-            sx={{
-                width: '100%',
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 0.5,
-                flexWrap: 'wrap',
-            }}
-        >
+        <Box sx={{width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 0.5, flexWrap: 'wrap'}}>
             {/* Icona i Text de l'Estat Principal */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 {configEstat && (
-                    <Box
-                        component="span"
-                        sx={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            color: configEstat.color,
-                        }}
-                    >
+                    <Box component="span" sx={{display: 'inline-flex', alignItems: 'center', color: configEstat.color,}}>
                         {configEstat.icona}
                     </Box>
                 )}
@@ -336,19 +322,10 @@ export const NotificacioEstatDetall: React.FC<{ notificacio: any }> = (props) =>
             {mostraSubEstats &&
                 notificacio?.enviamentsInfo &&
                 notificacio.enviamentsInfo.length > 0 && (
-                    <Typography
-                        variant="body2"
-                        sx={{
-                            color: 'text.secondary',
-                            display: 'inline-flex',
-                            gap: '4px',
-                            flexWrap: 'wrap',
-                        }}
-                    >
+                    <Typography variant="body2" sx={{color: 'text.secondary', display: 'inline-flex', gap: '4px', flexWrap: 'wrap',}}>
                         (
                         {notificacio.enviamentsInfo.map((enviament: any, index: number) => {
                             let textEnviament = '';
-
                             if (enviament.notificat == true) {
                                 textEnviament = t('utils.estatConfig.ESTAT_ENUM_MAP.NOTIFICADA');
                             } else if (notificacio?.comunicacioSir) {
@@ -363,7 +340,9 @@ export const NotificacioEstatDetall: React.FC<{ notificacio: any }> = (props) =>
                             }
 
                             // Si finalment no s'ha pogut calcular cap text
-                            if (!textEnviament) return null;
+                            if (!textEnviament) {
+                                return null;
+                            }
 
                             return (
                                 <Typography key={index} component={'span'} variant="body2">
@@ -418,15 +397,10 @@ export const NotificacioEstatDetall: React.FC<{ notificacio: any }> = (props) =>
             {/* Errors de dispositius mòbils */}
             {notificacio?.notificacionsMovilErrorDesc?.map((errorText: string, id: number) => (
                 <Tooltip key={id} title={errorText} arrow>
-                    <PhoneIphoneIcon
-                        sx={{
-                            fontSize: '18px',
-                            color: (theme) =>
-                                theme.palette.mode === 'dark' ? '#f5c777' : '#8a6d3b',
-                        }}
-                    />
+                    <PhoneIphoneIcon sx={{fontSize: '18px', color: (theme) => theme.palette.mode === 'dark' ? '#f5c777' : '#8a6d3b'}}/>
                 </Tooltip>
             ))}
+
         </Box>
     );
 };

@@ -22,6 +22,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -186,6 +188,7 @@ public class LegacyHelper {
 	 * @param notificacioId l'identificador de la notificació
 	 * @param enviamentsIds la llista d'ids dels enviaments associats a la notificació
 	 */
+	@Transactional
 	public void altaNotificacio(Long notificacioId, List<Long> enviamentsIds) {
 
 		// Lògica antiga per a les notificacions
@@ -206,7 +209,7 @@ public class LegacyHelper {
 		}
 		// Crea el registre a notificacio_table
 		 notificacioTableHelper.crearRegistre(notificacioEntity.get());
-
+		actualitzarColumnaEstat(notificacioEntity.get());
 		// Crea la informació d'auditoria
 		auditHelper.auditaNotificacio(notificacioEntity.get(), AuditService.TipusOperacio.CREATE, "NotificacioResourceServiceImpl.afterCreateSave");
 		// Dona d'alta els enviaments a la màqina d'estats al finalitzar la transacció
@@ -241,20 +244,29 @@ public class LegacyHelper {
 	private final NotificacioListHelper notificacioListHelper;
 	private final CacheHelper cacheHelper;
 
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public String actualitzarColumnaEstat(NotificacioResourceEntity entity) {
 
-	public void actualitzarColumnaEstat(NotificacioResourceEntity entity) {
+		var notificacio = notificacioRepository.findById(entity.getId()).orElseThrow();
+		return actualitzarColumnaEstat(notificacio);
+
+	}
+
+	public String actualitzarColumnaEstat(NotificacioEntity entity) {
 
 		var entitat = entity.getEntitat();
 		var tableEntity = notificacioTableViewRepository.findById(entity.getId()).get();
 		if (!tableEntity.isPerActualitzar()) {
-			return;
+			return null;
 		}
-		notificacioTableMapper.toNotificacionsTableItemDto(
-			List.of(tableEntity),
-			notificacioListHelper.getCodisProcedimentsAndOrgansAmpPermisProcessar(entitat.getId(), tableEntity.getUsuariCodi()),
-			cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi()));
-		tableEntity = notificacioTableViewRepository.save(tableEntity);
+		if (tableEntity.getEnviaments() == null) {
+			tableEntity.setEnviaments(new java.util.LinkedHashSet<>(entity.getEnviaments()));
+		}
+		var permisos = notificacioListHelper.getCodisProcedimentsAndOrgansAmpPermisProcessar(entitat.getId(), tableEntity.getUsuariCodi());
+		var organigrama = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
+		notificacioTableMapper.toNotificacionsTableItemDto(List.of(tableEntity), permisos, organigrama);
 		var reloaded =  notificacioTableViewRepository.findById(tableEntity.getId()).orElseThrow();
+		return reloaded.getEstatString();
 	}
 
 }
