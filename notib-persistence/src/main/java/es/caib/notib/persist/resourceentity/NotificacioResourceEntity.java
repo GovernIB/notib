@@ -242,8 +242,8 @@ public class NotificacioResourceEntity
 	@Formula("(select t.estat_string from " + BaseConfig.DB_PREFIX + "notificacio_table t where t.id = id)")
 	private String estatString;
 
-	@Formula("(select t.per_actualitzar from " + BaseConfig.DB_PREFIX + "notificacio_table t where t.id = id)")
-	private boolean perActualitzar;
+	@Formula("(select coalesce(t.per_actualitzar, true) from " + BaseConfig.DB_PREFIX + "notificacio_table t where t.id = id)")
+	private Boolean perActualitzar;
 
 //	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "titular", insertable = false, updatable = false)
 	@Formula("(select t.titular from " + BaseConfig.DB_PREFIX + "notificacio_table t where t.id = id)")

@@ -170,7 +170,7 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 	@Override
 	protected NotificacioResource entityToResource(NotificacioResourceEntity entity) {
 
-		if (entity.isPerActualitzar()) {
+		if (Boolean.TRUE.equals(entity.getPerActualitzar())) {
 			var estatString = legacyHelper.actualitzarColumnaEstat(entity);
 //			entity.setEstatString(estatString);
 		}
