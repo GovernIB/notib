@@ -75,11 +75,7 @@ export const UserProfileFormDialog: React.FC<{
                 <GridFormField size={8} name="nomSencer" disabled />
                 <GridFormField size={6} name="email" disabled />
                 <GridFormField size={6} name="emailAlt" />
-                <GridFormField
-                    size={4}
-                    name="numElementsPaginaDefecte"
-                    emptyValueDescription={t('component.UserProfile.auto')}
-                />
+                <GridFormField size={4} name="numElementsPaginaDefecte" emptyValueDescription={t('component.UserProfile.auto')}/>
                 <GridFormField size={4} name="idioma" />
                 <GridFormField size={4} name="tema" />
                 <GridFormField size={6} name="rebreEmailsNotificacio" />

@@ -7,13 +7,14 @@ import GridFormField from '../../components/GridFormField';
 import PermissionGridSwitch from '../../components/PermissionGridSwitch';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 
-const PermissionForm: React.FC = () => {
+const PermissionForm: React.FC<{ comu: boolean }> = (props) => {
 
+    const { comu } = props;
     const { t } = useTranslation();
-    const { apiRef } = useFormContext();
+    const { apiRef, data } = useFormContext();
     const doFieldChange = (targetValue: boolean) => {
         const permisos = [
-            'adminAllowed',
+            'readAllowed',
             'perm4Allowed',
             'adminAllowed',
             'perm5Allowed',
@@ -22,33 +23,49 @@ const PermissionForm: React.FC = () => {
         ];
         permisos.forEach((nomPermis) => apiRef?.current?.setFieldValue?.(nomPermis, targetValue));
     };
+    React.useEffect(() => {
+        if (!data?.id && !data?.tipus) {
+            apiRef?.current?.setFieldValue?.('tipus', 'USUARI');
+        }
+    }, [data?.id, data?.tipus, apiRef]);
+    React.useEffect(() => {
 
-    const sidGrantedAuthorityEnumOptions = [
-        {
-            value: false,
-            description: t('component.PermissionGrid.grantedAuthority.user'),
-        },
-        {
-            value: true,
-            description: t('component.PermissionGrid.grantedAuthority.role'),
-        },
-    ];
+        if (typeof data?.sidName !== 'string' || typeof data?.tipus !== 'string') {
+            return;
+        }
+        const next = data.tipus === 'ROL' ? data.sidName.toUpperCase() : data.sidName.toLowerCase();
+        if (data.sidName !== next) {
+            apiRef?.current?.setFieldValue?.('sidName', next);
+        }
+    }, [data?.tipus, data?.sidName, apiRef]);
+    // const sidGrantedAuthorityEnumOptions = [
+    //     {
+    //         value: false,
+    //         description: t('component.PermissionGrid.grantedAuthority.user'),
+    //     },
+    //     {
+    //         value: true,
+    //         description: t('component.PermissionGrid.grantedAuthority.role'),
+    //     },
+    // ];
 
     return (
         <Grid container spacing={2}>
             <GridFormField
-                name="sidGrantedAuthority"
-                type="enum"
+                name="tipus"
                 label={t('component.PermissionGrid.tipus')}
-                options={sidGrantedAuthorityEnumOptions}
+                // type="enum"
+                // options={sidGrantedAuthorityEnumOptions}
                 required
                 size={3}
+                disabled={data?.id}
             />
-            <GridFormField size={9} name="sidName" />
+            <GridFormField size={9} name="sidName" disabled={data?.id}  />
+            {comu && <GridFormField name="organGestor" required size={12} disabled={data?.id} />}
             <PermissionGridSwitch name="selectAll" label={'Seleccionar tots'} icon={<Icon>toggle_on</Icon>} size={12} onChange={doFieldChange}/>
             <Grid size={1} />
             <PermissionGridSwitch
-                name="adminAllowed"
+                name="readAllowed"
                 label={t('page.serveis.form.permisos.consultaAllowed')}
                 tooltip={t('page.serveis.form.permisos.consultaAllowedTooltip')}
                 icon={<Icon>search</Icon>}
@@ -177,7 +194,7 @@ const ServeiFormTabPermisos: React.FC = () => {
                 resourceName="procedimentResource"
                 id={id}
                 permissionEntries={permissionEntries}
-                permissionForm={<PermissionForm />}
+                permissionForm={<PermissionForm comu={data.comu} />}
                 withOrganGestor={data.comu}
     />);
 };

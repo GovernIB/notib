@@ -98,7 +98,7 @@ public class AclHelper {
 	 * @param sidGrantedAuthority true si el nom del sid correspon a una GrantedAuthority (rol) false en cas contrari.
 	 * @param permissionsGranted la llista de permisos que te el SID especificat sobre el recurs.
 	 */
-	public void set(Class<?> resourceClass, Serializable resourceId, String sidName, boolean sidGrantedAuthority, List<PermissionEnum> permissionsGranted) {
+		public void set(Class<?> resourceClass, Serializable resourceId, String sidName, boolean sidGrantedAuthority, List<PermissionEnum> permissionsGranted) {
 
 		var sid = getSid(sidName, sidGrantedAuthority);
 		MutableAcl acl = getMutableAcl(resourceClass, resourceId, List.of(sid), true);

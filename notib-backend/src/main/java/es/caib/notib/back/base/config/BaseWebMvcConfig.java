@@ -26,14 +26,15 @@ import java.util.List;
 
 /**
  * Configuració de Spring MVC.
- * 
+ *
  * @author Límit Tecnologies
  */
 public abstract class BaseWebMvcConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-		CustomPageableHandlerMethodArgumentResolver resolver = new CustomPageableHandlerMethodArgumentResolver();
+
+		var resolver = new CustomPageableHandlerMethodArgumentResolver();
 		resolver.setFallbackPageable(Pageable.unpaged());
 		resolvers.add(resolver);
 		WebMvcConfigurer.super.addArgumentResolvers(resolvers);
@@ -41,24 +42,25 @@ public abstract class BaseWebMvcConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		if (isJsAppResourceHandlerEnabled()) {
-			// ResourceHandler per a que totes les peticions desconegudes passin per l'index.html
-			registry.
-					addResourceHandler(getJsAppStaticFolder() + "/**").
-					addResourceLocations("classpath:/static" + getJsAppStaticFolder() + "/").
-					resourceChain(true).
-					addResolver(new PathResourceResolver() {
-						@Override
-						protected Resource getResource(String resourcePath, Resource location) throws IOException {
-							Resource requestedResource = location.createRelative(resourcePath);
-							if (requestedResource.exists() && requestedResource.isReadable()) {
-								return requestedResource;
-							} else {
-								return new ClassPathResource("static" + getJsAppStaticFolder() + "/index.html");
-							}
-						}
-					});
+
+		if (!isJsAppResourceHandlerEnabled()) {
+			return;
 		}
+		// ResourceHandler per a que totes les peticions desconegudes passin per l'index.html
+		registry.addResourceHandler(getJsAppStaticFolder() + "/**")
+				.addResourceLocations("classpath:/static" + getJsAppStaticFolder() + "/")
+				.resourceChain(true)
+				.addResolver(new PathResourceResolver() {
+					@Override
+					protected Resource getResource(String resourcePath, Resource location) throws IOException {
+						Resource requestedResource = location.createRelative(resourcePath);
+						if (requestedResource.exists() && requestedResource.isReadable()) {
+							return requestedResource;
+						}
+						return new ClassPathResource("static" + getJsAppStaticFolder() + "/index.html");
+
+					}
+				});
 	}
 
 	@Override
@@ -75,36 +77,37 @@ public abstract class BaseWebMvcConfig implements WebMvcConfigurer {
 	}
 
 	public static class CustomPageableHandlerMethodArgumentResolver extends PageableHandlerMethodArgumentResolverSupport implements PageableArgumentResolver {
+
 		private static final String UNPAGED_MARKER = "UNPAGED";
 		private final SortArgumentResolver sortResolver = new SortHandlerMethodArgumentResolver();
+
 		@Override
 		public boolean supportsParameter(MethodParameter parameter) {
 			return Pageable.class.equals(parameter.getParameterType());
 		}
+
 		@Override
 		public Pageable resolveArgument(
 				MethodParameter methodParameter,
 				@Nullable ModelAndViewContainer mavContainer,
 				NativeWebRequest webRequest,
 				@Nullable WebDataBinderFactory binderFactory) {
+
 			String page = webRequest.getParameter(getParameterNameToUse(getPageParameterName(), methodParameter));
 			String pageSize = webRequest.getParameter(getParameterNameToUse(getSizeParameterName(), methodParameter));
 			Sort sort = sortResolver.resolveArgument(methodParameter, mavContainer, webRequest, binderFactory);
 			boolean withPageOrSort = page != null || pageSize != null || sort.isSorted();
 			if (!withPageOrSort) {
 				return null;
-			} else if (UNPAGED_MARKER.equals(page)) {
-				return new UnpagedButSorted(sort);
-			} else {
-				Pageable pageable = getPageable(
-						methodParameter,
-						page == null ? "0" : page,
-						pageSize == null || "0".equals(pageSize) ? "10" : pageSize);
-				if (sort.isSorted()) {
-					return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-				}
-				return pageable;
 			}
+			if (UNPAGED_MARKER.equals(page)) {
+				return new UnpagedButSorted(sort);
+			}
+			var pageNum = page == null ? "0" : page;
+			var size = pageSize == null || "0".equals(pageSize) ? "10" : pageSize;
+			var pageable = getPageable(methodParameter, pageNum, size);
+			return sort.isSorted() ? PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort) : pageable;
+
 		}
 	}
 

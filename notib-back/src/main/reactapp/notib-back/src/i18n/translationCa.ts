@@ -1,7 +1,7 @@
 const translationCa = {
     app: {
         loading: 'Iniciant NOTIB',
-        noEntitat: 'Aquest usuari no te accés a cap entorn',
+        noEntitat: 'Aquest usuari no te accés a cap entitat',
         menu: {
             home: 'Inici',
             config: 'Configuració',

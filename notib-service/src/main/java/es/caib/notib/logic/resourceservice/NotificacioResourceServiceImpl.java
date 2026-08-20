@@ -368,6 +368,7 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 			var isComunicacio = previous.getEnviamentTipus() != null && (EnviamentTipus.COMUNICACIO.equals(previous.getEnviamentTipus()) || EnviamentTipus.SIR.equals(previous.getEnviamentTipus()));
 			if (organGestor == null || !isComunicacio) {
 				target.setProcedimentRequired(true);
+				return;
 			}
 			List<Long> organGestorIdsWithPermission = notibPermissionHelper.organGestorIdsWithPermissionRecursive(ExtendedPermission.PERM7);
 			var hasComunicacionsSenseProcedimentPermission = organGestorIdsWithPermission.contains(organGestor.getId());

@@ -40,7 +40,7 @@ public class EnviamentCertificacioReportGenerator implements BaseReadonlyResourc
 			return DownloadableFile.builder().name(certificacio.getNom()).content(certificacio.getContingut()).contentType(certificacio.getContentType()).build();
 		} catch (Exception ex) {
 			log.error("[EnviamentCertificacioReportGenerator] Error obtinguent la certificacio per l'enviament" + enviament.getId());
-			return DownloadableFile.builder().name("error_certificacio.df").content(new byte[]{}).contentType(mimeType).build();
+			return DownloadableFile.builder().name("error_certificacio.pdf").content(new byte[]{}).contentType(mimeType).build();
 		}
 	}
 

@@ -1,7 +1,6 @@
 package es.caib.notib.logic.intf.resourceservice;
 
 import es.caib.notib.logic.intf.base.service.ReadonlyResourceService;
-import es.caib.notib.logic.intf.model.ActiveMqResource;
 import es.caib.notib.logic.intf.model.UsuariPermisResource;
 
 /**

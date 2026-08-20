@@ -1096,29 +1096,17 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		}
 	}
 
-	protected <T> void validateResource(
-			T resource,
-			int paramIndex,
-			BindingResult bindingResult,
-			Object... validationHints) throws MethodArgumentNotValidException {
-		BindingResult resourceBindingResult = new BeanPropertyBindingResult(
-				resource,
-				bindingResult != null ? bindingResult.getObjectName() : "resource");
+	protected <T> void validateResource(T resource, int paramIndex, BindingResult bindingResult, Object... validationHints) throws MethodArgumentNotValidException {
+
+		BindingResult resourceBindingResult = new BeanPropertyBindingResult(resource, bindingResult != null ? bindingResult.getObjectName() : "resource");
 		Object[] finalValidationHints = validationHints;
 		if (validationHints == null || validationHints.length == 0) {
 			finalValidationHints = new Object[] { Default.class };
 		}
-		validator.validate(
-				resource,
-				resourceBindingResult,
-				finalValidationHints);
+		validator.validate(resource, resourceBindingResult, finalValidationHints);
 		if (resourceBindingResult.hasErrors() && bindingResult != null) {
 			bindingResult.addAllErrors(resourceBindingResult);
-			throw new MethodArgumentNotValidException(
-					new MethodParameter(
-							new Object() {}.getClass().getEnclosingMethod(),
-							paramIndex),
-					bindingResult);
+			throw new MethodArgumentNotValidException(new MethodParameter(new Object() {}.getClass().getEnclosingMethod(), paramIndex), bindingResult);
 		}
 	}
 

@@ -3,27 +3,27 @@ package es.caib.notib.logic.resourceservice;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.helper.AclHelper;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
+import es.caib.notib.logic.helper.ProcSerHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.model.ProcedimentResource;
 import es.caib.notib.logic.intf.resourceservice.ProcedimentResourceService;
+import es.caib.notib.logic.procSer.ComuOnChangeLogicProcessor;
 import es.caib.notib.persist.resourceentity.EntregaCieResourceEntity;
-import es.caib.notib.persist.resourceentity.PagadorCieResourceEntity;
-import es.caib.notib.persist.resourceentity.PagadorPostalResourceEntity;
 import es.caib.notib.persist.resourceentity.ProcedimentResourceEntity;
 import es.caib.notib.persist.resourcerepository.EntregaCieResourceRepository;
+import es.caib.notib.persist.resourcerepository.OrganGestorResourceRepository;
 import es.caib.notib.persist.resourcerepository.PagadorCieResourceRepository;
 import es.caib.notib.persist.resourcerepository.PagadorPostalResourceRepository;
+import es.caib.notib.persist.resourcerepository.ProcedimentOrganGestorResourceRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.io.Serializable;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Implementació del servei de gestió de procediments.
@@ -38,6 +38,8 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 	private final PagadorPostalResourceRepository pagadorPostalResourceRepository;
 	private final PagadorCieResourceRepository pagadorCieResourceRepository;
 	private final EntregaCieResourceRepository entregaCieResourceRepository;
+	private final OrganGestorResourceRepository organGestorResourceRepository;
+	private final ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository;
 
 	public ProcedimentResourceServiceImpl(
 		UserSessionHelper userSessionHelper,
@@ -46,18 +48,22 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 		AclHelper aclHelper,
 		PagadorPostalResourceRepository pagadorPostalResourceRepository,
 		PagadorCieResourceRepository pagadorCieResourceRepository,
-		EntregaCieResourceRepository entregaCieResourceRepository) {
+		EntregaCieResourceRepository entregaCieResourceRepository,
+		OrganGestorResourceRepository organGestorResourceRepository,
+		ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository) {
 
 		super(userSessionHelper, authenticationHelper, notibPermissionHelper);
 		this.aclHelper = aclHelper;
 		this.pagadorPostalResourceRepository = pagadorPostalResourceRepository;
 		this.pagadorCieResourceRepository = pagadorCieResourceRepository;
 		this.entregaCieResourceRepository = entregaCieResourceRepository;
+		this.organGestorResourceRepository = organGestorResourceRepository;
+		this.procedimentOrganGestorResourceRepository = procedimentOrganGestorResourceRepository;
 	}
 
 	@PostConstruct
 	public void init() {
-		register(ProcedimentResource.Fields.comu, new ProcedimentResourceServiceImpl.ComuOnChangeLogicProcessor());
+		register(ProcedimentResource.Fields.comu, new ComuOnChangeLogicProcessor(organGestorResourceRepository, userSessionHelper));
 	}
 
 	@Override
@@ -75,15 +81,25 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 	@Override
 	protected void completeResource(ProcedimentResource resource) {
 
-		if (resource.isComu()) {
-			resource.setOrganGestor(null);
-		}
+//		if (!resource.isComu()) {
+//			return;
+//		}
+//		var entitat = userSessionHelper.getCurrentEntitat();
+//
+//		resource.setOrganGestor(null);
 	}
 
 	@Override
 	protected void afterConversion(ProcedimentResourceEntity entity, ProcedimentResource resource) {
 
-		resource.setAclEntryCount(aclHelper.count(AclHelper.PROCEDIMENT_CLASS, entity.getId(), null));
+		var count = aclHelper.count(AclHelper.PROCEDIMENT_CLASS, resource.getId(), null);
+		if (resource.isComu()) {
+			var procSerIds = procedimentOrganGestorResourceRepository.findProcOrganIdByProcediment(resource.getId());
+			for (var procSerId : procSerIds) {
+				count += aclHelper.count(AclHelper.PROCEDIMENT_ORGAN_CLASS, procSerId, null);
+			}
+		}
+		resource.setAclEntryCount(count);
 		if (entity.getEntregaCie() == null) {
 			return;
 		}
@@ -118,24 +134,6 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 		entregaCieResourceRepository.save(entregaCie);
 	}
 
-	/*
-	 * Lògica onChange pel camp comu. Segons el valor d'aquest camp canvien els camps visibles / habilitats.
-	 */
-	public static class ComuOnChangeLogicProcessor implements OnChangeLogicProcessor<ProcedimentResource> {
 
-		@Override
-		public void onChange(Serializable id, ProcedimentResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ProcedimentResource target) {
-
-			if ((boolean)fieldValue) {
-				target.setFieldEntregaCieHidden(true);
-				target.setFieldOrganGestorDisabled(true);
-				target.setOrganGestor(ResourceReference.toResourceReference(0L, "A04003003, Govern de les Illes Balears"));
-				return;
-			}
-			target.setFieldEntregaCieHidden(false);
-			target.setFieldOrganGestorDisabled(false);
-			target.setOrganGestor(null);
-		}
-	}
 
 }

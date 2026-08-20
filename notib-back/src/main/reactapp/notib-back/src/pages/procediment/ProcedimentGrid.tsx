@@ -77,7 +77,7 @@ const columns: MuiDataGridColDef[] = [
         flex: 0.6,
         renderCell: (params: any) => {
             return (
-                <LinkToTab id={params.id} tab={2}>
+                <LinkToTab id={params.id} tab={2} clickEnabled>
                     <Chip label={params.value} color={params.value ? 'primary' : undefined} size="small"/>
                 </LinkToTab>
             );

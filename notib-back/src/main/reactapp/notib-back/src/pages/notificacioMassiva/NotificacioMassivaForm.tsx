@@ -1,4 +1,4 @@
-import {FormPage, MuiActionReportButton, MuiForm, useFormApiRef} from "reactlib";
+import {FormField, FormPage, MuiActionReportButton, MuiForm, useFormApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -74,26 +74,26 @@ const NotificacioMassivaForm: React.FC = () => {
                     </Box>
                 </Box>
                 <Grid container spacing={2} sx={{marginTop:'50px'}}>
-                    {/*<Grid size={12}>*/}
-                    {/*    <FormField*/}
-                    {/*        type="file"*/}
-                    {/*        name="csv"*/}
-                    {/*        label={t('page.notificacioMassiva.form.csvFieldLabel')}*/}
-                    {/*        componentProps={{ helperText: t('page.notificacioMassiva.form.csvFieldText')}}*/}
-                    {/*        accept=".csv"*/}
-                    {/*        required*/}
-                    {/*    />*/}
-                    {/*</Grid>*/}
-                    {/*<Grid size={12}>*/}
-                    {/*    <FormField*/}
-                    {/*        type="file"*/}
-                    {/*        name="zip"*/}
-                    {/*        label={t('page.notificacioMassiva.form.zipFieldLabel')}*/}
-                    {/*        componentProps={{ helperText: t('page.notificacioMassiva.form.zipFieldText')}}*/}
-                    {/*        accept=".zip"*/}
-                    {/*        required*/}
-                    {/*    />*/}
-                    {/*</Grid>*/}
+                    <Grid size={12}>
+                        <FormField
+                            type="file"
+                            name="csv"
+                            label={t('page.notificacioMassiva.form.csvFieldLabel')}
+                            componentProps={{ helperText: t('page.notificacioMassiva.form.csvFieldText')}}
+                            accept=".csv"
+                            required
+                        />
+                    </Grid>
+                    <Grid size={12}>
+                        <FormField
+                            type="file"
+                            name="zip"
+                            label={t('page.notificacioMassiva.form.zipFieldLabel')}
+                            componentProps={{ helperText: t('page.notificacioMassiva.form.zipFieldText')}}
+                            accept=".zip"
+                            required
+                        />
+                    </Grid>
                     <GridFormField size={12} name="caducitat" label={t('page.notificacioMassiva.form.caducitat')} type="date" required />
                     <GridFormField size={12} name="email" label={t('page.notificacioMassiva.form.email')} />
                 </Grid>

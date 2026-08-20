@@ -11,7 +11,7 @@ import javax.persistence.Id;
 
 /**
  * Mapping lleuger per mantenir un identificador estable d'API per a AclEntry.
- * Les dades reals d'autorització es desen en les taules Spring ACL (com_acl_*).
+ * Les dades reals d'autorització es desen en les taules Spring ACL (not_acl_*).
  */
 @Getter
 @Setter
@@ -33,24 +33,15 @@ public class AclEntryResourceEntity implements es.caib.notib.persist.base.entity
 	}
 
 	public Boolean getSidGrantedAuthority() {
-		if (getResource() != null) {
-			return getResource().isSidGrantedAuthority();
-		} else {
-			return null;
-		}
+		return getResource() != null ? getResource().isSidGrantedAuthority() : null;
 	}
+
 	public String getSidName() {
-		if (getResource() != null) {
-			return getResource().getSidName();
-		} else {
-			return null;
-		}
+		return getResource() != null ? getResource().getSidName() : null;
 	}
 
 	@Builder
-	public AclEntryResourceEntity(
-			String id,
-			AclEntryResource resource) {
+	public AclEntryResourceEntity(String id, AclEntryResource resource) {
 		this.id = id;
 		this.resource = resource;
 	}

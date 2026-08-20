@@ -30,6 +30,7 @@ import es.caib.notib.persist.repository.PagadorPostalRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
 import es.caib.notib.persist.repository.ProcedimentRepository;
 import es.caib.notib.persist.repository.ServeiRepository;
+import es.caib.notib.persist.resourcerepository.ProcedimentOrganGestorResourceRepository;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +51,7 @@ import java.util.Set;
 
 /**
  * Helper per a convertir entities a dto
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -77,6 +78,8 @@ public class ProcSerHelper {
 	private NotificacioRepository notificacioRepository;
 	@Autowired
 	private ProcSerRepository procSerRepository;
+	@Autowired
+	private ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository;
 	@Autowired
 	private GrupRepository grupReposity;
 	@Autowired
@@ -256,7 +259,7 @@ public class ProcSerHelper {
 		log.debug(sb.toString());
 		return usuaris;
 	}
-	
+
 	public Set<String> findUsuarisAmbPermisReadPerGrup(ProcSerEntity procediment) {
 
 		var sb = new StringBuilder(LLISTA_MAIL_TEXT);
@@ -418,7 +421,7 @@ public class ProcSerHelper {
 	@Transactional(timeout = 300, propagation = Propagation.REQUIRES_NEW)
 	public void actualitzarProcedimentFromGda(ProgresActualitzacioProcSer progres, ProcSerDataDto procedimentGda, EntitatEntity entitat, List<String> codiOrgansGda,
 											  boolean modificar, List<OrganGestorEntity> organsGestorsModificats, Map<String, String[]> avisosProcedimentsOrgans) {
-		
+
 		Long t1 = System.currentTimeMillis();
 		OrganGestorEntity organGestorGda = null;
 		try {

@@ -29,7 +29,7 @@ const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void
                     <GridFormField size={9} name="nom" />
                     <GridFormField size={6} name="retard" />
                     <GridFormField size={6} name="caducitat" componentProps={{ helperText: 'En dies naturals' }}/>
-                    <GridFormField size={9} name="organGestor" disabled={data?.fieldOrganGestorDisabled}/>
+                    <GridFormField size={9} name="organGestor" disabled={data?.comu}/>
                     <GridFormField size={3} name="comu" />
                     {!data?.fieldEntregaCieHidden && (
                         <>

@@ -9,7 +9,7 @@ import PermissionGridSwitch from '../../components/PermissionGridSwitch';
 
 const PermissionForm: React.FC = () => {
     const { t } = useTranslation();
-    const { apiRef } = useFormContext();
+    const { apiRef, data } = useFormContext();
 
     const doFieldChange = (targetValue: boolean) => {
         const permisos = [
@@ -27,29 +27,45 @@ const PermissionForm: React.FC = () => {
             apiRef?.current?.setFieldValue?.(nomPermis, targetValue);
         });
     };
+    React.useEffect(() => {
+        if (!data?.id && !data?.tipus) {
+            apiRef?.current?.setFieldValue?.('tipus', 'USUARI');
+        }
+    }, [data?.id, data?.tipus, apiRef]);
+    React.useEffect(() => {
 
-    const sidGrantedAuthorityEnumOptions = [
-        {
-            value: false,
-            description: t('component.PermissionGrid.grantedAuthority.user'),
-        },
-        {
-            value: true,
-            description: t('component.PermissionGrid.grantedAuthority.role'),
-        },
-    ];
+        if (typeof data?.sidName !== 'string' || typeof data?.tipus !== 'string') {
+            return;
+        }
+        const next = data.tipus === 'ROL' ? data.sidName.toUpperCase() : data.sidName.toLowerCase();
+        if (data.sidName !== next) {
+            apiRef?.current?.setFieldValue?.('sidName', next);
+        }
+    }, [data?.tipus, data?.sidName, apiRef]);
+    //
+    // const sidGrantedAuthorityEnumOptions = [
+    //     {
+    //         value: false,
+    //         description: t('component.PermissionGrid.grantedAuthority.user'),
+    //     },
+    //     {
+    //         value: true,
+    //         description: t('component.PermissionGrid.grantedAuthority.role'),
+    //     },
+    // ];
 
     return (
         <Grid container spacing={2}>
             <GridFormField
-                name="sidGrantedAuthority"
-                type="enum"
+                name="tipus"
                 label={t('component.PermissionGrid.tipus')}
-                options={sidGrantedAuthorityEnumOptions}
+                // type="enum"
+                // options={sidGrantedAuthorityEnumOptions}
                 required
                 size={3}
+                disabled={data?.id}
             />
-            <GridFormField size={9} name="sidName" />
+            <GridFormField size={9} name="sidName" disabled={data?.id} />
             <PermissionGridSwitch
                 name="adminAllowed"
                 label={t('page.organs.form.permisos.administrador')}

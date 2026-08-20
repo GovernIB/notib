@@ -3,16 +3,20 @@ package es.caib.notib.logic.resourceservice;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.helper.AclHelper;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
+import es.caib.notib.logic.helper.ProcSerHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.model.ProcedimentResource;
+import es.caib.notib.logic.procSer.ComuOnChangeLogicProcessor;
 import es.caib.notib.persist.resourceentity.EntregaCieResourceEntity;
 import es.caib.notib.persist.resourceentity.PagadorCieResourceEntity;
 import es.caib.notib.persist.resourceentity.PagadorPostalResourceEntity;
 import es.caib.notib.persist.resourceentity.ProcedimentResourceEntity;
 import es.caib.notib.persist.resourcerepository.EntregaCieResourceRepository;
+import es.caib.notib.persist.resourcerepository.OrganGestorResourceRepository;
 import es.caib.notib.persist.resourcerepository.PagadorCieResourceRepository;
 import es.caib.notib.persist.resourcerepository.PagadorPostalResourceRepository;
+import es.caib.notib.persist.resourcerepository.ProcedimentOrganGestorResourceRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +37,10 @@ class ProcedimentResourceServiceImplTest {
 
 	@Mock
 	private AclHelper aclHelper;
+	@Mock
+	private OrganGestorResourceRepository organGestorResourceRepository;
+	@Mock
+	private ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository;
 	@Mock
 	private PagadorPostalResourceRepository pagadorPostalRepository;
 	@Mock
@@ -56,7 +64,9 @@ class ProcedimentResourceServiceImplTest {
 			aclHelper,
 			pagadorPostalRepository,
 			pagadorCieRepository,
-			entregaCieRepository
+			entregaCieRepository,
+			organGestorResourceRepository,
+			procedimentOrganGestorResourceRepository
 		);
 	}
 
@@ -132,7 +142,7 @@ class ProcedimentResourceServiceImplTest {
 	@Test
 	void comuOnChangeShouldSetFieldsWhenTrue() {
 		ProcedimentResource target = new ProcedimentResource();
-		var processor = new ProcedimentResourceServiceImpl.ComuOnChangeLogicProcessor();
+		var processor = new ComuOnChangeLogicProcessor(organGestorResourceRepository, userSessionHelper);
 		processor.onChange(
 			null,
 			null,
@@ -150,7 +160,7 @@ class ProcedimentResourceServiceImplTest {
 	@Test
 	void comuOnChangeShouldResetFieldsWhenFalse() {
 		ProcedimentResource target = new ProcedimentResource();
-		var processor = new ProcedimentResourceServiceImpl.ComuOnChangeLogicProcessor();
+		var processor = new ComuOnChangeLogicProcessor(organGestorResourceRepository, userSessionHelper);
 		processor.onChange(
 			null,
 			null,

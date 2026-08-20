@@ -30,7 +30,7 @@ public interface OrganGestorResourceRepository extends BaseRepository<OrganGesto
 	@Query("SELECT og.codi FROM OrganGestorResourceEntity og WHERE og.id IN :ids")
 	List<String> findCodisByIdsIn(@Param("ids") Set<Long> ids);
 
-	Optional<OrganGestorResourceEntity> findByCodiAndEstat(String codi, OrganGestorEstatEnum estat);
+	Optional<OrganGestorResourceEntity> findByCodiAndEntitatAndEstat(String codi, EntitatResourceEntity entitat, OrganGestorEstatEnum estat);
 
 	// Per millorar el rendiment de la següent consulta es recomana crear els següents índexos:
 	//   CREATE INDEX orgges_entitat_codi_idx ON not_organ_gestor(entitat, codi);

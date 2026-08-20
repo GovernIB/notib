@@ -15,7 +15,7 @@ import {DataCommonAdditionalAction} from "../../../lib/components/mui/datacommon
 import Typography from "@mui/material/Typography";
 import { useNotificacioMassivaResumDialog } from './NotificacioMassivaResumDialog';
 import {useNavigate} from "react-router-dom";
-import {ROLE_ADMIN_LECTURA, useNotibContext} from "../../components/NotibContext.ts";
+import {ROLE_ADMIN_LECTURA, ROLE_USER, useNotibContext} from "../../components/NotibContext.ts";
 
 const iconOk= React.cloneElement(<Icon>check</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center"} });
 const iconError= React.cloneElement(<Icon>close</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center" } });
@@ -176,18 +176,17 @@ const ContentFilter: React.FC = () => {
 
     const { t } = useTranslation();
     const filterApiRef = useFilterApiContext();
+    const { currentRole } = useNotibContext();
+    const isNotRoleUser = currentRole !== ROLE_USER
 
-    const handleButtonClick = () => {
-        filterApiRef.current?.clear();
-    };
-
+    const handleButtonClick = () => filterApiRef.current?.clear();
     return (
         <Box>
             <Grid container spacing={1}>
                 <GridFormField size={1.75} name="dataIniciInici" />
                 <GridFormField size={1.75} name="dataIniciFi" />
                 <GridFormField size={2.5} name="estatProces" />
-                <GridFormField size={1.75} name="createdBy" />
+                {isNotRoleUser && (<GridFormField size={1.75} name="createdBy" />)}
 
                 <Grid size={0.5} sx={{ textAlign: 'center' }}>
                     <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>

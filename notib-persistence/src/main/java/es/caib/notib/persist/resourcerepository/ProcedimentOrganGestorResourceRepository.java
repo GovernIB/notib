@@ -19,9 +19,10 @@ import java.util.Set;
  */
 public interface ProcedimentOrganGestorResourceRepository extends BaseRepository<ProcedimentOrganGestorResourceEntity, Long> {
 
-	Optional<ProcedimentOrganGestorResourceEntity> findByProcedimentAndOrganGestor(
-		ProcedimentResourceEntity procediment,
-		OrganGestorResourceEntity organGestor);
+	Optional<ProcedimentOrganGestorResourceEntity> findByProcedimentAndOrganGestor(ProcedimentResourceEntity procediment, OrganGestorResourceEntity organGestor);
+
+	@Query("SELECT pog.id FROM ProcedimentOrganGestorResourceEntity pog WHERE pog.procediment.id = :procedimentId")
+	Set<Long> findProcOrganIdByProcediment(@Param("procedimentId") Long procedimentId);
 
 	@Query("SELECT pog.id " +
 		"FROM ProcedimentOrganGestorResourceEntity pog " +

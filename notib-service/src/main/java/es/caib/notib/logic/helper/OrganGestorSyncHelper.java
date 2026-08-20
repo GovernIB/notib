@@ -7,6 +7,8 @@ import es.caib.notib.logic.intf.model.OrganGestorDir3Sync;
 import es.caib.notib.logic.intf.model.OrganGestorResource;
 import es.caib.notib.logic.intf.model.SseEvent;
 import es.caib.notib.logic.intf.resourceservice.SseEventService;
+import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
 import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
 import es.caib.notib.persist.resourcerepository.OrganGestorResourceRepository;
@@ -196,55 +198,44 @@ public class OrganGestorSyncHelper {
 		}
 	}
 
-	private void actualitzarOrganGestor(
-		EntitatResourceEntity entitat,
-		NodeDir3 dir3SyncNode,
-		OrganGestorResourceEntity organGestor) {
-		OrganGestorResourceEntity updated;
+	private void actualitzarOrganGestor(EntitatResourceEntity entitat, NodeDir3 dir3SyncNode, OrganGestorResourceEntity organGestor) {
+
 		// Actualitza l'òrgan gestor si ja existeix a la BD o el crea si no existeix
+		OrganGestorResourceEntity updated;
+		var msg = "òrgan gestor (entitatId=" + entitat.getId()
+					+ ", organCodiDir3=" + dir3SyncNode.getCodi()
+					+ ", organNom=" + getOrganGestorNomFromDir3Node(dir3SyncNode)
+					+ ", organEstat=" + OrganGestorEstatEnum.valueOf(dir3SyncNode.getEstat()) + ")";
 		if (organGestor != null) {
-			log.debug("Actualitzant òrgan gestor (" +
-				"entitatId=" + entitat.getId() + ", " +
-				"organCodiDir3=" + dir3SyncNode.getCodi() + ", " +
-				"organNom=" + getOrganGestorNomFromDir3Node(dir3SyncNode) + ", " +
-				"organEstat=" + OrganGestorEstatEnum.valueOf(dir3SyncNode.getEstat()) + ")");
+			msg = "Actualitzant " + msg;
+			NotibLogger.getInstance().info(msg, log, LoggingTipus.UNITATS);
 			organGestor.setNom(getOrganGestorNomFromDir3Node(dir3SyncNode));
 			organGestor.setNomEs(dir3SyncNode.getDenominacio());
 			organGestor.setCodiPare(dir3SyncNode.getSuperior());
 			organGestor.setEstat(OrganGestorEstatEnum.valueOf(dir3SyncNode.getEstat()));
 			updated = organGestor;
 		} else {
-			log.debug("Creant òrgan gestor (" +
-				"entitatId=" + entitat.getId() + ", " +
-				"organCodiDir3=" + dir3SyncNode.getCodi() + ", " +
-				"organNom=" + getOrganGestorNomFromDir3Node(dir3SyncNode) + ", " +
-				"organEstat=" + OrganGestorEstatEnum.valueOf(dir3SyncNode.getEstat()) + ")");
-			OrganGestorResource organGestorResource = new OrganGestorResource();
+			msg = "Creant " + msg;
+			NotibLogger.getInstance().info(msg, log, LoggingTipus.UNITATS);
+			var organGestorResource = new OrganGestorResource();
 			organGestorResource.setCodi(dir3SyncNode.getCodi());
 			organGestorResource.setNom(getOrganGestorNomFromDir3Node(dir3SyncNode));
 			organGestorResource.setNomEs(dir3SyncNode.getDenominacio());
 			organGestorResource.setCodiPare(dir3SyncNode.getSuperior());
 			organGestorResource.setEstat(OrganGestorEstatEnum.valueOf(dir3SyncNode.getEstat()));
-			updated = organGestorResourceRepository.save(
-				OrganGestorResourceEntity.builder().
-					resource(organGestorResource).
-					entitat(entitat).
-					build());
+			var organResourceEntity = OrganGestorResourceEntity.builder().resource(organGestorResource).entitat(entitat).build();
+			updated = organGestorResourceRepository.save(organResourceEntity);
 		}
 		if (updated.getCodiPare() != null) {
-			updated.setPare(
-				organGestorResourceRepository.findByCodiAndEstat(
-						updated.getCodiPare(),
-						OrganGestorEstatEnum.V).
-					orElse(null));
+			var organResourceEntity = organGestorResourceRepository.findByCodiAndEntitatAndEstat(updated.getCodiPare(), entitat, OrganGestorEstatEnum.V).orElse(null);
+			updated.setPare(organResourceEntity);
 		}
 		organGestorLlibreOficinaHelper.updateLlibre(updated);
 		organGestorLlibreOficinaHelper.updateOficina(updated, null);
 	}
 
-	private NodeDir3[] getDir3SyncNodesExistentsDarreraVersioExtincio(
-		List<NodeDir3> dir3SyncNodes,
-		List<OrganGestorResourceEntity> organsGestors) {
+	private NodeDir3[] getDir3SyncNodesExistentsDarreraVersioExtincio(List<NodeDir3> dir3SyncNodes, List<OrganGestorResourceEntity> organsGestors) {
+
 		// Aquest mètode retorna una llista dels nodes DIR3 de la sicronització que ja existeixen a la base de dades
 		// i acaben en una extinció.
 		// Primer obté un mapa de llistes de nodes DIR3 amb el mateix codi ordenats per versió ascendent.

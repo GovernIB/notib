@@ -39,12 +39,8 @@ const columns: MuiDataGridColDef[] = [
         align: 'center',
         renderCell: (params: any) => {
             return (
-                <LinkToTab id={params.id} tab={2}>
-                    <Chip
-                        label={params.value}
-                        color={params.value ? 'primary' : undefined}
-                        size="small"
-                    />
+                <LinkToTab id={params.id} tab={2} clickEnabled>
+                    <Chip label={params.value} color={params.value ? 'primary' : undefined} size="small"/>
                 </LinkToTab>
             );
         },
@@ -55,12 +51,8 @@ const columns: MuiDataGridColDef[] = [
         align: 'center',
         renderCell: (params: any) => {
             return (
-                <LinkToTab id={params.id} tab={3}>
-                    <Chip
-                        label={params.value}
-                        color={params.value ? 'primary' : undefined}
-                        size="small"
-                    />
+                <LinkToTab id={params.id} tab={3} clickEnabled>
+                    <Chip label={params.value} color={params.value ? 'primary' : undefined} size="small"/>
                 </LinkToTab>
             );
         },
@@ -71,12 +63,8 @@ const columns: MuiDataGridColDef[] = [
         align: 'center',
         renderCell: (params: any) => {
             return (
-                <LinkToTab id={params.id} tab={4}>
-                    <Chip
-                        label={params.value}
-                        color={params.value ? 'primary' : undefined}
-                        size="small"
-                    />
+                <LinkToTab id={params.id} tab={4} clickEnabled>
+                    <Chip label={params.value} color={params.value ? 'primary' : undefined} size="small"/>
                 </LinkToTab>
             );
         },

@@ -52,19 +52,14 @@ public class CustomValidationValidator implements ConstraintValidator<CustomVali
 				validator.validate(target, context));
 	}
 
-	private void addFieldConstraintViolation(
-			ConstraintValidatorContext context,
-			String fieldName,
-			CustomValidator<?> validator) {
+	private void addFieldConstraintViolation(ConstraintValidatorContext context, String fieldName, CustomValidator<?> validator) {
+
 		String fieldMessage = validator.getFieldMessage();
 		String message = fieldMessage != null ? fieldMessage : customValidation.message();
 		if (message.startsWith("{") && message.endsWith("}")) {
-			message = I18nUtil.getInstance().getI18nMessage(
-					message.substring(1, message.length() - 1).trim());
+			message = I18nUtil.getInstance().getI18nMessage(message.substring(1, message.length() - 1).trim());
 		}
-		context.buildConstraintViolationWithTemplate(message).
-				addPropertyNode(fieldName).
-				addConstraintViolation();
+		context.buildConstraintViolationWithTemplate(message).addPropertyNode(fieldName).addConstraintViolation();
 	}
 
 	@Getter

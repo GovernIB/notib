@@ -92,5 +92,6 @@ public class NotificacioMassivaResourceServiceImpl
 	public void beforeCreateSave(NotificacioMassivaResourceEntity entity, NotificacioMassivaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
 
 		log.info("beforeCreateSave");
+		entity.setEntitat(userSessionHelper.getCurrentEntitat());
 	}
 }

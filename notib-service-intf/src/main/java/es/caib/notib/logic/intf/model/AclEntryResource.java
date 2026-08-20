@@ -9,6 +9,7 @@ import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import es.caib.notib.logic.intf.base.validation.CustomValidation;
+import es.caib.notib.logic.intf.dto.TipusEnumDto;
 import es.caib.notib.logic.intf.model.validator.OrganGestorNotNullEnProcedimentComu;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -61,6 +62,7 @@ public class AclEntryResource extends BaseResource<String> {
 
 	public static final String FILTER_CODE = "FILTER_PERMISOS";
 
+	private TipusEnumDto tipus;
 	private boolean sidGrantedAuthority;
 	@NotBlank
 	@Size(max = 128)
@@ -86,6 +88,14 @@ public class AclEntryResource extends BaseResource<String> {
 	private boolean perm8Allowed;
 	private boolean perm9Allowed;
 	private boolean permXAllowed;
+
+	public TipusEnumDto getTipus() {
+		return tipus != null ? tipus : sidGrantedAuthority ? TipusEnumDto.ROL : TipusEnumDto.USUARI;
+	}
+
+	public void setTipus(TipusEnumDto dto) {
+		tipus = dto == null ? TipusEnumDto.USUARI : dto;
+	}
 
 	@Getter
 	@RequiredArgsConstructor
@@ -113,7 +123,9 @@ public class AclEntryResource extends BaseResource<String> {
 	@Setter
 	@NoArgsConstructor
 	public static class PermisosResourceFilter implements Serializable {
+
 		private String sidName;
+		private TipusEnumDto tipus;
 		private boolean sidGrantedAuthority;
 		private boolean perm0Allowed;
 		private boolean perm2Allowed;
