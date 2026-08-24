@@ -215,15 +215,6 @@ export const PermisosUsuariDetail: React.FC<{id: any}> = (props) => {
         return () => { gridRegistry.delete(`${id}-procediment`);}
     }, [id, procedimentRows, columns]);
 
-    //
-    // select DISTINCT nac.ID,  nac.CLASS, entry.sid, entry.ACL_OBJECT_IDENTITY
-    // from NOT_ACL_OBJECT_IDENTITY oi JOIN NOT_acl_entry entry ON oi.Id = entry.ACL_OBJECT_IDENTITY
-    // JOIN not_acl_class nac ON nac.id = oi.object_Id_class
-    // WHERE entry.sid in (1324)
-    // and nac.class = 'es.caib.notib.persist.entity.OrganGestorEntity'
-    // and  entry.mask in (2048)
-    // and  entry.granting = 1
-
     const [showOrganPermisHeredat, setOrganPermisHeredat] = React.useState(false);
     const [showProcedimentPermisOrgan, setProcedimentPermisOrgan] = React.useState(false);
 

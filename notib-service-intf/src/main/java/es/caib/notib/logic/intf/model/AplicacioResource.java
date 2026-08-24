@@ -8,6 +8,10 @@ import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
+import es.caib.notib.logic.intf.base.validation.CustomValidation;
+import es.caib.notib.logic.intf.model.validator.entitat.CodiAplicacioNoRepetit;
+import es.caib.notib.logic.intf.model.validator.entitat.CodiDir3EntitatNoRepetit;
+import es.caib.notib.logic.intf.model.validator.entitat.CodiEntitatNoRepetit;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -48,6 +52,13 @@ import java.time.LocalTime;
 				formClass = AplicacioResource.AplicacioResourceFilter.class)
 		}
 )
+@CustomValidation.List({
+	@CustomValidation(
+		customValidatorType = CodiAplicacioNoRepetit.class,
+		targetFields = AplicacioResource.Fields.usuariCodi,
+		springBean = true,
+		message = "{es.caib.notib.validation.CodiAplicacioNoRepetit.message}"),
+})
 public class AplicacioResource extends BaseResource<Long> {
 
 	public static final String FILTER_CODE = "FILTER_APLICACIO";

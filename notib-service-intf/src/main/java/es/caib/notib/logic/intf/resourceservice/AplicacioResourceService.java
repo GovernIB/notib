@@ -10,4 +10,5 @@ import es.caib.notib.logic.intf.model.AplicacioResource;
  */
 public interface AplicacioResourceService extends MutableResourceService<AplicacioResource, Long> {
 
+	boolean validarCodiNoRepetit(Long id, String codi, Long entitatId);
 }

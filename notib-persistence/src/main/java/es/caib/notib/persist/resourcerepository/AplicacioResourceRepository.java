@@ -13,4 +13,7 @@ public interface AplicacioResourceRepository extends BaseRepository<AplicacioRes
 
 	AplicacioResourceEntity findByUsuariCodiAndEntitatId(String usuariCodi, Long entitatId);
 
+	AplicacioResourceEntity findByIdNotLikeAndUsuariCodiAndEntitatId(Long id, String usuariCodi, Long entitatId);
+
+
 }

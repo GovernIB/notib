@@ -83,6 +83,11 @@ const translationCa = {
                     admLecturaAllowed: 'Adm. lectura',
                     aplicacioAllowed: 'Aplicació',
                 },
+                llibre: {
+                    refrescar: "Refrescar llibre",
+                    error: "No s'ha trobat cap llibre per al codi dir3 especificat"
+                }
+
             },
         },
         avisos: {

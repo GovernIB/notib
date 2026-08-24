@@ -10,4 +10,7 @@ import es.caib.notib.logic.intf.model.EntitatResource;
  */
 public interface EntitatResourceService extends MutableResourceService<EntitatResource, Long> {
 
+	boolean validarCodiNoRepetit(Long id, String codi);
+
+	boolean validarCodiDir3NoRepetit(Long id, String codi);
 }

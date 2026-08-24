@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
@@ -25,6 +25,8 @@ import notibLogoLight from '../../assets/notib_logo_light.png';
 import { useNotibContext } from '../../components/NotibContext';
 import GridFormField from '../../components/GridFormField';
 import { useTabParam } from '../../hooks/useSearchParams';
+import Button from "@mui/material/Button";
+import {Icon, Tooltip} from "@mui/material";
 
 const useEntitatId = () => {
 
@@ -68,14 +70,7 @@ const CustomToolbar: React.FC = () => {
 
     return (
         <Toolbar component={Paper} square sx={{ backgroundColor: backgroundColor }}>
-            {logoUrl && (
-                <img
-                    alt="logo"
-                    src={logoUrl}
-                    height={49}
-                    style={{paddingLeft: '8px', paddingRight: '29px', borderRight: '1px solid ' + theme.palette.divider,}}
-                />
-            )}
+            {logoUrl && (<img alt="logo" src={logoUrl} height={49} style={{paddingLeft: '8px', paddingRight: '29px', borderRight: '1px solid ' + theme.palette.divider}}/>)}
             <img alt="logo2" src={notibLogoLight} height={49} style={{ paddingLeft: '24px', verticalAlign: 'middle' }}/>
             <div style={{ flexGrow: 1 }} />
             {tokenParsed && <TextAvatar text={tokenParsed.name} />}
@@ -101,19 +96,153 @@ const EntitatFormTabPersonalitzar: React.FC = () => {
 };
 
 const EntitatFormTabDades: React.FC = () => {
+
+    const { data, apiRef } = useFormContext();
+    const { t } = useTranslation();
+    const { artifactAction: apiAction } = useResourceApiService('entitatResource');
+
+    const dir3Changed = (codiDir3: string) => {
+
+        if (!data.llibreEntitat) {
+            return;
+        }
+        if (!codiDir3) {
+            apiRef.current?.setFieldValue('llibreNom', '');
+        }
+        getLlibreEntitat(codiDir3);
+    }
+
+    const actualitzarLlibre = (codiDir3: string) => {
+
+       if (data.llibreEntitat || !data.dir3Codi) {
+            apiRef.current?.setFieldValue('llibreNom', '');
+            return;
+        }
+        getLlibreEntitat(codiDir3);
+    }
+
+    const getLlibreEntitat = (codiDir3: string) => {
+
+        apiAction(undefined, { code: 'LLIBRE_ENTITAT', data: {codiDir3: codiDir3} }).then(llibre => {
+        if (!llibre) {
+            return;
+        }
+        apiRef.current?.setFieldValue('llibre', llibre.codi);
+        apiRef.current?.setFieldValue('llibreNom', llibre.nomCurt);
+
+        }).catch(error => console.error(error))
+    };
+    //
+    // const getOficinesEntitat = (oficinaEntitat: boolean, codiDir3: string) => {
+    //
+    //     if (!oficinaEntitat || ! codiDir3) {
+    //         return;
+    //     }
+    //     apiAction(undefined, { code: 'OFICINES_ENTITAT', data: {codiDir3: codiDir3} }).then(oficines => {
+    //         console.log(oficines);
+    //         if (!oficines) {
+    //             return;
+    //         }
+    //         console.log(oficines)
+    //         apiRef.current?.setFieldValue('oficina', oficines);
+    //         // apiRef.current?.setFieldValue('nomOficinaVirtual', oficina.nomCurt);
+    //
+    //     }).catch(error => console.error(error))
+    // };
+
+    const [oficines, setOficines] = useState<any[]>([]);
+
+    const oficinaOptions = oficines.map((oficina) => ({
+        value: oficina.codi,
+        description: oficina.nom,
+    }));
+
+    const getOficinesEntitat = async (oficinaEntitat: boolean, codiDir3: string) => {
+
+        if (!oficinaEntitat || !codiDir3) {
+            setOficines([]);
+            apiRef.current?.setFieldValue("oficina", undefined);
+            return;
+        }
+
+        try {
+            const result = await apiAction(undefined, {code: "OFICINES_ENTITAT", data: {codiDir3,},});
+            const oficinaList = result.oficines ?? [];
+            setOficines(oficinaList);
+            // Clear the selected value when the list changes
+            apiRef.current?.setFieldValue("oficina", undefined);
+        } catch (error) {
+            console.error(error);
+            setOficines([]);
+        }
+    };
+
     return (
         <Grid container spacing={2}>
             <GridFormField size={4} name="codi" />
-            <Grid size={8} />
             <GridFormField size={4} name="tipus" />
+            <Grid size={8} />
             <GridFormField size={8} name="nom" />
-            <GridFormField size={6} name="dir3Codi" />
-            <GridFormField size={6} name="dir3CodiReg" />
-            <GridFormField size={3} name="activa" />
-            <GridFormField size={3} name="ambEntregaDeh" />
-            <GridFormField size={3} name="llibreEntitat" />
-            <GridFormField size={3} name="oficinaEntitat" />
+            <Grid size={4} />
+            <GridFormField size={3} name="dir3Codi" onChange={dir3Codi => dir3Changed(dir3Codi)} />
+            <GridFormField size={3} name="dir3CodiReg" />
             <GridFormField size={12} name="apiKey" />
+            <GridFormField size={3} name="activa" />
+            <GridFormField size={12} name="ambEntregaDeh" />
+            <GridFormField size={3} name="entregaCieActiva" />
+            {data?.entregaCieActiva && (
+                <>
+                    <GridFormField size={3} name="entregaCiePagadorPostal" />
+                    <GridFormField size={3} name="entregaCiePagadorCie" />
+                </>
+            )}
+            <Grid size={12} />
+            <GridFormField size={3} name="llibreEntitat" onChange={() => actualitzarLlibre(data.dir3Codi)} />
+            {data?.llibreEntitat && (
+                <>
+                    <Grid size={3}>
+                        <GridFormField size={12} name="llibreNom" />
+                        <Typography variant="caption" color="text.secondary" display="block" >
+                            {t("page.entitats.form.llibre.error")}
+                        </Typography>
+                    </Grid>
+                    <Tooltip title={t("page.entitats.form.llibre.refrescar")} placement="top">
+                        <Button onClick={() => getLlibreEntitat(data.dir3Codi)}>
+                            <Icon fontSize='small'>refresh</Icon>
+                        </Button>
+                    </Tooltip>
+                </>
+            )}
+            <Grid size={12} />
+            <GridFormField size={3} name="oficinaEntitat" onChange={oficinaEntitat => getOficinesEntitat(oficinaEntitat, data.dir3Codi)} />
+            {data?.oficinaEntitat && (
+                <GridFormField
+                    size={3}
+                    label=""
+                    name="oficina"
+                    type="enum"
+                    options={oficinaOptions}
+                />
+            )}
+            {/*{data?.oficinaEntitat && (*/}
+            {/*    <select*/}
+            {/*        value={data?.oficina ?? ""}*/}
+            {/*        onChange={(event) =>*/}
+            {/*            apiRef.current?.setFieldValue(*/}
+            {/*                "oficina",*/}
+            {/*                event.target.value*/}
+            {/*            )*/}
+            {/*        }*/}
+            {/*    >*/}
+            {/*        <option value="">Select an office</option>*/}
+
+            {/*        {oficines.map((oficina) => (*/}
+            {/*            <option key={oficina.codi} value={oficina.codi}>*/}
+            {/*                {oficina.nom}*/}
+            {/*            </option>*/}
+            {/*        ))}*/}
+            {/*    </select>*/}
+            {/*)}*/}
             <GridFormField size={12} name="descripcio" type="textarea" />
         </Grid>
     );

@@ -24,13 +24,11 @@ public class CustomValidationValidator implements ConstraintValidator<CustomVali
 
 	@Override
 	public boolean isValid(Object target, ConstraintValidatorContext context) {
+
 		ValidatorAndValid<?> validatorAndValid = validate(target, context);
 		if (customValidation.targetFields().length > 0) {
 			for (String fieldName: customValidation.targetFields()) {
-				addFieldConstraintViolation(
-						context,
-						fieldName,
-						validatorAndValid.getValidator());
+				addFieldConstraintViolation(context, fieldName, validatorAndValid.getValidator());
 			}
 			context.disableDefaultConstraintViolation();
 		}
@@ -39,6 +37,7 @@ public class CustomValidationValidator implements ConstraintValidator<CustomVali
 
 	@SneakyThrows
 	private <T> ValidatorAndValid<T> validate(T target, ConstraintValidatorContext context) {
+
 		CustomValidator<T> validator;
 		if (customValidation.springBean()) {
 			validator = CustomValidatorLocator.getInstance().getCustomValidatorWithClass(
@@ -47,9 +46,7 @@ public class CustomValidationValidator implements ConstraintValidator<CustomVali
 			Class<? extends CustomValidator<T>> validatorType = (Class<? extends CustomValidator<T>>)customValidation.customValidatorType();
 			validator = validatorType.getConstructor().newInstance();
 		}
-		return new ValidatorAndValid<>(
-				validator,
-				validator.validate(target, context));
+		return new ValidatorAndValid<>(validator, validator.validate(target, context));
 	}
 
 	private void addFieldConstraintViolation(ConstraintValidatorContext context, String fieldName, CustomValidator<?> validator) {

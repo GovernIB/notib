@@ -6,6 +6,7 @@ import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.model.AplicacioResource;
 import es.caib.notib.logic.intf.resourceservice.AplicacioResourceService;
 import es.caib.notib.persist.resourceentity.AplicacioResourceEntity;
+import es.caib.notib.persist.resourcerepository.AplicacioResourceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.acls.domain.BasePermission;
@@ -21,52 +22,36 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AplicacioResourceServiceImpl
-	extends BaseMutableResourceService<AplicacioResource, Long, AplicacioResourceEntity>
-	implements AplicacioResourceService {
+public class AplicacioResourceServiceImpl extends BaseMutableResourceService<AplicacioResource, Long, AplicacioResourceEntity> implements AplicacioResourceService {
 
 	private final NotibPermissionHelper notibPermissionHelper;
+	private final AplicacioResourceRepository aplicacioResourceRepository;
 
 	@Override
-	protected String additionalSpringFilter(
-		String currentSpringFilter,
-		String[] namedQueries) {
+	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
 		return notibPermissionHelper.entitatAdditionalSpringFilter("entitat.id");
 	}
 
 	@Override
-	protected void beforeCreateEntity(
-		AplicacioResourceEntity entity,
-		AplicacioResource resource,
-		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		notibPermissionHelper.entitatCheckAdminPermissionThrows(
-			getResourceClass(),
-			null,
-			resource.getEntitat().getId(),
-			BasePermission.CREATE);
+	protected void beforeCreateEntity(AplicacioResourceEntity entity, AplicacioResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+		notibPermissionHelper.entitatCheckAdminPermissionThrows(getResourceClass(), null, resource.getEntitat().getId(), BasePermission.CREATE);
 	}
 
 	@Override
-	protected void beforeUpdateEntity(
-		AplicacioResourceEntity entity,
-		AplicacioResource resource,
-		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		notibPermissionHelper.entitatCheckAdminPermissionThrows(
-			getResourceClass(),
-			resource.getId(),
-			resource.getEntitat().getId(),
-			BasePermission.WRITE);
+	protected void beforeUpdateEntity(AplicacioResourceEntity entity, AplicacioResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+		notibPermissionHelper.entitatCheckAdminPermissionThrows(getResourceClass(), resource.getId(), resource.getEntitat().getId(), BasePermission.WRITE);
 	}
 
 	@Override
-	protected void beforeDelete(
-		AplicacioResourceEntity entity,
-		Map<String, AnswerRequiredException.AnswerValue> answers) {
-		notibPermissionHelper.entitatCheckAdminPermissionThrows(
-			getResourceClass(),
-			entity.getId(),
-			entity.getEntitat().getId(),
-			BasePermission.DELETE);
+	protected void beforeDelete(AplicacioResourceEntity entity, Map<String, AnswerRequiredException.AnswerValue> answers) {
+		notibPermissionHelper.entitatCheckAdminPermissionThrows(getResourceClass(), entity.getId(), entity.getEntitat().getId(), BasePermission.DELETE);
 	}
 
+	@Override
+	public boolean validarCodiNoRepetit(Long id, String codi, Long entitatId) {
+
+		var aplicacio = id != null ? aplicacioResourceRepository.findByIdNotLikeAndUsuariCodiAndEntitatId(id, codi, entitatId)
+									: aplicacioResourceRepository.findByUsuariCodiAndEntitatId(codi, entitatId);
+		return aplicacio == null;
+	}
 }

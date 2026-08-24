@@ -82,6 +82,10 @@ const translationEs = {
                     admLecturaAllowed: 'Adm. lectura',
                     aplicacioAllowed: 'Aplicación',
                 },
+                llibre: {
+                    refrescar: "Refrescar libro",
+                    error: "No se ha encontrado ningún libro con el código dir3 especificado"
+                }
             },
         },
         avisos: {

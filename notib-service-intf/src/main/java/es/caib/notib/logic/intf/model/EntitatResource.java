@@ -7,9 +7,14 @@ import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.model.FileReference;
 import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
+import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
+import es.caib.notib.logic.intf.base.validation.CustomValidation;
 import es.caib.notib.logic.intf.dto.EntitatTipusEnumDto;
 import es.caib.notib.logic.intf.dto.TipusDocumentEnumDto;
+import es.caib.notib.logic.intf.dto.entitat.EntitatActionParams;
+import es.caib.notib.logic.intf.model.validator.entitat.CodiDir3EntitatNoRepetit;
+import es.caib.notib.logic.intf.model.validator.entitat.CodiEntitatNoRepetit;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -74,12 +79,49 @@ import java.io.Serializable;
 				type = ResourceArtifactType.PERSPECTIVE,
 				code = EntitatResource.PERSPECTIVE_PERMISSIONS
 			),
+			@ResourceArtifact(
+				type = ResourceArtifactType.ACTION,
+				code = EntitatResource.ACTION_LLIBRE_ENTITAT,
+				formClass = EntitatActionParams.class,
+				accessConstraints = {
+					@ResourceAccessConstraint(
+						type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+						roles = { BaseConfig.ROLE_SUPER }
+					)
+				}
+			),
+			@ResourceArtifact(
+				type = ResourceArtifactType.ACTION,
+				code = EntitatResource.ACTION_OFICINA_ENTITAT,
+				formClass = EntitatActionParams.class,
+				accessConstraints = {
+					@ResourceAccessConstraint(
+						type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+						roles = { BaseConfig.ROLE_SUPER }
+					)
+				}
+			)
 		}
+
 )
+@CustomValidation.List({
+	@CustomValidation(
+		customValidatorType = CodiEntitatNoRepetit.class,
+		targetFields = EntitatResource.Fields.codi,
+		springBean = true,
+		message = "{es.caib.notib.validation.CodiEntitatNoRepetit.message}"),
+	@CustomValidation(
+		customValidatorType = CodiDir3EntitatNoRepetit.class,
+		targetFields = EntitatResource.Fields.dir3Codi,
+		springBean = true,
+		message = "{es.caib.notib.validation.CodiDir3EntitatNoRepetit.message}")
+})
 public class EntitatResource extends BaseResource<Long> {
 
 	public static final String FILTER_CODE = "FILTER_ENTITAT";
 	public static final String PERSPECTIVE_PERMISSIONS = "PERMISSIONS";
+	public static final String ACTION_LLIBRE_ENTITAT = "LLIBRE_ENTITAT";
+	public static final String ACTION_OFICINA_ENTITAT = "OFICINES_ENTITAT";
 
 	@NotNull
 	@Size(max = 64)
@@ -109,16 +151,15 @@ public class EntitatResource extends BaseResource<Long> {
 	private String colorLletra;
 	private TipusDocumentEnumDto tipusDocDefault;
 	private boolean llibreEntitat;
-	private boolean oficinaEntitat;
-
-	@Size(max = 255)
-	private String nomOficinaVirtual;
 	@Size(max = 255)
 	protected String llibre;
 	@Size(max = 255)
 	protected String llibreNom;
+	private boolean oficinaEntitat;
 	@Size(max = 255)
 	private String oficina;
+	@Size(max = 255)
+	private String nomOficinaVirtual;
 
 	private FileReference logoCapsalera;
 	//private boolean eliminarLogoCap;
@@ -126,8 +167,10 @@ public class EntitatResource extends BaseResource<Long> {
 	//private boolean eliminarLogoPeu;
 
 	private boolean entregaCieActiva;
-	private Long operadorPostalId;
-	private Long cieId;
+	private ResourceReference<EntregaCieResource, Long> entregaCie;
+	// Camps per emplenar els valors del formulari referent a la entrega CIE
+	private ResourceReference<PagadorCieResource, Long> entregaCiePagadorCie;
+	private ResourceReference<PagadorPostalResource, Long> entregaCiePagadorPostal;
 
 	// Camps calculats
 	private Integer tipusDocCount;
@@ -136,6 +179,10 @@ public class EntitatResource extends BaseResource<Long> {
 	private boolean crearNotificacions;
 	private boolean crearComunicacions;
 	private boolean crearSir;
+
+	public String getLlibreCodiNom() {
+		return llibre + " " + llibreNom;
+	}
 
 	@Getter
 	@Setter
