@@ -14,7 +14,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Formula;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -26,10 +25,11 @@ import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import java.util.Date;
 import java.util.LinkedHashSet;
@@ -44,7 +44,6 @@ import java.util.Set;
 @Table(
 	name = BaseConfig.DB_PREFIX + "notificacio",
 	uniqueConstraints = @UniqueConstraint(columnNames = { "referencia" }))
-//@SecondaryTable(name = BaseConfig.DB_PREFIX +  "notificacio_table", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -225,38 +224,44 @@ public class NotificacioResourceEntity
 	protected NotificacioMassivaResourceEntity notificacioMassiva;
 
 
-	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "registre_nums", insertable = false, updatable = false)
-	@Formula("(select t.registre_nums from " + BaseConfig.DB_PREFIX + "notificacio_table t where t.id = id)")
-	private String registreNums;
+	// Vista de només lectura de not_notificacio_table (id compartit): és una entitat @Immutable, Hibernate no en
+	// gestiona mai el cicle de vida des d'aquí (ni INSERT ni UPDATE). L'única escriptura real d'aquesta taula
+	// segueix sent NotificacioTableHelper (via l'entitat legacy NotificacioTableEntity)
+	@OneToOne(fetch = FetchType.EAGER, optional = true)
+	@PrimaryKeyJoinColumn
+	private NotificacioTableResourceEntity taula;
 
-	@Enumerated(EnumType.STRING)
-//	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "procediment_tipus", insertable = false, updatable = false)
-	@Formula("(select t.procediment_tipus from " + BaseConfig.DB_PREFIX + "notificacio_table t where t.id = id)")
-	private ProcSerTipusEnum procedimentTipus;
+	public String getRegistreNums() {
+		return taula != null ? taula.getRegistreNums() : null;
+	}
 
-//	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "enviada_date", insertable = false, updatable = false)
-	@Formula("(select t.enviada_date from " + BaseConfig.DB_PREFIX + "notificacio_table t where t.id = id)")
-	private Date enviadaDate;
+	public ProcSerTipusEnum getProcedimentTipus() {
+		return taula != null ? taula.getProcedimentTipus() : null;
+	}
 
-//	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "estat_string", insertable = false, updatable = false)
-	@Formula("(select t.estat_string from " + BaseConfig.DB_PREFIX + "notificacio_table t where t.id = id)")
-	private String estatString;
+	public Date getEnviadaDate() {
+		return taula != null ? taula.getEnviadaDate() : null;
+	}
 
-	@Formula("(select coalesce(t.per_actualitzar, true) from " + BaseConfig.DB_PREFIX + "notificacio_table t where t.id = id)")
-	private Boolean perActualitzar;
+	public String getEstatString() {
+		return taula != null ? taula.getEstatString() : null;
+	}
 
-//	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "titular", insertable = false, updatable = false)
-	@Formula("(select t.titular from " + BaseConfig.DB_PREFIX + "notificacio_table t where t.id = id)")
-	private String titular;
+	public Boolean getPerActualitzar() {
+		return taula != null ? taula.isPerActualitzar() : null;
+	}
 
-//	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "notifica_ids", insertable = false, updatable = false)
-	@Formula("(select t.notifica_ids from " + BaseConfig.DB_PREFIX + "notificacio_table t where t.id = id)")
-	private String notificaIds;
+	public String getTitular() {
+		return taula != null ? taula.getTitular() : null;
+	}
 
-//	@Column(table = BaseConfig.DB_PREFIX + "notificacio_table", name = "entrega_postal", insertable = false, updatable = false)
-//	@Formula("(select (case when t.entrega_postal = 1 then 1 else 0 end) from " + BaseConfig.DB_PREFIX + "notificacio_table t where t.id = id)")
-	@Transient
-	private boolean entregaPostal;
+	public String getNotificaIds() {
+		return taula != null ? taula.getNotificaIds() : null;
+	}
+
+	public boolean isEntregaPostal() {
+		return taula != null && taula.isEntregaPostal();
+	}
 
 	public boolean isTipusUsuariAplicacio() {
 		return this.tipusUsuari != null && this.tipusUsuari.equals(TipusUsuariEnumDto.APLICACIO);

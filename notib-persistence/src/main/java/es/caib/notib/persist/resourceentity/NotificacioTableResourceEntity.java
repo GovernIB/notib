@@ -7,24 +7,46 @@ import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.model.NotificacioTableResource;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.Immutable;
+import org.springframework.data.domain.Persistable;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import java.util.Date;
 
 /**
- * Entitat de base de dades de taula optimitzada de notificació.
+ * Vista de només lectura de "not_notificacio_table" (id compartit amb "not_notificacio"), pensada per fer-hi JOIN
+ * des de NotificacioResourceEntity sense que Hibernate en gestioni mai el cicle de vida (INSERT/UPDATE/DELETE):
+ * és una entitat @Immutable, l'única escriptura real d'aquesta taula segueix sent NotificacioTableHelper (via
+ * l'entitat legacy NotificacioTableEntity). No estén BaseAuditableResourceEntity perquè aquella base força un id
+ * autogenerat per seqüència, incompatible amb compartir la clau primària de NotificacioResourceEntity.
  *
  * @author Límit Tecnologies
  */
 @Entity
+@Immutable
 @Table(name = BaseConfig.DB_PREFIX + "notificacio_table")
 @Getter
+// @Setter només per conveniència en tests (construir un objecte en memòria); com que l'entitat és @Immutable,
+// Hibernate mai persisteix cap canvi fet amb aquests setters.
 @Setter
 @NoArgsConstructor
-public class NotificacioTableResourceEntity
-	extends BaseAuditableResourceEntity<NotificacioTableResource>
-	implements AdminEntitatResourceEntity<NotificacioTableResource> {
+public class NotificacioTableResourceEntity implements AdminEntitatResourceEntity<NotificacioTableResource> {
+
+	@Id
+	@Column(name = "id")
+	private Long id;
 
 	@Column(name = "tipus_usuari")
 	private TipusUsuariEnumDto tipusUsuari;
@@ -110,10 +132,9 @@ public class NotificacioTableResourceEntity
 		nullable = false)
 	protected EntitatResourceEntity entitat;
 
-	@Builder
-	public NotificacioTableResourceEntity(
-		NotificacioTableResource resource,
-		EntitatResourceEntity entitat) {
+	@Override
+	public boolean isNew() {
+		return id == null;
 	}
 
 }
