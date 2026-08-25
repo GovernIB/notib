@@ -17,6 +17,7 @@ import es.caib.notib.persist.resourcerepository.OrganGestorResourceRepository;
 import es.caib.notib.persist.resourcerepository.PagadorCieResourceRepository;
 import es.caib.notib.persist.resourcerepository.PagadorPostalResourceRepository;
 import es.caib.notib.persist.resourcerepository.ProcedimentOrganGestorResourceRepository;
+import es.caib.notib.persist.resourcerepository.ProcedimentResourceRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,6 +47,8 @@ class ProcedimentResourceServiceImplTest {
 	@Mock
 	private PagadorCieResourceRepository pagadorCieRepository;
 	@Mock
+	private ProcedimentResourceRepository procedimentResourceRepository;
+	@Mock
 	private EntregaCieResourceRepository entregaCieRepository;
 	@Mock
 	private UserSessionHelper userSessionHelper;
@@ -65,6 +68,7 @@ class ProcedimentResourceServiceImplTest {
 			pagadorPostalRepository,
 			pagadorCieRepository,
 			entregaCieRepository,
+			procedimentResourceRepository,
 			organGestorResourceRepository,
 			procedimentOrganGestorResourceRepository
 		);

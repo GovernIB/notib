@@ -10,4 +10,7 @@ import es.caib.notib.logic.intf.model.ProcedimentResource;
  */
 public interface ProcedimentResourceService extends MutableResourceService<ProcedimentResource, Long> {
 
+	boolean validarCodiNoRepetit(Long id, String codi);
+
+	boolean validarNomNoRepetit(Long id, String nom);
 }

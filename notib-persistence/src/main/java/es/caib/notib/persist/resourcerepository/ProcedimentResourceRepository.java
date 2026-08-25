@@ -41,4 +41,12 @@ public interface ProcedimentResourceRepository extends BaseRepository<Procedimen
 		@Param("tipus") ProcSerTipusEnum tipus,
 		@Param("ids") Set<Long> ids);
 
+    List<ProcedimentResourceEntity> findByIdNotLikeAndCodi(Long id, String codi);
+
+	List<ProcedimentResourceEntity> findByCodi(String codi);
+
+
+	List<ProcedimentResourceEntity> findByIdNotLikeAndNom(Long id, String nom);
+
+	List<ProcedimentResourceEntity> findByNom(String nom);
 }

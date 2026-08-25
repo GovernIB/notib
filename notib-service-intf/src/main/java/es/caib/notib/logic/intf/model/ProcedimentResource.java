@@ -9,7 +9,12 @@ import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
+import es.caib.notib.logic.intf.base.validation.CustomValidation;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
+import es.caib.notib.logic.intf.model.validator.entitat.CodiDir3EntitatNoRepetit;
+import es.caib.notib.logic.intf.model.validator.entitat.CodiEntitatNoRepetit;
+import es.caib.notib.logic.intf.model.validator.procediment.CodiProcedimentNoRepetit;
+import es.caib.notib.logic.intf.model.validator.procediment.NomProcedimentNoRepetit;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -58,6 +63,18 @@ import java.util.Date;
 			formClass = ProcedimentResource.ProcedimentResourceFilter.class)
 	}
 )
+@CustomValidation.List({
+	@CustomValidation(
+		customValidatorType = CodiProcedimentNoRepetit.class,
+		targetFields = ProcedimentResource.Fields.codi,
+		springBean = true,
+		message = "{es.caib.notib.validation.CodiProcedimentNoRepetit.message}"),
+	@CustomValidation(
+		customValidatorType = NomProcedimentNoRepetit.class,
+		targetFields = ProcedimentResource.Fields.nom,
+		springBean = true,
+		message = "{es.caib.notib.validation.NomProcedimentNoRepetit.message}")
+})
 public class ProcedimentResource extends BaseResource<Long> {
 
 	public static final String FILTER_CODE = "FILTER_PROCEDIMENT";
@@ -91,6 +108,7 @@ public class ProcedimentResource extends BaseResource<Long> {
 	private boolean entregaCieActiva;
 
 	private ResourceReference<EntitatResource, Long> entitat;
+	@NotNull
 	private ResourceReference<OrganGestorResource, Long> organGestor;
 	private ResourceReference<EntregaCieResource, Long> entregaCie;
 

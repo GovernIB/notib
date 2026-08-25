@@ -3,7 +3,6 @@ package es.caib.notib.logic.resourceservice;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.helper.AclHelper;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
-import es.caib.notib.logic.helper.ProcSerHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
@@ -18,6 +17,7 @@ import es.caib.notib.persist.resourcerepository.OrganGestorResourceRepository;
 import es.caib.notib.persist.resourcerepository.PagadorCieResourceRepository;
 import es.caib.notib.persist.resourcerepository.PagadorPostalResourceRepository;
 import es.caib.notib.persist.resourcerepository.ProcedimentOrganGestorResourceRepository;
+import es.caib.notib.persist.resourcerepository.ProcedimentResourceRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
@@ -38,6 +38,7 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 	private final PagadorPostalResourceRepository pagadorPostalResourceRepository;
 	private final PagadorCieResourceRepository pagadorCieResourceRepository;
 	private final EntregaCieResourceRepository entregaCieResourceRepository;
+	private final ProcedimentResourceRepository procedimentResourceRepository;
 	private final OrganGestorResourceRepository organGestorResourceRepository;
 	private final ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository;
 
@@ -49,6 +50,7 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 		PagadorPostalResourceRepository pagadorPostalResourceRepository,
 		PagadorCieResourceRepository pagadorCieResourceRepository,
 		EntregaCieResourceRepository entregaCieResourceRepository,
+		ProcedimentResourceRepository procedimentResourceRepository,
 		OrganGestorResourceRepository organGestorResourceRepository,
 		ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository) {
 
@@ -57,6 +59,7 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 		this.pagadorPostalResourceRepository = pagadorPostalResourceRepository;
 		this.pagadorCieResourceRepository = pagadorCieResourceRepository;
 		this.entregaCieResourceRepository = entregaCieResourceRepository;
+		this.procedimentResourceRepository = procedimentResourceRepository;
 		this.organGestorResourceRepository = organGestorResourceRepository;
 		this.procedimentOrganGestorResourceRepository = procedimentOrganGestorResourceRepository;
 	}
@@ -134,6 +137,17 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 		entregaCieResourceRepository.save(entregaCie);
 	}
 
+	@Override
+	public boolean validarCodiNoRepetit(Long id, String codi) {
 
+		var procediments =  id != null ? procedimentResourceRepository.findByIdNotLikeAndCodi(id, codi) : procedimentResourceRepository.findByCodi(codi);
+		return procediments.isEmpty();
+	}
 
+	@Override
+	public boolean validarNomNoRepetit(Long id, String nom) {
+
+		var procediments =  id != null ? procedimentResourceRepository.findByIdNotLikeAndNom(id, nom) : procedimentResourceRepository.findByNom(nom);
+		return procediments.isEmpty();
+	}
 }
