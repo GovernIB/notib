@@ -1661,11 +1661,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (notificacio.getProcediment().isComu() && cieOrgan != null && cieOrgan.getCie().isCieExtern()) {
 				return true;
 			}
-			var entitatDto = conversioTipusHelper.convertir(notificacio.getEntitat(), EntitatDto.class);
-			var cieOrganPare = organGestorService.entregaCieActiva(entitatDto, notificacio.getOrganGestor().getCodi());
-			if (cieOrganPare) {
-				return true;
-			}
+            var entitatDto = conversioTipusHelper.convertir(notificacio.getEntitat(), EntitatDto.class);
+            var cieOrganPare = organGestorService.entregaCieActivaPerPare(entitatDto, notificacio.getOrganGestor().getCodi());
+            if (cieOrganPare) {
+                return true;
+            }
 		}
 		return false;
 	}

@@ -3,6 +3,7 @@ package es.caib.notib.logic.service;
 import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentTipus;
+import es.caib.notib.client.domini.Procediment;
 import es.caib.notib.logic.aspect.Audita;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.helper.CacheHelper;
@@ -37,6 +38,7 @@ import es.caib.notib.logic.intf.dto.procediment.ProcSerFormDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerGrupDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerOrganDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerSimpleDto;
+import es.caib.notib.logic.intf.dto.procediment.ProcedimentConsultaFiltre;
 import es.caib.notib.logic.intf.dto.procediment.ProcedimentEstat;
 import es.caib.notib.logic.intf.dto.procediment.ProgresActualitzacioProcSer;
 import es.caib.notib.logic.intf.exception.NotFoundException;
@@ -46,6 +48,7 @@ import es.caib.notib.logic.intf.service.AuditService.TipusEntitat;
 import es.caib.notib.logic.intf.service.AuditService.TipusObjecte;
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
 import es.caib.notib.logic.intf.service.GrupService;
+import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.logic.intf.service.ProcedimentService;
 import es.caib.notib.persist.entity.EntitatEntity;
@@ -144,6 +147,8 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 	private NotificacioTableViewRepository notificacioTableViewRepository;
 	@Autowired
 	private PermisosService permisosService;
+	@Autowired
+	private OrganGestorService organGestorService;
 
 	@Getter
 	private static final String PROCEDIMENT_ORGAN_NO_SYNC = "Hi ha procediments que pertanyen a òrgans no existents en l'organigrama actual";
@@ -544,6 +549,134 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 			procedimentsAmbOrganNoSincronitzat.put(entitatId, organsNoSincronitzats);
 		}
 		return organsNoSincronitzats;
+	}
+
+	@Override
+	public PaginaDto<Procediment> findByEntitat(String codiEntitat, ProcedimentConsultaFiltre filtre) {
+
+		try {
+			var entitat = entitatRepository.findByCodi(codiEntitat);
+			if (entitat == null) {
+				log.error("[ProcedimentService.findByEntitat] Error consultant els procediments de l'entitat: " + codiEntitat + ". Entitat Inexistent");
+				return null;
+			}
+			filtre.setNulls();
+			OrganGestorEntity organ;
+			List<Procediment> procedimentsCie = new ArrayList<>();
+			var entitatDto = conversioTipusHelper.convertir(entitat, EntitatDto.class);
+			var procediments = procedimentRepository.findByEntitat(entitat);
+			var filtreEntregaCie = filtre.getEntregaCieActiva();
+			for (var procediment : procediments) {
+				if (!checkFiltre(procediment, filtre) || (filtreEntregaCie != null && (
+						(filtreEntregaCie && !isEntregaPostalActiva(procediment, entitatDto, null))
+						|| (!filtreEntregaCie && isEntregaPostalActiva(procediment, entitatDto, null))
+						))) {
+					continue;
+				}
+				organ = procediment.getOrganGestor();
+				var proc = Procediment.builder()
+						.tipus(procediment.getTipus().name())
+						.comu(procediment.isComu())
+						.organNom(organ != null ? organ.getNom() : null)
+						.organCodi(organ != null ? organ.getCodi() : null)
+						.codiSia(procediment.getCodi())
+						.nom(procediment.getNom())
+						.actiu(procediment.isActiu())
+						.entregaCieActiva(isEntregaPostalActiva(procediment, entitatDto, null))
+						.build();
+				procedimentsCie.add(proc);
+			}
+			var pageable = paginacioHelper.getPageable(filtre.getPagina(), filtre.getMida());
+			return paginacioHelper.toPaginaDto(procedimentsCie, pageable);
+		} catch (Exception ex) {
+			log.error("[ProcedimentService.findByEntitat] Error obtinguent els procediments amb CIE actiu by entitat amb codi " + codiEntitat, ex);
+			return null;
+		}
+	}
+
+	@Override
+	public List<Procediment> getProcedimentsCieByEntitat(String codiEntitat, ProcedimentConsultaFiltre filtre) {
+
+		try {
+			var entitat = entitatRepository.findByCodi(codiEntitat);
+			if (entitat == null) {
+				log.error("[ProcedimentService.getProcedimentsCieByEntitat] Error consultant els procediments de l'entitat: " + codiEntitat + ". Entitat Inexistent");
+				return null;
+			}
+			var procediments = procedimentRepository.findByEntitat(entitat);
+			var entitatDto = conversioTipusHelper.convertir(entitat, EntitatDto.class);
+			OrganGestorEntity organ;
+			List<Procediment> procedimentsCie = new ArrayList<>();
+			for (var procediment : procediments) {
+				if (!isEntregaPostalActiva(procediment, entitatDto, null) || !checkFiltre(procediment, filtre)) {
+//				if (!isEntregaPostalActiva(procediment, entitatDto, null)) {
+					continue;
+				}
+				organ = procediment.getOrganGestor();
+				var proc = Procediment.builder()
+						.tipus(procediment.getTipus().name())
+						.comu(procediment.isComu())
+						.organNom(organ != null ? organ.getNom() : null)
+						.organCodi(organ != null ? organ.getCodi() : null)
+						.codiSia(procediment.getCodi())
+						.nom(procediment.getNom())
+						.actiu(procediment.isActiu())
+						.entregaCieActiva(true)
+						.build();
+				procedimentsCie.add(proc);
+			}
+			return procedimentsCie;
+		} catch (Exception ex) {
+			log.error("[ProcedimentService.getProcedimentsCieByEntitat] Error obtinguent els procediments amb CIE actiu by entitat amb codi " + codiEntitat, ex);
+			return null;
+		}
+	}
+
+	private boolean checkFiltre(ProcedimentEntity entity, ProcedimentConsultaFiltre filtre) {
+
+		filtre.setNulls();
+		return (filtre.isNomNull() || entity.getNom().toLowerCase().contains(filtre.getNom()))
+				&& (filtre.isCodiNull() || entity.getCodi().toLowerCase().contains(filtre.getCodi()))
+				&& (filtre.isOrganGestorNull() || entity.getOrganGestor() != null && entity.getOrganGestor().getCodi().toLowerCase().contains(filtre.getOrganGestor()))
+				&& (filtre.getActiu() == null || filtre.getActiu() == entity.isActiu())
+				&& (filtre.getComu() == null || filtre.getComu() == entity.isComu())
+				&& (filtre.getManual() == null || filtre.getManual() == entity.isManual())
+				&& (filtre.getRequireDirectPermission() == null || filtre.getRequireDirectPermission() == entity.isRequireDirectPermission());
+
+	}
+
+
+	@Override
+	public Boolean isProcedimentEntregaCieActiva(String codiEntitat, String organCodi, String codiProcediment) {
+
+		try {
+			if (Strings.isNullOrEmpty(organCodi)) {
+				log.error("[ProcedimentService.getProcedimentsCieByEntitatAndCodi] Error consultant els procediments de l'entitat: " + codiEntitat + ". organCodi no pot ser null");
+				return null;
+			}
+			var entitat = entitatRepository.findByCodi(codiEntitat);
+			if (entitat == null) {
+				log.error("[ProcedimentService.getProcedimentsCieByEntitatAndCodi] Error consultant els procediments de l'entitat: " + codiEntitat + ". Entitat Inexistent");
+				return null;
+			}
+			var organ = organGestorRepository.findByEntitatAndCodi(entitat, organCodi);
+			var entitatDto = conversioTipusHelper.convertir(entitat, EntitatDto.class);
+			var procediment = procedimentRepository.findByEntitatAndCodiProcediment(entitat, codiProcediment);
+			return isEntregaPostalActiva(procediment, entitatDto, organ);
+		} catch (Exception ex) {
+			var msg = "[ProcedimentService.getProcedimentsCieByEntitatAndCodi] Error consultant si el procediment pot fer entregues CIE, entitat: ";
+			log.error(msg + codiEntitat + " organ: " + organCodi + " procediment: " + codiProcediment, ex);
+			return false;
+		}
+	}
+
+	private boolean isEntregaPostalActiva(ProcedimentEntity procediment, EntitatDto entitat, OrganGestorEntity organ) {
+
+		var organCodi = organ != null ? organ.getCodi() : null;
+		return procediment.isEntregaCieActivaAlgunNivell()
+				|| procediment.getOrganGestor() != null && organGestorService.entregaCieActivaPerPare(entitat, procediment.getOrganGestor().getCodi())
+				|| (!Strings.isNullOrEmpty(organCodi) && organGestorService.entregaCieActivaPerPare(entitat, organCodi))
+				|| (organ != null && organ.getEntregaCie() != null);
 	}
 
 	@Override

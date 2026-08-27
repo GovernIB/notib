@@ -891,4 +891,28 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertFalse(resposta.isError());
 		assertNull(resposta.getErrorDescripcio());
 	}
+
+	@Test
+	public void consultaProcedimentsEntitat() {
+
+		List<Procediment> procediments = client.getProcedimentsByEntitat("CAIB");
+		assertFalse(procediments == null);
+		assertFalse(procediments.isEmpty());
+	}
+
+	@Test
+	public void consultaProcedimentsEntitatCieActiu() {
+
+		List<Procediment> procediments = client.getProcedimentsCieByEntitat("CAIB");
+		assertFalse(procediments == null);
+		assertFalse(procediments.isEmpty());
+	}
+
+	@Test
+	public void isProcedimentEntregaCieActiva() {
+
+		Boolean actiu = client.isProcedimentEntregaCieActiva("2313620", "CAIB", "A04006334");
+		assertFalse(actiu == null);
+		assertTrue(actiu);
+	}
 }

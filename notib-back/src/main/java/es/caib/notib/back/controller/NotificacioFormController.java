@@ -512,7 +512,7 @@ public class NotificacioFormController extends BaseUserController {
         var codi = dadesProcediment.getOrganCodi();
         if (codi != null) {
             var organ = organGestorService.findById(entitatActual.getId(), Long.valueOf(codi));
-            var cieActiuPerPare = organGestorService.entregaCieActiva(entitatActual, organ.getCodi());
+            var cieActiuPerPare = organGestorService.entregaCieActivaPerPare(entitatActual, organ.getCodi());
             dadesProcediment.setEntregaCieActiva(organ.isEntregaCieActiva() || cieActiuPerPare);
         }
 //        dadesProcediment.setEntregaCieActiva(cieActiuPerPare);

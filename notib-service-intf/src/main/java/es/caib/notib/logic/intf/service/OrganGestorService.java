@@ -235,7 +235,7 @@ public interface OrganGestorService {
 	FitxerDto exportacio(Long entitatId) throws IOException;
 
 	@PreAuthorize("isAuthenticated()")
-	boolean entregaCieActiva(EntitatDto entitat, String organCodi);
+	boolean entregaCieActivaPerPare(EntitatDto entitat, String organCodi);
 
 
 }

@@ -142,11 +142,11 @@ public class OrganGestorArbreController extends BaseUserController {
             var cieList = pagadorCieService.findByEntitatAndOrgan(entitat, codi, isAdminOrgan);
             model.addAttribute("cieList", cieList);
             var o = organGestorService.findByCodi(entitat.getId(), codi);
-            model.addAttribute("entregaCieHeredada", organGestorService.entregaCieActiva(entitat, codi));
-			var auth = SecurityContextHolder.getContext().getAuthentication();
-			if (auth == null || o == null || (isAdminOrgan && !permisosService.hasUsrPermisOrgan(entitat.getId(), auth.getName(), codi, PermisEnum.ADMIN))) {
-				throw new NotFoundException(codi, OrganGestorDto.class);
-			}
+            model.addAttribute("entregaCieHeredada", organGestorService.entregaCieActivaPerPare(entitat, codi));
+            var auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null || o == null || (isAdminOrgan && !permisosService.hasUsrPermisOrgan(entitat.getId(), auth.getName(), codi, PermisEnum.ADMIN))) {
+                throw new NotFoundException(codi, OrganGestorDto.class);
+            }
             o.setEstatTraduccio(getMessage(request,"es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum." + o.getEstat(),null));
             omplirModel(model, entitat, o);
         } catch (Exception ex) {

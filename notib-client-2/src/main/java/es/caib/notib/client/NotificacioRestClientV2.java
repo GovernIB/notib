@@ -2,12 +2,14 @@ package es.caib.notib.client; /**
  * 
  */
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.notib.client.domini.AppInfo;
 import es.caib.notib.client.domini.DadesConsulta;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.PermisConsulta;
+import es.caib.notib.client.domini.Procediment;
 import es.caib.notib.client.domini.RespostaAltaV2;
 import es.caib.notib.client.domini.RespostaConsultaDadesRegistreV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
@@ -23,6 +25,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Client REST v2 per al servei de notificacions de NOTIB.
@@ -36,6 +39,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	private static final String CONSULTAV2_SERVICE_PATH = "/interna/consulta/v2";
 	private static final String COMUNICACIONS = "/comunicacions/";
 	private static final String NOTIFICACIONS = "/notificacions/";
+	private static final String PROCEDIMENTS = "/interna/procediment";
 
 	private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 	/**
@@ -307,6 +311,40 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + NOTIFICACIONS + dniTitular + "/llegides";
 			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
 			return getMapper().readValue(json, RespostaConsultaV2.class);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	public List<Procediment> getProcedimentsByEntitat(String codiEntitat) {
+
+		try {
+			String urlAmbMetode = baseUrl +  PROCEDIMENTS + "/entitat/" + codiEntitat;
+			String json = getConsultaJsonString(null, null, null, null, null, null, urlAmbMetode);
+			return getMapper().readValue(json, new TypeReference<List<Procediment>>(){});
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	public List<Procediment> getProcedimentsCieByEntitat(String codiEntitat) {
+
+		try {
+			String urlAmbMetode = baseUrl +  PROCEDIMENTS + "/entitat/" + codiEntitat + "/cie/actiu";
+			String json = getConsultaJsonString(null, null, null, null, null, null, urlAmbMetode);
+			return getMapper().readValue(json, new TypeReference<List<Procediment>>(){});
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+
+	public Boolean isProcedimentEntregaCieActiva(String codiProcediment, String codiEntitat, String codiOrgan) {
+
+		try {
+			String urlAmbMetode = baseUrl +  PROCEDIMENTS + "/" + codiProcediment + "/entitat/" + codiEntitat + "/organ/" + codiOrgan + "/cie/actiu";
+			String json = getConsultaJsonString(null, null, null, null, null, null, urlAmbMetode);
+			return getMapper().readValue(json, Boolean.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}

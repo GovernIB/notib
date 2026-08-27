@@ -691,7 +691,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 
 
 	@Test
-	public void 	consultaEstatNotificacioTest() throws DatatypeConfigurationException, IOException {
+	public void consultaEstatNotificacioTest() throws DatatypeConfigurationException, IOException {
 		// Given
 //		String referencia = "43573ddf-4f26-40d9-ae80-5bc9dcafbb96";
 		String referencia = "a88ad1c6-4e79-4287-b781-ffd689e4a6de";
@@ -776,5 +776,29 @@ public class ClientRestv2Test extends ClientBaseTest {
 		System.out.println(">>> Informació registre: " + resposta.toString());
 		assertFalse(resposta.isError());
 		assertNull(resposta.getErrorDescripcio());
+	}
+
+	@Test
+	public void consultaProcedimentsEntitat() {
+
+		var procediments = client.getProcedimentsByEntitat("CAIB");
+		assertFalse(procediments == null);
+		assertFalse(procediments.isEmpty());
+	}
+
+	@Test
+	public void consultaProcedimentsEntitatCieActiu() {
+
+		var procediments = client.getProcedimentsCieByEntitat("CAIB");
+		assertFalse(procediments == null);
+		assertFalse(procediments.isEmpty());
+	}
+
+	@Test
+	public void isProcedimentEntregaCieActiva() {
+
+		var actiu = client.isProcedimentEntregaCieActiva("2313620", "CAIB", "A04006334");
+		assertFalse(actiu == null);
+		assertTrue(actiu);
 	}
 }

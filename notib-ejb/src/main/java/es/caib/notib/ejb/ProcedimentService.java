@@ -23,8 +23,11 @@ import es.caib.notib.logic.intf.dto.procediment.ProcSerFormDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerGrupDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerOrganDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerSimpleDto;
+import es.caib.notib.logic.intf.dto.procediment.ProcedimentConsultaFiltre;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import org.springframework.context.annotation.Primary;
+import es.caib.notib.client.domini.Procediment;
+import org.springframework.data.domain.Page;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -315,5 +318,23 @@ public class ProcedimentService extends AbstractService<es.caib.notib.logic.intf
 	@PermitAll
 	public Integer getProcedimentsAmbOrganNoSincronitzat(Long entitatId) {
 		return getDelegateService().getProcedimentsAmbOrganNoSincronitzat(entitatId);
+	}
+
+	@Override
+	@PermitAll
+	public PaginaDto<Procediment> findByEntitat(String codiEntitat, ProcedimentConsultaFiltre filtre) {
+		return getDelegateService().findByEntitat(codiEntitat, filtre);
+	}
+
+	@Override
+	@PermitAll
+	public List<Procediment> getProcedimentsCieByEntitat(String codiEntitat, ProcedimentConsultaFiltre filtre) {
+		return getDelegateService().getProcedimentsCieByEntitat(codiEntitat, filtre);
+	}
+
+	@Override
+	@PermitAll
+	public Boolean isProcedimentEntregaCieActiva(String codiEntitat, String organCodi, String codiProcediment) {
+		return getDelegateService().isProcedimentEntregaCieActiva(codiEntitat, organCodi, codiProcediment);
 	}
 }

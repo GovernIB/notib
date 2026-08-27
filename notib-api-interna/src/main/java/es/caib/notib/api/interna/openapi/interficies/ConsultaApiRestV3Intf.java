@@ -154,9 +154,5 @@ public interface ConsultaApiRestV3Intf {
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Notificacions/Comunicacions per titular", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema( implementation = ArxiuApi.class, description = "Informació de comunicacions/notificacions"))})})
 	ResponseEntity<Arxiu> getCertificacio(HttpServletRequest request, @PathVariable Long enviamentId);
 
-	@GetMapping(value="/justificant/{enviamentId}", produces = MediaType.APPLICATION_JSON_VALUE)
-	@Operation(summary = "Obté el justificant d'una comunicació", description = "Retorna el document de justificant de entrega de la comunicació. El contingut del document està en Base64")
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Notificacions/Comunicacions per titular", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema( implementation = ArxiuApi.class, description = "Informació de comunicacions/notificacions"))})})
-	ResponseEntity<Arxiu> getJustificant(HttpServletRequest request, @PathVariable Long enviamentId);
 
 }
