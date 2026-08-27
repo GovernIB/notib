@@ -1,9 +1,10 @@
 package es.caib.notib.logic.intf.dto.procediment;
 
-import com.google.common.base.Strings;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.util.Strings;
 
 @Builder
 @Getter
@@ -26,8 +27,8 @@ public class ProcedimentConsultaFiltre {
 
     public void setNulls() {
 
-        codiNull = Strings.isNullOrEmpty(codi);
-        nomNull = Strings.isNullOrEmpty(nom);
-        organGestorNull = Strings.isNullOrEmpty(organGestor);
+        codiNull = StringUtils.isBlank(codi);
+        nomNull = StringUtils.isBlank(nom);
+        organGestorNull = StringUtils.isBlank(organGestor);
     }
 }

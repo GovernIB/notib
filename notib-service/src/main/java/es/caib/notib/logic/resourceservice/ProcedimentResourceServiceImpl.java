@@ -10,6 +10,7 @@ import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.model.ProcedimentResource;
 import es.caib.notib.logic.intf.resourceservice.ProcedimentResourceService;
 import es.caib.notib.logic.procSer.ComuOnChangeLogicProcessor;
+import es.caib.notib.persist.resourceentity.EntitatTipusDocumentResourceEntity;
 import es.caib.notib.persist.resourceentity.EntregaCieResourceEntity;
 import es.caib.notib.persist.resourceentity.ProcedimentResourceEntity;
 import es.caib.notib.persist.resourcerepository.EntregaCieResourceRepository;
@@ -135,6 +136,13 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 		entregaCie.setPagadorPostal(pagadorPostal.get());
 		entregaCie.setPagadorCie(pagadorCie.get());
 		entregaCieResourceRepository.save(entregaCie);
+	}
+
+	@Override
+	protected void beforeDelete(ProcedimentResourceEntity entity, Map<String, AnswerRequiredException.AnswerValue> answers) {
+
+		var procSerOrgans = procedimentOrganGestorResourceRepository.findProcOrganIdByProcediment(entity.getId());
+		procedimentOrganGestorResourceRepository.deleteAllById(procSerOrgans);
 	}
 
 	@Override
