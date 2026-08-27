@@ -1741,7 +1741,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public boolean entregaCieActiva(EntitatDto entitat, String organCodi)  {
+	public boolean entregaCieActivaPerPare(EntitatDto entitat, String organCodi)  {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {

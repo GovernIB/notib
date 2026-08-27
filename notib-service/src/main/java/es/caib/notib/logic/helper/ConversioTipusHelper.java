@@ -5,6 +5,7 @@ package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.CieEstat;
+import es.caib.notib.client.domini.Procediment;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliacionPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliacionesPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
@@ -332,6 +333,19 @@ public class ConversioTipusHelper {
 						}
 					}
 				}).byDefault().register();
+
+		mapperFactory.classMap(ProcedimentEntity.class, Procediment.class)
+				.field("codi", "codiSia")
+				.field("organGestor.codi", "organCodi")
+				.field("organGestor.nom", "organNom")
+				.customize(new CustomMapper<>() {
+					@Override
+					public void mapAtoB(ProcedimentEntity a, Procediment b, MappingContext context) {
+						// add your custom mapping code here
+						b.setEntregaCieActiva(a.getEntregaCie() != null);
+					}
+				}).byDefault().register();
+
 
 		mapperFactory.classMap(ProcedimentEntity.class, ProcSerDto.class)
                 .field("organGestor.codi", "organGestor")

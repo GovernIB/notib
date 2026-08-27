@@ -1,6 +1,8 @@
 package es.caib.notib.persist.repository;
 
+import es.caib.notib.client.domini.Procediment;
 import es.caib.notib.logic.intf.dto.CodiValorDto;
+import es.caib.notib.logic.intf.dto.procediment.ProcedimentConsultaFiltre;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.ProcedimentEntity;
@@ -24,38 +26,38 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 
 	@Query(
 			"from ProcedimentEntity pro " +
-			"where pro.entitat = :entitat " +
-			"  and pro.agrupar = false ")
+					"where pro.entitat = :entitat " +
+					"  and pro.agrupar = false ")
 //			"  and pro.id not in (select distinct p.id " +
 //			"		from GrupProcedimentEntity gp " +
 //			"		left outer join gp.procediment p " +
 //			"		where p.entitat = :entitat) ")
 	public List<ProcedimentEntity> findProcedimentsSenseGrupsByEntitat(@Param("entitat") EntitatEntity entitat);
-	
+
 	@Query(
 			"from ProcedimentEntity pro " +
-			"where pro.entitat = :entitat " +
-			"  and pro.agrupar = true " +
-			"  and pro in (select distinct gp.procSer " +
-			"		from GrupProcSerEntity gp " +
-			"		left outer join gp.grup g " +
-			"		where g.entitat = :entitat " +
-			"		  and g.codi in (:grups)) ")
+					"where pro.entitat = :entitat " +
+					"  and pro.agrupar = true " +
+					"  and pro in (select distinct gp.procSer " +
+					"		from GrupProcSerEntity gp " +
+					"		left outer join gp.grup g " +
+					"		where g.entitat = :entitat " +
+					"		  and g.codi in (:grups)) ")
 	public List<ProcedimentEntity> findProcedimentsAmbGrupsByEntitatAndGrup(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("grups") List<String> grups);
-	
+
 	@Query(
 			"from ProcedimentEntity pro " +
-			"where pro.entitat = :entitat " +
-			"  and (pro.agrupar = false " +
-			"  	or (pro.agrupar = true " +
-			"  and pro in (select distinct gp.procSer " +
-			"		from GrupProcSerEntity gp " +
-			"		left outer join gp.grup g " +
-			"		where g.entitat = :entitat " +
-			"		  and g.codi in (:grups))) ) " +
-			"order by pro.nom asc")
+					"where pro.entitat = :entitat " +
+					"  and (pro.agrupar = false " +
+					"  	or (pro.agrupar = true " +
+					"  and pro in (select distinct gp.procSer " +
+					"		from GrupProcSerEntity gp " +
+					"		left outer join gp.grup g " +
+					"		where g.entitat = :entitat " +
+					"		  and g.codi in (:grups))) ) " +
+					"order by pro.nom asc")
 	public List<ProcedimentEntity> findProcedimentsByEntitatAndGrup(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("grups") List<String> grups);
@@ -80,10 +82,10 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 			@Param("grups") List<String> grups,
 			@Param("ids") List<Long> ids);
 
-	@Query( "select distinct pro " +
+	@Query("select distinct pro " +
 			"from ProcedimentEntity pro " +
 			"     left outer join pro.organGestor og " +
-			"where pro.entitat = :entitat " + 
+			"where pro.entitat = :entitat " +
 			"  and og.id = :organGestorId " +
 			"  and (pro.agrupar = false " +
 			"  	or (pro.agrupar = true " +
@@ -97,7 +99,7 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 			@Param("entitat") EntitatEntity entitat,
 			@Param("organGestorId") Long organGestorId,
 			@Param("grups") List<String> grups);
-	
+
 	public List<ProcedimentEntity> findByComuTrue();
 
 	List<ProcedimentEntity> findByEntitatAndComuTrue(EntitatEntity entitat);
@@ -105,138 +107,123 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 	Set<ProcedimentEntity> findByEntitatAndComuTrueAndRequireDirectPermissionIsFalse(EntitatEntity entitat);
 
 	List<ProcedimentEntity> findByEntitatActiva(boolean activa);
-	
+
 	@Query(
 			"from " +
-			"    ProcedimentEntity pro " +
-			"where pro.entitat = (:entitatActual)")
+					"    ProcedimentEntity pro " +
+					"where pro.entitat = (:entitatActual)")
 	Page<ProcedimentEntity> findByEntitatActual(
 			@Param("entitatActual") EntitatEntity entitatActiva,
 			Pageable paginacio);
-	
+
 	@Query(
 			"from " +
-			"    ProcedimentEntity pro " +
-			"where pro.entitat = (:entitatActual) and " + 
-			"lower(pro.codi) = (lower(:codiProcediment))")
+					"    ProcedimentEntity pro " +
+					"where pro.entitat = (:entitatActual) and " +
+					"lower(pro.codi) = (lower(:codiProcediment))")
 	ProcedimentEntity findByEntitatAndCodiProcediment(
 			@Param("entitatActual") EntitatEntity entitat,
 			@Param("codiProcediment") String codiProcediment);
-	
+
 	ProcedimentEntity findByIdAndEntitat(
-			Long procedimentId, 
+			Long procedimentId,
 			EntitatEntity entitat);
-	
+
 //	ProcedimentEntity findById(Long procedimentId);
-	
+
 	ProcedimentEntity findByCodi(String codi);
 
 	@Query("from ProcedimentEntity p where p.organGestor = :organGestor and p.actiu = true")
 	List<ProcedimentEntity> findByOrganGestor(@Param("organGestor") OrganGestorEntity organGestor);
-	
+
 	ProcedimentEntity findByCodiAndEntitat(String codi, EntitatEntity entitat);
-	
-	@Query(
-			"from " +
-			"    ProcedimentEntity pro " +
-			"where pro.entitat in (:entitatActiva)")
-	Page<ProcedimentEntity> findByEntitatActiva(
-			@Param("entitatActiva") List<EntitatEntity> entitatActiva,
-			Pageable paginacio);
-	
+
+	@Query("from ProcedimentEntity pro where pro.entitat in (:entitatActiva)")
+	Page<ProcedimentEntity> findByEntitatActiva(@Param("entitatActiva") List<EntitatEntity> entitatActiva, Pageable paginacio);
+
 	List<ProcedimentEntity> findByEntitat(EntitatEntity entitat);
+
 	List<ProcedimentEntity> findByEntitatAndActiuTrue(EntitatEntity entitat);
-	
-	List<ProcedimentEntity> findByEntitatOrderByNomAsc(
-			EntitatEntity entitat);
-	
-	Page<ProcedimentEntity> findByEntitat(
-			EntitatEntity entitat,
-			Pageable paginacio);
+
+	List<ProcedimentEntity> findByEntitatOrderByNomAsc(EntitatEntity entitat);
+
+	Page<ProcedimentEntity> findByEntitat(EntitatEntity entitat, Pageable paginacio);
 
 
-	@Query(	"from " +
-			"    ProcedimentEntity pro " +
+	@Query("from ProcedimentEntity pro " +
 			"where (:isCodiNull = true or lower(pro.codi) like lower('%'||:codi||'%'))" +
 			" and (:isNomNull = true or lower(pro.nom) like lower('%'||:nom||'%'))")
-	public Page<ProcedimentEntity> findAmbEntitatAndFiltre(
-			@Param("isCodiNull") boolean isCodiNull,
-			@Param("codi") String codi,
-			@Param("isNomNull") boolean isNomNull,
-			@Param("nom") String nom,
-			Pageable paginacio);
-	
-	@Query(	"from " +
-			"    ProcedimentEntity pro " +
-			"where ((:isCodiNull = true) or (lower(pro.codi) like lower('%'||:codi||'%')))" + 
-			" and ((:isNomNull = true) or (lower(pro.nom) like lower('%'||:nom||'%')))")
-	public Page<ProcedimentEntity> findAmbFiltre(
+	Page<ProcedimentEntity> findAmbEntitatAndFiltre(
 			@Param("isCodiNull") boolean isCodiNull,
 			@Param("codi") String codi,
 			@Param("isNomNull") boolean isNomNull,
 			@Param("nom") String nom,
 			Pageable paginacio);
 
-	@Query(	"select distinct pro.organGestor " +
+	@Query("from " +
+			"    ProcedimentEntity pro " +
+			"where ((:isCodiNull = true) or (lower(pro.codi) like lower('%'||:codi||'%')))" +
+			" and ((:isNomNull = true) or (lower(pro.nom) like lower('%'||:nom||'%')))")
+	Page<ProcedimentEntity> findAmbFiltre(
+			@Param("isCodiNull") boolean isCodiNull,
+			@Param("codi") String codi,
+			@Param("isNomNull") boolean isNomNull,
+			@Param("nom") String nom,
+			Pageable paginacio);
+
+	@Query("select distinct pro.organGestor " +
 			"  from ProcedimentEntity pro " +
 			" where pro.entitat = :entitat")
-	public List<String> findOrgansGestorsCodisByEntitat(@Param("entitat") EntitatEntity entitat);
-	
+	List<String> findOrgansGestorsCodisByEntitat(@Param("entitat") EntitatEntity entitat);
+
 	List<ProcedimentEntity> findByOrganGestorId(Long organGestorId);
 
 	@Query(
 			"from ProcedimentEntity pro " +
-			"where pro.organGestor.codi in (:organsCodis) " +
-			"  and pro.requireDirectPermission = false" +
-			"  and (pro.agrupar = false " +
-			"  	or (pro.agrupar = true " +
-			"  and pro in (select distinct gp.procSer " +
-			"		from GrupProcSerEntity gp " +
-			"		left outer join gp.grup g " +
-			"		where g.codi in (:grups))) ) " +
-			"order by pro.nom asc")
+					"where pro.organGestor.codi in (:organsCodis) " +
+					"  and pro.requireDirectPermission = false" +
+					"  and (pro.agrupar = false " +
+					"  	or (pro.agrupar = true " +
+					"  and pro in (select distinct gp.procSer " +
+					"		from GrupProcSerEntity gp " +
+					"		left outer join gp.grup g " +
+					"		where g.codi in (:grups))) ) " +
+					"order by pro.nom asc")
 	List<ProcedimentEntity> findProcedimentsAccesiblesPerOrganGestor(
 			@Param("organsCodis") List<String> organsCodis,
 			@Param("grups") List<String> grups);
 
-	public List<ProcedimentEntity> findByOrganGestorCodiIn(List<String> organsFills);
+	List<ProcedimentEntity> findByOrganGestorCodiIn(List<String> organsFills);
 
-	@Query(
-			"from ProcedimentEntity pro " +
+	@Query("from ProcedimentEntity pro " +
 			"where (pro.organGestor.codi in (:organsCodis) " +
 			"  	or pro.comu = true) " +
 			"  and pro.entitat in (:entitat) " +
 			"order by pro.nom asc")
-	public List<ProcedimentEntity> findByOrganGestorCodiInOrComu(
-			@Param("organsCodis") List<String> organsCodis,
-			@Param("entitat") EntitatEntity entitat);
-	
-	@Query(
-			"from " +
-			"    ProcedimentEntity pro " +
-			"where pro.entitat = (:entitatActual) and " + 
-			"lower(pro.nom) = (lower(:nomProcediment))")
-	List<ProcedimentEntity> findByNomAndEntitat(
-			@Param("nomProcediment") String nomProcediment,
-			@Param("entitatActual") EntitatEntity entitat);
+	List<ProcedimentEntity> findByOrganGestorCodiInOrComu(@Param("organsCodis") List<String> organsCodis, @Param("entitat") EntitatEntity entitat);
+
+	@Query("from     ProcedimentEntity pro where pro.entitat = (:entitatActual) and lower(pro.nom) = (lower(:nomProcediment))")
+	List<ProcedimentEntity> findByNomAndEntitat(@Param("nomProcediment") String nomProcediment, @Param("entitatActual") EntitatEntity entitat);
 
 	Integer countByEntitatIdAndOrganNoSincronitzatTrue(Long entitatId);
 
 	Integer countByEntitatId(Long entitatId);
+
 	Integer countByEntitatIdAndActiuTrue(Long entitatId);
+
 	Integer countByEntitatIdAndActiuFalse(Long entitatId);
 
-	@Query(	"select distinct pro.codi " +
+	@Query("select distinct pro.codi " +
 			"  from ProcedimentEntity pro " +
 			" where pro.entitat.codi = :entitatCodi and pro.actiu = true")
-	public List<String> findCodiActiusByEntitat(@Param("entitatCodi") String entitatCodi);
+	List<String> findCodiActiusByEntitat(@Param("entitatCodi") String entitatCodi);
 
 	@Modifying
 	@Query("update ProcedimentEntity pro set pro.actiu = :actiu where pro.codi = :codi")
-	public void updateActiu(@Param("codi") String codi, @Param("actiu") boolean actiu);
+	void updateActiu(@Param("codi") String codi, @Param("actiu") boolean actiu);
 
 	@Query("select new es.caib.notib.logic.intf.dto.CodiValorDto(''||pro.id, pro.codi||' - '||pro.nom) from ProcedimentEntity pro")
-	public List<CodiValorDto> findAllIdDesc();
+	List<CodiValorDto> findAllIdDesc();
 
 	@Modifying
 	@Query(value = "UPDATE NOT_PROCEDIMENT " +
@@ -245,5 +232,18 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
 			nativeQuery = true)
 	int updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+
+	@Query("from ProcedimentEntity p " +
+			"where p.entitat.codi = :entitatCodi " +
+			" and (:#{#filtre.nomNull} = true or lower(p.nom) like concat('%', lower(:#{#filtre.nom}), '%')) " +
+			" and (:#{#filtre.codiNull} = true or lower(p.codi) like concat('%', lower(:#{#filtre.codi}), '%')) " +
+			" and (:#{#filtre.organGestorNull} = true or lower(p.organGestor.codi) like concat('%', lower(:#{#filtre.organGestor}), '%')) " +
+			" and (:#{#filtre.actiu} is null or p.actiu = :#{#filtre.actiu}) " +
+			" and (:#{#filtre.comu} is null or p.comu = :#{#filtre.comu}) " +
+			" and (:#{#filtre.manual} is null or p.comu = :#{#filtre.manual}) " +
+			" and (:#{#filtre.requireDirectPermission} is null or p.requireDirectPermission = :#{#filtre.requireDirectPermission}) " +
+			" and (:#{#filtre.entregaCieActiva} is null " +
+			"		or ((:#{#filtre.entregaCieActiva} = true and p.entregaCie is not null) or (:#{#filtre.entregaCieActiva} = false and p.entregaCie is null)))")
+	Page<ProcedimentEntity> findByEntitatAndFiltre(@Param("entitatCodi") String entitatCodi, ProcedimentConsultaFiltre filtre, Pageable pageable);
 
 }

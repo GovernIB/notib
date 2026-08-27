@@ -27,7 +27,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Procediment {
 
+    protected String tipus;
     protected String codiSia;
     protected String nom;
-
+    private boolean comu;
+    private String organCodi;
+    private String organNom;
+    private boolean actiu;
+    private boolean entregaCieActiva;
 }

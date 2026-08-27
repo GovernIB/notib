@@ -219,7 +219,7 @@ public class NotificacioValidator implements Validator {
             }
             var cieActiuPerProcComuOrgan = procediment.isComu() && organGestor.getEntregaCie() != null;
             var entitatDto = conversioTipusHelper.convertir(entitat, EntitatDto.class);
-            var cieActiuOrgan = organGestorService.entregaCieActiva(entitatDto, organGestor.getCodi());
+            var cieActiuOrgan = organGestorService.entregaCieActivaPerPare(entitatDto, organGestor.getCodi());
             if (!procediment.isEntregaCieActivaAlgunNivell() && !cieActiuPerProcComuOrgan && !cieActiuOrgan) {
                 int i = 0;
                 for (var enviament : notificacio.getEnviaments()) {
@@ -599,7 +599,7 @@ public class NotificacioValidator implements Validator {
 
         if (!entregaPostalActiva) {
             var entitatDto = conversioTipusHelper.convertir(entitat, EntitatDto.class);
-            entregaPostalActiva = organGestor != null && organGestorService.entregaCieActiva(entitatDto, organGestor.getCodi());
+            entregaPostalActiva = organGestor != null && organGestorService.entregaCieActivaPerPare(entitatDto, organGestor.getCodi());
         }
 
         boolean entregaDehActiva = entitat != null && entitat.isAmbEntregaDeh();

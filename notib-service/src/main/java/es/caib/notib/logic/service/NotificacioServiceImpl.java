@@ -1666,7 +1666,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				return true;
 			}
             var entitatDto = conversioTipusHelper.convertir(notificacio.getEntitat(), EntitatDto.class);
-            var cieOrganPare = organGestorService.entregaCieActiva(entitatDto, notificacio.getOrganGestor().getCodi());
+            var cieOrganPare = organGestorService.entregaCieActivaPerPare(entitatDto, notificacio.getOrganGestor().getCodi());
             if (cieOrganPare) {
                 return true;
             }

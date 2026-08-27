@@ -8,6 +8,7 @@ import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto.OrdreDireccioDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto.OrdreDto;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -171,6 +173,46 @@ public class PaginacioHelper {
 		dto.setPosteriors(false);
 		dto.setDarrera(true);
 		return dto;
+	}
+
+	public static <T> PaginaDto<T> toPaginaDto(List<T> elements, Pageable pageable) {
+
+		if (elements == null) {
+			elements = Collections.emptyList();
+		}
+		int pageNumber = pageable.getPageNumber(); // zero-based
+		int pageSize = pageable.getPageSize();
+		long totalElements = elements.size();
+		long offset = pageable.getOffset();
+		List<T> content;
+		if (offset >= totalElements) {
+			content = Collections.emptyList();
+		} else {
+			int start = (int) offset;
+			int end = Math.min(start + pageSize, elements.size());
+			content = new ArrayList<>(elements.subList(start, end));
+		}
+		int totalPages = pageSize != 0 ? (int) Math.ceil((double) totalElements / pageSize) : 0;
+		PaginaDto<T> pagina = new PaginaDto<>();
+		pagina.setNumero(pageNumber);
+		pagina.setTamany(pageSize);
+		pagina.setTotal(totalPages);
+		pagina.setElementsTotal(totalElements);
+		pagina.setContingut(content);
+		pagina.setPrimera(pageNumber == 0);
+		pagina.setDarrera(totalPages == 0 || pageNumber >= totalPages - 1);
+		pagina.setAnteriors(pageNumber > 0);
+		pagina.setPosteriors(pageNumber < totalPages - 1);
+		return pagina;
+	}
+
+	public Pageable getPageable(Integer pagina, Integer mida) {
+
+		var pageable = PageRequest.of(0, 999999999);
+		if (pagina != null && mida != null) {
+			pageable = PageRequest.of(pagina, mida);
+		}
+		return pageable;
 	}
 
 	public interface Converter<S, T> {

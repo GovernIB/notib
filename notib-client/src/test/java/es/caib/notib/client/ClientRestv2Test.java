@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
 public class ClientRestv2Test extends ClientBaseTest {
 
 	//	private static final String URL = "http://localhost:8080/notib";
-	private static final String URL = "http://localhost:8080/notibapi";
+	private static final String URL = "http://localhost:8082/notibapi";
 //	private static final String USERNAME = "admin";
 //	private static final String PASSWORD = "admin";
 	private static final String USERNAME = "u999000";
@@ -890,5 +890,29 @@ public class ClientRestv2Test extends ClientBaseTest {
 		System.out.println(">>> Informació registre: " + resposta.toString());
 		assertFalse(resposta.isError());
 		assertNull(resposta.getErrorDescripcio());
+	}
+
+	@Test
+	public void consultaProcedimentsEntitat() {
+
+		List<Procediment> procediments = client.getProcedimentsByEntitat("CAIB");
+		assertFalse(procediments == null);
+		assertFalse(procediments.isEmpty());
+	}
+
+	@Test
+	public void consultaProcedimentsEntitatCieActiu() {
+
+		List<Procediment> procediments = client.getProcedimentsCieByEntitat("CAIB");
+		assertFalse(procediments == null);
+		assertFalse(procediments.isEmpty());
+	}
+
+	@Test
+	public void isProcedimentEntregaCieActiva() {
+
+		Boolean actiu = client.isProcedimentEntregaCieActiva("2313620", "CAIB", "A04006334");
+		assertFalse(actiu == null);
+		assertTrue(actiu);
 	}
 }

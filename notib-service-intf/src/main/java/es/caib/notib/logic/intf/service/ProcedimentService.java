@@ -2,6 +2,7 @@ package es.caib.notib.logic.intf.service;
 
 
 import es.caib.notib.client.domini.EnviamentTipus;
+import es.caib.notib.client.domini.Procediment;
 import es.caib.notib.logic.intf.dto.CodiAssumpteDto;
 import es.caib.notib.logic.intf.dto.CodiValorDto;
 import es.caib.notib.logic.intf.dto.CodiValorOrganGestorComuDto;
@@ -21,7 +22,9 @@ import es.caib.notib.logic.intf.dto.procediment.ProcSerFormDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerGrupDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerOrganDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerSimpleDto;
+import es.caib.notib.logic.intf.dto.procediment.ProcedimentConsultaFiltre;
 import es.caib.notib.logic.intf.exception.NotFoundException;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
@@ -403,4 +406,31 @@ public interface ProcedimentService {
 
 
     Integer getProcedimentsAmbOrganNoSincronitzat(Long entitatId);
+
+    /**
+     * Consulta els procediments d'una entitat.
+     *
+     * @param codiEntitat Identificador de l'entitat
+     * @return Llistat de procediments de l'entitat. Null si hi ha hagut error.
+     */
+    @PreAuthorize("isAuthenticated()")
+    PaginaDto<Procediment> findByEntitat(String codiEntitat, ProcedimentConsultaFiltre filtre);
+
+    /**
+     * Consulta els procediments amb entrega CIE d'una entitat.
+     *
+     * @param codiEntitat Identificador de l'entitat
+     * @return Llistat de procediments de l'entitat pels quals es pot fer una entrega postal. Null si hi ha hagut error.
+     */
+    @PreAuthorize("isAuthenticated()")
+    List<Procediment> getProcedimentsCieByEntitat(String codiEntitat, ProcedimentConsultaFiltre filtre);
+
+    /**
+     * Consulta si donat una entitat, un òrgan i un codi de procediment aquest pot fer una entrega CIE.
+     *
+     * @param codiEntitat Identificador de l'entitat
+     * @return True si pot fer entrega CIE, false altrament. Null si hi ha hagut error.
+     */
+    @PreAuthorize("isAuthenticated()")
+    Boolean isProcedimentEntregaCieActiva(String codiEntitat, String organCodi, String codiProcediment);
 }
