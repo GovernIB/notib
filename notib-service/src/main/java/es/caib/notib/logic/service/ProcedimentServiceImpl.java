@@ -609,7 +609,6 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 			List<Procediment> procedimentsCie = new ArrayList<>();
 			for (var procediment : procediments) {
 				if (!isEntregaPostalActiva(procediment, entitatDto, null) || !checkFiltre(procediment, filtre)) {
-//				if (!isEntregaPostalActiva(procediment, entitatDto, null)) {
 					continue;
 				}
 				organ = procediment.getOrganGestor();

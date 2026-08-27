@@ -24,7 +24,7 @@ public interface ProcedimentApiRestIntf {
 
 	@GetMapping(value="/entitat/{codiEntitat}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(summary = "Obté procediments CIE", description = "Retorna la llista de procediments d'una entitat")
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Notificacions/Comunicacions per titular", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema( implementation = ArxiuApi.class, description = "Informació de comunicacions/notificacions"))})})
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Procediments de l'entitat paginats", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema( implementation = ArxiuApi.class, description = "Informació de comunicacions/notificacions"))})})
     PaginaDto<Procediment> getProcedimentsByEntitat(HttpServletRequest request,
                                                     @PathVariable String codiEntitat,
                                                     @RequestParam(value = "codi", required = false) String codi,
@@ -39,8 +39,8 @@ public interface ProcedimentApiRestIntf {
                                                     @RequestParam(value = "mida", required = false) Integer mida);
 
 	@GetMapping(value="/entitat/{codiEntitat}/procediment/cie/actiu", produces = MediaType.APPLICATION_JSON_VALUE)
-	@Operation(summary = "Obté procediments amb entrega CIE", description = "Retorna la llista de procediments d'una entitat que tenenen l'entrega CIE activada")
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Notificacions/Comunicacions per titular", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema( implementation = ArxiuApi.class, description = "Informació de comunicacions/notificacions"))})})
+	@Operation(summary = "Obté procediments amb entrega CIE", description = "Retorna la llista de procediments d'una entitat que tenen l'entrega CIE activada a algun nivell")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Llistat de procediments de l'entitat que tenen l'entrega CIE activada a algun nivell ", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema( implementation = ArxiuApi.class, description = "Informació de comunicacions/notificacions"))})})
 	List<Procediment> getProcedimentsCieByEntitat(HttpServletRequest request,
 												  @PathVariable String codiEntitat,
 												  @RequestParam(value = "codi", required = false) String codi,
@@ -55,7 +55,7 @@ public interface ProcedimentApiRestIntf {
 												  @RequestParam(value = "mida", required = false) Integer mida);
 
 	@GetMapping(value="/entitat/{codiEntitat}/procediment/{codiProcediment}/organ/{organCodi}/cie/actiu", produces = MediaType.APPLICATION_JSON_VALUE)
-	@Operation(summary = "Consulta si entrega CIE permesa", description = "Retorna cert si el procediment té activa l'entrega CIE")
+	@Operation(summary = "Consulta si entrega CIE permesa", description = "Retorna cert si el procediment té activa l'entrega CIE per l'entitat i òrgan especificat en el paràmetre")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Consulta CIE per procediment", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema( implementation = ArxiuApi.class, description = "Informació de comunicacions/notificacions"))})})
 	Boolean getProcedimentsCieByEntitatAndOrganAndCodi(HttpServletRequest request, @PathVariable String codiProcediment, @PathVariable String codiEntitat, @PathVariable String codiOrgan);
 
