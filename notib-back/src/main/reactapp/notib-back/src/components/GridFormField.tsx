@@ -47,8 +47,8 @@ export const GridButtonField = (props: any) => {
 };
 
 const GridFormField: React.FC<GridFormFieldProps> = (props) => {
-    const { size } = props;
 
+    const { size } = props;
     return (
         <Grid size={size}>
             <FormField {...props} />

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.logic.helper;
 
@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * Helper per a convertir les dades de paginació entre el DTO
  * i Spring-Data.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Component
@@ -113,7 +113,7 @@ public class PaginacioHelper {
 		}
 		return dto;
 	}
-	
+
 	public <S, T> PaginaDto<T> toPaginaDto(Page<S> page, Class<T> targetType) {
 		return toPaginaDto(page, targetType, null);
 	}
@@ -175,7 +175,7 @@ public class PaginacioHelper {
 		return dto;
 	}
 
-	public static <T> PaginaDto<T> toPaginaDto(List<T> elements, Pageable pageable) {
+	public <T> PaginaDto<T> toPaginaDto(List<T> elements, Pageable pageable) {
 
 		if (elements == null) {
 			elements = Collections.emptyList();
@@ -204,6 +204,23 @@ public class PaginacioHelper {
 		pagina.setAnteriors(pageNumber > 0);
 		pagina.setPosteriors(pageNumber < totalPages - 1);
 		return pagina;
+	}
+
+	public <T> Page<T> toPage(List<T> elements, Pageable pageable) {
+
+		if (elements == null) {
+			elements = Collections.emptyList();
+		}
+		long totalElements = elements.size();
+		long offset = pageable.getOffset();
+		int pageSize = pageable.getPageSize();
+		if (offset >= totalElements) {
+			return new PageImpl<>(Collections.emptyList(), pageable, totalElements);
+		}
+		int start = (int) offset;
+		int end = Math.min(start + pageSize, elements.size());
+		List<T> content = elements.subList(start, end);
+		return new PageImpl<>(content, pageable, totalElements);
 	}
 
 	public Pageable getPageable(Integer pagina, Integer mida) {

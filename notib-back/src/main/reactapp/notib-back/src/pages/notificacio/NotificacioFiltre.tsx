@@ -56,7 +56,7 @@ const ContentFilter: React.FC<{openByDefault?: boolean, notificacionsEsborrades:
                 <GridFormField size={2} name="interessat" />
                 <GridFormField size={2} name="numExpedient" />
                 <GridFormField size={2} name="identificadorNotifica" />
-                <GridFormField size={6} name="organGestor" />
+                <GridFormField size={6} name="organGestor" namedQueries={`PERM_READ`} />
                 <GridFormField size={5} name="procediment" filter={springFilterBuilder.and(springFilterBuilder.eq('tipus', `'PROCEDIMENT'`))}/>
                 <GridFormField size={5} name="servei" filter={springFilterBuilder.and(springFilterBuilder.eq('tipus', `'SERVEI'`))}/>
                 <Grid size={0.5} sx={{ textAlign: 'center' }}>

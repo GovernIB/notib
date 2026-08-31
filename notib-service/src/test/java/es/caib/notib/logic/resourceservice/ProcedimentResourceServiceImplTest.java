@@ -3,11 +3,13 @@ package es.caib.notib.logic.resourceservice;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.helper.AclHelper;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
-import es.caib.notib.logic.helper.ProcSerHelper;
+import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.model.ProcedimentResource;
 import es.caib.notib.logic.procSer.ComuOnChangeLogicProcessor;
+import es.caib.notib.logic.service.ProcedimentServiceImpl;
+import es.caib.notib.logic.service.ServeiServiceImpl;
 import es.caib.notib.persist.resourceentity.EntregaCieResourceEntity;
 import es.caib.notib.persist.resourceentity.PagadorCieResourceEntity;
 import es.caib.notib.persist.resourceentity.PagadorPostalResourceEntity;
@@ -57,6 +59,12 @@ class ProcedimentResourceServiceImplTest {
 	@Mock
 	private NotibPermissionHelper notibPermissionHelper;
 	private ProcedimentResourceServiceImpl service;
+	@Mock
+	private PaginacioHelper paginacioHelper;
+	@Mock
+	private ProcedimentServiceImpl procedimentService;
+	@Mock
+	private ServeiServiceImpl serveiService;
 
 	@BeforeEach
 	void setUp() {
@@ -70,7 +78,10 @@ class ProcedimentResourceServiceImplTest {
 			entregaCieRepository,
 			procedimentResourceRepository,
 			organGestorResourceRepository,
-			procedimentOrganGestorResourceRepository
+			procedimentOrganGestorResourceRepository,
+			paginacioHelper,
+			procedimentService,
+			serveiService
 		);
 	}
 

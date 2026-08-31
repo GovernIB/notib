@@ -172,9 +172,12 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 
 		if (Boolean.TRUE.equals(entity.getPerActualitzar())) {
 			var estatString = legacyHelper.actualitzarColumnaEstat(entity);
-//			entity.setEstatString(estatString);
+//			entity.getTaula().setEstatString(estatString);
 		}
-		return super.entityToResource(entity);
+		var resource = super.entityToResource(entity);
+//		resource.setEstatString(entity.getTaula().getEstatString());
+		resource.setEstatString(entity.getEstatString());
+		return resource;
 	}
 
 	@Override

@@ -3,14 +3,20 @@ package es.caib.notib.logic.resourceservice;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.helper.AclHelper;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
+import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
+import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
+import es.caib.notib.logic.intf.dto.CodiValorOrganGestorComuDto;
+import es.caib.notib.logic.intf.dto.PermisEnum;
+import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.model.ProcedimentResource;
 import es.caib.notib.logic.intf.resourceservice.ProcedimentResourceService;
+import es.caib.notib.logic.intf.service.ProcedimentService;
+import es.caib.notib.logic.intf.service.ServeiService;
 import es.caib.notib.logic.procSer.ComuOnChangeLogicProcessor;
-import es.caib.notib.persist.resourceentity.EntitatTipusDocumentResourceEntity;
 import es.caib.notib.persist.resourceentity.EntregaCieResourceEntity;
 import es.caib.notib.persist.resourceentity.ProcedimentResourceEntity;
 import es.caib.notib.persist.resourcerepository.EntregaCieResourceRepository;
@@ -20,11 +26,20 @@ import es.caib.notib.persist.resourcerepository.PagadorPostalResourceRepository;
 import es.caib.notib.persist.resourcerepository.ProcedimentOrganGestorResourceRepository;
 import es.caib.notib.persist.resourcerepository.ProcedimentResourceRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Implementació del servei de gestió de procediments.
@@ -42,6 +57,9 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 	private final ProcedimentResourceRepository procedimentResourceRepository;
 	private final OrganGestorResourceRepository organGestorResourceRepository;
 	private final ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository;
+	private final PaginacioHelper paginacioHelper;
+	private final ProcedimentService procedimentService;
+	private final ServeiService serveiService;
 
 	public ProcedimentResourceServiceImpl(
 		UserSessionHelper userSessionHelper,
@@ -53,7 +71,8 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 		EntregaCieResourceRepository entregaCieResourceRepository,
 		ProcedimentResourceRepository procedimentResourceRepository,
 		OrganGestorResourceRepository organGestorResourceRepository,
-		ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository) {
+		ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository, PaginacioHelper paginacioHelper,
+		ProcedimentService procedimentService, ServeiService serveiService) {
 
 		super(userSessionHelper, authenticationHelper, notibPermissionHelper);
 		this.aclHelper = aclHelper;
@@ -63,6 +82,9 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 		this.procedimentResourceRepository = procedimentResourceRepository;
 		this.organGestorResourceRepository = organGestorResourceRepository;
 		this.procedimentOrganGestorResourceRepository = procedimentOrganGestorResourceRepository;
+		this.paginacioHelper = paginacioHelper;
+		this.procedimentService = procedimentService;
+		this.serveiService = serveiService;
 	}
 
 	@PostConstruct
@@ -76,8 +98,9 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 		var superFilter = super.additionalSpringFilter(currentSpringFilter, namedQueries);
 		var isRoleAdminOrgan = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN);
 		if (isRoleAdminOrgan && notibPermissionHelper.currentOrganGestorPermissionAllowed(BasePermission.ADMINISTRATION)) {
-			var currentOrganGestorId = userSessionHelper.getCurrentOrganGestorId();
-			superFilter += " and organGestor.id: " + currentOrganGestorId;
+			var permisComuns = notibPermissionHelper.currentOrganGestorPermissionAllowed(ExtendedPermission.PERM3);
+			superFilter += " and (organGestor.id:" + userSessionHelper.getCurrentOrganGestorId()
+							+ (permisComuns ? " or comu:true)" : "");
 		}
 		return superFilter;
 	}
@@ -91,6 +114,41 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 //		var entitat = userSessionHelper.getCurrentEntitat();
 //
 //		resource.setOrganGestor(null);
+	}
+
+	@Override
+	protected Page<ProcedimentResourceEntity> entityRepositoryFindEntities(String quickFilter, String filter, String[] namedQueries, Pageable pageable) {
+
+		var userRoles = authenticationHelper.getCurrentUserRoles();
+		if (userRoles == null || userRoles.length != 1) {
+			return new PageImpl<>(new ArrayList<>(), pageable, 0);
+		}
+		var entitat = userSessionHelper.getCurrentEntitatId();
+//		filter += " and entitat.id:" + entitat;
+		Sort processedSort = toProcessedSort(pageable.getSort());
+		List<ProcedimentResourceEntity> procediments;
+		var rol = userRoles[0];
+		if (BaseConfig.ROLE_ADMIN.equals(rol) || BaseConfig.ROLE_ADMIN_LECTURA.equals(rol)) {
+			Specification<ProcedimentResourceEntity> specification = toFindProcessedSpecification(quickFilter, filter, namedQueries);
+			procediments = procedimentResourceRepository.findAll(specification, processedSort);
+		} else if (BaseConfig.ROLE_ORGAN.equals(rol)) {
+			Specification<ProcedimentResourceEntity> specification = toFindProcessedSpecification(quickFilter, filter, namedQueries);
+			procediments = procedimentResourceRepository.findAll(specification, processedSort);
+		} else {
+			var isProcediment = filter.contains("tipus:'PROCEDIMENT'");
+			var isServei = filter.contains("tipus:'SERVEI'");
+			var codisValor = isProcediment ? procedimentService.getProcedimentsOrgan(entitat, null, null, RolEnumDto.valueOf(rol), PermisEnum.CONSULTA)
+								: isServei ? serveiService.getServeisOrgan(entitat, null, null, RolEnumDto.valueOf(rol), PermisEnum.CONSULTA) : null;
+			if (codisValor == null) {
+				return new PageImpl<>(new ArrayList<>(), pageable, 0);
+			}
+			procediments = procedimentResourceRepository.findAllById(codisValor.stream().map(CodiValorOrganGestorComuDto::getId).collect(Collectors.toList()));
+		}
+		if (pageable.isUnpaged()) {
+			return new PageImpl<>(procediments, pageable, procediments.size());
+		}
+		Pageable processedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), processedSort);
+		return paginacioHelper.toPage(procediments, processedPageable);
 	}
 
 	@Override

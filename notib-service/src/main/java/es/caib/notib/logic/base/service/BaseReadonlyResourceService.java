@@ -96,9 +96,8 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 
 	@Override
 	@Transactional(readOnly = true)
-	public R getOne(
-			ID id,
-			String[] perspectives) throws ResourceNotFoundException {
+	public R getOne(ID id, String[] perspectives) throws ResourceNotFoundException {
+
 		log.debug("Getting single resource (id={}, perspectives={})", id, perspectives);
 		beforeGetOne(perspectives);
 		E entity = getEntity(id);
@@ -857,9 +856,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		}
 	}
 
-	protected void register(
-			String fieldName,
-			FieldDownloader<E> fieldDownloader) {
+	protected void register(String fieldName, FieldDownloader<E> fieldDownloader) {
 		fieldDownloaderMap.put(fieldName, fieldDownloader);
 	}
 
@@ -872,59 +869,33 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		return entityRepository.findOne(specification);
 	}
 
-	protected Page<E> entityRepositoryFindEntities(
-			String quickFilter,
-			String filter,
-			String[] namedQueries,
-			Pageable pageable) {
-		Specification<E> specification = toFindProcessedSpecification(
-				quickFilter,
-				filter,
-				namedQueries);
+	protected Page<E> entityRepositoryFindEntities(String quickFilter, String filter, String[] namedQueries, Pageable pageable) {
+
+		Specification<E> specification = toFindProcessedSpecification(quickFilter, filter, namedQueries);
 		log.debug("Consulta amb specification ({})", specification);
 		Sort processedSort = toProcessedSort(pageable.getSort());
 		if (pageable.isUnpaged()) {
 			List<E> resultList = entityRepository.findAll(specification, processedSort);
 			return new PageImpl<>(resultList, pageable, resultList.size());
-		} else {
-			Pageable processedPageable = PageRequest.of(
-					pageable.getPageNumber(),
-					pageable.getPageSize(),
-					processedSort);
-			return entityRepository.findAll(specification, processedPageable);
 		}
+		Pageable processedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), processedSort);
+		return entityRepository.findAll(specification, processedPageable);
 	}
 
 	protected Specification<E> toGetOneProcessedSpecification(ID id) {
+
 		Specification<E> processedSpecification = new PkSpec<>(id);
 		String additionalSpringFilter = additionalSpringFilter(null, null);
-		processedSpecification = appendSpecificationWithAnd(
-				processedSpecification,
-				getSpringFilterSpecification(additionalSpringFilter));
-		return appendSpecificationWithAnd(
-				processedSpecification,
-				additionalSpecification(null));
+		processedSpecification = appendSpecificationWithAnd(processedSpecification, getSpringFilterSpecification(additionalSpringFilter));
+		return appendSpecificationWithAnd(processedSpecification, additionalSpecification(null));
 	}
 
-	protected <P> Specification<P> toFindProcessedSpecification(
-			String quickFilter,
-			String filter,
-			String[] namedQueries) {
-		Specification<P> processedSpecification = getSpringFilterSpecification(
-				buildSpringFilterForQuickFilter(
-						getResourceClass(),
-						null,
-						quickFilter));
-		processedSpecification = appendSpecificationWithAnd(
-				processedSpecification,
-				getSpringFilterSpecification(filter));
-		processedSpecification = appendSpecificationWithAnd(
-				processedSpecification,
-				getSpringFilterSpecification(
-						additionalSpringFilter(filter, namedQueries)));
-		processedSpecification = appendSpecificationWithAnd(
-				processedSpecification,
-				(Specification<P>)additionalSpecification(namedQueries));
+	protected <P> Specification<P> toFindProcessedSpecification(String quickFilter, String filter, String[] namedQueries) {
+
+		Specification<P> processedSpecification = getSpringFilterSpecification(buildSpringFilterForQuickFilter(getResourceClass(), null, quickFilter));
+		processedSpecification = appendSpecificationWithAnd(processedSpecification, getSpringFilterSpecification(filter));
+		processedSpecification = appendSpecificationWithAnd(processedSpecification, getSpringFilterSpecification(additionalSpringFilter(filter, namedQueries)));
+		processedSpecification = appendSpecificationWithAnd(processedSpecification, (Specification<P>)additionalSpecification(namedQueries));
 		if (namedQueries != null) {
 			for (String namedQuery: namedQueries) {
 				Specification<P> namedSpecification;
@@ -934,9 +905,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 				} else {
 					namedSpecification = namedQueryToSpecification(namedQuery);
 				}
-				processedSpecification = appendSpecificationWithAnd(
-						processedSpecification,
-						namedSpecification);
+				processedSpecification = appendSpecificationWithAnd(processedSpecification, namedSpecification);
 			}
 		}
 		Specification<P> finalSpecification = processSpecification(processedSpecification);
@@ -944,11 +913,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	}
 
 	protected <P> Specification<P> getSpringFilterSpecification(String springFilter) {
-		if (springFilter != null) {
-			return new FilterSpecification<>(springFilter);
-		} else {
-			return null;
-		}
+		return springFilter != null ? new FilterSpecification<>(springFilter) : null;
 	}
 
 	protected <P> Specification<P> appendSpecificationWithAnd(
