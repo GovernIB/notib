@@ -91,7 +91,6 @@ const NotificacioMassivaForm: React.FC = () => {
                             label={t('page.notificacioMassiva.form.zipFieldLabel')}
                             componentProps={{ helperText: t('page.notificacioMassiva.form.zipFieldText')}}
                             accept=".zip"
-                            required
                         />
                     </Grid>
                     <GridFormField size={12} name="caducitat" label={t('page.notificacioMassiva.form.caducitat')} type="date" required />

@@ -171,11 +171,9 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 	protected NotificacioResource entityToResource(NotificacioResourceEntity entity) {
 
 		if (Boolean.TRUE.equals(entity.getPerActualitzar())) {
-			var estatString = legacyHelper.actualitzarColumnaEstat(entity);
-//			entity.getTaula().setEstatString(estatString);
+			legacyHelper.actualitzarColumnaEstat(entity);
 		}
 		var resource = super.entityToResource(entity);
-//		resource.setEstatString(entity.getTaula().getEstatString());
 		resource.setEstatString(entity.getEstatString());
 		return resource;
 	}
@@ -201,6 +199,9 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 		}
 		// Condició per a mostrar només les notificacions amb permís de lectura
 		var ids = notibPermissionHelper.getIdsToCheckNotificacioPermission(BasePermission.READ, BasePermission.READ);
+		if (ids.isEmpty()) {
+			return !currentSpringFilter.contains("createdBy:") ? entitatFilter + " and createdBy:'" + authenticationHelper.getCurrentUserName() + "'" : entitatFilter;
+		}
 		List<String> andConditions = new ArrayList<>();
 		andConditions.add(entitatFilter);
 		var permissionFilter = springFilterWithReadPermission(ids, "");

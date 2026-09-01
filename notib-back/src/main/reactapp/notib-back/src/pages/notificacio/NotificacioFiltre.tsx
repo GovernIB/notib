@@ -112,6 +112,7 @@ const ContentFilter: React.FC<{openByDefault?: boolean, notificacionsEsborrades:
             <GridFormField size={2.5} name="estat" />
             <GridFormField size={1.75} name="dataIniciInici" />
             <GridFormField size={1.75} name="dataIniciFi" />
+            { !advancedFilter && <GridButtonField size={0.5} name="nomesLesMeves" icon={'person'} hiddenLabel />}
 
             {advancedFilter && (
                 <>

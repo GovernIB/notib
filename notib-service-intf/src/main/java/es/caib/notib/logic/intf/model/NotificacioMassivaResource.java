@@ -1,6 +1,5 @@
 package es.caib.notib.logic.intf.model;
 
-import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
 import es.caib.notib.logic.intf.base.annotation.ResourceArtifact;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
@@ -9,15 +8,26 @@ import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
+import es.caib.notib.logic.intf.base.validation.CustomValidation;
+import es.caib.notib.logic.intf.dto.fitxer.FitxerMui;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaEstatDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaInfoDto;
+import es.caib.notib.logic.intf.model.validator.entitat.CodiDir3EntitatNoRepetit;
+import es.caib.notib.logic.intf.model.validator.entitat.CodiEntitatNoRepetit;
+import es.caib.notib.logic.intf.model.validator.massiva.EmailFormatValid;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.File;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -106,14 +116,13 @@ import java.util.List;
 		),
 	}
 )
-//@CustomValidation.List({
-//	@CustomValidation(
-//		customValidatorType = PrimerEnviamentCodiDir3ObligatoriEnviamentTipusSir.class),
-//	@CustomValidation(
-//		customValidatorType = NotificacioProcedimentNotNull.class,
-//		targetFields = NotificacioResource.Fields.procediment,
-//		springBean = true),
-//})
+@CustomValidation.List({
+	@CustomValidation(
+		customValidatorType = EmailFormatValid.class,
+		targetFields = NotificacioMassivaResource.Fields.email,
+		springBean = true,
+		message = "{es.caib.notib.validation.EmailFormatValid.message}"),
+})
 public class NotificacioMassivaResource extends BaseResource<Long>  {
 
 	public static final String FILTER_CODE = "FILTER_NOTIFICACIO_MASSIVA";
@@ -138,7 +147,8 @@ public class NotificacioMassivaResource extends BaseResource<Long>  {
 	private String zipGesdocId;
 	private String resumGesdocId;
 	private String errorsGesdocId;
-	protected Date caducitat;
+	protected Date caducitat = Date.from(LocalDate.now().plusDays(10).atStartOfDay(ZoneId.systemDefault()).toInstant());
+	@Size(max=64)
 	private String email;
 	private NotificacioMassivaEstatDto estatValidacio;
 	private NotificacioMassivaEstatDto estatProces;
@@ -152,6 +162,11 @@ public class NotificacioMassivaResource extends BaseResource<Long>  {
 	private ResourceReference<PagadorPostalResource, Long> pagadorPostal;
 	private List<NotificacioResource> notificacions;
 	private List<NotificacioMassivaInfoDto.NotificacioInfo> resum;
+
+	@NotNull
+	private FitxerMui csv;
+	private FitxerMui zip;
+
 
 	@Getter
 	@Setter

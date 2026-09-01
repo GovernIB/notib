@@ -47,9 +47,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-public class NotificacioResourceEntity
-	extends BaseAuditableResourceEntity<NotificacioResource>
-	implements AdminEntitatResourceEntity<NotificacioResource> {
+public class NotificacioResourceEntity extends BaseAuditableResourceEntity<NotificacioResource> implements AdminEntitatResourceEntity<NotificacioResource> {
 
 	@Column(name = "usuari_codi", length = 64, nullable = false)
 	private String usuariCodi;

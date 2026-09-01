@@ -774,8 +774,16 @@ const translationEs = {
                     descarregarResum: 'Descargar resumen',
                     errorsValidacio: 'Errores validación',
                     errorsExecucio: 'Errores execución',
-                    posposar: 'Pospone',
-                    reactivar: 'Reactiva',
+                    posposar: {
+                        title: 'Pospone',
+                        success: "Notificación masiva pospuesta con éxito",
+                        error: "Error posponiendo la notificación masiva"
+                    },
+                    reactivar: {
+                        title: 'Reactiva',
+                        success: "Notificación masiva reactivada con éxito",
+                        error: "Error reactivando la notificación masiva"
+                    },
                     mostrarRemeses: {
                         label: 'Muestra remesas',
                         msg1: 'Envío masivo del',

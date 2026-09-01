@@ -17,13 +17,13 @@ import java.util.Date;
 
 /**
  * Command per al manteniment d'enviaments massius.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
 @Getter @Setter
 @ValidNotificacioMassiu
-public class NotificacioMassivaCommand {
+public class 	NotificacioMassivaCommand {
 
 	private MultipartFile ficheroCsv;
 	private String fitxerCSVGestdocId;
@@ -43,7 +43,7 @@ public class NotificacioMassivaCommand {
 		return ConversioTipusHelper.convertir(dto, NotificacioMassivaCommand.class);
 	}
 	public NotificacioMassivaDto asDto(GestioDocumentalService gestioDocumentalService) throws IOException {
-		
+
 		var notificacioMassivaDto = ConversioTipusHelper.convertir(this, NotificacioMassivaDto.class);
 		if (fitxerCSVGestdocId == null || fitxerCSVGestdocId.isEmpty() ) {
 			notificacioMassivaDto.setFicheroCsvBytes(this.getFicheroCsv().getBytes());
@@ -61,7 +61,7 @@ public class NotificacioMassivaCommand {
 		}
 		return notificacioMassivaDto;
 	}
-	
+
 	public int getEmailDefaultSize() {
 
 		var emailSize = 0;
@@ -78,5 +78,5 @@ public class NotificacioMassivaCommand {
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
-	
+
 }

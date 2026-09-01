@@ -5,7 +5,7 @@ import {
     GridPage, MuiActionReportButton,
     MuiDataGrid,
     MuiDataGridColDef,
-    springFilterBuilder as filterBuilder,
+    springFilterBuilder as filterBuilder, useBaseAppContext,
     useFilterApiContext, useMuiActionReportLogic, useResourceApiService,
 } from 'reactlib';
 import GridFormField from '../../components/GridFormField';
@@ -16,6 +16,7 @@ import Typography from "@mui/material/Typography";
 import { useNotificacioMassivaResumDialog } from './NotificacioMassivaResumDialog';
 import {useNavigate} from "react-router-dom";
 import {ROLE_ADMIN_LECTURA, ROLE_USER, useNotibContext} from "../../components/NotibContext.ts";
+import {TemporalMessageSeverity} from "../../../lib/components/BaseAppContext.tsx";
 
 const iconOk= React.cloneElement(<Icon>check</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center"} });
 const iconError= React.cloneElement(<Icon>close</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center" } });
@@ -243,6 +244,7 @@ export const NotifiacioMassivaGrid = () => {
         const { artifactAction: apiAction, isReady } = useResourceApiService('notificacioMassivaResource');
         const navigate = useNavigate();
         const { currentRole} = useNotibContext();
+        const {temporalMessageShow} = useBaseAppContext();
         const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
         const listActions: DataCommonAdditionalAction[] = [
             {
@@ -274,18 +276,34 @@ export const NotifiacioMassivaGrid = () => {
                 onClick: (id) => descarregarErrorsExecucio(id),
             },
             ...(isRoleAdminLectura ? [] : [{
-                label: t('page.notificacioMassiva.grid.accions.posposar'),
-                title: t('page.notificacioMassiva.grid.accions.posposar'),
+                label: t('page.notificacioMassiva.grid.accions.posposar.title'),
+                title: t('page.notificacioMassiva.grid.accions.posposar.title'),
                 icon: 'access_time',
                 showInMenu: true,
-                onClick: (id: any) => isReady && apiAction(id, { code: 'POSPOSAR_NOTIFICACIO_MASSIVA'}),// posposarAccioMassiva(id),
+                onClick: (id: any) => {
+                    if (!isReady) {
+                        return;
+                    }
+                    apiAction(id, { code: 'POSPOSAR_NOTIFICACIO_MASSIVA'}).then(resposta => {
+                        let tipus : TemporalMessageSeverity = resposta ? "success" : "error";
+                        temporalMessageShow(null, t("page.notificacioMassiva.grid.accions.posposar." + tipus), tipus);
+                    });
+                },
             },
             {
-                label: t('page.notificacioMassiva.grid.accions.reactivar'),
-                title: t('page.notificacioMassiva.grid.accions.reactivar   '),
+                label: t('page.notificacioMassiva.grid.accions.reactivar.title'),
+                title: t('page.notificacioMassiva.grid.accions.reactivar.title'),
                 icon: 'bolt',
                 showInMenu: true,
-                onClick: (id: any) => isReady && apiAction(id, { code: 'REACTIVAR_NOTIFICACIO_MASSIVA'}),
+                onClick: (id: any) =>  {
+                    if (!isReady) {
+                        return;
+                    }
+                    apiAction(id, { code: 'REACTIVAR_NOTIFICACIO_MASSIVA'}).then(resposta => {
+                        let tipus : TemporalMessageSeverity = resposta ? "success" : "error";
+                        temporalMessageShow(null, t("page.notificacioMassiva.grid.accions.reactivar." + tipus), tipus);
+                    });
+                },
             }]),
             {
                 label: t('page.notificacioMassiva.grid.accions.mostrarRemeses.label'),
@@ -315,6 +333,7 @@ export const NotifiacioMassivaGrid = () => {
                 title={t('page.notificacioMassiva.grid.title')}
                 resourceName="notificacioMassivaResource"
                 columns={columns}
+                defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
                 paginationActive
                 persistentStateActive
                 persistentStateClearPageSortPropsOnTopLevelRouteChange

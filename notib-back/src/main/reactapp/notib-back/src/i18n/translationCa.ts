@@ -803,8 +803,16 @@ const translationCa = {
                     descarregarResum: 'Descarregar resum',
                     errorsValidacio: 'Errors validació',
                     errorsExecucio: 'Errors execució',
-                    posposar: 'Posposa',
-                    reactivar: 'Reactiva',
+                    posposar: {
+                        title: 'Posposa',
+                        success: "Notificació massiva posposada amb èxit",
+                        error: "Error posposant la notificació massiva"
+                    },
+                    reactivar: {
+                        title: 'Reactiva',
+                        success: "Notificació massiva reactivada amb èxit",
+                        error: "Error reactivant la notificació massiva"
+                    },
                     mostrarRemeses: {
                         label: 'Mostra remeses',
                         msg1: 'Enviament massiu del',

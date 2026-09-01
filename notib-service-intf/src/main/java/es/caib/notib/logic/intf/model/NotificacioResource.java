@@ -600,7 +600,7 @@ public class NotificacioResource extends BaseResource<Long> {
 		private String registreNumeroSortida;
 		private Date dataCaducitatInici;
 		private Date dataCaducitatFi;
-		private boolean nomesLesMeves;
+		private boolean nomesLesMeves = true;
 		private boolean errorLastCallback;
 		private boolean entregaPostal;
 		private boolean deleted;

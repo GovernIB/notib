@@ -36,9 +36,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class NotificacioMassivaResourceEntity
-	extends BaseAuditableResourceEntity<NotificacioMassivaResource>
-	implements AdminEntitatResourceEntity<NotificacioMassivaResource> {
+public class NotificacioMassivaResourceEntity extends BaseAuditableResourceEntity<NotificacioMassivaResource> implements AdminEntitatResourceEntity<NotificacioMassivaResource> {
 
 //	@Transient
 //	private final Object procesLock = new Object();

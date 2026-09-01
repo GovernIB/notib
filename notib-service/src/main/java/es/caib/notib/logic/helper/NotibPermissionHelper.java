@@ -325,6 +325,13 @@ public class NotibPermissionHelper {
 		private List<Long> organGestorIds;
 		private List<Long> procedimentNoComuIds;
 		private List<Long> procedimentComuOrganGestorIds;
+
+		public boolean isEmpty() {
+
+			return organGestorIds != null && organGestorIds.isEmpty()
+					&& procedimentNoComuIds != null && procedimentNoComuIds.isEmpty()
+					&& procedimentComuOrganGestorIds != null && procedimentComuOrganGestorIds.isEmpty();
+		}
 	}
 
 }
