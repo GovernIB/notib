@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.back.controller;
 
@@ -33,7 +33,7 @@ import static es.caib.notib.back.controller.UsuariController.ResultatEstatEnum.O
 
 /**
  * Controlador per al manteniment de regles.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j

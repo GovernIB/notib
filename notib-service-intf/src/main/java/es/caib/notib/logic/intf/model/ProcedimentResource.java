@@ -58,7 +58,35 @@ import java.util.Date;
 		@ResourceArtifact(
 			type = ResourceArtifactType.FILTER,
 			code = ProcedimentResource.FILTER_CODE,
-			formClass = ProcedimentResource.ProcedimentResourceFilter.class)
+			formClass = ProcedimentResource.ProcedimentResourceFilter.class),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = ProcedimentResource.PROCEDIMENTS_SYNC_ACTION_CODE,
+			formClass = OrganGestorResource.OrganGestorDir3SyncForm.class,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN })
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = ProcedimentResource.PROCEDIMENTS_NETEJAR_CACHE_ACTION_CODE,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN })
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = ProcedimentResource.SERVEIS_SYNC_ACTION_CODE,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN })
+			}
+		),
 	}
 )
 @CustomValidation.List({
@@ -76,6 +104,9 @@ import java.util.Date;
 public class ProcedimentResource extends BaseResource<Long> {
 
 	public static final String FILTER_CODE = "FILTER_PROCEDIMENT";
+	public static final String PROCEDIMENTS_SYNC_ACTION_CODE = "PROCEDIMENTS_SYNC";
+	public static final String SERVEIS_SYNC_ACTION_CODE = "SERVEIS_SYNC";
+	public static final String PROCEDIMENTS_NETEJAR_CACHE_ACTION_CODE = "PROCEDIMENTS_NETEJAR_CACHE";
 
 	@NotNull
 	private ProcSerTipusEnum tipus;

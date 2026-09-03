@@ -8,7 +8,7 @@ databaseChangeLog:
             baseColumnNames: ENTITAT_ID
             referencedTableName: ${db_prefix}ENTITAT
             referencedColumnNames: ID
-            constraintName: ${db_prefix}ACC_MASS_ENTITAT_FKq
+            constraintName: ${db_prefix}ACC_MASS_ENTITAT_FK
   - changeSet:
       id: init_constraint-2
       author: limit

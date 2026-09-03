@@ -64,6 +64,16 @@ import java.io.Serializable;
 			}
 		),
 		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = OrganGestorResource.OFICINES_SYNC_ACTION_CODE,
+			formClass = OrganGestorResource.OrganGestorDir3SyncForm.class,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN })
+			}
+		),
+		@ResourceArtifact(
 			type = ResourceArtifactType.FILTER,
 			code = OrganGestorResource.FILTER_CODE,
 			formClass = OrganGestorResource.OrganGestorResourceFilter.class
@@ -96,6 +106,7 @@ public class OrganGestorResource extends BaseResource<Long> {
 	public static final String ACTION_ADMIN_ORGANS_AMB_PERMIS = "ADMIN_ORGANS_AMB_PERMIS";
 
 	public static final String DIR3_SYNC_ACTION_CODE = "DIR3_SYNC";
+	public static final String OFICINES_SYNC_ACTION_CODE = "OFICINES_SYNC";
 	public static final String FILTER_CODE = "FILTER_ORGAN_GESTOR";
 	public static final String NAMED_QUERY_PERM_READ = "PERM_READ";
 	public static final String NAMED_QUERY_PERM_NOT = "PERM_NOT";

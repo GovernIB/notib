@@ -8,12 +8,13 @@ import {
     MuiDataGrid,
     springFilterBuilder as filterBuilder,
     MuiDataGridColDef,
-    useFilterApiContext,
+    useFilterApiContext, MuiDataGridApiRef, useBaseAppContext, MuiActionReportButton, useMuiDataGridApiRef,
 } from 'reactlib';
 import LinkToTab from '../../components/LinkToTab';
-import { useNotibContext } from '../../components/NotibContext';
+import {ROLE_ADMIN, useNotibContext} from '../../components/NotibContext';
 import GridFormField, { GridButtonField } from '../../components/GridFormField';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
+import React from "react";
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -120,10 +121,72 @@ const ContentFilter: React.FC = () => {
     );
 };
 
+const NetejarCacheActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRef; }> = (props) => {
+
+    const { dataGridApiRef } = props;
+    const { t } = useTranslation();
+    const { temporalMessageShow } = useBaseAppContext();
+    return (
+        <MuiActionReportButton
+            resourceName="procedimentResource"
+            action="PROCEDIMENTS_NETEJAR_CACHE"
+            title={t('page.procediments.grid.netejarCache.title')}
+            buttonComponentProps={{ variant: 'outlined', sx: { mr: 1} }}
+            buttonIcon="delete"
+            onSuccess={resposta => {
+                const msg = resposta ? "success" : "error";
+                dataGridApiRef.current?.refresh();
+                temporalMessageShow(null, t('page.procediments.grid.netejarCache.' + msg), msg);
+            }}
+            // onError={error => temporalMessageShow(null, error?.message, "error")}
+        />
+    );
+}
+
+const ProcedimentSyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRef; }> = (props) => {
+
+    const { dataGridApiRef } = props;
+    const { t } = useTranslation();
+    const { temporalMessageShow } = useBaseAppContext();
+    const formDialogButtons = [
+        {
+            value: false,
+            text: t('page.procediments.grid.sync.cancelar'),
+            componentProps: { variant: 'outlined' },
+        },
+        {
+            value: true,
+            text: t('page.procediments.grid.sync.actualitzar'),
+            icon: 'check',
+            componentProps: { variant: 'contained' },
+        },
+    ];
+    return (
+        <MuiActionReportButton
+            resourceName="procedimentResource"
+            action="PROCEDIMENTS_SYNC"
+            title={t('page.procediments.grid.sync.title')}
+            buttonComponentProps={{ variant: 'contained', sx: { mr: 1 } }}
+            formDialogTitle={t('page.serveis.grid.sync.title')}
+            formDialogButtons={formDialogButtons}
+            buttonIcon="refresh"
+            onSuccess={resposta => {
+                const msg = resposta ? "success" : "error";
+                dataGridApiRef.current?.refresh();
+                temporalMessageShow(null, t('page.serveis.grid.sync.' + msg), msg);
+            }}
+            // onError={error => temporalMessageShow(null, error?.message, "error")}
+        />
+    );
+}
+
 export const ProcedimentGrid = () => {
 
     const { t } = useTranslation();
     const { currentEntitatId } = useNotibContext();
+    const dataGridApiRef = useMuiDataGridApiRef();
+    const {currentRole} = useNotibContext();
+    let isRoleAdmin = currentRole == ROLE_ADMIN;
     const filterDataGridProps = useDatagridFilterProps(
         'procedimentResource',
         'FILTER_PROCEDIMENT',
@@ -147,6 +210,17 @@ export const ProcedimentGrid = () => {
                 toolbarCreateLink="form"
                 rowLink="form/{{id}}"
                 rowUpdateLink="form/{{id}}"
+                toolbarElementsWithPositions={ !isRoleAdmin ? [] : [
+                    {
+                        position: 2,
+                        element: <NetejarCacheActionButton dataGridApiRef={dataGridApiRef} />,
+
+                    } ,
+                    {
+                        position: 2,
+                        element: <ProcedimentSyncActionButton dataGridApiRef={dataGridApiRef} />,
+                    }
+                ]}
             />
         </GridPage>
     );

@@ -32,8 +32,15 @@ const ProcedimentServeiField: React.FC = () => {
 
     const handleChange = (value: any) => {
         setType(value);
+        console.log(data);
         if (data.procediment != null) {
             formApiRef.current?.setFieldValue('procediment', null);
+        }
+    };
+
+    const handleChangeProcediment = (value: any) => {
+        console.log(value);
+        if (data.procediment != null) {
         }
     };
 
@@ -59,7 +66,9 @@ const ProcedimentServeiField: React.FC = () => {
                 <Grid size={9}>
                     <FormField
                         name="procediment"
+                        onChange={(value) => handleChangeProcediment(value)}
                         label={t(`page.notificacio.form.camps.${type}`)}
+                        optionsUnpaged={1===1}
                         filter={"tipus:'" + type.toUpperCase() + "'"}
                         required={data.procedimentRequired}
                     />
@@ -70,7 +79,9 @@ const ProcedimentServeiField: React.FC = () => {
         return (
             <FormField
                 name="procediment"
+                onChange={(value) => handleChangeProcediment(value)}
                 filter={"tipus:'" + type.toUpperCase() + "'"}
+                optionsUnpaged={1===1}
                 required={data.procedimentRequired}
             />
         );
@@ -88,7 +99,7 @@ export const NotificacioFormContent: React.FC = () => {
                 <GridFormField size={12} name="concepte" />
             </Grid>
             <GridFormField size={12} name="descripcio" type="textarea" />
-            <GridFormField size={6} name="organGestor" />
+            <GridFormField size={6} name="organGestor" namedQueries={`PERM_READ`} optionsUnpaged={1===1} />
             <Grid size={6}>
                 <ProcedimentServeiField />
             </Grid>

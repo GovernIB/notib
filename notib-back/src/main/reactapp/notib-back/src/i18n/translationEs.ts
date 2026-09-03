@@ -126,6 +126,13 @@ const translationEs = {
                         senseCanvis: "Sin cambios",
                     },
                     success: 'Cambios aplicados con éxito',
+                    oficines: {
+                        title: "Actualitza oficinas",
+                        success: "Oficinas actualizadas correctamente",
+                        error: "Se ha producido un error actualizando las oficinas, consulte los logs",
+                        cancel: 'Cancelar',
+                        actualitzar: "Actualizar"
+                    }
                 },
             },
             form: {
@@ -183,9 +190,21 @@ const translationEs = {
                 titleUpdate: 'Modificar propiedad configurable',
             },
         },
-        procediment: {
+        procediments: {
             grid: {
                 title: 'Procedimientos',
+                sync: {
+                    title: "Actualizar procedimientos",
+                    actualitzar: "Actualizar",
+                    cancelar: "Cancelar",
+                    success: "Procedimientos actualizados correctamente",
+                    error: "Error actualizando los procedimientos",
+                },
+                netejarCache: {
+                    title: "Limpia memoria cache",
+                    success: "Memoria cache limpiada correctamente",
+                    error: "Error limpiando la memoria cache"
+                }
             },
             form: {
                 titleCreate: 'Crear procedimiento',
@@ -228,6 +247,18 @@ const translationEs = {
         serveis: {
             grid: {
                 title: 'Servicios',
+                sync: {
+                    title: "Actualizar servicios",
+                    actualitzar: "Actualizar",
+                    cancelar: "Cancelar",
+                    success: "Servicios actualizados correctamente",
+                    error: "Error actualizando los servicios",
+                },
+                netejarCache: {
+                    title: "Limpia memoria cache",
+                    success: "Memoria cache limpiada correctamente",
+                    error: "Error limpiando la memoria cache"
+                }
             },
             form: {
                 titleCreate: 'Crear servicio',

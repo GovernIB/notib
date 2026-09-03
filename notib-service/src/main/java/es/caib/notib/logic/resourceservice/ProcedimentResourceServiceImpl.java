@@ -147,7 +147,7 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 			Specification<ProcedimentResourceEntity> specification = toFindProcessedSpecification(quickFilter, filter, namedQueries);
 			procediments = procedimentResourceRepository.findAll(specification, processedSort);
 		} else if (authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_USER)) {
-			var isProcediment = filter.contains("tipus:'PROCEDIMENT'");
+			var isProcediment = !Strings.isNullOrEmpty(filter) && filter.contains("tipus:'PROCEDIMENT'");
 			var isServei = filter.contains("tipus:'SERVEI'");
 			Long filtreOrgan = null;
 			try {

@@ -205,6 +205,15 @@ const ContentFilter: React.FC<{openByDefault?: boolean}> = ({openByDefault}) => 
     const advancedFilterClick = () => {
         setAdvancedFilter(!advancedFilter);
     };
+    const organId = filterApiRef.current?.getData()?.organGestor?.id;
+    let procedimentFiltre;
+    if (organId) {
+        procedimentFiltre = filterBuilder.and(
+                            filterBuilder.or(filterBuilder.eq('tipus', `'PROCEDIMENT'`), filterBuilder.eq('tipus', `'SERVEI'`)),
+                            filterBuilder.eq('organGestor', organId));
+    } else {
+        procedimentFiltre = filterBuilder.or(filterBuilder.eq('tipus', `'PROCEDIMENT'`), filterBuilder.eq('tipus', `'SERVEI'`));
+    }
     return (
         <Grid container spacing={1}>
             <GridFormField size={2} name="tipusEnviament" />
@@ -221,8 +230,8 @@ const ContentFilter: React.FC<{openByDefault?: boolean}> = ({openByDefault}) => 
                     <GridFormField size={2} name="enviamentDataProgramadaFi" />
                     <GridFormField size={2} name="notificaReferencia" />
                     <GridFormField size={2} name="grupCodi" />
-                    <GridFormField size={4} name="organGestor" />
-                    <GridFormField size={3} name="procedimentServei" />
+                    <GridFormField size={4} name="organGestor" namedQueries={`PERM_READ`} optionsUnpaged={1===1} />
+                    <GridFormField size={3} name="procedimentServei" filter={procedimentFiltre} />
                     <GridFormField size={2} name="createdBy" />
                     <GridFormField size={3} name="notificacioDescripcio" />
                     <GridFormField size={3} name="titularNomNif" />
@@ -328,7 +337,6 @@ const EnviamentGrid = () => {
                         icon: 'calendar_month',
                         showInMenu: true,
                         onClick: (id, row) => {
-                            console.log(row);
                             ampliarTermini(row?.notificacio?.id, t('page.notificacio.grid.accions.ampliarTermini.modalTitle'), {enviamentId:id, caducitat: row.caducitat})
                         },
                         hidden: row => currentRole === 'NOT_ADMIN_LECTURA' || row?.entregaPostalActiva || row?.notifcacioEstat !== 'ENVIADA',

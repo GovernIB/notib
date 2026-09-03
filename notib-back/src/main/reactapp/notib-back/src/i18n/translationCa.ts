@@ -128,6 +128,13 @@ const translationCa = {
                         senseCanvis: "Sense canvis",
                     },
                     success: 'Canvis aplicats amb èxit',
+                    oficines: {
+                        title: "Actualitza oficines",
+                        success: "Oficines actualizades correctament",
+                        error: "S'ha produit un error consultant les oficines, consulti els logs",
+                        cancel: 'Cancelar',
+                        actualitzar: "Actualitzar"
+                    }
                 },
             },
             form: {
@@ -196,6 +203,18 @@ const translationCa = {
         procediments: {
             grid: {
                 title: 'Procediments',
+                sync: {
+                    title: "Actualitzar procediments",
+                    actualitzar: "Actualitzar",
+                    cancelar: "Cancelar",
+                    success: "Procediments actualitzats correctament",
+                    error: "Error actualitzant els procediments",
+                },
+                netejarCache: {
+                    title: "Neteja memòria cache",
+                    success: "Memòria cache netejada correctament",
+                    error: "Error netejant la memòria cache"
+                }
             },
             form: {
                 titleCreate: 'Crear procediment',
@@ -247,6 +266,18 @@ const translationCa = {
         serveis: {
             grid: {
                 title: 'Serveis',
+                sync: {
+                    title: "Actualizar serveis",
+                    actualitzar: "Actualizar",
+                    cancelar: "Cancelar",
+                    success: "Serveis actualizados correctamente",
+                    error: "Error actualizando los serveis",
+                },
+                netejarCache: {
+                    title: "Limpia memoria cache",
+                    success: "Memoria cache limpiada correctamente",
+                    error: "Error limpiando la memoria cache"
+                }
             },
             form: {
                 titleCreate: 'Crear servei',

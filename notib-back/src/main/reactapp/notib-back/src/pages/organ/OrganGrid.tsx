@@ -23,8 +23,11 @@ import {
 } from 'reactlib';
 import LinkToTab from '../../components/LinkToTab';
 import GridFormField from '../../components/GridFormField';
-import {useDatagridFilterProps, useDatagridPageSizeOptionsProps,} from '../../hooks/useDataGrid';
+import {useDatagridFilterProps, useDatagridPageSizeOptionsProps, useDatagridTreeData,} from '../../hooks/useDataGrid';
 import {OrganFormContent} from './OrganForm';
+import {FormGroup} from "@mui/material";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Switch from "@mui/material/Switch";
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -103,10 +106,7 @@ const useSse = (
         const eventSourceHref = subscribeHref.replace('{queueId}', queueId);
         const eventSource = new EventSource(eventSourceHref, {
             fetch: (input, init) =>
-                fetch(input, {
-                    ...init,
-                    headers: {
-                        ...init.headers,
+                fetch(input, {...init, headers: {...init.headers,
                         Authorization: 'Bearer ' + getToken(),
                     },
                 }),
@@ -124,29 +124,29 @@ const useSse = (
     }, [apiIsReady]);
 };
 
-// const useColumns = (treeDataActive: boolean) => {
-//     return !treeDataActive ? columns
-//         : columns.filter((c) => c.field !== 'codi' && c.field !== 'nom' && c.field !== 'pare');
-// };
+const useColumns = (treeDataActive: boolean) => {
+    return !treeDataActive ? columns
+        : columns.filter((c) => c.field !== 'codi' && c.field !== 'nom' && c.field !== 'pare');
+};
 
-// const useTreeDataViewSwitch = (label: string, defaultValue: boolean) => {
-//     const [treeDataViewActive, setTreeDataViewActive] = React.useState<boolean>(defaultValue);
-//     const viewSwitchComponent = (
-//         <FormGroup sx={{ ml: 4 }}>
-//             <FormControlLabel
-//                 control={
-//                     <Switch
-//                         checked={treeDataViewActive}
-//                         onChange={(event) => setTreeDataViewActive(event.target.checked)}
-//                         slotProps={{ input: { 'aria-label': 'controlled' } }}
-//                     />
-//                 }
-//                 label={label}
-//             />
-//         </FormGroup>
-//     );
-//     return { treeDataViewActive, viewSwitchComponent};
-// };
+const useTreeDataViewSwitch = (label: string, defaultValue: boolean) => {
+    const [treeDataViewActive, setTreeDataViewActive] = React.useState<boolean>(defaultValue);
+    const viewSwitchComponent = (
+        <FormGroup sx={{ ml: 4 }}>
+            <FormControlLabel
+                control={
+                    <Switch
+                        checked={treeDataViewActive}
+                        onChange={(event) => setTreeDataViewActive(event.target.checked)}
+                        slotProps={{ input: { 'aria-label': 'controlled' } }}
+                    />
+                }
+                label={label}
+            />
+        </FormGroup>
+    );
+    return { treeDataViewActive, viewSwitchComponent};
+};
 
 const OrganGridDir3SyncLoading: React.FC<{ percent?: number; message?: string }> = (props) => {
 
@@ -215,6 +215,43 @@ const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
         </Grid>
     );
 };
+
+const OficinesSyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRef; }> = (props) => {
+
+    const { dataGridApiRef } = props;
+    const { t } = useTranslation();
+    const { temporalMessageShow } = useBaseAppContext();
+    const formDialogButtons = [
+        {
+            value: false,
+            text: t('page.organs.grid.sync.oficines.cancel'),
+            componentProps: { variant: 'outlined' },
+        },
+        {
+            value: true,
+            text: t('page.organs.grid.sync.oficines.actualitzar'),
+            icon: 'check',
+            componentProps: { variant: 'contained' },
+        },
+    ];
+    return (
+        <MuiActionReportButton
+            resourceName="organGestorResource"
+            action="OFICINES_SYNC"
+            title={t('page.organs.grid.sync.oficines.title')}
+            buttonComponentProps={{ variant: 'outlined', sx: { mr: 1 } }}
+            formDialogTitle={t('page.organs.grid.sync.oficines.title')}
+            formDialogButtons={formDialogButtons}
+            buttonIcon="refresh"
+            onSuccess={resposta => {
+                const msg = resposta?.ok ? "success" : "error";
+                dataGridApiRef.current?.refresh();
+                temporalMessageShow(null, t('page.organs.grid.sync.oficines.' + msg), msg);
+            }}
+            // onError={error => temporalMessageShow(null, error?.message, "error")}
+        />
+    );
+}
 
 const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRef; }> = (props) => {
 
@@ -309,17 +346,18 @@ const ContentFilter: React.FC = () => {
 };
 
 export const OrganGrid = () => {
+
     const { t } = useTranslation();
     const dataGridApiRef = useMuiDataGridApiRef();
-    // const { treeDataViewActive, viewSwitchComponent } = useTreeDataViewSwitch(t('page.organs.grid.viewSwitch'), true);
-    // const columns = useColumns(treeDataViewActive);
-    // const treeDataProps = useDatagridTreeData(
-    //     treeDataViewActive,
-    //     t('page.organs.grid.groupColumn'),
-    //     false,
-    //     1,
-    //     { flex: 6 }
-    // );
+    const { treeDataViewActive, viewSwitchComponent } = useTreeDataViewSwitch(t('page.organs.grid.viewSwitch'), true);
+    const columns = useColumns(treeDataViewActive);
+    const treeDataProps = useDatagridTreeData(
+        treeDataViewActive,
+        t('page.organs.grid.groupColumn'),
+        false,
+        1,
+        { flex: 6 }
+    );
     const filterDataGridProps = useDatagridFilterProps(
         'organGestorResource',
         'FILTER_ORGAN_GESTOR',
@@ -333,7 +371,7 @@ export const OrganGrid = () => {
                 title={t('page.organs.grid.title')}
                 resourceName="organGestorResource"
                 columns={columns}
-                //{...treeDataProps}
+                {...treeDataProps}
                 // persistentStateActive
                 // persistentStateClearPageSortPropsOnTopLevelRouteChange
                 {...filterDataGridProps}
@@ -344,10 +382,14 @@ export const OrganGrid = () => {
                 popupEditFormDialogResourceTitle={t('page.organs.grid.popupDialogTitle')}
                 popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
                 toolbarElementsWithPositions={[
-                    // {
-                    //     position: 1,
-                    //     element: viewSwitchComponent,
-                    // },
+                    {
+                        position: 1,
+                        element: viewSwitchComponent,
+                    },
+                    {
+                        position: 2,
+                        element: <OficinesSyncActionButton dataGridApiRef={dataGridApiRef} />,
+                    },
                     {
                         position: 2,
                         element: <OrganGridDir3SyncActionButton dataGridApiRef={dataGridApiRef} />,
