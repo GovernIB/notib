@@ -143,7 +143,11 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 		if (authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN) || authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN_LECTURA)) {
 			Specification<ProcedimentResourceEntity> specification = toFindProcessedSpecification(quickFilter, filter, namedQueries);
 			procediments = procedimentResourceRepository.findAll(specification, processedSort);
-		} else if (authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN)) {
+		} else if (authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN)) {
+			var organ = userSessionHelper.getCurrentOrganGestor();
+			if (organ != null) {
+				filter += " and organGestor: " + organ.getId();
+			}
 			Specification<ProcedimentResourceEntity> specification = toFindProcessedSpecification(quickFilter, filter, namedQueries);
 			procediments = procedimentResourceRepository.findAll(specification, processedSort);
 		} else if (authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_USER)) {

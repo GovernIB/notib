@@ -230,7 +230,7 @@ const ContentFilter: React.FC<{openByDefault?: boolean}> = ({openByDefault}) => 
                     <GridFormField size={2} name="enviamentDataProgramadaFi" />
                     <GridFormField size={2} name="notificaReferencia" />
                     <GridFormField size={2} name="grupCodi" />
-                    <GridFormField size={4} name="organGestor" namedQueries={`PERM_READ`} optionsUnpaged={1===1} />
+                    <GridFormField size={4} name="organGestor" namedQueries={`PERM_READ`} />
                     <GridFormField size={3} name="procedimentServei" filter={procedimentFiltre} />
                     <GridFormField size={2} name="createdBy" />
                     <GridFormField size={3} name="notificacioDescripcio" />

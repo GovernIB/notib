@@ -67,7 +67,7 @@ const ContentFilter: React.FC<{openByDefault?: boolean, notificacionsEsborrades:
                 <GridFormField size={2} name="interessat" />
                 <GridFormField size={2} name="numExpedient" />
                 <GridFormField size={2} name="identificadorNotifica" />
-                <GridFormField size={6} name="organGestor" namedQueries={`PERM_READ`}    />
+                <GridFormField size={6} name="organGestor" namedQueries={`PERM_READ`}/>
                 <GridFormField size={5} name="procediment" filter={procedimentFiltre}/>
                 <GridFormField size={5} name="servei" filter={serveiFiltre}/>
                 <Grid size={0.5} sx={{ textAlign: 'center' }}>
@@ -82,8 +82,8 @@ const ContentFilter: React.FC<{openByDefault?: boolean, notificacionsEsborrades:
     if (notificacionsErrorRegistre) {
         return (
             <Grid container spacing={1}>
-                <GridFormField size={3.5} name="procediment" filter={springFilterBuilder.and(springFilterBuilder.eq('tipus', `'PROCEDIMENT'`))}/>
-                <GridFormField size={3.5} name="servei" filter={springFilterBuilder.and(springFilterBuilder.eq('tipus', `'SERVEI'`))}/>
+                <GridFormField size={3.5} name="procediment" filter={springFilterBuilder.and(springFilterBuilder.eq('tipus', `'PROCEDIMENT'`))} />
+                <GridFormField size={3.5} name="servei" filter={springFilterBuilder.and(springFilterBuilder.eq('tipus', `'SERVEI'`))} />
                 <GridFormField size={4} name="concepte" />
                 <GridFormField size={4} name="createdBy" />
                 <GridFormField size={2} name="dataIniciInici" />
@@ -130,19 +130,9 @@ const ContentFilter: React.FC<{openByDefault?: boolean, notificacionsEsborrades:
                     <GridFormField size={2} name="interessat" />
                     <GridFormField size={2} name="numExpedient" />
                     <GridFormField size={2} name="identificadorNotifica" />
-                    <GridFormField size={6} name="organGestor" namedQueries={`PERM_READ`} optionsUnpaged={1===1} />
-                    <GridFormField
-                        size={3.5}
-                        name="procediment"
-                        optionsUnpaged={1===1}
-                        filter={procedimentFiltre}
-                    />
-                    <GridFormField
-                        size={3.5}
-                        name="servei"
-                        optionsUnpaged={1===1}
-                        filter={serveiFiltre}
-                    />
+                    <GridFormField size={6} name="organGestor" namedQueries={`PERM_READ`} />
+                    <GridFormField size={3.5} name="procediment"  filter={procedimentFiltre}/>
+                    <GridFormField size={3.5} name="servei" filter={serveiFiltre}/>
                     <GridFormField size={2} name="tipusUsuari" />
                     <GridFormField size={3} name="createdBy" />
                     <GridFormField size={3} name="referencia" />

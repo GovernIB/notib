@@ -68,7 +68,6 @@ const ProcedimentServeiField: React.FC = () => {
                         name="procediment"
                         onChange={(value) => handleChangeProcediment(value)}
                         label={t(`page.notificacio.form.camps.${type}`)}
-                        optionsUnpaged={1===1}
                         filter={"tipus:'" + type.toUpperCase() + "'"}
                         required={data.procedimentRequired}
                     />
@@ -81,7 +80,6 @@ const ProcedimentServeiField: React.FC = () => {
                 name="procediment"
                 onChange={(value) => handleChangeProcediment(value)}
                 filter={"tipus:'" + type.toUpperCase() + "'"}
-                optionsUnpaged={1===1}
                 required={data.procedimentRequired}
             />
         );
@@ -99,7 +97,7 @@ export const NotificacioFormContent: React.FC = () => {
                 <GridFormField size={12} name="concepte" />
             </Grid>
             <GridFormField size={12} name="descripcio" type="textarea" />
-            <GridFormField size={6} name="organGestor" namedQueries={`PERM_READ`} optionsUnpaged={1===1} />
+            <GridFormField size={6} name="organGestor" namedQueries={`PERM_READ`} />
             <Grid size={6}>
                 <ProcedimentServeiField />
             </Grid>
