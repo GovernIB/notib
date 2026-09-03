@@ -14,6 +14,7 @@ import es.caib.notib.persist.resourceentity.EntregaCieResourceEntity;
 import es.caib.notib.persist.resourceentity.PagadorCieResourceEntity;
 import es.caib.notib.persist.resourceentity.PagadorPostalResourceEntity;
 import es.caib.notib.persist.resourceentity.ProcedimentResourceEntity;
+import es.caib.notib.persist.resourcerepository.EntitatResourceRepository;
 import es.caib.notib.persist.resourcerepository.EntregaCieResourceRepository;
 import es.caib.notib.persist.resourcerepository.OrganGestorResourceRepository;
 import es.caib.notib.persist.resourcerepository.PagadorCieResourceRepository;
@@ -40,6 +41,8 @@ class ProcedimentResourceServiceImplTest {
 
 	@Mock
 	private AclHelper aclHelper;
+	@Mock
+	private EntitatResourceRepository entitatResourceRepository;
 	@Mock
 	private OrganGestorResourceRepository organGestorResourceRepository;
 	@Mock
@@ -74,6 +77,7 @@ class ProcedimentResourceServiceImplTest {
 			notibPermissionHelper,
 			aclHelper,
 			pagadorPostalRepository,
+			entitatResourceRepository,
 			pagadorCieRepository,
 			entregaCieRepository,
 			procedimentResourceRepository,

@@ -1,7 +1,10 @@
 package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
-import es.caib.notib.logic.helper.*;
+import es.caib.notib.logic.helper.AclHelper;
+import es.caib.notib.logic.helper.NotibPermissionHelper;
+import es.caib.notib.logic.helper.OrganGestorSyncHelper;
+import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.ActionExecutionException;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
@@ -13,8 +16,14 @@ import es.caib.notib.logic.intf.model.OrganGestorResource;
 import es.caib.notib.logic.intf.resourceservice.OrganGestorResourceService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.organs.AdminOrgansAmbPermisActionExecutor;
-import es.caib.notib.persist.resourceentity.*;
-import es.caib.notib.persist.resourcerepository.*;
+import es.caib.notib.logic.organs.OficinesSyncActionExecutor;
+import es.caib.notib.persist.resourceentity.EntregaCieResourceEntity;
+import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
+import es.caib.notib.persist.resourcerepository.EntitatResourceRepository;
+import es.caib.notib.persist.resourcerepository.EntregaCieResourceRepository;
+import es.caib.notib.persist.resourcerepository.OrganGestorResourceRepository;
+import es.caib.notib.persist.resourcerepository.PagadorCieResourceRepository;
+import es.caib.notib.persist.resourcerepository.PagadorPostalResourceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.acls.domain.BasePermission;
@@ -23,7 +32,10 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -70,9 +82,10 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 
 	@PostConstruct
 	public void init() {
-
+		var resourceClass = getResourceClass();
 		register(OrganGestorResource.PERSPECTIVE_TREE, new OrganGestorResourceTreePerspectiveApplicator());
 		register(OrganGestorResource.DIR3_SYNC_ACTION_CODE, new Dir3SyncActionExecutor());
+		register(OrganGestorResource.OFICINES_SYNC_ACTION_CODE, new OficinesSyncActionExecutor(entitatResourceRepository, userSessionHelper, organGestorService, resourceClass));
 		register(OrganGestorResource.ACTION_ADMIN_ORGANS_AMB_PERMIS, new AdminOrgansAmbPermisActionExecutor(organGestorService, userSessionHelper));
 	}
 

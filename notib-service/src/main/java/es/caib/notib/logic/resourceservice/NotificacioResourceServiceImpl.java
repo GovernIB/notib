@@ -425,7 +425,7 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 	private static void caducitatOnChange(Integer caducitatDiesNaturals, NotificacioResource previous, NotificacioResource target) {
 
 		Date caducitat = null;
-		if (caducitatDiesNaturals != null) {
+			if (caducitatDiesNaturals != null) {
 			caducitat = Date.from(LocalDate.now().plusDays(caducitatDiesNaturals).atStartOfDay(ZoneId.systemDefault()).toInstant());
 		}
 		target.setCaducitat(caducitat);
