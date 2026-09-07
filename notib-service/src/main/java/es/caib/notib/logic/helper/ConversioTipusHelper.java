@@ -627,6 +627,7 @@ public class ConversioTipusHelper {
 			}
 
 			var entregaPostal = entity.getEntregaPostal();
+			dto.setCieExtern(entity.isCieExtern());
 			if (entregaPostal != null) {
 				var missatgeEstatPostal = messageHelper.getMessage(entregaPostal != null ?
 						entregaPostal.getCieEstat() != null ? "es.caib.notib.client.domini.CieEstat." + entregaPostal.getCieEstat() : "entrega.postal.pendent.enviar"

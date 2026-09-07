@@ -659,6 +659,22 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		return entregaPostal != null && entregaPostal.isCieEstatFinal();
 	}
 
+	// si l'entrega postal de l'enviament la gestiona un CIE extern. Si no hi ha entrega postal o el CIE el gestiona Notific@ retorna false.
+	public boolean isCieExtern() {
+
+		if (entregaPostal == null || notificacio == null) {
+			return false;
+		}
+		var entregaCie = notificacio.getProcediment() != null ? notificacio.getProcediment().getEntregaCieEfectiva() : null;
+		if (entregaCie == null && notificacio.getOrganGestor() != null) {
+			entregaCie = notificacio.getOrganGestor().getEntregaCie();
+		}
+		if (entregaCie == null && notificacio.getEntitat() != null) {
+			entregaCie = notificacio.getEntitat().getEntregaCie();
+		}
+		return entregaCie != null && entregaCie.getCie() != null && entregaCie.getCie().isCieExtern();
+	}
+
 	public boolean isNotificat() {
 
 		return EnviamentEstat.NOTIFICADA.equals(notificaEstat) || entregaPostal != null && CieEstat.NOTIFICADA.equals(entregaPostal.getCieEstat());
@@ -691,6 +707,8 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
                 || EnviamentEstat.NOTIFICADA.equals(notificaEstat)
                 || EnviamentEstat.REBUTJADA.equals(notificaEstat)
                 || EnviamentEstat.EXPIRADA.equals(notificaEstat)
-                || EnviamentEstat.LLEGIDA.equals(notificaEstat);
+                || EnviamentEstat.LLEGIDA.equals(notificaEstat)
+                // DESCONEGUT és final només si el CIE no és extern (si ho és, l'adviser del CIE donarà l'estat definitiu)
+                || (EnviamentEstat.DESCONEGUT.equals(notificaEstat) && !isCieExtern());
     }
 }

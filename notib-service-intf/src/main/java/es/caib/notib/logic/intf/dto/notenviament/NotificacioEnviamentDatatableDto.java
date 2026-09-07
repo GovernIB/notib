@@ -35,6 +35,8 @@ public class NotificacioEnviamentDatatableDto {
 
 	private String estatEntregaPostal;
 	private String errorEntregaPostal;
+	// Si l'entrega postal la gestiona un proveïdor CIE extern (veure NotificacioEnviamentEntity.isCieExtern())
+	private boolean cieExtern;
 
 	private NotificacioEstatEnumDto notificacioEstat;
 	private Date notificacioErrorData;
