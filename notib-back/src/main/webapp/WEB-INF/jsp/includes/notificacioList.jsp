@@ -286,6 +286,8 @@
         var getUrl = "<c:url value="/notificacio/"/>" + rowData.id + "/enviament";
         $.get(getUrl).done(function(data) {
             $(td).empty();
+            // Només es mostra la columna d'entrega postal si el CIE és extern (si no, l'estat ja el dona la columna telemàtica)
+            var mostrarColumnaEntregaPostal = data.some(function(d) { return d.cieExtern; });
             $(td).append(
                 '<table class="table table-striped table-bordered table-enviaments">' +
                 '<caption><spring:message code="notificacio.list.enviament.list.titol"/></caption>' +
@@ -293,7 +295,7 @@
                 '<tr>' +
                 '<th><spring:message code="notificacio.list.enviament.list.titular"/></th>' +
                 '<th><spring:message code="notificacio.list.enviament.list.destinataris"/></th>' +
-                '<th><spring:message code="notificacio.list.enviament.list.estat.entrega.postal"/></th>' +
+                (mostrarColumnaEntregaPostal ? '<th><spring:message code="notificacio.list.enviament.list.estat.entrega.postal"/></th>' : '') +
                 '<th><spring:message code="notificacio.list.enviament.list.estat"/></th>' +
                 '<th></th>' +
                 '</tr>' +
@@ -355,25 +357,27 @@
                     destinataris = '<spring:message code="notificacio.list.enviament.list.sensedestinataris"/>';
                 }
                 contingutTbody += '<td>' + destinataris + '</td>';
-                let estatPostal = data[i].estatEntregaPostal;
-                let mostrarIconaError = estatPostal && estatPostal.toString().toLowerCase().includes("error") && data[i].errorEntregaPostal;
-                let iconaError = mostrarIconaError ? '<span class="fa fa-warning text-danger" title="' + data[i].errorEntregaPostal + '"></span>' : "";
-				let isUltimEventCie = data[i]?.ultimEvent?.eventCie;
-                let cieEventError = "";
-                if (isUltimEventCie && data[i].ultimEventError && !iconaError) {
-                    var errorTitle = '';
-                    if (data[i].notificacioErrorDescripcio) {
-                        errorTitle = data[i].notificacioErrorDescripcio.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-                    } else {
-                        errorTitle = "Descripció de l'error no registrada";
+                let isUltimEventCie = data[i]?.ultimEvent?.eventCie;
+                if (mostrarColumnaEntregaPostal) {
+                    let estatPostal = data[i].estatEntregaPostal;
+                    let mostrarIconaError = estatPostal && estatPostal.toString().toLowerCase().includes("error") && data[i].errorEntregaPostal;
+                    let iconaError = mostrarIconaError ? '<span class="fa fa-warning text-danger" title="' + data[i].errorEntregaPostal + '"></span>' : "";
+                    let cieEventError = "";
+                    if (isUltimEventCie && data[i].ultimEventError && !iconaError) {
+                        var errorTitle = '';
+                        if (data[i].notificacioErrorDescripcio) {
+                            errorTitle = data[i].notificacioErrorDescripcio.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                        } else {
+                            errorTitle = "Descripció de l'error no registrada";
+                        }
+                        cieEventError += ' <span class="fa fa-warning text-danger" title="' + errorTitle + '"></span>';
                     }
-                    cieEventError += ' <span class="fa fa-warning text-danger" title="' + errorTitle + '"></span>';
-                }
-                if (isUltimEventCie && data[i].fiReintents) {
-                    cieEventError += ' <span class="fa fa-warning text-warning" title="' + data[i].fiReintentsDesc + '"></span>';
-                }
+                    if (isUltimEventCie && data[i].fiReintents) {
+                        cieEventError += ' <span class="fa fa-warning text-warning" title="' + data[i].fiReintentsDesc + '"></span>';
+                    }
 
-                contingutTbody += '<td>' + data[i].estatEntregaPostal + "<span> </span>" + iconaError + cieEventError + '</td>';
+                    contingutTbody += '<td>' + data[i].estatEntregaPostal + "<span> </span>" + iconaError + cieEventError + '</td>';
+                }
 
 
                 contingutTbody +=  data[i].estatColor ? '<td style="box-shadow: inset 3px 0px 0px ' + data[i].estatColor + ';"> ' +
