@@ -1,6 +1,5 @@
 package es.caib.notib.logic.intf.model;
 
-import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.ServeiTipus;
@@ -24,7 +23,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
-import org.bouncycastle.util.Strings;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -276,6 +274,7 @@ public class NotificacioEnviamentResource extends BaseResource<Long> {
 	private boolean anulable;
 	private boolean cieEstatFinal;
 	private NotificacioEstatEnumDto notificacioEstat;
+	private String estatColor;
 
 	public String getNotificaCertificacioArxiuNom() {
 		return !StringUtils.isEmpty(notificaReferencia) ?  "certificacio_" + notificaReferencia + ".pdf" : null;

@@ -338,9 +338,16 @@ const translationEs = {
                 enviament: {
                     column: {
                         interessat: 'Interesado',
-                        representant: 'Representante',
-                        estatPostal: 'Estado de entrega postal',
+                        representant: {
+                            title: 'Representante',
+                            senseRepresentant: "Sin representante"
+                        },
+                        estatPostal: {
+                            title: "Estado de entrega postal",
+                            senseCie: "Sin entrega postal"
+                        },
                         estatTelematica: 'Estado de entrega telemática',
+
                     },
                     accions: 'Acciones',
                 },

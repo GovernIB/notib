@@ -36,8 +36,8 @@ export const NotificacioGridEnviaments: React.FC<{ id: any }> = (props) => {
                     <TableHead>
                         <TableRow>
                             <TableCell>{t('page.notificacio.grid.enviament.column.interessat')}</TableCell>
-                            <TableCell>{t('page.notificacio.grid.enviament.column.representant')}</TableCell>
-                            <TableCell>{t('page.notificacio.grid.enviament.column.estatPostal')}</TableCell>
+                            <TableCell>{t('page.notificacio.grid.enviament.column.representant.title')}</TableCell>
+                            <TableCell>{t('page.notificacio.grid.enviament.column.estatPostal.title')}</TableCell>
                             <TableCell>{t('page.notificacio.grid.enviament.column.estatTelematica')}</TableCell>
                             <TableCell></TableCell>
                         </TableRow>
@@ -48,18 +48,24 @@ export const NotificacioGridEnviaments: React.FC<{ id: any }> = (props) => {
                                 <TableCell component="th" scope="row" sx={{ width: '50%'}}>
                                     {enviament.titular.description}
                                 </TableCell>
-                                <TableCell component="th" scope="row"></TableCell>
-                                <TableCell component="th" scope="row"></TableCell>
-                                <TableCell component="th" scope="row"></TableCell>
+                                <TableCell component="th" scope="row">
+                                    {enviament.titular.representant ? enviament.titular.representant : t('page.notificacio.grid.enviament.column.representant.senseRepresentant')}
+                                </TableCell>
+                                <TableCell component="th" scope="row">
+                                    {enviament.entregaPostalInfo?.cieEstat ? enviament.entregaPostalInfo?.cieEstat : t('page.notificacio.grid.enviament.column.estatPostal.senseCie')}
+                                </TableCell>
+                                <TableCell component="th" scope="row" sx={{borderLeft: "1.5px solid " + enviament.estatColor}}>
+                                    {t('utils.estatConfig.ENVIAMENT_ESTAT_MAP.' + enviament.notificaEstat)}
+                                </TableCell>
                                 <TableCell component="th" scope="row" sx={{ width: 'fit-content', display:'flex' }}>
-                                    <MuiActionReportButton
+                                    { enviament.notificaCertificacioData &&(<MuiActionReportButton
                                         id={enviament?.id}
                                         resourceName={"notificacioEnviamentResource"}
                                         report="DESCARREGAR_CERTIFICACIO_ENVIAMENT"
                                         reportFileType="CUSTOM"
                                         title={t('page.notificacio.detail.dades.enviaments.registre.certificacio')}
                                         buttonComponentProps={{ variant: 'outlined', sx: { mr: 1 } }}
-                                        buttonIcon="file_download"/>
+                                        buttonIcon="file_download"/>)}
                                     <Button variant="outlined"
                                         size="small"
                                         startIcon={<Icon>info</Icon>}

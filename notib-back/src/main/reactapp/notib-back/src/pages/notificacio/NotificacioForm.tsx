@@ -126,6 +126,8 @@ export const NotificacioForm: React.FC = () => {
         // canviat l'atribut key i no refresca la informació dels formularis.
         formApiRef.current?.setFieldValue('enviamentsInfo', [{ id: new Date().valueOf() }]);
         formApiRef.current?.setFieldValue('documentsInfo', [{ id: new Date().valueOf() }]);
+        formApiRef.current?.setFieldValue('origen', 'WEB');
+        formApiRef.current?.setFieldValue('tipusUsuari', 'INTERFICIE_WEB');
     };
 
     return (

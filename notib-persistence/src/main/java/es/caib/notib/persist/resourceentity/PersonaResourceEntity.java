@@ -62,9 +62,8 @@ public class PersonaResourceEntity
 	private String nomSencerNif;
 
 	@Builder
-	public PersonaResourceEntity(
-		PersonaResource resource,
-		NotificacioEnviamentResourceEntity enviament) {
+	public PersonaResourceEntity(PersonaResource resource, NotificacioEnviamentResourceEntity enviament) {
+
 		this.interessatTipus = resource.getInteressatTipus();
 		this.incapacitat = resource.isIncapacitat();
 		this.email = resource.getEmail();

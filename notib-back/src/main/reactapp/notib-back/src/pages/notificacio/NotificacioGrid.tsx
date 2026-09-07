@@ -357,7 +357,9 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                 title: t('page.notificacio.grid.accions.documentEnviat'),
                 icon: 'download',
                 showInMenu: true,
-                onClick: (id) => descarregarDocumentEnviat(id),
+                onClick: (id) => {
+                    console.log("click");
+                descarregarDocumentEnviat(id)} ,
                 hidden: noEsTaulaRemeses
             },
             {

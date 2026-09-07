@@ -239,6 +239,8 @@ const TableEnviaments: React.FC<PropsTabDades> = (props) => {
                         },
                         {
                             field: 'notificaEstat', // TODO: Revisar back
+                            label: t('page.notificacio.detail.dades.enviaments.estat'),
+                            valueRenderer: () => t('utils.estatConfig.ENVIAMENT_ESTAT_MAP.' + enviament.notificaEstat)
                             // Revisar condicions JSP Linia 775 a 807 notificacioInfo.jsp
                         },
                         {
@@ -405,17 +407,18 @@ const NotificacioDetailDialogTabDades: React.FC<PropsTabDades> = (props) => {
                     {
                         field: 'createdBy', // TODO
                         valueRenderer: () => {
+                            console.log(notificacio);
                             return (
                                 <>
                                     {notificacio.tipusUsuari === 'INTERFICIE_WEB' ? (
-                                        <Typography>{`${notificacio?.createdBy?.nom} (${notificacio?.createdBy?.codi}`}</Typography>
+                                        <Typography>{`${notificacio?.createdByNom} (${notificacio?.createdBy})`}</Typography>
                                     ) : (
                                         <>
                                             <Typography>
-                                                {` Aplicacio: ${notificacio?.createdBy?.nom} (${notificacio?.createdBy?.codi}`}
+                                                {` Aplicacio: ${notificacio?.createdByNom} (${notificacio?.createdBy})`}
                                             </Typography>
                                             <Typography>
-                                                {` Usuari: ${notificacio?.usuariNom} (${notificacio?.usuariCodi}`}
+                                                {` Usuari: ${notificacio?.usuariNom} (${notificacio?.usuariCodi})`}
                                             </Typography>
                                         </>
                                     )}

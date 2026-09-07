@@ -137,10 +137,4 @@ public class NotificacioMassivaResourceServiceImpl extends BaseMutableResourceSe
 			log.error("[NotificacioMassivaResourceServiceImpl.afterCreateSave] Error tractant la notificacio massiva", ex);
 		}
 	}
-
-	@Override
-	protected void completeResource(NotificacioMassivaResource resource) {
-
-
-	}
 }

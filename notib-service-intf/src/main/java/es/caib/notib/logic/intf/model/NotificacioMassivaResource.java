@@ -121,7 +121,7 @@ import java.util.List;
 		customValidatorType = EmailFormatValid.class,
 		targetFields = NotificacioMassivaResource.Fields.email,
 		springBean = true,
-		message = "{es.caib.notib.validation.EmailFormatValid.message}"),
+		message = "{es.caib.notib.logic.intf.model.validator.massiva.EmailFormatValid.fieldMessage}"),
 })
 public class NotificacioMassivaResource extends BaseResource<Long>  {
 

@@ -541,6 +541,7 @@ public class NotificacioResource extends BaseResource<Long> {
 	// Camps calculats
 	private LocalDateTime createdDate;
 	private String createdBy;
+	private String createdByNom;
 	private ProcSerTipusEnum procedimentTipus;
 	private boolean procedimentRequired = true;
 	private boolean entregaPostal;

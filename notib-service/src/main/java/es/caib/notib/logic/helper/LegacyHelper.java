@@ -18,12 +18,15 @@ import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import joptsimple.internal.Strings;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +37,7 @@ import java.util.stream.Collectors;
  *
  * @author Límit Tecnologies
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class LegacyHelper {
@@ -213,7 +217,6 @@ public class LegacyHelper {
 		// Crea la informació d'auditoria
 		auditHelper.auditaNotificacio(notificacioEntity.get(), AuditService.TipusOperacio.CREATE, "NotificacioResourceServiceImpl.afterCreateSave");
 		// Dona d'alta els enviaments a la màqina d'estats al finalitzar la transacció
-		notificacioEntity.get().getEnviaments().forEach(e -> enviamentSmService.altaEnviament(e.getNotificaReferencia()));
 	}
 
 	private Dir3Resource toDir3Resource(NodeDir3 nodeDir3) {

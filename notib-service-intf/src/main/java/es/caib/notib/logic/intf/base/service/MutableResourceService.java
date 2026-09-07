@@ -16,8 +16,7 @@ import java.util.Map;
  *
  * @author Límit Tecnologies
  */
-public interface MutableResourceService<R extends Resource<? extends Serializable>, ID extends Serializable>
-		extends ReadonlyResourceService<R, ID> {
+public interface MutableResourceService<R extends Resource<? extends Serializable>, ID extends Serializable> extends ReadonlyResourceService<R, ID> {
 
 	/**
 	 * Crea una nova instància del recurs per a inicialitzar el formulari de creació.
@@ -28,21 +27,14 @@ public interface MutableResourceService<R extends Resource<? extends Serializabl
 	/**
 	 * Crea un nou recurs.
 	 *
-	 * @param resource
-	 *            informació del recurs.
-	 * @param answers
-	 *            respostes a les preguntes formulades en el front.
+	 * @param resource informació del recurs.
+	 * @param answers respostes a les preguntes formulades en el front.
 	 * @return el recurs creat.
-	 * @throws ResourceAlreadyExistsException
-	 *             si el recurs que es vol crear ja existeix.
-	 * @throws ResourceNotCreatedException
-	 *             si no s'ha pogut crear el recurs especificat.
-	 * @throws AnswerRequiredException
-	 *             si es requereixen respostes de l'usuari per a crear el registre.
+	 * @throws ResourceAlreadyExistsException si el recurs que es vol crear ja existeix.
+	 * @throws ResourceNotCreatedException si no s'ha pogut crear el recurs especificat.
+	 * @throws AnswerRequiredException si es requereixen respostes de l'usuari per a crear el registre.
 	 */
-	R create(
-			R resource,
-			Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceAlreadyExistsException, ResourceNotCreatedException, AnswerRequiredException;
+	R create(R resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceAlreadyExistsException, ResourceNotCreatedException, AnswerRequiredException;
 
 	/**
 	 * Actualitza la informació d'un recurs.

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.logic.intf.service;
 
@@ -11,14 +11,14 @@ import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
 
 /**
  * Servei per a l'enviament i consulta de notificacions.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface NotificacioServiceWs {
 
 	/**
 	 * Dona d'alta una notificació.
-	 * 
+	 *
 	 * @param notificacio Dades per a donar d'alta la notificació.
 	 * @return la llista de referencies generades per NOTIB (una per enviament)).
 	 */
@@ -28,14 +28,14 @@ public interface NotificacioServiceWs {
 
     /**
 	 * Dona permís de consulta sobre un procediment.
-	 * 
+	 *
 	 * @param permisConsulta Dades per a donar d'alta la notificació.
 	 * @return la llista de referencies generades per NOTIB (una per enviament)).
 	 */
 	public boolean donarPermisConsulta(PermisConsulta permisConsulta);
 	/**
 	 * Consulta l'estat d'un enviament d'una notificació.
-	 * 
+	 *
 	 * @param identificador Referència de l'enviament a consultar.
 	 * @return la informació de la notificació amb l'enviament especificat.
 	 */
@@ -44,7 +44,7 @@ public interface NotificacioServiceWs {
 
 	/**
 	 * Consulta l'estat d'un enviament d'una notificació.
-	 * 
+	 *
 	 * @param referencia Referència de l'enviament a consultar.
 	 * @return la informació de la notificació amb l'enviament especificat.
 	 */

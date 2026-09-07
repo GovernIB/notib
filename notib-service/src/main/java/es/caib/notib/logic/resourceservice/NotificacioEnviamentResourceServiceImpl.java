@@ -112,6 +112,7 @@ public class NotificacioEnviamentResourceServiceImpl extends BaseMutableResource
 		resource.setReferenciaNotificacio(entity.getNotificacio().getReferencia());
 		resource.setAnulable(entity.isAnulable());
 		resource.setNotificacioEstat(entity.getNotificacio().getEstat());
+		resource.setEstatColor(entity.getNotificaEstat() != null ? entity.getNotificaEstat().getColor() : null);
 		var titular = entity.getTitular();
 		resource.setTitular(ResourceReference.toResourceReference(titular.getId(), titular.getNomSencerNif()));
 	}

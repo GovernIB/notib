@@ -11,7 +11,7 @@ const EnviamentDetailTabNotifica: React.FC<{ enviament: any; apiCurrentFields: a
     const { temporalMessageShow } = useBaseAppContext();
 
     const renderAlertEstat = () => {
-        if (enviament?.notificaEstat === 'PENDENT') {
+        if (enviament?.notificaEstat === 'PENDENT' || enviament?.notificaEstat === 'ENVIANT') {
             return (
                 <Alert severity="warning" sx={{ mb: 1, mt: 2 }}>
                     {enviament?.perEmail ? t('page.enviament.detail.tab.notifica.noEnviat') : t('page.enviament.detail.tab.notifica.notificacioNoEnviat')}
@@ -19,7 +19,7 @@ const EnviamentDetailTabNotifica: React.FC<{ enviament: any; apiCurrentFields: a
             );
         }
     };
-    const isAlertVisible = Boolean(renderAlertEstat);
+    const isAlertVisible = enviament?.notificaEstat === 'PENDENT' || enviament?.notificaEstat === 'ENVIANT';
     const renderContingutRefrescar = () => {
 
         // Cas NO PENDENT
@@ -68,7 +68,7 @@ const EnviamentDetailTabNotifica: React.FC<{ enviament: any; apiCurrentFields: a
             );
         }
     };
-
+    console.log("foo: " + renderAlertEstat);
     return (
         <Box sx={{ height: '100%', overflowY: 'auto', minHeight: 0 }}>
             {renderContingutRefrescar()}

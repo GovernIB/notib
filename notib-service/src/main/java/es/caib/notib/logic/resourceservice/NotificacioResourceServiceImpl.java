@@ -15,6 +15,7 @@ import es.caib.notib.logic.accionsMassives.ReactivarRegistreMassiuActionExecutor
 import es.caib.notib.logic.accionsMassives.ReenviarAmbErrorMassiuActionExecutor;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
+import es.caib.notib.logic.enviaments.NotificacioEventStartSm;
 import es.caib.notib.logic.enviaments.EnviarCallbackActionExecutor;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.LegacyHelper;
@@ -37,6 +38,7 @@ import es.caib.notib.logic.intf.resourceservice.NotificacioResourceService;
 import es.caib.notib.logic.intf.service.AccioMassivaService;
 import es.caib.notib.logic.intf.service.CallbackService;
 import es.caib.notib.logic.intf.service.EnviamentService;
+import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.JustificantService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.notificacions.AmpliarTerminiRemesaActionExecutor;
@@ -74,10 +76,10 @@ import es.caib.notib.persist.resourcerepository.NotificacioEnviamentResourceRepo
 import es.caib.notib.persist.resourcerepository.NotificacioResourceRepository;
 import es.caib.notib.persist.resourcerepository.PersonaResourceRepository;
 import es.caib.notib.persist.resourcerepository.ProcedimentOrganGestorResourceRepository;
-import liquibase.pro.packaged.E;
-import liquibase.pro.packaged.R;
+import es.caib.notib.persist.resourcerepository.UsuariResourceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
 
@@ -110,6 +112,7 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 	private final MessageHelper messageHelper;
 	private final NotibPermissionHelper notibPermissionHelper;
 	private final NotificacioEnviamentResourceRepository notificacioEnviamentResourceRepository;
+	private final UsuariResourceRepository usuariResourceRepository;
 	private final EventResourceRepository eventResourceRepository;
 	private final DocumentResourceRepository documentResourceRepository;
 	private final CallbackResourceRepository callbackResourceRepository;
@@ -120,7 +123,7 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 	private final EnviamentService enviamentService;
 	private final AccioMassivaService accioMassivaService;
 	private final CallbackService callbackService;
-	private final NotificacioResourceRepository notificacioResourceRepository;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@PostConstruct
 	public void init() {
@@ -175,6 +178,10 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 		}
 		var resource = super.entityToResource(entity);
 		resource.setEstatString(entity.getEstatString());
+		var createdBy = usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null);
+		if (createdBy != null) {
+			resource.setCreatedByNom(createdBy.getNomSencer());
+		}
 		return resource;
 	}
 
@@ -240,6 +247,7 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 			});
 		}
 		legacyHelper.altaNotificacio(entity.getId(), enviamentsIds);
+		eventPublisher.publishEvent(new NotificacioEventStartSm(entity.getId()));
 	}
 
 	/*
