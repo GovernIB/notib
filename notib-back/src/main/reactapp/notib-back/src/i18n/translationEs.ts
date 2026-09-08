@@ -1097,6 +1097,10 @@ const translationEs = {
         UserProfile: {
             perfil: "Perfil del usuario",
             auto: "Automático",
+            dades: 'Datos',
+            correu: 'Notificaciones por correo',
+            general: 'Configuración general',
+            tema: 'Apariencia',
         },
         FormDropzoneField: {
             arrosegar:  "Arrastra el fichero aquí",

@@ -1,6 +1,7 @@
 package es.caib.notib.persist.resourceentity;
 
 import es.caib.notib.client.domini.Idioma;
+import es.caib.notib.client.domini.MenuEstil;
 import es.caib.notib.client.domini.NumElementsPaginaDefecte;
 import es.caib.notib.client.domini.Tema;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
@@ -47,8 +48,12 @@ public class UsuariResourceEntity extends es.caib.notib.persist.base.entity.Base
 	@Convert(converter = IdiomaConverter.class)
 	@Column(name = "idioma", length = 2)
 	private Idioma idioma;
+	@Enumerated(EnumType.STRING)
 	@Column(name = "tema", length = 10)
 	private Tema tema;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "estil_menu", length = 16, nullable = false)
+	private MenuEstil estilMenu = MenuEstil.TEMA;
 //	@Convert(converter = NumElementsPaginaConverter.class)
 	@Column(name = "num_elements_pagina_defecte", length = 3)
 	@Enumerated(EnumType.STRING)

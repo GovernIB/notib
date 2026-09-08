@@ -434,3 +434,19 @@ databaseChangeLog:
                 -   sql: "INSERT INTO ${db_prefix}CONFIG (id,POSITION, KEY, VALUE, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE, TYPE_CODE, CONFIG_GROUP_ID, CONFIG_TYPE_ID, CONFIGURABLE)
                             VALUES (${db_prefix}HIBERNATE_SEQ.NEXTVAL, 0, 'es.caib.notib.app.maxresults.selects', '20', 0, 'Nombre de resultats màxim a mostrar per les llistes desplegables abans de paginar', 'GENERAL', 'INT',
                             (SELECT ID FROM ${db_prefix}CONFIG_GROUP g WHERE g.code = 'GENERAL'), (SELECT ID FROM ${db_prefix}CONFIG_TYPE t WHERE t.code = 'INT'), 0);"
+
+    -   changeSet:
+            id: 2_1_1_000-25
+            author: limit
+            changes:
+                -   addColumn:
+                        tableName: ${db_prefix}usuari
+                        columns:
+                            -   column:
+                                    name: estil_menu
+                                    type: varchar(16 ${varcharUnit})
+                                    defaultValue: TEMA
+                                    constraints:
+                                        nullable: false
+                -   sql:
+                        "UPDATE ${db_prefix}usuari SET tema = NULL WHERE tema IS NOT NULL AND tema NOT IN ('LIGHT','DARK','DRACULA','SISTEMA');"

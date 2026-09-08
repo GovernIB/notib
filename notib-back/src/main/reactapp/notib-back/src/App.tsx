@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
 import Alert from '@mui/material/Alert';
 import { CssBaseline } from '@mui/material';
-import { ThemeProvider, useTheme, useColorScheme } from '@mui/material/styles';
+import { ThemeProvider, useTheme } from '@mui/material/styles';
 import { envVar, OidcAuthProvider, ContainerAuthProvider, ResourceApiProvider } from 'reactlib';
 import goibLogoLight from './assets/goib_logo_light.svg';
 import goibLogoDark from './assets/goib_logo_dark.svg';
@@ -11,8 +11,9 @@ import notibLogoDark from './assets/notib_logo_dark.png';
 import { BaseApp } from './components/BaseApp';
 import DrassanaFooter from './components/DrassanaFooter';
 import NotibProvider from './components/NotibProvider';
+import ThemeUserProvider, { useThemeUserContext } from './components/ThemeUserProvider';
 import {useNotibContext, ROLE_SUPER, ROLE_ADMIN, ROLE_USER, ROLE_ADMIN_LECTURA, ROLE_ORGAN} from './components/NotibContext';
-import theme from './theme';
+import { lightTheme } from './theme';
 
 export const envVars = {
     VITE_API_URL: import.meta.env.VITE_API_URL,
@@ -52,7 +53,7 @@ const version = '0.0.0';
 
 const InnerApp: React.FC = () => {
     const { t } = useTranslation();
-    const { mode } = useColorScheme();
+    const { estilMenu } = useThemeUserContext();
     const { currentRole, currentEntitatId } = useNotibContext();
     const menuEnviamentMassiu = [
         {
@@ -309,32 +310,32 @@ const InnerApp: React.FC = () => {
         },
     ];
     const theme = useTheme();
+    const mode = theme.palette.mode;
     const bgColor= mode === 'light' ? theme.palette.background.paper : undefined;
     const textColor= bgColor ? theme.palette.getContrastText(bgColor) : undefined;
     const currentRoleSuperOrEntitatSelected= currentRole === ROLE_SUPER || currentEntitatId != null;
     const logoColor = mode === 'light' ? notibLogoLight : notibLogoDark;
     return (
-        mode && (
-            <BaseApp
-                code="NOTIB"
-                logo={mode === 'light' ? goibLogoLight : goibLogoDark}
-                logoStyle={{'& img': { height: '49px' }, pl: 1, pr: '29px', borderRight: '1px solid ' + theme.palette.divider,}}
-                title={<img style={{ marginLeft: '8px', height: '49px', verticalAlign: 'middle' }} src={logoColor} alt="Notib"/>}
-                version={version}
-                availableLanguages={['ca', 'es']}
-                menuEntries={currentRoleSuperOrEntitatSelected ? menuEntries : undefined}
-                appbarBackgroundColor={bgColor}
-                appbarStyle={{ color: textColor }}
-                footerHeight={36}
-                footer={
-                    <div style={{ height: '36px' }}>
-                        <DrassanaFooter title="NOTIB" backgroundColor="#5F5D5D" style={{ position: 'fixed', width: '100%', bottom: 0 }}/>
-                    </div>
-                }
-            >
-                {currentRoleSuperOrEntitatSelected ? (<Outlet />) : (<Alert severity="error">{t('app.noEntitat')}</Alert>)}
-            </BaseApp>
-        )
+        <BaseApp
+            code="NOTIB"
+            logo={mode === 'light' ? goibLogoLight : goibLogoDark}
+            logoStyle={{'& img': { height: '49px' }, pl: 1, pr: '29px', borderRight: '1px solid ' + theme.palette.divider,}}
+            title={<img style={{ marginLeft: '8px', height: '49px', verticalAlign: 'middle' }} src={logoColor} alt="Notib"/>}
+            version={version}
+            availableLanguages={['ca', 'es']}
+            menuEntries={currentRoleSuperOrEntitatSelected ? menuEntries : undefined}
+            menuAppearance={estilMenu}
+            appbarBackgroundColor={bgColor}
+            appbarStyle={{ color: textColor }}
+            footerHeight={36}
+            footer={
+                <div style={{ height: '36px' }}>
+                    <DrassanaFooter title="NOTIB" backgroundColor="#5F5D5D" style={{ position: 'fixed', width: '100%', bottom: 0 }}/>
+                </div>
+            }
+        >
+            {currentRoleSuperOrEntitatSelected ? (<Outlet />) : (<Alert severity="error">{t('app.noEntitat')}</Alert>)}
+        </BaseApp>
     );
 };
 
@@ -348,10 +349,12 @@ export const App = () => {
             mandatory
         >
             <ResourceApiProvider apiUrl={getEnvApiUrl()}>
-                <ThemeProvider theme={theme}>
+                <ThemeProvider theme={lightTheme}>
                     <CssBaseline />
                     <NotibProvider>
-                        <InnerApp />
+                        <ThemeUserProvider>
+                            <InnerApp />
+                        </ThemeUserProvider>
                     </NotibProvider>
                 </ThemeProvider>
             </ResourceApiProvider>

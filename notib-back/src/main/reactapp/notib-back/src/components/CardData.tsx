@@ -14,7 +14,7 @@ const CardHead = (props: any) => {
     return (
         <CardHeader
             title={
-                <Box display={'flex'} alignItems={'center'} {...componentProps}>
+                <Box display={'flex'} alignItems={'center'} gap={1} {...componentProps}>
                     {icon && <Icon>{icon}</Icon>}
                     {children}
                 </Box>

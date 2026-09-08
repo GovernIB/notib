@@ -10,4 +10,6 @@ import java.io.Serializable;
 public enum Tema implements Serializable {
 	LIGHT,
 	DARK,
+	DRACULA,
+	SISTEMA,
 }

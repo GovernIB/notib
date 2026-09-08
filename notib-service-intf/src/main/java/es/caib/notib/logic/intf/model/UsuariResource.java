@@ -1,6 +1,7 @@
 package es.caib.notib.logic.intf.model;
 
 import es.caib.notib.client.domini.Idioma;
+import es.caib.notib.client.domini.MenuEstil;
 import es.caib.notib.client.domini.NumElementsPaginaDefecte;
 import es.caib.notib.client.domini.Tema;
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
@@ -60,6 +61,7 @@ public class UsuariResource extends BaseResource<String> {
 	protected Long ultimaEntitat;
 	protected Idioma idioma;
 	protected Tema tema;
+	protected MenuEstil estilMenu;
 	protected NumElementsPaginaDefecte numElementsPaginaDefecte;
 	protected ResourceReference<EntitatResource, Long> entitatDefecte;
 	protected ResourceReference<OrganGestorResource, Long> organDefecte;
