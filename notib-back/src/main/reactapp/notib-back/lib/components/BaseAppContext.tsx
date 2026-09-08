@@ -76,4 +76,14 @@ export const useOptionalBaseAppContext = (): BaseAppContextType | undefined => {
     return React.useContext(BaseAppContext);
 };
 
+/**
+ * Indica si el contingut actual es troba dins un Dialog (finestra emergent).
+ * S'utilitza per evitar que components com GridPage alterin l'estat global de
+ * disposició de la pàgina (contentExpandsToAvailableHeight, marginsDisabled) quan
+ * es troben dins una finestra emergent, ja que aquesta ja imposa la seva pròpia
+ * alçada i no ha d'interferir amb la disposició de la pàgina de fons.
+ */
+export const NestedInDialogContext = React.createContext<boolean>(false);
+export const useIsNestedInDialog = (): boolean => React.useContext(NestedInDialogContext);
+
 export default BaseAppContext;

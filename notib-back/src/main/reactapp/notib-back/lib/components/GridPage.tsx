@@ -1,5 +1,5 @@
 import React from 'react';
-import { useBaseAppContext } from './BaseAppContext';
+import { useBaseAppContext, useIsNestedInDialog } from './BaseAppContext';
 
 /**
  * Propietats del component GridPage.
@@ -21,29 +21,49 @@ type GridPageProps = React.PropsWithChildren & {
  */
 export const GridPage: React.FC<GridPageProps> = (props) => {
     const { disableMargins = true, autoHeight, style, children } = props;
+    // Quan GridPage es troba dins un Dialog (p. ex. una pestanya d'un detall en una finestra
+    // emergent), l'estat global de disposició de la pàgina (contentExpandsToAvailableHeight,
+    // marginsDisabled) no li és rellevant: el Dialog ja imposa la seva pròpia alçada. Alterar
+    // aquest estat global des d'aquí faria que, en muntar/desmuntar-se en canviar de pestanya,
+    // es sobreescrigués l'estat que necessita la pàgina de fons (p. ex. un llistat visible
+    // darrere la finestra emergent), deixant-la sense alçada i, per tant, sense contingut visible
+    // fins que es refresqui la pàgina. Per això, quan està niat dins un Dialog, s'ignora
+    // completament aquest mecanisme.
+    const isNestedInDialog = useIsNestedInDialog();
     const {
         setMarginsDisabled,
         contentExpandsToAvailableHeight,
         setContentExpandsToAvailableHeight,
     } = useBaseAppContext();
-    const [proceed, setProceed] = React.useState<boolean>(contentExpandsToAvailableHeight);
+    const [proceed, setProceed] = React.useState<boolean>(
+        isNestedInDialog || contentExpandsToAvailableHeight
+    );
     React.useEffect(() => {
+        if (isNestedInDialog) {
+            return;
+        }
         if (!proceed && contentExpandsToAvailableHeight === !autoHeight) {
             setProceed(true);
         }
-    }, [contentExpandsToAvailableHeight]);
+    }, [contentExpandsToAvailableHeight, isNestedInDialog]);
     React.useEffect(() => {
+        if (isNestedInDialog) {
+            return;
+        }
         setMarginsDisabled(disableMargins);
         return () => setMarginsDisabled(false);
-    }, [disableMargins]);
+    }, [disableMargins, isNestedInDialog]);
     React.useEffect(() => {
+        if (isNestedInDialog) {
+            return;
+        }
         if (!autoHeight) {
             setContentExpandsToAvailableHeight(true);
             return () => setContentExpandsToAvailableHeight(false);
         } else {
             setContentExpandsToAvailableHeight(false);
         }
-    }, [autoHeight]);
+    }, [autoHeight, isNestedInDialog]);
     return (
         <div
             style={{
@@ -52,7 +72,7 @@ export const GridPage: React.FC<GridPageProps> = (props) => {
                     : {}),
                 ...style,
             }}>
-            {proceed && children}
+            {(isNestedInDialog || proceed) && children}
         </div>
     );
 };

@@ -5,7 +5,12 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import Icon from '@mui/material/Icon';
 import IconButton from '@mui/material/IconButton';
-import { DialogButton, ContentDialogShowFn, MessageDialogShowFn } from '../BaseAppContext';
+import {
+    DialogButton,
+    ContentDialogShowFn,
+    MessageDialogShowFn,
+    NestedInDialogContext,
+} from '../BaseAppContext';
 import { useMessageDialogButtons, useConfirmDialogButtons } from '../AppButtons';
 import DialogButtons from './DialogButtons';
 
@@ -156,7 +161,9 @@ export const Dialog: React.FC<DialogProps> = (props) => {
                     <Icon fontSize="small">close</Icon>
                 </IconButton>
             )}
-            <DialogContent sx={title ? { pt: 0 } : undefined}>{children}</DialogContent>
+            <DialogContent sx={title ? { pt: 0 } : undefined}>
+                <NestedInDialogContext.Provider value={true}>{children}</NestedInDialogContext.Provider>
+            </DialogContent>
             {buttons && (
                 <DialogButtons
                     buttons={buttons}
