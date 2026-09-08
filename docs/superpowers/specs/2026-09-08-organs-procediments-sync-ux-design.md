@@ -142,8 +142,10 @@ Aquest helper orquestra, seqüencialment:
 
 1. `organGestorSyncHelper.sincronitzar(entitat, simular=false)` (òrgans, ja
    existent).
-2. `permisosHelper.actualitzarPermisosOrgansObsolets(...)` (migració de
-   permisos, ja existent a `OrganGestorServiceImpl.syncDir3OrgansGestors`).
+2. Migració de permisos d'òrgans obsolets, reutilitzant
+   `permisosHelper.actualitzarPermisosOrgansObsolets(...)` **sense
+   modificar-lo** — veure "Pont de permisos" més avall per als detalls de
+   com es construeixen els seus paràmetres a partir del resultat de (1).
 3. `procSerSyncHelper.actualitzaProcediments(entitatDto, progressPublisher)`
    (nou overload, veure més avall).
 4. `procSerSyncHelper.actualitzaServeis(entitatDto, progressPublisher)` (nou
@@ -157,6 +159,53 @@ Cada fase publica progrés sota el mateix esdeveniment SSE nou
 controlador legacy: òrgans i procediments/serveis reben els trams més grans;
 permisos i oficines són fases més curtes, amb missatges d'inici/fi només,
 sense percentatge fi per operació).
+
+### Pont de permisos entre el model nou i el legacy
+
+`PermisosHelper.actualitzarPermisosOrgansObsolets(List<NodeDir3> unitatsWs,
+List<OrganGestorEntity> organsDividits, List<OrganGestorEntity>
+organsFusionats, List<OrganGestorEntity> organsSubstituits,
+ProgresActualitzacioDto progres)` (`PermisosHelper.java:751`) depèn de la
+relació `@ManyToMany` `nous`/`antics` entre `OrganGestorEntity` (l'entitat
+JPA legacy, taula `not_organ_gestor`) — relació que avui només omple
+l'algoritme antic (`OrganGestorHelper.sincronitzarOrgans`). El nou
+`OrganGestorSyncHelper` (que és el que ha d'aplicar els canvis, per
+coherència amb el que mostra la previsualització) no la toca. Com que
+`OrganGestorResourceEntity` mapeja la mateixa taula (`DB_PREFIX +
+"organ_gestor"` = `not_organ_gestor`) i declara la mateixa relació, la
+solució és:
+
+1. **`OrganGestorSyncHelper.actualitzarOrgansGestors(...)`** (aplicat sempre,
+   no només per al flux combinat): després de crear/actualitzar totes les
+   entitats, per a cada substitució/fusió/divisió ja calculada a
+   `substitucionsMap`/`fusionsMap`/`divisionsMap` (dins `sincronitzar()`),
+   carregar les `OrganGestorEntity` origen i destí per codi
+   (`organGestorRepository.findByCodiIn(...)`, ja existent) i cridar
+   `origen.addNou(desti)` per a cada parella, guardant amb
+   `organGestorRepository.saveAll(...)`. Els orígens són sempre `vell`
+   (substitucions/fusions) o `vell` (divisions); els destins són `nou`
+   (substitucions/divisions) o cadascun dels `vells` (per a fusions, cada
+   origen apunta al mateix `nou`).
+2. **A `OrganGestorFullSyncHelper`** (el nou orquestrador), després
+   d'aplicar la fase d'òrgans: construir els paràmetres de
+   `actualitzarPermisosOrgansObsolets` a partir del resultat
+   `OrganGestorDir3Sync` ja retornat per `sincronitzar()` (no cal tornar a
+   consultar DIR3, evitant el problema que la marca d'aigua
+   `dataSincronitzacio`/`dataActualitzacio` de l'entitat ja s'ha avançat):
+   - `organsDividits` = `organGestorRepository.findByCodiIn(codis dels
+     divisions[].vell)`
+   - `organsFusionats` = `organGestorRepository.findByCodiIn(codis de
+     fusions[].vells[], aplanats)`
+   - `organsSubstituits` = `organGestorRepository.findByCodiIn(codis dels
+     substitucions[].vell)`
+   - `unitatsWs`: com que `actualitzarPermisosOrgansObsolets` només fa
+     servir `unitat.getCodi()` per aparellar-lo amb les tres llistes
+     anteriors (i salta silenciosament les divisions), n'hi ha prou amb una
+     llista sintètica d'`NodeDir3` amb només el `codi` establert, un per
+     cada codi dels tres conjunts anteriors — no cal reobtenir la resposta
+     completa de DIR3.
+   - Es crida `permisosHelper.actualitzarPermisosOrgansObsolets(...)` sense
+     cap modificació.
 
 ### Plumbing de progrés per a procediments/serveis (canvi additiu)
 
@@ -221,6 +270,8 @@ Backend:
   `onInfo`/`onProgressChanged`.
 - `notib-service/.../helper/ProcSerSyncHelper.java` — nous overloads amb
   `ProgressPublisher`.
+- `notib-service/.../helper/OrganGestorSyncHelper.java` — persistir la
+  relació `nous`/`antics` en aplicar substitucions/fusions/divisions.
 - `notib-service/.../helper/OrganGestorFullSyncHelper.java` — **nou**,
   orquestració de les 5 fases.
 - `notib-service/.../resourceservice/OrganGestorResourceServiceImpl.java` —
