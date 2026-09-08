@@ -271,6 +271,22 @@ public class NotificacioEnviamentResourceEntity extends BaseAuditableResourceEnt
 			&& notificacio.getOrganGestor().getEntregaCie().getPagadorCie().isCieExtern());
 	}
 
+	// si l'entrega postal de l'enviament la gestiona un CIE extern. Si no hi ha entrega postal o el CIE el gestiona Notific@ retorna false.
+	public boolean isCieExtern() {
+
+		if (entregaPostal == null || notificacio == null) {
+			return false;
+		}
+		var entregaCie = notificacio.getProcediment() != null ? notificacio.getProcediment().getEntregaCieEfectiva() : null;
+		if (entregaCie == null && notificacio.getOrganGestor() != null) {
+			entregaCie = notificacio.getOrganGestor().getEntregaCie();
+		}
+		if (entregaCie == null && notificacio.getEntitat() != null) {
+			entregaCie = notificacio.getEntitat().getEntregaCie();
+		}
+		return entregaCie != null && entregaCie.getPagadorCie() != null && entregaCie.getPagadorCie().isCieExtern();
+	}
+
 	@Builder
 	public NotificacioEnviamentResourceEntity(NotificacioEnviamentResource resource, NotificacioResourceEntity notificacio, PersonaResourceEntity titular) {
 

@@ -369,7 +369,8 @@ const translationCa = {
                         },
                         estatPostal: {
                             title: "Estat d'entrega postal",
-                            senseCie: "Sense entrega postal"
+                            senseCie: "Sense entrega postal",
+                            cieNotifica: "Entrega postal gestionada per Notifica"
                         },
                         estatTelematica: "Estat d'entrega telemàtica",
                     },

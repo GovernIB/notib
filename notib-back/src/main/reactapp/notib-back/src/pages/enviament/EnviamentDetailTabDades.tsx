@@ -1,7 +1,10 @@
-import { Box, Icon, Typography } from '@mui/material';
+import {Box, Tooltip, Typography} from '@mui/material';
 import React from 'react';
 import { FieldsDataCard } from '../../components/DataCard';
 import { useTranslation } from 'react-i18next';
+import WarningIcon from "@mui/icons-material/Warning";
+import ErrorIcon from "@mui/icons-material/Error";
+import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
 
 const EnviamentDetailTabDades: React.FC<{
     enviament: any;
@@ -114,22 +117,43 @@ const EnviamentDetailTabDades: React.FC<{
                             // };
 
                             return (
-                                <>
-                                    <Typography>
-                                        <Icon
-                                            sx={{
-                                                position: 'relative',
-                                                top: 2,
-                                                mr: 0.6,
-                                                fontSize: 16,
-                                            }}
-                                        >
-                                            {/* TODO: S'ha de fer una funció per obtenir l'icon amb getIcon o obtenir-ho del back*/}
-                                            rocket_launch
-                                        </Icon>
+                                    <Typography sx={{display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap'}}>
+                                        {/*<Icon sx={{position: 'relative', top: 1, mr: 0.6, fontSize: 16,}}>*/}
+                                        {/*    /!* TODO: S'ha de fer una funció per obtenir l'icon amb getIcon o obtenir-ho del back*!/*/}
+                                        {/*    rocket_launch*/}
+                                        {/*</Icon>*/}
                                         {formattedValue}
+                                        {enviament?.ultimEventInfo?.error && (
+                                            <Tooltip title={enviament.ultimEventInfo.errorDescripcio} arrow>
+                                                <WarningIcon color="error" sx={{ fontSize: '16px' }} />
+                                            </Tooltip>
+                                        )}
+                                        {enviament?.ultimEventInfo?.fiReintents && (
+                                            <Tooltip title={enviament?.ultimEventInfo?.fiReintentsDesc} arrow>
+                                                <WarningIcon color="warning" sx={{ fontSize: '16px' }} />
+                                            </Tooltip>
+                                        )}
+                                        {/*{notificacio?.tipusUsuari === 'APLICACIO' && enviament?.ultimEventInfo?.errorLastCallback && (*/}
+                                        {enviament?.ultimEventInfo?.errorLastCallback && (
+                                            <Tooltip title={t('page.notificacio.detail.dades.errorCanviEstat')} arrow>
+                                                <ErrorIcon color="primary" sx={{ fontSize: '16px' }} />
+                                            </Tooltip>
+                                        )}
+
+                                        {/* Fi de Reintents de Callback */}
+                                        {enviament?.ultimEventInfo?.callbackFiReintents && (
+                                            <Tooltip title={enviament?.ultimEventInfo?.callbackFiReintentsDesc} arrow>
+                                                <WarningIcon color="info" sx={{ fontSize: '16px' }} />
+                                            </Tooltip>
+                                        )}
+
+                                        {/* Errors de dispositius mòbils */}
+                                        {enviament?.ultimEventInfo?.notificacionsMovilErrorDesc?.map((errorText: string, id: number) => (
+                                            <Tooltip key={id} title={errorText} arrow>
+                                                <PhoneIphoneIcon sx={{fontSize: '18px', color: (theme) => theme.palette.mode === 'dark' ? '#f5c777' : '#8a6d3b'}}/>
+                                            </Tooltip>
+                                        ))}
                                     </Typography>
-                                </>
                             );
                         },
                     },

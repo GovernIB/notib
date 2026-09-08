@@ -26,7 +26,7 @@ const EnviamentDetailDialogContent: React.FC<{ id: any }> = (props) => {
 
     React.useEffect(() => {
         if (apiIsReady) {
-            apiGetOne(id, { perspectives: ['TITULAR', 'ENTREGA_POSTAL'] }).then(setEnviament);
+            apiGetOne(id, { perspectives: ['TITULAR', 'ENTREGA_POSTAL', 'ULTIM_EVENT'] }).then(setEnviament);
         }
     }, [apiIsReady]);
 

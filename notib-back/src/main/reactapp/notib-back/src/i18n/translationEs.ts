@@ -344,7 +344,8 @@ const translationEs = {
                         },
                         estatPostal: {
                             title: "Estado de entrega postal",
-                            senseCie: "Sin entrega postal"
+                            senseCie: "Sin entrega postal",
+                            cieNotifica: "Entrega postal gestionada por Notifica"
                         },
                         estatTelematica: 'Estado de entrega telemática',
 

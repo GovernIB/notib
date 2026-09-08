@@ -11,6 +11,10 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import {MuiActionReportButton, useResourceApiService} from 'reactlib';
 import { useEnviamentDetailDialog } from '../enviament/EnviamentDetailDialog';
+import {Box, Tooltip} from "@mui/material";
+import WarningIcon from "@mui/icons-material/Warning";
+import ErrorIcon from "@mui/icons-material/Error";
+import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
 
 export const NotificacioGridEnviaments: React.FC<{ id: any }> = (props) => {
 
@@ -23,7 +27,7 @@ export const NotificacioGridEnviaments: React.FC<{ id: any }> = (props) => {
         if (!apiIsReady) {
             return;
         }
-        const args = {filter: 'notificacio.id:' + id, unpaged: true};
+        const args = {filter: 'notificacio.id:' + id, unpaged: true, perspectives: ["ULTIM_EVENT"]};
         apiFind(args).then((response) => setEnviaments(response.rows));
     }, [apiIsReady]);
 
@@ -52,10 +56,61 @@ export const NotificacioGridEnviaments: React.FC<{ id: any }> = (props) => {
                                     {enviament.titular.representant ? enviament.titular.representant : t('page.notificacio.grid.enviament.column.representant.senseRepresentant')}
                                 </TableCell>
                                 <TableCell component="th" scope="row">
-                                    {enviament.entregaPostalInfo?.cieEstat ? enviament.entregaPostalInfo?.cieEstat : t('page.notificacio.grid.enviament.column.estatPostal.senseCie')}
+                                    <Box sx={{display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap'}}>
+
+                                        {   enviament.entregaPostalInfo && !enviament.cieExtern ? t('page.notificacio.grid.enviament.column.estatPostal.cieNotifica') :
+                                            enviament.entregaPostalInfo?.cieEstat ? enviament.entregaPostalInfo?.cieEstat : t('page.notificacio.grid.enviament.column.estatPostal.senseCie')
+                                        }
+                                        {enviament?.ultimEventInfo?.ultimEventCie && (<>
+                                            {enviament?.ultimEventInfo?.error && (
+                                                <Tooltip title={enviament.ultimEventInfo.errorDescripcio} arrow>
+                                                    <WarningIcon color="error" sx={{ fontSize: '16px' }} />
+                                                </Tooltip>
+                                            )}
+                                            {enviament?.ultimEventInfo?.fiReintents && (
+                                                <Tooltip title={enviament?.ultimEventInfo?.fiReintentsDesc} arrow>
+                                                    <WarningIcon color="warning" sx={{ fontSize: '16px' }} />
+                                                </Tooltip>
+                                            )}
+                                        </>)}
+                                    </Box>
                                 </TableCell>
                                 <TableCell component="th" scope="row" sx={{borderLeft: "1.5px solid " + enviament.estatColor}}>
-                                    {t('utils.estatConfig.ENVIAMENT_ESTAT_MAP.' + enviament.notificaEstat)}
+                                    <Box sx={{display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap'}}>
+                                        {t('utils.estatConfig.ENVIAMENT_ESTAT_MAP.' + enviament.notificaEstat)}
+                                        {!enviament?.ultimEventInfo?.ultimEventCie && (<>
+                                            {enviament?.ultimEventInfo?.error && (
+                                                <Tooltip title={enviament.ultimEventInfo.errorDescripcio} arrow>
+                                                    <WarningIcon color="error" sx={{ fontSize: '16px' }} />
+                                                </Tooltip>
+                                            )}
+                                            {enviament?.ultimEventInfo?.fiReintents && (
+                                                <Tooltip title={enviament?.ultimEventInfo?.fiReintentsDesc} arrow>
+                                                    <WarningIcon color="warning" sx={{ fontSize: '16px' }} />
+                                                </Tooltip>
+                                            )}
+                                            {/*{notificacio?.tipusUsuari === 'APLICACIO' && enviament?.ultimEventInfo?.errorLastCallback && (*/}
+                                            {enviament?.ultimEventInfo?.errorLastCallback && (
+                                                <Tooltip title={t('page.notificacio.detail.dades.errorCanviEstat')} arrow>
+                                                    <ErrorIcon color="primary" sx={{ fontSize: '16px' }} />
+                                                </Tooltip>
+                                            )}
+
+                                            {/* Fi de Reintents de Callback */}
+                                            {enviament?.ultimEventInfo?.callbackFiReintents && (
+                                                <Tooltip title={enviament?.ultimEventInfo?.callbackFiReintentsDesc} arrow>
+                                                    <WarningIcon color="info" sx={{ fontSize: '16px' }} />
+                                                </Tooltip>
+                                            )}
+
+                                            {/* Errors de dispositius mòbils */}
+                                            {enviament?.ultimEventInfo?.notificacionsMovilErrorDesc?.map((errorText: string, id: number) => (
+                                                <Tooltip key={id} title={errorText} arrow>
+                                                    <PhoneIphoneIcon sx={{fontSize: '18px', color: (theme) => theme.palette.mode === 'dark' ? '#f5c777' : '#8a6d3b'}}/>
+                                                </Tooltip>
+                                            ))}
+                                        </>)}
+                                    </Box>
                                 </TableCell>
                                 <TableCell component="th" scope="row" sx={{ width: 'fit-content', display:'flex' }}>
                                     { enviament.notificaCertificacioData &&(<MuiActionReportButton

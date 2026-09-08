@@ -18,10 +18,7 @@ const NotificacioFormEnviamentPersonaFormContent: React.FC<{ interessat?: boolea
     return (
         <Grid container spacing={2}>
             <Grid size={12} sx={{ mb: 1 }}>
-                {t(
-                    'page.notificacio.form.interessats.' +
-                        (interessat ? 'interessat' : 'representant')
-                )}
+                {t('page.notificacio.form.interessats.' + (interessat ? 'interessat' : 'representant'))}
             </Grid>
             <GridFormField size={6} name="interessatTipus" />
             {data.visibleDocumentTipus && <GridFormField size={6} name="documentTipus" />}
@@ -34,33 +31,21 @@ const NotificacioFormEnviamentPersonaFormContent: React.FC<{ interessat?: boolea
                 />
             )}
             {data.visibleNom && <GridFormField size={6} name="nom" required={data.requiredNom} />}
-            {data.visibleLlinatge1 && (
-                <GridFormField size={6} name="llinatge1" required={data.requiredLlinatge1} />
-            )}
+            {data.visibleLlinatge1 && (<GridFormField size={6} name="llinatge1" required={data.requiredLlinatge1} />)}
             {data.visibleLlinatge2 && <GridFormField size={6} name="llinatge2" />}
-            {data.visibleRaoSocial && (
-                <GridFormField size={6} name="raoSocial" required={data.requiredRaoSocial} />
-            )}
-            {data.visibleDir3Codi && (
-                <GridFormField size={6} name="dir3Codi" required={data.requiredDir3Codi} />
-            )}
+            {data.visibleRaoSocial && (<GridFormField size={6} name="raoSocial" required={data.requiredRaoSocial} />)}
+            {data.visibleDir3Codi && (<GridFormField size={6} name="dir3Codi" required={data.requiredDir3Codi} />)}
             {data.visibleTelefon && <GridFormField size={6} name="telefon" />}
-            {data.visibleEmail && (
-                <GridFormField size={6} name="email" required={data.requiredEmail} />
-            )}
+            {data.visibleEmail && (<GridFormField size={6} name="email" required={data.requiredEmail} />)}
             {data.visibleIncapacitat && <GridFormField size={6} name="incapacitat" />}
         </Grid>
     );
 };
 
-const NotificacioFormEnviamentPersona: React.FC<{
-    index?: number;
-    indexKey?: number;
-    interessat?: boolean;
-}> = (props) => {
+const NotificacioFormEnviamentPersona: React.FC<{ index?: number; indexKey?: number; interessat?: boolean; }> = (props) => {
+
     const { index, indexKey, interessat } = props;
-    const [currentPersonaFieldValidationErrors, setCurrentPersonaFieldValidationErrors] =
-        React.useState<any[]>();
+    const [currentPersonaFieldValidationErrors, setCurrentPersonaFieldValidationErrors] = React.useState<any[]>();
     const {
         data: parentFormData,
         fieldErrors: parentFieldErrors,

@@ -22,19 +22,22 @@ const EnviamentDetailTabRegistreEsdev: React.FC<{ id: any }> = (props) => {
             {
                 field: 'error',
                 flex: 1,
-                renderCell: (params: any) => (
-                    <Tooltip
-                        title={
-                            params.value
-                                ? t('page.enviament.detail.tab.registreEsdev.estatError')
-                                : t('page.enviament.detail.tab.registreEsdev.estatSuccess')
-                        }
-                    >
-                        <Icon color={params.value ? 'error' : 'success'}>
-                            {params.value ? 'error' : 'done'}
-                        </Icon>
-                    </Tooltip>
-                ),
+                renderCell: (params: any) => {
+                    return (
+                        <Tooltip
+                            title={
+                                params.value
+                                    ? t('page.enviament.detail.tab.registreEsdev.estatError')
+                                    : t('page.enviament.detail.tab.registreEsdev.estatSuccess')
+                            }
+                        >
+                            <Icon color={params.value ? 'error' : 'success'}>
+                                {params.value ? 'error' : 'done'}
+                            </Icon>
+                        </Tooltip>
+                    )
+
+                },
             },
             {
                 field: 'intents',

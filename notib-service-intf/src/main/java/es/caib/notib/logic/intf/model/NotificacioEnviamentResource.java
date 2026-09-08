@@ -14,6 +14,7 @@ import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import es.caib.notib.logic.intf.base.validation.CustomValidation;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioTipusEnumDto;
+import es.caib.notib.logic.intf.dto.NotificacioEventDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.model.validator.TitularIncapacitatObligatoriRepresentant;
@@ -65,6 +66,10 @@ import java.util.List;
 		@ResourceArtifact(
 			type = ResourceArtifactType.PERSPECTIVE,
 			code = NotificacioEnviamentResource.PERSPECTIVE_TITULAR
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.PERSPECTIVE,
+			code = NotificacioEnviamentResource.PERSPECTIVE_ULTIM_EVENT
 		),
 		@ResourceArtifact(
 			type = ResourceArtifactType.PERSPECTIVE,
@@ -140,6 +145,7 @@ public class NotificacioEnviamentResource extends BaseResource<Long> {
 	public static final String FILTER_CODE = "FILTER_ENVIAMENT";
 	public static final String PERSPECTIVE_TITULAR = "TITULAR";
 	public static final String PERSPECTIVE_ENTREGA_POSTAL = "ENTREGA_POSTAL";
+	public static final String PERSPECTIVE_ULTIM_EVENT = "ULTIM_EVENT";
 	public static final String REPORT_DESCARREGAR_DIAGRAMA_STATE_MACHINE = "DESCARREGAR_DIAGRAMA_STATE_MACHINE";
 	public static final String REPORT_DESCARREGAR_CIE_CERTIFICACIO = "DESCARREGAR_CIE_CERTIFICACIO";
 	public static final String REPORT_DESCARREGAR_CERTIFICACIO_ENVIAMENT = "DESCARREGAR_CERTIFICACIO_ENVIAMENT";
@@ -273,8 +279,11 @@ public class NotificacioEnviamentResource extends BaseResource<Long> {
 	private boolean notificat;
 	private boolean anulable;
 	private boolean cieEstatFinal;
+	private boolean cieExtern;
 	private NotificacioEstatEnumDto notificacioEstat;
 	private String estatColor;
+	private ResourceReference<EventResource, Long> ultimEvent;
+	private EventResource ultimEventInfo;
 
 	public String getNotificaCertificacioArxiuNom() {
 		return !StringUtils.isEmpty(notificaReferencia) ?  "certificacio_" + notificaReferencia + ".pdf" : null;
