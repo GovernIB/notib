@@ -12,6 +12,7 @@ public class JacksonConfiguration {
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        objectMapper.findAndRegisterModules();
         return objectMapper;
     }
 }

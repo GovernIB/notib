@@ -10,7 +10,9 @@ import es.caib.notib.logic.intf.model.ProcedimentResource;
 import es.caib.notib.logic.procSer.ComuOnChangeLogicProcessor;
 import es.caib.notib.logic.service.ProcedimentServiceImpl;
 import es.caib.notib.logic.service.ServeiServiceImpl;
+import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
 import es.caib.notib.persist.resourceentity.EntregaCieResourceEntity;
+import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
 import es.caib.notib.persist.resourceentity.PagadorCieResourceEntity;
 import es.caib.notib.persist.resourceentity.PagadorPostalResourceEntity;
 import es.caib.notib.persist.resourceentity.ProcedimentResourceEntity;
@@ -94,6 +96,7 @@ class ProcedimentResourceServiceImplTest {
 		ProcedimentResourceEntity entity = new ProcedimentResourceEntity();
 		entity.setId(1L);
 		ProcedimentResource resource = new ProcedimentResource();
+		resource.setId(1L);
 		when(aclHelper.count(any(), eq(1L), isNull())).thenReturn(3);
 		service.afterConversion(entity, resource);
 		assertEquals(3, resource.getAclEntryCount());
@@ -159,7 +162,15 @@ class ProcedimentResourceServiceImplTest {
 	}
 
 	@Test
-	void comuOnChangeShouldSetFieldsWhenTrue() {
+	void comuOnChangeShouldSetFieldsWhenTrue() throws Exception {
+		EntitatResourceEntity entitat = new EntitatResourceEntity();
+		entitat.setDir3Codi("A00000001");
+		OrganGestorResourceEntity organGestor = new OrganGestorResourceEntity();
+		organGestor.setId(5L);
+		organGestor.setCodi("A00000001");
+		organGestor.setNom("Organ arrel");
+		when(userSessionHelper.getCurrentEntitat()).thenReturn(entitat);
+		when(organGestorResourceRepository.findByEntitatAndCodi(entitat, entitat.getDir3Codi())).thenReturn(Optional.of(organGestor));
 		ProcedimentResource target = new ProcedimentResource();
 		var processor = new ComuOnChangeLogicProcessor(organGestorResourceRepository, userSessionHelper);
 		processor.onChange(

@@ -54,8 +54,17 @@ public class UsuariHelper {
 		if (sessionContext.isCallerInRole("NOT_CARPETA")) {
 			authorities.add(new SimpleGrantedAuthority("NOT_CARPETA"));
 		}
+		if (sessionContext.isCallerInRole("NOT_COM")) {
+			authorities.add(new SimpleGrantedAuthority("NOT_COM"));
+		}
 		if (sessionContext.isCallerInRole("NOT_ADMIN")) {
 			authorities.add(new SimpleGrantedAuthority("NOT_ADMIN"));
+		}
+		if (sessionContext.isCallerInRole("NOT_ADMIN_LECTURA")) {
+			authorities.add(new SimpleGrantedAuthority("NOT_ADMIN_LECTURA"));
+		}
+		if (sessionContext.isCallerInRole("NOT_ADMIN_ORGAN")) {
+			authorities.add(new SimpleGrantedAuthority("NOT_ADMIN_ORGAN"));
 		}
 		if (sessionContext.isCallerInRole("NOT_SUPER")) {
 			authorities.add(new SimpleGrantedAuthority("NOT_SUPER"));

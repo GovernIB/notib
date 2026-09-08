@@ -71,6 +71,14 @@
             <version>5.7.1</version>
             <scope>test</scope>
         </dependency>
+        <!-- Nomes per a tests: BD en memòria per a NotificacioResourceEntitySecondaryTableTest (verifica el
+             mapeig Hibernate real contra una BD, sense dependre del perfil "hsql" (aquell és per executar
+             l'aplicació completa contra HSQLDB, no cal activar-lo només per fer "mvn test"). -->
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <profiles>
         <profile>

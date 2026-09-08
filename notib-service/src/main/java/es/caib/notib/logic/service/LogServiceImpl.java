@@ -30,28 +30,26 @@ public class LogServiceImpl implements LogService {
 
     private static final Long maxNLinies = 10000L;
     private static final Long minNLinies = 100L;
+	private static final String LOG_FILE_PATH_PROP = "es.caib.notib.plugin.fitxer.logs.path";
 
     @Override
     public List<FitxerInfo> llistarFitxers() {
 
-        var directoriPath = configHelper.getConfig("es.caib.notib.plugin.fitxer.logs.path");
-        if (Strings.isNullOrEmpty(directoriPath)) {
-            return new ArrayList<>();
-        }
+        var directoriPath = configHelper.getConfig(LOG_FILE_PATH_PROP);
         return LogHelper.llistarFitxers(directoriPath, "notib");
     }
 
     @Override
 	public FitxerContingut getFitxerByNom(String nom) {
 
-		var directoriPath = configHelper.getConfig("es.caib.notib.plugin.fitxer.logs.path");
+		var directoriPath = configHelper.getConfig(LOG_FILE_PATH_PROP);
 		return LogHelper.getFitxerByNom(directoriPath, nom);
 	}
 
 	@Override
 	public LogFileStream descarregarFitxerDirecte(String nom) {
 
-		var directoriPath = configHelper.getConfig("es.caib.notib.plugin.fitxer.logs.path");
+		var directoriPath = configHelper.getConfig(LOG_FILE_PATH_PROP);
 		return LogHelper.getFileStreamByNom(directoriPath, nom);
 	}
 
@@ -61,7 +59,7 @@ public class LogServiceImpl implements LogService {
     @Override
     public void tailLogFile(String filePath) {
 
-        var directoriPath = configHelper.getConfig("es.caib.notib.plugin.fitxer.logs.path");
+        var directoriPath = configHelper.getConfig(LOG_FILE_PATH_PROP);
         if (Strings.isNullOrEmpty(directoriPath)) {
             log.error("[LogService.tailLogFile] No s'ha especificat valor a la propietat \"es.caib.notib.plugin.fitxer.logs.path\"");
             return;

@@ -221,6 +221,7 @@ class EntitatResourceServiceImplTest {
 	@Test
 	void logoCapsaleraFieldFileManagerSave_whenFileReferenceNotNull_setsContent() {
 		EntitatResourceEntity saved = new EntitatResourceEntity();
+		when(resourceEntityMappingHelper.resourceToEntity(any(), any(), any(), any())).thenReturn(new EntitatResourceEntity());
 		when(entitatResourceRepository.saveAndFlush(any())).thenReturn(saved);
 		when(resourceEntityMappingHelper.entityToResource(any(), any())).thenReturn(new EntitatResource());
 		when(entitatResourceRepository.merge(any())).thenReturn(saved);

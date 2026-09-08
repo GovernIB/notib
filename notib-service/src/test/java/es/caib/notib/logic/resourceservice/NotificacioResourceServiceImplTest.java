@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.acls.domain.BasePermission;
 
 import java.util.*;
@@ -46,6 +47,7 @@ class NotificacioResourceServiceImplTest {
 	@Mock private PersonaResourceRepository personaRepo;
 	@Mock private LegacyHelper legacyHelper;
 	@Mock private NotibPermissionHelper notibPermissionHelper;
+	@Mock private ApplicationEventPublisher eventPublisher;
 
 	@InjectMocks
 	private NotificacioResourceServiceImpl service;
@@ -75,13 +77,14 @@ class NotificacioResourceServiceImplTest {
 	@Test
 	void additionalSpringFilterShouldReturnNoResults_whenNoPermissions() {
 		when(userSessionHelper.getCurrentEntitatId()).thenReturn(1L);
+		when(authenticationHelper.getCurrentUserName()).thenReturn("usuari1");
 		when(notibPermissionHelper.getIdsToCheckNotificacioPermission(BasePermission.READ, BasePermission.READ)).thenReturn(
 			new NotibPermissionHelper.IdsToCheckNotificacioPermission(
 				new ArrayList<>(),
 				new ArrayList<>(),
 				new ArrayList<>()));
 		String result = service.additionalSpringFilter("", null);
-		assertEquals("entitat.id:1 and (id is null)", result);
+		assertEquals("entitat.id:1 and createdBy:'usuari1'", result);
 	}
 
 	@Test
