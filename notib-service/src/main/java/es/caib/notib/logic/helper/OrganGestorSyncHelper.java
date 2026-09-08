@@ -138,7 +138,7 @@ public class OrganGestorSyncHelper {
 		OrganGestorDir3Sync.OrganGestorDir3SyncCanviDivisio[] divisions = divisionsMap.keySet().stream().
 			map(key -> new OrganGestorDir3Sync.OrganGestorDir3SyncCanviDivisio(
 				toArbreItem(key),
-				toArbreItems(fusionsMap.get(key)))).
+				toArbreItems(divisionsMap.get(key)))).
 			toArray(OrganGestorDir3Sync.OrganGestorDir3SyncCanviDivisio[]::new);
 		OrganGestorDir3Sync resposta = new OrganGestorDir3Sync(
 			null,
