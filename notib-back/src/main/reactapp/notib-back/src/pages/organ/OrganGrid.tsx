@@ -28,6 +28,7 @@ import {OrganFormContent} from './OrganForm';
 import {FormGroup} from "@mui/material";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
+import Dir3SyncBranch, { Dir3SyncNode } from './Dir3SyncBranch';
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -161,55 +162,112 @@ const OrganGridDir3SyncLoading: React.FC<{ percent?: number; message?: string }>
     );
 };
 
+const toNode = (item: any): Dir3SyncNode => ({
+    codi: item.codi,
+    nom: item.nomCooficial || item.nom,
+});
+
+const Dir3SyncSection: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
+    <Box className="dir3-section">
+        <Typography className="dir3-section-title">{title}</Typography>
+        {children}
+    </Box>
+);
+
 const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
 
     const { result } = props;
     const { t } = useTranslation();
+    if (result.senseCanvis) {
+        return <Typography>{t('page.organs.grid.sync.dialogButton.senseCanvis')}</Typography>;
+    }
     return (
         <Grid container>
             <Grid size={12}>
-                {result.senseCanvis ? (
-                    <Typography>{t('page.organs.grid.sync.dialogButton.senseCanvis')}</Typography>
-                ) : (
-                    <>
-                        <Typography gutterBottom sx={{ fontWeight: 'bold' }}>
-                            {`${t('page.organs.grid.sync.dialogButton.creacions')}: `}
-                            <Typography component="span">
-                                {result.creacions?.length ?? 0}
-                            </Typography>
-                        </Typography>
-                        <Typography gutterBottom sx={{ fontWeight: 'bold' }}>
-                            {`${t('page.organs.grid.sync.dialogButton.modificacions')}: `}
-                            <Typography component="span">
-                                {result.modificacions?.length ?? 0}
-                            </Typography>
-                        </Typography>
-                        <Typography gutterBottom sx={{ fontWeight: 'bold' }}>
-                            {`${t('page.organs.grid.sync.dialogButton.substitucions')}: `}
-                            <Typography component="span">
-                                {result.substitucions?.length ?? 0}
-                            </Typography>
-                        </Typography>
-                        <Typography gutterBottom sx={{ fontWeight: 'bold' }}>
-                            {`${t('page.organs.grid.sync.dialogButton.extincions')}: `}
-                            <Typography component="span">
-                                {result.extincions?.length ?? 0}
-                            </Typography>
-                        </Typography>
-                        <Typography gutterBottom sx={{ fontWeight: 'bold' }}>
-                            {`${t('page.organs.grid.sync.dialogButton.fusions')}: `}
-                            <Typography component="span">{result.fusions?.length ?? 0}</Typography>
-                        </Typography>
-                        <Typography gutterBottom sx={{ fontWeight: 'bold' }}>
-                            {`${t('page.organs.grid.sync.dialogButton.divisions')}: `}
-                            <Typography component="span">
-                                {result.divisions?.length ?? 0}
-                            </Typography>
-                        </Typography>
-                        <Typography gutterBottom sx={{ mt: 3 }}>
-                            {t('page.organs.grid.sync.dialogButton.aplicarCanvis')}
-                        </Typography>
-                    </>
+                {result.divisions?.length > 0 && (
+                    <Dir3SyncSection title={t('page.organs.grid.sync.dialogButton.divisions')}>
+                        {result.divisions.map((d: any, i: number) => (
+                            <Dir3SyncBranch
+                                key={i}
+                                orientation="left"
+                                root={toNode(d.vell)}
+                                rootColor="red"
+                                leaves={d.nous.map((n: any) => ({ node: toNode(n), color: 'green' as const }))}
+                            />
+                        ))}
+                    </Dir3SyncSection>
+                )}
+                {result.fusions?.length > 0 && (
+                    <Dir3SyncSection title={t('page.organs.grid.sync.dialogButton.fusions')}>
+                        {result.fusions.map((f: any, i: number) => (
+                            <Dir3SyncBranch
+                                key={i}
+                                orientation="right"
+                                root={toNode(f.nou)}
+                                rootColor="green"
+                                leaves={f.vells.map((n: any) => ({ node: toNode(n), color: 'red' as const }))}
+                            />
+                        ))}
+                    </Dir3SyncSection>
+                )}
+                {result.substitucions?.length > 0 && (
+                    <Dir3SyncSection title={t('page.organs.grid.sync.dialogButton.substitucions')}>
+                        {/* NOTE: for substitucions (and fusions/divisions), OrganGestorSyncHelper's DTO
+                            has vell/nou meaning the OPPOSITE of what the names suggest: `vell` is the
+                            SURVIVING (vigent) org, `nou` is the one going EXTINCT — see
+                            OrganGestorSyncHelper.java's substitucionsMap construction (key=vigent
+                            successor, value=extinct code). Do not "fix" this to look like modificacions
+                            (where vell=old/nou=new correctly) — it's a different field, confirmed by
+                            tracing getDir3SyncNodesExistentsDarreraVersioExtincio's estat checks. */}
+                        {result.substitucions.map((s: any, i: number) => (
+                            <Dir3SyncBranch
+                                key={i}
+                                orientation="right"
+                                root={toNode(s.vell)}
+                                rootColor="green"
+                                leaves={[{ node: toNode(s.nou), color: 'red' as const }]}
+                            />
+                        ))}
+                    </Dir3SyncSection>
+                )}
+                {result.modificacions?.length > 0 && (
+                    <Dir3SyncSection title={t('page.organs.grid.sync.dialogButton.modificacions')}>
+                        {result.modificacions.map((m: any, i: number) => (
+                            <Dir3SyncBranch
+                                key={i}
+                                orientation="left"
+                                root={toNode(m.vell)}
+                                rootColor="green"
+                                leaves={[{ node: toNode(m.nou), color: 'yellow' as const }]}
+                            />
+                        ))}
+                    </Dir3SyncSection>
+                )}
+                {result.creacions?.length > 0 && (
+                    <Dir3SyncSection title={t('page.organs.grid.sync.dialogButton.creacions')}>
+                        {result.creacions.map((c: any, i: number) => (
+                            <Dir3SyncBranch
+                                key={i}
+                                orientation="left"
+                                root={null}
+                                rootColor="green"
+                                leaves={[{ node: toNode(c.nou), color: 'green' as const }]}
+                            />
+                        ))}
+                    </Dir3SyncSection>
+                )}
+                {result.extincions?.length > 0 && (
+                    <Dir3SyncSection title={t('page.organs.grid.sync.dialogButton.extincions')}>
+                        {result.extincions.map((e: any, i: number) => (
+                            <Dir3SyncBranch
+                                key={i}
+                                orientation="left"
+                                root={toNode(e.vell)}
+                                rootColor="red"
+                                leaves={[{ node: null, color: 'red' as const }]}
+                            />
+                        ))}
+                    </Dir3SyncSection>
                 )}
             </Grid>
         </Grid>
