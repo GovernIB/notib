@@ -41,7 +41,13 @@ public class EventResource extends BaseResource<Long>  {
 	private boolean error = false;
 	private String errorDescripcio;
 	protected Boolean fiReintents;
+	protected String fiReintentsDesc;
 	protected int intents;
+	protected String notificacioMovilErrorDesc;
+	protected Boolean errorLastCallback;
+	protected Boolean callbackFiReintents;
+	protected String callbackFiReintentsDesc;
+	protected Boolean ultimEventCie;
 
 	@NotNull
 	private ResourceReference<NotificacioResource, Long> notificacio;

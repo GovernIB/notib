@@ -11,6 +11,8 @@ import es.caib.notib.logic.enviaments.RefrescarEstatEntregaPostalActionExecutor;
 import es.caib.notib.logic.enviaments.RefrescarEstatNotificaActionExecutor;
 import es.caib.notib.logic.enviaments.RefrescarEstatSirActionExecutor;
 import es.caib.notib.logic.enviaments.TitularPerspectiveApplicator;
+import es.caib.notib.logic.enviaments.UltimEventPerspectiveApplicator;
+import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.helper.PluginHelper;
@@ -24,6 +26,8 @@ import es.caib.notib.logic.intf.model.NotificacioEnviamentResource;
 import es.caib.notib.logic.intf.resourceservice.NotificacioEnviamentResourceService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
+import es.caib.notib.persist.resourcerepository.CallbackResourceRepository;
+import es.caib.notib.persist.resourcerepository.EventResourceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.acls.domain.BasePermission;
@@ -51,13 +55,17 @@ public class NotificacioEnviamentResourceServiceImpl extends BaseMutableResource
 	private final NotibPermissionHelper notibPermissionHelper;
 	private final PluginHelper pluginHelper;
 	private final MetricsHelper metricsHelper;
+	private final MessageHelper messageHelper;
 	private final NotificacioService notificacioService;
+	private final EventResourceRepository eventRepository;
+	private final CallbackResourceRepository callbackRepository;
 
 	@PostConstruct
 	public void init() {
 
 		register(NotificacioEnviamentResource.PERSPECTIVE_TITULAR, new TitularPerspectiveApplicator());
 		register(NotificacioEnviamentResource.PERSPECTIVE_ENTREGA_POSTAL, new EntregaPostalPerspectiveApplicator());
+		register(NotificacioEnviamentResource.PERSPECTIVE_ULTIM_EVENT, new UltimEventPerspectiveApplicator(messageHelper, eventRepository, callbackRepository));
 		register(NotificacioEnviamentResource.REPORT_DESCARREGAR_DIAGRAMA_STATE_MACHINE, new DiagramaStateMachineReportGenerator());
 		register(NotificacioEnviamentResource.REPORT_DESCARREGAR_CIE_CERTIFICACIO, new EntregaPostalCertificacioReportGenerator(pluginHelper, metricsHelper));
 		register(NotificacioEnviamentResource.REPORT_DESCARREGAR_CERTIFICACIO_ENVIAMENT, new EnviamentCertificacioReportGenerator(notificacioService));
@@ -113,6 +121,7 @@ public class NotificacioEnviamentResourceServiceImpl extends BaseMutableResource
 		resource.setAnulable(entity.isAnulable());
 		resource.setNotificacioEstat(entity.getNotificacio().getEstat());
 		resource.setEstatColor(entity.getNotificaEstat() != null ? entity.getNotificaEstat().getColor() : null);
+		resource.setCieExtern(entity.isCieExtern());
 		var titular = entity.getTitular();
 		resource.setTitular(ResourceReference.toResourceReference(titular.getId(), titular.getNomSencerNif()));
 	}
