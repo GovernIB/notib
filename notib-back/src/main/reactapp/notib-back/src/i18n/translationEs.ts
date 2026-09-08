@@ -180,6 +180,9 @@ const translationEs = {
                 success: 'Valor modificado correctamente',
                 error: 'Error modificando la propiedad',
             },
+            entitats: {
+                empty: 'Sin propiedades por entidad configuradas',
+            },
         },
         propietatsConfiguracio: {
             grid: {

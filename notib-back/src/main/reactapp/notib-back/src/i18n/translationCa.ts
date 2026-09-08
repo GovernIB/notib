@@ -190,6 +190,9 @@ const translationCa = {
                 success: 'Valor modificat correctament',
                 error: 'Error modificant la propietat',
             },
+            entitats: {
+                empty: 'Sense propietats per entitat configurades',
+            },
         },
         propietatsConfiguracio: {
             grid: {
