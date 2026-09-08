@@ -22,6 +22,7 @@ import {
     useMuiFormDialogApiRef,
 } from 'reactlib';
 import {useNotibContext, ROLE_SUPER, ROLE_ORGAN} from './NotibContext';
+import AppFormFieldReference from './AppFormFieldReference';
 import Offline from './Offline';
 import RoleSelector from './RoleSelector';
 import EntitatSelector from './EntitatSelector';
@@ -195,6 +196,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             routerAnyHistoryEntryExist={anyHistoryEntryExist}
             linkComponent={Link}
             saveAs={saveAs}
+            formFieldComponents={[{ type: 'reference', component: AppFormFieldReference }]}
             menuEntries={baseAppMenuEntries}
         >
             <CustomLocalizationProvider>

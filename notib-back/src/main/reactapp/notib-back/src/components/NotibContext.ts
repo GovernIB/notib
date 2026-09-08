@@ -12,6 +12,7 @@ export type NotibContextType = {
     currentUser: any;
     setCurrentUser: (currentUser: any | undefined) => void;
     currentUserGridPageSizeOptions?: number[];
+    maxResultSelects?: number;
     rolesAvailable?: string[];
     entitatsAvailable?: any[];
     currentRole?: string;

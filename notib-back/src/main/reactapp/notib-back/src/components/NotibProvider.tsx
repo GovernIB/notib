@@ -128,6 +128,23 @@ const useCurrentUser = () => {
     return { currentUser, setCurrentUser, currentUserGridPageSizeOptions };
 };
 
+const useMaxResultSelects = () => {
+
+    const { isReady: apiIsReady, find: apiFind } = useResourceApiService('configResource');
+    const [maxResultSelects, setMaxResultSelects] = React.useState<number>();
+    React.useEffect(() => {
+        if (!apiIsReady) {
+            return;
+        }
+        const args = { filter: "key: 'es.caib.notib.app.maxresults.selects'", unpaged: true };
+        apiFind(args).then((response) => {
+            const value = response.rows?.[0]?.value;
+            setMaxResultSelects(value != null ? Number.parseInt(value) : undefined);
+        }).catch((error) => console.error('Error obtenint el nombre màxim de resultats als desplegables:', error));
+    }, [apiIsReady]);
+    return maxResultSelects;
+};
+
 const useCurrentRole = (broadcast: BroadcastSession) => {
 
     const {isReady: authIsReady, getUserId: authGetUserId, getToken: authGetToken,} = useAuthContext();
@@ -338,6 +355,7 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
     const broadcast = useBroadcastSession();
     const { currentUserId, currentRole, currentRoleReady, rolesAvailable, setCurrentRole } = useCurrentRole(broadcast);
     const { currentUser, setCurrentUser, currentUserGridPageSizeOptions } = useCurrentUser();
+    const maxResultSelects = useMaxResultSelects();
     const {
         currentEntitatId,
         currentEntitatReady,
@@ -355,6 +373,7 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
         currentUser,
         setCurrentUser,
         currentUserGridPageSizeOptions,
+        maxResultSelects,
         rolesAvailable,
         currentRole,
         setCurrentRole,
