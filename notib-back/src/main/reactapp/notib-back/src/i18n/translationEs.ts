@@ -1054,6 +1054,9 @@ const translationEs = {
         },
     },
     component: {
+        AppFormFieldReference: {
+            mostrarTots: 'Mostrar todos...',
+        },
         HeaderThemeSelector: {
             light: 'Claro',
             system: 'Sistema',

@@ -1082,6 +1082,9 @@ const translationCa = {
         },
     },
     component: {
+        AppFormFieldReference: {
+            mostrarTots: 'Mostrar tots...',
+        },
         HeaderThemeSelector: {
             light: 'Clar',
             system: 'Sistema',
