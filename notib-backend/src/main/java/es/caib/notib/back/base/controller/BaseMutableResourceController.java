@@ -82,7 +82,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 		R created = getMutableResourceService().create(resource, getAnswersFromHeaderOrRequest(null));
 		final URI uri = MvcUriComponentsBuilder.fromController(getClass()).path("/{id}").buildAndExpand(created.getId()).toUri();
 		var permisos = resourceApiService.permissionsCurrentUser(getResourceClass(), created.getId());
-		var links = buildSingleResourceLinks(created.getId(), null, null, null, permisos, true, true).toArray(new Link[0]);
+		var links = buildSingleResourceLinks(created.getId(), null, null, null, permisos, true, true, true).toArray(new Link[0]);
 		return ResponseEntity.created(uri).body(toEntityModel(created, links));
 	}
 
@@ -103,7 +103,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 		validateResource(resource, 1, bindingResult, Resource.OnUpdate.class, Default.class);
 		R updated = getMutableResourceService().update(id, resource, getAnswersFromHeaderOrRequest(null));
 		var permisosUsuari = resourceApiService.permissionsCurrentUser(getResourceClass(), id);
-		var links =	buildSingleResourceLinks(updated.getId(), null, null, null, permisosUsuari, true, true);
+		var links =	buildSingleResourceLinks(updated.getId(), null, null, null, permisosUsuari, true, true, true);
 		return ResponseEntity.ok(toEntityModel(updated, links.toArray(new Link[0])));
 	}
 
@@ -122,7 +122,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 		log.debug("Modificant parcialment el recurs (id={}, jsonNode={})", id, jsonNode);
 		R updated = internalPatch(id, jsonNode, bindingResult.getObjectName());
 		var permisosUsuari = resourceApiService.permissionsCurrentUser(getResourceClass(), id);
-		var links = buildSingleResourceLinks(updated.getId(), null, null, null, permisosUsuari, true, true);
+		var links = buildSingleResourceLinks(updated.getId(), null, null, null, permisosUsuari, true, true, true);
 		return ResponseEntity.ok(toEntityModel(updated, links.toArray(new Link[0])));
 	}
 
@@ -393,9 +393,10 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 			List<ResourceArtifact> artifactsAll,
 			ResourcePermissions resourcePermissions,
 			boolean withDownloadLink,
-			boolean withEditLinksInputAndOutput) {
+			boolean withEditLinksInputAndOutput,
+			boolean withArtifactLinks) {
 
-		List<Link> links = super.buildSingleResourceLinks(id, perspective, singleResourceSelfLink, artifactsAll, resourcePermissions, withDownloadLink, withEditLinksInputAndOutput);
+		List<Link> links = super.buildSingleResourceLinks(id, perspective, singleResourceSelfLink, artifactsAll, resourcePermissions, withDownloadLink, withEditLinksInputAndOutput, withArtifactLinks);
 		Link selfLink = links.stream().filter(l -> l.getRel().value().equals("self")).findFirst().orElse(null);
 		if (selfLink != null) {
 			if (resourcePermissions.isWriteGranted()) {
