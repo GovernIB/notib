@@ -538,76 +538,141 @@ git commit -m "#1011 Previsualització gràfica de canvis DIR3 (branques per cat
 
 ---
 
-### Task 3: New REST endpoint for the DIR3 JSON download
+### Task 3: `REPORT_DESCARREGAR_DIR3_JSON` report artifact for the DIR3 JSON download
+
+> **Superseded design, ruled during execution:** the original version of this
+> task specified a bespoke `@RestController` in `notib-back`, directly
+> injecting `AuthenticationHelper`/`UserSessionHelper` (both defined in
+> `notib-service`). That does not compile under `notib-back`'s default
+> `jboss` Maven profile — `notib-back/pom.xml` only declares a dependency on
+> `notib-service` inside the `ide` profile block (lines ~203-226); under
+> `jboss` (the profile CI/deployment actually uses), `notib-service` is not
+> on `notib-back`'s classpath at all. This was caught by the Task 3
+> implementer reporting BLOCKED on a real compile error, not guessed.
+> The codebase already has an established, jboss-safe mechanism for exactly
+> this ("generate a file, let the user download it"): the `REPORT` artifact
+> type (`ResourceArtifactType.REPORT`), implemented via
+> `BaseReadonlyResourceService.ReportGenerator<E, P, R>` and registered the
+> same way actions are — entirely inside `notib-service`, where
+> `AuthenticationHelper`/`UserSessionHelper` are always available. See
+> `JusitficantEnviamentMassiuReportGenerator.java` for a working example of
+> the pattern this task follows. The REPORT dispatch is already exposed
+> through the same generic REST framework `DIR3_SYNC`/`OFICINES_SYNC` use
+> (`ActionReportButton.tsx`'s `generateReport`/`apiArtifactReport`), so **no
+> new REST controller is needed at all** — this replaces the plan's original
+> Task 3 in full.
 
 **Files:**
-- Create: `notib-back/src/main/java/es/caib/notib/back/resourcecontroller/OrganGestorDir3SyncJsonController.java`
-- Test: `notib-service` already exposes `OrganGestorService.getJsonOrgansGestorDir3` — no backend logic changes needed there. Add a lightweight controller test only if the project already has controller-level tests under `notib-backend`/`notib-back`; otherwise this task is verified manually (Task 5).
+- Modify: `notib-service-intf/src/main/java/es/caib/notib/logic/intf/model/OrganGestorResource.java` (new artifact code + `@ResourceArtifact` entry)
+- Create: `notib-service/src/main/java/es/caib/notib/logic/organs/OrganGestorDir3SyncJsonReportGenerator.java`
+- Modify: `notib-service/src/main/java/es/caib/notib/logic/resourceservice/OrganGestorResourceServiceImpl.java` (register the new report generator)
 
 **Interfaces:**
-- Consumes: `OrganGestorService.getJsonOrgansGestorDir3(Long entitatId)` (existing, unchanged, `notib-service-intf/.../service/OrganGestorService.java:88`), `UserSessionHelper.getCurrentEntitatId()`, `AuthenticationHelper.isCurrentUserInRole(String)` (existing, `notib-service-intf/.../base/config/BaseConfig.ROLE_ADMIN`).
-- Produces: `GET {BaseConfig.API_PATH}/organGestorResource/dir3SyncJson` → `ResponseEntity<byte[]>`, `Content-Disposition: attachment; filename=organsDir3JSON.json`, `403` if the current user is not `ROLE_ADMIN`.
+- Consumes: `OrganGestorService.getJsonOrgansGestorDir3(Long entitatId)` (existing, unchanged, `notib-service-intf/.../service/OrganGestorService.java:88`), `UserSessionHelper.getCurrentEntitatId()`, `AuthenticationHelper.isCurrentUserInRole(String)` (existing).
+- Produces: `OrganGestorResource.REPORT_DESCARREGAR_DIR3_JSON` artifact code, dispatched via the existing generic REPORT mechanism (`apiArtifactReport`/`generate_REPORT_DESCARREGAR_DIR3_JSON` link) — no bespoke endpoint.
 
-- [ ] **Step 1: Write the controller**
+- [ ] **Step 1: Add the artifact code and declaration**
+
+In `OrganGestorResource.java`, add the constant next to `DIR3_SYNC_ACTION_CODE`/`OFICINES_SYNC_ACTION_CODE`:
 
 ```java
-package es.caib.notib.back.resourcecontroller;
+	public static final String REPORT_DESCARREGAR_DIR3_JSON = "REPORT_DESCARREGAR_DIR3_JSON";
+```
+
+Add a new `@ResourceArtifact` entry to the `artifacts` array (alongside the existing ACTION entries) — no `formClass` (no params needed), no `requiresId` (acts on the current session's entitat, not a specific row):
+
+```java
+			@ResourceArtifact(
+				type = ResourceArtifactType.REPORT,
+				code = OrganGestorResource.REPORT_DESCARREGAR_DIR3_JSON,
+				accessConstraints = {
+					@ResourceAccessConstraint(
+						type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+						roles = { BaseConfig.ROLE_ADMIN })
+				}
+			),
+```
+
+- [ ] **Step 2: Write the report generator**
+
+```java
+package es.caib.notib.logic.organs;
 
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
+import es.caib.notib.logic.base.service.BaseReadonlyResourceService;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
+import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
+import es.caib.notib.logic.intf.base.exception.ReportGenerationException;
+import es.caib.notib.logic.intf.base.model.DownloadableFile;
+import es.caib.notib.logic.intf.base.model.ReportFileType;
 import es.caib.notib.logic.intf.service.OrganGestorService;
-import io.swagger.v3.oas.annotations.Hidden;
+import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.OutputStream;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Descàrrega del JSON amb la darrera consulta DIR3 dels òrgans gestors de l'entitat actual.
- *
- * @author Límit Tecnologies
+ * Genera el JSON amb la darrera consulta DIR3 dels òrgans gestors de l'entitat actual, per
+ * a descàrrega.
  */
-@RestController("organGestorDir3SyncJsonController")
-@RequestMapping(BaseConfig.API_PATH + "/organGestorResource/dir3SyncJson")
+@Slf4j
 @RequiredArgsConstructor
-public class OrganGestorDir3SyncJsonController {
+public class OrganGestorDir3SyncJsonReportGenerator implements BaseReadonlyResourceService.ReportGenerator<OrganGestorResourceEntity, Serializable, Serializable> {
 
 	private final OrganGestorService organGestorService;
 	private final UserSessionHelper userSessionHelper;
 	private final AuthenticationHelper authenticationHelper;
 
-	@Hidden
-	@GetMapping
-	public ResponseEntity<byte[]> download() {
+	@Override
+	public List<Serializable> generateData(String code, OrganGestorResourceEntity entity, Serializable params) throws ReportGenerationException {
+		return List.of();
+	}
+
+	@Override
+	public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
 
 		if (!authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN)) {
-			return ResponseEntity.status(403).build();
+			log.warn("[DIR3-JSON] Usuari sense permisos ha intentat descarregar el JSON DIR3");
+			return DownloadableFile.builder().name("organsDir3JSON.json").content(new byte[]{}).contentType("application/json").build();
 		}
 		var entitatId = userSessionHelper.getCurrentEntitatId();
 		var arxiu = organGestorService.getJsonOrgansGestorDir3(entitatId);
-		return ResponseEntity.ok()
-			.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=organsDir3JSON.json")
-			.contentType(MediaType.APPLICATION_OCTET_STREAM)
-			.body(arxiu);
+		return DownloadableFile.builder().name("organsDir3JSON.json").content(arxiu).contentType("application/json").build();
 	}
 
+	@Override
+	public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, Serializable target) {
+	}
 }
 ```
 
-- [ ] **Step 2: Build the module to catch compile errors**
+- [ ] **Step 3: Register it in `OrganGestorResourceServiceImpl`**
 
-Run: `mvn -pl notib-back -am clean compile -DskipTests -Dfrontend.skip=true`
-Expected: `BUILD SUCCESS`.
+Add the registration line in `init()`, alongside the existing `register(...)` calls:
 
-- [ ] **Step 3: Commit**
+```java
+		register(OrganGestorResource.REPORT_DESCARREGAR_DIR3_JSON, new OrganGestorDir3SyncJsonReportGenerator(organGestorService, userSessionHelper, authenticationHelper));
+```
+
+Add the import `import es.caib.notib.logic.organs.OrganGestorDir3SyncJsonReportGenerator;`.
+
+- [ ] **Step 4: Build the module to catch compile errors**
+
+Run: `mvn -pl notib-service -am clean compile -DskipTests`
+Expected: `BUILD SUCCESS`. This deliberately does NOT build `notib-back` (its default `jboss` profile is unrelated to this change, and this task touches no `notib-back` files at all — the report generator lives entirely in `notib-service`).
+
+- [ ] **Step 5: Commit**
 
 ```bash
-git add notib-back/src/main/java/es/caib/notib/back/resourcecontroller/OrganGestorDir3SyncJsonController.java
-git commit -m "#1011 Endpoint REST per a descarregar el JSON DIR3 d'òrgans gestors"
+git add notib-service-intf/src/main/java/es/caib/notib/logic/intf/model/OrganGestorResource.java \
+        notib-service/src/main/java/es/caib/notib/logic/organs/OrganGestorDir3SyncJsonReportGenerator.java \
+        notib-service/src/main/java/es/caib/notib/logic/resourceservice/OrganGestorResourceServiceImpl.java
+git commit -m "#1011 Informe de descàrrega del JSON DIR3 d'òrgans gestors"
 ```
 
 ---
@@ -623,19 +688,29 @@ git commit -m "#1011 Endpoint REST per a descarregar el JSON DIR3 d'òrgans gest
 
 - [ ] **Step 1: Add JSON-download and PDF-print handlers, embed them in the result content, simplify `formDialogButtons` to a single Sincronitzar/Cancel·lar pair**
 
+> **Superseded, ruled during execution:** the JSON download no longer goes
+> through a bespoke REST endpoint (see Task 3's updated design — it's now a
+> `REPORT` artifact, `OrganGestorResource.REPORT_DESCARREGAR_DIR3_JSON`,
+> dispatched through the same generic mechanism `DIR3_SYNC` already uses).
+> The frontend call below uses `useResourceApiService`'s `artifactReport`
+> function directly (the same one `ActionReportButton.tsx`'s internal
+> `generateReport` calls — see `lib/components/mui/ActionReportButton.tsx:228-255`
+> for the exact blob-handling pattern this mirrors), rather than a raw
+> `fetch` to a URL that doesn't exist.
+
 `MuiActionReportButton`'s `formDialogButtons` only supports form-submitting buttons (each click resolves the dialog's promise with a `value`). "Descarregar JSON" and "Descarrega PDF" are side-effect-only actions that must NOT close the dialog, so they're rendered as extra buttons inside the content returned by `formDialogResultProcessor`, alongside the graphical preview — not as `formDialogButtons` entries.
 
 ```tsx
 const useDir3JsonDownload = () => {
-    const { getToken } = useAuthContext();
     const { saveAs } = useBaseAppContext();
+    const { artifactReport } = useResourceApiService('organGestorResource');
     return React.useCallback(() => {
-        fetch('/notibback/apinew/organGestorResource/dir3SyncJson', {
-            headers: { Authorization: 'Bearer ' + getToken() },
-        })
-            .then((res) => res.blob())
-            .then((blob) => saveAs?.(blob, 'organsDir3JSON.json'));
-    }, [getToken, saveAs]);
+        artifactReport(undefined, { code: 'REPORT_DESCARREGAR_DIR3_JSON', data: {}, fileType: 'JSON' })
+            .then((result: any) => {
+                const blob = result?.blob instanceof Blob ? result.blob : new Blob([JSON.stringify(result.blob, null, 2)], { type: 'application/json; charset=utf-8' });
+                saveAs?.(blob, result.fileName ?? 'organsDir3JSON.json');
+            });
+    }, [artifactReport, saveAs]);
 };
 
 const Dir3SyncResultActions: React.FC<{ result: any }> = ({ result }) => {
@@ -655,7 +730,7 @@ const Dir3SyncResultActions: React.FC<{ result: any }> = ({ result }) => {
 };
 ```
 
-Note: the literal URL `/notibback/apinew/organGestorResource/dir3SyncJson` is derived from `BaseConfig.API_PATH = "/apinew"` plus the `/notibback` context path used elsewhere in this codebase (CLAUDE.md's dev URL is `http://localhost:8080/notibback/reactapp/`) — it has not been confirmed against a running instance. Before relying on it, verify the actual mount prefix during Task 5's manual verification, e.g. by logging `useResourceApiService('organGestorResource').currentLinks` once and comparing its resolved `href` prefix, and correct the literal path here if it differs.
+Before writing this, read `useResourceApiService`'s `artifactReport` function signature in `lib/components/ResourceApiProvider.tsx` (the same file `OrganGrid.tsx`'s existing `useSse` already imports `useResourceApiService` from) to confirm the exact parameter shape (id, request-args object) and adjust the call above to match exactly — do not guess the signature; `ActionReportButton.tsx:228-255`'s `generateReport` function is the authoritative reference for both the call shape and the response's `{blob, fileName}` shape.
 
 Wrap the preview content and result actions together in `resultProcessor`:
 
@@ -777,7 +852,7 @@ Follow `CLAUDE.md`'s "Spring Boot + live React dev server" setup (`ide,oracle` M
 1. Open Configuració > Òrgans gestors, click "Sincronització Dir3".
 2. Confirm the graphical preview (or "Sense canvis") appears immediately, with no separate query click needed.
 3. If there are pending DIR3 changes, confirm each populated category (Divisions/Fusions/Substitucions/Canvis en atributs/Nous/Extingides) renders as connected boxes with correct codi/nom and colors (green=kept/valid, red=going away, yellow=new attribute state).
-4. Click "Descarregar òrgans JSON" — confirm a file downloads named `organsDir3JSON.json` with DIR3 JSON content. If the fetch 404s, inspect the network tab for the actual resolved base path used by other `organGestorResource` API calls and correct the literal URL from Task 4 Step 1 to match.
+4. Click "Descarregar òrgans JSON" — confirm a file downloads named `organsDir3JSON.json` with DIR3 JSON content, dispatched via the `REPORT_DESCARREGAR_DIR3_JSON` report artifact (Task 3) rather than a raw endpoint.
 5. Click "Descarrega PDF" — confirm the browser print dialog opens showing only the preview panel (no app chrome, no footer buttons).
 6. Click "Sincronitzar" — confirm the sync applies and the grid refreshes, matching today's existing apply behavior.
 7. Confirm "Oficines" button (separate, `OficinesSyncActionButton`) still works unchanged.
