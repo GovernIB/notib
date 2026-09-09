@@ -13,6 +13,7 @@ import {
 import {ROLE_ADMIN, useNotibContext} from '../../components/NotibContext';
 import LinkToTab from '../../components/LinkToTab';
 import GridFormField, { GridButtonField } from '../../components/GridFormField';
+import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 import React from "react";
 
@@ -103,12 +104,13 @@ const ContentFilter: React.FC = () => {
 
     const { t } = useTranslation();
     const filterApiRef = useFilterApiContext();
+    const organGestorOptionRenderer = useOrganGestorOptionRenderer();
     const handleButtonClick = () => filterApiRef.current?.clear();
     return (
         <Grid container spacing={2}>
             <GridFormField size={1} name="codi" />
             <GridFormField size={3} name="nom" />
-            <GridFormField size={4} name="organGestor" />
+            <GridFormField size={4} name="organGestor" optionRenderer={organGestorOptionRenderer} />
             <GridButtonField size={0.5} name="actiu" icon={'flash_on'} hiddenLabel />
             <GridButtonField size={0.5} name="comu" icon={'public'} hiddenLabel />
             <GridButtonField size={0.5} name="entregaCieActiva" icon={'email'} hiddenLabel />

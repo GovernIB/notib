@@ -1224,7 +1224,8 @@ const translationEs = {
         obrirFiltreAvançat: 'Abrir filtro avanzado',
         tancarFiltreAvançat: 'Cerrar filtro avanzado',
         guardar: 'Guarda',
-        cancelar: 'Cancela'
+        cancelar: 'Cancela',
+        organGestorNoVigent: 'Órgano no vigente',
     },
 };
 

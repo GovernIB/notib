@@ -7,6 +7,7 @@ import { FormPage, MuiForm, MuiFormTabs, MuiFormTabContent, useFormContext } fro
 import ProcedimentFormTabGrups from './ProcedimentFormTabGrups';
 import ProcedimentFormTabPermisos from './ProcedimentFormTabPermisos';
 import GridFormField from '../../components/GridFormField';
+import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
 import { useTabParam } from '../../hooks/useSearchParams';
 
 const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
@@ -15,6 +16,7 @@ const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void
     const { t } = useTranslation();
     const { data } = useFormContext();
     const initialTab = useTabParam();
+    const organGestorOptionRenderer = useOrganGestorOptionRenderer();
     React.useEffect(() => {
         setSubtitle(data?.codi + ', ' + data?.nom);
     }, [data]);
@@ -30,7 +32,7 @@ const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void
                     <GridFormField size={6} name="retard" />
                     <GridFormField size={6} name="caducitat" componentProps={{ helperText: 'En dies naturals' }}/>
                     <GridFormField size={3} name="comu" />
-                    {!data?.comu && <GridFormField size={9} name="organGestor" />}
+                    {!data?.comu && <GridFormField size={9} name="organGestor" optionRenderer={organGestorOptionRenderer} />}
                     {!data?.fieldEntregaCieHidden && (
                         <>
                             <GridFormField size={2} name="entregaCieActiva" />

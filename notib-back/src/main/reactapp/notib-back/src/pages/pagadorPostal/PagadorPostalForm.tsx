@@ -4,11 +4,13 @@ import {useTranslation} from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import {FormPage, MuiForm, useFormContext} from 'reactlib';
 import GridFormField from '../../components/GridFormField';
+import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
 
 const PagadorPostalFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
 
     const { setSubtitle } = props;
     const { data } = useFormContext();
+    const organGestorOptionRenderer = useOrganGestorOptionRenderer();
 
     React.useEffect(() => {
         setSubtitle(data?.nom);
@@ -17,7 +19,7 @@ const PagadorPostalFormContent: React.FC<{ setSubtitle: (subtitle: string) => vo
     return (
         <Grid container spacing={2}>
             <GridFormField size={12} name="nom" />
-            <GridFormField size={12} name="organGestor" />
+            <GridFormField size={12} name="organGestor" optionRenderer={organGestorOptionRenderer} />
             <GridFormField size={4} name="contracteNum" />
             <GridFormField size={4} name="facturacioClientCodi" />
             <GridFormField size={4} name="contracteDataVig" />

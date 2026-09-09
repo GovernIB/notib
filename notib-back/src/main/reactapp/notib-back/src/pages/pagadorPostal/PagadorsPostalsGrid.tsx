@@ -10,6 +10,7 @@ import {
     useFilterApiContext,
 } from 'reactlib';
 import GridFormField from '../../components/GridFormField.tsx';
+import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer.tsx';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils.ts';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid.tsx';
 
@@ -52,6 +53,7 @@ const springFilterBuilder = (data: any) => {
 const ContentFilter: React.FC = () => {
     const { t } = useTranslation();
     const filterApiRef = useFilterApiContext();
+    const organGestorOptionRenderer = useOrganGestorOptionRenderer();
     const handleButtonClick = () => {
         filterApiRef.current?.clear();
     };
@@ -59,7 +61,7 @@ const ContentFilter: React.FC = () => {
     return (
         <Grid container spacing={2}>
             <GridFormField size={2} name="nom" />
-            <GridFormField size={3} name="organGestor" />
+            <GridFormField size={3} name="organGestor" optionRenderer={organGestorOptionRenderer} />
             <GridFormField size={1.5} name="contracteNum" />
             <GridFormField size={1.75} name="contracteDataVigInici" />
             <GridFormField size={1.75} name="contracteDataVigFinal" />

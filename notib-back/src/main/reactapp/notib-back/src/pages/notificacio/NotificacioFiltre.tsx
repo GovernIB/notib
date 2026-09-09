@@ -2,6 +2,7 @@ import React from "react";
 import {useTranslation} from "react-i18next";
 import {Grid, Icon, IconButton} from "@mui/material";
 import GridFormField, {GridButtonField} from "../../components/GridFormField.tsx";
+import useOrganGestorOptionRenderer from "../../components/OrganGestorOptionRenderer.tsx";
 import {springFilterBuilder, springFilterBuilder as filterBuilder, useFilterApiContext} from 'reactlib';
 import {useNotibContext} from "../../components/NotibContext.ts";
 import {formatEndOfDay, formatStartOfDay} from "../../utils/dateUtils.ts";
@@ -39,6 +40,7 @@ const ContentFilter: React.FC<{openByDefault?: boolean, notificacionsEsborrades:
 
     const { t } = useTranslation();
     const filterApiRef = useFilterApiContext();
+    const organGestorOptionRenderer = useOrganGestorOptionRenderer();
     const [advancedFilter, setAdvancedFilter] = React.useState(openByDefault ?? false);
     const handleButtonClick = () => filterApiRef.current?.clear();
     const advancedFilterClick = () => setAdvancedFilter(!advancedFilter);
@@ -67,7 +69,7 @@ const ContentFilter: React.FC<{openByDefault?: boolean, notificacionsEsborrades:
                 <GridFormField size={2} name="interessat" />
                 <GridFormField size={2} name="numExpedient" />
                 <GridFormField size={2} name="identificadorNotifica" />
-                <GridFormField size={6} name="organGestor" namedQueries={`PERM_READ`}/>
+                <GridFormField size={6} name="organGestor" namedQueries={`PERM_READ`} optionRenderer={organGestorOptionRenderer}/>
                 <GridFormField size={5} name="procediment" filter={procedimentFiltre}/>
                 <GridFormField size={5} name="servei" filter={serveiFiltre}/>
                 <Grid size={0.5} sx={{ textAlign: 'center' }}>
@@ -130,7 +132,7 @@ const ContentFilter: React.FC<{openByDefault?: boolean, notificacionsEsborrades:
                     <GridFormField size={2} name="interessat" />
                     <GridFormField size={2} name="numExpedient" />
                     <GridFormField size={2} name="identificadorNotifica" />
-                    <GridFormField size={6} name="organGestor" namedQueries={`PERM_READ`} />
+                    <GridFormField size={6} name="organGestor" namedQueries={`PERM_READ`} optionRenderer={organGestorOptionRenderer} />
                     <GridFormField size={3.5} name="procediment"  filter={procedimentFiltre}/>
                     <GridFormField size={3.5} name="servei" filter={serveiFiltre}/>
                     <GridFormField size={2} name="tipusUsuari" />

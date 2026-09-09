@@ -11,6 +11,7 @@ import {
 } from 'reactlib';
 import LinkToTab from '../../components/LinkToTab';
 import GridFormField from '../../components/GridFormField';
+import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 
@@ -69,12 +70,13 @@ const ContentFilter: React.FC = () => {
 
     const { t } = useTranslation();
     const filterApiRef = useFilterApiContext();
+    const organGestorOptionRenderer = useOrganGestorOptionRenderer();
     const handleButtonClick = () => filterApiRef.current?.clear();
     return (
         <Grid container spacing={2}>
             <GridFormField size={2} name="nom" />
-            <GridFormField size={3} name="organGestorEmissor" />
-            <GridFormField size={3} name="organGestorPagador" />
+            <GridFormField size={3} name="organGestorEmissor" optionRenderer={organGestorOptionRenderer} />
+            <GridFormField size={3} name="organGestorPagador" optionRenderer={organGestorOptionRenderer} />
             <GridFormField size={1.75} name="contracteDataVigInici" />
             <GridFormField size={1.75} name="contracteDataVigFinal" />
             <Grid size={0.5}>

@@ -6,6 +6,7 @@ import Badge from '@mui/material/Badge';
 import { FormPage, MuiForm, MuiFormTabs, MuiFormTabContent, useFormContext } from 'reactlib';
 import OrganFormTabPermisos from './OrganFormTabPermisos';
 import GridFormField from '../../components/GridFormField';
+import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
 import { useTabParam } from '../../hooks/useSearchParams';
 
 export const OrganFormContent: React.FC<{ setSubtitle?: (subtitle: string) => void }> = (props) => {
@@ -13,6 +14,7 @@ export const OrganFormContent: React.FC<{ setSubtitle?: (subtitle: string) => vo
     const { t } = useTranslation();
     const { data } = useFormContext();
     const initialTab = useTabParam();
+    const organGestorOptionRenderer = useOrganGestorOptionRenderer();
 
     React.useEffect(() => {
         setSubtitle?.(data?.codi + ', ' + data?.nom);
@@ -30,7 +32,7 @@ export const OrganFormContent: React.FC<{ setSubtitle?: (subtitle: string) => vo
         <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1]} initialIndex={initialTab}>
             <MuiFormTabContent index={0} showOnCreate>
                 <Grid container spacing={2}>
-                    <GridFormField size={12} name="pare" />
+                    <GridFormField size={12} name="pare" optionRenderer={organGestorOptionRenderer} />
                     <GridFormField size={4} name="codi" />
                     <GridFormField size={8} name="nom" />
                     <GridFormField size={4} name="estat" />

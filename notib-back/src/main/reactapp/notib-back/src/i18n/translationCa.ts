@@ -1248,7 +1248,8 @@ const translationCa = {
         obrirFiltreAvançat: 'Obrir filtre avançat',
         tancarFiltreAvançat: 'Tancar filtre avançat',
         guardar: 'Desa',
-        cancelar: 'Cancel·la'
+        cancelar: 'Cancel·la',
+        organGestorNoVigent: 'Òrgan no vigent',
     },
 };
 

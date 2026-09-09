@@ -7,6 +7,7 @@ import { FormPage, MuiForm, MuiFormTabs, MuiFormTabContent, useFormContext } fro
 import ServeiFormTabGrups from './ServeiFormTabGrups';
 import ServeiFormTabPermisos from './ServeiFormTabPermisos';
 import GridFormField from '../../components/GridFormField';
+import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
 import { useTabParam } from '../../hooks/useSearchParams';
 
 const ServeiFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
@@ -14,6 +15,7 @@ const ServeiFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> =
     const { t } = useTranslation();
     const { data } = useFormContext();
     const initialTab = useTabParam();
+    const organGestorOptionRenderer = useOrganGestorOptionRenderer();
     React.useEffect(() => {
         setSubtitle(data?.codi + ', ' + data?.nom);
     }, [data]);
@@ -48,6 +50,7 @@ const ServeiFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> =
                         size={9}
                         name="organGestor"
                         disabled={data?.fieldOrganGestorDisabled}
+                        optionRenderer={organGestorOptionRenderer}
                     />
                     <GridFormField size={3} name="comu" />
                     {!data?.fieldEntregaCieHidden && (

@@ -23,6 +23,7 @@ import {
 } from 'reactlib';
 import LinkToTab from '../../components/LinkToTab';
 import GridFormField from '../../components/GridFormField';
+import {OrganGestorNoVigentIcon, useOrganGestorOptionRenderer} from '../../components/OrganGestorOptionRenderer';
 import {useDatagridFilterProps, useDatagridPageSizeOptionsProps, useDatagridTreeData,} from '../../hooks/useDataGrid';
 import {OrganFormContent} from './OrganForm';
 import {FormGroup} from "@mui/material";
@@ -48,6 +49,12 @@ const columns: MuiDataGridColDef[] = [
     {
         field: 'estat',
         flex: 1.5,
+        renderCell: (params: any) => (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <span>{params.formattedValue}</span>
+                {params.value != null && params.value !== 'V' && <OrganGestorNoVigentIcon />}
+            </Box>
+        ),
     },
     {
         field: 'entregaCieActiva',
@@ -326,6 +333,7 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
 const ContentFilter: React.FC = () => {
     const { t } = useTranslation();
     const filterApiRef = useFilterApiContext();
+    const organGestorOptionRenderer = useOrganGestorOptionRenderer();
     const handleButtonClick = () => {
         filterApiRef.current?.clear();
     };
@@ -333,7 +341,7 @@ const ContentFilter: React.FC = () => {
         <Grid container spacing={2}>
             <GridFormField size={1} name="codi" />
             <GridFormField size={2} name="nom" />
-            <GridFormField size={4} name="pare" />
+            <GridFormField size={4} name="pare" optionRenderer={organGestorOptionRenderer} />
             <GridFormField size={1} name="llibre" />
             <GridFormField size={1.25} name="estat" />
             <GridFormField size={1} name="entregaCieActiva" />
