@@ -171,8 +171,12 @@ class OrganGestorSyncHelperTest {
 		Mockito.when(resourceRepository.findByEntitat(Mockito.any())).thenReturn(List.of(existingA01, existingA02));
 		var progressEventService = Mockito.mock(es.caib.notib.logic.intf.resourceservice.SseEventService.class);
 		var organGestorRepository = Mockito.mock(OrganGestorRepository.class);
-		var legacyA01 = OrganGestorEntity.builder().codi("A01").build();
-		var legacyA02 = OrganGestorEntity.builder().codi("A02").build();
+		// legacyA01 and legacyA02 belong to the SAME entitat as the one being synced, so
+		// persistirTransicions' entitat-scoping filter must accept them.
+		var legacyEntitat = Mockito.mock(es.caib.notib.persist.entity.EntitatEntity.class);
+		Mockito.when(legacyEntitat.getCodi()).thenReturn("ENT1");
+		var legacyA01 = OrganGestorEntity.builder().codi("A01").entitat(legacyEntitat).build();
+		var legacyA02 = OrganGestorEntity.builder().codi("A02").entitat(legacyEntitat).build();
 		// persistirTransicions collects all involved codis (survivor + extinct) into a single
 		// list and issues ONE findByCodiIn call with it, so both legacy entities must come back
 		// from that single combined-list call.
@@ -196,6 +200,68 @@ class OrganGestorSyncHelperTest {
 		// then: A01 (the extinct one, DTO-field-`nou` for substitucions per the inverted
 		// naming) must record A02 (the survivor, DTO-field-`vell`) as its successor.
 		assertTrue(legacyA01.getNous().contains(legacyA02));
+		// and: the inverse side must also be maintained in-memory during the same session, so a
+		// downstream read of the survivor's `antics` (e.g. PermisosHelper.actualitzarPermisosOrgansObsolets)
+		// sees the newly-added link.
+		assertTrue(legacyA02.getAntics().contains(legacyA01));
+	}
+
+	@Test
+	void persistirTransicionsShouldIgnoreOrgansFromADifferentEntitat() {
+		// given: DIR3 reports A01 (currently vigent in DB) evolving into A02 (still vigent), same
+		// substitucio scenario as above, BUT findByCodiIn returns a legacy A02 entity that belongs
+		// to a DIFFERENT entitat than the one being synced (a codi collision across entitats).
+		var a01 = new NodeDir3();
+		a01.setCodi("A01");
+		a01.setDenominacio("Unitat A01");
+		a01.setEstat("E");
+		a01.setHistoricosUO(List.of("A02"));
+		var a02 = new NodeDir3();
+		a02.setCodi("A02");
+		a02.setDenominacio("Unitat A02");
+		a02.setEstat("V");
+		a02.setSuperior("");
+
+		var pluginHelper = Mockito.mock(PluginHelper.class);
+		Mockito.when(pluginHelper.unitatsOrganitzativesFindByPare(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+			.thenReturn(List.of(a01, a02));
+		var llibreOficinaHelper = Mockito.mock(OrganGestorLlibreOficinaUpdateHelper.class);
+		var resourceRepository = Mockito.mock(OrganGestorResourceRepository.class);
+		var existingA01 = new OrganGestorResourceEntity();
+		existingA01.setCodi("A01");
+		var existingA02 = new OrganGestorResourceEntity();
+		existingA02.setCodi("A02");
+		existingA02.setEstat(es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum.V);
+		Mockito.when(resourceRepository.findByEntitat(Mockito.any())).thenReturn(List.of(existingA01, existingA02));
+		var progressEventService = Mockito.mock(es.caib.notib.logic.intf.resourceservice.SseEventService.class);
+		var organGestorRepository = Mockito.mock(OrganGestorRepository.class);
+
+		var entitatSincronitzada = Mockito.mock(es.caib.notib.persist.entity.EntitatEntity.class);
+		Mockito.when(entitatSincronitzada.getCodi()).thenReturn("ENT1");
+		var entitatAliena = Mockito.mock(es.caib.notib.persist.entity.EntitatEntity.class);
+		Mockito.when(entitatAliena.getCodi()).thenReturn("ENT-ALIENA");
+		var legacyA01 = OrganGestorEntity.builder().codi("A01").entitat(entitatSincronitzada).build();
+		// legacyA02 belongs to a DIFFERENT entitat than the one being synced.
+		var legacyA02 = OrganGestorEntity.builder().codi("A02").entitat(entitatAliena).build();
+		Mockito.when(organGestorRepository.findByCodiIn(Mockito.argThat(l -> l != null && l.contains("A01") && l.contains("A02"))))
+			.thenReturn(List.of(legacyA01, legacyA02));
+
+		var helper = new OrganGestorSyncHelper(pluginHelper, llibreOficinaHelper, resourceRepository, progressEventService, organGestorRepository);
+		var entitat = new EntitatResourceEntity();
+		entitat.setCodi("ENT1");
+		entitat.setDir3Codi("D3-ENT1");
+
+		try (var mockedNotibLogger = Mockito.mockStatic(es.caib.notib.logic.utils.NotibLogger.class)) {
+			var mockNotibLogger = Mockito.mock(es.caib.notib.logic.utils.NotibLogger.class);
+			mockedNotibLogger.when(es.caib.notib.logic.utils.NotibLogger::getInstance).thenReturn(mockNotibLogger);
+			helper.sincronitzar(entitat, false);
+		}
+
+		// then: legacyA02 belongs to a different entitat than the one being synced, so it must be
+		// excluded from consideration and the transition must not be applied at all (legacyA01's
+		// `nous` is never touched, staying at its unset builder default of null).
+		assertTrue(legacyA01.getNous() == null || legacyA01.getNous().isEmpty());
+		Mockito.verify(organGestorRepository, Mockito.never()).saveAll(Mockito.any());
 	}
 
 }

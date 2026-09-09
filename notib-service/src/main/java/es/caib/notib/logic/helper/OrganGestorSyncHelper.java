@@ -178,7 +178,7 @@ public class OrganGestorSyncHelper {
 				10,
 				"Actualitzant informació dels òrgans gestors");
 			actualitzarOrgansGestors(entitat, dir3SyncNodes, organsGestors, eventName);
-			persistirTransicions(substitucionsMap, fusionsMap, divisionsMap);
+			persistirTransicions(substitucionsMap, fusionsMap, divisionsMap, entitat);
 			LocalDate now = LocalDate.now();
 			if (entitat.getDataSincronitzacio() == null) {
 				entitat.setDataSincronitzacio(now);
@@ -474,7 +474,8 @@ public class OrganGestorSyncHelper {
 	private void persistirTransicions(
 		MultiValuedMap<NodeDir3, NodeDir3> substitucionsMap,
 		MultiValuedMap<NodeDir3, NodeDir3> fusionsMap,
-		MultiValuedMap<NodeDir3, NodeDir3> divisionsMap) {
+		MultiValuedMap<NodeDir3, NodeDir3> divisionsMap,
+		EntitatResourceEntity entitat) {
 
 		List<String> totsElsCodis = new ArrayList<>();
 		substitucionsMap.entries().forEach(e -> { totsElsCodis.add(e.getKey().getCodi()); totsElsCodis.add(e.getValue().getCodi()); });
@@ -484,7 +485,16 @@ public class OrganGestorSyncHelper {
 			return;
 		}
 		Map<String, OrganGestorEntity> entitatsPerCodi = new HashMap<>();
-		organGestorRepository.findByCodiIn(totsElsCodis).forEach(e -> entitatsPerCodi.put(e.getCodi(), e));
+		organGestorRepository.findByCodiIn(totsElsCodis).forEach(e -> {
+			if (e.getEntitat() != null && entitat.getCodi().equals(e.getEntitat().getCodi())) {
+				entitatsPerCodi.put(e.getCodi(), e);
+			} else {
+				log.warn(
+					"Ignorant òrgan gestor amb codi {} trobat en la sincronització perquè pertany a una entitat diferent de la que s'està sincronitzant (entitat esperada: {})",
+					e.getCodi(),
+					entitat.getCodi());
+			}
+		});
 		List<OrganGestorEntity> aGuardar = new ArrayList<>();
 		// Substitucions: la clau (vell al DTO) és el supervivent, el valor (nou al DTO) és l'extint.
 		substitucionsMap.entries().forEach(entry -> afegeixTransicio(entitatsPerCodi, entry.getValue().getCodi(), entry.getKey().getCodi(), aGuardar));
@@ -502,6 +512,7 @@ public class OrganGestorSyncHelper {
 		var desti = entitatsPerCodi.get(codiDesti);
 		if (origen != null && desti != null) {
 			origen.addNou(desti);
+			desti.addAntic(origen);
 			aGuardar.add(origen);
 		}
 	}
