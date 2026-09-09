@@ -9,6 +9,8 @@ import es.caib.notib.logic.intf.model.SseEvent;
 import es.caib.notib.logic.intf.resourceservice.SseEventService;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.utils.NotibLogger;
+import es.caib.notib.persist.entity.OrganGestorEntity;
+import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
 import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
 import es.caib.notib.persist.resourcerepository.OrganGestorResourceRepository;
@@ -40,6 +42,8 @@ public class OrganGestorSyncHelper {
 
 	private final SseEventService progressEventService;
 
+	private final OrganGestorRepository organGestorRepository;
+
 	/**
 	 * Sincronitza els òrgans gestors d'una entitat amb la informació actualitzada de DIR3.
 	 *
@@ -50,7 +54,23 @@ public class OrganGestorSyncHelper {
 	public OrganGestorDir3Sync sincronitzar(
 		EntitatResourceEntity entitat,
 		boolean simular) {
+		return sincronitzar(entitat, simular, SseEvent.SseEventName.DIR3_SYNC);
+	}
+
+	/**
+	 * Sincronitza els òrgans gestors d'una entitat amb la informació actualitzada de DIR3.
+	 *
+	 * @param entitat l'entitat de la qual es volen actualitzar els òrgans.
+	 * @param simular indica si s'han de guardar o no els canvis a la base de dades.
+	 * @param eventName el nom de l'event SSE sota el qual s'han de publicar els events de progrés.
+	 * @return la llista de canvis a realitzar als òrgans de la base de dades.
+	 */
+	public OrganGestorDir3Sync sincronitzar(
+		EntitatResourceEntity entitat,
+		boolean simular,
+		SseEvent.SseEventName eventName) {
 		publishProgressEvent(
+			eventName,
 			SseEvent.SseEventStatus.RUNNING,
 			0,
 			"Consultant canvis a DIR3CAIB");
@@ -65,6 +85,7 @@ public class OrganGestorSyncHelper {
 			dataActualitzacio,
 			dataSincronitzacio);
 		publishProgressEvent(
+			eventName,
 			SseEvent.SseEventStatus.RUNNING,
 			simular ? 70 : 5,
 			"Processant canvis rebuts de DIR3CAIB");
@@ -152,21 +173,25 @@ public class OrganGestorSyncHelper {
 			simular);
 		if (!simular) {
 			publishProgressEvent(
+				eventName,
 				SseEvent.SseEventStatus.RUNNING,
 				10,
 				"Actualitzant informació dels òrgans gestors");
-			actualitzarOrgansGestors(entitat, dir3SyncNodes, organsGestors);
+			actualitzarOrgansGestors(entitat, dir3SyncNodes, organsGestors, eventName);
+			persistirTransicions(substitucionsMap, fusionsMap, divisionsMap);
 			LocalDate now = LocalDate.now();
 			if (entitat.getDataSincronitzacio() == null) {
 				entitat.setDataSincronitzacio(now);
 			}
 			entitat.setDataActualitzacio(now);
 			publishProgressEvent(
+				eventName,
 				SseEvent.SseEventStatus.DONE,
 				100,
 				null);
 		} else {
 			publishProgressEvent(
+				eventName,
 				SseEvent.SseEventStatus.DONE,
 				100,
 				null);
@@ -177,7 +202,8 @@ public class OrganGestorSyncHelper {
 	private void actualitzarOrgansGestors(
 		EntitatResourceEntity entitat,
 		List<NodeDir3> dir3SyncNodes,
-		List<OrganGestorResourceEntity> organsGestors) {
+		List<OrganGestorResourceEntity> organsGestors,
+		SseEvent.SseEventName eventName) {
 		int numDir3SyncNodes = dir3SyncNodes.size();
 		int nextPublishableProgress = 0;
 		for (int i = 0; i < numDir3SyncNodes; i++) {
@@ -190,6 +216,7 @@ public class OrganGestorSyncHelper {
 			if (percentProcessed >= nextPublishableProgress) {
 				int percent = 10 + 90 * percentProcessed / 100;
 				publishProgressEvent(
+					eventName,
 					SseEvent.SseEventStatus.RUNNING,
 					percent,
 					"Actualitzant informació dels òrgans gestors");
@@ -431,16 +458,52 @@ public class OrganGestorSyncHelper {
 	}
 
 	private void publishProgressEvent(
+		SseEvent.SseEventName eventName,
 		SseEvent.SseEventStatus status,
 		int percent,
 		String message) {
 		progressEventService.publishEvent(
 			SseEventService.SseQueue.PROGRESS,
 			new SseEvent(
-				SseEvent.SseEventName.DIR3_SYNC,
+				eventName,
 				percent,
 				status,
 				message));
+	}
+
+	private void persistirTransicions(
+		MultiValuedMap<NodeDir3, NodeDir3> substitucionsMap,
+		MultiValuedMap<NodeDir3, NodeDir3> fusionsMap,
+		MultiValuedMap<NodeDir3, NodeDir3> divisionsMap) {
+
+		List<String> totsElsCodis = new ArrayList<>();
+		substitucionsMap.entries().forEach(e -> { totsElsCodis.add(e.getKey().getCodi()); totsElsCodis.add(e.getValue().getCodi()); });
+		fusionsMap.entries().forEach(e -> { totsElsCodis.add(e.getKey().getCodi()); totsElsCodis.add(e.getValue().getCodi()); });
+		divisionsMap.entries().forEach(e -> { totsElsCodis.add(e.getKey().getCodi()); totsElsCodis.add(e.getValue().getCodi()); });
+		if (totsElsCodis.isEmpty()) {
+			return;
+		}
+		Map<String, OrganGestorEntity> entitatsPerCodi = new HashMap<>();
+		organGestorRepository.findByCodiIn(totsElsCodis).forEach(e -> entitatsPerCodi.put(e.getCodi(), e));
+		List<OrganGestorEntity> aGuardar = new ArrayList<>();
+		// Substitucions: la clau (vell al DTO) és el supervivent, el valor (nou al DTO) és l'extint.
+		substitucionsMap.entries().forEach(entry -> afegeixTransicio(entitatsPerCodi, entry.getValue().getCodi(), entry.getKey().getCodi(), aGuardar));
+		// Fusions: la clau és el supervivent (nou al DTO), els valors són els extints (vells al DTO).
+		fusionsMap.entries().forEach(entry -> afegeixTransicio(entitatsPerCodi, entry.getValue().getCodi(), entry.getKey().getCodi(), aGuardar));
+		// Divisions: la clau és l'extint (vell al DTO), els valors són els supervivents (nous al DTO).
+		divisionsMap.entries().forEach(entry -> afegeixTransicio(entitatsPerCodi, entry.getKey().getCodi(), entry.getValue().getCodi(), aGuardar));
+		if (!aGuardar.isEmpty()) {
+			organGestorRepository.saveAll(aGuardar);
+		}
+	}
+
+	private void afegeixTransicio(Map<String, OrganGestorEntity> entitatsPerCodi, String codiOrigen, String codiDesti, List<OrganGestorEntity> aGuardar) {
+		var origen = entitatsPerCodi.get(codiOrigen);
+		var desti = entitatsPerCodi.get(codiDesti);
+		if (origen != null && desti != null) {
+			origen.addNou(desti);
+			aGuardar.add(origen);
+		}
 	}
 
 }

@@ -2,6 +2,8 @@ package es.caib.notib.logic.helper;
 
 import es.caib.notib.logic.intf.model.OrganGestorDir3Sync;
 import es.caib.notib.logic.intf.resourceservice.SseEventService;
+import es.caib.notib.persist.entity.OrganGestorEntity;
+import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
 import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
 import es.caib.notib.persist.resourcerepository.OrganGestorResourceRepository;
@@ -14,6 +16,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class OrganGestorSyncHelperTest {
 
@@ -46,8 +49,10 @@ class OrganGestorSyncHelperTest {
 		var existingA01 = new OrganGestorResourceEntity();
 		existingA01.setCodi("A01");
 		Mockito.when(repository.findByEntitat(Mockito.any())).thenReturn(List.of(existingA01));
+		var organGestorRepository = Mockito.mock(OrganGestorRepository.class);
+		Mockito.when(organGestorRepository.findByCodiIn(Mockito.anyList())).thenReturn(List.of());
 
-		var helper = new OrganGestorSyncHelper(pluginHelper, llibreOficinaHelper, repository, progressEventService);
+		var helper = new OrganGestorSyncHelper(pluginHelper, llibreOficinaHelper, repository, progressEventService, organGestorRepository);
 		var entitat = new EntitatResourceEntity();
 		entitat.setCodi("ENT1");
 		entitat.setDir3Codi("D3-ENT1");
@@ -91,8 +96,10 @@ class OrganGestorSyncHelperTest {
 		var existingA01 = new OrganGestorResourceEntity();
 		existingA01.setCodi("A01");
 		Mockito.when(repository.findByEntitat(Mockito.any())).thenReturn(List.of(existingA01));
+		var organGestorRepository = Mockito.mock(OrganGestorRepository.class);
+		Mockito.when(organGestorRepository.findByCodiIn(Mockito.anyList())).thenReturn(List.of());
 
-		var helper = new OrganGestorSyncHelper(pluginHelper, llibreOficinaHelper, repository, progressEventService);
+		var helper = new OrganGestorSyncHelper(pluginHelper, llibreOficinaHelper, repository, progressEventService, organGestorRepository);
 		var entitat = new EntitatResourceEntity();
 		entitat.setCodi("ENT1");
 		entitat.setDir3Codi("D3-ENT1");
@@ -107,6 +114,88 @@ class OrganGestorSyncHelperTest {
 		boolean anyDivisionSuccessorAlsoInCreacions = Arrays.stream(result.getCreacions())
 			.anyMatch(c -> "A02".equals(c.getNou().getCodi()) || "A03".equals(c.getNou().getCodi()));
 		assertFalse(anyDivisionSuccessorAlsoInCreacions, "Division successors must not also be listed as creacions");
+	}
+
+	@Test
+	void sincronitzarShouldPublishUnderTheGivenEventName() {
+		// given
+		var pluginHelper = Mockito.mock(PluginHelper.class);
+		Mockito.when(pluginHelper.unitatsOrganitzativesFindByPare(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+			.thenReturn(List.of());
+		var llibreOficinaHelper = Mockito.mock(OrganGestorLlibreOficinaUpdateHelper.class);
+		var repository = Mockito.mock(OrganGestorResourceRepository.class);
+		Mockito.when(repository.findByEntitat(Mockito.any())).thenReturn(List.of());
+		var organGestorRepository = Mockito.mock(OrganGestorRepository.class);
+		var progressEventService = Mockito.mock(es.caib.notib.logic.intf.resourceservice.SseEventService.class);
+		var helper = new OrganGestorSyncHelper(pluginHelper, llibreOficinaHelper, repository, progressEventService, organGestorRepository);
+		var entitat = new EntitatResourceEntity();
+		entitat.setCodi("ENT1");
+		entitat.setDir3Codi("D3-ENT1");
+		var eventCaptor = org.mockito.ArgumentCaptor.forClass(es.caib.notib.logic.intf.model.SseEvent.class);
+
+		// when
+		helper.sincronitzar(entitat, true, es.caib.notib.logic.intf.model.SseEvent.SseEventName.ORGANS_PROCEDIMENTS_SYNC);
+
+		// then
+		Mockito.verify(progressEventService, Mockito.atLeastOnce())
+			.publishEvent(Mockito.eq(es.caib.notib.logic.intf.resourceservice.SseEventService.SseQueue.PROGRESS), eventCaptor.capture());
+		assertTrue(eventCaptor.getAllValues().stream()
+			.allMatch(e -> e.getEventName() == es.caib.notib.logic.intf.model.SseEvent.SseEventName.ORGANS_PROCEDIMENTS_SYNC));
+	}
+
+	@Test
+	void sincronitzarShouldPersistNousAnticsOnSubstitucio() {
+		// given: DIR3 reports A01 (currently vigent in DB) evolving into A02 (still vigent),
+		// with A01's own latest record marked extinct.
+		var a01 = new NodeDir3();
+		a01.setCodi("A01");
+		a01.setDenominacio("Unitat A01");
+		a01.setEstat("E");
+		a01.setHistoricosUO(List.of("A02"));
+		var a02 = new NodeDir3();
+		a02.setCodi("A02");
+		a02.setDenominacio("Unitat A02");
+		a02.setEstat("V");
+		a02.setSuperior("");
+
+		var pluginHelper = Mockito.mock(PluginHelper.class);
+		Mockito.when(pluginHelper.unitatsOrganitzativesFindByPare(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+			.thenReturn(List.of(a01, a02));
+		var llibreOficinaHelper = Mockito.mock(OrganGestorLlibreOficinaUpdateHelper.class);
+		var resourceRepository = Mockito.mock(OrganGestorResourceRepository.class);
+		var existingA01 = new OrganGestorResourceEntity();
+		existingA01.setCodi("A01");
+		var existingA02 = new OrganGestorResourceEntity();
+		existingA02.setCodi("A02");
+		existingA02.setEstat(es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum.V);
+		Mockito.when(resourceRepository.findByEntitat(Mockito.any())).thenReturn(List.of(existingA01, existingA02));
+		var progressEventService = Mockito.mock(es.caib.notib.logic.intf.resourceservice.SseEventService.class);
+		var organGestorRepository = Mockito.mock(OrganGestorRepository.class);
+		var legacyA01 = OrganGestorEntity.builder().codi("A01").build();
+		var legacyA02 = OrganGestorEntity.builder().codi("A02").build();
+		// persistirTransicions collects all involved codis (survivor + extinct) into a single
+		// list and issues ONE findByCodiIn call with it, so both legacy entities must come back
+		// from that single combined-list call.
+		Mockito.when(organGestorRepository.findByCodiIn(Mockito.argThat(l -> l != null && l.contains("A01") && l.contains("A02"))))
+			.thenReturn(List.of(legacyA01, legacyA02));
+
+		var helper = new OrganGestorSyncHelper(pluginHelper, llibreOficinaHelper, resourceRepository, progressEventService, organGestorRepository);
+		var entitat = new EntitatResourceEntity();
+		entitat.setCodi("ENT1");
+		entitat.setDir3Codi("D3-ENT1");
+
+		// when: actualitzarOrganGestor logs via the NotibLogger singleton (populated in
+		// production by Spring's @PostConstruct), which is absent in this plain unit test, so
+		// its static accessor is mocked for the duration of the call.
+		try (var mockedNotibLogger = Mockito.mockStatic(es.caib.notib.logic.utils.NotibLogger.class)) {
+			var mockNotibLogger = Mockito.mock(es.caib.notib.logic.utils.NotibLogger.class);
+			mockedNotibLogger.when(es.caib.notib.logic.utils.NotibLogger::getInstance).thenReturn(mockNotibLogger);
+			helper.sincronitzar(entitat, false);
+		}
+
+		// then: A01 (the extinct one, DTO-field-`nou` for substitucions per the inverted
+		// naming) must record A02 (the survivor, DTO-field-`vell`) as its successor.
+		assertTrue(legacyA01.getNous().contains(legacyA02));
 	}
 
 }
