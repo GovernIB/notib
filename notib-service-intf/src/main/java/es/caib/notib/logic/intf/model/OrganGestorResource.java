@@ -98,6 +98,15 @@ import java.io.Serializable;
 				)
 			}
 		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.REPORT,
+			code = OrganGestorResource.REPORT_DESCARREGAR_DIR3_JSON,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN })
+			}
+		),
 	}
 )
 public class OrganGestorResource extends BaseResource<Long> {
@@ -107,6 +116,7 @@ public class OrganGestorResource extends BaseResource<Long> {
 
 	public static final String DIR3_SYNC_ACTION_CODE = "DIR3_SYNC";
 	public static final String OFICINES_SYNC_ACTION_CODE = "OFICINES_SYNC";
+	public static final String REPORT_DESCARREGAR_DIR3_JSON = "REPORT_DESCARREGAR_DIR3_JSON";
 	public static final String FILTER_CODE = "FILTER_ORGAN_GESTOR";
 	public static final String NAMED_QUERY_PERM_READ = "PERM_READ";
 	public static final String NAMED_QUERY_PERM_NOT = "PERM_NOT";

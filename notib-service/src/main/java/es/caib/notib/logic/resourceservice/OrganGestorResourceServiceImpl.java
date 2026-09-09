@@ -17,6 +17,7 @@ import es.caib.notib.logic.intf.resourceservice.OrganGestorResourceService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.organs.AdminOrgansAmbPermisActionExecutor;
 import es.caib.notib.logic.organs.OficinesSyncActionExecutor;
+import es.caib.notib.logic.organs.OrganGestorDir3SyncJsonReportGenerator;
 import es.caib.notib.persist.resourceentity.EntregaCieResourceEntity;
 import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
 import es.caib.notib.persist.resourcerepository.EntitatResourceRepository;
@@ -87,6 +88,7 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 		register(OrganGestorResource.DIR3_SYNC_ACTION_CODE, new Dir3SyncActionExecutor());
 		register(OrganGestorResource.OFICINES_SYNC_ACTION_CODE, new OficinesSyncActionExecutor(entitatResourceRepository, userSessionHelper, organGestorService, resourceClass));
 		register(OrganGestorResource.ACTION_ADMIN_ORGANS_AMB_PERMIS, new AdminOrgansAmbPermisActionExecutor(organGestorService, userSessionHelper));
+		register(OrganGestorResource.REPORT_DESCARREGAR_DIR3_JSON, new OrganGestorDir3SyncJsonReportGenerator(organGestorService, userSessionHelper, authenticationHelper));
 	}
 
 	/*
