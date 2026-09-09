@@ -113,8 +113,8 @@ const translationCa = {
                 groupColumn: 'Òrgan gestor',
                 popupDialogTitle: 'òrgan gestor',
                 sync: {
-                    title: 'Sincronització DIR3',
-                    dialogTitle: 'Sincronització DIR3',
+                    title: 'Actualitzar òrgans i procediments',
+                    dialogTitle: 'Actualitzar òrgans i procediments',
                     dialogButton: {
                         cancel: 'Cancel·lar',
                         sincronitzar: 'Sincronitzar',

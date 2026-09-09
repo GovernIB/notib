@@ -41,7 +41,8 @@ const NodeChip: React.FC<{ node: Dir3SyncNode | null; color: Dir3SyncNodeColor }
             size="small"
             title={nodeLabel(node)}
             sx={{
-                maxWidth: 340,
+                width: 340,
+                justifyContent: 'flex-start',
                 '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis' },
             }}
         />
@@ -66,7 +67,7 @@ export const Dir3SyncBranch: React.FC<Dir3SyncBranchProps> = (props) => {
             </Box>
             <ArrowForwardIcon
                 fontSize="small"
-                sx={{ color: 'text.disabled', flexShrink: 0, transform: orientation === 'right' ? 'scaleX(-1)' : 'none' }}
+                sx={{ color: 'text.disabled', flexShrink: 0 }}
             />
             <Box
                 sx={{

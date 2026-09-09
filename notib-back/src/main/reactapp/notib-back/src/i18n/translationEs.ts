@@ -111,8 +111,8 @@ const translationEs = {
                 groupColumn: 'Órgano gestor',
                 popupDialogTitle: 'órgano gestor',
                 sync: {
-                    title: 'Sincronización DIR3',
-                    dialogTitle: 'Sincronización DIR3',
+                    title: 'Actualizar órganos y procedimientos',
+                    dialogTitle: 'Actualizar órganos y procedimientos',
                     dialogButton: {
                         cancel: 'Cancelar',
                         sincronitzar: 'Sincronizar',

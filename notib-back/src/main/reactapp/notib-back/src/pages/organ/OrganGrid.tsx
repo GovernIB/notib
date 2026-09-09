@@ -30,7 +30,8 @@ import {FormGroup} from "@mui/material";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import Dir3SyncBranch, { Dir3SyncNode } from './Dir3SyncBranch';
-import OrgansProcedimentsSyncActionButton from './OrgansProcedimentsSyncActionButton';
+// Amagat: substituït pel botó "Actualitzar òrgans i procediments" (OrganGridDir3SyncActionButton)
+// import OrgansProcedimentsSyncActionButton from './OrgansProcedimentsSyncActionButton';
 import {ROLE_ADMIN_LECTURA, useNotibContext} from '../../components/NotibContext';
 
 const columns: MuiDataGridColDef[] = [
@@ -275,33 +276,6 @@ const useDir3JsonDownload = () => {
     }, [artifactReport, saveAs, temporalMessageShow, t]);
 };
 
-const Dir3SyncResultActions: React.FC<{ result: any }> = () => {
-    const { t } = useTranslation();
-    const downloadJson = useDir3JsonDownload();
-    const printPdf = () => window.print();
-    return (
-        <Box
-            className="dir3-sync-no-print"
-            sx={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-                gap: 1,
-                mt: 3,
-                pt: 2,
-                borderTop: 1,
-                borderColor: 'divider',
-            }}
-        >
-            <Button variant="outlined" size="small" onClick={downloadJson} startIcon={<Icon>download</Icon>}>
-                {t('page.organs.grid.sync.dialogButton.descarregarJson')}
-            </Button>
-            <Button variant="outlined" size="small" onClick={printPdf} startIcon={<Icon>picture_as_pdf</Icon>}>
-                {t('page.organs.grid.sync.dialogButton.descarregarPdf')}
-            </Button>
-        </Box>
-    );
-};
-
 const OficinesSyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRef; }> = (props) => {
 
     const { dataGridApiRef } = props;
@@ -346,8 +320,10 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
     const { temporalMessageShow } = useBaseAppContext();
     const [simular, setSimular] = React.useState<boolean>(true);
     const [senseCanvis, setSenseCanvis] = React.useState<boolean>();
+    const [showResultActions, setShowResultActions] = React.useState<boolean>(false);
     const [percent, setPercent] = React.useState<number>();
     const [message, setMessage] = React.useState<string>();
+    const downloadJson = useDir3JsonDownload();
 
     useSse('PROGRESS', 'DIR3_SYNC', (event: any) => {
         setPercent(event.percent);
@@ -358,12 +334,8 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
 
         setSenseCanvis(!hasCanvis(result));
         setSimular(false);
-        return (
-            <>
-                <OrganGridDir3SyncActionResults result={result} />
-                {hasCanvis(result) && <Dir3SyncResultActions result={result} />}
-            </>
-        );
+        setShowResultActions(true);
+        return <OrganGridDir3SyncActionResults result={result} />;
     };
 
     const handleSuccess = (result?: any) => {
@@ -389,6 +361,17 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
         },
     ];
 
+    const extraActions = showResultActions && senseCanvis === false ? (
+        <>
+            <Button variant="outlined" size="small" onClick={downloadJson} startIcon={<Icon>download</Icon>}>
+                {t('page.organs.grid.sync.dialogButton.descarregarJson')}
+            </Button>
+            <Button variant="outlined" size="small" onClick={() => window.print()} startIcon={<Icon>picture_as_pdf</Icon>}>
+                {t('page.organs.grid.sync.dialogButton.descarregarPdf')}
+            </Button>
+        </>
+    ) : undefined;
+
     return (
         <MuiActionReportButton
             resourceName="organGestorResource"
@@ -400,11 +383,13 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
             formDialogButtons={formDialogButtons}
             formDialogLoading={<OrganGridDir3SyncLoading percent={percent} message={message} />}
             formDialogResultProcessor={resultProcessor}
+            formDialogExtraActions={extraActions}
             buttonComponentProps={{ variant: 'contained', sx: { mr: 1 } }}
             onSuccess={handleSuccess}
             onClose={() => {
                 setSimular(true);
                 setSenseCanvis(undefined);
+                setShowResultActions(false);
             }}
             dialogAutoSubmit
         />
@@ -488,10 +473,11 @@ export const OrganGrid = () => {
                         position: 2,
                         element: <OrganGridDir3SyncActionButton dataGridApiRef={dataGridApiRef} />,
                     },
-                    {
-                        position: 2,
-                        element: <OrgansProcedimentsSyncActionButton dataGridApiRef={dataGridApiRef} />,
-                    },
+                    // Amagat: substituït pel botó "Actualitzar òrgans i procediments" (OrganGridDir3SyncActionButton)
+                    // {
+                    //     position: 2,
+                    //     element: <OrgansProcedimentsSyncActionButton dataGridApiRef={dataGridApiRef} />,
+                    // },
                 ]}
                 apiRef={dataGridApiRef}
                 density="compact"

@@ -71,6 +71,8 @@ export type ActionReportButtonProps = {
     formDialogButtons?: DialogButton[];
     /** Propietats pel component de diàleg */
     formDialogComponentProps?: any;
+    /** Contingut addicional (p. ex. botons) que es mostra a la fila de botons del diàleg, abans dels botons de formDialogButtons */
+    formDialogExtraActions?: React.ReactNode;
     /** Funció que processa els resultats d'executar l'artefacte i retorna un element per a mostrar al diàleg com a resultat (només per a artefactes de tipus acció) */
     formDialogResultProcessor?: (result?: any) => React.ReactElement | undefined;
     /** Event que es llença quan l'execució de l'artefacte finalitza sense errors */
@@ -188,7 +190,8 @@ export const useActionReportLogic = (
     onClose?: () => void,
     dialogCloseIcon?: boolean,
     dialogCloseCallback?: (reason?: string) => boolean,
-    dialogAutoSubmit?: boolean
+    dialogAutoSubmit?: boolean,
+    formDialogExtraActions?: React.ReactNode
 ): ActionReportLogicResult => {
     const { t, messageDialogShow, temporalMessageShow, saveAs } = useBaseAppContext();
     const actionDialogButtons = useActionDialogButtons();
@@ -271,7 +274,8 @@ export const useActionReportLogic = (
         formI18nKeys,
         dialogCloseCallback,
         dialogCloseIcon ?? false,
-        dialogAutoSubmit
+        dialogAutoSubmit,
+        formDialogExtraActions
     );
     const exec = (
         id: any,
@@ -397,6 +401,7 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
         formDialogButtons,
         formDialogComponentProps,
         formDialogResultProcessor,
+        formDialogExtraActions,
         onSuccess,
         onError,
         onClose,
@@ -430,7 +435,8 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
         onClose,
         formDialogCloseIcon,
         undefined,
-        dialogAutoSubmit
+        dialogAutoSubmit,
+        formDialogExtraActions
     );
     const buttonTitle = title ?? apiLink?.title ?? action ?? report;
     const ButtonComponent =
