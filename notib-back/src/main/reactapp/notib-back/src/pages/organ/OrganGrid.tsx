@@ -175,11 +175,16 @@ const Dir3SyncSection: React.FC<{ title: string; children: React.ReactNode }> = 
     </Box>
 );
 
+const dir3SyncChangeKeys = ['creacions', 'modificacions', 'substitucions', 'extincions', 'fusions', 'divisions'] as const;
+
+const hasCanvis = (result: any) =>
+    dir3SyncChangeKeys.some((k) => result?.[k]?.length > 0);
+
 const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
 
     const { result } = props;
     const { t } = useTranslation();
-    if (result.senseCanvis) {
+    if (!hasCanvis(result)) {
         return <Typography>{t('page.organs.grid.sync.dialogButton.senseCanvis')}</Typography>;
     }
     return (
@@ -276,15 +281,19 @@ const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
 };
 
 const useDir3JsonDownload = () => {
-    const { saveAs } = useBaseAppContext();
+    const { t } = useTranslation();
+    const { saveAs, temporalMessageShow } = useBaseAppContext();
     const { artifactReport } = useResourceApiService('organGestorResource');
     return React.useCallback(() => {
         artifactReport(undefined, { code: 'REPORT_DESCARREGAR_DIR3_JSON', data: {}, fileType: 'CUSTOM' })
             .then((result: any) => {
                 const blob = result?.blob instanceof Blob ? result.blob : new Blob([JSON.stringify(result.blob, null, 2)], { type: 'application/json; charset=utf-8' });
                 saveAs?.(blob, result.fileName ?? 'organsDir3JSON.json');
+            })
+            .catch(() => {
+                temporalMessageShow(null, t('page.organs.grid.sync.dialogButton.descarregarJsonError'), 'error');
             });
-    }, [artifactReport, saveAs]);
+    }, [artifactReport, saveAs, temporalMessageShow, t]);
 };
 
 const Dir3SyncResultActions: React.FC<{ result: any }> = () => {
@@ -357,19 +366,19 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
 
     const resultProcessor = (result: any) => {
 
-        setSenseCanvis(result.senseCanvis);
+        setSenseCanvis(!hasCanvis(result));
         setSimular(false);
         return (
             <>
                 <OrganGridDir3SyncActionResults result={result} />
-                {!result.senseCanvis && <Dir3SyncResultActions result={result} />}
+                {hasCanvis(result) && <Dir3SyncResultActions result={result} />}
             </>
         );
     };
 
     const handleSuccess = (result?: any) => {
 
-        if (!result.simulat) {
+        if (result.simulat) {
             return;
         }
         dataGridApiRef.current?.refresh();

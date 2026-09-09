@@ -118,6 +118,7 @@ const translationCa = {
                         cancel: 'Cancel·lar',
                         sincronitzar: 'Sincronitzar',
                         descarregarJson: 'Descarregar òrgans JSON',
+                        descarregarJsonError: "S'ha produït un error descarregant el JSON, consulti els logs",
                         descarregarPdf: 'Descarrega PDF',
                         creacions: "Nous",
                         modificacions: "Canvis en atributs",

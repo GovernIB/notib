@@ -140,8 +140,7 @@
 }
 .dir3-label {
   display: inline-block;
-  min-width: 150px;
-  max-width: 330px;
+  width: 330px;
   padding: 5px 10px;
   line-height: 20px;
   text-align: center;
@@ -155,8 +154,8 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.dir3-horizontal-left .dir3-label.dir3-root { left: 0; }
-.dir3-horizontal-right .dir3-label.dir3-root { right: 0; }
+.dir3-horizontal-left .dir3-label { left: 0; }
+.dir3-horizontal-right .dir3-label { right: 0; }
 .dir3-bg-green { background: #dff0d8; border-color: #d6e9c6 !important; }
 .dir3-bg-red { background: #f2dede; border-color: #ebccd1 !important; }
 .dir3-bg-yellow { background: #fcf8e3; border-color: #faebcc !important; }
@@ -179,13 +178,14 @@
 }
 
 @media print {
-    body * {
+    body:has(#dir3-sync-preview) * {
         visibility: hidden;
     }
-    #dir3-sync-preview, #dir3-sync-preview * {
+    body:has(#dir3-sync-preview) #dir3-sync-preview,
+    body:has(#dir3-sync-preview) #dir3-sync-preview * {
         visibility: visible;
     }
-    #dir3-sync-preview {
+    body:has(#dir3-sync-preview) #dir3-sync-preview {
         position: absolute;
         left: 0;
         top: 0;

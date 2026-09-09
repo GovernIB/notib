@@ -116,6 +116,7 @@ const translationEs = {
                         cancel: 'Cancelar',
                         sincronitzar: 'Sincronizar',
                         descarregarJson: 'Descargar órganos JSON',
+                        descarregarJsonError: 'Se ha producido un error descargando el JSON, consulte los logs',
                         descarregarPdf: 'Descargar PDF',
                         creacions: "Nuevos",
                         modificacions: "Cambios en atributos",
