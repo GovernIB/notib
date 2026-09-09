@@ -144,6 +144,72 @@ class OrganGestorSyncHelperTest {
 	}
 
 	@Test
+	void sincronitzarShouldPublishDoneAtTheEndInStandaloneMode() {
+		// given: la crida de 2 arguments és la que fa servir el botó autònom "Sincronització Dir3",
+		// que sí ha de tancar el flux SSE en acabar.
+		var progressEventService = Mockito.mock(SseEventService.class);
+		var helper = helperAmbSincronitzacioBuida(progressEventService);
+		var entitat = new EntitatResourceEntity();
+		entitat.setCodi("ENT1");
+		entitat.setDir3Codi("D3-ENT1");
+		var eventCaptor = org.mockito.ArgumentCaptor.forClass(es.caib.notib.logic.intf.model.SseEvent.class);
+
+		// when
+		helper.sincronitzar(entitat, true);
+
+		// then
+		Mockito.verify(progressEventService, Mockito.atLeastOnce())
+			.publishEvent(Mockito.eq(SseEventService.SseQueue.PROGRESS), eventCaptor.capture());
+		var events = eventCaptor.getAllValues();
+		var darrer = events.get(events.size() - 1);
+		assertEquals(es.caib.notib.logic.intf.model.SseEvent.SseEventStatus.DONE, darrer.getStatus());
+		assertEquals(100, darrer.getPercent());
+	}
+
+	@Test
+	void sincronitzarShouldPublishRunningInsteadOfDoneWhenNotTerminal() {
+		// given: en mode NO terminal (una fase d'un procés combinat més llarg) l'event final no pot
+		// ser DONE, perquè SseController tanca l'emitter en rebre un DONE/ERROR i descartaria tots
+		// els events de les fases següents.
+		var progressEventService = Mockito.mock(SseEventService.class);
+		var helper = helperAmbSincronitzacioBuida(progressEventService);
+		var entitat = new EntitatResourceEntity();
+		entitat.setCodi("ENT1");
+		entitat.setDir3Codi("D3-ENT1");
+		var eventCaptor = org.mockito.ArgumentCaptor.forClass(es.caib.notib.logic.intf.model.SseEvent.class);
+
+		// when
+		helper.sincronitzar(entitat, true, es.caib.notib.logic.intf.model.SseEvent.SseEventName.ORGANS_PROCEDIMENTS_SYNC, false);
+
+		// then
+		Mockito.verify(progressEventService, Mockito.atLeastOnce())
+			.publishEvent(Mockito.eq(SseEventService.SseQueue.PROGRESS), eventCaptor.capture());
+		var events = eventCaptor.getAllValues();
+		var darrer = events.get(events.size() - 1);
+		assertEquals(es.caib.notib.logic.intf.model.SseEvent.SseEventStatus.RUNNING, darrer.getStatus());
+		assertEquals(100, darrer.getPercent());
+		// i cap event de tot el flux d'aquesta fase pot ser terminal.
+		assertTrue(events.stream().noneMatch(e ->
+			es.caib.notib.logic.intf.model.SseEvent.SseEventStatus.DONE.equals(e.getStatus())
+				|| es.caib.notib.logic.intf.model.SseEvent.SseEventStatus.ERROR.equals(e.getStatus())));
+	}
+
+	/**
+	 * Helper amb un DIR3 que no retorna cap canvi, per a les proves centrades només en els events
+	 * de progrés publicats.
+	 */
+	private OrganGestorSyncHelper helperAmbSincronitzacioBuida(SseEventService progressEventService) {
+		var pluginHelper = Mockito.mock(PluginHelper.class);
+		Mockito.when(pluginHelper.unitatsOrganitzativesFindByPare(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+			.thenReturn(List.of());
+		var llibreOficinaHelper = Mockito.mock(OrganGestorLlibreOficinaUpdateHelper.class);
+		var repository = Mockito.mock(OrganGestorResourceRepository.class);
+		Mockito.when(repository.findByEntitat(Mockito.any())).thenReturn(List.of());
+		var organGestorRepository = Mockito.mock(OrganGestorRepository.class);
+		return new OrganGestorSyncHelper(pluginHelper, llibreOficinaHelper, repository, progressEventService, organGestorRepository);
+	}
+
+	@Test
 	void sincronitzarShouldPersistNousAnticsOnSubstitucio() {
 		// given: DIR3 reports A01 (currently vigent in DB) evolving into A02 (still vigent),
 		// with A01's own latest record marked extinct.

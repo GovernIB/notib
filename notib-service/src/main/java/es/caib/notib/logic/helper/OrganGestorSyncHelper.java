@@ -69,6 +69,27 @@ public class OrganGestorSyncHelper {
 		EntitatResourceEntity entitat,
 		boolean simular,
 		SseEvent.SseEventName eventName) {
+		return sincronitzar(entitat, simular, eventName, true);
+	}
+
+	/**
+	 * Sincronitza els òrgans gestors d'una entitat amb la informació actualitzada de DIR3.
+	 *
+	 * @param entitat l'entitat de la qual es volen actualitzar els òrgans.
+	 * @param simular indica si s'han de guardar o no els canvis a la base de dades.
+	 * @param eventName el nom de l'event SSE sota el qual s'han de publicar els events de progrés.
+	 * @param terminal indica si aquesta sincronització és l'operació completa (i per tant el seu
+	 *                 event final s'ha de publicar amb estat {@code DONE}, que tanca el flux SSE)
+	 *                 o només una fase d'un procés més llarg (i per tant el seu event final s'ha
+	 *                 de publicar amb estat {@code RUNNING} al 100%, deixant el flux SSE obert
+	 *                 per a les fases següents).
+	 * @return la llista de canvis a realitzar als òrgans de la base de dades.
+	 */
+	public OrganGestorDir3Sync sincronitzar(
+		EntitatResourceEntity entitat,
+		boolean simular,
+		SseEvent.SseEventName eventName,
+		boolean terminal) {
 		publishProgressEvent(
 			eventName,
 			SseEvent.SseEventStatus.RUNNING,
@@ -186,13 +207,13 @@ public class OrganGestorSyncHelper {
 			entitat.setDataActualitzacio(now);
 			publishProgressEvent(
 				eventName,
-				SseEvent.SseEventStatus.DONE,
+				estatFinalitzacio(terminal),
 				100,
 				null);
 		} else {
 			publishProgressEvent(
 				eventName,
-				SseEvent.SseEventStatus.DONE,
+				estatFinalitzacio(terminal),
 				100,
 				null);
 		}
@@ -457,6 +478,15 @@ public class OrganGestorSyncHelper {
 		return false;
 	}
 
+	/**
+	 * Estat amb què s'ha de publicar l'event de finalització d'aquesta sincronització: {@code DONE}
+	 * si és una execució completa (el transport SSE tanca l'emitter en rebre'l), o {@code RUNNING}
+	 * si només és una fase d'un procés més llarg que ha de continuar publicant events.
+	 */
+	private SseEvent.SseEventStatus estatFinalitzacio(boolean terminal) {
+		return terminal ? SseEvent.SseEventStatus.DONE : SseEvent.SseEventStatus.RUNNING;
+	}
+
 	private void publishProgressEvent(
 		SseEvent.SseEventName eventName,
 		SseEvent.SseEventStatus status,
@@ -486,7 +516,7 @@ public class OrganGestorSyncHelper {
 		}
 		Map<String, OrganGestorEntity> entitatsPerCodi = new HashMap<>();
 		organGestorRepository.findByCodiIn(totsElsCodis).forEach(e -> {
-			if (e.getEntitat() != null && entitat.getCodi().equals(e.getEntitat().getCodi())) {
+			if (pertanyAEntitat(e, entitat)) {
 				entitatsPerCodi.put(e.getCodi(), e);
 			} else {
 				log.warn(
@@ -505,6 +535,24 @@ public class OrganGestorSyncHelper {
 		if (!aGuardar.isEmpty()) {
 			organGestorRepository.saveAll(aGuardar);
 		}
+	}
+
+	/**
+	 * Indica si un òrgan gestor pertany a l'entitat que s'està sincronitzant. El camp {@code codi}
+	 * no és únic entre entitats a {@code not_organ_gestor}, així que qualsevol resultat de
+	 * {@code OrganGestorRepository.findByCodiIn} s'ha de filtrar amb aquest predicat abans
+	 * d'utilitzar-lo. Compartit amb {@code OrganGestorFullSyncHelper.migrarPermisos}.
+	 *
+	 * @param organGestor l'òrgan gestor (model antic) retornat per la consulta per codi.
+	 * @param entitat l'entitat que s'està sincronitzant.
+	 * @return cert si l'òrgan pertany a l'entitat indicada.
+	 */
+	static boolean pertanyAEntitat(OrganGestorEntity organGestor, EntitatResourceEntity entitat) {
+		return organGestor != null
+			&& organGestor.getEntitat() != null
+			&& entitat != null
+			&& entitat.getCodi() != null
+			&& entitat.getCodi().equals(organGestor.getEntitat().getCodi());
 	}
 
 	private void afegeixTransicio(Map<String, OrganGestorEntity> entitatsPerCodi, String codiOrigen, String codiDesti, List<OrganGestorEntity> aGuardar) {
