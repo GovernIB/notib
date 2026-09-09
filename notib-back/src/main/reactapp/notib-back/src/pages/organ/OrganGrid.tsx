@@ -1,5 +1,4 @@
 import React from 'react';
-import {EventSource} from 'eventsource';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -16,7 +15,6 @@ import {
     MuiDataGridApiRef,
     MuiDataGridColDef,
     springFilterBuilder as filterBuilder,
-    useAuthContext,
     useBaseAppContext,
     useFilterApiContext,
     useMuiDataGridApiRef,
@@ -25,11 +23,13 @@ import {
 import LinkToTab from '../../components/LinkToTab';
 import GridFormField from '../../components/GridFormField';
 import {useDatagridFilterProps, useDatagridPageSizeOptionsProps, useDatagridTreeData,} from '../../hooks/useDataGrid';
+import {useSse} from '../../hooks/useSse';
 import {OrganFormContent} from './OrganForm';
 import {FormGroup} from "@mui/material";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import Dir3SyncBranch, { Dir3SyncNode } from './Dir3SyncBranch';
+import OrgansProcedimentsSyncActionButton from './OrgansProcedimentsSyncActionButton';
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -90,40 +90,6 @@ const springFilterBuilder = (data: any) => {
               : null,
         filterBuilder.eq('permetreSir', `'${data?.permetreSir}'`)
     );
-};
-
-const useSse = (
-    queueId: string,
-    eventName: string,
-    onEvent: (event: any) => void,
-    closeOnError?: boolean
-) => {
-    const { getToken } = useAuthContext();
-    const { isReady: apiIsReady, currentLinks } = useResourceApiService('sse');
-    React.useEffect(() => {
-        if (!apiIsReady) {
-            return;
-        }
-        const subscribeHref = currentLinks['subscribe'].href;
-        const eventSourceHref = subscribeHref.replace('{queueId}', queueId);
-        const eventSource = new EventSource(eventSourceHref, {
-            fetch: (input, init) =>
-                fetch(input, {...init, headers: {...init.headers,
-                        Authorization: 'Bearer ' + getToken(),
-                    },
-                }),
-        });
-        eventSource.addEventListener(eventName, (event) => {
-            const data = JSON.parse(event.data);
-            onEvent?.(data);
-        });
-        eventSource.onerror = () => {
-            if (closeOnError) {
-                eventSource.close();
-            }
-        };
-        return () => eventSource.close();;
-    }, [apiIsReady]);
 };
 
 const useColumns = (treeDataActive: boolean) => {
@@ -491,6 +457,10 @@ export const OrganGrid = () => {
                     {
                         position: 2,
                         element: <OrganGridDir3SyncActionButton dataGridApiRef={dataGridApiRef} />,
+                    },
+                    {
+                        position: 2,
+                        element: <OrgansProcedimentsSyncActionButton dataGridApiRef={dataGridApiRef} />,
                     },
                 ]}
                 apiRef={dataGridApiRef}
