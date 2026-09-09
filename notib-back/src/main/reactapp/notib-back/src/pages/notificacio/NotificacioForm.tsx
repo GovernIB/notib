@@ -67,6 +67,9 @@ const useProcSerOptionsRequest = (type: string, organGestorId?: number | string)
                 // desplegable, es combina amb un "or" que sempre inclou els comuns.
                 filter: springFilterBuilder.and(
                     springFilterBuilder.eq('tipus', `'${type.toUpperCase()}'`),
+                    // Al desplegable de l'alta de notificacions/remeses no s'han de mostrar els procediments/
+                    // serveis inactius.
+                    springFilterBuilder.eq('actiu', true),
                     organGestorId != null
                         ? springFilterBuilder.or(
                               springFilterBuilder.eq('organGestor', organGestorId),
@@ -248,7 +251,7 @@ export const NotificacioFormContent: React.FC = () => {
                 <GridFormField size={12} name="concepte" />
             </Grid>
             <GridFormField size={12} name="descripcio" type="textarea" />
-            <GridFormField size={6} name="organGestor" namedQueries={`PERM_READ`} onChange={handleOrganGestorChange} />
+            <GridFormField size={6} name="organGestor" namedQueries={`PERM_READ_VIGENT`} onChange={handleOrganGestorChange} />
             <Grid size={6}>
                 <ProcedimentServeiField organGestorFromProcedimentRef={organGestorFromProcedimentRef} />
             </Grid>

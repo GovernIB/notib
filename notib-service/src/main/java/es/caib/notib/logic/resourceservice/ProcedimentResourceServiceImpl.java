@@ -165,6 +165,12 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 				return new PageImpl<>(new ArrayList<>(), pageable, 0);
 			}
 			procediments = procedimentResourceRepository.findAllById(codisValor.stream().map(CodiValorOrganGestorComuDto::getId).collect(Collectors.toList()));
+			// Al desplegable de l'alta de notificacions/remeses (que demana explícitament "actiu:true") no s'han de
+			// mostrar els procediments/serveis inactius; als filtres de cerca es mantenen visibles per poder
+			// consultar notificacions antigues.
+			if (!Strings.isNullOrEmpty(filter) && filter.contains("actiu:true")) {
+				procediments = procediments.stream().filter(ProcedimentResourceEntity::isActiu).collect(Collectors.toList());
+			}
 			if (!Strings.isNullOrEmpty(quickFilter)) {
 				procediments = procediments.stream().filter(p -> !Strings.isNullOrEmpty(p.getNom()) && p.getNom().toLowerCase().contains(quickFilter)).collect(Collectors.toList());
 			}

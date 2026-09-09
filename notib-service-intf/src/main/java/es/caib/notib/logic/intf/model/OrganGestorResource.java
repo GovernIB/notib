@@ -109,6 +109,9 @@ public class OrganGestorResource extends BaseResource<Long> {
 	public static final String OFICINES_SYNC_ACTION_CODE = "OFICINES_SYNC";
 	public static final String FILTER_CODE = "FILTER_ORGAN_GESTOR";
 	public static final String NAMED_QUERY_PERM_READ = "PERM_READ";
+	// Com NAMED_QUERY_PERM_READ, però només retorna els òrgans vigents; s'usa al desplegable de l'alta de
+	// notificacions/remeses, on no s'han de poder seleccionar òrgans no vigents.
+	public static final String NAMED_QUERY_PERM_READ_VIGENT = "PERM_READ_VIGENT";
 	public static final String NAMED_QUERY_PERM_NOT = "PERM_NOT";
 	public static final String NAMED_QUERY_PERM_COM = "PERM_COM";
 	public static final String NAMED_QUERY_PERM_SIR = "PERM_SIR";

@@ -11,6 +11,7 @@ import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.exception.PerspectiveApplicationException;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
+import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.model.OrganGestorDir3Sync;
 import es.caib.notib.logic.intf.model.OrganGestorResource;
 import es.caib.notib.logic.intf.resourceservice.OrganGestorResourceService;
@@ -108,8 +109,15 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 			return superFilter;
 		}
 		String filter = superFilter;
-		if (Arrays.asList(namedQueries).contains(OrganGestorResource.NAMED_QUERY_PERM_READ)) {
+		var namedQueriesList = Arrays.asList(namedQueries);
+		if (namedQueriesList.contains(OrganGestorResource.NAMED_QUERY_PERM_READ) || namedQueriesList.contains(OrganGestorResource.NAMED_QUERY_PERM_READ_VIGENT)) {
 			filter = addIdsWithPermissionFilterExpression(ExtendedPermission.READ, filter);
+			if (namedQueriesList.contains(OrganGestorResource.NAMED_QUERY_PERM_READ_VIGENT)) {
+				// Al desplegable de l'alta de notificacions/remeses no s'han de mostrar els òrgans no vigents;
+				// als filtres de cerca (NAMED_QUERY_PERM_READ) es mantenen visibles per poder consultar
+				// notificacions antigues.
+				filter = concatenaFiltresAnd(filter, "estat: '" + OrganGestorEstatEnum.V.name() + "'");
+			}
 		}
 		if (Arrays.asList(namedQueries).contains(OrganGestorResource.NAMED_QUERY_PERM_NOT)) {
 			filter = addIdsWithPermissionFilterExpression(ExtendedPermission.PERM4, filter);
