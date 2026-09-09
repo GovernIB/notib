@@ -135,6 +135,14 @@ const translationEs = {
                         actualitzar: "Actualizar"
                     }
                 },
+                syncCombined: {
+                    title: 'Actualizar órganos y procedimientos',
+                    dialogTitle: 'Actualizar órganos y procedimientos',
+                    nota: 'Se sincronizarán órganos, permisos, procedimientos, servicios y oficinas SIR.',
+                    cancelar: 'Cancelar',
+                    sincronitzar: 'Sincronizar',
+                    success: 'Actualización completada correctamente',
+                },
             },
             form: {
                 titleCreate: 'Crear órgano gestor',

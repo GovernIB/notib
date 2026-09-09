@@ -137,6 +137,14 @@ const translationCa = {
                         actualitzar: "Actualitzar"
                     }
                 },
+                syncCombined: {
+                    title: 'Actualitzar òrgans i procediments',
+                    dialogTitle: 'Actualitzar òrgans i procediments',
+                    nota: "Se sincronitzaran òrgans, permisos, procediments, serveis i oficines SIR.",
+                    cancelar: 'Cancel·lar',
+                    sincronitzar: 'Sincronitzar',
+                    success: 'Actualització completada correctament',
+                },
             },
             form: {
                 titleCreate: 'Crear òrgan gestor',
