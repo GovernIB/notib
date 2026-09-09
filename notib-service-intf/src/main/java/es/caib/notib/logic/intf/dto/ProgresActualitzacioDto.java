@@ -1,5 +1,6 @@
 package es.caib.notib.logic.intf.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,7 +35,13 @@ public class ProgresActualitzacioDto {
 	boolean error = false;
 	String errorMsg;
 
+	// @JsonIgnore és imprescindible: `transient` no evita que Jackson descobreixi la propietat a
+	// través del getter generat per Lombok, i aquesta mateixa instància es guarda als mapes
+	// estàtics de progrés que els endpoints REST legacy (ProcedimentController/ServeiController)
+	// serialitzen directament com a @ResponseBody — serialitzar un Consumer hi provocaria un error.
+	@JsonIgnore
 	transient Consumer<ActualitzacioInfo> onInfo;
+	@JsonIgnore
 	transient Consumer<Integer> onProgressChanged;
 
 	public void addInfo(TipusInfo tipus, String text) {

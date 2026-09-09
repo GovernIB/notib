@@ -1,11 +1,13 @@
 package es.caib.notib.logic.intf.dto;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ProgresActualitzacioDtoTest {
@@ -52,6 +54,24 @@ class ProgresActualitzacioDtoTest {
 		// when / then
 		progres.incrementOperacionsRealitzades(5);
 		assertTrue(progres.getProgres() == 50);
+	}
+
+	@Test
+	void shouldBeSerializableToJsonWithHooksSet() throws Exception {
+		// given: la mateixa instància que rep els hooks es guarda als mapes estàtics de progrés
+		// que els endpoints REST legacy (ProcedimentController/ServeiController) serialitzen
+		// directament com a @ResponseBody. `transient` no evita que Jackson descobreixi la
+		// propietat a través del getter generat per Lombok, així que sense @JsonIgnore la
+		// serialització d'un Consumer faria fallar aquells endpoints.
+		var progres = new ProgresActualitzacioDto();
+		progres.setOnInfo(entry -> { });
+		progres.setOnProgressChanged(percent -> { });
+		progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, "hola");
+		// when
+		var json = new ObjectMapper().writeValueAsString(progres);
+		// then
+		assertFalse(json.contains("onInfo"));
+		assertFalse(json.contains("onProgressChanged"));
 	}
 
 }
