@@ -281,6 +281,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private EntregaPostalEntity entregaPostal;
 
+	@Column(name = "entrega_postal")
+	private boolean entregaPostalActiva;
+
 	@Column(name = "per_email")
 	private boolean perEmail;
 
@@ -576,6 +579,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 				EntregaPostalEntity entregaPostal = new EntregaPostalEntity();
 				entregaPostal.update(enviament.getEntregaPostal());
 				built.entregaPostal = entregaPostal;
+				built.entregaPostalActiva = true;
 			}
 			if (isAmbEntregaDeh && enviament.isEntregaDehActiva() && enviament.getEntregaDeh() != null) {
 				built.dehNif = enviament.getTitular().getNif();

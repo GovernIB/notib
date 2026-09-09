@@ -1320,6 +1320,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 
 		var titular = saveTitular(enviament);
 		var destinataris = getDestinataris(enviament);
+		enviament.setEntregaPostalActiva(enviament.getEntregaPostal() != null);
 		var enviamentSaved = notificacioEnviamentRepository.saveAndFlush(
 				NotificacioEnviamentEntity.getBuilderV2(enviament,
 						entitat.isAmbEntregaDeh(),

@@ -27,7 +27,7 @@ export const NotificacioGridEnviaments: React.FC<{ id: any }> = (props) => {
         if (!apiIsReady) {
             return;
         }
-        const args = {filter: 'notificacio.id:' + id, unpaged: true, perspectives: ["ULTIM_EVENT"]};
+        const args = {filter: 'notificacio.id:' + id, unpaged: true, perspectives: ["ULTIM_EVENT", "ENTREGA_POSTAL"]};
         apiFind(args).then((response) => setEnviaments(response.rows));
     }, [apiIsReady]);
 

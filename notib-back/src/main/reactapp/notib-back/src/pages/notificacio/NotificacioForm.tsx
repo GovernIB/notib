@@ -15,6 +15,7 @@ import {
     useFormContext,
     useFormApiRef,
     useResourceApiContext,
+    useResourceApiService,
 } from 'reactlib';
 import NotificacioFormEnviaments from './NotificacioFormEnviaments';
 import NotificacioFormDocuments from './NotificacioFormDocuments';
@@ -122,24 +123,35 @@ const procSerOptionRenderer = ({ id, description }: { id: string | number; descr
 };
 
 const ProcedimentServeiField: React.FC = () => {
+
     const { t } = useTranslation();
     const { data, apiRef: formApiRef } = useFormContext();
     const [type, setType] = React.useState<string>('procediment');
+    const {isReady: apiIsReady, getOne: apiGetOne} = useResourceApiService('procedimentResource');
+
     const procSerOptionsRequest = useProcSerOptionsRequest(type);
 
     const handleChange = (value: any) => {
         setType(value);
-        console.log(data);
+        // console.log(data);
         if (data.procediment != null) {
             formApiRef.current?.setFieldValue('procediment', null);
         }
     };
 
-    const handleChangeProcediment = (value: any) => {
-        console.log(value);
-        if (data.procediment != null) {
+    React.useEffect(() => {
+
+        const procediment = data.procediment;
+        if (!apiIsReady || !procediment?.id) {
+            return;
         }
-    };
+        apiGetOne(procediment.id)
+            .then((resposta: any) => {
+                console.log(resposta);
+                formApiRef.current?.setFieldValue('entregaPostalActiva', true);
+            })
+            .catch((error: any) => console.error(error));
+        }, [apiIsReady, data.procediment, data.entregaPostalActiva, apiGetOne]);
 
     if (data.enviamentTipus === 'SIR') {
         return (
@@ -163,7 +175,7 @@ const ProcedimentServeiField: React.FC = () => {
                 <Grid size={9}>
                     <FormField
                         name="procediment"
-                        onChange={(value) => handleChangeProcediment(value)}
+                        // onChange={(value) => handleChangeProcediment(value)}
                         label={t(`page.notificacio.form.camps.${type}`)}
                         required={data.procedimentRequired}
                         optionsRequest={procSerOptionsRequest}
@@ -176,8 +188,8 @@ const ProcedimentServeiField: React.FC = () => {
         return (
             <FormField
                 name="procediment"
-                onChange={(value) => handleChangeProcediment(value)}
-                label={t(`page.notificacio.form.camps.procediment`)}
+                // onChange={(value) => handleChangeProcediment(value)}
+                filter={"tipus:'" + type.toUpperCase() + "'"}
                 required={data.procedimentRequired}
                 optionsRequest={procSerOptionsRequest}
                 optionRenderer={procSerOptionRenderer}

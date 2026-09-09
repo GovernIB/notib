@@ -37,12 +37,16 @@ public class PagadorCieResourceServiceImpl extends BaseAdminEntitatResourceServi
 
 	@Override
 	protected void beforeCreateSave(PagadorCieResourceEntity entity, PagadorCieResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+
 		super.beforeCreateSave(entity, resource, answers);
+		entity.setCieExtern(!resource.isCieExtern());
 		updateOrgansGestors(entity, resource);
 	}
 
 	@Override
 	protected void beforeUpdateSave(PagadorCieResourceEntity entity, PagadorCieResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+
+		entity.setCieExtern(!resource.isCieExtern());
 		updateOrgansGestors(entity, resource);
 	}
 

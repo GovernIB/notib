@@ -439,19 +439,19 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 				+ (enviament.getTitular().getLlinatge1() != null ? " " + enviament.getTitular().getLlinatge1() : "")
 				+ (enviament.getTitular().getLlinatge2() != null ? " " + enviament.getTitular().getLlinatge2() : ""));
 			datat.setOrigen("electronico");
-			datat.setResultado("notificada");
+			datat.setResultado("pendiente");
 			datats.getDatado().add(datat);
 			resultat.setDatados(datats);
-			var certificacio = new Certificacion();
-			certificacio.setFechaCertificacion(date);
+//			var certificacio = new Certificacion();
+//			certificacio.setFechaCertificacion(date);
 //			certificacio.setHash("b081c7abf42d5a8e5a4050958f28046bdf86158c");
-			certificacio.setOrigen("electronico");
+//			certificacio.setOrigen("electronico");
 //			certificacio.setCsv("dasd-dsadad-asdasd-asda-sda-das");
 //			certificacio.setMime("application/pdf");
-			var arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
+//			var arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 //			certificacio.setContenidoCertificacion(arxiuBytes);
 //			certificacio.setSize(String.valueOf(arxiuBytes.length));
-			resultat.setCertificacion(certificacio);
+//			resultat.setCertificacion(certificacio);
 //			resultat.setFechaCreacion(date);
 //			resultat.setFechaPuestaDisposicion(date);
 //			var cal = date.toGregorianCalendar();

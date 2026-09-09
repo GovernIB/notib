@@ -91,20 +91,15 @@ const NotificacioFormEnviamentPersona: React.FC<{ index?: number; indexKey?: num
     );
 };
 
-const NotificacioFormEnviament: React.FC<{
-    index: number;
-    indexKey: number;
-    handleRemove: (indexKey: number) => void;
-    canDelete?: boolean;
-}> = (props) => {
+const NotificacioFormEnviament: React.FC<{ index: number; indexKey: number; handleRemove: (indexKey: number) => void; canDelete?: boolean; }> = (props) => {
+
     const { index, indexKey, handleRemove, canDelete } = props;
     const { t } = useTranslation();
     const [titularInitialized, setTitularInitialized] = React.useState<boolean>(false);
     const [ambRepresentant, setAmbRepresentant] = React.useState<boolean>(false);
-    const [currentEnviamentFieldValidationErrors, setCurrentEnviamentFieldValidationErrors] =
-        React.useState<any[]>();
-    const [currentEnviamentGlobalValidationErrors, setCurrentEnviamentGlobalValidationErrors] =
-        React.useState<any[]>();
+    const [entregaPostalActiva, setEntregaPostalActiva] = React.useState<boolean>(false);
+    const [currentEnviamentFieldValidationErrors, setCurrentEnviamentFieldValidationErrors] = React.useState<any[]>();
+    const [currentEnviamentGlobalValidationErrors, setCurrentEnviamentGlobalValidationErrors] = React.useState<any[]>();
     const {
         data: parentFormData,
         fieldErrors: parentFieldErrors,
@@ -131,7 +126,8 @@ const NotificacioFormEnviament: React.FC<{
             e.id === indexKey ? { id: indexKey, ...data } : e
         );
         parentFormApiRef.current?.setFieldValue('enviamentsInfo', enviamentsWithData);
-
+        console.log(data);
+        setEntregaPostalActiva(Boolean(data.entregaPostalActiva));
         if (!initial) {
             if (titularInitialized) {
                 parentFormApiRef.current?.setModified(true);
@@ -210,6 +206,13 @@ const NotificacioFormEnviament: React.FC<{
                                     </Button>
                                 </Grid>
                             )}
+                            <GridFormField size={12} name="ambEntregaDeh" />
+                            <GridFormField size={3} name="entregaPostalActiva" />
+                            {entregaPostalActiva && (
+                                <Typography variant="h6" sx={{ mt: 3, mb: 2, borderBottom: 1, borderColor: 'divider' }}>
+                                    {t('page.notificacio.form.tabs.enviaments')}
+                                </Typography>
+                            )}
                         </Grid>
                     </MuiForm>
                 </Grid>
@@ -219,6 +222,7 @@ const NotificacioFormEnviament: React.FC<{
 };
 
 export const NotificacioFormEnviaments: React.FC = () => {
+
     const { t } = useTranslation();
     const { data, apiRef: formApiRef } = useFormContext();
     const enviamentsInfo = data?.enviamentsInfo;
