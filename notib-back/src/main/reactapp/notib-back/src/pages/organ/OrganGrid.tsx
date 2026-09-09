@@ -362,7 +362,7 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
         return (
             <>
                 <OrganGridDir3SyncActionResults result={result} />
-                <Dir3SyncResultActions result={result} />
+                {!result.senseCanvis && <Dir3SyncResultActions result={result} />}
             </>
         );
     };
