@@ -177,3 +177,21 @@
   padding-bottom: 4px;
   margin-bottom: 12px;
 }
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #dir3-sync-preview, #dir3-sync-preview * {
+        visibility: visible;
+    }
+    #dir3-sync-preview {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+    .dir3-sync-no-print {
+        display: none !important;
+    }
+}

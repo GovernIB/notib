@@ -2,6 +2,7 @@ import React from 'react';
 import {EventSource} from 'eventsource';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import Icon from '@mui/material/Icon';
@@ -182,7 +183,7 @@ const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
         return <Typography>{t('page.organs.grid.sync.dialogButton.senseCanvis')}</Typography>;
     }
     return (
-        <Grid container>
+        <Grid container id="dir3-sync-preview">
             <Grid size={12}>
                 {result.divisions?.length > 0 && (
                     <Dir3SyncSection title={t('page.organs.grid.sync.dialogButton.divisions')}>
@@ -274,6 +275,34 @@ const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
     );
 };
 
+const useDir3JsonDownload = () => {
+    const { saveAs } = useBaseAppContext();
+    const { artifactReport } = useResourceApiService('organGestorResource');
+    return React.useCallback(() => {
+        artifactReport(undefined, { code: 'REPORT_DESCARREGAR_DIR3_JSON', data: {}, fileType: 'CUSTOM' })
+            .then((result: any) => {
+                const blob = result?.blob instanceof Blob ? result.blob : new Blob([JSON.stringify(result.blob, null, 2)], { type: 'application/json; charset=utf-8' });
+                saveAs?.(blob, result.fileName ?? 'organsDir3JSON.json');
+            });
+    }, [artifactReport, saveAs]);
+};
+
+const Dir3SyncResultActions: React.FC<{ result: any }> = () => {
+    const { t } = useTranslation();
+    const downloadJson = useDir3JsonDownload();
+    const printPdf = () => window.print();
+    return (
+        <Box sx={{ display: 'flex', gap: 1, mt: 2 }} className="dir3-sync-no-print">
+            <Button variant="outlined" onClick={downloadJson} startIcon={<Icon>download</Icon>}>
+                {t('page.organs.grid.sync.dialogButton.descarregarJson')}
+            </Button>
+            <Button variant="outlined" onClick={printPdf} startIcon={<Icon>picture_as_pdf</Icon>}>
+                {t('page.organs.grid.sync.dialogButton.descarregarPdf')}
+            </Button>
+        </Box>
+    );
+};
+
 const OficinesSyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRef; }> = (props) => {
 
     const { dataGridApiRef } = props;
@@ -329,11 +358,13 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
     const resultProcessor = (result: any) => {
 
         setSenseCanvis(result.senseCanvis);
-        if (!result.simulat) {
-            setSimular(true);
-        }
         setSimular(false);
-        return <OrganGridDir3SyncActionResults result={result} />;
+        return (
+            <>
+                <OrganGridDir3SyncActionResults result={result} />
+                <Dir3SyncResultActions result={result} />
+            </>
+        );
     };
 
     const handleSuccess = (result?: any) => {
@@ -353,8 +384,8 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
         },
         {
             value: true,
-            text: simular ? t('page.organs.grid.sync.dialogButton.query') : t('page.organs.grid.sync.dialogButton.apply'),
-            icon: simular ? 'search' : 'check',
+            text: t('page.organs.grid.sync.dialogButton.sincronitzar'),
+            icon: 'save',
             componentProps: { variant: 'contained', disabled: senseCanvis === true },
         },
     ];
