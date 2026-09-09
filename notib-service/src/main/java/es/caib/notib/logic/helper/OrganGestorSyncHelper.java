@@ -185,7 +185,7 @@ public class OrganGestorSyncHelper {
 		OrganGestorDir3Sync resposta = new OrganGestorDir3Sync(
 			null,
 			getCreacions(dir3SyncNodes, organsGestors, substitucionsMap, fusionsMap, divisionsMap),
-			getModificacions(dir3SyncNodes, organsGestors),
+			getModificacions(dir3SyncNodes, organsGestors, extincionsDarreraVersio, substitucionsMap, fusionsMap, divisionsMap),
 			substitucions,
 			extincions.toArray(OrganGestorDir3Sync.OrganGestorDir3SyncCanviExtincio[]::new),
 			fusions,
@@ -326,29 +326,45 @@ public class OrganGestorSyncHelper {
 		return creacions.toArray(OrganGestorDir3Sync.OrganGestorDir3SyncCanviCreacio[]::new);
 	}
 
+	@SafeVarargs
 	private OrganGestorDir3Sync.OrganGestorDir3SyncCanviModificacio[] getModificacions(
 		List<NodeDir3> dir3SyncNodes,
-		List<OrganGestorResourceEntity> organsGestors) {
-		// Retorna una llista dels nodes DIR3 provinents de la sincronització que compleixen els següents punts:
-		// - El node DIR3 no te cap historicoUO.
-		// - Existeix un òrgan gestor en estat vigent (V) a la base de dades amb el mateix codi.
+		List<OrganGestorResourceEntity> organsGestors,
+		NodeDir3[] extincionsDarreraVersio,
+		MultiValuedMap<NodeDir3, NodeDir3>... multiValuedMaps) {
+		// Retorna una llista dels nodes DIR3 (darrera versió de cada codi) que compleixen els següents punts:
+		// - No formen part de cap extinció, fusió, substitució o divisió d'aquesta sincronització (ja es
+		//   mostren a les seves seccions corresponents).
+		// - Existeix un òrgan gestor a la base de dades amb el mateix codi.
+		// - Alguna de les seves propietats (nom, nomEs, òrgan pare, estat) ha canviat respecte la BD.
+		// NOTA: abans es descartava qualsevol node amb historicosUO no buit, mentre que aquest camp de DIR3
+		// no indica només transicions d'aquesta sincronització, sinó també l'historial complet de codis
+		// predecessors d'una unitat (que es manté indefinidament). Això descartava, per error, la immensa
+		// majoria d'unitats amb canvis reals d'atributs (qualsevol unitat que alguna vegada hagués
+		// participat en una fusió/substitució/divisió, encara que fes anys). Ara només s'exclouen els codis
+		// que formen part de les transicions detectades en AQUESTA sincronització.
 		List<OrganGestorDir3Sync.OrganGestorDir3SyncCanviModificacio> modificacions = new ArrayList<>();
-		for (NodeDir3 dir3SyncNode : dir3SyncNodes) {
-			if (dir3SyncNode.getHistoricosUO() == null || dir3SyncNode.getHistoricosUO().isEmpty()) {
-				Optional<OrganGestorResourceEntity> organGestor = organsGestors.stream().
-					filter(o -> o.getCodi().equals(dir3SyncNode.getCodi())).
-					findFirst();
-				if (organGestor.isPresent()) {
-					boolean nomChanged = !getOrganGestorNomFromDir3Node(dir3SyncNode).equals(organGestor.get().getNom());
-					boolean nomEsChanged = !dir3SyncNode.getDenominacio().equals(organGestor.get().getNomEs());
-					boolean codiPareChanged = !dir3SyncNode.getSuperior().equals(organGestor.get().getCodiPare());
-					boolean estatChanged = !dir3SyncNode.getEstat().equals(organGestor.get().getEstat().name());
-					if (nomChanged || nomEsChanged || codiPareChanged || estatChanged) {
-						modificacions.add(
-							new OrganGestorDir3Sync.OrganGestorDir3SyncCanviModificacio(
-								toArbreItem(organGestor.get()),
-								toArbreItem(dir3SyncNode)));
-					}
+		Map<String, List<NodeDir3>> dir3SyncNodesMapSorted = getDir3SyncNodesMapSortedByVersionAsc(dir3SyncNodes);
+		for (Map.Entry<String, List<NodeDir3>> entry : dir3SyncNodesMapSorted.entrySet()) {
+			NodeDir3 lastNode = entry.getValue().get(entry.getValue().size() - 1);
+			boolean isExtincio = Arrays.stream(extincionsDarreraVersio).
+				anyMatch(e -> e.getCodi().equals(entry.getKey()));
+			if (isExtincio || isCodiInAnyMap(entry.getKey(), multiValuedMaps)) {
+				continue;
+			}
+			Optional<OrganGestorResourceEntity> organGestor = organsGestors.stream().
+				filter(o -> o.getCodi().equals(entry.getKey())).
+				findFirst();
+			if (organGestor.isPresent()) {
+				boolean nomChanged = !getOrganGestorNomFromDir3Node(lastNode).equals(organGestor.get().getNom());
+				boolean nomEsChanged = !lastNode.getDenominacio().equals(organGestor.get().getNomEs());
+				boolean codiPareChanged = !Objects.equals(lastNode.getSuperior(), organGestor.get().getCodiPare());
+				boolean estatChanged = !lastNode.getEstat().equals(organGestor.get().getEstat().name());
+				if (nomChanged || nomEsChanged || codiPareChanged || estatChanged) {
+					modificacions.add(
+						new OrganGestorDir3Sync.OrganGestorDir3SyncCanviModificacio(
+							toArbreItem(organGestor.get()),
+							toArbreItem(lastNode)));
 				}
 			}
 		}

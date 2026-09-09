@@ -14,7 +14,6 @@ export type Dir3SyncBranchProps = {
     leaves: { node: Dir3SyncNode | null; color: Dir3SyncNodeColor }[];
 };
 
-const COLUMN_WIDTH = 340;
 const ARROW_COLUMN_WIDTH = 32;
 
 const muiColor = (color: Dir3SyncNodeColor): 'success' | 'warning' | 'error' =>
@@ -92,14 +91,14 @@ export const Dir3SyncBranch: React.FC<Dir3SyncBranchProps> = (props) => {
         </Box>
     );
 
-    // Graella amb columnes d'amplada fixa (no basades en contingut): garanteix que totes
-    // les branques de totes les seccions quedin alineades verticalment, independentment
-    // de la longitud del text o del nombre d'elements de cada fila.
+    // Graella amb columnes que no depenen del contingut (minmax(0, 1fr) en lloc d'amplades
+    // basades en el text): garanteix que totes les branques de totes les seccions quedin
+    // alineades verticalment, i que els xips s'ajustin a l'amplada disponible de la modal.
     return (
         <Box
             sx={{
                 display: 'grid',
-                gridTemplateColumns: `${COLUMN_WIDTH}px ${ARROW_COLUMN_WIDTH}px ${COLUMN_WIDTH}px`,
+                gridTemplateColumns: `minmax(0, 1fr) ${ARROW_COLUMN_WIDTH}px minmax(0, 1fr)`,
                 alignItems: 'center',
                 columnGap: 1.5,
                 py: 0.75,
