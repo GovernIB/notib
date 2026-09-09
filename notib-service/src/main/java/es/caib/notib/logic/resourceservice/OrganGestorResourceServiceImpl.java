@@ -3,6 +3,7 @@ package es.caib.notib.logic.resourceservice;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.helper.AclHelper;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
+import es.caib.notib.logic.helper.OrganGestorFullSyncHelper;
 import es.caib.notib.logic.helper.OrganGestorSyncHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
@@ -18,6 +19,7 @@ import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.organs.AdminOrgansAmbPermisActionExecutor;
 import es.caib.notib.logic.organs.OficinesSyncActionExecutor;
 import es.caib.notib.logic.organs.OrganGestorDir3SyncJsonReportGenerator;
+import es.caib.notib.logic.organs.OrgansProcedimentsSyncActionExecutor;
 import es.caib.notib.persist.resourceentity.EntregaCieResourceEntity;
 import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
 import es.caib.notib.persist.resourcerepository.EntitatResourceRepository;
@@ -50,6 +52,7 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 
 	private final AclHelper aclHelper;
 	private final OrganGestorSyncHelper organGestorSyncHelper;
+	private final OrganGestorFullSyncHelper organGestorFullSyncHelper;
 	private final EntitatResourceRepository entitatResourceRepository;
 	private final OrganGestorResourceRepository organGestorResourceRepository;
 	private final PagadorPostalResourceRepository pagadorPostalResourceRepository;
@@ -63,6 +66,7 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 		NotibPermissionHelper notibPermissionHelper,
 		AclHelper aclHelper,
 		OrganGestorSyncHelper organGestorSyncHelper,
+		OrganGestorFullSyncHelper organGestorFullSyncHelper,
 		EntitatResourceRepository entitatResourceRepository,
 		OrganGestorResourceRepository organGestorResourceRepository,
 		PagadorPostalResourceRepository pagadorPostalResourceRepository,
@@ -73,6 +77,7 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 		super(userSessionHelper, authenticationHelper, notibPermissionHelper);
 		this.aclHelper = aclHelper;
 		this.organGestorSyncHelper = organGestorSyncHelper;
+		this.organGestorFullSyncHelper = organGestorFullSyncHelper;
 		this.entitatResourceRepository = entitatResourceRepository;
 		this.organGestorResourceRepository = organGestorResourceRepository;
 		this.pagadorPostalResourceRepository = pagadorPostalResourceRepository;
@@ -87,6 +92,7 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 		register(OrganGestorResource.PERSPECTIVE_TREE, new OrganGestorResourceTreePerspectiveApplicator());
 		register(OrganGestorResource.DIR3_SYNC_ACTION_CODE, new Dir3SyncActionExecutor());
 		register(OrganGestorResource.OFICINES_SYNC_ACTION_CODE, new OficinesSyncActionExecutor(entitatResourceRepository, userSessionHelper, organGestorService, resourceClass));
+		register(OrganGestorResource.ORGANS_PROCEDIMENTS_SYNC_ACTION_CODE, new OrgansProcedimentsSyncActionExecutor(entitatResourceRepository, userSessionHelper, organGestorFullSyncHelper, resourceClass));
 		register(OrganGestorResource.ACTION_ADMIN_ORGANS_AMB_PERMIS, new AdminOrgansAmbPermisActionExecutor(organGestorService, userSessionHelper));
 		register(OrganGestorResource.REPORT_DESCARREGAR_DIR3_JSON, new OrganGestorDir3SyncJsonReportGenerator(organGestorService, userSessionHelper, authenticationHelper));
 	}

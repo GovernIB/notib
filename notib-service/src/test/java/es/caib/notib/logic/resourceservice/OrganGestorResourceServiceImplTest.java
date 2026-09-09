@@ -3,6 +3,7 @@ package es.caib.notib.logic.resourceservice;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.helper.AclHelper;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
+import es.caib.notib.logic.helper.OrganGestorFullSyncHelper;
 import es.caib.notib.logic.helper.OrganGestorSyncHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
@@ -52,6 +53,7 @@ class OrganGestorResourceServiceImplTest {
 	@Mock private NotibPermissionHelper notibPermissionHelper;
 	@Mock private AclHelper aclHelper;
 	@Mock private OrganGestorSyncHelper syncHelper;
+	@Mock private OrganGestorFullSyncHelper organGestorFullSyncHelper;
 	@Mock private EntitatResourceRepository entitatRepo;
 	@Mock private OrganGestorResourceRepository organGestorResourceRepository;
 	@Mock private PagadorPostalResourceRepository pagadorPostalRepo;
@@ -69,6 +71,7 @@ class OrganGestorResourceServiceImplTest {
 			notibPermissionHelper,
 			aclHelper,
 			syncHelper,
+			organGestorFullSyncHelper,
 			entitatRepo,
 			organGestorResourceRepository,
 			pagadorPostalRepo,
