@@ -13,6 +13,9 @@ export type Dir3SyncBranchProps = {
     leaves: { node: Dir3SyncNode | null; color: Dir3SyncNodeColor }[];
 };
 
+const COLUMN_WIDTH = 340;
+const ARROW_COLUMN_WIDTH = 32;
+
 const muiColor = (color: Dir3SyncNodeColor): 'success' | 'warning' | 'error' =>
     color === 'red' ? 'error' : color === 'yellow' ? 'warning' : 'success';
 
@@ -41,7 +44,8 @@ const NodeChip: React.FC<{ node: Dir3SyncNode | null; color: Dir3SyncNodeColor }
             size="small"
             title={nodeLabel(node)}
             sx={{
-                width: 340,
+                width: '100%',
+                minWidth: 0,
                 justifyContent: 'flex-start',
                 '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis' },
             }}
@@ -52,41 +56,52 @@ const NodeChip: React.FC<{ node: Dir3SyncNode | null; color: Dir3SyncNodeColor }
 export const Dir3SyncBranch: React.FC<Dir3SyncBranchProps> = (props) => {
     const { orientation, root, rootColor, leaves } = props;
     const multi = leaves.length > 1;
-    return (
+
+    const rootBox = (
+        <Box sx={{ display: 'flex', alignItems: 'center', minWidth: 0, overflow: 'hidden' }}>
+            <NodeChip node={root} color={rootColor} />
+        </Box>
+    );
+
+    const leavesBox = (
         <Box
             sx={{
                 display: 'flex',
-                alignItems: 'center',
-                gap: 1.5,
-                py: 0.75,
-                flexDirection: orientation === 'left' ? 'row' : 'row-reverse',
+                flexDirection: 'column',
+                gap: 0.5,
+                minWidth: 0,
+                overflow: 'hidden',
+                pl: orientation === 'left' && multi ? 1.5 : 0,
+                pr: orientation === 'right' && multi ? 1.5 : 0,
+                borderLeft: orientation === 'left' && multi ? '2px solid' : 'none',
+                borderRight: orientation === 'right' && multi ? '2px solid' : 'none',
+                borderColor: 'divider',
             }}
         >
-            <Box sx={{ flexShrink: 0 }}>
-                <NodeChip node={root} color={rootColor} />
-            </Box>
-            <ArrowForwardIcon
-                fontSize="small"
-                sx={{ color: 'text.disabled', flexShrink: 0 }}
-            />
-            <Box
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 0.5,
-                    pl: orientation === 'left' && multi ? 1.5 : 0,
-                    pr: orientation === 'right' && multi ? 1.5 : 0,
-                    borderLeft: orientation === 'left' && multi ? '2px solid' : 'none',
-                    borderRight: orientation === 'right' && multi ? '2px solid' : 'none',
-                    borderColor: 'divider',
-                }}
-            >
-                {leaves.map((leaf, i) => (
-                    <Box key={leaf.node?.codi ?? i} sx={{ display: 'flex', alignItems: 'center' }}>
-                        <NodeChip node={leaf.node} color={leaf.color} />
-                    </Box>
-                ))}
-            </Box>
+            {leaves.map((leaf, i) => (
+                <Box key={leaf.node?.codi ?? i} sx={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
+                    <NodeChip node={leaf.node} color={leaf.color} />
+                </Box>
+            ))}
+        </Box>
+    );
+
+    // Graella amb columnes d'amplada fixa (no basades en contingut): garanteix que totes
+    // les branques de totes les seccions quedin alineades verticalment, independentment
+    // de la longitud del text o del nombre d'elements de cada fila.
+    return (
+        <Box
+            sx={{
+                display: 'grid',
+                gridTemplateColumns: `${COLUMN_WIDTH}px ${ARROW_COLUMN_WIDTH}px ${COLUMN_WIDTH}px`,
+                alignItems: 'center',
+                columnGap: 1.5,
+                py: 0.75,
+            }}
+        >
+            {orientation === 'left' ? rootBox : leavesBox}
+            <ArrowForwardIcon fontSize="small" sx={{ color: 'text.disabled', justifySelf: 'center' }} />
+            {orientation === 'left' ? leavesBox : rootBox}
         </Box>
     );
 };
