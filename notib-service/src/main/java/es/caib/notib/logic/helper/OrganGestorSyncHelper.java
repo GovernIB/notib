@@ -418,6 +418,14 @@ public class OrganGestorSyncHelper {
 			if (map.keySet().stream().anyMatch(n -> n.getCodi().equals(codi))) {
 				return true;
 			}
+			// Els valors del mapa també han de quedar exclosos: per a divisionsMap la clau és
+			// l'òrgan extint i els valors són els seus successors vigents; per a fusionsMap i
+			// substitucionsMap la clau és l'òrgan vigent i els valors són els orígens extints.
+			// En qualsevol dels dos casos el codi ja està classificat i no ha d'aparèixer també
+			// com a creació.
+			if (map.values().stream().anyMatch(n -> n.getCodi().equals(codi))) {
+				return true;
+			}
 		}
 		return false;
 	}
