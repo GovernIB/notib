@@ -2,6 +2,7 @@ const translationCa = {
     app: {
         loading: 'Iniciant NOTIB',
         noEntitat: 'Aquest usuari no te accés a cap entitat',
+        sensePermisos: 'Aquest usuari no té cap permís per accedir a l\'aplicació',
         menu: {
             home: 'Inici',
             config: 'Configuració',
@@ -1117,6 +1118,7 @@ const translationCa = {
                 NOT_ADMIN: 'Administrador Entitat',
                 NOT_ADMIN_LECTURA: "Administrador (lectura)",
                 NOT_ORGAN: "Administrador d'òrgan",
+                NOT_APL: 'Aplicació',
                 tothom: 'Usuari',
             },
         },
@@ -1139,6 +1141,9 @@ const translationCa = {
             correu: 'Notificacions per correu',
             general: 'Configuració general',
             tema: 'Aparença',
+        },
+        SwitchInterface: {
+            classica: 'Anar a la versió clàssica',
         },
         FormDropzoneField: {
             arrosegar: 'Arrossega el fitxer aquí',

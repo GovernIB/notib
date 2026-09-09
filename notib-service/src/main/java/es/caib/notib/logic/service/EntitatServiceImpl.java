@@ -46,6 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -544,6 +545,30 @@ public class EntitatServiceImpl implements EntitatService {
 			}
 			hasPermisos.put(RolEnumDto.tothom, false);
 			hasPermisos.put(RolEnumDto.NOT_ADMIN, false);
+			hasPermisos.put(RolEnumDto.NOT_APL, false);
+			hasPermisos.put(RolEnumDto.NOT_ADMIN_ORGAN, false);
+			return hasPermisos;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Override
+	public Map<RolEnumDto, Boolean> getPermisosEntitatsUsuariActual(Authentication auth) {
+
+		var timer = metricsHelper.iniciMetrica();
+		try {
+			Map<RolEnumDto, Boolean> hasPermisos = new EnumMap<>(RolEnumDto.class);
+			if (auth != null) {
+				try {
+					return permisosCacheable.getPermisosEntitatsUsuariActual(auth);
+				} catch (Exception ex) {
+					log.error("Error obtenint els permisos de l'usuari " + auth.getName(), ex);
+				}
+			}
+			hasPermisos.put(RolEnumDto.tothom, false);
+			hasPermisos.put(RolEnumDto.NOT_ADMIN, false);
+			hasPermisos.put(RolEnumDto.NOT_ADMIN_LECTURA, false);
 			hasPermisos.put(RolEnumDto.NOT_APL, false);
 			hasPermisos.put(RolEnumDto.NOT_ADMIN_ORGAN, false);
 			return hasPermisos;

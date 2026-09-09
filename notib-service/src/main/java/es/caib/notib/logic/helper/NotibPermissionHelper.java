@@ -7,6 +7,7 @@ import es.caib.notib.logic.intf.base.exception.ResourceNotCreatedException;
 import es.caib.notib.logic.intf.base.exception.ResourceNotUpdatedException;
 import es.caib.notib.logic.intf.base.model.Resource;
 import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
+import es.caib.notib.logic.intf.base.util.HttpRequestUtil;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.persist.resourcerepository.OrganGestorResourceRepository;
 import es.caib.notib.persist.resourcerepository.ProcedimentOrganGestorResourceRepository;
@@ -14,6 +15,7 @@ import es.caib.notib.persist.resourcerepository.ProcedimentResourceRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid;
@@ -37,6 +39,11 @@ public class NotibPermissionHelper {
 	private final OrganGestorResourceRepository organGestorResourceRepository;
 	private final ProcedimentResourceRepository procedimentResourceRepository;
 	private final ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository;
+	// Mateixa propietat que WebSecurityConfig.selectedRoleHttpHeader, per a poder determinar el rol
+	// actualment seleccionat directament per capçalera i evitar dependre de si l'Authentication ja té
+	// les autoritats correctament restringides a únicament aquest rol.
+	@Value("${" + BaseConfig.PROP_SECURITY_ROLE_HTTP_HEADER + ":X-App-Role}")
+	private String selectedRoleHttpHeader;
 
 	/**
 	 * Crea una expressió Spring Filter per a consultar únicament les entitats sobre les que es tenen permisos.
@@ -46,17 +53,36 @@ public class NotibPermissionHelper {
 	 */
 	public String entitatAdditionalSpringFilter(String filterProperty) {
 
+		// Es determina el rol pel qual s'ha de filtrar directament per la capçalera del rol seleccionat,
+		// en lloc de mirar quins rols individuals té l'usuari (isCurrentUserInRole): l'usuari pot tenir
+		// concedits més d'un rol alhora (p.ex. usuari i administrador de lectura), i comprovar-los per
+		// separat no garanteix que es filtri únicament pel rol amb el que està treballant actualment.
+		var rolActual = getRolActualHttpHeader();
+		if (rolActual != null) {
+			return entitatAdditionalSpringFilter(filterProperty, BaseConfig.ROLE_SUPER.equals(rolActual),
+					BaseConfig.ROLE_USER.equals(rolActual),
+					BaseConfig.ROLE_ADMIN.equals(rolActual),
+					BaseConfig.ROLE_ADMIN_LECTURA.equals(rolActual),
+					BaseConfig.ROLE_ORGAN.equals(rolActual));
+		}
+		// Si no es pot determinar el rol actual per capçalera (p.ex. petició que no prové de la SPA de
+		// React) es recorre als rols concedits a l'Authentication actual.
+		return entitatAdditionalSpringFilter(filterProperty,
+				authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER),
+				authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_USER),
+				authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN),
+				authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN_LECTURA),
+				authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN));
+	}
+
+	private String entitatAdditionalSpringFilter(
+			String filterProperty, boolean isRoleSuper, boolean isRoleUser, boolean isRoleAdmin, boolean isRoleAdminLectura, boolean isRoleAdminOrgan) {
 
 		// Restringeix la consulta si no es te el rol NOT_SUPER o si no es tenen permisos sobre l'entitat del tipus de document.
-		var isRoleSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);
 		if (isRoleSuper) {
 			return null;
 		}
 		// Es calcula el permís a comprovar depenent del rol actual
-		var isRoleUser = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_USER);
-		var isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
-		var isRoleAdminLectura = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN_LECTURA);
-		var isRoleAdminOrgan = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN);
 		Permission permission = null;
 		if (isRoleUser) {
 			permission = ExtendedPermission.PERM0;
@@ -75,7 +101,10 @@ public class NotibPermissionHelper {
 		}
 		// Si no s'ha pogut calcular el permís o no s'ha trobat cap id no dona accés a cap entitat
 		return filterProperty + " is null";
+	}
 
+	private String getRolActualHttpHeader() {
+		return HttpRequestUtil.getCurrentHttpRequest().map(r -> r.getHeader(selectedRoleHttpHeader)).orElse(null);
 	}
 
 	/**

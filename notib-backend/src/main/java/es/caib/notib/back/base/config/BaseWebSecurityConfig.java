@@ -6,15 +6,19 @@ import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.util.HttpRequestUtil;
+import es.caib.notib.logic.intf.dto.RolEnumDto;
+import es.caib.notib.logic.intf.service.EntitatService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
@@ -70,6 +74,13 @@ public abstract class BaseWebSecurityConfig {
 
 	@Autowired
 	private ServletContext servletContext;
+	// Necessari per ajustar els rols segons els permisos concedits des de NOTIB (vegeu
+	// applyPermisBasedRoles). required=false perquè aquesta classe base es pugui reutilitzar sense
+	// aquest servei disponible; @Lazy per evitar problemes d'ordre d'inicialització, ja que aquesta
+	// és una classe de configuració de seguretat que s'instancia molt aviat.
+	@Autowired(required = false)
+	@Lazy
+	private EntitatService entitatService;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -352,9 +363,39 @@ public abstract class BaseWebSecurityConfig {
 				}
 			}
 		}
+		applyPermisBasedRoles(getPrincipalClaimName(jwt), roles);
 		return roles.stream().
 				map(SimpleGrantedAuthority::new).
 				collect(Collectors.toSet());
+	}
+
+	/**
+	 * Ajusta el conjunt de rols segons els permisos que l'usuari indicat té concedits des de NOTIB, per
+	 * als rols la disponibilitat dels quals no depèn únicament del que indiqui Keycloak/el contenidor:
+	 * - Administrador d'òrgan: no es gestiona a Keycloak, s'afegeix si l'usuari té el permís concedit
+	 *   sobre algun òrgan gestor, encara que el seu token/contenidor no li assigni el rol.
+	 * - Administrador de lectura: a més de tenir-ne el rol, cal tenir el permís concedit sobre alguna
+	 *   entitat; si no en té, se li treu encara que Keycloak/el contenidor li assigni el rol.
+	 *
+	 * @param principalName el nom de l'usuari a comprovar.
+	 * @param roles el conjunt de rols a ajustar (es modifica in-place).
+	 */
+	protected void applyPermisBasedRoles(String principalName, Set<String> roles) {
+		if (entitatService == null || principalName == null) {
+			return;
+		}
+		try {
+			var auth = new UsernamePasswordAuthenticationToken(principalName, null, Collections.emptyList());
+			var permisos = entitatService.getPermisosEntitatsUsuariActual(auth);
+			if (Boolean.TRUE.equals(permisos.get(RolEnumDto.NOT_ADMIN_ORGAN))) {
+				roles.add(BaseConfig.ROLE_ORGAN);
+			}
+			if (!Boolean.TRUE.equals(permisos.get(RolEnumDto.NOT_ADMIN_LECTURA))) {
+				roles.remove(BaseConfig.ROLE_ADMIN_LECTURA);
+			}
+		} catch (Exception ex) {
+			log.warn("No s'han pogut comprovar els permisos de l'usuari " + principalName + " per ajustar els rols", ex);
+		}
 	}
 
 	protected void filterAllowedGrantedAuthorities(Set<GrantedAuthority> grantedAuthorities) {

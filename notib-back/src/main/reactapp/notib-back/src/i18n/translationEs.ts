@@ -2,6 +2,7 @@ const translationEs = {
     app: {
         loading: 'Iniciando NOTIB',
         noEntitat: 'Este usuario no tiene acceso a ninguna entidad',
+        sensePermisos: 'Este usuario no tiene ningún permiso para acceder a la aplicación',
         menu: {
             home: 'Inicio',
             config: 'Configuración',
@@ -1093,6 +1094,7 @@ const translationEs = {
                 NOT_ADMIN: 'Administrador Entitat',
                 NOT_ADMIN_LECTURA: "Administrador (lectura)",
                 NOT_ORGAN: 'Administrador de órgano',
+                NOT_APL: 'Aplicación',
                 tothom: 'Usuario',
             },
         },
@@ -1115,6 +1117,9 @@ const translationEs = {
             correu: 'Notificaciones por correo',
             general: 'Configuración general',
             tema: 'Apariencia',
+        },
+        SwitchInterface: {
+            classica: 'Ir a la versión clásica',
         },
         FormDropzoneField: {
             arrosegar:  "Arrastra el fichero aquí",

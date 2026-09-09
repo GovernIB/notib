@@ -29,6 +29,7 @@ import RoleSelector from './RoleSelector';
 import EntitatSelector from './EntitatSelector';
 import { UserProfileMenu, UserProfileFormDialog } from './UserProfile';
 import OrganSelector from "./OrganSelector.tsx";
+import SwitchInterfaceMenuItem from './SwitchInterfaceMenuItem';
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
@@ -262,6 +263,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
                 <Box key="user_profile" sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
                     <UserProfileMenu formDialogApiRef={formDialogApiRef} />
                 </Box>,
+                <SwitchInterfaceMenuItem key="switch_interface" />,
             ]}
             offline={<Offline />}
             footer={footer}

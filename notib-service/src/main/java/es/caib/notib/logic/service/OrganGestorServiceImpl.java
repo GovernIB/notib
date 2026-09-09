@@ -1286,7 +1286,11 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			} else if (RolEnumDto.tothom.equals(rol)) {
 				organsGestorsDisponibles = recuperarOrgansPerProcedimentAmbPermis(usuari, entitat, PermisEnum.CONSULTA);
 			}
-			organsGestorsDisponibles.sort(Comparator.comparing(OrganGestorEntity::getNom, Comparator.nullsLast(Comparator.naturalOrder())));
+			organsGestorsDisponibles.sort(Comparator.nullsLast(
+				Comparator.comparing(
+					OrganGestorEntity::getNom,
+					Comparator.nullsLast(Comparator.naturalOrder())))
+			);
 
 			String nom;
 			for (var organGestor : organsGestorsDisponibles) {

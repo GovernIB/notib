@@ -432,7 +432,7 @@ databaseChangeLog:
             author: limit
             changes:
                 -   sql: "INSERT INTO ${db_prefix}CONFIG (id,POSITION, KEY, VALUE, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE, TYPE_CODE, CONFIG_GROUP_ID, CONFIG_TYPE_ID, CONFIGURABLE)
-                            VALUES (${db_prefix}HIBERNATE_SEQ.NEXTVAL, 0, 'es.caib.notib.app.maxresults.selects', '20', 0, 'Nombre de resultats màxim a mostrar per les llistes desplegables abans de paginar', 'GENERAL', 'INT',
+                            VALUES (${db_prefix}HIBERNATE_SEQ.NEXTVAL, 20, 'es.caib.notib.app.maxresults.selects', '20', 0, 'Nombre de resultats màxim a mostrar per les llistes desplegables abans de paginar', 'GENERAL', 'INT',
                             (SELECT ID FROM ${db_prefix}CONFIG_GROUP g WHERE g.code = 'GENERAL'), (SELECT ID FROM ${db_prefix}CONFIG_TYPE t WHERE t.code = 'INT'), 0);"
 
     -   changeSet:
@@ -450,3 +450,11 @@ databaseChangeLog:
                                         nullable: false
                 -   sql:
                         "UPDATE ${db_prefix}usuari SET tema = NULL WHERE tema IS NOT NULL AND tema NOT IN ('LIGHT','DARK','DRACULA','SISTEMA');"
+
+    -   changeSet:
+            id: 2_1_1_000-26
+            author: limit
+            changes:
+                -   sql: "INSERT INTO ${db_prefix}CONFIG (id,POSITION, KEY, VALUE, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE, TYPE_CODE, CONFIG_GROUP_ID, CONFIG_TYPE_ID, CONFIGURABLE)
+                            VALUES (${db_prefix}HIBERNATE_SEQ.NEXTVAL, 21, 'es.caib.notib.app.interficie.react.defecte', 'true', 0, 'Indica si en accedir a l''aplicació (/notibback) s''ha de mostrar per defecte la interfície nova (React) enlloc de la clàssica (JSP)', 'GENERAL', 'BOOL',
+                            (SELECT ID FROM ${db_prefix}CONFIG_GROUP g WHERE g.code = 'GENERAL'), (SELECT ID FROM ${db_prefix}CONFIG_TYPE t WHERE t.code = 'BOOL'), 0);"

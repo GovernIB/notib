@@ -176,6 +176,10 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 								forEach(roles::add);
 					}
 					IDToken idToken = keycloakPrincipal.getKeycloakSecurityContext().getIdToken();
+					String preferredUsername = nameAttributeKey.equals("preferred_username") ?
+							idToken.getPreferredUsername() :
+							(String)idToken.getOtherClaims().get(nameAttributeKey);
+					applyPermisBasedRoles(preferredUsername, roles);
 					Collection<? extends GrantedAuthority> grantedAuthorities = j2eeUserRoles2GrantedAuthoritiesMapper.
 							getGrantedAuthorities(roles);
 					filterAllowedGrantedAuthorities(new HashSet<>(grantedAuthorities));
@@ -183,9 +187,7 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 							context,
 							j2eeUserRoles2GrantedAuthoritiesMapper.getGrantedAuthorities(roles),
 							keycloakPrincipal.getKeycloakSecurityContext().getIdTokenString(),
-							nameAttributeKey.equals("preferred_username") ?
-									idToken.getPreferredUsername() :
-									(String)idToken.getOtherClaims().get(nameAttributeKey),
+							preferredUsername,
 							idToken.getName(),
 							idToken.getEmail(),
 							(String)idToken.getOtherClaims().get("nif"),

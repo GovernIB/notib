@@ -5,6 +5,7 @@ export const ROLE_SUPER = ROLE_PREFIX + 'SUPER';
 export const ROLE_ADMIN = ROLE_PREFIX + 'ADMIN';
 export const ROLE_ADMIN_LECTURA = ROLE_PREFIX + 'ADMIN_LECTURA';
 export const ROLE_ORGAN = ROLE_PREFIX + 'ORGAN';
+export const ROLE_APLICACIO = ROLE_PREFIX + 'APL';
 export const ROLE_USER = 'tothom';
 
 export type NotibContextType = {
