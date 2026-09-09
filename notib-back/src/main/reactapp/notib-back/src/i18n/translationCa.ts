@@ -117,15 +117,16 @@ const translationCa = {
                     dialogTitle: 'Sincronització DIR3',
                     dialogButton: {
                         cancel: 'Cancel·lar',
-                        query: 'Consultar canvis',
-                        apply: 'Aplicar canvis',
-                        creacions: "Creacions",
-                        modificacions: "Modificacions",
+                        sincronitzar: 'Sincronitzar',
+                        descarregarJson: 'Descarregar òrgans JSON',
+                        descarregarJsonError: "S'ha produït un error descarregant el JSON, consulti els logs",
+                        descarregarPdf: 'Descarrega PDF',
+                        creacions: "Nous",
+                        modificacions: "Canvis en atributs",
                         substitucions: "Substitucions",
-                        extincions: "Extincions",
+                        extincions: "Extingides",
                         fusions: "Fusions",
                         divisions: "Divisions",
-                        aplicarCanvis: "Faci clic al botó d'aplicar per a fer efectius els canvis.",
                         senseCanvis: "Sense canvis",
                     },
                     success: 'Canvis aplicats amb èxit',
@@ -136,6 +137,14 @@ const translationCa = {
                         cancel: 'Cancelar',
                         actualitzar: "Actualitzar"
                     }
+                },
+                syncCombined: {
+                    title: 'Actualitzar òrgans i procediments',
+                    dialogTitle: 'Actualitzar òrgans i procediments',
+                    nota: "Se sincronitzaran òrgans, permisos, procediments, serveis i oficines SIR.",
+                    cancelar: 'Cancel·lar',
+                    sincronitzar: 'Sincronitzar',
+                    success: 'Actualització completada correctament',
                 },
             },
             form: {

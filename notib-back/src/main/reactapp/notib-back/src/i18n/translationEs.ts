@@ -115,15 +115,16 @@ const translationEs = {
                     dialogTitle: 'Sincronización DIR3',
                     dialogButton: {
                         cancel: 'Cancelar',
-                        query: 'Consultar cambios',
-                        apply: 'Aplicar cambios',
-                        creacions: "Creaciones",
-                        modificacions: "Modificaciones",
+                        sincronitzar: 'Sincronizar',
+                        descarregarJson: 'Descargar órganos JSON',
+                        descarregarJsonError: 'Se ha producido un error descargando el JSON, consulte los logs',
+                        descarregarPdf: 'Descargar PDF',
+                        creacions: "Nuevos",
+                        modificacions: "Cambios en atributos",
                         substitucions: "Sustituciones",
-                        extincions: "Extinciones",
+                        extincions: "Extinguidas",
                         fusions: "Fusiones",
                         divisions: "Divisiones",
-                        aplicarCanvis: "Haga clic al botón de aplicar para hacer efectivos los cambios.",
                         senseCanvis: "Sin cambios",
                     },
                     success: 'Cambios aplicados con éxito',
@@ -134,6 +135,14 @@ const translationEs = {
                         cancel: 'Cancelar',
                         actualitzar: "Actualizar"
                     }
+                },
+                syncCombined: {
+                    title: 'Actualizar órganos y procedimientos',
+                    dialogTitle: 'Actualizar órganos y procedimientos',
+                    nota: 'Se sincronizarán órganos, permisos, procedimientos, servicios y oficinas SIR.',
+                    cancelar: 'Cancelar',
+                    sincronitzar: 'Sincronizar',
+                    success: 'Actualización completada correctamente',
                 },
             },
             form: {

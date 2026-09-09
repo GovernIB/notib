@@ -1,7 +1,7 @@
 import React from 'react';
-import {EventSource} from 'eventsource';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import Icon from '@mui/material/Icon';
@@ -15,7 +15,6 @@ import {
     MuiDataGridApiRef,
     MuiDataGridColDef,
     springFilterBuilder as filterBuilder,
-    useAuthContext,
     useBaseAppContext,
     useFilterApiContext,
     useMuiDataGridApiRef,
@@ -25,10 +24,13 @@ import LinkToTab from '../../components/LinkToTab';
 import GridFormField from '../../components/GridFormField';
 import {OrganGestorNoVigentIcon, useOrganGestorOptionRenderer} from '../../components/OrganGestorOptionRenderer';
 import {useDatagridFilterProps, useDatagridPageSizeOptionsProps, useDatagridTreeData,} from '../../hooks/useDataGrid';
+import {useSse} from '../../hooks/useSse';
 import {OrganFormContent} from './OrganForm';
 import {FormGroup} from "@mui/material";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
+import Dir3SyncBranch, { Dir3SyncNode } from './Dir3SyncBranch';
+import OrgansProcedimentsSyncActionButton from './OrgansProcedimentsSyncActionButton';
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -97,40 +99,6 @@ const springFilterBuilder = (data: any) => {
     );
 };
 
-const useSse = (
-    queueId: string,
-    eventName: string,
-    onEvent: (event: any) => void,
-    closeOnError?: boolean
-) => {
-    const { getToken } = useAuthContext();
-    const { isReady: apiIsReady, currentLinks } = useResourceApiService('sse');
-    React.useEffect(() => {
-        if (!apiIsReady) {
-            return;
-        }
-        const subscribeHref = currentLinks['subscribe'].href;
-        const eventSourceHref = subscribeHref.replace('{queueId}', queueId);
-        const eventSource = new EventSource(eventSourceHref, {
-            fetch: (input, init) =>
-                fetch(input, {...init, headers: {...init.headers,
-                        Authorization: 'Bearer ' + getToken(),
-                    },
-                }),
-        });
-        eventSource.addEventListener(eventName, (event) => {
-            const data = JSON.parse(event.data);
-            onEvent?.(data);
-        });
-        eventSource.onerror = () => {
-            if (closeOnError) {
-                eventSource.close();
-            }
-        };
-        return () => eventSource.close();;
-    }, [apiIsReady]);
-};
-
 const useColumns = (treeDataActive: boolean) => {
     return !treeDataActive ? columns
         : columns.filter((c) => c.field !== 'codi' && c.field !== 'nom' && c.field !== 'pare');
@@ -168,58 +136,152 @@ const OrganGridDir3SyncLoading: React.FC<{ percent?: number; message?: string }>
     );
 };
 
+const toNode = (item: any): Dir3SyncNode => ({
+    codi: item.codi,
+    nom: item.nomCooficial || item.nom,
+});
+
+const Dir3SyncSection: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
+    <Box className="dir3-section">
+        <Typography className="dir3-section-title">{title}</Typography>
+        {children}
+    </Box>
+);
+
+const dir3SyncChangeKeys = ['creacions', 'modificacions', 'substitucions', 'extincions', 'fusions', 'divisions'] as const;
+
+const hasCanvis = (result: any) =>
+    dir3SyncChangeKeys.some((k) => result?.[k]?.length > 0);
+
 const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
 
     const { result } = props;
     const { t } = useTranslation();
+    if (!hasCanvis(result)) {
+        return <Typography>{t('page.organs.grid.sync.dialogButton.senseCanvis')}</Typography>;
+    }
     return (
-        <Grid container>
+        <Grid container id="dir3-sync-preview">
             <Grid size={12}>
-                {result.senseCanvis ? (
-                    <Typography>{t('page.organs.grid.sync.dialogButton.senseCanvis')}</Typography>
-                ) : (
-                    <>
-                        <Typography gutterBottom sx={{ fontWeight: 'bold' }}>
-                            {`${t('page.organs.grid.sync.dialogButton.creacions')}: `}
-                            <Typography component="span">
-                                {result.creacions?.length ?? 0}
-                            </Typography>
-                        </Typography>
-                        <Typography gutterBottom sx={{ fontWeight: 'bold' }}>
-                            {`${t('page.organs.grid.sync.dialogButton.modificacions')}: `}
-                            <Typography component="span">
-                                {result.modificacions?.length ?? 0}
-                            </Typography>
-                        </Typography>
-                        <Typography gutterBottom sx={{ fontWeight: 'bold' }}>
-                            {`${t('page.organs.grid.sync.dialogButton.substitucions')}: `}
-                            <Typography component="span">
-                                {result.substitucions?.length ?? 0}
-                            </Typography>
-                        </Typography>
-                        <Typography gutterBottom sx={{ fontWeight: 'bold' }}>
-                            {`${t('page.organs.grid.sync.dialogButton.extincions')}: `}
-                            <Typography component="span">
-                                {result.extincions?.length ?? 0}
-                            </Typography>
-                        </Typography>
-                        <Typography gutterBottom sx={{ fontWeight: 'bold' }}>
-                            {`${t('page.organs.grid.sync.dialogButton.fusions')}: `}
-                            <Typography component="span">{result.fusions?.length ?? 0}</Typography>
-                        </Typography>
-                        <Typography gutterBottom sx={{ fontWeight: 'bold' }}>
-                            {`${t('page.organs.grid.sync.dialogButton.divisions')}: `}
-                            <Typography component="span">
-                                {result.divisions?.length ?? 0}
-                            </Typography>
-                        </Typography>
-                        <Typography gutterBottom sx={{ mt: 3 }}>
-                            {t('page.organs.grid.sync.dialogButton.aplicarCanvis')}
-                        </Typography>
-                    </>
+                {result.divisions?.length > 0 && (
+                    <Dir3SyncSection title={t('page.organs.grid.sync.dialogButton.divisions')}>
+                        {result.divisions.map((d: any, i: number) => (
+                            <Dir3SyncBranch
+                                key={i}
+                                orientation="left"
+                                root={toNode(d.vell)}
+                                rootColor="red"
+                                leaves={d.nous.map((n: any) => ({ node: toNode(n), color: 'green' as const }))}
+                            />
+                        ))}
+                    </Dir3SyncSection>
+                )}
+                {result.fusions?.length > 0 && (
+                    <Dir3SyncSection title={t('page.organs.grid.sync.dialogButton.fusions')}>
+                        {result.fusions.map((f: any, i: number) => (
+                            <Dir3SyncBranch
+                                key={i}
+                                orientation="right"
+                                root={toNode(f.nou)}
+                                rootColor="green"
+                                leaves={f.vells.map((n: any) => ({ node: toNode(n), color: 'red' as const }))}
+                            />
+                        ))}
+                    </Dir3SyncSection>
+                )}
+                {result.substitucions?.length > 0 && (
+                    <Dir3SyncSection title={t('page.organs.grid.sync.dialogButton.substitucions')}>
+                        {/* NOTE: for substitucions (and fusions/divisions), OrganGestorSyncHelper's DTO
+                            has vell/nou meaning the OPPOSITE of what the names suggest: `vell` is the
+                            SURVIVING (vigent) org, `nou` is the one going EXTINCT — see
+                            OrganGestorSyncHelper.java's substitucionsMap construction (key=vigent
+                            successor, value=extinct code). Do not "fix" this to look like modificacions
+                            (where vell=old/nou=new correctly) — it's a different field, confirmed by
+                            tracing getDir3SyncNodesExistentsDarreraVersioExtincio's estat checks. */}
+                        {result.substitucions.map((s: any, i: number) => (
+                            <Dir3SyncBranch
+                                key={i}
+                                orientation="right"
+                                root={toNode(s.vell)}
+                                rootColor="green"
+                                leaves={[{ node: toNode(s.nou), color: 'red' as const }]}
+                            />
+                        ))}
+                    </Dir3SyncSection>
+                )}
+                {result.modificacions?.length > 0 && (
+                    <Dir3SyncSection title={t('page.organs.grid.sync.dialogButton.modificacions')}>
+                        {result.modificacions.map((m: any, i: number) => (
+                            <Dir3SyncBranch
+                                key={i}
+                                orientation="left"
+                                root={toNode(m.vell)}
+                                rootColor="green"
+                                leaves={[{ node: toNode(m.nou), color: 'yellow' as const }]}
+                            />
+                        ))}
+                    </Dir3SyncSection>
+                )}
+                {result.creacions?.length > 0 && (
+                    <Dir3SyncSection title={t('page.organs.grid.sync.dialogButton.creacions')}>
+                        {result.creacions.map((c: any, i: number) => (
+                            <Dir3SyncBranch
+                                key={i}
+                                orientation="left"
+                                root={null}
+                                rootColor="green"
+                                leaves={[{ node: toNode(c.nou), color: 'green' as const }]}
+                            />
+                        ))}
+                    </Dir3SyncSection>
+                )}
+                {result.extincions?.length > 0 && (
+                    <Dir3SyncSection title={t('page.organs.grid.sync.dialogButton.extincions')}>
+                        {result.extincions.map((e: any, i: number) => (
+                            <Dir3SyncBranch
+                                key={i}
+                                orientation="left"
+                                root={toNode(e.vell)}
+                                rootColor="red"
+                                leaves={[{ node: null, color: 'red' as const }]}
+                            />
+                        ))}
+                    </Dir3SyncSection>
                 )}
             </Grid>
         </Grid>
+    );
+};
+
+const useDir3JsonDownload = () => {
+    const { t } = useTranslation();
+    const { saveAs, temporalMessageShow } = useBaseAppContext();
+    const { artifactReport } = useResourceApiService('organGestorResource');
+    return React.useCallback(() => {
+        artifactReport(undefined, { code: 'REPORT_DESCARREGAR_DIR3_JSON', data: {}, fileType: 'CUSTOM' })
+            .then((result: any) => {
+                const blob = result?.blob instanceof Blob ? result.blob : new Blob([JSON.stringify(result.blob, null, 2)], { type: 'application/json; charset=utf-8' });
+                saveAs?.(blob, result.fileName ?? 'organsDir3JSON.json');
+            })
+            .catch(() => {
+                temporalMessageShow(null, t('page.organs.grid.sync.dialogButton.descarregarJsonError'), 'error');
+            });
+    }, [artifactReport, saveAs, temporalMessageShow, t]);
+};
+
+const Dir3SyncResultActions: React.FC<{ result: any }> = () => {
+    const { t } = useTranslation();
+    const downloadJson = useDir3JsonDownload();
+    const printPdf = () => window.print();
+    return (
+        <Box sx={{ display: 'flex', gap: 1, mt: 2 }} className="dir3-sync-no-print">
+            <Button variant="outlined" onClick={downloadJson} startIcon={<Icon>download</Icon>}>
+                {t('page.organs.grid.sync.dialogButton.descarregarJson')}
+            </Button>
+            <Button variant="outlined" onClick={printPdf} startIcon={<Icon>picture_as_pdf</Icon>}>
+                {t('page.organs.grid.sync.dialogButton.descarregarPdf')}
+            </Button>
+        </Box>
     );
 };
 
@@ -277,17 +339,19 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
 
     const resultProcessor = (result: any) => {
 
-        setSenseCanvis(result.senseCanvis);
-        if (!result.simulat) {
-            setSimular(true);
-        }
+        setSenseCanvis(!hasCanvis(result));
         setSimular(false);
-        return <OrganGridDir3SyncActionResults result={result} />;
+        return (
+            <>
+                <OrganGridDir3SyncActionResults result={result} />
+                {hasCanvis(result) && <Dir3SyncResultActions result={result} />}
+            </>
+        );
     };
 
     const handleSuccess = (result?: any) => {
 
-        if (!result.simulat) {
+        if (result.simulat) {
             return;
         }
         dataGridApiRef.current?.refresh();
@@ -302,8 +366,8 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
         },
         {
             value: true,
-            text: simular ? t('page.organs.grid.sync.dialogButton.query') : t('page.organs.grid.sync.dialogButton.apply'),
-            icon: simular ? 'search' : 'check',
+            text: t('page.organs.grid.sync.dialogButton.sincronitzar'),
+            icon: 'save',
             componentProps: { variant: 'contained', disabled: senseCanvis === true },
         },
     ];
@@ -401,6 +465,10 @@ export const OrganGrid = () => {
                     {
                         position: 2,
                         element: <OrganGridDir3SyncActionButton dataGridApiRef={dataGridApiRef} />,
+                    },
+                    {
+                        position: 2,
+                        element: <OrgansProcedimentsSyncActionButton dataGridApiRef={dataGridApiRef} />,
                     },
                 ]}
                 apiRef={dataGridApiRef}

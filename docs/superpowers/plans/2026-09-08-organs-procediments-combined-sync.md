@@ -371,9 +371,9 @@ Add the new field **after** `progressEventService` (i.e., last), so the generate
 
 Add the import: `import es.caib.notib.persist.repository.OrganGestorRepository;`
 
-- [ ] **Step 2: Update `OrganGestorSyncHelperTest`'s constructor call**
+- [ ] **Step 2: Update `OrganGestorSyncHelperTest`'s constructor calls**
 
-In the test written by the graphical-preview plan's Task 1b, add a mock for the new dependency:
+`OrganGestorSyncHelperTest.java` now has **two** `new OrganGestorSyncHelper(...)` call sites (one from the graphical-preview plan's Task 1b, one added later by that plan's final-review fix wave for the `isCodiInAnyMap` fix) — grep the file for `new OrganGestorSyncHelper(` and update **every** match, not just one. For each, add a mock for the new dependency:
 
 ```java
 		var organGestorRepository = Mockito.mock(OrganGestorRepository.class);
@@ -386,7 +386,9 @@ and pass it as the last constructor argument:
 		var helper = new OrganGestorSyncHelper(pluginHelper, llibreOficinaHelper, repository, progressEventService, organGestorRepository);
 ```
 
-Add the import `import es.caib.notib.persist.repository.OrganGestorRepository;` to that test file.
+(the local variable names for the mocked `pluginHelper`/`llibreOficinaHelper`/`repository`/`progressEventService` differ slightly between the two existing tests — match each test's own existing variable names, don't rename them.)
+
+Add the import `import es.caib.notib.persist.repository.OrganGestorRepository;` to that test file (once, if not already present).
 
 - [ ] **Step 3: Parameterize the SSE event name — write the failing test first**
 
