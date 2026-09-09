@@ -9,6 +9,7 @@ import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto.ActualitzacioInfo;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto.TipusInfo;
+import es.caib.notib.logic.intf.dto.ProgressPublisher;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.dto.procediment.ProgresActualitzacioProcSer;
 import es.caib.notib.logic.service.ProcedimentServiceImpl;
@@ -70,6 +71,10 @@ public class ProcSerSyncHelper {
 	// ///////////////////////////////////////////////////////////////////////////
 
 	public void actualitzaProcediments(EntitatDto entitatDto) {
+		actualitzaProcediments(entitatDto, null);
+	}
+
+	public void actualitzaProcediments(EntitatDto entitatDto, ProgressPublisher publisher) {
 
 		var info = new IntegracioInfo(IntegracioCodi.PROCEDIMENTS, "Actualització de procediments", IntegracioAccioTipusEnumDto.PROCESSAR,
 				new AccioParam("Codi Dir3 de l'entitat", entitatDto.getDir3Codi()));
@@ -88,6 +93,11 @@ public class ProcSerSyncHelper {
 		}
 		// inicialitza el seguiment del prgrés d'actualització
 		progres = new ProgresActualitzacioProcSer();
+		if (publisher != null) {
+			final var progresRef = progres;
+			progresRef.setOnInfo(entry -> publisher.publish(progresRef.getProgres(), entry.getText()));
+			progresRef.setOnProgressChanged(percent -> publisher.publish(percent, null));
+		}
 		ProcedimentServiceImpl.getProgresActualitzacio().put(entitatDto.getDir3Codi(), progres);
 		Map<String, String[]> avisosProcedimentsOrgans = new HashMap<>();
 		try {
@@ -390,6 +400,10 @@ public class ProcSerSyncHelper {
 	// Sincronitzar serveis
 	// ///////////////////////////////////////////////////////////////////////////
 	public void actualitzaServeis(EntitatDto entitatDto) {
+		actualitzaServeis(entitatDto, null);
+	}
+
+	public void actualitzaServeis(EntitatDto entitatDto, ProgressPublisher publisher) {
 
 		var info = new IntegracioInfo(IntegracioCodi.PROCEDIMENTS, "Actualització de serveis", IntegracioAccioTipusEnumDto.PROCESSAR, new AccioParam("Codi Dir3 de l'entitat", entitatDto.getDir3Codi()));
 		info.setCodiEntitat(entitatDto.getCodi());
@@ -407,6 +421,11 @@ public class ProcSerSyncHelper {
 		}
 		// inicialitza el seguiment del prgrés d'actualització
 		progres = new ProgresActualitzacioProcSer();
+		if (publisher != null) {
+			final var progresRef = progres;
+			progresRef.setOnInfo(entry -> publisher.publish(progresRef.getProgres(), entry.getText()));
+			progresRef.setOnProgressChanged(percent -> publisher.publish(percent, null));
+		}
 		ServeiServiceImpl.getProgresActualitzacioServeis().put(entitatDto.getDir3Codi(), progres);
 		Map<String, String[]> avisosServeisOrgans = new HashMap<>();
 		try {
