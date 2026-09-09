@@ -13,6 +13,7 @@ import GridFormField from '../../components/GridFormField.tsx';
 import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer.tsx';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils.ts';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid.tsx';
+import { ROLE_ADMIN_LECTURA, useNotibContext } from '../../components/NotibContext.ts';
 
 const columns = [
     {
@@ -78,6 +79,8 @@ const ContentFilter: React.FC = () => {
 export const PagadorsPostalsGrid: React.FC = () => {
 
     const { t } = useTranslation();
+    const { currentRole } = useNotibContext();
+    const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
     const filterDataGridProps = useDatagridFilterProps(
         'pagadorPostalResource',
         'FILTER_PAGADOR_POSTAL',
@@ -114,8 +117,11 @@ export const PagadorsPostalsGrid: React.FC = () => {
                 {...pageSizeOptionsDataGridProps}
                 toolbarType="upper"
                 toolbarCreateLink="form"
+                toolbarHideCreate={isRoleAdminLectura ? true : undefined}
                 rowLink="form/{{id}}"
                 rowUpdateLink="form/{{id}}"
+                rowHideUpdateButton={isRoleAdminLectura}
+                rowHideDeleteButton={isRoleAdminLectura}
             />
         </GridPage>
     );

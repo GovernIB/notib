@@ -14,6 +14,7 @@ import {
 import LinkToTab from '../../components/LinkToTab';
 import GridFormField from '../../components/GridFormField';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
+import { ROLE_ADMIN_LECTURA, useNotibContext } from '../../components/NotibContext';
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -103,6 +104,8 @@ const ContentFilter: React.FC = () => {
 
 export const EntitatGrid: React.FC = () => {
     const { t } = useTranslation();
+    const { currentRole } = useNotibContext();
+    const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
     const filterDataGridProps = useDatagridFilterProps(
         'entitatResource',
         'FILTER_ENTITAT',
@@ -123,8 +126,11 @@ export const EntitatGrid: React.FC = () => {
                 {...pageSizeOptionsDataGridProps}
                 toolbarType="upper"
                 toolbarCreateLink="form"
+                toolbarHideCreate={isRoleAdminLectura ? true : undefined}
                 rowLink="form/{{id}}"
                 rowUpdateLink="form/{{id}}"
+                rowHideUpdateButton={isRoleAdminLectura}
+                rowHideDeleteButton={isRoleAdminLectura}
             />
         </GridPage>
     );

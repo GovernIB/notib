@@ -122,7 +122,9 @@ const PermissionGrid: React.FC<{
             paginationActive
             //density="standard"
             toolbarHide={toolbarHide}
+            toolbarHideCreate={isRoleAdminLectura ? true : undefined}
             rowHideUpdateButton={isRoleAdminLectura}
+            rowHideDeleteButton={isRoleAdminLectura}
             toolbarHideQuickFilter
             toolbarAdditionalRow={toolbarAdditionalRow}
             popupEditActive

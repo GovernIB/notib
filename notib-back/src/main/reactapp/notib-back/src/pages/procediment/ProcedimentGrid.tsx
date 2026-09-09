@@ -12,7 +12,7 @@ import {
     useFilterApiContext, MuiDataGridApiRef, useBaseAppContext, MuiActionReportButton, useMuiDataGridApiRef,
 } from 'reactlib';
 import LinkToTab from '../../components/LinkToTab';
-import {ROLE_ADMIN, useNotibContext} from '../../components/NotibContext';
+import {ROLE_ADMIN, ROLE_ADMIN_LECTURA, useNotibContext} from '../../components/NotibContext';
 import GridFormField, { GridButtonField } from '../../components/GridFormField';
 import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
@@ -193,6 +193,7 @@ export const ProcedimentGrid = () => {
     const dataGridApiRef = useMuiDataGridApiRef();
     const {currentRole} = useNotibContext();
     let isRoleAdmin = currentRole == ROLE_ADMIN;
+    const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
     const filterDataGridProps = useDatagridFilterProps(
         'procedimentResource',
         'FILTER_PROCEDIMENT',
@@ -270,8 +271,11 @@ export const ProcedimentGrid = () => {
                 {...pageSizeOptionsDataGridProps}
                 toolbarType="upper"
                 toolbarCreateLink="form"
+                toolbarHideCreate={isRoleAdminLectura ? true : undefined}
                 rowLink="form/{{id}}"
                 rowUpdateLink="form/{{id}}"
+                rowHideUpdateButton={isRoleAdminLectura}
+                rowHideDeleteButton={isRoleAdminLectura}
                 rowAdditionalActions={rowAdditionalActions}
                 apiRef={dataGridApiRef}
                 toolbarElementsWithPositions={ !isRoleAdmin ? [] : [

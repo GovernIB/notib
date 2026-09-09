@@ -21,6 +21,7 @@ import es.caib.notib.logic.organs.AdminOrgansAmbPermisActionExecutor;
 import es.caib.notib.logic.organs.OficinesSyncActionExecutor;
 import es.caib.notib.logic.organs.OrganGestorDir3SyncJsonReportGenerator;
 import es.caib.notib.logic.organs.OrgansProcedimentsSyncActionExecutor;
+import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
 import es.caib.notib.persist.resourceentity.EntregaCieResourceEntity;
 import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
 import es.caib.notib.persist.resourcerepository.EntitatResourceRepository;
@@ -40,6 +41,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -114,7 +116,7 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 			return superFilter + " and id: " + currentOrganGestorId;
 		}
 		if (isRoleAdmin || isRoleAdminLectura || isRoleAdminOrgan) {
-			return superFilter;
+			return concatenaFiltresAnd(superFilter, entitatRootDescendantsFilterExpression());
 		}
 		String filter = superFilter;
 		var namedQueriesList = Arrays.asList(namedQueries);
@@ -136,7 +138,40 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 		if (Arrays.asList(namedQueries).contains(OrganGestorResource.NAMED_QUERY_PERM_SIR)) {
 			filter = addIdsWithPermissionFilterExpression(ExtendedPermission.PERM6, filter);
 		}
-		return filter;
+		return concatenaFiltresAnd(filter, entitatRootDescendantsFilterExpression());
+	}
+
+	/*
+	 * Restringeix el llistat d'òrgans gestors únicament a l'òrgan arrel de l'entitat actual (el que té el
+	 * mateix codi que el codiDir3 de l'entitat) i als seus descendents. Els òrgans que no en depenen (p.ex.
+	 * òrgans obsolets sense pare real conegut a DIR3) no s'han de mostrar mai.
+	 */
+	private String entitatRootDescendantsFilterExpression() {
+
+		var entitatId = userSessionHelper.getCurrentEntitatId();
+		var dir3Codi = entitatDir3Codi(entitatId);
+		if (dir3Codi == null) {
+			return null;
+		}
+		List<Object[]> paresAll = organGestorResourceRepository.findParesByEntitatIdAndId(entitatId, null);
+		Set<Long> eligibleIds = paresAll.stream().
+			collect(Collectors.groupingBy(p -> ((Number)p[0]).longValue())).
+			entrySet().stream().
+			filter(e -> e.getValue().stream().anyMatch(p -> dir3Codi.equals(p[2]))).
+			map(Map.Entry::getKey).
+			collect(Collectors.toSet());
+		if (eligibleIds.isEmpty()) {
+			return "id: -1";
+		}
+		return "id in (" + eligibleIds.stream().map(Object::toString).collect(Collectors.joining(",")) + ")";
+	}
+
+	private String entitatDir3Codi(Long entitatId) {
+
+		if (entitatId == null) {
+			return null;
+		}
+		return entitatResourceRepository.findById(entitatId).map(EntitatResourceEntity::getDir3Codi).orElse(null);
 	}
 
 	@Override
@@ -197,8 +232,9 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 		@Override
 		public void applySingle(String code, OrganGestorResourceEntity entity, OrganGestorResource resource) throws PerspectiveApplicationException {
 
-			List<Object[]> paresAll = organGestorResourceRepository.findParesByEntitatIdAndId(resource.getEntitat().getId(), null);
-			emplenarCamps(paresAll, resource);
+			var entitatId = resource.getEntitat().getId();
+			List<Object[]> paresAll = organGestorResourceRepository.findParesByEntitatIdAndId(entitatId, null);
+			emplenarCamps(paresAll, resource, entitatDir3Codi(entitatId));
 		}
 
 		@Override
@@ -207,14 +243,16 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 			if (resources.isEmpty()) {
 			return true;
 			}
-			List<Object[]> paresAll = organGestorResourceRepository.findParesByEntitatIdAndId(resources.get(0).getEntitat().getId(), null);
+			var entitatId = resources.get(0).getEntitat().getId();
+			List<Object[]> paresAll = organGestorResourceRepository.findParesByEntitatIdAndId(entitatId, null);
+			var entitatDir3Codi = entitatDir3Codi(entitatId);
 			for (var resource: resources) {
-				emplenarCamps(paresAll, resource);
+				emplenarCamps(paresAll, resource, entitatDir3Codi);
 			}
 			return true;
 		}
 
-		private void emplenarCamps(List<Object[]> paresAll, OrganGestorResource resource) {
+		private void emplenarCamps(List<Object[]> paresAll, OrganGestorResource resource, String entitatDir3Codi) {
 
 			List<Object[]> paresResource = paresAll.stream().filter(p -> ((Number)p[0]).longValue() == resource.getId()).
 				collect(Collectors.collectingAndThen(Collectors.toList(), list -> {
@@ -222,6 +260,21 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 						return list;
 					}
 				));
+			// Talla la cadena d'ancestres a l'òrgan arrel de l'entitat (el que té el codi DIR3 de l'entitat), per
+			// evitar que a l'arbre aparegui per damunt seu un pare "artificial" (p.ex. un òrgan obsolet usat com
+			// a pare provisional a les dades de DIR3 per a òrgans sense pare real conegut).
+			if (entitatDir3Codi != null) {
+				var rootIndex = -1;
+				for (var i = 0; i < paresResource.size(); i++) {
+					if (entitatDir3Codi.equals(paresResource.get(i)[2])) {
+						rootIndex = i;
+						break;
+					}
+				}
+				if (rootIndex > 0) {
+					paresResource = paresResource.subList(rootIndex, paresResource.size());
+				}
+			}
 			ResourceReference<?, ?>[] path = paresResource.stream().map(p ->
 				ResourceReference.toResourceReference(((Number)p[1]).longValue(), p[2] + ", " + p[3])).toArray(ResourceReference[]::new);
 			resource.setPath((ResourceReference<OrganGestorResource, Long>[]) path);
