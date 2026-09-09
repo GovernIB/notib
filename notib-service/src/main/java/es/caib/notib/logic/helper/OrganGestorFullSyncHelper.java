@@ -59,7 +59,10 @@ public class OrganGestorFullSyncHelper {
 		} catch (Exception ex) {
 			log.error("Error sincronitzant òrgans a la sincronització combinada", ex);
 			publish(40, "Error sincronitzant òrgans: " + ex.getMessage(), SseEvent.SseEventStatus.ERROR);
-			return;
+			// Es rellança perquè la transacció REQUIRES_NEW faci rollback (una tornada normal la
+			// confirmaria malgrat l'error) i perquè OrgansProcedimentsSyncActionExecutor.exec()
+			// detecti el fallo i no informi d'un èxit fals al frontend.
+			throw ex;
 		}
 		publish(40, "Òrgans actualitzats");
 
@@ -69,7 +72,9 @@ public class OrganGestorFullSyncHelper {
 		} catch (Exception ex) {
 			log.error("Error migrant permisos d'òrgans obsolets a la sincronització combinada", ex);
 			publish(45, "Error migrant permisos d'òrgans obsolets: " + ex.getMessage(), SseEvent.SseEventStatus.ERROR);
-			return;
+			// Es rellança pel mateix motiu que a la fase d'òrgans: rollback de la transacció i
+			// propagació del fallo a l'executor.
+			throw ex;
 		}
 		publish(45, "Permisos migrats");
 

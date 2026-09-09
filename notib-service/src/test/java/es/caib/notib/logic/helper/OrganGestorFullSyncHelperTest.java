@@ -15,6 +15,7 @@ import org.mockito.Mockito;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class OrganGestorFullSyncHelperTest {
@@ -191,12 +192,13 @@ class OrganGestorFullSyncHelperTest {
 	}
 
 	@Test
-	void sincronitzarTotShouldPublishTerminalErrorAndStopWhenOrgansPhaseFails() {
+	void sincronitzarTotShouldPublishTerminalErrorAndRethrowWhenOrgansPhaseFails() {
 		// given: la fase d'òrgans llança una excepció.
 		var organGestorSyncHelper = Mockito.mock(OrganGestorSyncHelper.class);
+		var causa = new RuntimeException("DIR3 no disponible");
 		Mockito.when(organGestorSyncHelper.sincronitzar(
 				Mockito.any(), Mockito.eq(false), Mockito.any(), Mockito.eq(false)))
-			.thenThrow(new RuntimeException("DIR3 no disponible"));
+			.thenThrow(causa);
 		var permisosHelper = Mockito.mock(PermisosHelper.class);
 		var procSerSyncHelper = Mockito.mock(ProcSerSyncHelper.class);
 		var organGestorService = Mockito.mock(OrganGestorService.class);
@@ -206,14 +208,18 @@ class OrganGestorFullSyncHelperTest {
 		var helper = new OrganGestorFullSyncHelper(organGestorSyncHelper, permisosHelper, procSerSyncHelper,
 			organGestorService, organGestorRepository, progressEventService);
 
-		// when
-		helper.sincronitzarTot(novaEntitat());
+		// when: l'excepció s'ha de propagar fora de sincronitzarTot (no quedar-se engolida), perquè
+		// la transacció REQUIRES_NEW faci rollback i OrgansProcedimentsSyncActionExecutor.exec() no
+		// informi d'un èxit fals.
+		var llançada = assertThrows(RuntimeException.class, () -> helper.sincronitzarTot(novaEntitat()));
+		assertEquals(causa, llançada);
 
 		// then: cap fase posterior s'executa...
 		Mockito.verifyNoInteractions(permisosHelper);
 		Mockito.verifyNoInteractions(procSerSyncHelper);
 		Mockito.verifyNoInteractions(organGestorService);
-		// ...i el flux SSE es tanca amb un event ERROR terminal, no queda penjat sense terminal.
+		// ...però abans de rellançar, el flux SSE s'ha tancat amb un event ERROR terminal, no queda
+		// penjat sense terminal.
 		var eventCaptor = ArgumentCaptor.forClass(SseEvent.class);
 		Mockito.verify(progressEventService, Mockito.atLeastOnce())
 			.publishEvent(Mockito.eq(SseEventService.SseQueue.PROGRESS), eventCaptor.capture());
@@ -224,7 +230,7 @@ class OrganGestorFullSyncHelperTest {
 	}
 
 	@Test
-	void sincronitzarTotShouldPublishTerminalErrorAndStopWhenPermisosPhaseFails() {
+	void sincronitzarTotShouldPublishTerminalErrorAndRethrowWhenPermisosPhaseFails() {
 		// given: la fase d'òrgans va bé però la migració de permisos falla.
 		var substitucio = new OrganGestorDir3Sync.OrganGestorDir3SyncCanviSubstitucio(
 			new OrganGestorDir3Sync.OrganGestorDir3SyncArbreItem("A02", "Unitat A02", "Unitat A02", null),
@@ -237,15 +243,17 @@ class OrganGestorFullSyncHelperTest {
 		var procSerSyncHelper = Mockito.mock(ProcSerSyncHelper.class);
 		var organGestorService = Mockito.mock(OrganGestorService.class);
 		var organGestorRepository = Mockito.mock(OrganGestorRepository.class);
+		var causa = new RuntimeException("BD no disponible");
 		Mockito.when(organGestorRepository.findByCodiIn(Mockito.anyList()))
-			.thenThrow(new RuntimeException("BD no disponible"));
+			.thenThrow(causa);
 		var progressEventService = Mockito.mock(SseEventService.class);
 
 		var helper = new OrganGestorFullSyncHelper(organGestorSyncHelper, permisosHelper, procSerSyncHelper,
 			organGestorService, organGestorRepository, progressEventService);
 
 		// when
-		helper.sincronitzarTot(novaEntitat());
+		var llançada = assertThrows(RuntimeException.class, () -> helper.sincronitzarTot(novaEntitat()));
+		assertEquals(causa, llançada);
 
 		// then
 		Mockito.verifyNoInteractions(procSerSyncHelper);
