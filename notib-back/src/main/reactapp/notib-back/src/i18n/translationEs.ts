@@ -199,6 +199,7 @@ const translationEs = {
                 title: 'Procedimientos',
                 sync: {
                     title: "Actualizar procedimientos",
+                    confirmacio: "¿Quieres actualizar los procedimientos con la información de ROLSAC?",
                     actualitzar: "Actualizar",
                     cancelar: "Cancelar",
                     success: "Procedimientos actualizados correctamente",
@@ -208,7 +209,34 @@ const translationEs = {
                     title: "Limpia memoria cache",
                     success: "Memoria cache limpiada correctamente",
                     error: "Error limpiando la memoria cache"
-                }
+                },
+                accions: {
+                    activar: {
+                        title: "Activa",
+                        success: "El procedimiento se ha activado correctamente",
+                        error: "Error activando el procedimiento",
+                    },
+                    desactivar: {
+                        title: "Desactiva",
+                        success: "El procedimiento se ha desactivado correctamente",
+                        error: "Error desactivando el procedimiento",
+                    },
+                    actualitzar: {
+                        title: "Actualiza procedimiento",
+                        success: "El procedimiento se ha actualizado correctamente",
+                        error: "Error actualizando el procedimiento",
+                    },
+                    syncManual: {
+                        title: "Sincronización manual",
+                        success: "El procedimiento se ha marcado para actualizarse de forma manual",
+                        error: "Error marcando el procedimiento para sincronización manual",
+                    },
+                    syncAuto: {
+                        title: "Sincronización automática",
+                        success: "El procedimiento se ha marcado para actualizarse de forma automática",
+                        error: "Error marcando el procedimiento para sincronización automática",
+                    },
+                },
             },
             form: {
                 titleCreate: 'Crear procedimiento',

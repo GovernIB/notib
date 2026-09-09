@@ -3,6 +3,7 @@ import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import Icon from '@mui/material/Icon';
 import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
 import {
     GridPage,
     MuiDataGrid,
@@ -15,6 +16,8 @@ import {ROLE_ADMIN, useNotibContext} from '../../components/NotibContext';
 import GridFormField, { GridButtonField } from '../../components/GridFormField';
 import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
+import { useAccionsProcediment } from '../accions/AccionsProcediment';
+import { DataCommonAdditionalAction } from '../../../lib/components/mui/datacommon/MuiDataCommon.tsx';
 import React from "react";
 
 const columns: MuiDataGridColDef[] = [
@@ -169,13 +172,14 @@ const ProcedimentSyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRef;
             action="PROCEDIMENTS_SYNC"
             title={t('page.procediments.grid.sync.title')}
             buttonComponentProps={{ variant: 'contained', sx: { mr: 1 } }}
-            formDialogTitle={t('page.serveis.grid.sync.title')}
+            formDialogTitle={t('page.procediments.grid.sync.title')}
+            formDialogContent={<Typography align="center">{t('page.procediments.grid.sync.confirmacio')}</Typography>}
             formDialogButtons={formDialogButtons}
             buttonIcon="refresh"
             onSuccess={resposta => {
                 const msg = resposta ? "success" : "error";
                 dataGridApiRef.current?.refresh();
-                temporalMessageShow(null, t('page.serveis.grid.sync.' + msg), msg);
+                temporalMessageShow(null, t('page.procediments.grid.sync.' + msg), msg);
             }}
             // onError={error => temporalMessageShow(null, error?.message, "error")}
         />
@@ -196,6 +200,62 @@ export const ProcedimentGrid = () => {
         <ContentFilter />
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
+    const {
+        activarProcediment,
+        desactivarProcediment,
+        actualitzarProcediment,
+        syncManualProcediment,
+        syncAutoProcediment,
+    } = useAccionsProcediment(dataGridApiRef);
+    // Els procediments comuns només els pot gestionar un administrador d'entitat.
+    const rowActionsHidden = (row: { comu?: boolean }) => row.comu && !isRoleAdmin;
+    const rowAdditionalActions: DataCommonAdditionalAction[] = [
+        {
+            label: t('page.procediments.grid.accions.actualitzar.title'),
+            title: t('page.procediments.grid.accions.actualitzar.title'),
+            icon: 'refresh',
+            action: 'PROCEDIMENT_ACTUALITZAR',
+            showInMenu: true,
+            hidden: row => row.manual || rowActionsHidden(row),
+            onClick: id => actualitzarProcediment(id),
+        },
+        {
+            label: t('page.procediments.grid.accions.activar.title'),
+            title: t('page.procediments.grid.accions.activar.title'),
+            icon: 'check',
+            action: 'PROCEDIMENT_ACTIVAR',
+            showInMenu: true,
+            hidden: row => row.actiu || rowActionsHidden(row),
+            onClick: id => activarProcediment(id),
+        },
+        {
+            label: t('page.procediments.grid.accions.desactivar.title'),
+            title: t('page.procediments.grid.accions.desactivar.title'),
+            icon: 'close',
+            action: 'PROCEDIMENT_DESACTIVAR',
+            showInMenu: true,
+            hidden: row => !row.actiu || rowActionsHidden(row),
+            onClick: id => desactivarProcediment(id),
+        },
+        {
+            label: t('page.procediments.grid.accions.syncManual.title'),
+            title: t('page.procediments.grid.accions.syncManual.title'),
+            icon: 'back_hand',
+            action: 'PROCEDIMENT_SYNC_MANUAL',
+            showInMenu: true,
+            hidden: row => row.manual || rowActionsHidden(row),
+            onClick: id => syncManualProcediment(id),
+        },
+        {
+            label: t('page.procediments.grid.accions.syncAuto.title'),
+            title: t('page.procediments.grid.accions.syncAuto.title'),
+            icon: 'settings',
+            action: 'PROCEDIMENT_SYNC_AUTO',
+            showInMenu: true,
+            hidden: row => !row.manual || rowActionsHidden(row),
+            onClick: id => syncAutoProcediment(id),
+        },
+    ];
     return (
         <GridPage>
             <MuiDataGrid
@@ -212,6 +272,8 @@ export const ProcedimentGrid = () => {
                 toolbarCreateLink="form"
                 rowLink="form/{{id}}"
                 rowUpdateLink="form/{{id}}"
+                rowAdditionalActions={rowAdditionalActions}
+                apiRef={dataGridApiRef}
                 toolbarElementsWithPositions={ !isRoleAdmin ? [] : [
                     {
                         position: 2,

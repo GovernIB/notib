@@ -65,7 +65,7 @@ public interface ProcedimentService {
      * @return El procediment modificat.
      * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
      */
-    @PreAuthorize("hasRole('NOT_SUPER')")
+    @PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
     ProcSerDto updateActiu(Long id, boolean actiu) throws NotFoundException;
 
     /**
@@ -76,7 +76,7 @@ public interface ProcedimentService {
      * @return El procediment modificat.
      * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
      */
-    @PreAuthorize("hasRole('NOT_SUPER')")
+    @PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
     ProcSerDto updateManual(Long id, boolean manual) throws NotFoundException;
 
     /**

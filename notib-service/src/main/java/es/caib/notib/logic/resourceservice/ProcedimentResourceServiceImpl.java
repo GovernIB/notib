@@ -19,6 +19,11 @@ import es.caib.notib.logic.intf.service.ProcedimentService;
 import es.caib.notib.logic.intf.service.ServeiService;
 import es.caib.notib.logic.procSer.ComuOnChangeLogicProcessor;
 import es.caib.notib.logic.procediments.NetejerCacheActionExecutor;
+import es.caib.notib.logic.procediments.ProcedimentActivarActionExecutor;
+import es.caib.notib.logic.procediments.ProcedimentActualitzarActionExecutor;
+import es.caib.notib.logic.procediments.ProcedimentDesactivarActionExecutor;
+import es.caib.notib.logic.procediments.ProcedimentSyncAutoActionExecutor;
+import es.caib.notib.logic.procediments.ProcedimentSyncManualActionExecutor;
 import es.caib.notib.logic.procediments.ProcedimentsSyncActionExecutor;
 import es.caib.notib.logic.procediments.ServeisSyncActionExecutor;
 import es.caib.notib.persist.resourceentity.EntregaCieResourceEntity;
@@ -75,6 +80,11 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 		register(ProcedimentResource.PROCEDIMENTS_SYNC_ACTION_CODE, new ProcedimentsSyncActionExecutor(entitatResourceRepository, userSessionHelper, procedimentService, resourceClass));
 		register(ProcedimentResource.SERVEIS_SYNC_ACTION_CODE, new ServeisSyncActionExecutor(entitatResourceRepository, userSessionHelper, serveiService, resourceClass));
 		register(ProcedimentResource.PROCEDIMENTS_NETEJAR_CACHE_ACTION_CODE, new NetejerCacheActionExecutor(entitatResourceRepository, userSessionHelper, procedimentService, resourceClass));
+		register(ProcedimentResource.PROCEDIMENT_ACTIVAR_ACTION_CODE, new ProcedimentActivarActionExecutor(procedimentService));
+		register(ProcedimentResource.PROCEDIMENT_DESACTIVAR_ACTION_CODE, new ProcedimentDesactivarActionExecutor(procedimentService));
+		register(ProcedimentResource.PROCEDIMENT_ACTUALITZAR_ACTION_CODE, new ProcedimentActualitzarActionExecutor(entitatResourceRepository, userSessionHelper, procedimentService));
+		register(ProcedimentResource.PROCEDIMENT_SYNC_MANUAL_ACTION_CODE, new ProcedimentSyncManualActionExecutor(procedimentService));
+		register(ProcedimentResource.PROCEDIMENT_SYNC_AUTO_ACTION_CODE, new ProcedimentSyncAutoActionExecutor(procedimentService));
 		register(ProcedimentResource.Fields.comu, new ComuOnChangeLogicProcessor(organGestorResourceRepository, userSessionHelper));
 
 	}

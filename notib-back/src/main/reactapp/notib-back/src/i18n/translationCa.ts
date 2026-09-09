@@ -209,6 +209,7 @@ const translationCa = {
                 title: 'Procediments',
                 sync: {
                     title: "Actualitzar procediments",
+                    confirmacio: "Vols actualitzar els procediments amb la informació de ROLSAC?",
                     actualitzar: "Actualitzar",
                     cancelar: "Cancelar",
                     success: "Procediments actualitzats correctament",
@@ -218,7 +219,34 @@ const translationCa = {
                     title: "Neteja memòria cache",
                     success: "Memòria cache netejada correctament",
                     error: "Error netejant la memòria cache"
-                }
+                },
+                accions: {
+                    activar: {
+                        title: "Activa",
+                        success: "El procediment s'ha activat correctament",
+                        error: "Error activant el procediment",
+                    },
+                    desactivar: {
+                        title: "Desactiva",
+                        success: "El procediment s'ha desactivat correctament",
+                        error: "Error desactivant el procediment",
+                    },
+                    actualitzar: {
+                        title: "Actualitza procediment",
+                        success: "El procediment s'ha actualitzat correctament",
+                        error: "Error actualitzant el procediment",
+                    },
+                    syncManual: {
+                        title: "Sincronització manual",
+                        success: "El procediment s'ha marcat per a actualitzar-se de forma manual",
+                        error: "Error marcant el procediment per a sincronització manual",
+                    },
+                    syncAuto: {
+                        title: "Sincronització automàtica",
+                        success: "El procediment s'ha marcat per a actualitzar-se de forma automàtica",
+                        error: "Error marcant el procediment per a sincronització automàtica",
+                    },
+                },
             },
             form: {
                 titleCreate: 'Crear procediment',
