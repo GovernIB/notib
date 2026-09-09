@@ -7,7 +7,15 @@ import IconButton from '@mui/material/IconButton';
 import Icon from '@mui/material/Icon';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import { FormPage, MuiForm, FormField, useFormContext, useFormApiRef } from 'reactlib';
+import Box from '@mui/material/Box';
+import {
+    FormPage,
+    MuiForm,
+    FormField,
+    useFormContext,
+    useFormApiRef,
+    useResourceApiContext,
+} from 'reactlib';
 import NotificacioFormEnviaments from './NotificacioFormEnviaments';
 import NotificacioFormDocuments from './NotificacioFormDocuments';
 import GridFormField from '../../components/GridFormField';
@@ -25,10 +33,99 @@ const JSonButton: React.FC = () => {
     );
 };
 
+// Agrupació dels resultats del desplegable de procediments/serveis, de forma similar a com es fa
+// al formulari JSP: primer els procediments/serveis comuns i després els de l'òrgan gestor. Els
+// dos grups es construeixen a mà com a opcions més (no seleccionables) dins la mateixa llista de
+// resultats, ja que el component genèric `FormField` no ofereix agrupació nativa: `optionsRequest`
+// permet substituir la consulta per defecte i `optionRenderer` en personalitza la representació.
+const PROC_SER_HEADER_COMU_ID = '__procSerGroup:comuns__';
+const PROC_SER_HEADER_ORGAN_ID = '__procSerGroup:organs__';
+
+type ProcSerOption = {
+    id: string | number;
+    description: string;
+    disabled?: boolean;
+    comu?: boolean;
+};
+
+const useProcSerOptionsRequest = (type: string) => {
+    const { t } = useTranslation();
+    const { fields } = useFormContext();
+    const { requestHref } = useResourceApiContext();
+    const dataSource = fields?.find((f) => f.name === 'procediment')?.dataSource;
+    return React.useCallback(
+        (q: string) => {
+            if (dataSource == null) {
+                return Promise.resolve({ options: [] });
+            }
+            const templateData = {
+                quickFilter: q?.length ? q : null,
+                filter: "tipus:'" + type.toUpperCase() + "'",
+                page: 'UNPAGED',
+            };
+            return requestHref(dataSource.href, templateData).then((state) => {
+                const items = state.getEmbedded().map((e) => ({
+                    id: e.data[dataSource.valueField],
+                    description: e.data[dataSource.labelField],
+                    comu: e.data.comu,
+                }));
+                const comuns = items.filter((item) => item.comu);
+                const organs = items.filter((item) => !item.comu);
+                const options: ProcSerOption[] = [];
+                if (comuns.length > 0) {
+                    options.push({
+                        id: PROC_SER_HEADER_COMU_ID,
+                        description: t(`page.notificacio.form.camps.${type}Comuns`),
+                        disabled: true,
+                    });
+                    options.push(...comuns);
+                }
+                if (organs.length > 0) {
+                    options.push({
+                        id: PROC_SER_HEADER_ORGAN_ID,
+                        description: t(`page.notificacio.form.camps.${type}Organs`),
+                        disabled: true,
+                    });
+                    options.push(...organs);
+                }
+                return { options };
+            });
+        },
+        [dataSource, requestHref, type, t]
+    );
+};
+
+const procSerOptionRenderer = ({ id, description }: { id: string | number; description: string }) => {
+    if (id === PROC_SER_HEADER_COMU_ID || id === PROC_SER_HEADER_ORGAN_ID) {
+        return (
+            <Box
+                sx={{
+                    // Marges negatius perquè el fons ressaltat ocupi tota l'amplada de l'opció,
+                    // compensant el padding horitzontal per defecte de les opcions de l'Autocomplete.
+                    width: '100%',
+                    mx: -2,
+                    px: 2,
+                    py: 0.75,
+                    fontWeight: 'bold',
+                    fontSize: '0.8125rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                    bgcolor: 'primary.main',
+                    color: 'primary.contrastText',
+                }}
+            >
+                {description}
+            </Box>
+        );
+    }
+    return <Box sx={{ pl: 2 }}>{description}</Box>;
+};
+
 const ProcedimentServeiField: React.FC = () => {
     const { t } = useTranslation();
     const { data, apiRef: formApiRef } = useFormContext();
     const [type, setType] = React.useState<string>('procediment');
+    const procSerOptionsRequest = useProcSerOptionsRequest(type);
 
     const handleChange = (value: any) => {
         setType(value);
@@ -68,8 +165,9 @@ const ProcedimentServeiField: React.FC = () => {
                         name="procediment"
                         onChange={(value) => handleChangeProcediment(value)}
                         label={t(`page.notificacio.form.camps.${type}`)}
-                        filter={"tipus:'" + type.toUpperCase() + "'"}
                         required={data.procedimentRequired}
+                        optionsRequest={procSerOptionsRequest}
+                        optionRenderer={procSerOptionRenderer}
                     />
                 </Grid>
             </Grid>
@@ -79,8 +177,10 @@ const ProcedimentServeiField: React.FC = () => {
             <FormField
                 name="procediment"
                 onChange={(value) => handleChangeProcediment(value)}
-                filter={"tipus:'" + type.toUpperCase() + "'"}
+                label={t(`page.notificacio.form.camps.procediment`)}
                 required={data.procedimentRequired}
+                optionsRequest={procSerOptionsRequest}
+                optionRenderer={procSerOptionRenderer}
             />
         );
     }

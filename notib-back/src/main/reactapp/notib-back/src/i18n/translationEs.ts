@@ -458,6 +458,14 @@ const translationEs = {
                             'Está la primera página del documento preparada para el ensobrado?',
                     },
                 },
+                camps: {
+                    procediment: 'Procedimiento',
+                    servei: 'Servicio',
+                    procedimentComuns: 'Procedimientos comunes',
+                    procedimentOrgans: 'Procedimientos de órganos gestores',
+                    serveiComuns: 'Servicios comunes',
+                    serveiOrgans: 'Servicios de órganos gestores',
+                },
             },
             detail: {
                 title: {

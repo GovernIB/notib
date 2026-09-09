@@ -478,6 +478,10 @@ const translationCa = {
                 camps: {
                     procediment: 'Procediment',
                     servei: 'Servei',
+                    procedimentComuns: 'Procediments comuns',
+                    procedimentOrgans: "Procediments d'òrgans gestors",
+                    serveiComuns: 'Serveis comuns',
+                    serveiOrgans: "Serveis d'òrgans gestors",
                 },
             },
             detail: {
