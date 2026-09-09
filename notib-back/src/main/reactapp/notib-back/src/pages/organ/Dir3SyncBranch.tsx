@@ -2,9 +2,10 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { alpha } from '@mui/material/styles';
 
 export type Dir3SyncNode = { codi?: string; nom: string };
-export type Dir3SyncNodeColor = 'red' | 'green' | 'yellow';
+export type Dir3SyncNodeColor = 'red' | 'green' | 'orange';
 
 export type Dir3SyncBranchProps = {
     orientation: 'left' | 'right';
@@ -17,7 +18,7 @@ const COLUMN_WIDTH = 340;
 const ARROW_COLUMN_WIDTH = 32;
 
 const muiColor = (color: Dir3SyncNodeColor): 'success' | 'warning' | 'error' =>
-    color === 'red' ? 'error' : color === 'yellow' ? 'warning' : 'success';
+    color === 'red' ? 'error' : color === 'orange' ? 'warning' : 'success';
 
 const nodeLabel = (node: Dir3SyncNode | null) => (node == null ? '' : `${node.codi ? node.codi + ' - ' : ''}${node.nom}`);
 
@@ -39,15 +40,20 @@ const NodeChip: React.FC<{ node: Dir3SyncNode | null; color: Dir3SyncNodeColor }
     return (
         <Chip
             label={nodeLabel(node)}
-            color={muiColor(color)}
-            variant="outlined"
             size="small"
             title={nodeLabel(node)}
-            sx={{
-                width: '100%',
-                minWidth: 0,
-                justifyContent: 'flex-start',
-                '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis' },
+            sx={(theme) => {
+                const palette = theme.palette[muiColor(color)];
+                return {
+                    width: '100%',
+                    minWidth: 0,
+                    justifyContent: 'flex-start',
+                    bgcolor: alpha(palette.main, 0.16),
+                    color: palette.dark,
+                    border: '1px solid',
+                    borderColor: alpha(palette.main, 0.35),
+                    '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis' },
+                };
             }}
         />
     );

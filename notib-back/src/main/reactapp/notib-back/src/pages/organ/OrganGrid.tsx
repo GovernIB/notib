@@ -223,8 +223,8 @@ const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
                                 key={i}
                                 orientation="left"
                                 root={toNode(m.vell)}
-                                rootColor="green"
-                                leaves={[{ node: toNode(m.nou), color: 'yellow' as const }]}
+                                rootColor="orange"
+                                leaves={[{ node: toNode(m.nou), color: 'green' as const }]}
                             />
                         ))}
                     </Dir3SyncSection>
@@ -423,7 +423,7 @@ export const OrganGrid = () => {
 
     const { t } = useTranslation();
     const dataGridApiRef = useMuiDataGridApiRef();
-    const { currentRole } = useNotibContext();
+    const { currentRole, currentEntitatId } = useNotibContext();
     const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
     const { treeDataViewActive, viewSwitchComponent } = useTreeDataViewSwitch(t('page.organs.grid.viewSwitch'), true);
     const columns = useColumns(treeDataViewActive);
@@ -444,9 +444,14 @@ export const OrganGrid = () => {
     return (
         <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
             <MuiDataGrid
+                // MUI-X no admet bé canviar treeData/getTreeDataPath/apiRef en calent sobre la mateixa
+                // instància del grid (dona "No getTreeDataPath given" en canviar de vista): forçam un
+                // remuntatge complet del grid en canviar entre vista en arbre i vista de taula.
+                key={treeDataViewActive ? 'tree' : 'flat'}
                 title={t('page.organs.grid.title')}
                 resourceName="organGestorResource"
                 columns={columns}
+                fixedFilter={"entitat.id:" + currentEntitatId}
                 {...treeDataProps}
                 // persistentStateActive
                 // persistentStateClearPageSortPropsOnTopLevelRouteChange
