@@ -31,6 +31,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import Dir3SyncBranch, { Dir3SyncNode } from './Dir3SyncBranch';
 import OrgansProcedimentsSyncActionButton from './OrgansProcedimentsSyncActionButton';
+import {ROLE_ADMIN_LECTURA, useNotibContext} from '../../components/NotibContext';
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -129,7 +130,12 @@ const OrganGridDir3SyncLoading: React.FC<{ percent?: number; message?: string }>
     return (
         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
             <Box sx={{ textAlign: 'center', my: 4 }}>
-                <CircularProgress enableTrackSlot variant="determinate" value={percent} size={50} />
+                <CircularProgress variant="indeterminate" size={50} />
+                {percent != null && (
+                    <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+                        {percent}%
+                    </Typography>
+                )}
                 <Typography variant="body2">{message}</Typography>
             </Box>
         </Box>
@@ -274,11 +280,22 @@ const Dir3SyncResultActions: React.FC<{ result: any }> = () => {
     const downloadJson = useDir3JsonDownload();
     const printPdf = () => window.print();
     return (
-        <Box sx={{ display: 'flex', gap: 1, mt: 2 }} className="dir3-sync-no-print">
-            <Button variant="outlined" onClick={downloadJson} startIcon={<Icon>download</Icon>}>
+        <Box
+            className="dir3-sync-no-print"
+            sx={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: 1,
+                mt: 3,
+                pt: 2,
+                borderTop: 1,
+                borderColor: 'divider',
+            }}
+        >
+            <Button variant="outlined" size="small" onClick={downloadJson} startIcon={<Icon>download</Icon>}>
                 {t('page.organs.grid.sync.dialogButton.descarregarJson')}
             </Button>
-            <Button variant="outlined" onClick={printPdf} startIcon={<Icon>picture_as_pdf</Icon>}>
+            <Button variant="outlined" size="small" onClick={printPdf} startIcon={<Icon>picture_as_pdf</Icon>}>
                 {t('page.organs.grid.sync.dialogButton.descarregarPdf')}
             </Button>
         </Box>
@@ -421,6 +438,8 @@ export const OrganGrid = () => {
 
     const { t } = useTranslation();
     const dataGridApiRef = useMuiDataGridApiRef();
+    const { currentRole } = useNotibContext();
+    const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
     const { treeDataViewActive, viewSwitchComponent } = useTreeDataViewSwitch(t('page.organs.grid.viewSwitch'), true);
     const columns = useColumns(treeDataViewActive);
     const treeDataProps = useDatagridTreeData(
@@ -453,6 +472,9 @@ export const OrganGrid = () => {
                 popupEditFormContent={<OrganFormContent />}
                 popupEditFormDialogResourceTitle={t('page.organs.grid.popupDialogTitle')}
                 popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
+                toolbarHideCreate={isRoleAdminLectura ? true : undefined}
+                rowHideUpdateButton={isRoleAdminLectura}
+                rowHideDeleteButton={isRoleAdminLectura}
                 toolbarElementsWithPositions={[
                     {
                         position: 1,
