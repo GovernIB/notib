@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 @Slf4j
 @Getter @Setter
@@ -33,12 +34,19 @@ public class ProgresActualitzacioDto {
 	boolean error = false;
 	String errorMsg;
 
+	transient Consumer<ActualitzacioInfo> onInfo;
+	transient Consumer<Integer> onProgressChanged;
+
 	public void addInfo(TipusInfo tipus, String text) {
 
 		log.info("[Progres Actualitzacio] " + text);
-		info.add(new ActualitzacioInfo(tipus, text));
+		var entry = new ActualitzacioInfo(tipus, text);
+		info.add(entry);
+		if (onInfo != null) {
+			onInfo.accept(entry);
+		}
 	}
-	
+
 	public void addSeparador() {
 		info.add(new ActualitzacioInfo(TipusInfo.SEPARADOR, ""));
 	}
@@ -53,6 +61,9 @@ public class ProgresActualitzacioDto {
 		this.numOperacionsRealitzades += numOperacions;
 		double auxprogres = (this.numOperacionsRealitzades.doubleValue()  / this.numOperacions.doubleValue()) * 100;
 		this.progres = (int) auxprogres;
+		if (onProgressChanged != null) {
+			onProgressChanged.accept(this.progres);
+		}
 	}
 	
 	@Getter @Setter @AllArgsConstructor @NoArgsConstructor

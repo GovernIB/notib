@@ -26,7 +26,8 @@ public class SseEvent {
 	}
 
 	public enum SseEventName {
-		DIR3_SYNC
+		DIR3_SYNC,
+		ORGANS_PROCEDIMENTS_SYNC
 	}
 
 }
