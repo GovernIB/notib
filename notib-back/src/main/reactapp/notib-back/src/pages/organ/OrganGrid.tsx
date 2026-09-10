@@ -323,6 +323,7 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
     const [simular, setSimular] = React.useState<boolean>(true);
     const [senseCanvis, setSenseCanvis] = React.useState<boolean>();
     const [showResultActions, setShowResultActions] = React.useState<boolean>(false);
+    const [syncCompleted, setSyncCompleted] = React.useState<boolean>(false);
     const [percent, setPercent] = React.useState<number>();
     const [message, setMessage] = React.useState<string>();
     const downloadJson = useDir3JsonDownload();
@@ -336,8 +337,10 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
 
         if (result.simulat === false) {
             // Resultat de la sincronització real (no de la previsualització): es mostra un
-            // missatge de finalització en lloc de tornar a mostrar el llistat de canvis.
+            // missatge de finalització en lloc de tornar a mostrar el llistat de canvis, i es
+            // deshabilita el botó "Sincronitzar" (ja no hi ha res més a fer en aquest diàleg).
             setShowResultActions(false);
+            setSyncCompleted(true);
             return (
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, my: 4 }}>
                     <Icon color="success" fontSize="large">check_circle</Icon>
@@ -363,14 +366,16 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
     const formDialogButtons = [
         {
             value: false,
-            text: t('page.organs.grid.sync.dialogButton.cancel'),
+            // Un cop feta la sincronització real ja no hi ha res a cancel·lar: el botó passa a
+            // tancar el diàleg.
+            text: t(syncCompleted ? 'page.organs.grid.sync.dialogButton.tancar' : 'page.organs.grid.sync.dialogButton.cancel'),
             componentProps: { variant: 'outlined' },
         },
         {
             value: true,
             text: t('page.organs.grid.sync.dialogButton.sincronitzar'),
             icon: 'save',
-            componentProps: { variant: 'contained', disabled: senseCanvis === true },
+            componentProps: { variant: 'contained', disabled: senseCanvis === true || syncCompleted },
         },
     ];
 
@@ -394,7 +399,8 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
             formAdditionalData={{ simular }}
             formDialogTitle={t('page.organs.grid.sync.dialogTitle')}
             formDialogButtons={formDialogButtons}
-            formDialogLoading={<OrganGridDir3SyncLoading percent={percent} message={message} />}
+            formDialogLiveButtons={formDialogButtons}
+            formDialogLoading={<OrganGridDir3SyncLoading percent={simular ? undefined : percent} message={message} />}
             formDialogResultProcessor={resultProcessor}
             formDialogExtraActions={extraActions}
             buttonComponentProps={{ variant: 'contained', sx: { mr: 1 } }}
@@ -403,6 +409,7 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
                 setSimular(true);
                 setSenseCanvis(undefined);
                 setShowResultActions(false);
+                setSyncCompleted(false);
             }}
             dialogAutoSubmit
         />

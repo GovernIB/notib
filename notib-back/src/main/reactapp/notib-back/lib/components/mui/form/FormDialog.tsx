@@ -50,7 +50,8 @@ export type UseFormDialogFn = (
     closeFn?: (reason?: string) => boolean,
     closeIcon?: boolean,
     autoSubmit?: boolean,
-    extraActions?: React.ReactNode
+    extraActions?: React.ReactNode,
+    liveButtons?: DialogButton[]
 ) => [FormDialogShowFn, React.ReactElement, FormDialogCloseFn];
 
 const FormDialogLoading: React.FC = () => {
@@ -76,7 +77,8 @@ export const useFormDialog: UseFormDialogFn = (
     closeFn?: (reason?: string) => boolean,
     closeIcon?: boolean,
     autoSubmit?: boolean,
-    extraActions?: React.ReactNode
+    extraActions?: React.ReactNode,
+    liveButtons?: DialogButton[]
 ) => {
     const formApiRef = React.useRef<FormApi | any>({});
     const formDialogButtons = useFormDialogButtons();
@@ -179,16 +181,21 @@ export const useFormDialog: UseFormDialogFn = (
             setRejectFn(() => reject);
         });
     };
+    // `liveButtons`, si es proporciona, substitueix `buttons` en cada render (a diferència de
+    // `buttons`, que només s'actualitza quan es crida `show()`) — permet que un consumidor
+    // canviï el text/estat dels botons en resposta a l'evolució del diàleg ja obert (p. ex.
+    // deshabilitar "Sincronitzar" i canviar "Cancel·lar" per "Tancar" en acabar una acció).
+    const activeButtons = liveButtons ?? buttons;
     // Deshabilita els botons si s'està en estat loading
     const processedButtons = loading
-        ? buttons.map((b) => ({
+        ? activeButtons.map((b) => ({
               ...b,
               componentProps: {
                   ...b.componentProps,
                   disabled: true,
               },
           }))
-        : buttons;
+        : activeButtons;
     const close = () => setOpen(false);
     const dialogComponent = (
         <FormDialog
