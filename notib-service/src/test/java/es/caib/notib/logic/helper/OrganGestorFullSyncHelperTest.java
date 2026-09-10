@@ -83,7 +83,7 @@ class OrganGestorFullSyncHelperTest {
 		var entitat = novaEntitat();
 
 		// when
-		helper.sincronitzarTot(entitat);
+		helper.sincronitzarTot(entitat, SseEvent.SseEventName.ORGANS_PROCEDIMENTS_SYNC);
 
 		// then
 		Mockito.verify(organGestorSyncHelper).sincronitzar(entitat, false, SseEvent.SseEventName.ORGANS_PROCEDIMENTS_SYNC, false);
@@ -142,7 +142,7 @@ class OrganGestorFullSyncHelperTest {
 			organGestorService, organGestorRepository, progressEventService);
 
 		// when
-		helper.sincronitzarTot(novaEntitat());
+		helper.sincronitzarTot(novaEntitat(), SseEvent.SseEventName.ORGANS_PROCEDIMENTS_SYNC);
 
 		// then: només l'òrgan de l'entitat sincronitzada arriba a PermisosHelper; l'homònim de
 		// l'altra entitat s'ha de descartar per no duplicar-li permisos ACL.
@@ -181,7 +181,7 @@ class OrganGestorFullSyncHelperTest {
 			organGestorService, organGestorRepository, progressEventService);
 
 		// when
-		helper.sincronitzarTot(novaEntitat());
+		helper.sincronitzarTot(novaEntitat(), SseEvent.SseEventName.ORGANS_PROCEDIMENTS_SYNC);
 
 		// then
 		@SuppressWarnings("unchecked")
@@ -211,7 +211,7 @@ class OrganGestorFullSyncHelperTest {
 		// when: l'excepció s'ha de propagar fora de sincronitzarTot (no quedar-se engolida), perquè
 		// la transacció REQUIRES_NEW faci rollback i OrgansProcedimentsSyncActionExecutor.exec() no
 		// informi d'un èxit fals.
-		var llançada = assertThrows(RuntimeException.class, () -> helper.sincronitzarTot(novaEntitat()));
+		var llançada = assertThrows(RuntimeException.class, () -> helper.sincronitzarTot(novaEntitat(), SseEvent.SseEventName.ORGANS_PROCEDIMENTS_SYNC));
 		assertEquals(causa, llançada);
 
 		// then: cap fase posterior s'executa...
@@ -252,7 +252,7 @@ class OrganGestorFullSyncHelperTest {
 			organGestorService, organGestorRepository, progressEventService);
 
 		// when
-		var llançada = assertThrows(RuntimeException.class, () -> helper.sincronitzarTot(novaEntitat()));
+		var llançada = assertThrows(RuntimeException.class, () -> helper.sincronitzarTot(novaEntitat(), SseEvent.SseEventName.ORGANS_PROCEDIMENTS_SYNC));
 		assertEquals(causa, llançada);
 
 		// then

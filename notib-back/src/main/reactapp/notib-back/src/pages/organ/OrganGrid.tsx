@@ -8,6 +8,7 @@ import Icon from '@mui/material/Icon';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
+import LinearProgress from '@mui/material/LinearProgress';
 import {
     GridPage,
     MuiActionReportButton,
@@ -126,19 +127,44 @@ const useTreeDataViewSwitch = (label: string, defaultValue: boolean) => {
     return { treeDataViewActive, viewSwitchComponent};
 };
 
-const OrganGridDir3SyncLoading: React.FC<{ percent?: number; message?: string }> = (props) => {
+type Dir3SyncLogLine = { message: string; isError: boolean };
 
-    const { percent, message } = props;
+const OrganGridDir3SyncLoading: React.FC<{ percent?: number; message?: string; lines?: Dir3SyncLogLine[] }> = (props) => {
+
+    const { percent, message, lines } = props;
+    const logRef = React.useRef<HTMLDivElement>(null);
+    React.useEffect(() => {
+        if (logRef.current) {
+            logRef.current.scrollTop = logRef.current.scrollHeight;
+        }
+    }, [lines?.length]);
+
+    if (percent == null) {
+        // Previsualització: el backend només publica 2-3 checkpoints molt separats en el temps
+        // (abans/després de la crida lenta a DIR3), no és representatiu com a percentatge — es
+        // mostra només l'spinner indeterminat i el missatge actual.
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                <Box sx={{ textAlign: 'center', my: 4 }}>
+                    <CircularProgress variant="indeterminate" size={50} />
+                    <Typography variant="body2" sx={{ mt: 1 }}>{message}</Typography>
+                </Box>
+            </Box>
+        );
+    }
+
+    // Sincronització real (òrgans, permisos, procediments, serveis i oficines SIR): mostra el
+    // progrés granular i el registre de les operacions que es van realitzant, com a la JSP.
     return (
-        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-            <Box sx={{ textAlign: 'center', my: 4 }}>
-                <CircularProgress variant="indeterminate" size={50} />
-                {percent != null && (
-                    <Typography variant="caption" display="block" sx={{ mt: 1 }}>
-                        {percent}%
+        <Box sx={{ my: 2 }}>
+            <LinearProgress variant="determinate" value={percent} sx={{ mb: 1 }} />
+            <Typography variant="caption" display="block" sx={{ mb: 1 }}>{percent}%</Typography>
+            <Box ref={logRef} sx={{ maxHeight: 300, overflow: 'auto', bgcolor: 'action.hover', p: 1 }}>
+                {lines?.map((line, i) => (
+                    <Typography key={i} variant="body2" color={line.isError ? 'error' : undefined}>
+                        {line.message}
                     </Typography>
-                )}
-                <Typography variant="body2">{message}</Typography>
+                ))}
             </Box>
         </Box>
     );
@@ -326,11 +352,15 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
     const [syncCompleted, setSyncCompleted] = React.useState<boolean>(false);
     const [percent, setPercent] = React.useState<number>();
     const [message, setMessage] = React.useState<string>();
+    const [lines, setLines] = React.useState<Dir3SyncLogLine[]>([]);
     const downloadJson = useDir3JsonDownload();
 
     useSse('PROGRESS', 'DIR3_SYNC', (event: any) => {
         setPercent(event.percent);
         setMessage(event.message);
+        if (event.message) {
+            setLines((prev) => [...prev, { message: event.message, isError: event.status === 'ERROR' }]);
+        }
     });
 
     const resultProcessor = (result: any) => {
@@ -350,8 +380,18 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
         }
         setSenseCanvis(!hasCanvis(result));
         setSimular(false);
+        // Neteja el registre de la previsualització: el registre de la sincronització real
+        // (propera fase) ha de començar en blanc, no arrossegar els missatges d'aquesta fase.
+        setLines([]);
         setShowResultActions(true);
-        return <OrganGridDir3SyncActionResults result={result} />;
+        return (
+            <>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    {t('page.organs.grid.syncCombined.nota')}
+                </Typography>
+                <OrganGridDir3SyncActionResults result={result} />
+            </>
+        );
     };
 
     const handleSuccess = (result?: any) => {
@@ -375,7 +415,10 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
             value: true,
             text: t('page.organs.grid.sync.dialogButton.sincronitzar'),
             icon: 'save',
-            componentProps: { variant: 'contained', disabled: senseCanvis === true || syncCompleted },
+            // No es deshabilita quan `senseCanvis` (sense canvis pendents als ÒRGANS): la
+            // sincronització real actualitza també permisos, procediments, serveis i oficines
+            // SIR, que poden tenir canvis pendents encara que els òrgans no en tinguin.
+            componentProps: { variant: 'contained', disabled: syncCompleted },
         },
     ];
 
@@ -400,7 +443,7 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
             formDialogTitle={t('page.organs.grid.sync.dialogTitle')}
             formDialogButtons={formDialogButtons}
             formDialogLiveButtons={formDialogButtons}
-            formDialogLoading={<OrganGridDir3SyncLoading percent={simular ? undefined : percent} message={message} />}
+            formDialogLoading={<OrganGridDir3SyncLoading percent={simular ? undefined : percent} message={message} lines={lines} />}
             formDialogResultProcessor={resultProcessor}
             formDialogExtraActions={extraActions}
             buttonComponentProps={{ variant: 'contained', sx: { mr: 1 } }}
@@ -410,6 +453,7 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
                 setSenseCanvis(undefined);
                 setShowResultActions(false);
                 setSyncCompleted(false);
+                setLines([]);
             }}
             dialogAutoSubmit
         />

@@ -38,8 +38,16 @@ public class OrganGestorFullSyncHelper {
 	private final OrganGestorRepository organGestorRepository;
 	private final SseEventService progressEventService;
 
+	/**
+	 * Sincronitza òrgans, permisos, procediments, serveis i oficines SIR en una sola execució,
+	 * publicant el progrés combinat via SSE sota l'event indicat (permet reutilitzar aquesta
+	 * mateixa orquestració des de diferents botons/diàlegs del frontend, cadascun escoltant el
+	 * seu propi event).
+	 *
+	 * @return el resultat de la sincronització d'òrgans (primera fase), amb {@code simulat=false}.
+	 */
 	@Transactional(propagation = Propagation.REQUIRES_NEW, timeout = 3600)
-	public void sincronitzarTot(EntitatResourceEntity entitat) {
+	public OrganGestorDir3Sync sincronitzarTot(EntitatResourceEntity entitat, SseEvent.SseEventName eventName) {
 
 		var entitatDto = new EntitatDto();
 		entitatDto.setId(entitat.getId());
@@ -47,7 +55,7 @@ public class OrganGestorFullSyncHelper {
 		entitatDto.setNom(entitat.getNom());
 		entitatDto.setDir3Codi(entitat.getDir3Codi());
 
-		publish(0, "Iniciant sincronització completa");
+		publish(eventName, 0, "Iniciant sincronització completa");
 		// Fases 1 i 2 (òrgans i permisos) són prerequisit de les següents: si fallen no es pot
 		// continuar, i el flux SSE s'ha de tancar amb un event ERROR terminal perquè el frontend
 		// no quedi esperant indefinidament.
@@ -55,57 +63,58 @@ public class OrganGestorFullSyncHelper {
 		try {
 			// terminal=false: la finalització d'aquesta fase no ha de publicar DONE, que tancaria
 			// el flux SSE i descartaria els events de les fases següents.
-			resultatOrgans = organGestorSyncHelper.sincronitzar(entitat, false, SseEvent.SseEventName.ORGANS_PROCEDIMENTS_SYNC, false);
+			resultatOrgans = organGestorSyncHelper.sincronitzar(entitat, false, eventName, false);
 		} catch (Exception ex) {
 			log.error("Error sincronitzant òrgans a la sincronització combinada", ex);
-			publish(40, "Error sincronitzant òrgans: " + ex.getMessage(), SseEvent.SseEventStatus.ERROR);
+			publish(eventName, 40, "Error sincronitzant òrgans: " + ex.getMessage(), SseEvent.SseEventStatus.ERROR);
 			// Es rellança perquè la transacció REQUIRES_NEW faci rollback (una tornada normal la
-			// confirmaria malgrat l'error) i perquè OrgansProcedimentsSyncActionExecutor.exec()
-			// detecti el fallo i no informi d'un èxit fals al frontend.
+			// confirmaria malgrat l'error) i perquè l'executor detecti el fallo i no informi d'un
+			// èxit fals al frontend.
 			throw ex;
 		}
-		publish(40, "Òrgans actualitzats");
+		publish(eventName, 40, "Òrgans actualitzats");
 
-		publish(40, "Migrant permisos d'òrgans obsolets");
+		publish(eventName, 40, "Migrant permisos d'òrgans obsolets");
 		try {
-			migrarPermisos(resultatOrgans, entitat);
+			migrarPermisos(resultatOrgans, entitat, eventName);
 		} catch (Exception ex) {
 			log.error("Error migrant permisos d'òrgans obsolets a la sincronització combinada", ex);
-			publish(45, "Error migrant permisos d'òrgans obsolets: " + ex.getMessage(), SseEvent.SseEventStatus.ERROR);
+			publish(eventName, 45, "Error migrant permisos d'òrgans obsolets: " + ex.getMessage(), SseEvent.SseEventStatus.ERROR);
 			// Es rellança pel mateix motiu que a la fase d'òrgans: rollback de la transacció i
 			// propagació del fallo a l'executor.
 			throw ex;
 		}
-		publish(45, "Permisos migrats");
+		publish(eventName, 45, "Permisos migrats");
 
-		publish(45, "Actualitzant procediments");
+		publish(eventName, 45, "Actualitzant procediments");
 		try {
-			procSerSyncHelper.actualitzaProcediments(entitatDto, (percent, message) -> publish(45 + percent * 25 / 100, message));
+			procSerSyncHelper.actualitzaProcediments(entitatDto, (percent, message) -> publish(eventName, 45 + percent * 25 / 100, message));
 		} catch (Exception ex) {
 			log.error("Error actualitzant procediments a la sincronització combinada", ex);
-			publish(70, "Error actualitzant procediments: " + ex.getMessage());
+			publish(eventName, 70, "Error actualitzant procediments: " + ex.getMessage());
 		}
 
-		publish(70, "Actualitzant serveis");
+		publish(eventName, 70, "Actualitzant serveis");
 		try {
-			procSerSyncHelper.actualitzaServeis(entitatDto, (percent, message) -> publish(70 + percent * 20 / 100, message));
+			procSerSyncHelper.actualitzaServeis(entitatDto, (percent, message) -> publish(eventName, 70 + percent * 20 / 100, message));
 		} catch (Exception ex) {
 			log.error("Error actualitzant serveis a la sincronització combinada", ex);
-			publish(90, "Error actualitzant serveis: " + ex.getMessage());
+			publish(eventName, 90, "Error actualitzant serveis: " + ex.getMessage());
 		}
 
-		publish(90, "Sincronitzant oficines SIR");
+		publish(eventName, 90, "Sincronitzant oficines SIR");
 		try {
 			organGestorService.syncOficinesSIR(entitat.getId());
 		} catch (Exception ex) {
 			log.error("Error sincronitzant oficines SIR a la sincronització combinada", ex);
-			publish(95, "Error sincronitzant oficines SIR: " + ex.getMessage());
+			publish(eventName, 95, "Error sincronitzant oficines SIR: " + ex.getMessage());
 		}
 
-		publish(100, "Sincronització completada", SseEvent.SseEventStatus.DONE);
+		publish(eventName, 100, "Sincronització completada", SseEvent.SseEventStatus.DONE);
+		return resultatOrgans;
 	}
 
-	private void migrarPermisos(OrganGestorDir3Sync resultatOrgans, EntitatResourceEntity entitat) {
+	private void migrarPermisos(OrganGestorDir3Sync resultatOrgans, EntitatResourceEntity entitat, SseEvent.SseEventName eventName) {
 
 		// Substitucions: `nou` és l'extint, `vell` és el supervivent (invertit respecte del
 		// nom del camp — veure el comentari de OrganGestorSyncHelper.persistirTransicions).
@@ -136,7 +145,7 @@ public class OrganGestorFullSyncHelper {
 			unitatsSintetiques.add(node);
 		}));
 		var progres = new es.caib.notib.logic.intf.dto.ProgresActualitzacioDto();
-		progres.setOnInfo(entry -> publish(42, entry.getText()));
+		progres.setOnInfo(entry -> publish(eventName, 42, entry.getText()));
 		permisosHelper.actualitzarPermisosOrgansObsolets(unitatsSintetiques, organsDividits, organsFusionats, organsSubstituits, progres);
 	}
 
@@ -179,14 +188,14 @@ public class OrganGestorFullSyncHelper {
 			.collect(Collectors.toList());
 	}
 
-	private void publish(int percent, String message) {
-		publish(percent, message, SseEvent.SseEventStatus.RUNNING);
+	private void publish(SseEvent.SseEventName eventName, int percent, String message) {
+		publish(eventName, percent, message, SseEvent.SseEventStatus.RUNNING);
 	}
 
-	private void publish(int percent, String message, SseEvent.SseEventStatus status) {
+	private void publish(SseEvent.SseEventName eventName, int percent, String message, SseEvent.SseEventStatus status) {
 		progressEventService.publishEvent(
 			SseEventService.SseQueue.PROGRESS,
-			new SseEvent(SseEvent.SseEventName.ORGANS_PROCEDIMENTS_SYNC, percent, status, message));
+			new SseEvent(eventName, percent, status, message));
 	}
 
 }

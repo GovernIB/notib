@@ -2,6 +2,7 @@ package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.helper.AclHelper;
+import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.helper.OrganGestorFullSyncHelper;
 import es.caib.notib.logic.helper.OrganGestorSyncHelper;
@@ -212,12 +213,21 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 			}
 			try {
 				boolean simular = params.getSimular() != null && params.getSimular();
-				// terminal=!simular: la previsualització (simular=true) no ha de tancar el flux SSE
-				// (emitter.complete() al DONE), perquè l'usuari revisa els canvis i després fa una
-				// segona crida (simular=false) des del mateix diàleg; si es tanqués aquí, el frontend
-				// hauria de reconnectar l'EventSource i podria perdre's el progrés de la sincronització
-				// real. Només la sincronització real (simular=false) tanca el flux com a terminal.
-				return organGestorSyncHelper.sincronitzar(entitat.get(), simular, SseEvent.SseEventName.DIR3_SYNC, !simular);
+				if (simular) {
+					// La previsualització només mostra els canvis d'òrgans pendents (és l'únic pas
+					// amb un "diff" gràfic). terminal=false: no ha de tancar el flux SSE (emitter.
+					// complete() al DONE), perquè l'usuari revisa els canvis i després fa una segona
+					// crida (aquesta vegada la sincronització completa) des del mateix diàleg; si es
+					// tanqués aquí, el frontend hauria de reconnectar l'EventSource i podria perdre's
+					// el progrés de la sincronització real.
+					return organGestorSyncHelper.sincronitzar(entitat.get(), true, SseEvent.SseEventName.DIR3_SYNC, false);
+				}
+				// Un cop confirmada la previsualització, la sincronització real no es limita als
+				// òrgans: s'executa la sincronització completa (òrgans, permisos, procediments,
+				// serveis i oficines SIR), publicant el progrés sota el mateix event DIR3_SYNC que ja
+				// escolta el frontend des de la previsualització.
+				ConfigHelper.setEntitatCodi(entitat.get().getCodi());
+				return organGestorFullSyncHelper.sincronitzarTot(entitat.get(), SseEvent.SseEventName.DIR3_SYNC);
 			} catch (Exception ex) {
 				var msg = "Error al sincronitzar les unitats DIR3";
 				log.error(msg, ex);

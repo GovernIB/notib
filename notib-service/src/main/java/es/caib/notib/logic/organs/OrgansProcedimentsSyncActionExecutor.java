@@ -37,7 +37,7 @@ public class OrgansProcedimentsSyncActionExecutor implements BaseMutableResource
 		}
 		try {
 			ConfigHelper.setEntitatCodi(entitat.get().getCodi());
-			organGestorFullSyncHelper.sincronitzarTot(entitat.get());
+			organGestorFullSyncHelper.sincronitzarTot(entitat.get(), es.caib.notib.logic.intf.model.SseEvent.SseEventName.ORGANS_PROCEDIMENTS_SYNC);
 			return true;
 		} catch (Exception ex) {
 			var msg = "Error a la sincronització combinada d'òrgans i procediments de l'entitat " + entitat.get().getCodi() + ": ";
