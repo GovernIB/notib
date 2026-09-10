@@ -17,6 +17,7 @@ import {generateGridRowStylesFromMap, getGridRowColorClass, NOTIFICACIO_ESTAT_EN
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import CustomDetailPanelToggle from "../../utils/CustomDetailPanelToggle.tsx";
 import ContentFilter, {useSpringFilterBuilder} from "./NotificacioFiltre.tsx";
+import useSseRowRefresh from "../../hooks/useSseRowRefresh";
 
 const useDataGridColumns = (datagridApiRef: any,
                                                             notificacionsEsborrades: boolean,
@@ -311,6 +312,10 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
     const [reloadKey, setReloadKey] = React.useState(0);
     const refreshGrid = React.useCallback(() => setReloadKey(k => k + 1), []);
     const columns = useDataGridColumns(datagridApiRef, notificacionsEsborrades, notificacionsErrorRegistre, notificacionsCallbackError, refreshGrid);
+    // Actualitza automàticament, via SSE, les files de remeses visibles quan el seu estat canvia
+    // al servidor (p.ex. per una resposta de Notifica, un event de registre, un callback...), sense
+    // necessitat que l'usuari refresqui el llistat manualment.
+    useSseRowRefresh('notificacioResource', datagridApiRef, 'REMESA_ENVIAMENT_ESTAT', 'NOTIFICACIO_ESTAT_CANVIAT');
     const springFilterBuilder = useSpringFilterBuilder();
     const [searchParams] = useSearchParams();
     const referencia = searchParams.get('referencia');

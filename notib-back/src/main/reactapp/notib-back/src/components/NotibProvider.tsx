@@ -105,16 +105,19 @@ const useWindowFocusTrigger = () => {
     return trigger;
 };
 
-const useSessionStorage = (...keyParts: any[]) => {
+// Es fa servir localStorage (en lloc de sessionStorage) perquè el darrer rol/entitat/òrgan
+// utilitzats es recordin també entre sessions del navegador (p.ex. en tornar a obrir-lo), no
+// només mentre es manté la mateixa pestanya oberta.
+const useLocalStorage = (...keyParts: any[]) => {
 
     const key = keyParts.map((p) => (typeof p === 'object' && p !== null ? JSON.stringify(p) : String(p))).join('|');
-    const getValue = () => sessionStorage.getItem(key);
+    const getValue = () => localStorage.getItem(key);
     const setValue = (value: string | null) => {
         if (value == null) {
-            sessionStorage.removeItem(key);
+            localStorage.removeItem(key);
             return;
         }
-        sessionStorage.setItem(key, value);
+        localStorage.setItem(key, value);
     };
     return {getValue, setValue,};
 };
@@ -180,7 +183,7 @@ const useCurrentRole = (broadcast: BroadcastSession) => {
     const currentRole = session.role;
 
     const setCurrentRole = (role?: string) => setSession({role, entitatId: undefined, organId: undefined});
-    const { getValue: roleSessionGetValue, setValue: roleSessionSetValue } = useSessionStorage(currentUserId, 'currentRole');
+    const { getValue: roleStorageGetValue, setValue: roleStorageSetValue } = useLocalStorage(currentUserId, 'currentRole');
     const focusTrigger = useWindowFocusTrigger();
     React.useEffect(() => {
         // Obté els rols disponibles del token JWT o de __AUTH_ROLES__. Es torna a consultar quan la
@@ -231,21 +234,21 @@ const useCurrentRole = (broadcast: BroadcastSession) => {
         if (rolesAvailable == null || currentRole != null) {
             return;
         }
-        const sessionValue = roleSessionGetValue();
-        const isSessionValueInRolesAvailable = sessionValue != null && rolesAvailable?.includes(sessionValue);
-        if (sessionValue != null && isSessionValueInRolesAvailable) {
-            setCurrentRole(sessionValue);
+        const storedValue = roleStorageGetValue();
+        const isStoredValueInRolesAvailable = storedValue != null && rolesAvailable?.includes(storedValue);
+        if (storedValue != null && isStoredValueInRolesAvailable) {
+            setCurrentRole(storedValue);
         } else if (rolesAvailable?.length && currentRole == null) {
             setCurrentRole(rolesAvailable[0]);
         }
     }, [rolesAvailable, currentRole]);
 
     React.useEffect(() => {
-        // Configura el session storage i la capçalera HTTP amb el rol actual quan aquest canvia
+        // Desa al local storage i a la capçalera HTTP el rol actual quan aquest canvia
         if (currentRole === undefined) {
             return;
         }
-        roleSessionSetValue(currentRole);
+        roleStorageSetValue(currentRole);
         if (currentRole) {
             apiSetHttpHeaders([{ 'X-App-Role': currentRole }]);
         }
@@ -276,7 +279,7 @@ const useCurrentEntitat = (
     const [entitatsAvailable, setEntitatsAvailable] = React.useState<any[]>();
     const [currentEntitatLoading, setCurrentEntitatLoading] = React.useState<boolean>();
     const [currentEntitat, setCurrentEntitat] = React.useState<any>();
-    const { getValue: sessionSessionGetValue, setValue: sessionSessionSetValue } = useSessionStorage(currentUserId, 'currentSession');
+    const { getValue: entitatOrganStorageGetValue, setValue: entitatOrganStorageSetValue } = useLocalStorage(currentUserId, 'currentSession');
     const { isReady: apiIsReadyOrgan, artifactAction: apiAction } = useResourceApiService('organGestorResource', { enabled: currentRole === ROLE_ORGAN });
     const [organsAvailable, setOrgansAvailable] = React.useState<any[]>();
     const {
@@ -319,7 +322,7 @@ const useCurrentEntitat = (
             const entitatsAvailable = response.rows;
             setEntitatsAvailable(entitatsAvailable);
 
-            const storedSession = sessionSessionGetValue();
+            const storedSession = entitatOrganStorageGetValue();
 
             const parsedSession = storedSession ? JSON.parse(storedSession) : {};
             const sessionValue = parsedSession.e;
@@ -385,7 +388,7 @@ const useCurrentEntitat = (
             e: currentEntitatId,
             ...(currentOrganId != null && { o: currentOrganId }),
         });
-        sessionSessionSetValue(sessionJson);
+        entitatOrganStorageSetValue(sessionJson);
 
         apiSetHttpHeaders([
             { "X-App-Role": currentRole },

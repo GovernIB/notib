@@ -2,6 +2,8 @@ package es.caib.notib.logic.helper;
 
 import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
+import es.caib.notib.logic.intf.model.SseEvent;
+import es.caib.notib.logic.intf.resourceservice.SseEventService;
 import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EnviamentTableEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -23,6 +25,18 @@ public class EnviamentTableHelper {
     private EnviamentTableRepository enviamentTableRepository;
     @Autowired
     private NotificacioTableHelper notificacioTableHelper;
+    @Autowired
+    private SseEventService sseEventService;
+
+    /**
+     * Avisa (via SSE) que l'estat de l'enviament indicat ha canviat, perquè els clients que el
+     * tenguin visible al llistat en refresquin la fila en comptes d'esperar un refresc manual.
+     */
+    private void publicarCanviEstat(Long enviamentId) {
+        sseEventService.publishEvent(
+                SseEventService.SseQueue.REMESA_ENVIAMENT_ESTAT,
+                SseEvent.entityChanged(SseEvent.SseEventName.ENVIAMENT_ESTAT_CANVIAT, enviamentId));
+    }
 
     @Transactional(propagation = Propagation.MANDATORY)
     public void actualitzarEstat(Long enviamentId, NotificacioEstatEnumDto estat) {
@@ -94,6 +108,7 @@ public class EnviamentTableHelper {
                 .anulable(isAnulable(enviament))
                 .build();
         enviamentTableRepository.save(tableViewItem);
+        publicarCanviEstat(enviament.getId());
     }
 
     @Transactional(propagation = Propagation.MANDATORY)
@@ -166,6 +181,7 @@ public class EnviamentTableHelper {
         tableViewItem.setErrorLastCallback(enviament.isErrorLastCallback());
 
         enviamentTableRepository.saveAndFlush(tableViewItem);
+        publicarCanviEstat(enviament.getId());
         notificacioTableHelper.actualitzarRegistre(notificacio);
     }
 

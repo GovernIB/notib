@@ -54,8 +54,8 @@ class SseEventServiceImplTest {
 		AtomicBoolean called = new AtomicBoolean(false);
 		SseEventService.SseQueue queue = SseEventService.SseQueue.TEST;
 		SseEvent event = newSseEvent();
-		service.addListener(queue, e -> called.set(true));
-		service.removeListener(queue);
+		String listenerId = service.addListener(queue, e -> called.set(true));
+		service.removeListener(queue, listenerId);
 		// when
 		service.publishEvent(queue, event);
 		// then
@@ -63,8 +63,9 @@ class SseEventServiceImplTest {
 	}
 
 	@Test
-	void addListenerShouldReplaceExistingListener() {
-		// given
+	void addListenerShouldBroadcastToAllRegisteredListeners() {
+		// given: dues connexions SSE simultànies a la mateixa cua (p.ex. dos usuaris amb el
+		// llistat obert) han de rebre totes dues el mateix event, sense desallotjar-se.
 		AtomicBoolean firstCalled = new AtomicBoolean(false);
 		AtomicBoolean secondCalled = new AtomicBoolean(false);
 		SseEventService.SseQueue queue = SseEventService.SseQueue.TEST;
@@ -72,6 +73,23 @@ class SseEventServiceImplTest {
 		service.addListener(queue, e -> firstCalled.set(true));
 		service.addListener(queue, e -> secondCalled.set(true));
 		// when
+		service.publishEvent(queue, event);
+		// then
+		assertTrue(firstCalled.get());
+		assertTrue(secondCalled.get());
+	}
+
+	@Test
+	void removeListenerShouldOnlyAffectItsOwnListener() {
+		// given
+		AtomicBoolean firstCalled = new AtomicBoolean(false);
+		AtomicBoolean secondCalled = new AtomicBoolean(false);
+		SseEventService.SseQueue queue = SseEventService.SseQueue.TEST;
+		SseEvent event = newSseEvent();
+		String firstListenerId = service.addListener(queue, e -> firstCalled.set(true));
+		service.addListener(queue, e -> secondCalled.set(true));
+		// when
+		service.removeListener(queue, firstListenerId);
 		service.publishEvent(queue, event);
 		// then
 		assertFalse(firstCalled.get());

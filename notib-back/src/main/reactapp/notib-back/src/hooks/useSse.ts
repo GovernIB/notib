@@ -8,13 +8,15 @@ type SseCallback = (event: any) => void;
 type TokenProvider = () => string | undefined;
 
 /**
- * Connexió SSE compartida per tots els subscriptors d'una mateixa cua (queueId).
+ * Connexió SSE compartida per tots els subscriptors d'una mateixa cua (queueId) EN AQUESTA
+ * PESTANYA/sessió del navegador.
  *
- * El backend (SseEventServiceImpl) només manté UN listener per nom de cua, de manera global:
- * `consumers.put(queue.name(), listener)`. Si dos components obren cadascun el seu propi
- * EventSource cap a /api/sse/{queueId}, el segon a registrar-se desallotja silenciosament el
- * listener del primer i només un dels dos rep events. Per això aquí es multiplexa: una sola
- * connexió per queueId, i el repartiment per nom d'event es fa al client.
+ * El backend (SseEventServiceImpl) admet múltiples listeners simultanis per cua (un per cada
+ * connexió SSE, p.ex. un per usuari o pestanya oberta), de manera que dues pestanyes/usuaris
+ * diferents reben totes dues els mateixos events sense desallotjar-se. Tot i així, dins una
+ * mateixa pestanya es continua multiplexant en una sola connexió EventSource per queueId (encara
+ * que hi hagi diversos components subscrits a noms d'event diferents de la mateixa cua), evitant
+ * obrir-ne una per cada `useSse`; el repartiment per nom d'event es fa al client.
  */
 type SharedConnection = {
     eventSource: EventSource;

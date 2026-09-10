@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
@@ -20,7 +21,12 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor
 public class SseEventServiceImpl implements SseEventService {
 
-	private final Map<String, Consumer<SseEvent>> consumers = new ConcurrentHashMap<>();
+	// Múltiples listeners per cua: cada connexió SSE (un per usuari/pestanya) en registra un, tots
+	// reben tots els events publicats a la cua. Abans només s'admetia un listener per cua (pensat
+	// per un únic procés de progrés com la sincronització DIR3), i un segon subscriptor desallotjava
+	// silenciosament el primer; ara cal difondre canvis d'estat a tots els usuaris que tenen un
+	// llistat obert.
+	private final Map<String, Map<String, Consumer<SseEvent>>> consumers = new ConcurrentHashMap<>();
 	// Darrer event publicat per cua, mentre encara no s'hagi tancat (DONE/ERROR). Un procés llarg
 	// (p.ex. la sincronització DIR3, que pot trigar desenes de segons abans del primer event de
 	// progrés) pot començar a publicar events abans que el frontend hagi acabat d'establir la
@@ -31,14 +37,16 @@ public class SseEventServiceImpl implements SseEventService {
 	private final Map<String, SseEvent> lastEvents = new ConcurrentHashMap<>();
 
 	@Override
-	public void addListener(SseQueue queue, Consumer<SseEvent> listener) {
-		log.debug("SSE listener add: " + queue.name());
-		consumers.put(queue.name(), listener);
+	public String addListener(SseQueue queue, Consumer<SseEvent> listener) {
+		var listenerId = UUID.randomUUID().toString();
+		log.debug("SSE listener add: " + queue.name() + ", " + listenerId);
+		consumers.computeIfAbsent(queue.name(), q -> new ConcurrentHashMap<>()).put(listenerId, listener);
 		SseEvent lastEvent = lastEvents.get(queue.name());
 		if (lastEvent != null) {
 			log.debug("SSE listener catch-up: " + queue.name() + ", " + lastEvent.getMessage() + ", " + lastEvent.getPercent());
 			listener.accept(lastEvent);
 		}
+		return listenerId;
 	}
 
 	@Override
@@ -50,19 +58,24 @@ public class SseEventServiceImpl implements SseEventService {
 		} else {
 			lastEvents.put(queue.name(), event);
 		}
-		Consumer<SseEvent> listener = consumers.get(queue.name());
-		if (listener != null) {
-			log.debug("SSE listener accept: " + queue.name() + ", " + event.getMessage() + ", " + event.getPercent());
-			listener.accept(event);
-		} else {
+		var listeners = consumers.get(queue.name());
+		if (listeners == null || listeners.isEmpty()) {
 			log.debug("SSE listener discard: " + queue.name() + ", " + event.getMessage() + ", " + event.getPercent());
+			return;
+		}
+		log.debug("SSE listener accept: " + queue.name() + ", " + listeners.size() + " listener(s), " + event.getMessage() + ", " + event.getPercent());
+		for (var listener : listeners.values()) {
+			listener.accept(event);
 		}
 	}
 
 	@Override
-	public void removeListener(SseQueue queue) {
-		log.debug("SSE listener remove: " + queue.name());
-		consumers.remove(queue.name());
+	public void removeListener(SseQueue queue, String listenerId) {
+		log.debug("SSE listener remove: " + queue.name() + ", " + listenerId);
+		var listeners = consumers.get(queue.name());
+		if (listeners != null) {
+			listeners.remove(listenerId);
+		}
 	}
 
 }

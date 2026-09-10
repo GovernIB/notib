@@ -12,17 +12,19 @@ import java.util.function.Consumer;
 public interface SseEventService {
 
 	/**
-	 * Registra un listener per a un procés.
+	 * Registra un listener per a una cua. Admet múltiples listeners simultanis per la mateixa cua
+	 * (per exemple, un per cada usuari que té el llistat obert): tots reben els events publicats.
 	 *
 	 * @param queue
 	 *            la coa d'events que es vol escoltar.
 	 * @param listener
 	 *            el consumidor.
+	 * @return l'identificador únic d'aquest listener, necessari per eliminar-lo amb removeListener.
 	 */
-	void addListener(SseQueue queue, Consumer<SseEvent> listener);
+	String addListener(SseQueue queue, Consumer<SseEvent> listener);
 
 	/**
-	 * Publica un event.
+	 * Publica un event. Es reenvia a tots els listeners registrats a la cua indicada.
 	 *
 	 * @param event
 	 *            la informació de l'event.
@@ -30,15 +32,18 @@ public interface SseEventService {
 	void publishEvent(SseQueue queue, SseEvent event);
 
 	/**
-	 * Esborra el listener del registre.
+	 * Esborra un listener concret del registre.
 	 *
 	 * @param queue
 	 *            la coa d'events de la qual es vol esborrar el listener.
+	 * @param listenerId
+	 *            l'identificador retornat per addListener.
 	 */
-	void removeListener(SseQueue queue);
+	void removeListener(SseQueue queue, String listenerId);
 
 	enum SseQueue {
 		PROGRESS,
+		REMESA_ENVIAMENT_ESTAT,
 		TEST
 	}
 

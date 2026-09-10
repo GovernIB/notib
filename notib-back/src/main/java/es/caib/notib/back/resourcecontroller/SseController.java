@@ -18,6 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import javax.annotation.PreDestroy;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -33,7 +41,28 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequiredArgsConstructor
 public class SseController extends BaseController {
 
+	// En producció l'aplicació queda darrere d'un proxy que talla les connexions inactives més de
+	// 30 segons. Com que un event real (canvi d'estat, progrés d'una sync...) pot trigar molt més a
+	// arribar, cal enviar periòdicament un "batec" perquè el proxy no consideri la connexió SSE
+	// inactiva i la tanqui, encara que el client no en faci res (és un comentari SSE, no un event).
+	private static final long HEARTBEAT_INTERVAL_SECONDS = 15;
+
 	private final SseEventService sseEventService;
+	private final ScheduledExecutorService heartbeatScheduler = Executors.newScheduledThreadPool(2, sseHeartbeatThreadFactory());
+
+	private static ThreadFactory sseHeartbeatThreadFactory() {
+		var counter = new AtomicInteger();
+		return runnable -> {
+			var thread = new Thread(runnable, "sse-heartbeat-" + counter.incrementAndGet());
+			thread.setDaemon(true);
+			return thread;
+		};
+	}
+
+	@PreDestroy
+	public void shutdown() {
+		heartbeatScheduler.shutdownNow();
+	}
 
 	@Hidden
 	@GetMapping
@@ -62,33 +91,60 @@ public class SseController extends BaseController {
 				.findFirst();
 		if (queue.isPresent()) {
 			SseEmitter emitter = new SseEmitter(0L);
-			sseEventService.addListener(queue.get(), event -> {
+			// L'identificador del listener no es coneix fins que retorna addListener, però les
+			// callbacks de l'emitter (incloent la del propi listener, que es pot invocar de manera
+			// síncrona per reenviar l'últim event conegut) el necessiten: es guarda en un
+			// AtomicReference perquè totes hi tinguin accés un cop assignat.
+			var listenerId = new AtomicReference<String>();
+			listenerId.set(sseEventService.addListener(queue.get(), event -> {
 				try {
 					emitter.send(SseEmitter.event().name(event.getEventName().name()).data(event));
 					if (SseEvent.SseEventStatus.DONE.equals(event.getStatus()) || SseEvent.SseEventStatus.ERROR.equals(event.getStatus())) {
 						emitter.complete();
-						sseEventService.removeListener(queue.get());
+						sseEventService.removeListener(queue.get(), listenerId.get());
 					}
 				} catch (Exception ex) {
 					emitter.completeWithError(ex);
-					sseEventService.removeListener(queue.get());
+					sseEventService.removeListener(queue.get(), listenerId.get());
 				}
-			});
+			}));
+			ScheduledFuture<?> heartbeat = heartbeatScheduler.scheduleAtFixedRate(
+				() -> sendHeartbeat(emitter),
+				HEARTBEAT_INTERVAL_SECONDS,
+				HEARTBEAT_INTERVAL_SECONDS,
+				TimeUnit.SECONDS);
 			emitter.onCompletion(() -> {
 				log.debug("Emitter onCompletion");
-				sseEventService.removeListener(queue.get());
+				heartbeat.cancel(true);
+				sseEventService.removeListener(queue.get(), listenerId.get());
 			});
 			emitter.onTimeout(() -> {
 				log.debug("Emitter onTimeout");
-				sseEventService.removeListener(queue.get());
+				heartbeat.cancel(true);
+				sseEventService.removeListener(queue.get(), listenerId.get());
 			});
 			emitter.onError(e -> {
 				log.debug("Emitter onError", e);
-				sseEventService.removeListener(queue.get());
+				heartbeat.cancel(true);
+				sseEventService.removeListener(queue.get(), listenerId.get());
 			});
 			return ResponseEntity.ok(emitter);
 		} else {
 			return ResponseEntity.notFound().build();
+		}
+	}
+
+	/**
+	 * Envia un comentari SSE buit (una línia ":", ignorada per l'EventSource del client) només
+	 * perquè hi hagi tràfic de tant en tant a la connexió i el proxy intermedi no la doni per
+	 * inactiva. Si l'enviament falla és que la connexió ja no és vàlida: no cal fer res, l'emitter
+	 * mateix dispararà onError/onCompletion i el batec quedarà cancel·lat des d'allà.
+	 */
+	private void sendHeartbeat(SseEmitter emitter) {
+		try {
+			emitter.send(SseEmitter.event().comment("heartbeat"));
+		} catch (Exception ex) {
+			log.debug("SSE heartbeat: connexió ja tancada", ex);
 		}
 	}
 

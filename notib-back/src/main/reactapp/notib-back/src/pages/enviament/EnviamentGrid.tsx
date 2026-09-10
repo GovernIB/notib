@@ -26,6 +26,7 @@ import {useSearchParams} from "react-router-dom";
 import useAccionsNotificacio from "../accions/AccionsNotificacio.tsx";
 import {ROLE_ADMIN_LECTURA, useNotibContext} from "../../components/NotibContext.ts";
 import {GridApiPro, useGridApiRef} from "@mui/x-data-grid-pro";
+import useSseRowRefresh from "../../hooks/useSseRowRefresh";
 
 const columns = [
     {
@@ -272,6 +273,9 @@ const EnviamentGrid = () => {
     const datagridApiRef = useGridApiRef();
     const [reloadKey, setReloadKey] = React.useState(0);
     const refreshGrid = React.useCallback(() => setReloadKey(k => k + 1), []);
+    // Actualitza automàticament, via SSE, les files d'enviaments visibles quan el seu estat canvia
+    // al servidor, sense necessitat que l'usuari refresqui el llistat manualment.
+    useSseRowRefresh('notificacioEnviamentResource', datagridApiRef, 'REMESA_ENVIAMENT_ESTAT', 'ENVIAMENT_ESTAT_CANVIAT');
     const referencia = searchParams.get('referencia');
     const filterDataGridProps = useDatagridFilterProps(
         'notificacioEnviamentResource',

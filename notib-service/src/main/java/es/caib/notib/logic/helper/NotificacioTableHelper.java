@@ -5,6 +5,8 @@ import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
+import es.caib.notib.logic.intf.model.SseEvent;
+import es.caib.notib.logic.intf.resourceservice.SseEventService;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.NotificacioEventEntity;
@@ -35,6 +37,21 @@ public class NotificacioTableHelper {
     private NotificacioMassivaRepository notificacioMassivaRepository;
     @Autowired
     private EnviamentTableRepository enviamentTableRepository;
+    @Autowired
+    private SseEventService sseEventService;
+
+    /**
+     * Avisa (via SSE) que l'estat de la remesa indicada ha canviat, perquè els clients que la
+     * tenguin visible al llistat en refresquin la fila en comptes d'esperar un refresc manual.
+     * Només s'envia l'identificador: el valor actualitzat es calcula de manera peresosa quan el
+     * client torna a demanar el recurs, reaprofitant el mateix mecanisme de generació sota demanda
+     * de l'estatString.
+     */
+    private void publicarCanviEstat(Long notificacioId) {
+        sseEventService.publishEvent(
+                SseEventService.SseQueue.REMESA_ENVIAMENT_ESTAT,
+                SseEvent.entityChanged(SseEvent.SseEventName.NOTIFICACIO_ESTAT_CANVIAT, notificacioId));
+    }
 
 
     @Transactional(propagation = Propagation.MANDATORY)
@@ -153,6 +170,7 @@ public class NotificacioTableHelper {
             }
             item.setPerActualitzar(true);
             notificacioTableViewRepository.saveAndFlush(item);
+            publicarCanviEstat(item.getId());
         } catch (Exception ex) {
             log.error("Error actualitzant la informació de la notificació " + not.getId(), ex);
         }
@@ -165,6 +183,9 @@ public class NotificacioTableHelper {
             var tableViewItem = enviamentTableRepository.findById(enviamentId).orElseThrow();
             tableViewItem.setEstat(estat);
             enviamentTableRepository.save(tableViewItem);
+            sseEventService.publishEvent(
+                    SseEventService.SseQueue.REMESA_ENVIAMENT_ESTAT,
+                    SseEvent.entityChanged(SseEvent.SseEventName.ENVIAMENT_ESTAT_CANVIAT, enviamentId));
         } catch (Exception ex) {
             log.error("[EnviamentTableHelper.actualitzarEstat] Error actualitzant l'estat per l'enviament amb id " + enviamentId + " estat " + estat);
         }
@@ -307,6 +328,7 @@ public class NotificacioTableHelper {
             tableViewItem.setEstatMask(estatMask);
             tableViewItem.setPerActualitzar(true);
             notificacioTableViewRepository.saveAndFlush(tableViewItem);
+            publicarCanviEstat(tableViewItem.getId());
             if (notificacio.getNotificacioMassivaEntity() == null) {
                 return;
             }
