@@ -444,6 +444,7 @@ const translationCa = {
                     remesa: 'Informació de la remesa',
                     enviaments: 'Enviaments',
                     documents: 'Documents adjunts',
+                    metodesEnviament: "Métodes d'enviament"
                 },
                 enviaments: {
                     title: 'Enviament',
@@ -1235,6 +1236,21 @@ const translationCa = {
                 ENVIADA_AMB_ERRORS: "Finalitzat",
                 FINALITZADA_AMB_ERRORS: "Processat",
             },
+            CIE_ESTAT_MAP: {
+                ENVIADO_CI: "Entregada al centre d'impresió",
+                ENTREGADO_OP: "Entregada a l'operador postal",
+                CANCELADO: "Cancelada",
+                ERROR: "Error",
+                EXTRAVIADA: "Extraviada",
+                SIN_INFORMACION: "Sense informació",
+                REHUSADA: "Rebutjada",
+                AUSENTE: "Ausent",
+                NOTIFICADA: "Notificada",
+                DESCONOCIDO: "Desconegut",
+                DIRECCION_INCORRECTA: "Direcció incorrecta",
+                FALLECIDO: "Mort",
+                DEVUELTO: "Retornada"
+            }
         },
     },
     comu: {

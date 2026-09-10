@@ -5,6 +5,7 @@ import es.caib.notib.client.domini.EntregaPostalVia;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
+import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import es.caib.notib.logic.intf.dto.NotificaDomiciliNumeracioTipusEnumDto;
@@ -18,7 +19,7 @@ import lombok.Setter;
 import java.util.Date;
 
 /**
- * Informació d'un enviament d'una notificació.
+ * Informació de l'entrega postal d'un enviament d'una notificació.
  *
  * @author Límit Tecnologies
  */
@@ -27,10 +28,17 @@ import java.util.Date;
 @NoArgsConstructor
 @ResourceConfig(
 	descriptionField = "id",
-	accessConstraints = @ResourceAccessConstraint(
-		type = ResourceAccessConstraint.ResourceAccessConstraintType.AUTHENTICATED,
-		grantedPermissions = { PermissionEnum.READ, PermissionEnum.CREATE }
-	)
+	accessConstraints = {
+		@ResourceAccessConstraint(
+			type = ResourceAccessConstraint.ResourceAccessConstraintType.AUTHENTICATED,
+			grantedPermissions = { PermissionEnum.READ, PermissionEnum.CREATE, PermissionEnum.WRITE }
+		),
+		@ResourceAccessConstraint(
+			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+			roles = { BaseConfig.ROLE_USER },
+			grantedPermissions = { PermissionEnum.READ, PermissionEnum.CREATE, PermissionEnum.WRITE }
+		),
+	}
 )
 public class EntregaPostalResource extends BaseResource<Long> {
 

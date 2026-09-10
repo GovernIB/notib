@@ -24,8 +24,10 @@ import es.caib.notib.persist.resourceentity.PersonaResourceEntity;
 import es.caib.notib.persist.resourcerepository.CallbackResourceRepository;
 import es.caib.notib.persist.resourcerepository.EventResourceRepository;
 import es.caib.notib.persist.resourcerepository.NotificacioEnviamentResourceRepository;
+import es.caib.notib.persist.resourcerepository.UsuariResourceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tika.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +46,7 @@ public class NotificacioDetallPerspectiveApplicator implements BaseReadonlyResou
 	private final EventResourceRepository eventResourceRepository;
 	private final MessageHelper messageHelper;
 	private final NotibPermissionHelper notibPermissionHelper;
+	private final UsuariResourceRepository usuariResourceRepository;
 
 	@Override
 	public void applySingle(String code, NotificacioResourceEntity entity, NotificacioResource resource) throws PerspectiveApplicationException {
@@ -54,7 +57,17 @@ public class NotificacioDetallPerspectiveApplicator implements BaseReadonlyResou
 		resource.setNotificacioAntiga(DatesUtils.isNowAfterDate(entity.getCreatedDate(), llindarDies));
 		resource.setComunicacioSir(entity.isComunicacioSir());
 		resource.setPermisProcessar(hasPermisProcessar(entity));
-//		legacyHelper.actualitzarColumnaEstat(entity);
+		var createdBy = usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null);
+		if (createdBy != null) {
+			resource.setCreatedByNom(createdBy.getNomSencer());
+		}
+		if (!StringUtils.isBlank(entity.getUsuariCodi())) {
+			var usuari = usuariResourceRepository.findById(entity.getUsuariCodi()).orElse(null);
+			if (createdBy != null) {
+				resource.setUsuariNom(usuari.getNomSencer());
+				resource.setUsuariCodi(usuari.getCodi());
+			}
+		}
 		//CALLBACKS
 		var pendents = callbackResourceRepository.findByNotificacioIdAndEstatOrderByDataDesc(entity.getId(), CallbackEstatEnumDto.PENDENT);
 		resource.setEventsCallbackPendent(entity.isTipusUsuariAplicacio() && pendents != null && !pendents.isEmpty());

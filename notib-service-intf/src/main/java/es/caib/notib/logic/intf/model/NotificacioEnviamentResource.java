@@ -54,7 +54,7 @@ import java.util.List;
 		@ResourceAccessConstraint(
 			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
 			roles = {BaseConfig.ROLE_USER},
-			grantedPermissions = {PermissionEnum.READ}
+			grantedPermissions = {PermissionEnum.READ, PermissionEnum.WRITE, PermissionEnum.CREATE}
 		)
 	},
 	artifacts = {

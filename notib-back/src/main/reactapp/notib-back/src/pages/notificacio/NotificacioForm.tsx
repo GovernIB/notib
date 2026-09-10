@@ -15,7 +15,6 @@ import {
     useFormContext,
     useFormApiRef,
     useResourceApiContext,
-    useResourceApiService,
 } from 'reactlib';
 import NotificacioFormEnviaments from './NotificacioFormEnviaments';
 import NotificacioFormDocuments from './NotificacioFormDocuments';
@@ -127,31 +126,14 @@ const ProcedimentServeiField: React.FC = () => {
     const { t } = useTranslation();
     const { data, apiRef: formApiRef } = useFormContext();
     const [type, setType] = React.useState<string>('procediment');
-    const {isReady: apiIsReady, getOne: apiGetOne} = useResourceApiService('procedimentResource');
-
     const procSerOptionsRequest = useProcSerOptionsRequest(type);
 
     const handleChange = (value: any) => {
         setType(value);
-        // console.log(data);
         if (data.procediment != null) {
             formApiRef.current?.setFieldValue('procediment', null);
         }
     };
-
-    React.useEffect(() => {
-
-        const procediment = data.procediment;
-        if (!apiIsReady || !procediment?.id) {
-            return;
-        }
-        apiGetOne(procediment.id)
-            .then((resposta: any) => {
-                console.log(resposta);
-                formApiRef.current?.setFieldValue('entregaPostalActiva', true);
-            })
-            .catch((error: any) => console.error(error));
-        }, [apiIsReady, data.procediment, data.entregaPostalActiva, apiGetOne]);
 
     if (data.enviamentTipus === 'SIR') {
         return (
