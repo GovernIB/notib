@@ -466,8 +466,24 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                 selectionActive={!notificacionsEsborrades ? true : undefined}
                 rowUpdateLink="form/{{id}}"
                 rowUpdateShowInMenu
-                // persistentStateClearPageSortPropsOnTopLevelRouteChange
-                // persistentStateActive
+                // Aquest mateix component es fa servir per a les 4 rutes de notificacions
+                // (totes, esborrades, error de registre, error de callback), cadascuna amb un
+                // joc de columnes diferent (vegeu useDataGridColumns): la clau per defecte
+                // (basada només en resourceName) faria que l'estat persistit d'una vista es
+                // sobreescrivís incorrectament amb el d'una altra. Per això s'inclou un sufix
+                // que les distingeix.
+                persistentStateKey={
+                    'notificacioResource' +
+                    (notificacionsEsborrades
+                        ? '-esborrades'
+                        : notificacionsErrorRegistre
+                            ? '-errorRegistre'
+                            : notificacionsCallbackError
+                                ? '-callbackError'
+                                : '')
+                }
+                persistentStateClearPageSortPropsOnTopLevelRouteChange
+                persistentStateActive
                 rowHideDeleteButton
                 rowHideUpdateButton={params => (mostrarEditarBorrar(params.estat) || noEsTaulaRemeses)}
                 {...filterDataGridProps}

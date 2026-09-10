@@ -87,8 +87,8 @@ export const PermisosUsuariGrid = () => {
                 columns={columns}
                 paginationActive
                 className="permisos-grid"
-                // persistentStateActive
-                // persistentStateClearPageSortPropsOnTopLevelRouteChange
+                persistentStateActive
+                persistentStateClearPageSortPropsOnTopLevelRouteChange
                 {...filterDataGridProps}
                 {...pageSizeOptionsDataGridProps}
                 toolbarType="upper"

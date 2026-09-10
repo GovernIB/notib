@@ -525,8 +525,12 @@ export const OrganGrid = () => {
                 columns={columns}
                 fixedFilter={"entitat.id:" + currentEntitatId}
                 {...treeDataProps}
-                // persistentStateActive
-                // persistentStateClearPageSortPropsOnTopLevelRouteChange
+                // La vista en arbre i la vista de taula tenen columnes diferents (useColumns), per
+                // això la clau inclou quina de les dues està activa: en cas contrari l'estat
+                // persistit d'una es sobreescriuria incorrectament amb el de l'altra.
+                persistentStateKey={'organGestorResource-' + (treeDataViewActive ? 'tree' : 'flat')}
+                persistentStateActive
+                persistentStateClearPageSortPropsOnTopLevelRouteChange
                 {...filterDataGridProps}
                 {...pageSizeOptionsDataGridProps}
                 toolbarType="upper"

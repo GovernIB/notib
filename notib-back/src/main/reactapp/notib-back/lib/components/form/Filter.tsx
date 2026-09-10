@@ -136,7 +136,7 @@ export const Filter: React.FC<FilterProps> = (props) => {
         persistentStateActive ?? false,
         initialDataProp,
         persistentStateKey ?? resourceName,
-        persistentStateStorage === 'local'
+        persistentStateStorage !== 'session'
     );
     const [nextDataChangeAsUncontrolled, setNextDataChangeAsUncontrolled] =
         React.useState<boolean>(false);

@@ -1046,7 +1046,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         treeDataDefaultExpandedRowIds,
         datagridApiRef,
         persistentStateKey ?? resourceName,
-        persistentStateStorage === 'local'
+        persistentStateStorage !== 'session'
     );
     const {
         sortModel,
