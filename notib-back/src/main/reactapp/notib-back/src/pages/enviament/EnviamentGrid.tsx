@@ -11,6 +11,7 @@ import {
 } from 'reactlib';
 import { Grid, IconButton } from '@mui/material';
 import GridFormField, { GridButtonField } from '../../components/GridFormField';
+import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
 import { useNotificacioDetailDialog } from '../notificacio/NotificacioDetailDialog';
 import AccionsMassives, {MenuOption, MenuOptionDivider, useAccionsMassives} from '../../components/AccionsMassives';
@@ -197,6 +198,7 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
 const ContentFilter: React.FC<{openByDefault?: boolean}> = ({openByDefault}) => {
     const filterApiRef = useFilterApiContext();
     const { t } = useTranslation();
+    const organGestorOptionRenderer = useOrganGestorOptionRenderer();
     const [advancedFilter, setAdvancedFilter] = React.useState(openByDefault ?? false);
 
     const handleButtonClick = () => {
@@ -230,7 +232,7 @@ const ContentFilter: React.FC<{openByDefault?: boolean}> = ({openByDefault}) => 
                     <GridFormField size={2} name="enviamentDataProgramadaFi" />
                     <GridFormField size={2} name="notificaReferencia" />
                     <GridFormField size={2} name="grupCodi" />
-                    <GridFormField size={4} name="organGestor" namedQueries={`PERM_READ`} />
+                    <GridFormField size={4} name="organGestor" namedQueries={`PERM_READ`} optionRenderer={organGestorOptionRenderer} />
                     <GridFormField size={3} name="procedimentServei" filter={procedimentFiltre} />
                     <GridFormField size={2} name="createdBy" />
                     <GridFormField size={3} name="notificacioDescripcio" />

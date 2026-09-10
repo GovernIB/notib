@@ -2,6 +2,7 @@ package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
+import es.caib.notib.logic.cacheable.PermisosCacheable;
 import es.caib.notib.logic.helper.AclHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
@@ -68,6 +69,7 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 	private final AclHelper aclHelper;
 	private final AuthenticationHelper authenticationHelper;
 	private final UserSessionHelper userSessionHelper;
+	private final PermisosCacheable permisosCacheable;
 	private final ProcedimentResourceRepository procedimentResourceRepository;
 	private final OrganGestorResourceRepository organGestorResourceRepository;
 	private final ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository;
@@ -215,6 +217,7 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 			var classe = getClassFromResourceName(resource.getResourceName());
 			aclHelper.set(classe, resource.getResourceId(), resource.getSidName(), resource.isSidGrantedAuthority(), permissionsGranted);
 		}
+		evictPermisosCaches();
 		return entity;
 	}
 
@@ -237,6 +240,16 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 
 		var resource = entity.getResource();
 		aclHelper.delete(getClassFromResourceName(resource.getResourceName()), resource.getResourceId(), resource.getSidName(), resource.isSidGrantedAuthority());
+		evictPermisosCaches();
+	}
+
+	// Els permisos concedits/revocats aquí (entitat, òrgan gestor, procediment) es reflecteixen a les
+	// caches de permisos de tots els usuaris (getPermisosEntitatsUsuariActual, entitats i òrgans gestors
+	// accessibles), perquè el canvi sigui visible sense haver de tornar a iniciar sessió.
+	private void evictPermisosCaches() {
+		permisosCacheable.evictAllPermisosEntitatsUsuariActual();
+		permisosCacheable.evictAllFindEntitatsAccessiblesUsuari();
+		permisosCacheable.evictAllFindOrgansGestorsAccessiblesUsuari();
 	}
 
 	/*

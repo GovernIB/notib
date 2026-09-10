@@ -50,7 +50,9 @@ export const Grups: React.FC = () => {
                 popupEditActive
                 popupEditFormContent={<GrupForm />}
                 popupEditFormDialogResourceTitle={t('page.grups.grid.popupResourceTitle')}
+                toolbarHideCreate={isRoleAdminLectura ? true : undefined}
                 rowHideUpdateButton={isRoleAdminLectura}
+                rowHideDeleteButton={isRoleAdminLectura}
             />
         </GridPage>
     );

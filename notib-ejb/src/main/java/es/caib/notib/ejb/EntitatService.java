@@ -17,6 +17,7 @@ import es.caib.notib.logic.intf.dto.TipusDocumentEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import org.springframework.context.annotation.Primary;
+import org.springframework.security.core.Authentication;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -179,6 +180,12 @@ public class EntitatService extends AbstractService<es.caib.notib.logic.intf.ser
 	@PermitAll
 	public Map<RolEnumDto, Boolean> getPermisosEntitatsUsuariActual() {
 		return getDelegateService().getPermisosEntitatsUsuariActual();
+	}
+
+	@Override
+	@PermitAll
+	public Map<RolEnumDto, Boolean> getPermisosEntitatsUsuariActual(Authentication auth) {
+		return getDelegateService().getPermisosEntitatsUsuariActual(auth);
 	}
 
 	@Override

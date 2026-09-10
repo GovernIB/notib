@@ -4,6 +4,10 @@ import AuthContext from './AuthContext';
 
 const LOG_PREFIX = '[CAUTH]';
 const CHECK_TOKEN_TIMEOUT_MARGIN_SECS = 1;
+// Temps mínim d'espera abans de tornar a verificar el token. Si el servidor retorna un token que ja ha
+// (o està a punt de) caducar, sense aquest mínim es tornaria a demanar immediatament, en un bucle que
+// repeteix la petició sense parar mentre el servidor no serveixi un token amb més vigència.
+const CHECK_TOKEN_MIN_DELAY_MS = 5000;
 
 type AuthProviderProps = React.PropsWithChildren & {
     /** La url a carregar després de fer logout */
@@ -81,8 +85,10 @@ export const AuthProvider = (props: AuthProviderProps) => {
         tokenRef.current = token;
         const tokenParsed = parseJwt(token);
         tokenParsedRef.current = tokenParsed;
-        const checkTokenTimeout =
-            (tokenParsed.exp - Date.now() / 1000 + CHECK_TOKEN_TIMEOUT_MARGIN_SECS) * 1000;
+        const checkTokenTimeout = Math.max(
+            (tokenParsed.exp - Date.now() / 1000 + CHECK_TOKEN_TIMEOUT_MARGIN_SECS) * 1000,
+            CHECK_TOKEN_MIN_DELAY_MS
+        );
         tokenParsed && checkTokenRefresh(checkTokenTimeout);
         setLoading(false);
         debug && logConsole.debug('Token', verified ? 'verificat:' : 'obtingut:', token);

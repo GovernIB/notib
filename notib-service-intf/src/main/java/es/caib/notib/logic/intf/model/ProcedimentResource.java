@@ -87,6 +87,56 @@ import java.util.Date;
 					roles = { BaseConfig.ROLE_ADMIN })
 			}
 		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = ProcedimentResource.PROCEDIMENT_ACTIVAR_ACTION_CODE,
+			requiresId = true,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN })
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = ProcedimentResource.PROCEDIMENT_DESACTIVAR_ACTION_CODE,
+			requiresId = true,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN })
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = ProcedimentResource.PROCEDIMENT_ACTUALITZAR_ACTION_CODE,
+			requiresId = true,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN })
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = ProcedimentResource.PROCEDIMENT_SYNC_MANUAL_ACTION_CODE,
+			requiresId = true,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN })
+			}
+		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = ProcedimentResource.PROCEDIMENT_SYNC_AUTO_ACTION_CODE,
+			requiresId = true,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN })
+			}
+		),
 	}
 )
 @CustomValidation.List({
@@ -107,6 +157,11 @@ public class ProcedimentResource extends BaseResource<Long> {
 	public static final String PROCEDIMENTS_SYNC_ACTION_CODE = "PROCEDIMENTS_SYNC";
 	public static final String SERVEIS_SYNC_ACTION_CODE = "SERVEIS_SYNC";
 	public static final String PROCEDIMENTS_NETEJAR_CACHE_ACTION_CODE = "PROCEDIMENTS_NETEJAR_CACHE";
+	public static final String PROCEDIMENT_ACTIVAR_ACTION_CODE = "PROCEDIMENT_ACTIVAR";
+	public static final String PROCEDIMENT_DESACTIVAR_ACTION_CODE = "PROCEDIMENT_DESACTIVAR";
+	public static final String PROCEDIMENT_ACTUALITZAR_ACTION_CODE = "PROCEDIMENT_ACTUALITZAR";
+	public static final String PROCEDIMENT_SYNC_MANUAL_ACTION_CODE = "PROCEDIMENT_SYNC_MANUAL";
+	public static final String PROCEDIMENT_SYNC_AUTO_ACTION_CODE = "PROCEDIMENT_SYNC_AUTO";
 
 	@NotNull
 	private ProcSerTipusEnum tipus;

@@ -175,17 +175,36 @@ coherència amb el que mostra la previsualització) no la toca. Com que
 "organ_gestor"` = `not_organ_gestor`) i declara la mateixa relació, la
 solució és:
 
+**Important — polaritat `vell`/`nou` als camps de substitucions/fusions/divisions:**
+a diferència de `modificacions` (on `vell`=estat antic a BD, `nou`=estat nou
+de DIR3, tal com suggereix el nom), a `OrganGestorSyncHelper.sincronitzar()`
+els camps `vell`/`nou` de `substitucions`/`fusions`/`divisions` tenen el
+significat *invertit*: `vell` és l'òrgan que **sobreviu** (vigent) i `nou` és
+el que **s'extingeix**. Confirmat traçant `substitucionsMap`
+(`key`=vigent, `value`=`extincioDarreraVersio`, sempre extint per
+construcció a `getDir3SyncNodesExistentsDarreraVersioExtincio`) i el
+constructor `new OrganGestorDir3SyncCanviSubstitucio(toArbreItem(key),
+toArbreItem(value))` amb els camps declarats com `(vell, nou)`. A fusions
+`vells[]` sí que són els extints (múltiples) i `nou` el supervivent —
+consistent amb el nom. A divisions `vell` és l'extint (un) i `nous[]` els
+supervivents (múltiples) — també consistent. Només substitucions té la
+inversió.
+
 1. **`OrganGestorSyncHelper.actualitzarOrgansGestors(...)`** (aplicat sempre,
    no només per al flux combinat): després de crear/actualitzar totes les
    entitats, per a cada substitució/fusió/divisió ja calculada a
    `substitucionsMap`/`fusionsMap`/`divisionsMap` (dins `sincronitzar()`),
-   carregar les `OrganGestorEntity` origen i destí per codi
-   (`organGestorRepository.findByCodiIn(...)`, ja existent) i cridar
+   carregar les `OrganGestorEntity` origen (extint) i destí (vigent) per
+   codi (`organGestorRepository.findByCodiIn(...)`, ja existent) i cridar
    `origen.addNou(desti)` per a cada parella, guardant amb
-   `organGestorRepository.saveAll(...)`. Els orígens són sempre `vell`
-   (substitucions/fusions) o `vell` (divisions); els destins són `nou`
-   (substitucions/divisions) o cadascun dels `vells` (per a fusions, cada
-   origen apunta al mateix `nou`).
+   `organGestorRepository.saveAll(...)`:
+   - Substitucions: origen=`nou` (extint), destí=`vell` (vigent) — **al
+     revés dels noms de camp**, per la inversió explicada més amunt.
+   - Fusions: origen=cadascun dels `vells` (extints), destí=`nou` (vigent).
+   - Divisions: origen=`vell` (extint), destí=cadascun dels `nous`
+     (vigents) — requereix que el bug de `divisions[].nous` sempre buit
+     (`OrganGestorSyncHelper.java:141`, veure pla d'implementació del
+     Component 1) estigui corregit primer.
 2. **A `OrganGestorFullSyncHelper`** (el nou orquestrador), després
    d'aplicar la fase d'òrgans: construir els paràmetres de
    `actualitzarPermisosOrgansObsolets` a partir del resultat
@@ -193,11 +212,11 @@ solució és:
    consultar DIR3, evitant el problema que la marca d'aigua
    `dataSincronitzacio`/`dataActualitzacio` de l'entitat ja s'ha avançat):
    - `organsDividits` = `organGestorRepository.findByCodiIn(codis dels
-     divisions[].vell)`
+     divisions[].vell)` (extints)
    - `organsFusionats` = `organGestorRepository.findByCodiIn(codis de
-     fusions[].vells[], aplanats)`
+     fusions[].vells[], aplanats)` (extints)
    - `organsSubstituits` = `organGestorRepository.findByCodiIn(codis dels
-     substitucions[].vell)`
+     substitucions[].nou)` (extints — **no `.vell`**, per la inversió)
    - `unitatsWs`: com que `actualitzarPermisosOrgansObsolets` només fa
      servir `unitat.getCodi()` per aparellar-lo amb les tres llistes
      anteriors (i salta silenciosament les divisions), n'hi ha prou amb una

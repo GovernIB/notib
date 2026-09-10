@@ -15,6 +15,8 @@ import {
     useFormContext,
     useFormApiRef,
     useResourceApiContext,
+    useResourceApiService,
+    springFilterBuilder,
 } from 'reactlib';
 import NotificacioFormEnviaments from './NotificacioFormEnviaments';
 import NotificacioFormDocuments from './NotificacioFormDocuments';
@@ -48,7 +50,7 @@ type ProcSerOption = {
     comu?: boolean;
 };
 
-const useProcSerOptionsRequest = (type: string) => {
+const useProcSerOptionsRequest = (type: string, organGestorId?: number | string) => {
     const { t } = useTranslation();
     const { fields } = useFormContext();
     const { requestHref } = useResourceApiContext();
@@ -60,7 +62,21 @@ const useProcSerOptionsRequest = (type: string) => {
             }
             const templateData = {
                 quickFilter: q?.length ? q : null,
-                filter: "tipus:'" + type.toUpperCase() + "'",
+                // Els procediments/serveis comuns no tenen òrgan gestor, per la qual cosa el filtre
+                // per organGestor només ha de restringir els que no ho són; per no perdre'ls del
+                // desplegable, es combina amb un "or" que sempre inclou els comuns.
+                filter: springFilterBuilder.and(
+                    springFilterBuilder.eq('tipus', `'${type.toUpperCase()}'`),
+                    // Al desplegable de l'alta de notificacions/remeses no s'han de mostrar els procediments/
+                    // serveis inactius.
+                    springFilterBuilder.eq('actiu', true),
+                    organGestorId != null
+                        ? springFilterBuilder.or(
+                              springFilterBuilder.eq('organGestor', organGestorId),
+                              springFilterBuilder.eq('comu', true)
+                          )
+                        : ''
+                ),
                 page: 'UNPAGED',
             };
             return requestHref(dataSource.href, templateData).then((state) => {
@@ -91,7 +107,7 @@ const useProcSerOptionsRequest = (type: string) => {
                 return { options };
             });
         },
-        [dataSource, requestHref, type, t]
+        [dataSource, requestHref, type, organGestorId, t]
     );
 };
 
@@ -121,12 +137,21 @@ const procSerOptionRenderer = ({ id, description }: { id: string | number; descr
     return <Box sx={{ pl: 2 }}>{description}</Box>;
 };
 
-const ProcedimentServeiField: React.FC = () => {
+type ProcedimentServeiFieldProps = {
+    // Marcat a true just abans d'emplenar automàticament l'òrgan gestor a partir del procediment
+    // seleccionat, perquè l'onChange de l'òrgan gestor (que normalment buida el procediment en
+    // canviar-lo) sàpiga que aquest canvi ve del propi procediment i no ha d'esborrar-lo.
+    organGestorFromProcedimentRef: React.MutableRefObject<boolean>;
+};
+
+const ProcedimentServeiField: React.FC<ProcedimentServeiFieldProps> = ({ organGestorFromProcedimentRef }) => {
 
     const { t } = useTranslation();
     const { data, apiRef: formApiRef } = useFormContext();
     const [type, setType] = React.useState<string>('procediment');
-    const procSerOptionsRequest = useProcSerOptionsRequest(type);
+    const {isReady: apiIsReady, getOne: apiGetOne} = useResourceApiService('procedimentResource');
+
+    const procSerOptionsRequest = useProcSerOptionsRequest(type, data.organGestor?.id);
 
     const handleChange = (value: any) => {
         setType(value);
@@ -134,6 +159,26 @@ const ProcedimentServeiField: React.FC = () => {
             formApiRef.current?.setFieldValue('procediment', null);
         }
     };
+
+    React.useEffect(() => {
+
+        const procediment = data.procediment;
+        if (!apiIsReady || !procediment?.id) {
+            return;
+        }
+        apiGetOne(procediment.id)
+            .then((resposta: any) => {
+                console.log(resposta);
+                formApiRef.current?.setFieldValue('entregaPostalActiva', true);
+                // Un procediment/servei no comú sempre pertany a un únic òrgan gestor: l'emplenam
+                // automàticament perquè l'usuari no l'hagi de triar dues vegades.
+                if (!resposta.comu && resposta.organGestor?.id !== data.organGestor?.id) {
+                    organGestorFromProcedimentRef.current = true;
+                    formApiRef.current?.setFieldValue('organGestor', resposta.organGestor);
+                }
+            })
+            .catch((error: any) => console.error(error));
+        }, [apiIsReady, data.procediment, data.entregaPostalActiva, apiGetOne]);
 
     if (data.enviamentTipus === 'SIR') {
         return (
@@ -171,7 +216,6 @@ const ProcedimentServeiField: React.FC = () => {
             <FormField
                 name="procediment"
                 // onChange={(value) => handleChangeProcediment(value)}
-                filter={"tipus:'" + type.toUpperCase() + "'"}
                 required={data.procedimentRequired}
                 optionsRequest={procSerOptionsRequest}
                 optionRenderer={procSerOptionRenderer}
@@ -182,6 +226,21 @@ const ProcedimentServeiField: React.FC = () => {
 
 export const NotificacioFormContent: React.FC = () => {
     const { t } = useTranslation();
+    const { data, apiRef: formApiRef } = useFormContext();
+    // Vegeu ProcedimentServeiFieldProps: evita que emplenar l'òrgan gestor a partir del
+    // procediment seleccionat esborri, tot seguit, aquest mateix procediment.
+    const organGestorFromProcedimentRef = React.useRef(false);
+
+    const handleOrganGestorChange = () => {
+        if (organGestorFromProcedimentRef.current) {
+            organGestorFromProcedimentRef.current = false;
+            return;
+        }
+        if (data.procediment != null) {
+            formApiRef.current?.setFieldValue('procediment', null);
+        }
+    };
+
     return (
         <Grid container spacing={2}>
             <Grid size={12}>
@@ -191,9 +250,9 @@ export const NotificacioFormContent: React.FC = () => {
                 <GridFormField size={12} name="concepte" />
             </Grid>
             <GridFormField size={12} name="descripcio" type="textarea" />
-            <GridFormField size={6} name="organGestor" namedQueries={`PERM_READ`} />
+            <GridFormField size={6} name="organGestor" namedQueries={`PERM_READ_VIGENT`} onChange={handleOrganGestorChange} />
             <Grid size={6}>
-                <ProcedimentServeiField />
+                <ProcedimentServeiField organGestorFromProcedimentRef={organGestorFromProcedimentRef} />
             </Grid>
             <GridFormField size={6} name="numExpedient" />
             <GridFormField size={6} name="idioma" />

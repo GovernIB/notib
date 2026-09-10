@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -45,6 +46,30 @@ import java.util.stream.Collectors;
 public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<UnitatsOrganitzativesPlugin> {
 
 	public static final String GRUP = "DIR3";
+
+	// Consultar DIR3 (findAmbPare/findAmbPareJson) pot trigar desenes de segons. Es manté una
+	// petita memòria cau, de vida curta, perquè obrir la previsualització i descarregar el JSON
+	// tot seguit (o reobrir la previsualització) no dupliqui la mateixa consulta lenta.
+	private static final long CACHE_TTL_MILLIS = 120_000L;
+	private final Map<String, CacheEntry<List<NodeDir3>>> findByPareCache = new ConcurrentHashMap<>();
+	private final Map<String, CacheEntry<byte[]>> findByPareJsonCache = new ConcurrentHashMap<>();
+
+	private static class CacheEntry<T> {
+		private final long timestamp = System.currentTimeMillis();
+		private final T value;
+		private CacheEntry(T value) {
+			this.value = value;
+		}
+		private boolean isExpired() {
+			return System.currentTimeMillis() - timestamp > CACHE_TTL_MILLIS;
+		}
+	}
+
+	private static String cacheKey(String entitatCodi, String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) {
+		return entitatCodi + "|" + pareCodi + "|"
+			+ (dataActualitzacio == null ? "" : dataActualitzacio.getTime()) + "|"
+			+ (dataSincronitzacio == null ? "" : dataSincronitzacio.getTime());
+	}
 
 	private final MessageHelper messageManager;
 
@@ -106,6 +131,11 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 
 	public byte[] unitatsOrganitzativesFindByPareJSON(String entitatCodi, String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) {
 
+		var key = cacheKey(entitatCodi, pareCodi, dataActualitzacio, dataSincronitzacio);
+		var cached = findByPareJsonCache.get(key);
+		if (cached != null && !cached.isExpired()) {
+			return cached.value;
+		}
 		var info = new IntegracioInfo(IntegracioCodi.UNITATS, "Obtenier llista JSON d'unitats donat un pare", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("unitatPare", pareCodi));
 		try {
@@ -114,6 +144,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 			// peticionsPlugin.updatePeticioTotal(entitatCodi);
 			var unitatsOrganitzatives = getPlugin().findAmbPareJson(pareCodi, dataActualitzacio, dataSincronitzacio);
 			integracioHelper.addAccioOk(info);
+			findByPareJsonCache.put(key, new CacheEntry<>(unitatsOrganitzatives));
 			return unitatsOrganitzatives;
 		} catch (SistemaExternException sex) {
 			throw sex;
@@ -127,6 +158,11 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 
 	public List<NodeDir3> unitatsOrganitzativesFindByPare(String entitatCodi, String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) {
 
+		var key = cacheKey(entitatCodi, pareCodi, dataActualitzacio, dataSincronitzacio);
+		var cached = findByPareCache.get(key);
+		if (cached != null && !cached.isExpired()) {
+			return cached.value;
+		}
 		var info = new IntegracioInfo(IntegracioCodi.UNITATS, "Consulta llista d'unitats donat un pare", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("unitatPare", pareCodi),
 				new AccioParam("fechaActualizacion", dataActualitzacio == null ? null : dataActualitzacio.toString()),
@@ -137,6 +173,7 @@ public class UnitatsOrganitzativesPluginHelper extends AbstractPluginHelper<Unit
 			// peticionsPlugin.updatePeticioTotal(entitatCodi);
 			var unitatsOrganitzatives = getPlugin().findAmbPare(pareCodi, dataActualitzacio, dataSincronitzacio);
 			removeUnitatsSubstitutedByItself(unitatsOrganitzatives);
+			findByPareCache.put(key, new CacheEntry<>(unitatsOrganitzatives));
 			/*if (unitatsOrganitzatives == null || unitatsOrganitzatives.isEmpty()) {
 				var errorMissatge = messageManager.getMessage("organgestor.actualitzacio.sense.canvis");
 				info.addParam("Resultat", "No s'han obtingut canvis.");

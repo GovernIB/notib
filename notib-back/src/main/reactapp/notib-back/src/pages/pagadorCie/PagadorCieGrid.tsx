@@ -11,8 +11,10 @@ import {
 } from 'reactlib';
 import LinkToTab from '../../components/LinkToTab';
 import GridFormField from '../../components/GridFormField';
+import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
+import { ROLE_ADMIN_LECTURA, useNotibContext } from '../../components/NotibContext';
 
 const columns = [
     {
@@ -69,12 +71,13 @@ const ContentFilter: React.FC = () => {
 
     const { t } = useTranslation();
     const filterApiRef = useFilterApiContext();
+    const organGestorOptionRenderer = useOrganGestorOptionRenderer();
     const handleButtonClick = () => filterApiRef.current?.clear();
     return (
         <Grid container spacing={2}>
             <GridFormField size={2} name="nom" />
-            <GridFormField size={3} name="organGestorEmissor" />
-            <GridFormField size={3} name="organGestorPagador" />
+            <GridFormField size={3} name="organGestorEmissor" optionRenderer={organGestorOptionRenderer} />
+            <GridFormField size={3} name="organGestorPagador" optionRenderer={organGestorOptionRenderer} />
             <GridFormField size={1.75} name="contracteDataVigInici" />
             <GridFormField size={1.75} name="contracteDataVigFinal" />
             <Grid size={0.5}>
@@ -89,6 +92,8 @@ const ContentFilter: React.FC = () => {
 export const PagadorCieGrid: React.FC = () => {
 
     const { t } = useTranslation();
+    const { currentRole } = useNotibContext();
+    const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
     const filterDataGridProps = useDatagridFilterProps(
         'pagadorCieResource',
         'FILTER_PAGADOR_CIE',
@@ -109,8 +114,11 @@ export const PagadorCieGrid: React.FC = () => {
                 {...pageSizeOptionsDataGridProps}
                 toolbarType="upper"
                 toolbarCreateLink="form"
+                toolbarHideCreate={isRoleAdminLectura ? true : undefined}
                 rowLink="form/{{id}}"
                 rowUpdateLink="form/{{id}}"
+                rowHideUpdateButton={isRoleAdminLectura}
+                rowHideDeleteButton={isRoleAdminLectura}
             />
         </GridPage>
     );

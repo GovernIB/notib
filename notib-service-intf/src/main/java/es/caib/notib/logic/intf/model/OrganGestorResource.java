@@ -74,6 +74,16 @@ import java.io.Serializable;
 			}
 		),
 		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = OrganGestorResource.ORGANS_PROCEDIMENTS_SYNC_ACTION_CODE,
+			formClass = OrganGestorResource.OrganGestorDir3SyncForm.class,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN })
+			}
+		),
+		@ResourceArtifact(
 			type = ResourceArtifactType.FILTER,
 			code = OrganGestorResource.FILTER_CODE,
 			formClass = OrganGestorResource.OrganGestorResourceFilter.class
@@ -98,6 +108,15 @@ import java.io.Serializable;
 				)
 			}
 		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.REPORT,
+			code = OrganGestorResource.REPORT_DESCARREGAR_DIR3_JSON,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN })
+			}
+		),
 	}
 )
 public class OrganGestorResource extends BaseResource<Long> {
@@ -107,8 +126,13 @@ public class OrganGestorResource extends BaseResource<Long> {
 
 	public static final String DIR3_SYNC_ACTION_CODE = "DIR3_SYNC";
 	public static final String OFICINES_SYNC_ACTION_CODE = "OFICINES_SYNC";
+	public static final String ORGANS_PROCEDIMENTS_SYNC_ACTION_CODE = "ORGANS_PROCEDIMENTS_SYNC";
+	public static final String REPORT_DESCARREGAR_DIR3_JSON = "REPORT_DESCARREGAR_DIR3_JSON";
 	public static final String FILTER_CODE = "FILTER_ORGAN_GESTOR";
 	public static final String NAMED_QUERY_PERM_READ = "PERM_READ";
+	// Com NAMED_QUERY_PERM_READ, però només retorna els òrgans vigents; s'usa al desplegable de l'alta de
+	// notificacions/remeses, on no s'han de poder seleccionar òrgans no vigents.
+	public static final String NAMED_QUERY_PERM_READ_VIGENT = "PERM_READ_VIGENT";
 	public static final String NAMED_QUERY_PERM_NOT = "PERM_NOT";
 	public static final String NAMED_QUERY_PERM_COM = "PERM_COM";
 	public static final String NAMED_QUERY_PERM_SIR = "PERM_SIR";

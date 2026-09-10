@@ -11,10 +11,12 @@ import {
     ROLE_ADMIN,
     ROLE_ADMIN_LECTURA,
     ROLE_ORGAN,
+    ROLE_APLICACIO,
     ROLE_USER,
 } from './NotibContext';
+import { getAuthRolesUrl } from '../appUrls';
 
-const ALLOWED_ROLES = [ROLE_SUPER, ROLE_ADMIN, ROLE_ADMIN_LECTURA, ROLE_ORGAN, ROLE_USER].reverse();
+const ALLOWED_ROLES = [ROLE_APLICACIO, ROLE_SUPER, ROLE_ADMIN, ROLE_ADMIN_LECTURA, ROLE_ORGAN, ROLE_USER].reverse();
 
 export const notibChannel = new BroadcastChannel('notib');
 type CurrentSession = Readonly<{
@@ -90,6 +92,19 @@ const decodeJwt = (token: string) => {
     return JSON.parse(atob(base64));
 };
 
+// Es fa servir per tornar a consultar els rols disponibles quan l'usuari torna a la pestanya/finestra
+// (p.ex. després que un administrador li hagi concedit un permís nou), sense haver de tancar sessió.
+const useWindowFocusTrigger = () => {
+
+    const [trigger, setTrigger] = React.useState(0);
+    React.useEffect(() => {
+        const handleFocus = () => setTrigger((t) => t + 1);
+        window.addEventListener('focus', handleFocus);
+        return () => window.removeEventListener('focus', handleFocus);
+    }, []);
+    return trigger;
+};
+
 const useSessionStorage = (...keyParts: any[]) => {
 
     const key = keyParts.map((p) => (typeof p === 'object' && p !== null ? JSON.stringify(p) : String(p))).join('|');
@@ -128,9 +143,10 @@ const useCurrentUser = () => {
     return { currentUser, setCurrentUser, currentUserGridPageSizeOptions };
 };
 
-const useMaxResultSelects = () => {
+const useMaxResultSelects = (currentRole: string | undefined) => {
 
-    const { isReady: apiIsReady, find: apiFind } = useResourceApiService('configResource');
+    // El rol aplicació no té accés al recurs configResource.
+    const { isReady: apiIsReady, find: apiFind } = useResourceApiService('configResource', { enabled: currentRole !== ROLE_APLICACIO });
     const [maxResultSelects, setMaxResultSelects] = React.useState<number>();
     React.useEffect(() => {
         if (!apiIsReady) {
@@ -160,8 +176,13 @@ const useCurrentRole = (broadcast: BroadcastSession) => {
 
     const setCurrentRole = (role?: string) => setSession({role, entitatId: undefined, organId: undefined});
     const { getValue: roleSessionGetValue, setValue: roleSessionSetValue } = useSessionStorage(currentUserId, 'currentRole');
+    const focusTrigger = useWindowFocusTrigger();
     React.useEffect(() => {
-        // Obté els rols disponibles del token JWT o de __AUTH_ROLES__
+        // Obté els rols disponibles del token JWT o de __AUTH_ROLES__. Es torna a consultar quan la
+        // finestra recupera el focus (focusTrigger) perquè, si un administrador ha concedit o revocat
+        // un permís mentre l'usuari tenia l'aplicació oberta, el canvi es reflecteixi sense haver de
+        // tancar sessió; com que currentRole ja està establert, això no en força el canvi, només
+        // n'actualitza la llista de disponibles.
         if (!authIsReady) {
             return;
         }
@@ -178,10 +199,21 @@ const useCurrentRole = (broadcast: BroadcastSession) => {
             setRolesAvailable(rolesAvailable);
             return;
         }
-        const realmRoles = tokenDecoded.realm_access?.roles?.filter((r: string) => r === ROLE_USER || r.startsWith(ROLE_PREFIX)) ?? [];
-        const rolesAvailable = ALLOWED_ROLES.filter((a) => realmRoles.includes(a));
-        setRolesAvailable(rolesAvailable);
-    }, [authIsReady]);
+        // Els rols del token només inclouen els gestionats des de Keycloak: n'hi ha (com l'administrador
+        // d'òrgan) que es concedeixen des de NOTIB i no hi apareixen mai. Es consulten sempre al
+        // servidor, que és qui coneix els permisos reals; si la consulta falla es cau als rols del
+        // propi token, per no deixar l'aplicació sense cap rol disponible.
+        fetch(getAuthRolesUrl(), { headers: { Authorization: 'Bearer ' + token } }).
+            then((response) => response.ok ? response.json() : Promise.reject(response.status)).
+            then((serverRoles: string[]) => {
+                setRolesAvailable(ALLOWED_ROLES.filter((a) => serverRoles.includes(a)));
+            }).
+            catch((error) => {
+                console.error('Error obtenint els rols disponibles des del servidor:', error);
+                const realmRoles = tokenDecoded.realm_access?.roles?.filter((r: string) => r === ROLE_USER || r.startsWith(ROLE_PREFIX)) ?? [];
+                setRolesAvailable(ALLOWED_ROLES.filter((a) => realmRoles.includes(a)));
+            });
+    }, [authIsReady, focusTrigger]);
 
     React.useEffect(() => {
         // Configura l'estat amb el rol actual si aquest encara no s'ha inicialitzat i els rols disponibles ja s'han obtingut
@@ -226,13 +258,16 @@ const useCurrentEntitat = (
 ) => {
 
     const { httpHeaders: apiHttpHeaders, setHttpHeaders: apiSetHttpHeaders } = useResourceApiContext();
-    const {isReady: apiIsReady, find: apiFind, getOne: apiGetOne} = useResourceApiService('entitatResource');
+    // El rol aplicació no té accés al recurs entitatResource (no apareix ni al document arrel de l'API), per tant
+    // cal no consultar-lo per a aquest rol: quedaria bloquejat esperant per sempre un recurs que mai estarà llest.
+    const roleWithoutEntitat = currentRole === ROLE_APLICACIO;
+    const {isReady: apiIsReady, find: apiFind, getOne: apiGetOne} = useResourceApiService('entitatResource', { enabled: !roleWithoutEntitat });
     const [entitatsAvailable, setEntitatsAvailable] = React.useState<any[]>();
     const [currentEntitatLoading, setCurrentEntitatLoading] = React.useState<boolean>();
     const [currentEntitat, setCurrentEntitat] = React.useState<any>();
     const { getValue: sessionSessionGetValue, setValue: sessionSessionSetValue } = useSessionStorage(currentUserId, 'currentSession');
     const { isReady: apiIsReadyOrgan, artifactAction: apiAction } = useResourceApiService('organGestorResource', { enabled: currentRole === ROLE_ORGAN });
-    const [organsAvailable, setOrgansAvailable] = React.useState<any[]>([]);
+    const [organsAvailable, setOrgansAvailable] = React.useState<any[]>();
     const {
         session,
         setSession
@@ -245,12 +280,25 @@ const useCurrentEntitat = (
 
     const setCurrentOrganId = (id?: number) => setSession({ organId: id });
     React.useEffect(() => {
-        if (!apiIsReady || !currentRoleReady || currentRole == null) {
+        if (!currentRoleReady || currentRole == null) {
+            return;
+        }
+        if (roleWithoutEntitat) {
+            setEntitatsAvailable([]);
+            setCurrentEntitat(undefined);
+            setCurrentEntitatId(undefined);
+            setOrgansAvailable(undefined);
+            return;
+        }
+        if (!apiIsReady) {
             return;
         }
         setEntitatsAvailable(undefined);
         setCurrentEntitat(undefined);
         setCurrentEntitatId(undefined);
+        if (currentRole !== ROLE_ORGAN) {
+            setOrgansAvailable(undefined);
+        }
 
         if (currentRole === ROLE_SUPER) {
             setEntitatsAvailable([]);
@@ -265,9 +313,11 @@ const useCurrentEntitat = (
             const parsedSession = storedSession ? JSON.parse(storedSession) : {};
             const sessionValue = parsedSession.e;
             const isSessionValueInEntitatsAvailable = entitatsAvailable.map((e) => e.id).includes(sessionValue);
+            // Si l'entitat actual (la darrera seleccionada, es mantengui o no amb el nou rol) té permís
+            // amb el rol actual es manté; en cas contrari se selecciona la primera entitat disponible.
             if (isSessionValueInEntitatsAvailable) {
                 setCurrentEntitatId(sessionValue);
-            } else if (entitatsAvailable?.length && currentEntitatId == null) {
+            } else if (entitatsAvailable?.length) {
                 setCurrentEntitatId(entitatsAvailable[0].id);
             }
             if (!apiIsReadyOrgan || currentRole !== ROLE_ORGAN) {
@@ -283,9 +333,37 @@ const useCurrentEntitat = (
                 } else if (organs.length) {
                     setCurrentOrganId(organs[0].id);
                 }
-            }).catch(error => console.error(error))
+            }).catch((error) => {
+                console.error(error);
+                setOrgansAvailable([]);
+            })
+        }).catch((error) => {
+            // Si la consulta d'entitats falla (p.ex. l'usuari no té cap permís concedit) es considera que no
+            // té accés a cap entitat, en lloc de deixar l'aplicació carregant indefinidament.
+            console.error('Error obtenint les entitats disponibles:', error);
+            setEntitatsAvailable([]);
+            setOrgansAvailable([]);
         });
     }, [apiIsReady, apiIsReadyOrgan, currentRoleReady, currentRole]);
+
+    const entitatsFocusTrigger = useWindowFocusTrigger();
+    React.useEffect(() => {
+        // Quan la finestra recupera el focus es torna a consultar la llista d'entitats disponibles en
+        // segon pla (sense el reset "carregant" complet de l'efecte anterior, per no fer parpellejar
+        // l'aplicació), perquè un permís concedit o revocat mentre l'usuari tenia l'aplicació oberta es
+        // reflecteixi sense haver de tancar sessió. Si l'entitat actual ha deixat de tenir permís es
+        // canvia a la primera disponible.
+        if (entitatsFocusTrigger === 0 || roleWithoutEntitat || !apiIsReady || !currentRoleReady || currentRole == null || currentRole === ROLE_SUPER) {
+            return;
+        }
+        apiFind({ unpaged: true }).then((response) => {
+            const freshEntitats = response.rows;
+            setEntitatsAvailable(freshEntitats);
+            if (currentEntitatId != null && !freshEntitats.some((e: any) => e.id === currentEntitatId)) {
+                setCurrentEntitatId(freshEntitats.length ? freshEntitats[0].id : undefined);
+            }
+        }).catch((error) => console.error('Error refrescant les entitats disponibles:', error));
+    }, [entitatsFocusTrigger]);
 
     React.useEffect(() => {
         if (currentRole == null || currentRole === ROLE_SUPER || currentEntitatId == null) {
@@ -324,7 +402,10 @@ const useCurrentEntitat = (
     const entitatIdHttpHeaderInitialized = currentRole === ROLE_SUPER
         || (currentEntitatId == null && currentEntitatIdFromHttpHeader == null)
         || currentEntitatId === currentEntitatIdFromHttpHeader;
-    const currentEntitatReady = apiIsReady && entitatsAvailable != null && entitatIdHttpHeaderInitialized;
+    // Per a l'administrador d'òrgan cal esperar que el selector d'òrgans de la capçalera hagi rebut els valors
+    // abans de donar l'aplicació per carregada, per no mostrar-lo momentàniament buit.
+    const organsReady = currentRole !== ROLE_ORGAN || organsAvailable != null;
+    const currentEntitatReady = roleWithoutEntitat || (apiIsReady && entitatsAvailable != null && entitatIdHttpHeaderInitialized && organsReady);
     return {
         currentEntitatId,
         currentEntitatReady,
@@ -349,13 +430,23 @@ const NotibProviderLoading: React.FC = () => {
     );
 };
 
+const NotibProviderNoAccess: React.FC = () => {
+
+    const { t } = useTranslation();
+    return (
+        <Box sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh',}}>
+            <Typography variant="h6">{t('app.sensePermisos')}</Typography>
+        </Box>
+    );
+};
+
 export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
 
     const { offline: apiOffline } = useResourceApiContext();
     const broadcast = useBroadcastSession();
     const { currentUserId, currentRole, currentRoleReady, rolesAvailable, setCurrentRole } = useCurrentRole(broadcast);
     const { currentUser, setCurrentUser, currentUserGridPageSizeOptions } = useCurrentUser();
-    const maxResultSelects = useMaxResultSelects();
+    const maxResultSelects = useMaxResultSelects(currentRole);
     const {
         currentEntitatId,
         currentEntitatReady,
@@ -368,6 +459,17 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
         setCurrentOrganId
     } = useCurrentEntitat(broadcast, currentUserId, currentRole, currentRoleReady);
     const isReady = apiOffline || (currentRoleReady && currentEntitatReady && currentUser != null);
+    // Un usuari autenticat sense cap dels rols de NOTIB no arribarà mai a tenir un rol actual, per tant cal
+    // distingir aquest cas del de "encara carregant" per no deixar l'aplicació carregant indefinidament.
+    const noRolesAvailable = rolesAvailable != null && rolesAvailable.length === 0;
+    // Un cop l'aplicació ha arribat a estar llesta una vegada, canviar de rol o d'entitat torna a posar
+    // isReady a false momentàniament (es tornen a demanar entitats/òrgans). No es vol tornar a mostrar
+    // l'spinner de pàgina completa en aquest cas (faria l'efecte de refrescar tota l'aplicació): un cop
+    // superada la càrrega inicial es continuen mostrant els fills, encara que isReady torni a ser false.
+    const hasBeenReadyRef = React.useRef(false);
+    if (isReady) {
+        hasBeenReadyRef.current = true;
+    }
     const contextValue = {
         isReady,
         currentUser,
@@ -388,7 +490,7 @@ export const NotibProvider: React.FC<React.PropsWithChildren> = ({ children }) =
     };
     return (
         <NotibContext.Provider value={contextValue}>
-            {isReady ? children : <NotibProviderLoading />}
+            {noRolesAvailable ? <NotibProviderNoAccess /> : (isReady || hasBeenReadyRef.current) ? children : <NotibProviderLoading />}
         </NotibContext.Provider>
     );
 };

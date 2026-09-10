@@ -17,6 +17,7 @@ import es.caib.notib.logic.intf.dto.TipusDocumentEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
@@ -203,6 +204,20 @@ public interface EntitatService {
 	 */
 //	@PreAuthorize("isAuthenticated()")
 	public Map<RolEnumDto, Boolean> getPermisosEntitatsUsuariActual();
+
+	/**
+	 * Comprova els permisos (Usuari, Administrador d'entitat, Administrador de lectura, Aplicació i
+	 * Administrador d'òrgan) de l'usuari indicat. A diferència de {@link #getPermisosEntitatsUsuariActual()},
+	 * no depèn del SecurityContextHolder: rep l'Authentication explícitament, ja que s'ha de poder cridar
+	 * durant la construcció d'aquest (p.ex. en calcular les autoritats a partir del JWT o dels rols J2EE
+	 * a JBoss), abans que s'hagi instal·lat al contexte de seguretat. Per aquest mateix motiu no es pot
+	 * anotar amb @PreAuthorize.
+	 *
+	 * @param auth l'Authentication a comprovar.
+	 * @return El mapa de permisos, amb la mateixa semàntica que {@link #getPermisosEntitatsUsuariActual()}.
+	 */
+	Map<RolEnumDto, Boolean> getPermisosEntitatsUsuariActual(Authentication auth);
+
 	/**
 	 * Consulta els permisos de l'entitat.
 	 * 

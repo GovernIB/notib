@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.back.controller;
 
@@ -8,6 +8,7 @@ import es.caib.notib.back.helper.AjaxHelper;
 import es.caib.notib.back.helper.MissatgesHelper;
 import es.caib.notib.back.helper.ModalHelper;
 import es.caib.notib.back.helper.RolHelper;
+import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -43,7 +45,7 @@ import java.util.jar.Manifest;
 
 /**
  * Controlador amb utilitats per a l'aplicació NOTIB.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -59,18 +61,46 @@ public class NotibController implements ErrorController {
 	@Autowired
 	private SessionScopedContext sessionScopedContext;
 
+	public static final String PROPERTY_INTERFICIE_REACT_PER_DEFECTE = "es.caib.notib.app.interficie.react.defecte";
+	// Cookie que marca la interfície triada explícitament per l'usuari (des del selector de la capçalera
+	// de cada interfície), que preval sobre la propietat de la interfície per defecte. Es fixa des del
+	// navegador (no des d'aquest controlador) precisament perquè, sent una cookie, sobreviu a qualsevol
+	// redirecció intermèdia (p.ex. una reautenticació) que pugui haver-hi entre l'acció de canviar
+	// d'interfície i l'arribada final a aquest mètode.
+	private static final String COOKIE_INTERFICIE = "notibInterficie";
+	private static final String INTERFICIE_REACT = "react";
+	private static final String INTERFICIE_JSP = "jsp";
+
 	@GetMapping(value = "/")
 	public String root(HttpServletRequest request) {
+		var interficiePreferida = getCookieValue(request, COOKIE_INTERFICIE);
+		var reactPerDefecte = INTERFICIE_JSP.equals(interficiePreferida) ? false :
+				INTERFICIE_REACT.equals(interficiePreferida) ? true :
+				Boolean.parseBoolean(aplicacioService.propertyGet(PROPERTY_INTERFICIE_REACT_PER_DEFECTE, "true"));
+		if (reactPerDefecte) {
+			return "redirect:" + BaseConfig.REACT_APP_PATH + "/";
+		}
 		var rolActual = sessionScopedContext.getRolActual();
 		return RolHelper.ROLE_SUPER.equals(rolActual) ? "redirect:/integracio" :
 				RolHelper.ROLE_APLICACIO.equals(rolActual) ? "redirect:/api/rest" : "redirect:/notificacio";
+	}
+
+	private static String getCookieValue(HttpServletRequest request, String name) {
+		if (request.getCookies() == null) {
+			return null;
+		}
+		return Arrays.stream(request.getCookies()).
+				filter(cookie -> name.equals(cookie.getName())).
+				map(Cookie::getValue).
+				findFirst().
+				orElse(null);
 	}
 
 	private static final String REDIRECT_NOTIFICACIO = "redirect:notificacio";
 
 	@GetMapping(value = "/index")
 	public String get(HttpServletRequest request, Model model) {
-		
+
 		if (RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual())) {
 			return "redirect:integracio";
 		}

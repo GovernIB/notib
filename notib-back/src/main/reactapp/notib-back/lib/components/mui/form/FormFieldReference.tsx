@@ -19,6 +19,8 @@ const DEFAULT_PAGE_SIZE = 5;
 type FormFieldReferenceRendererArgs = {
     id: any;
     description: string;
+    /** Dades completes de l'element (tal com les ha retornat el backend), quan estan disponibles. */
+    data?: any;
 };
 
 type FormFieldRefProps = FormFieldCustomProps & {
@@ -227,6 +229,7 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
                             const options = state.getEmbedded().map((e) => ({
                                 id: e.data[valueField],
                                 description: e.data[labelField],
+                                data: e.data,
                             }));
                             const response = {
                                 options,
@@ -398,6 +401,7 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
                     const optionRendererArgs = {
                         id: option.id,
                         description: option.description,
+                        data: option.data,
                     };
                     const optionDescription = optionRenderer
                         ? optionRenderer(optionRendererArgs)

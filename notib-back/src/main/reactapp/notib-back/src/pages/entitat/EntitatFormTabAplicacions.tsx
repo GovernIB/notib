@@ -128,6 +128,7 @@ const EntitatFormTabAplicacions: React.FC = () => {
             onRowCreate={handleDataGridRowChanges}
             onRowDelete={handleDataGridRowChanges}
             rowHideUpdateButton={isRoleAdminLectura}
+            rowHideDeleteButton={isRoleAdminLectura}
         />
     );
 };

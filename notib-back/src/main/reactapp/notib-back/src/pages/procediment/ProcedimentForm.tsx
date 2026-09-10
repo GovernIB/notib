@@ -7,6 +7,7 @@ import { FormPage, MuiForm, MuiFormTabs, MuiFormTabContent, useFormContext } fro
 import ProcedimentFormTabGrups from './ProcedimentFormTabGrups';
 import ProcedimentFormTabPermisos from './ProcedimentFormTabPermisos';
 import GridFormField from '../../components/GridFormField';
+import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
 import { useTabParam } from '../../hooks/useSearchParams';
 
 const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
@@ -15,30 +16,39 @@ const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void
     const { t } = useTranslation();
     const { data } = useFormContext();
     const initialTab = useTabParam();
+    const organGestorOptionRenderer = useOrganGestorOptionRenderer();
     React.useEffect(() => {
         setSubtitle(data?.codi + ', ' + data?.nom);
     }, [data]);
     const grupsTabLabel = (<Badge badgeContent={data.grupCount} color="primary">{t('page.procediments.form.tabs.grups')}</Badge>);
     const permisosTabLabel = (<Badge badgeContent={data.aclEntryCount} color="primary">{t('page.procediments.form.tabs.permisos')}</Badge>);
-    const tabs = [t('page.procediments.form.tabs.dades'), { label: grupsTabLabel }, { label: permisosTabLabel }];
+    const showGrupsTab = !!data?.agrupar;
+    const tabs = [
+        t('page.procediments.form.tabs.dades'),
+        ...(showGrupsTab ? [{ label: grupsTabLabel }] : []),
+        { label: permisosTabLabel },
+    ];
+    const grupsTabIndex = 1;
+    const permisosTabIndex = showGrupsTab ? 2 : 1;
+    const tabIndexesWithGrids = showGrupsTab ? [grupsTabIndex, permisosTabIndex] : [permisosTabIndex];
     return (
-        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1, 2]} initialIndex={initialTab}>
+        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={tabIndexesWithGrids} initialIndex={initialTab}>
             <MuiFormTabContent index={0} showOnCreate>
                 <Grid container spacing={2}>
                     <GridFormField size={3} name="codi" />
                     <GridFormField size={9} name="nom" />
                     <GridFormField size={6} name="retard" />
                     <GridFormField size={6} name="caducitat" componentProps={{ helperText: 'En dies naturals' }}/>
-                    <GridFormField size={9} name="organGestor" disabled={data?.comu}/>
                     <GridFormField size={3} name="comu" />
-                    {!data?.fieldEntregaCieHidden && (
+                    {!data?.comu && <GridFormField size={9} name="organGestor" optionRenderer={organGestorOptionRenderer} />}
+                    {!data?.fieldEntregaCieHidden && !data?.comu && (
                         <>
-                            <GridFormField size={2} name="entregaCieActiva" />
+                            <GridFormField size={3} name="entregaCieActiva" />
                             {data?.entregaCieActiva && (
                                 <>
                                     <GridFormField size={4} name="entregaCiePagadorPostal" />
-                                    <GridFormField size={4} name="entregaCiePagadorCie" />
-                                    <Grid size={2} />
+                                    <GridFormField size={5} name="entregaCiePagadorCie" />
+                                    {/*<Grid size={1} />*/}
                                 </>
                             )}
                         </>
@@ -48,10 +58,12 @@ const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void
                     <GridFormField size={2} name="manual" />
                 </Grid>
             </MuiFormTabContent>
-            <MuiFormTabContent index={1}>
-                <ProcedimentFormTabGrups />
-            </MuiFormTabContent>
-            <MuiFormTabContent index={2}>
+            {showGrupsTab && (
+                <MuiFormTabContent index={grupsTabIndex}>
+                    <ProcedimentFormTabGrups />
+                </MuiFormTabContent>
+            )}
+            <MuiFormTabContent index={permisosTabIndex}>
                 <ProcedimentFormTabPermisos />
             </MuiFormTabContent>
         </MuiFormTabs>

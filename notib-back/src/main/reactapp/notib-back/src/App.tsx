@@ -1,6 +1,9 @@
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
 import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
 import { CssBaseline } from '@mui/material';
 import { ThemeProvider, useTheme } from '@mui/material/styles';
 import { envVar, OidcAuthProvider, ContainerAuthProvider, ResourceApiProvider } from 'reactlib';
@@ -12,8 +15,9 @@ import { BaseApp } from './components/BaseApp';
 import DrassanaFooter from './components/DrassanaFooter';
 import NotibProvider from './components/NotibProvider';
 import ThemeUserProvider, { useThemeUserContext } from './components/ThemeUserProvider';
-import {useNotibContext, ROLE_SUPER, ROLE_ADMIN, ROLE_USER, ROLE_ADMIN_LECTURA, ROLE_ORGAN} from './components/NotibContext';
+import {useNotibContext, ROLE_SUPER, ROLE_APLICACIO} from './components/NotibContext';
 import { lightTheme } from './theme';
+import { getMenuEntries } from './routeAccess';
 
 export const envVars = {
     VITE_API_URL: import.meta.env.VITE_API_URL,
@@ -54,266 +58,23 @@ const version = '0.0.0';
 const InnerApp: React.FC = () => {
     const { t } = useTranslation();
     const { estilMenu } = useThemeUserContext();
-    const { currentRole, currentEntitatId } = useNotibContext();
-    const menuEnviamentMassiu = [
-        {
-            id: 'nouEnviamentMassiu',
-            title: t('app.menu.nouEnviamentmassiu'),
-            to: '/notificacio/massiva/form',
-            icon: 'add',
-            resourceName: 'notificacioMassivaResource',
-            hidden: currentRole !== ROLE_USER
-        },
-        {
-            id: 'enviamentMassiu',
-            title: t('app.menu.consultaEnviamentmassiu'),
-            to: '/notificacio/massiva',
-            icon: 'forward_to_inbox',
-            resourceName: 'notificacioMassivaResource',
-            hidden: currentRole !== ROLE_USER
-        },
-    ];
-    const menuGestio = [
-        {
-            id: 'notificacionsErrorRegistre',
-            title: t('app.menu.errorRegistre'),
-            to: '/notificacionsErrorRegistre',
-            icon: 'error',
-            resourceName: 'notificacioResource',
-            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
-        },
-        {
-            id: 'enviamentMassiu',
-            title: t('app.menu.consultaEnviamentmassiu'),
-            to: '/notificacio/massiva',
-            icon: 'forward_to_inbox',
-            resourceName: 'notificacioMassivaResource',
-            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
-        },
-        {
-            id: 'notificacionsEsborrades',
-            title: t('app.menu.notificacioEsborrades'),
-            to: '/notificacionsEsborrades',
-            icon: 'delete_outline',
-            resourceName: 'notificacioResource',
-            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
-        },
-        {
-            id: 'callbackPendent',
-            title: t('app.menu.callbackPendent'),
-            to: '/callbacks',
-            icon: 'pending_actions',
-            resourceName: 'callbackResource',
-            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
-        },
-        {
-            id: 'accionsMassives',
-            title: t('app.menu.accionsMassives'),
-            to: '/accions/massives',
-            icon: 'format_list_bulleted',
-            resourceName: 'accioMassivaResource',
-            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
-        },
-        {
-            id: 'permisosUsuari',
-            title: t('app.menu.permisosUsuari'),
-            to: '/permisosUsuari',
-            icon: 'group',
-            resourceName: 'usuariPermisResource',
-            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA && currentRole !== ROLE_ORGAN
-        }
-    ];
-    const menuConfig = [
-        {
-            id: 'entitats',
-            title: t('app.menu.entitats'),
-            to: '/entitats',
-            icon: 'layers',
-            resourceName: 'entitatResource',
-            hidden: currentRole !== ROLE_SUPER
-        },
-        {
-            id: 'propietats',
-            title: t('app.menu.propietats'),
-            to: '/propietats',
-            icon: 'settings',
-            resourceName: 'configGroupResource',
-            hidden: currentRole !== ROLE_SUPER
-        },
-        {
-            id: 'currentEntitat',
-            title: t('app.menu.currentEntitat'),
-            to: '/entitats/current',
-            icon: 'my_location',
-            resourceName: 'entitatResource',
-            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
-        },
-        {
-            id: 'organs',
-            title: t('app.menu.organsGestors'),
-            to: '/organs',
-            icon: 'account_tree',
-            resourceName: 'organGestorResource',
-            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA && currentRole !== ROLE_ORGAN
-        },
-        {
-            id: 'procediment',
-            title: t('app.menu.procediments'),
-            to: '/procediments',
-            icon: 'view_timeline',
-            resourceName: 'procedimentResource',
-            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA && currentRole !== ROLE_ORGAN
-        },
-        {
-            id: 'servei',
-            title: t('app.menu.serveis'),
-            to: '/serveis',
-            icon: 'miscellaneous_services',
-            resourceName: 'procedimentResource',
-            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA && currentRole !== ROLE_ORGAN
-        },
-        {
-            id: 'grups',
-            title: t('app.menu.grups'),
-            to: '/grups',
-            icon: 'group',
-            resourceName: 'grupResource',
-            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA && currentRole !== ROLE_ORGAN
-        },
-        {
-            id: 'pagadorspostal',
-            title: t('app.menu.pagadorsPostals'),
-            to: '/pagadorspostal',
-            icon: 'markunread_mailbox',
-            resourceName: 'pagadorPostalResource',
-            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
-        },
-        {
-            id: 'pagadorscie',
-            title: t('app.menu.pagadorsCie'),
-            to: '/pagadorscie',
-            icon: 'mark_as_unread',
-            resourceName: 'pagadorCieResource',
-            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
-        },
-        {
-            id: 'caches',
-            title: t('app.menu.cache'),
-            to: '/caches',
-            icon: 'sd_storage',
-            resourceName: 'cacheResource',
-            hidden: currentRole !== ROLE_SUPER,
-        }
-    ];
-    const menuMonitoritza = [
-        {
-            id: 'notificacionsCallbackError',
-            title: t('app.menu.notificacionsCallbacksError'),
-            to: '/notificacionsCallbackError',
-            icon: 'running_with_errors',
-            resourceName: 'notificacioResource',
-            hidden: currentRole !== ROLE_SUPER,
-        },
-        {
-            id: 'integracions',
-            title: t('app.menu.integracions'),
-            to: '/integracions',
-            icon: 'build',
-            resourceName: 'monitorIntegracioResource',
-            hidden: currentRole !== ROLE_SUPER,
-        },
-        {
-            id: 'metriques',
-            title: t('app.menu.metriques'),
-            to: '/metriques',
-            icon: 'bar_chart',
-            resourceName: 'metriquesResource',
-            hidden: currentRole !== ROLE_SUPER,
-        },
-        {
-            id: 'monitorSistema',
-            title: t('app.menu.monitorSistema'),
-            to: '/monitorSistema',
-            icon: 'monitor_heart',
-            // resourceName: 'threadInfoResource',
-            // resourceName: 'integracioResource',
-            hidden: currentRole !== ROLE_SUPER,
-        },
-        {
-            id: 'activemq',
-            title: t('app.menu.activemq'),
-            to: '/activemq',
-            icon: 'subscriptions',
-            resourceName: 'activeMqResource',
-            hidden: currentRole !== ROLE_SUPER,
-        },
-
-    ];
-    const menuEntries = [
-        {
-            id: 'home',
-            title: t('app.menu.home'),
-            to: 'home',
-            icon: 'home'
-        },
-        {
-            id: 'notificacions',
-            title: t('app.menu.notificacions'),
-            to: '/notificacions',
-            icon: 'mail',
-            resourceName: 'notificacioResource',
-            hidden: currentRole === ROLE_SUPER
-        },
-        {
-            id: 'enviaments',
-            title: t('app.menu.enviaments'),
-            to: '/enviaments',
-            icon: 'send',
-            resourceName: 'notificacioEnviamentResource',
-            hidden: currentRole === ROLE_SUPER
-        },
-        {
-            id: 'enviamentsMassius',
-            title: t('app.menu.enviamentMassiu'),
-            icon: 'dashboard',
-            children: menuEnviamentMassiu,
-            hidden: currentRole !== ROLE_USER
-        },
-        {
-            id: 'gestio',
-            title: t('app.menu.gestio'),
-            icon: 'dashboard',
-            children: menuGestio,
-            hidden: currentRole !== ROLE_ADMIN && currentRole !== ROLE_ADMIN_LECTURA
-        },
-        {
-            id: 'monitoritza',
-            title: t('app.menu.monitoritza'),
-            icon: 'monitor',
-            children: menuMonitoritza,
-            hidden: currentRole !== ROLE_SUPER
-        },
-        {
-            id: 'config',
-            title: t('app.menu.config'),
-            icon: 'settings',
-            children: menuConfig,
-            hidden: currentRole === ROLE_USER
-        },
-        {
-            id: 'avisos',
-            title: t('app.menu.avisos'),
-            to: '/avisos',
-            icon: 'notifications',
-            resourceName: 'avisResource',
-            hidden: currentRole !== ROLE_SUPER
-        },
-    ];
+    const { isReady, currentRole, currentEntitatId } = useNotibContext();
+    const menuEntries = getMenuEntries(currentRole, t);
     const theme = useTheme();
     const mode = theme.palette.mode;
     const bgColor= mode === 'light' ? theme.palette.background.paper : undefined;
     const textColor= bgColor ? theme.palette.getContrastText(bgColor) : undefined;
-    const currentRoleSuperOrEntitatSelected= currentRole === ROLE_SUPER || currentEntitatId != null;
+    const currentRoleSuperOrEntitatSelected= currentRole === ROLE_SUPER || currentRole === ROLE_APLICACIO || currentEntitatId != null;
+    // Mentre es canvia de rol o d'entitat, isReady torna a ser false momentàniament i, per tant, també
+    // currentRoleSuperOrEntitatSelected (l'entitat es reinicia fins que se'n selecciona una de nova).
+    // Sense distingir-ho de la situació real "l'usuari no té accés a cap entitat", es mostraria
+    // momentàniament aquest avís cada vegada. Un cop seleccionat una vegada es manté el menú visible
+    // (les seves entrades ja reflecteixen el nou rol) i, al contingut, no es mostra l'avís fins que
+    // isReady torna a ser true i encara no hi ha entitat seleccionada.
+    const hasBeenSelectedRef = useRef(false);
+    if (currentRoleSuperOrEntitatSelected) {
+        hasBeenSelectedRef.current = true;
+    }
     const logoColor = mode === 'light' ? notibLogoLight : notibLogoDark;
     return (
         <BaseApp
@@ -323,7 +84,7 @@ const InnerApp: React.FC = () => {
             title={<img style={{ marginLeft: '8px', height: '49px', verticalAlign: 'middle' }} src={logoColor} alt="Notib"/>}
             version={version}
             availableLanguages={['ca', 'es']}
-            menuEntries={currentRoleSuperOrEntitatSelected ? menuEntries : undefined}
+            menuEntries={(currentRoleSuperOrEntitatSelected || hasBeenSelectedRef.current) ? menuEntries : undefined}
             menuAppearance={estilMenu}
             appbarBackgroundColor={bgColor}
             appbarStyle={{ color: textColor }}
@@ -334,7 +95,15 @@ const InnerApp: React.FC = () => {
                 </div>
             }
         >
-            {currentRoleSuperOrEntitatSelected ? (<Outlet />) : (<Alert severity="error">{t('app.noEntitat')}</Alert>)}
+            {currentRoleSuperOrEntitatSelected ? (
+                <Outlet />
+            ) : isReady ? (
+                <Alert severity="error">{t('app.noEntitat')}</Alert>
+            ) : (
+                <Box sx={{ display: 'flex', justifyContent: 'center', pt: 4 }}>
+                    <CircularProgress />
+                </Box>
+            )}
         </BaseApp>
     );
 };

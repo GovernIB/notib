@@ -8,6 +8,7 @@ import PagadorCieFormTabFulles from './PagadorCieFormTabFulles';
 import PagadorCieFormTabSobres from './PagadorCieFormTabSobres';
 import { useTabParam } from '../../hooks/useSearchParams';
 import GridFormField from '../../components/GridFormField';
+import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
 
 const PagadorCieFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
 
@@ -15,6 +16,7 @@ const PagadorCieFormContent: React.FC<{ setSubtitle: (subtitle: string) => void 
     const { t } = useTranslation();
     const { data } = useFormContext();
     const initialTab = useTabParam();
+    const organGestorOptionRenderer = useOrganGestorOptionRenderer();
 
     React.useEffect(() => {
         setSubtitle(data?.nom);
@@ -44,8 +46,8 @@ const PagadorCieFormContent: React.FC<{ setSubtitle: (subtitle: string) => void 
                 <Grid container spacing={2}>
                     <GridFormField size={6} name="nom" />
                     <Grid size={6}></Grid>
-                    <GridFormField size={6} name="organGestorEmissor" />
-                    <GridFormField size={6} name="organGestorPagador" />
+                    <GridFormField size={6} name="organGestorEmissor" optionRenderer={organGestorOptionRenderer} />
+                    <GridFormField size={6} name="organGestorPagador" optionRenderer={organGestorOptionRenderer} />
                     <GridFormField size={6} name="apiKey" />
                     <GridFormField size={6} name="contracteDataVig" />
                     <GridFormField size={6} name="cieExtern" />

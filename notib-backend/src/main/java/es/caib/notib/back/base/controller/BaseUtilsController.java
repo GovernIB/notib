@@ -56,25 +56,37 @@ public abstract class BaseUtilsController {
 	}
 
 	@GetMapping(BaseConfig.AUTH_ROLES_PATH)
-	public ResponseEntity<String> authRoles() {
-		String[] authRoles = getAuthRoles();
-		String response = null;
-		if (authRoles != null) {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			if (auth != null && auth.getAuthorities() != null) {
-				String[] requestRoles = Arrays.stream(authRoles).
-					filter(r -> auth.getAuthorities().stream().
-						anyMatch(a -> a.getAuthority().equals(r))).
-					toArray(String[]::new);
-				response = "window.__AUTH_ROLES__ = " + Arrays.stream(requestRoles).
-					map(s -> "\"" + s + "\"").
-					collect(Collectors.joining(",", "[", "]"));
-			}
+	public ResponseEntity<?> authRoles(@RequestParam(required = false) String format) {
+		List<String> requestRoles = computeAuthRoles();
+		if ("json".equalsIgnoreCase(format)) {
+			// Format consumit per fetch des de la SPA de React (p.ex. quan s'autentica amb un JWT
+			// obtingut directament del navegador i, per tant, no hi ha una pàgina servidora que hi
+			// pugui incrustar aquest recurs com a <script>).
+			return ResponseEntity.ok(requestRoles);
 		}
+		String response = requestRoles.isEmpty() ? null : "window.__AUTH_ROLES__ = " + requestRoles.stream().
+			map(s -> "\"" + s + "\"").
+			collect(Collectors.joining(",", "[", "]"));
 		return ResponseEntity.
 			ok().
 			contentType(MediaType.valueOf("text/javascript")).
 			body(response);
+	}
+
+	// Rols, d'entre els mappables per aquesta aplicació (getAuthRoles), que té l'usuari autenticat actual.
+	private List<String> computeAuthRoles() {
+		String[] authRoles = getAuthRoles();
+		if (authRoles == null) {
+			return List.of();
+		}
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth == null || auth.getAuthorities() == null) {
+			return List.of();
+		}
+		return Arrays.stream(authRoles).
+			filter(r -> auth.getAuthorities().stream().
+				anyMatch(a -> a.getAuthority().equals(r))).
+			collect(Collectors.toList());
 	}
 
 	@GetMapping(BaseConfig.MANIFEST_PATH)

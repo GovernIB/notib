@@ -2,6 +2,7 @@ const translationCa = {
     app: {
         loading: 'Iniciant NOTIB',
         noEntitat: 'Aquest usuari no te accés a cap entitat',
+        sensePermisos: 'Aquest usuari no té cap permís per accedir a l\'aplicació',
         menu: {
             home: 'Inici',
             config: 'Configuració',
@@ -112,19 +113,20 @@ const translationCa = {
                 groupColumn: 'Òrgan gestor',
                 popupDialogTitle: 'òrgan gestor',
                 sync: {
-                    title: 'Sincronització DIR3',
-                    dialogTitle: 'Sincronització DIR3',
+                    title: 'Actualitzar òrgans i procediments',
+                    dialogTitle: 'Actualitzar òrgans i procediments',
                     dialogButton: {
                         cancel: 'Cancel·lar',
-                        query: 'Consultar canvis',
-                        apply: 'Aplicar canvis',
-                        creacions: "Creacions",
-                        modificacions: "Modificacions",
+                        sincronitzar: 'Sincronitzar',
+                        descarregarJson: 'Descarregar òrgans JSON',
+                        descarregarJsonError: "S'ha produït un error descarregant el JSON, consulti els logs",
+                        descarregarPdf: 'Descarrega PDF',
+                        creacions: "Nous",
+                        modificacions: "Canvis en atributs",
                         substitucions: "Substitucions",
-                        extincions: "Extincions",
+                        extincions: "Extingides",
                         fusions: "Fusions",
                         divisions: "Divisions",
-                        aplicarCanvis: "Faci clic al botó d'aplicar per a fer efectius els canvis.",
                         senseCanvis: "Sense canvis",
                     },
                     success: 'Canvis aplicats amb èxit',
@@ -135,6 +137,14 @@ const translationCa = {
                         cancel: 'Cancelar',
                         actualitzar: "Actualitzar"
                     }
+                },
+                syncCombined: {
+                    title: 'Actualitzar òrgans i procediments',
+                    dialogTitle: 'Actualitzar òrgans i procediments',
+                    nota: "Se sincronitzaran òrgans, permisos, procediments, serveis i oficines SIR.",
+                    cancelar: 'Cancel·lar',
+                    sincronitzar: 'Sincronitzar',
+                    success: 'Actualització completada correctament',
                 },
             },
             form: {
@@ -208,6 +218,7 @@ const translationCa = {
                 title: 'Procediments',
                 sync: {
                     title: "Actualitzar procediments",
+                    confirmacio: "Vols actualitzar els procediments amb la informació de ROLSAC?",
                     actualitzar: "Actualitzar",
                     cancelar: "Cancelar",
                     success: "Procediments actualitzats correctament",
@@ -217,7 +228,34 @@ const translationCa = {
                     title: "Neteja memòria cache",
                     success: "Memòria cache netejada correctament",
                     error: "Error netejant la memòria cache"
-                }
+                },
+                accions: {
+                    activar: {
+                        title: "Activa",
+                        success: "El procediment s'ha activat correctament",
+                        error: "Error activant el procediment",
+                    },
+                    desactivar: {
+                        title: "Desactiva",
+                        success: "El procediment s'ha desactivat correctament",
+                        error: "Error desactivant el procediment",
+                    },
+                    actualitzar: {
+                        title: "Actualitza procediment",
+                        success: "El procediment s'ha actualitzat correctament",
+                        error: "Error actualitzant el procediment",
+                    },
+                    syncManual: {
+                        title: "Sincronització manual",
+                        success: "El procediment s'ha marcat per a actualitzar-se de forma manual",
+                        error: "Error marcant el procediment per a sincronització manual",
+                    },
+                    syncAuto: {
+                        title: "Sincronització automàtica",
+                        success: "El procediment s'ha marcat per a actualitzar-se de forma automàtica",
+                        error: "Error marcant el procediment per a sincronització automàtica",
+                    },
+                },
             },
             form: {
                 titleCreate: 'Crear procediment',
@@ -1118,6 +1156,7 @@ const translationCa = {
                 NOT_ADMIN: 'Administrador Entitat',
                 NOT_ADMIN_LECTURA: "Administrador (lectura)",
                 NOT_ORGAN: "Administrador d'òrgan",
+                NOT_APL: 'Aplicació',
                 tothom: 'Usuari',
             },
         },
@@ -1140,6 +1179,9 @@ const translationCa = {
             correu: 'Notificacions per correu',
             general: 'Configuració general',
             tema: 'Aparença',
+        },
+        SwitchInterface: {
+            classica: 'Anar a la versió clàssica',
         },
         FormDropzoneField: {
             arrosegar: 'Arrossega el fitxer aquí',
@@ -1259,7 +1301,8 @@ const translationCa = {
         obrirFiltreAvançat: 'Obrir filtre avançat',
         tancarFiltreAvançat: 'Tancar filtre avançat',
         guardar: 'Desa',
-        cancelar: 'Cancel·la'
+        cancelar: 'Cancel·la',
+        organGestorNoVigent: 'Òrgan no vigent',
     },
 };
 

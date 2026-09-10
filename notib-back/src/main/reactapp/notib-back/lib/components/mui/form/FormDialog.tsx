@@ -49,7 +49,8 @@ export type UseFormDialogFn = (
     formI18nKeys?: FormI18nKeys,
     closeFn?: (reason?: string) => boolean,
     closeIcon?: boolean,
-    autoSubmit?: boolean
+    autoSubmit?: boolean,
+    extraActions?: React.ReactNode
 ) => [FormDialogShowFn, React.ReactElement, FormDialogCloseFn];
 
 const FormDialogLoading: React.FC = () => {
@@ -74,7 +75,8 @@ export const useFormDialog: UseFormDialogFn = (
     formI18nKeys?: FormI18nKeys,
     closeFn?: (reason?: string) => boolean,
     closeIcon?: boolean,
-    autoSubmit?: boolean
+    autoSubmit?: boolean,
+    extraActions?: React.ReactNode
 ) => {
     const formApiRef = React.useRef<FormApi | any>({});
     const formDialogButtons = useFormDialogButtons();
@@ -209,7 +211,8 @@ export const useFormDialog: UseFormDialogFn = (
             }}
             formI18nKeys={formI18nKeys}
             noForm={submitReturnedContent != null}
-            closeIcon={closeIcon}>
+            closeIcon={closeIcon}
+            extraActions={extraActions}>
             {loading
                 ? (loadingComponent ?? <FormDialogLoading />)
                 : (submitReturnedContent ?? formContent)}

@@ -4,6 +4,7 @@ import { useFormContext } from 'reactlib';
 import PermissionGrid from '../../components/PermissionGrid';
 import { Grid, Icon, Tooltip } from '@mui/material';
 import GridFormField from '../../components/GridFormField';
+import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
 import PermissionGridSwitch from '../../components/PermissionGridSwitch';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 
@@ -12,6 +13,7 @@ const PermissionForm: React.FC<{ comu: boolean }> = (props) => {
     const { comu } = props;
     const { t } = useTranslation();
     const { apiRef, data } = useFormContext();
+    const organGestorOptionRenderer = useOrganGestorOptionRenderer();
     const doFieldChange = (targetValue: boolean) => {
         const permisos = [
             'readAllowed',
@@ -61,7 +63,7 @@ const PermissionForm: React.FC<{ comu: boolean }> = (props) => {
                 disabled={data?.id}
             />
             <GridFormField size={9} name="sidName" disabled={data?.id}  />
-            {comu && <GridFormField name="organGestor" required size={12} disabled={data?.id} />}
+            {comu && <GridFormField name="organGestor" required size={12} disabled={data?.id} optionRenderer={organGestorOptionRenderer} />}
             <PermissionGridSwitch name="selectAll" label={'Seleccionar tots'} icon={<Icon>toggle_on</Icon>} size={12} onChange={doFieldChange}/>
             <Grid size={1} />
             <PermissionGridSwitch

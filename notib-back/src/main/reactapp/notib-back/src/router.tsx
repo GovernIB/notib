@@ -1,6 +1,7 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter } from 'react-router-dom';
 import App from './App';
 import Home from './pages/Home';
+import HomeRedirect from './pages/HomeRedirect';
 import EntitatGrid from './pages/entitat/EntitatGrid';
 import EntitatForm from './pages/entitat/EntitatForm';
 import ProcedimentGrid from './pages/procediment/ProcedimentGrid';
@@ -40,7 +41,7 @@ export const router = createBrowserRouter(
             children: [
                 {
                     index: true,
-                    element: <Navigate to="/home" replace />,
+                    element: <HomeRedirect />,
                 },
                 {
                     path: 'home',

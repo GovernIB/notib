@@ -154,7 +154,17 @@ const PropsListItem: React.FC<{
                         decimalScale={decimalScale}
                         disabled={disabled}
                         onChange={handleFieldOnChange}
-                        componentProps={{ helperText: item.key }}
+                        componentProps={{
+                            helperText: (
+                                <TextHighlight
+                                    text={item.key}
+                                    match={highlight}
+                                    ignoreCase
+                                    component="span"
+                                    variant="inherit"
+                                />
+                            ),
+                        }}
                     />
                     <Box
                         sx={{

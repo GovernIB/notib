@@ -1,0 +1,22 @@
+/* dir3SyncTree.css — DIR3 sync graphical preview print behaviour.
+   (Dir3SyncBranch.tsx renders its own boxes/connectors via MUI sx props, and
+   each section is a CardData component — no custom section layout is needed here.) */
+
+@media print {
+    body:has(#dir3-sync-preview) * {
+        visibility: hidden;
+    }
+    body:has(#dir3-sync-preview) #dir3-sync-preview,
+    body:has(#dir3-sync-preview) #dir3-sync-preview * {
+        visibility: visible;
+    }
+    body:has(#dir3-sync-preview) #dir3-sync-preview {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+    .dir3-sync-no-print {
+        display: none !important;
+    }
+}
