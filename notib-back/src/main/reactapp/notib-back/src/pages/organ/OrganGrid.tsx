@@ -30,6 +30,7 @@ import {FormGroup} from "@mui/material";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import Dir3SyncBranch, { Dir3SyncNode } from './Dir3SyncBranch';
+import { CardData } from '../../components/CardData';
 // Amagat: substituït pel botó "Actualitzar òrgans i procediments" (OrganGridDir3SyncActionButton)
 // import OrgansProcedimentsSyncActionButton from './OrgansProcedimentsSyncActionButton';
 import {ROLE_ADMIN_LECTURA, useNotibContext} from '../../components/NotibContext';
@@ -148,11 +149,12 @@ const toNode = (item: any): Dir3SyncNode => ({
     nom: item.nomCooficial || item.nom,
 });
 
-const Dir3SyncSection: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-    <Box className="dir3-section">
-        <Typography className="dir3-section-title">{title}</Typography>
-        {children}
-    </Box>
+const Dir3SyncSection: React.FC<{ title: string; icon: string; children: React.ReactNode }> = ({ title, icon, children }) => (
+    <CardData title={title} icon={icon} variant="h6" cardProps={{ mb: 2 }}>
+        <Grid size={12}>
+            {children}
+        </Grid>
+    </CardData>
 );
 
 const dir3SyncChangeKeys = ['creacions', 'modificacions', 'substitucions', 'extincions', 'fusions', 'divisions'] as const;
@@ -171,7 +173,7 @@ const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
         <Grid container id="dir3-sync-preview">
             <Grid size={12}>
                 {result.divisions?.length > 0 && (
-                    <Dir3SyncSection title={t('page.organs.grid.sync.dialogButton.divisions')}>
+                    <Dir3SyncSection title={t('page.organs.grid.sync.dialogButton.divisions')} icon="call_split">
                         {result.divisions.map((d: any, i: number) => (
                             <Dir3SyncBranch
                                 key={i}
@@ -184,7 +186,7 @@ const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
                     </Dir3SyncSection>
                 )}
                 {result.fusions?.length > 0 && (
-                    <Dir3SyncSection title={t('page.organs.grid.sync.dialogButton.fusions')}>
+                    <Dir3SyncSection title={t('page.organs.grid.sync.dialogButton.fusions')} icon="call_merge">
                         {result.fusions.map((f: any, i: number) => (
                             <Dir3SyncBranch
                                 key={i}
@@ -197,7 +199,7 @@ const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
                     </Dir3SyncSection>
                 )}
                 {result.substitucions?.length > 0 && (
-                    <Dir3SyncSection title={t('page.organs.grid.sync.dialogButton.substitucions')}>
+                    <Dir3SyncSection title={t('page.organs.grid.sync.dialogButton.substitucions')} icon="swap_horiz">
                         {/* NOTE: for substitucions (and fusions/divisions), OrganGestorSyncHelper's DTO
                             has vell/nou meaning the OPPOSITE of what the names suggest: `vell` is the
                             SURVIVING (vigent) org, `nou` is the one going EXTINCT — see
@@ -217,7 +219,7 @@ const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
                     </Dir3SyncSection>
                 )}
                 {result.modificacions?.length > 0 && (
-                    <Dir3SyncSection title={t('page.organs.grid.sync.dialogButton.modificacions')}>
+                    <Dir3SyncSection title={t('page.organs.grid.sync.dialogButton.modificacions')} icon="edit">
                         {result.modificacions.map((m: any, i: number) => (
                             <Dir3SyncBranch
                                 key={i}
@@ -230,7 +232,7 @@ const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
                     </Dir3SyncSection>
                 )}
                 {result.creacions?.length > 0 && (
-                    <Dir3SyncSection title={t('page.organs.grid.sync.dialogButton.creacions')}>
+                    <Dir3SyncSection title={t('page.organs.grid.sync.dialogButton.creacions')} icon="add_circle">
                         {result.creacions.map((c: any, i: number) => (
                             <Dir3SyncBranch
                                 key={i}
@@ -243,7 +245,7 @@ const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
                     </Dir3SyncSection>
                 )}
                 {result.extincions?.length > 0 && (
-                    <Dir3SyncSection title={t('page.organs.grid.sync.dialogButton.extincions')}>
+                    <Dir3SyncSection title={t('page.organs.grid.sync.dialogButton.extincions')} icon="remove_circle">
                         {result.extincions.map((e: any, i: number) => (
                             <Dir3SyncBranch
                                 key={i}

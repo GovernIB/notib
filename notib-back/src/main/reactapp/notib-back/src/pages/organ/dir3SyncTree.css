@@ -1,16 +1,6 @@
-/* dir3SyncTree.css — section layout for the DIR3 sync graphical preview
-   (Dir3SyncBranch.tsx renders its own boxes/connectors via MUI sx props;
-   this file only covers section grouping and print behaviour). */
-
-.dir3-section {
-  margin-bottom: 24px;
-}
-.dir3-section-title {
-  font-weight: bold;
-  border-bottom: 1px solid #ccc;
-  padding-bottom: 4px;
-  margin-bottom: 12px;
-}
+/* dir3SyncTree.css — DIR3 sync graphical preview print behaviour.
+   (Dir3SyncBranch.tsx renders its own boxes/connectors via MUI sx props, and
+   each section is a CardData component — no custom section layout is needed here.) */
 
 @media print {
     body:has(#dir3-sync-preview) * {
