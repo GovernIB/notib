@@ -338,7 +338,8 @@ const callRequestExecFn = (
     resourceName: string,
     id: any,
     debugRequests: boolean | undefined,
-    logConsole: LogConsoleType
+    logConsole: LogConsoleType,
+    authContextRef: React.RefObject<AuthContextType | undefined>
 ) => {
     if (debugRequests) {
         const stateAction = getStateAction(state, link);
@@ -383,6 +384,7 @@ const callRequestExecFn = (
         })
         .catch((error: Problem) => {
             debugRequests && logConsole.debug('[x] Request error', error);
+            redirectToLoginOn401(error, authContextRef, logConsole);
             args?.callbacks?.error?.(error);
             reject(error);
         });
@@ -392,11 +394,30 @@ const callRequestExecFn = (
  * Un 401 de l'API vol dir que el bearer token ha estat rebutjat (normalment perquè ha
  * caducat sense que la renovació silenciosa de l'`AuthProvider` l'hagi refrescat a temps,
  * p.ex. una pestanya que ha estat molt de temps en segon pla i el navegador n'ha retardat
- * els temporitzadors). NO és un problema de connexió, així que no ho tractam com a "offline"
- * (això faria que es mostràs indefinidament "Sense connexió amb el servidor" quan en
- * realitat el que cal és tornar a autenticar-se). En lloc d'això forçam un nou login; per a
- * qualsevol altre error (real problema de xarxa, 5xx, etc.) es manté el comportament
- * anterior de marcar l'API com a offline.
+ * els temporitzadors). Es fa servir tant per a les peticions de l'índex/ping de l'API com
+ * per a qualsevol petició de recurs (getOne/find/create/update/...), ja que totes poden
+ * rebre un 401 si el token ha caducat mentre la petició estava en curs.
+ */
+const redirectToLoginOn401 = (
+    error: Error & { status?: number },
+    authContextRef: React.RefObject<AuthContextType | undefined>,
+    logConsole: LogConsoleType
+) => {
+    if (error?.status === 401) {
+        logConsole.error(
+            "L'API ha rebutjat el token (401). Redirigint cap a la pantalla de login.",
+            error
+        );
+        authContextRef.current?.signIn?.();
+    }
+};
+
+/**
+ * NO és un problema de connexió, així que no ho tractam com a "offline" (això faria que es
+ * mostràs indefinidament "Sense connexió amb el servidor" quan en realitat el que cal és
+ * tornar a autenticar-se). En lloc d'això forçam un nou login; per a qualsevol altre error
+ * (real problema de xarxa, 5xx, etc.) es manté el comportament anterior de marcar l'API com
+ * a offline.
  */
 const handleApiConnectionError = (
     error: Error & { status?: number },
@@ -405,12 +426,8 @@ const handleApiConnectionError = (
     setOffline: (offline: boolean) => void
 ) => {
     if (error?.status === 401) {
-        logConsole.error(
-            "L'API ha rebutjat el token (401). Redirigint cap a la pantalla de login.",
-            error
-        );
+        redirectToLoginOn401(error, authContextRef, logConsole);
         setOffline(false);
-        authContextRef.current?.signIn?.();
     } else {
         setOffline(true);
     }
@@ -1140,6 +1157,11 @@ export const useResourceApiService = (resourceName?: string, options?: { enabled
 
     const enabled = options?.enabled ?? true;
     const logConsole = useLogConsole(LOG_PREFIX);
+    const authContext = useOptionalAuthContext();
+    // Es fa servir una ref perquè el `.catch` de `request` (memoritzat amb `useCallback`)
+    // sempre llegeixi l'`authContext` (i el seu `signIn`) més recent.
+    const authContextRef = React.useRef(authContext);
+    authContextRef.current = authContext;
     const {
         isReady: indexIsReady,
         indexState,
@@ -1197,7 +1219,8 @@ export const useResourceApiService = (resourceName?: string, options?: { enabled
                     setIsCurrentLoading(false);
                     !isCurrentLoaded && setIsCurrentLoaded(true);
                 })
-                .catch((error: Error) => {
+                .catch((error: Error & { status?: number }) => {
+                    redirectToLoginOn401(error, authContextRef, logConsole);
                     setCurrentError(error);
                     setIsCurrentLoading(false);
                     !isCurrentLoaded && setIsCurrentLoaded(true);
@@ -1239,10 +1262,12 @@ export const useResourceApiService = (resourceName?: string, options?: { enabled
                                     resourceName,
                                     id,
                                     debugRequests,
-                                    logConsole
+                                    logConsole,
+                                    authContextRef
                                 );
                             })
                             .catch((error: Problem) => {
+                                redirectToLoginOn401(error, authContextRef, logConsole);
                                 args?.callbacks?.error?.(error);
                                 reject(error);
                             });
@@ -1256,7 +1281,8 @@ export const useResourceApiService = (resourceName?: string, options?: { enabled
                             resourceName,
                             null,
                             debugRequests,
-                            logConsole
+                            logConsole,
+                            authContextRef
                         );
                     }
                 } else {
