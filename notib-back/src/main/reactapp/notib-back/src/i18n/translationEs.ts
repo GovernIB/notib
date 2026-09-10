@@ -115,6 +115,7 @@ const translationEs = {
                     dialogTitle: 'Actualizar órganos y procedimientos',
                     dialogButton: {
                         cancel: 'Cancelar',
+                        tancar: 'Cerrar',
                         sincronitzar: 'Sincronizar',
                         descarregarJson: 'Descargar órganos JSON',
                         descarregarJsonError: 'Se ha producido un error descargando el JSON, consulte los logs',

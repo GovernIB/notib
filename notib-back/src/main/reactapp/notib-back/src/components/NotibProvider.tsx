@@ -163,7 +163,12 @@ const useMaxResultSelects = (currentRole: string | undefined) => {
 
 const useCurrentRole = (broadcast: BroadcastSession) => {
 
-    const {isReady: authIsReady, getUserId: authGetUserId, getToken: authGetToken,} = useAuthContext();
+    const {
+        isReady: authIsReady,
+        getUserId: authGetUserId,
+        getToken: authGetToken,
+        bearerTokenActive,
+    } = useAuthContext();
     const { httpHeaders: apiHttpHeaders, setHttpHeaders: apiSetHttpHeaders } = useResourceApiContext();
     const [currentUserId, setCurrentUserId] = React.useState<string>();
     const [rolesAvailable, setRolesAvailable] = React.useState<string[]>();
@@ -203,7 +208,13 @@ const useCurrentRole = (broadcast: BroadcastSession) => {
         // d'òrgan) que es concedeixen des de NOTIB i no hi apareixen mai. Es consulten sempre al
         // servidor, que és qui coneix els permisos reals; si la consulta falla es cau als rols del
         // propi token, per no deixar l'aplicació sense cap rol disponible.
-        fetch(getAuthRolesUrl(), { headers: { Authorization: 'Bearer ' + token } }).
+        // Només enviam el Bearer quan l'autenticació és per token (OidcAuthProvider): amb
+        // ContainerAuthProvider (bearerTokenActive=false) l'autenticació és per sessió/cookie i aquest
+        // endpoint no valida cap Bearer -Keycloak, quan detecta la capçalera Authorization, intenta
+        // autenticar la petició amb el token en lloc d'amb la sessió ja establerta, i si aquesta
+        // validació "bearer-only" falla (com passa en aquest mode, no pensat per anar per aquí) es rep
+        // un 401 encara que la sessió sigui perfectament vàlida.
+        fetch(getAuthRolesUrl(), bearerTokenActive ? { headers: { Authorization: 'Bearer ' + token } } : undefined).
             then((response) => response.ok ? response.json() : Promise.reject(response.status)).
             then((serverRoles: string[]) => {
                 setRolesAvailable(ALLOWED_ROLES.filter((a) => serverRoles.includes(a)));

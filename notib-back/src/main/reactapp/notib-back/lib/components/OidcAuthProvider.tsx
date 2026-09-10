@@ -56,7 +56,7 @@ export const AuthProvider = (props: AuthProviderProps) => {
         } else {
             tokenRef.current = undefined;
             tokenParsedRef.current = undefined;
-            setIsLoading(true);
+            setIsLoading(false);
             setIsAuthenticated(false);
         }
     };
@@ -94,8 +94,14 @@ export const AuthProvider = (props: AuthProviderProps) => {
                                 );
                             processUser(user);
                         } catch (error: any) {
-                            const isLoginRequired = error.error === 'login_required';
-                            if (mandatory && isLoginRequired) {
+                            // 'login_required' -> no hi ha sessió SSO activa a Keycloak.
+                            // 'invalid_grant' -> el refresh token (o la sessió a Keycloak) ha expirat.
+                            // En tots dos casos cal refer el login, no quedar-nos
+                            // indefinidament sense resoldre l'estat d'autenticació.
+                            const requiresSignin = ['login_required', 'invalid_grant'].includes(
+                                error.error
+                            );
+                            if (mandatory && requiresSignin) {
                                 debug &&
                                     logConsole.debug(
                                         'La renovació silenciosa ha fallat amb un codi ' +
@@ -125,36 +131,68 @@ export const AuthProvider = (props: AuthProviderProps) => {
     React.useEffect(() => {
         const userManager = userManagerRef.current;
         if (userManager) {
-            const onAccessTokenExpiring = () => {
-                debug && logConsole.debug("Renovant token a punt d'expirar");
+            // NOTA: aquí NO tornam a cridar `signinSilent()` en resposta a `accessTokenExpiring`.
+            // Com que `oidcAuthConfig` té `automaticSilentRenew: true` i cridam `userManager.startSilentRenew()`
+            // a l'altre efecte, la pròpia llibreria `oidc-client-ts` ja escolta aquest mateix esdeveniment i fa
+            // la renovació internament (`SilentRenewService`).
+            // Fer-ho també aquí (com es feia abans) provocava DUES crides `signinSilent()` concurrents amb el mateix
+            // refresh token cada vegada que el token estava a punt d'expirar; si el realm de Keycloak té activada la
+            // rotació de refresh tokens, una de les dues sempre falla amb `invalid_grant` (encara que la sessió sigui
+            // vàlida), la qual cosa forçava un `signinRedirect()` -> navegació completa de pàgina -> l'usuari
+            // perdia el que tingués a mig fer en aquell moment.
+            // Ara només reaccionam al resultat de la renovació (feta una única vegada per la llibreria).
+            const onUserLoaded = (user: User) => {
+                debug && logConsole.debug('Token renovat correctament', user);
+                processUser(user);
+            };
+            const handleRenewalError = (error: any) => {
+                logConsole.error('Error renovant el token', error);
+                // Forçam redirecció cap a la pantalla de login si la renovació falla
+                if (['login_required', 'invalid_grant'].includes(error.error)) {
+                    debug && logConsole.debug('Redirigint cap a la pantalla de login');
+                    userManagerRef.current?.removeUser();
+                    mandatory && userManagerRef.current?.signinRedirect();
+                } else {
+                    debug &&
+                        logConsole.debug('No redirigim cap a la pantalla de login', error.error);
+                }
+            };
+            userManager.events.addUserLoaded(onUserLoaded);
+            userManager.events.addSilentRenewError(handleRenewalError);
+            // El temporitzador intern de renovació (`SilentRenewService`, basat en
+            // `setTimeout`) pot arribar tard si la pestanya ha estat en segon pla: els
+            // navegadors retarden/pausen els temporitzadors de les pestanyes no visibles,
+            // de manera que quan l'usuari hi torna el token pot fer estona que ha caducat
+            // sense que s'hagi intentat renovar. En tornar a fer-se visible la pestanya,
+            // comprovam explícitament l'estat del token i, si cal, en forçam la renovació.
+            const onVisibilityChange = () => {
+                if (document.visibilityState !== 'visible') {
+                    return;
+                }
                 userManagerRef.current
-                    ?.signinSilent()
+                    ?.getUser()
                     .then((user) => {
-                        debug && logConsole.debug('Token renovat correctament', user);
-                        processUser(user);
-                    })
-                    .catch((error) => {
-                        logConsole.error('Error renovant el token', error);
-                        // Forçam redirecció cap a la pantalla de login si la renovació falla
-                        if (['login_required', 'invalid_grant'].includes(error.error)) {
-                            debug && logConsole.debug('Redirigint cap a la pantalla de login');
-                            userManagerRef.current?.removeUser();
-                            mandatory && userManagerRef.current?.signinRedirect();
-                        } else {
+                        if (!user || user.expired) {
                             debug &&
                                 logConsole.debug(
-                                    'No redirigim cap a la pantalla de login',
-                                    error.error
+                                    'Token caducat en tornar a la pestanya, renovant-lo'
                                 );
+                            return userManagerRef.current
+                                ?.signinSilent()
+                                .then((user) => processUser(user ?? null))
+                                .catch(handleRenewalError);
                         }
-                    });
+                    })
+                    .catch((error) => logConsole.error("Error comprovant l'usuari", error));
             };
-            userManager.events.addAccessTokenExpiring(onAccessTokenExpiring);
+            document.addEventListener('visibilitychange', onVisibilityChange);
             return () => {
-                userManager.events.removeAccessTokenExpiring(onAccessTokenExpiring);
+                userManager.events.removeUserLoaded(onUserLoaded);
+                userManager.events.removeSilentRenewError(handleRenewalError);
+                document.removeEventListener('visibilitychange', onVisibilityChange);
             };
         }
-    }, [debug, logConsole]);
+    }, [debug, logConsole, mandatory]);
     const signIn = isLoading
         ? undefined
         : () => {

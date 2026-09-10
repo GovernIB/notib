@@ -6,6 +6,8 @@ import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.config.PropertyConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.keycloak.KeycloakSecurityContext;
+import org.keycloak.adapters.RefreshableKeycloakSecurityContext;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -68,9 +70,35 @@ public class ReactController extends BaseUtilsController {
 			throw new IllegalStateException("No current request attributes found");
 		}
 		HttpServletRequest request = attrs.getRequest();
+		// L'adaptador de Keycloak de JBoss deixa el KeycloakSecurityContext com a atribut de la petició
+		// a CADA petició. El llegim d'aquí en lloc de request.getUserPrincipal(): un cop la sessió ja
+		// està autenticada, Spring Security substitueix getUserPrincipal() pel
+		// PreAuthenticatedAuthenticationToken que va quedar en cache la primera vegada
+		// (J2eePreAuthenticatedProcessingFilter no torna a construir els details mentre la sessió ja
+		// estigui autenticada), de manera que el token que hi guarda quedava congelat amb el del primer
+		// login.
+		//
+		// Usam l'ACCESS token (getTokenString()), no l'ID token (getIdTokenString()): a
+		// RefreshableKeycloakSecurityContext.refreshExpiredToken(), un refresc reeixit actualitza SEMPRE
+		// l'access token, però només actualitza l'id token "if (idToken != null)" -és a dir, només si
+		// Keycloak n'inclou un de nou a la resposta del refresc, cosa que en aquest entorn no fa mai
+		// (verificat als logs: refreshExpiredToken() retornava true -èxit- però l'id token no canviava
+		// mai). Per això l'id token quedava sempre caducat i el checkActive() intern (que es basa
+		// només en l'access token) no detectava mai que calia renovar-lo: exactament la causa del bucle
+		// de peticions cada 5 segons.
+		Object keycloakSecurityContext = request.getAttribute(KeycloakSecurityContext.class.getName());
+		if (keycloakSecurityContext instanceof RefreshableKeycloakSecurityContext) {
+			RefreshableKeycloakSecurityContext ctx = (RefreshableKeycloakSecurityContext) keycloakSecurityContext;
+			// getTokenString() ja renova internament (refreshExpiredToken(true)) si cal: ara la
+			// comprovació ("és actiu l'access token?") i el token que retornam són el mateix, així que
+			// aquest mecanisme intern ja funciona correctament sense necessitat de forçar res nosaltres.
+			return ctx.getTokenString();
+		}
+		// Fallback pel cas (p.ex. la primera petició de la sessió, o un KeycloakSecurityContext no
+		// renovable) en què l'atribut de la petició encara no hi sigui; manté el comportament anterior.
 		Principal principal = request.getUserPrincipal();
 		if (principal instanceof PreAuthenticatedAuthenticationToken) {
-			PreAuthenticatedAuthenticationToken token = ((PreAuthenticatedAuthenticationToken) request.getUserPrincipal());
+			PreAuthenticatedAuthenticationToken token = (PreAuthenticatedAuthenticationToken) principal;
 			if (token.getDetails() instanceof WebSecurityConfig.PreauthWebAuthenticationDetails) {
 				WebSecurityConfig.PreauthWebAuthenticationDetails tokenDetails = (WebSecurityConfig.PreauthWebAuthenticationDetails) token.getDetails();
 				return tokenDetails.getJwtToken();

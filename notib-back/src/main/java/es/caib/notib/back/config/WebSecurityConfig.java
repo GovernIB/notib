@@ -186,7 +186,12 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 					result = new PreauthWebAuthenticationDetails(
 							context,
 							j2eeUserRoles2GrantedAuthoritiesMapper.getGrantedAuthorities(roles),
-							keycloakPrincipal.getKeycloakSecurityContext().getIdTokenString(),
+							// Access token, no id token: veure el comentari a ReactController.getAuthToken()
+							// -en un refresc, Keycloak actualitza sempre l'access token de la sessió, però
+							// no sempre reemet un id token nou, cosa que deixava aquest camp (usat només com
+							// a fallback quan encara no hi ha l'atribut de petició KeycloakSecurityContext)
+							// congelat amb el valor del primer login.
+							keycloakPrincipal.getKeycloakSecurityContext().getTokenString(),
 							preferredUsername,
 							idToken.getName(),
 							idToken.getEmail(),

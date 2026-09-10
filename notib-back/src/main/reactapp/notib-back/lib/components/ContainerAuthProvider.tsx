@@ -76,7 +76,18 @@ export const AuthProvider = (props: AuthProviderProps) => {
     };
     const { refresh: checkTokenRefresh, stop: checkTokenStop } = useTokenWatchTimeout(checkToken);
     const getToken = async () => {
-        const response = await fetch(authSrc);
+        // redirect: 'manual' -> si la sessió del contenidor ja no és vàlida, /authToken respon amb
+        // una redirecció (cap al login de Keycloak). Sense això, fetch la seguiria automàticament;
+        // com que acaba creuant a un origen diferent (p.ex. authdev.limit.es) i l'endpoint de login
+        // de Keycloak mai serveix capçaleres CORS (està pensat per a navegació completa, no per a
+        // fetch/XHR -veure doc/Problema_Logout_CORS_Filter_Chain.md-), el navegador bloquejaria la
+        // lectura de la resposta final. Amb 'manual' detectam la redirecció immediatament (sense que
+        // el navegador n'intenti llegir el resultat) i ho tractam com "no hi ha token", deixant que
+        // qui crida faci el que ja té previst en aquest cas (redirigir a login).
+        const response = await fetch(authSrc, { redirect: 'manual' });
+        if (response.type === 'opaqueredirect') {
+            return null;
+        }
         const text = await response.text();
         const match = text.match(/window\.__AUTH_TOKEN__\s*=\s*'([^']+)'/);
         return match ? match[1] : null;

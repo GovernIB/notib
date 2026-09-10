@@ -117,6 +117,7 @@ const translationCa = {
                     dialogTitle: 'Actualitzar òrgans i procediments',
                     dialogButton: {
                         cancel: 'Cancel·lar',
+                        tancar: 'Tancar',
                         sincronitzar: 'Sincronitzar',
                         descarregarJson: 'Descarregar òrgans JSON',
                         descarregarJsonError: "S'ha produït un error descarregant el JSON, consulti els logs",

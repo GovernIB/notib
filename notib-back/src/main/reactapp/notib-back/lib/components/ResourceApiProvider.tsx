@@ -4,7 +4,7 @@ import { Client, Resource, State, Action, Links, Link, Problem } from 'ketting';
 import { processApiFields } from '../util/fields';
 import useLogConsole, { LogConsoleType } from '../util/useLogConsole';
 import useControlledUncontrolledState from '../util/useControlledUncontrolledState';
-import { useOptionalAuthContext } from './AuthContext';
+import { useOptionalAuthContext, AuthContextType } from './AuthContext';
 import ResourceApiContext, {
     useResourceApiContext,
     OpenAnswerRequiredDialogFn,
@@ -386,6 +386,34 @@ const callRequestExecFn = (
             args?.callbacks?.error?.(error);
             reject(error);
         });
+};
+
+/**
+ * Un 401 de l'API vol dir que el bearer token ha estat rebutjat (normalment perquè ha
+ * caducat sense que la renovació silenciosa de l'`AuthProvider` l'hagi refrescat a temps,
+ * p.ex. una pestanya que ha estat molt de temps en segon pla i el navegador n'ha retardat
+ * els temporitzadors). NO és un problema de connexió, així que no ho tractam com a "offline"
+ * (això faria que es mostràs indefinidament "Sense connexió amb el servidor" quan en
+ * realitat el que cal és tornar a autenticar-se). En lloc d'això forçam un nou login; per a
+ * qualsevol altre error (real problema de xarxa, 5xx, etc.) es manté el comportament
+ * anterior de marcar l'API com a offline.
+ */
+const handleApiConnectionError = (
+    error: Error & { status?: number },
+    authContextRef: React.RefObject<AuthContextType | undefined>,
+    logConsole: LogConsoleType,
+    setOffline: (offline: boolean) => void
+) => {
+    if (error?.status === 401) {
+        logConsole.error(
+            "L'API ha rebutjat el token (401). Redirigint cap a la pantalla de login.",
+            error
+        );
+        setOffline(false);
+        authContextRef.current?.signIn?.();
+    } else {
+        setOffline(true);
+    }
 };
 
 const toResourceApiError = (problem: Problem): ResourceApiError => {
@@ -1278,6 +1306,12 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
     } = props;
     const logConsole = useLogConsole(LOG_PREFIX);
     const authContext = useOptionalAuthContext();
+    // `refreshApiIndex` i la comprovació periòdica de connexió es memoritzen amb `[]` (es
+    // creen una sola vegada), però necessiten poder forçar un nou login si l'API respon 401;
+    // feim servir una ref perquè sempre llegeixin l'`authContext` (i el seu `signIn`) més
+    // recent, no el de la primera renderització (quan encara no s'havia resolt l'autenticació).
+    const authContextRef = React.useRef(authContext);
+    authContextRef.current = authContext;
     const isAuthReady = authContext?.isReady;
     const isAuthenticated = authContext?.isAuthenticated;
     const bearerTokenActive = authContext?.bearerTokenActive;
@@ -1338,10 +1372,10 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
                     setIsIndexLoading(false);
                     setOffline(false);
                 })
-                .catch((error: Error) => {
+                .catch((error: Error & { status?: number }) => {
                     setIndexError(error);
                     setIsIndexLoading(false);
-                    setOffline(true);
+                    handleApiConnectionError(error, authContextRef, logConsole, setOffline);
                 });
         }
     }, []);
@@ -1374,8 +1408,8 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
                             setOffline(false);
                             !indexState && refreshApiIndex();
                         })
-                        .catch(() => {
-                            setOffline(true);
+                        .catch((error: Error & { status?: number }) => {
+                            handleApiConnectionError(error, authContextRef, logConsole, setOffline);
                         });
                 }
             };

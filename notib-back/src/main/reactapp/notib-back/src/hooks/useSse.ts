@@ -33,16 +33,23 @@ const connections = new Map<string, SharedConnection>();
 const createConnection = (
     queueId: string,
     eventSourceHref: string,
-    getToken: TokenProvider
+    getToken: TokenProvider,
+    bearerTokenActive?: boolean
 ): SharedConnection => {
     const eventSource = new EventSource(eventSourceHref, {
+        // Només afegim el Bearer quan l'autenticació és per token (OidcAuthProvider). Amb
+        // ContainerAuthProvider (bearerTokenActive=false) l'autenticació és per sessió/cookie i
+        // aquest endpoint no valida cap Bearer -Keycloak, en detectar la capçalera Authorization,
+        // intenta autenticar la petició amb el token en lloc de la sessió ja establerta, i si
+        // aquesta validació "bearer-only" falla (com passa en aquest mode) la connexió SSE queda
+        // rebutjada en silenci (onerror no fa res tret que s'hagi demanat closeOnError), deixant
+        // l'usuari amb l'spinner indeterminat sense percentatge ni missatges.
         fetch: (input, init) =>
             fetch(input, {
                 ...init,
-                headers: {
-                    ...init.headers,
-                    Authorization: 'Bearer ' + getToken(),
-                },
+                headers: bearerTokenActive
+                    ? { ...init.headers, Authorization: 'Bearer ' + getToken() }
+                    : init.headers,
             }),
     });
     const connection: SharedConnection = {
@@ -70,9 +77,11 @@ const subscribe = (
     getToken: TokenProvider,
     eventName: string,
     callback: SseCallback,
-    closeOnError?: boolean
+    closeOnError?: boolean,
+    bearerTokenActive?: boolean
 ): (() => void) => {
-    const connection = connections.get(queueId) ?? createConnection(queueId, eventSourceHref, getToken);
+    const connection =
+        connections.get(queueId) ?? createConnection(queueId, eventSourceHref, getToken, bearerTokenActive);
     if (closeOnError) {
         connection.closeOnError = true;
     }
@@ -131,7 +140,7 @@ export const useSse = (
     onEvent: (event: any) => void,
     closeOnError?: boolean
 ) => {
-    const { getToken } = useAuthContext();
+    const { getToken, bearerTokenActive } = useAuthContext();
     const { isReady: apiIsReady, currentLinks } = useResourceApiService('sse');
     React.useEffect(() => {
         if (!apiIsReady) {
@@ -139,7 +148,7 @@ export const useSse = (
         }
         const subscribeHref = currentLinks['subscribe'].href;
         const eventSourceHref = subscribeHref.replace('{queueId}', queueId);
-        return subscribe(queueId, eventSourceHref, getToken, eventName, onEvent, closeOnError);
+        return subscribe(queueId, eventSourceHref, getToken, eventName, onEvent, closeOnError, bearerTokenActive);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [apiIsReady, queueId, eventName]);
 };
