@@ -466,6 +466,7 @@ const translationEs = {
                     remesa: 'Información de la remesa',
                     enviaments: 'Envios',
                     documents: 'Documentos adjuntos',
+                    metodesEnviament: "Métodos de envío"
                 },
                 enviaments: {
                     title: 'Envio',
@@ -1254,6 +1255,21 @@ const translationEs = {
                 ENVIADA_AMB_ERRORS: "Finalizado",
                 FINALITZADA_AMB_ERRORS: "Procesado",
             },
+            CIE_ESTAT_MAP: {
+                ENVIADO_CI: "Entregada al centro de impresión",
+                ENTREGADO_OP: "Entregada al operador operador postal",
+                CANCELADO: "Cancelado",
+                ERROR: "Error",
+                EXTRAVIADA: "Extraviada",
+                SIN_INFORMACION: "Sin información",
+                REHUSADA: "Rehusada",
+                AUSENTE: "Ausente",
+                NOTIFICADA: "Notificada",
+                DESCONOCIDO: "Desconocido",
+                DIRECCION_INCORRECTA: "Dirección incorrecta",
+                FALLECIDO: "Fallecido",
+                DEVUELTO: "Devuelto"
+            }
         },
     },
     comu: {

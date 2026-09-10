@@ -155,7 +155,6 @@ const ProcedimentServeiField: React.FC<ProcedimentServeiFieldProps> = ({ organGe
 
     const handleChange = (value: any) => {
         setType(value);
-        // console.log(data);
         if (data.procediment != null) {
             formApiRef.current?.setFieldValue('procediment', null);
         }

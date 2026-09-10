@@ -405,21 +405,16 @@ const NotificacioDetailDialogTabDades: React.FC<PropsTabDades> = (props) => {
                         field: 'createdDate',
                     },
                     {
-                        field: 'createdBy', // TODO
+                        field: 'createdBy',
                         valueRenderer: () => {
-                            console.log(notificacio);
                             return (
                                 <>
                                     {notificacio.tipusUsuari === 'INTERFICIE_WEB' ? (
                                         <Typography>{`${notificacio?.createdByNom} (${notificacio?.createdBy})`}</Typography>
                                     ) : (
                                         <>
-                                            <Typography>
-                                                {` Aplicacio: ${notificacio?.createdByNom} (${notificacio?.createdBy})`}
-                                            </Typography>
-                                            <Typography>
-                                                {` Usuari: ${notificacio?.usuariNom} (${notificacio?.usuariCodi})`}
-                                            </Typography>
+                                            <Typography>{` Aplicacio: ${notificacio?.createdByNom} (${notificacio?.createdBy})`}</Typography>
+                                            <Typography>{` Usuari: ${notificacio?.usuariNom} (${notificacio?.usuariCodi})`}</Typography>
                                         </>
                                     )}
                                 </>

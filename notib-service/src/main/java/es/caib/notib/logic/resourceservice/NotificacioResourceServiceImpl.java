@@ -134,7 +134,7 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 		register(NotificacioResource.Fields.caducitatDiesNaturals, new NotificacioResourceServiceImpl.CaducitatOnChangeLogicProcessor());
 		register(NotificacioResource.PERSPECTIVE_DOCUMENTS_NOTIFICACIO, new DocumentPerspectiveApplicator());
 		register(NotificacioResource.PERSPECTIVE_ENVIAMENTS_NOTIFICACIO, new EnviamentPerspectiveApplicator());
-		register(NotificacioResource.PERSPECTIVE_NOTIFICACIO_DETALL, new NotificacioDetallPerspectiveApplicator(notificacioEnviamentResourceRepository, configHelper, callbackResourceRepository, eventResourceRepository, messageHelper, notibPermissionHelper));
+		register(NotificacioResource.PERSPECTIVE_NOTIFICACIO_DETALL, new NotificacioDetallPerspectiveApplicator(notificacioEnviamentResourceRepository, configHelper, callbackResourceRepository, eventResourceRepository, messageHelper, notibPermissionHelper, usuariResourceRepository));
 		register(NotificacioResource.PERSPECTIVE_OPERADORS_CIE_POSTAL, new OperadorPostalCiePerspectiveApplicator());
 		register(NotificacioResource.PERSPECTIVE_GRUP, new GrupPerspectiveApplicator());
 		register(NotificacioResource.REPORT_DESCARREGAR_JUSTIFICANT_NOTIFICACIO, new JusitficantEnviamentReportGenerator(justificantService));
@@ -178,10 +178,6 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 		}
 		var resource = super.entityToResource(entity);
 		resource.setEstatString(entity.getEstatString());
-		var createdBy = usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null);
-		if (createdBy != null) {
-			resource.setCreatedByNom(createdBy.getNomSencer());
-		}
 		return resource;
 	}
 

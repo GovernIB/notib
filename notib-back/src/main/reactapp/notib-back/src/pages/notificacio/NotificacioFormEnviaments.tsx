@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Icon from '@mui/material/Icon';
 import IconButton from '@mui/material/IconButton';
-import { MuiForm, useFormContext } from 'reactlib';
+import {MuiForm, useFormApiRef, useFormContext, useResourceApiService} from 'reactlib';
 import Dir3SearchInput from '../../components/Dir3SearchInput';
 import GridFormField from '../../components/GridFormField';
 
@@ -91,20 +91,130 @@ const NotificacioFormEnviamentPersona: React.FC<{ index?: number; indexKey?: num
     );
 };
 
+const   NotificacioFormEnviamentEntregaPostal: React.FC<{ forceEntregaPostalActiva: boolean; }> = ({ forceEntregaPostalActiva }) => {
+
+    const [currentPersonaFieldValidationErrors, setCurrentPersonaFieldValidationErrors] = React.useState<any[]>();
+    const { fieldErrors: parentFieldErrors, apiRef: parentFormApiRef,} = useFormContext();
+    const { t } = useTranslation();
+    const formApiRef = useFormApiRef();
+    const { data } = useFormContext()
+    let entregaPostalActiva = data.entregaPostalActiva;
+    React.useEffect(() => {
+        if (forceEntregaPostalActiva) {
+            formApiRef.current?.setFieldValue('entregaPostalActiva', true);
+        }
+    }, [forceEntregaPostalActiva, formApiRef]);
+    React.useEffect(() => {
+        const errorPrefix = 'entregaPostalInfo';
+        const currentPersonaFieldValidationErrors = parentFieldErrors
+            ?.filter((e) => e.field.startsWith(errorPrefix))
+            .map((e) => ({ ...e, field: e.field.substring(errorPrefix.length + 1) }));
+        setCurrentPersonaFieldValidationErrors(currentPersonaFieldValidationErrors);
+    }, [parentFieldErrors]);
+
+    const handleDataChange = (data: any) => {
+        parentFormApiRef.current?.setFieldValue('entregaPostalInfo', data);
+    };
+    return (forceEntregaPostalActiva &&
+        <>
+            <GridFormField size={12} name="entregaPostalActiva"/>
+            {entregaPostalActiva &&
+                <>
+                    <Grid size={12}>
+                        <Typography variant="h6" sx={{mt: 3, mb: 2, borderBottom: 1, borderColor: 'divider'}}>
+                            {t('page.notificacio.form.tabs.metodesEnviament')}
+                        </Typography>
+                    </Grid>
+
+                    <Grid size={12}>
+                <MuiForm
+                    resourceName="entregaPostalResource"
+                    onDataChange={handleDataChange}
+                    validationErrors={currentPersonaFieldValidationErrors}
+                    initOnChangeRequest
+                    hiddenToolbar
+                    commonFieldComponentProps={{size: 'small'}}
+                    componentProps={{sx: {mb: 3}}}
+                >
+                    <EntregaPostalFields />
+                </MuiForm>
+                    </Grid>
+                </>
+            }
+        </>
+    );
+};
+
+const EntregaPostalFields = () => {
+
+    const { data } = useFormContext();
+    const senseNormalitzar = data?.domiciliConcretTipus === 'SENSE_NORMALITZAR';
+
+    return (
+        <Grid container spacing={2}  sx={{
+            width: '100%',
+            minWidth: 0,
+        }}>
+            <GridFormField size={4} name="domiciliConcretTipus" />
+            <Grid size={6}></Grid>
+            {senseNormalitzar ? (
+                <>
+                    <GridFormField size={12} name="linea1" />
+                    <GridFormField size={12} name="linea2" />
+                    <GridFormField size={12} name="codiPostalNorm" />
+                </>
+            ) : (
+                <>
+                    <GridFormField size={4} name="viaTipus" />
+                    <GridFormField size={8} name="viaNom" />
+                    <GridFormField size={4} name="apartatCorreus" />
+                    <GridFormField size={4} name="numeroCasa" />
+                    <GridFormField size={4} name="puntKm" />
+                    <GridFormField size={4} name="portal" />
+                    <GridFormField size={4} name="escala" />
+                    <GridFormField size={4} name="planta" />
+                    <GridFormField size={4} name="porta" />
+                    <GridFormField size={4} name="bloc" />
+                    <GridFormField size={4} name="codiPostal" />
+                    <GridFormField size={6} name="paisCodi" />
+                    <GridFormField size={6} name="provincia" />
+                    <GridFormField size={6} name="municipiCodi" />
+                    <GridFormField size={6} name="poblacio" />
+                    <GridFormField size={12} name="complement" />
+                </>
+            )}
+        </Grid>
+    );
+};
+
 const NotificacioFormEnviament: React.FC<{ index: number; indexKey: number; handleRemove: (indexKey: number) => void; canDelete?: boolean; }> = (props) => {
 
     const { index, indexKey, handleRemove, canDelete } = props;
     const { t } = useTranslation();
     const [titularInitialized, setTitularInitialized] = React.useState<boolean>(false);
     const [ambRepresentant, setAmbRepresentant] = React.useState<boolean>(false);
-    const [entregaPostalActiva, setEntregaPostalActiva] = React.useState<boolean>(false);
     const [currentEnviamentFieldValidationErrors, setCurrentEnviamentFieldValidationErrors] = React.useState<any[]>();
     const [currentEnviamentGlobalValidationErrors, setCurrentEnviamentGlobalValidationErrors] = React.useState<any[]>();
-    const {
-        data: parentFormData,
-        fieldErrors: parentFieldErrors,
-        apiRef: parentFormApiRef,
-    } = useFormContext();
+    const {data: parentFormData, fieldErrors: parentFieldErrors, apiRef: parentFormApiRef,} = useFormContext();
+    const {isReady: apiIsReady, getOne: apiGetOne,} = useResourceApiService('procedimentResource');
+
+    const [forceEntregaPostalActiva, setForceEntregaPostalActiva] = React.useState(false);
+
+    React.useEffect(() => {
+
+        const procediment = parentFormData?.procediment;
+        if (!apiIsReady || !procediment?.id) {
+            setForceEntregaPostalActiva(false);
+            return;
+        }
+        apiGetOne(procediment.id).then((resposta: any) => {
+            setForceEntregaPostalActiva(Boolean(true));
+            // setForceEntregaPostalActiva(Boolean(resposta?.entregaPostalActiva));
+        }).catch((error: any) => {
+            console.error(error);
+            setForceEntregaPostalActiva(false);
+        });
+    }, [apiIsReady, apiGetOne, parentFormData?.procediment?.id]);
 
     React.useEffect(() => {
         const errorPrefix = 'enviamentsInfo[' + index + ']';
@@ -126,8 +236,6 @@ const NotificacioFormEnviament: React.FC<{ index: number; indexKey: number; hand
             e.id === indexKey ? { id: indexKey, ...data } : e
         );
         parentFormApiRef.current?.setFieldValue('enviamentsInfo', enviamentsWithData);
-        console.log(data);
-        setEntregaPostalActiva(Boolean(data.entregaPostalActiva));
         if (!initial) {
             if (titularInitialized) {
                 parentFormApiRef.current?.setModified(true);
@@ -186,17 +294,10 @@ const NotificacioFormEnviament: React.FC<{ index: number; indexKey: number; hand
                             {parentFormData?.enviamentTipus !== 'SIR' && (
                                 <Grid size={12} sx={{ mt: 1 }}>
                                     <NotificacioFormEnviamentPersona interessat />
-                                    {ambRepresentant && (
-                                        <NotificacioFormEnviamentPersona
-                                            index={0}
-                                            indexKey={indexKey}
-                                        />
-                                    )}
+                                    {ambRepresentant && (<NotificacioFormEnviamentPersona index={0} indexKey={indexKey}/>)}
                                     <Button
                                         variant="contained"
-                                        startIcon={
-                                            <Icon>{ambRepresentant ? 'remove' : 'add'}</Icon>
-                                        }
+                                        startIcon={<Icon>{ambRepresentant ? 'remove' : 'add'}</Icon>}
                                         onClick={() => setAmbRepresentant((r) => !r)}
                                         size="small"
                                     >
@@ -207,12 +308,8 @@ const NotificacioFormEnviament: React.FC<{ index: number; indexKey: number; hand
                                 </Grid>
                             )}
                             <GridFormField size={12} name="ambEntregaDeh" />
-                            <GridFormField size={3} name="entregaPostalActiva" />
-                            {entregaPostalActiva && (
-                                <Typography variant="h6" sx={{ mt: 3, mb: 2, borderBottom: 1, borderColor: 'divider' }}>
-                                    {t('page.notificacio.form.tabs.enviaments')}
-                                </Typography>
-                            )}
+                           <NotificacioFormEnviamentEntregaPostal forceEntregaPostalActiva={forceEntregaPostalActiva}/>
+
                         </Grid>
                     </MuiForm>
                 </Grid>
@@ -228,16 +325,10 @@ export const NotificacioFormEnviaments: React.FC = () => {
     const enviamentsInfo = data?.enviamentsInfo;
 
     const handleAddClick = () => {
-        formApiRef.current?.setFieldValue('enviamentsInfo', [
-            ...(enviamentsInfo ?? []),
-            { id: new Date().valueOf() },
-        ]);
+        formApiRef.current?.setFieldValue('enviamentsInfo', [...(enviamentsInfo ?? []), { id: new Date().valueOf() },]);
     };
     const handleRemoveClick = (indexKey: number) => {
-        formApiRef.current?.setFieldValue(
-            'enviamentsInfo',
-            enviamentsInfo.filter((e: any) => e.id !== indexKey)
-        );
+        formApiRef.current?.setFieldValue('enviamentsInfo', enviamentsInfo.filter((e: any) => e.id !== indexKey));
     };
 
     return (

@@ -59,7 +59,8 @@ export const NotificacioGridEnviaments: React.FC<{ id: any }> = (props) => {
                                     <Box sx={{display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap'}}>
 
                                         {   enviament.entregaPostalInfo && !enviament.cieExtern ? t('page.notificacio.grid.enviament.column.estatPostal.cieNotifica') :
-                                            enviament.entregaPostalInfo?.cieEstat ? enviament.entregaPostalInfo?.cieEstat : t('page.notificacio.grid.enviament.column.estatPostal.senseCie')
+                                            enviament.entregaPostalInfo?.cieEstat ? t('utils.estatConfig.CIE_ESTAT_MAP.' + enviament.entregaPostalInfo?.cieEstat)
+                                            : t('page.notificacio.grid.enviament.column.estatPostal.senseCie')
                                         }
                                         {enviament?.ultimEventInfo?.ultimEventCie && (<>
                                             {enviament?.ultimEventInfo?.error && (

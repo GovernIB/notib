@@ -577,6 +577,9 @@ public class NotificacioResource extends BaseResource<Long> {
 	private NotificacioErrorTipusEnumDto notificaErrorTipus;
 	private NotificacioEventTipusEnumDto noticaErrorEventTipus;
 	private Date notificaErrorData;
+	private String usuariNom;
+	private String usuariCodi;
+
 
 
 	@Getter
