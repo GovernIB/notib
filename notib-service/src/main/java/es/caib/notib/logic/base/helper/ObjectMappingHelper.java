@@ -237,9 +237,10 @@ public class ObjectMappingHelper {
 		}
 		if (descriptionFieldName != null) {
 			try {
-				return (String)getFieldValue(
+				Object descriptionValue = getFieldValue(
 						entity,
 						descriptionFieldName);
+				return descriptionValue != null ? descriptionValue.toString() : null;
 			} catch (Exception ex) {
 				log.warn(
 						"Couldn't find description field {} in entity class {}",
