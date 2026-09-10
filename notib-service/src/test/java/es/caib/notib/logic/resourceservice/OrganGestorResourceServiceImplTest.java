@@ -226,7 +226,8 @@ class OrganGestorResourceServiceImplTest {
 			false);
 		when(userSessionHelper.getCurrentEntitatId()).thenReturn(1L);
 		when(entitatRepo.findById(1L)).thenReturn(Optional.of(entitat));
-		when(syncHelper.sincronitzar(any(), eq(true))).thenReturn(organGestorDir3Sync);
+		when(syncHelper.sincronitzar(any(), eq(true), eq(es.caib.notib.logic.intf.model.SseEvent.SseEventName.DIR3_SYNC), eq(false)))
+			.thenReturn(organGestorDir3Sync);
 		var result = executor.exec("code", entity, form);
 		assertNotNull(result);
 	}

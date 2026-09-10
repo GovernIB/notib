@@ -334,6 +334,17 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
 
     const resultProcessor = (result: any) => {
 
+        if (result.simulat === false) {
+            // Resultat de la sincronització real (no de la previsualització): es mostra un
+            // missatge de finalització en lloc de tornar a mostrar el llistat de canvis.
+            setShowResultActions(false);
+            return (
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, my: 4 }}>
+                    <Icon color="success" fontSize="large">check_circle</Icon>
+                    <Typography variant="h6">{t('page.organs.grid.sync.success')}</Typography>
+                </Box>
+            );
+        }
         setSenseCanvis(!hasCanvis(result));
         setSimular(false);
         setShowResultActions(true);

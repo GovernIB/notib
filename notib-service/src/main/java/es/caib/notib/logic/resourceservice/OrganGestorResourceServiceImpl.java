@@ -15,6 +15,7 @@ import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.model.OrganGestorDir3Sync;
 import es.caib.notib.logic.intf.model.OrganGestorResource;
+import es.caib.notib.logic.intf.model.SseEvent;
 import es.caib.notib.logic.intf.resourceservice.OrganGestorResourceService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.organs.AdminOrgansAmbPermisActionExecutor;
@@ -210,7 +211,13 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 				throw new ActionExecutionException(OrganGestorResource.class, null, code, "Couldn't find current entitat in user session");
 			}
 			try {
-				return organGestorSyncHelper.sincronitzar(entitat.get(), params.getSimular() != null && params.getSimular());
+				boolean simular = params.getSimular() != null && params.getSimular();
+				// terminal=!simular: la previsualització (simular=true) no ha de tancar el flux SSE
+				// (emitter.complete() al DONE), perquè l'usuari revisa els canvis i després fa una
+				// segona crida (simular=false) des del mateix diàleg; si es tanqués aquí, el frontend
+				// hauria de reconnectar l'EventSource i podria perdre's el progrés de la sincronització
+				// real. Només la sincronització real (simular=false) tanca el flux com a terminal.
+				return organGestorSyncHelper.sincronitzar(entitat.get(), simular, SseEvent.SseEventName.DIR3_SYNC, !simular);
 			} catch (Exception ex) {
 				var msg = "Error al sincronitzar les unitats DIR3";
 				log.error(msg, ex);
