@@ -359,7 +359,15 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
         setPercent(event.percent);
         setMessage(event.message);
         if (event.message) {
-            setLines((prev) => [...prev, { message: event.message, isError: event.status === 'ERROR' }]);
+            setLines((prev) => {
+                // Alguns missatges (p. ex. "Actualitzant informació dels òrgans gestors") es
+                // publiquen repetidament mentre avança el percentatge d'una mateixa fase: només
+                // s'afegeix al registre si és diferent de l'últim, per no repetir-lo línia rere línia.
+                if (prev.length > 0 && prev[prev.length - 1].message === event.message) {
+                    return prev;
+                }
+                return [...prev, { message: event.message, isError: event.status === 'ERROR' }];
+            });
         }
     });
 
