@@ -173,11 +173,21 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 	@Override
 	protected NotificacioResource entityToResource(NotificacioResourceEntity entity) {
 
-		if (Boolean.TRUE.equals(entity.getPerActualitzar())) {
-			legacyHelper.actualitzarColumnaEstat(entity);
-		}
 		var resource = super.entityToResource(entity);
-		resource.setEstatString(entity.getEstatString());
+		var estatString = entity.getEstatString();
+		if (Boolean.TRUE.equals(entity.getPerActualitzar())) {
+			// L'estat de la remesa encara no s'havia generat: el generam ara mateix perquè es
+			// pugui mostrar ja en aquesta mateixa càrrega del llistat. actualitzarColumnaEstat
+			// calcula i persisteix el nou estatString en una transacció (REQUIRES_NEW) separada
+			// de la d'aquesta petició, per la qual cosa cal emprar directament el valor que
+			// retorna en lloc de rellegir entity.getEstatString(), que no reflecteix els canvis
+			// fets a la transacció ja finalitzada de l'altre servei.
+			var estatStringActualitzat = legacyHelper.actualitzarColumnaEstat(entity);
+			if (estatStringActualitzat != null) {
+				estatString = estatStringActualitzat;
+			}
+		}
+		resource.setEstatString(estatString);
 		return resource;
 	}
 
