@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Helper per a sincronitzar les unitats organitzatives d'una entitat amb DIR3.
@@ -90,10 +91,40 @@ public class OrganGestorSyncHelper {
 		boolean simular,
 		SseEvent.SseEventName eventName,
 		boolean terminal) {
+		return sincronitzar(entitat, simular, eventName, terminal, 0, 100);
+	}
+
+	/**
+	 * Sincronitza els òrgans gestors d'una entitat amb la informació actualitzada de DIR3,
+	 * reescalant el seu propi progrés intern (0-100%) dins el rang [{@code percentMin},
+	 * {@code percentMax}]. Permet cridar aquest mètode com una fase més d'una sincronització
+	 * combinada més llarga (p. ex. {@code OrganGestorFullSyncHelper}) sense que el seu progrés
+	 * intern "envaeixi" tot el rang 0-100% i faci retrocedir visualment la barra de progrés quan
+	 * comença la fase següent.
+	 *
+	 * @param entitat l'entitat de la qual es volen actualitzar els òrgans.
+	 * @param simular indica si s'han de guardar o no els canvis a la base de dades.
+	 * @param eventName el nom de l'event SSE sota el qual s'han de publicar els events de progrés.
+	 * @param terminal indica si aquesta sincronització és l'operació completa (i per tant el seu
+	 *                 event final s'ha de publicar amb estat {@code DONE}, que tanca el flux SSE)
+	 *                 o només una fase d'un procés més llarg (i per tant el seu event final s'ha
+	 *                 de publicar amb estat {@code RUNNING} al 100%, deixant el flux SSE obert
+	 *                 per a les fases següents).
+	 * @param percentMin percentatge (0-100) del rang global al qual correspon el 0% intern d'aquest mètode.
+	 * @param percentMax percentatge (0-100) del rang global al qual correspon el 100% intern d'aquest mètode.
+	 * @return la llista de canvis a realitzar als òrgans de la base de dades.
+	 */
+	public OrganGestorDir3Sync sincronitzar(
+		EntitatResourceEntity entitat,
+		boolean simular,
+		SseEvent.SseEventName eventName,
+		boolean terminal,
+		int percentMin,
+		int percentMax) {
 		publishProgressEvent(
 			eventName,
 			SseEvent.SseEventStatus.RUNNING,
-			0,
+			scale(0, percentMin, percentMax),
 			"Consultant canvis a DIR3CAIB");
 		// Consulta els canvis des de la darrera sincronització DIR3
 		Date dataActualitzacio = entitat.getDataActualitzacio() != null ? Date.from(
@@ -108,19 +139,28 @@ public class OrganGestorSyncHelper {
 		publishProgressEvent(
 			eventName,
 			SseEvent.SseEventStatus.RUNNING,
-			simular ? 70 : 5,
+			scale(simular ? 70 : 5, percentMin, percentMax),
 			"Processant canvis rebuts de DIR3CAIB");
 		// Obté els òrgans gestors de l'entitat
 		List<OrganGestorResourceEntity> organsGestors = organGestorResourceRepository.findByEntitat(entitat);
+		// Totes les cerques d'un òrgan gestor per codi (a getDir3SyncNodesExistentsDarreraVersioExtincio,
+		// getCreacions, getModificacions, actualitzarOrgansGestors i getHistoricosUo, cadascuna cridada
+		// un cop per node DIR3 rebut) es feien amb un escaneig lineal de organsGestors
+		// (.stream().filter(...).findFirst()), és a dir cost O(N·M) en total per a una entitat amb N
+		// nodes DIR3 i M òrgans gestors ja existents -per a entitats grans, el principal cost d'aquest
+		// mètode un cop rebuda la resposta de DIR3. Indexant-los una sola vegada en un mapa, cada cerca
+		// passa a ser O(1).
+		Map<String, OrganGestorResourceEntity> organsGestorsPerCodi = organsGestors.stream().
+			collect(Collectors.toMap(OrganGestorResourceEntity::getCodi, o -> o, (a, b) -> a));
 		// Obté una llista dels nodes de la sincronització DIR3 que existeixen a la base de dades i que acaben en una
 		// extinció (estat 'E').
-		NodeDir3[] extincionsDarreraVersio = getDir3SyncNodesExistentsDarreraVersioExtincio(dir3SyncNodes, organsGestors);
+		NodeDir3[] extincionsDarreraVersio = getDir3SyncNodesExistentsDarreraVersioExtincio(dir3SyncNodes, organsGestorsPerCodi);
 		// Itera els nodes obtinguts i emplena la llista d'extincions i els mapes de divisions i de fusions/substitucions.
 		List<OrganGestorDir3Sync.OrganGestorDir3SyncCanviExtincio> extincions = new ArrayList<>();
 		MultiValuedMap<NodeDir3, NodeDir3> divisionsMap = new ArrayListValuedHashMap<>();
 		MultiValuedMap<NodeDir3, NodeDir3> fusionsOSubstitucionsMap = new ArrayListValuedHashMap<>();
 		for (NodeDir3 extincioDarreraVersio : extincionsDarreraVersio) {
-			List<NodeDir3> historicosUo = getHistoricosUo(extincioDarreraVersio, dir3SyncNodes, organsGestors);
+			List<NodeDir3> historicosUo = getHistoricosUo(extincioDarreraVersio, dir3SyncNodes, organsGestorsPerCodi);
 			long numHistoricosUoVigents = historicosUo.stream().
 				filter(uo -> OrganGestorEstatEnum.V.name().equals(uo.getEstat())).
 				count();
@@ -184,8 +224,8 @@ public class OrganGestorSyncHelper {
 			toArray(OrganGestorDir3Sync.OrganGestorDir3SyncCanviDivisio[]::new);
 		OrganGestorDir3Sync resposta = new OrganGestorDir3Sync(
 			null,
-			getCreacions(dir3SyncNodes, organsGestors, substitucionsMap, fusionsMap, divisionsMap),
-			getModificacions(dir3SyncNodes, organsGestors, extincionsDarreraVersio, substitucionsMap, fusionsMap, divisionsMap),
+			getCreacions(dir3SyncNodes, organsGestorsPerCodi, substitucionsMap, fusionsMap, divisionsMap),
+			getModificacions(dir3SyncNodes, organsGestorsPerCodi, extincionsDarreraVersio, substitucionsMap, fusionsMap, divisionsMap),
 			substitucions,
 			extincions.toArray(OrganGestorDir3Sync.OrganGestorDir3SyncCanviExtincio[]::new),
 			fusions,
@@ -196,9 +236,9 @@ public class OrganGestorSyncHelper {
 			publishProgressEvent(
 				eventName,
 				SseEvent.SseEventStatus.RUNNING,
-				10,
+				scale(10, percentMin, percentMax),
 				"Actualitzant informació dels òrgans gestors");
-			actualitzarOrgansGestors(entitat, dir3SyncNodes, organsGestors, eventName);
+			actualitzarOrgansGestors(entitat, dir3SyncNodes, organsGestorsPerCodi, eventName, percentMin, percentMax);
 			persistirTransicions(substitucionsMap, fusionsMap, divisionsMap, entitat);
 			LocalDate now = LocalDate.now();
 			if (entitat.getDataSincronitzacio() == null) {
@@ -208,34 +248,38 @@ public class OrganGestorSyncHelper {
 			publishProgressEvent(
 				eventName,
 				estatFinalitzacio(terminal),
-				100,
+				scale(100, percentMin, percentMax),
 				null);
 		} else {
 			publishProgressEvent(
 				eventName,
 				estatFinalitzacio(terminal),
-				100,
+				scale(100, percentMin, percentMax),
 				null);
 		}
 		return resposta;
 	}
 
+	private static int scale(int rawPercent, int percentMin, int percentMax) {
+		return percentMin + (percentMax - percentMin) * rawPercent / 100;
+	}
+
 	private void actualitzarOrgansGestors(
 		EntitatResourceEntity entitat,
 		List<NodeDir3> dir3SyncNodes,
-		List<OrganGestorResourceEntity> organsGestors,
-		SseEvent.SseEventName eventName) {
+		Map<String, OrganGestorResourceEntity> organsGestorsPerCodi,
+		SseEvent.SseEventName eventName,
+		int percentMin,
+		int percentMax) {
 		int numDir3SyncNodes = dir3SyncNodes.size();
 		int nextPublishableProgress = 0;
 		for (int i = 0; i < numDir3SyncNodes; i++) {
 			NodeDir3 dir3SyncNode = dir3SyncNodes.get(i);
-			Optional<OrganGestorResourceEntity> organGestor = organsGestors.stream().
-				filter(o -> o.getCodi().equals(dir3SyncNode.getCodi())).
-				findFirst();
-			actualitzarOrganGestor(entitat, dir3SyncNode, organGestor.orElse(null));
+			OrganGestorResourceEntity organGestor = organsGestorsPerCodi.get(dir3SyncNode.getCodi());
+			actualitzarOrganGestor(entitat, dir3SyncNode, organGestor);
 			int percentProcessed = (i + 1) * 100 / numDir3SyncNodes;
 			if (percentProcessed >= nextPublishableProgress) {
-				int percent = 10 + 90 * percentProcessed / 100;
+				int percent = scale(10 + 90 * percentProcessed / 100, percentMin, percentMax);
 				publishProgressEvent(
 					eventName,
 					SseEvent.SseEventStatus.RUNNING,
@@ -282,7 +326,7 @@ public class OrganGestorSyncHelper {
 		organGestorLlibreOficinaHelper.updateOficina(updated, null);
 	}
 
-	private NodeDir3[] getDir3SyncNodesExistentsDarreraVersioExtincio(List<NodeDir3> dir3SyncNodes, List<OrganGestorResourceEntity> organsGestors) {
+	private NodeDir3[] getDir3SyncNodesExistentsDarreraVersioExtincio(List<NodeDir3> dir3SyncNodes, Map<String, OrganGestorResourceEntity> organsGestorsPerCodi) {
 
 		// Aquest mètode retorna una llista dels nodes DIR3 de la sicronització que ja existeixen a la base de dades
 		// i acaben en una extinció.
@@ -294,11 +338,9 @@ public class OrganGestorSyncHelper {
 			// Obté la darrera versió de cada codi DIR3 diferent de la llista retornada per la sincronització
 			NodeDir3 lastNode = entry.getValue().get(entry.getValue().size() - 1);
 			// Mira si el codi DIR3 existeix als òrganis obtinguts de la base de dades.
-			Optional<OrganGestorResourceEntity> organGestor = organsGestors.stream().
-				filter(o -> o.getCodi().equals(entry.getKey())).
-				findFirst();
+			OrganGestorResourceEntity organGestor = organsGestorsPerCodi.get(entry.getKey());
 			// Si el codi és a la base de dades i l'estat de la darrera versió és E (extingit) l'afegeix a la llista
-			if (organGestor.isPresent() && "E".equals(lastNode.getEstat())) {
+			if (organGestor != null && "E".equals(lastNode.getEstat())) {
 				extincions.add(lastNode);
 			}
 		}
@@ -308,18 +350,16 @@ public class OrganGestorSyncHelper {
 	@SafeVarargs
 	private OrganGestorDir3Sync.OrganGestorDir3SyncCanviCreacio[] getCreacions(
 		List<NodeDir3> dir3SyncNodes,
-		List<OrganGestorResourceEntity> organsGestors,
+		Map<String, OrganGestorResourceEntity> organsGestorsPerCodi,
 		MultiValuedMap<NodeDir3, NodeDir3>... multiValuedMaps) {
 		List<OrganGestorDir3Sync.OrganGestorDir3SyncCanviCreacio> creacions = new ArrayList<>();
 		Map<String, List<NodeDir3>> dir3SyncNodesMapSorted = getDir3SyncNodesMapSortedByVersionAsc(dir3SyncNodes);
 		for (Map.Entry<String, List<NodeDir3>> entry : dir3SyncNodesMapSorted.entrySet()) {
 			NodeDir3 lastNode = entry.getValue().get(entry.getValue().size() - 1);
-			Optional<OrganGestorResourceEntity> organGestor = organsGestors.stream().
-				filter(o -> o.getCodi().equals(entry.getKey())).
-				findFirst();
+			OrganGestorResourceEntity organGestor = organsGestorsPerCodi.get(entry.getKey());
 			// Si el codi NO és a la base de dades i l'estat de la darrera versió NO és E (extingit) i el codi DIR3 no
 			// es troba a dins cap dels multiValuedMaps l'afegeix a la llista
-			if (organGestor.isEmpty() && !"E".equals(lastNode.getEstat()) && !isCodiInAnyMap(entry.getKey(), multiValuedMaps)) {
+			if (organGestor == null && !"E".equals(lastNode.getEstat()) && !isCodiInAnyMap(entry.getKey(), multiValuedMaps)) {
 				creacions.add(new OrganGestorDir3Sync.OrganGestorDir3SyncCanviCreacio(toArbreItem(lastNode)));
 			}
 		}
@@ -329,7 +369,7 @@ public class OrganGestorSyncHelper {
 	@SafeVarargs
 	private OrganGestorDir3Sync.OrganGestorDir3SyncCanviModificacio[] getModificacions(
 		List<NodeDir3> dir3SyncNodes,
-		List<OrganGestorResourceEntity> organsGestors,
+		Map<String, OrganGestorResourceEntity> organsGestorsPerCodi,
 		NodeDir3[] extincionsDarreraVersio,
 		MultiValuedMap<NodeDir3, NodeDir3>... multiValuedMaps) {
 		// Retorna una llista dels nodes DIR3 (darrera versió de cada codi) que compleixen els següents punts:
@@ -352,18 +392,16 @@ public class OrganGestorSyncHelper {
 			if (isExtincio || isCodiInAnyMap(entry.getKey(), multiValuedMaps)) {
 				continue;
 			}
-			Optional<OrganGestorResourceEntity> organGestor = organsGestors.stream().
-				filter(o -> o.getCodi().equals(entry.getKey())).
-				findFirst();
-			if (organGestor.isPresent()) {
-				boolean nomChanged = !getOrganGestorNomFromDir3Node(lastNode).equals(organGestor.get().getNom());
-				boolean nomEsChanged = !lastNode.getDenominacio().equals(organGestor.get().getNomEs());
-				boolean codiPareChanged = !Objects.equals(lastNode.getSuperior(), organGestor.get().getCodiPare());
-				boolean estatChanged = !lastNode.getEstat().equals(organGestor.get().getEstat().name());
+			OrganGestorResourceEntity organGestor = organsGestorsPerCodi.get(entry.getKey());
+			if (organGestor != null) {
+				boolean nomChanged = !getOrganGestorNomFromDir3Node(lastNode).equals(organGestor.getNom());
+				boolean nomEsChanged = !lastNode.getDenominacio().equals(organGestor.getNomEs());
+				boolean codiPareChanged = !Objects.equals(lastNode.getSuperior(), organGestor.getCodiPare());
+				boolean estatChanged = !lastNode.getEstat().equals(organGestor.getEstat().name());
 				if (nomChanged || nomEsChanged || codiPareChanged || estatChanged) {
 					modificacions.add(
 						new OrganGestorDir3Sync.OrganGestorDir3SyncCanviModificacio(
-							toArbreItem(organGestor.get()),
+							toArbreItem(organGestor),
 							toArbreItem(lastNode)));
 				}
 			}
@@ -397,7 +435,7 @@ public class OrganGestorSyncHelper {
 	private List<NodeDir3> getHistoricosUo(
 		NodeDir3 node,
 		List<NodeDir3> dir3SyncNodes,
-		List<OrganGestorResourceEntity> organsGestors) {
+		Map<String, OrganGestorResourceEntity> organsGestorsPerCodi) {
 		// Retorna la llista dels historicosUO del node DIR3 emplenada de forma recursiva. Si no es troba algun dels
 		// codis DIR3 als nodes provinents de la sincronizació intenta obtenir la informació de la base de dades.
 		List<NodeDir3> historicosUo = new ArrayList<>();
@@ -413,16 +451,14 @@ public class OrganGestorSyncHelper {
 						historicosUo.addAll(getHistoricosUo(
 							historicoUoNode.get(),
 							dir3SyncNodes,
-							organsGestors));
+							organsGestorsPerCodi));
 					} else {
 						historicosUo.add(node);
 					}
 				} else {
-					Optional<OrganGestorResourceEntity> organGestor = organsGestors.stream().
-						filter(o -> o.getCodi().equals(historicoUo)).
-						findFirst();
-					if (organGestor.isPresent()) {
-						historicosUo.add(toNodeDir3(organGestor.get()));
+					OrganGestorResourceEntity organGestor = organsGestorsPerCodi.get(historicoUo);
+					if (organGestor != null) {
+						historicosUo.add(toNodeDir3(organGestor));
 					} else {
 						String errorMissatge = "Error en la sincronització amb DIR3. La unitat orgánica (" + node.getCodi()
 							+ ") té l'estat (" + node.getEstat() + ") i l'històrica (" + historicoUo

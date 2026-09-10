@@ -65,7 +65,9 @@ class OrganGestorFullSyncHelperTest {
 				Mockito.any(),
 				Mockito.eq(false),
 				Mockito.eq(SseEvent.SseEventName.ORGANS_PROCEDIMENTS_SYNC),
-				Mockito.anyBoolean()))
+				Mockito.anyBoolean(),
+				Mockito.eq(0),
+				Mockito.eq(40)))
 			.thenAnswer(invocation -> {
 				boolean terminal = invocation.getArgument(3);
 				progressEventService.publishEvent(
@@ -86,7 +88,7 @@ class OrganGestorFullSyncHelperTest {
 		helper.sincronitzarTot(entitat, SseEvent.SseEventName.ORGANS_PROCEDIMENTS_SYNC);
 
 		// then
-		Mockito.verify(organGestorSyncHelper).sincronitzar(entitat, false, SseEvent.SseEventName.ORGANS_PROCEDIMENTS_SYNC, false);
+		Mockito.verify(organGestorSyncHelper).sincronitzar(entitat, false, SseEvent.SseEventName.ORGANS_PROCEDIMENTS_SYNC, false, 0, 40);
 		Mockito.verify(procSerSyncHelper).actualitzaProcediments(Mockito.any(), Mockito.any());
 		Mockito.verify(procSerSyncHelper).actualitzaServeis(Mockito.any(), Mockito.any());
 		Mockito.verify(organGestorService).syncOficinesSIR(1L);
@@ -117,7 +119,7 @@ class OrganGestorFullSyncHelperTest {
 			new OrganGestorDir3Sync.OrganGestorDir3SyncArbreItem("A01", "Unitat A01", "Unitat A01", null));
 		var organGestorSyncHelper = Mockito.mock(OrganGestorSyncHelper.class);
 		Mockito.when(organGestorSyncHelper.sincronitzar(
-				Mockito.any(), Mockito.eq(false), Mockito.any(), Mockito.eq(false)))
+				Mockito.any(), Mockito.eq(false), Mockito.any(), Mockito.eq(false), Mockito.eq(0), Mockito.eq(40)))
 			.thenReturn(novaResultatOrgans(new OrganGestorDir3Sync.OrganGestorDir3SyncCanviSubstitucio[] { substitucio }));
 
 		var entitatSincronitzada = Mockito.mock(EntitatEntity.class);
@@ -163,7 +165,7 @@ class OrganGestorFullSyncHelperTest {
 			new OrganGestorDir3Sync.OrganGestorDir3SyncArbreItem("A01", "Unitat A01", "Unitat A01", null));
 		var organGestorSyncHelper = Mockito.mock(OrganGestorSyncHelper.class);
 		Mockito.when(organGestorSyncHelper.sincronitzar(
-				Mockito.any(), Mockito.eq(false), Mockito.any(), Mockito.eq(false)))
+				Mockito.any(), Mockito.eq(false), Mockito.any(), Mockito.eq(false), Mockito.eq(0), Mockito.eq(40)))
 			.thenReturn(novaResultatOrgans(new OrganGestorDir3Sync.OrganGestorDir3SyncCanviSubstitucio[] { substitucio }));
 
 		var entitatSincronitzada = Mockito.mock(EntitatEntity.class);
@@ -197,7 +199,7 @@ class OrganGestorFullSyncHelperTest {
 		var organGestorSyncHelper = Mockito.mock(OrganGestorSyncHelper.class);
 		var causa = new RuntimeException("DIR3 no disponible");
 		Mockito.when(organGestorSyncHelper.sincronitzar(
-				Mockito.any(), Mockito.eq(false), Mockito.any(), Mockito.eq(false)))
+				Mockito.any(), Mockito.eq(false), Mockito.any(), Mockito.eq(false), Mockito.eq(0), Mockito.eq(40)))
 			.thenThrow(causa);
 		var permisosHelper = Mockito.mock(PermisosHelper.class);
 		var procSerSyncHelper = Mockito.mock(ProcSerSyncHelper.class);
@@ -237,7 +239,7 @@ class OrganGestorFullSyncHelperTest {
 			new OrganGestorDir3Sync.OrganGestorDir3SyncArbreItem("A01", "Unitat A01", "Unitat A01", null));
 		var organGestorSyncHelper = Mockito.mock(OrganGestorSyncHelper.class);
 		Mockito.when(organGestorSyncHelper.sincronitzar(
-				Mockito.any(), Mockito.eq(false), Mockito.any(), Mockito.eq(false)))
+				Mockito.any(), Mockito.eq(false), Mockito.any(), Mockito.eq(false), Mockito.eq(0), Mockito.eq(40)))
 			.thenReturn(novaResultatOrgans(new OrganGestorDir3Sync.OrganGestorDir3SyncCanviSubstitucio[] { substitucio }));
 		var permisosHelper = Mockito.mock(PermisosHelper.class);
 		var procSerSyncHelper = Mockito.mock(ProcSerSyncHelper.class);

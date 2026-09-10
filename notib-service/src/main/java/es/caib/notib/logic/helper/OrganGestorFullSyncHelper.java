@@ -63,7 +63,10 @@ public class OrganGestorFullSyncHelper {
 		try {
 			// terminal=false: la finalització d'aquesta fase no ha de publicar DONE, que tancaria
 			// el flux SSE i descartaria els events de les fases següents.
-			resultatOrgans = organGestorSyncHelper.sincronitzar(entitat, false, eventName, false);
+			// percentMin=0, percentMax=40: reescala el progrés intern (0-100%) d'aquesta fase dins
+			// el primer 40% del progrés combinat, perquè no "envaeixi" tot el rang i faci
+			// retrocedir la barra de progrés quan comenci la fase de permisos (40%).
+			resultatOrgans = organGestorSyncHelper.sincronitzar(entitat, false, eventName, false, 0, 40);
 		} catch (Exception ex) {
 			log.error("Error sincronitzant òrgans a la sincronització combinada", ex);
 			publish(eventName, 40, "Error sincronitzant òrgans: " + ex.getMessage(), SseEvent.SseEventStatus.ERROR);
