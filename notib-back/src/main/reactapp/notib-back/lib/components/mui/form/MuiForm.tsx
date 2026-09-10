@@ -1,5 +1,7 @@
 import React from 'react';
 import Box from '@mui/material/Box';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 import { Form, FormProps, useFormApiContext } from '../../form/Form';
 import { useBaseAppContext } from '../../BaseAppContext';
 import { useMuiBaseAppContext } from '../MuiBaseAppContext';
@@ -49,7 +51,7 @@ const MuiFormContent: React.FC<React.PropsWithChildren | any> = (props) => {
     const formApiRef = useFormApiContext();
     const { t, goBack, anyHistoryEntryExist, contentExpandsToAvailableHeight } =
         useBaseAppContext();
-    const { modified, isSaveActionPresent, isDeleteActionPresent } = useFormContext();
+    const { modified, isSaving, isSaveActionPresent, isDeleteActionPresent } = useFormContext();
     const backButtonDisabled = !anyHistoryEntryExist() && !goBackLink;
     const toolbarNodes: ReactElementWithPosition[] = [];
     !hiddenBackButton &&
@@ -58,7 +60,7 @@ const MuiFormContent: React.FC<React.PropsWithChildren | any> = (props) => {
             element: toToolbarIcon('arrow_back', {
                 title: t('form.goBack.title'),
                 onClick: () => goBack(goBackLink),
-                disabled: backButtonDisabled,
+                disabled: backButtonDisabled || isSaving,
                 sx: { mr: 1 },
             }),
         });
@@ -70,7 +72,7 @@ const MuiFormContent: React.FC<React.PropsWithChildren | any> = (props) => {
             element: toToolbarIcon('undo', {
                 title: t('form.revert.title'),
                 onClick: () => formApiRef.current?.revert(),
-                disabled: !modified,
+                disabled: !modified || isSaving,
             }),
         });
     !hiddenSaveButton &&
@@ -80,6 +82,7 @@ const MuiFormContent: React.FC<React.PropsWithChildren | any> = (props) => {
             element: toToolbarIcon('save', {
                 title: t(id != null ? 'form.update.title' : 'form.create.title'),
                 onClick: () => formApiRef.current?.save(),
+                disabled: isSaving,
             }),
         });
     !hiddenDeleteButton &&
@@ -89,6 +92,7 @@ const MuiFormContent: React.FC<React.PropsWithChildren | any> = (props) => {
             element: toToolbarIcon('delete', {
                 title: t('form.delete.title'),
                 onClick: () => formApiRef.current?.delete(),
+                disabled: isSaving,
             }),
         });
     const outerBoxStyles = contentExpandsToAvailableHeight
@@ -102,6 +106,29 @@ const MuiFormContent: React.FC<React.PropsWithChildren | any> = (props) => {
         : { m: 2, mt: 3, ...sx2, ...componentProps?.sx };
     return (
         <Box sx={outerBoxStyles}>
+            {/* Mentre es desa el formulari es bloqueja la interacció de l'usuari amb un
+                overlay amb spinner, fins que arribi la resposta del servidor. Es posiciona
+                relatiu a la finestra (en lloc d'al propi formulari) perquè ocupi sempre tota
+                l'alçada disponible sota la capçalera, encara que el formulari en si sigui més
+                curt que l'espai disponible; el peu de pàgina, per davant en z-index, hi queda
+                per damunt. Només s'aplica quan la barra d'eines pròpia és visible: quan el
+                MuiForm s'utilitza dins un FormDialog o un MuiFormSidebar (hiddenToolbar) ja
+                tenen el seu propi indicador de desat. */}
+            {!hiddenToolbar && (
+                <Backdrop
+                    open={!!isSaving}
+                    sx={{
+                        position: 'fixed',
+                        top: '64px',
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        zIndex: (theme) => theme.zIndex.drawer + 1,
+                        color: '#fff',
+                    }}>
+                    <CircularProgress color="inherit" />
+                </Backdrop>
+            )}
             {!hiddenToolbar && (
                 <Toolbar
                     title={title ?? resourceName}

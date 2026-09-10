@@ -271,6 +271,7 @@ export const Form: React.FC<FormProps> = (props) => {
     const confirmDialogButtons = useConfirmDialogButtons();
     const confirmDialogComponentProps = { maxWidth: 'sm', fullWidth: true };
     const [isLoading, setIsLoading] = React.useState<boolean>(true);
+    const [isSaving, setIsSaving] = React.useState<boolean>(false);
     const [modified, setModified] = React.useState<boolean>(false);
     const [externalModified, setExternalModified] = React.useState<boolean>(false);
     const [fields, setFields] = React.useState<any[]>();
@@ -553,10 +554,15 @@ export const Form: React.FC<FormProps> = (props) => {
     };
     const save = () =>
         new Promise<any>((resolve, reject) => {
-            if (resourceType == null) {
+            if (isSaving) {
+                // Ja hi ha un desat en curs: s'evita un doble enviament (p. ex. clic repetit
+                // al botó de desar o Intro mentre encara s'espera la resposta del servidor).
+                reject();
+            } else if (resourceType == null) {
                 if (avoidSubmitIfAnyValidatorErrors && validatorFieldErrors?.length) {
                     reject(t('form.validate.saveErrors'));
                 } else {
+                    setIsSaving(true);
                     setApiFieldErrors(undefined);
                     const apiSaveData = getApiSaveProcessedData(
                         id,
@@ -604,7 +610,8 @@ export const Form: React.FC<FormProps> = (props) => {
                                     ? t(i18nKeys?.updateError ?? 'form.update.error', { error })
                                     : t(i18nKeys?.createError ?? 'form.create.error', { error });
                             handleSubmissionErrors(error, title, reject);
-                        });
+                        })
+                        .finally(() => setIsSaving(false));
                 }
             } else {
                 reject(t('form.update.wrong_resource_type', { resourceType }));
@@ -777,6 +784,7 @@ export const Form: React.FC<FormProps> = (props) => {
             resourceTypeCode,
             isLoading,
             isReady,
+            isSaving,
             apiActions,
             isSaveActionPresent,
             isDeleteActionPresent,
@@ -798,6 +806,7 @@ export const Form: React.FC<FormProps> = (props) => {
         }),
         [
             isLoading,
+            isSaving,
             apiActions,
             fields,
             fieldErrors,

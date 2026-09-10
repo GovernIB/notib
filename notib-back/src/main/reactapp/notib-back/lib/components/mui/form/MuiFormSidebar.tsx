@@ -4,6 +4,8 @@ import MuiToolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Icon from '@mui/material/Icon';
 import Box from '@mui/material/Box';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 import { useBaseAppContext } from '../../BaseAppContext';
 import { useFormDialogButtons } from '../../AppButtons';
 import { FormApi } from '../../form/FormContext';
@@ -44,6 +46,7 @@ export const MuiFormSidebar: React.FC<FormSidebarProps> = (props) => {
     const [additionalData, setAdditionalData] = React.useState<any>();
     const [resolveFn, setResolveFn] = React.useState<(value?: any) => void>();
     const [rejectFn, setRejectFn] = React.useState<(value?: any) => void>();
+    const [saving, setSaving] = React.useState<boolean>(false);
     const title =
         titleProp ??
         (id != null ? t('form.dialog.update') : t('form.dialog.create')) +
@@ -69,7 +72,7 @@ export const MuiFormSidebar: React.FC<FormSidebarProps> = (props) => {
         };
     }
     const windowClickHandler = (event: MouseEvent) => {
-        if (open && autoClose) {
+        if (open && autoClose && !saving) {
             const insideDrawer = event.x > window.innerWidth - drawerWidth && event.y > 64;
             const insideDialog = (event.target as any)?.closest('.MuiDialog-container') != null;
             const insideAutocompletePopper =
@@ -83,6 +86,7 @@ export const MuiFormSidebar: React.FC<FormSidebarProps> = (props) => {
     };
     const buttonCloseHandler = (value?: any) => {
         if (value) {
+            setSaving(true);
             formApiRef.current
                 .save()
                 .then((value: any) => {
@@ -92,7 +96,8 @@ export const MuiFormSidebar: React.FC<FormSidebarProps> = (props) => {
                 })
                 .catch(() => {
                     // S'ha fet click al botó desar i s'han produit errors
-                });
+                })
+                .finally(() => setSaving(false));
         } else {
             // S'ha fet click al botó cancel·lar
             hide();
@@ -104,11 +109,19 @@ export const MuiFormSidebar: React.FC<FormSidebarProps> = (props) => {
             return () => window.removeEventListener('click', windowClickHandler);
         }
     }, [open]);
+    // Deshabilita els botons mentre s'està desant, per evitar interacció de l'usuari fins que
+    // arribi la resposta del servidor (mateix criteri que useFormDialog).
+    const processedButtons = saving
+        ? formDialogButtons.map((b) => ({
+              ...b,
+              componentProps: { ...b.componentProps, disabled: true },
+          }))
+        : formDialogButtons;
     return (
         <Drawer
             anchor="right"
             open={open}
-            onClose={() => setOpen((o) => !o)}
+            onClose={() => !saving && setOpen((o) => !o)}
             hideBackdrop
             ref={drawerRef}
             sx={{
@@ -123,7 +136,11 @@ export const MuiFormSidebar: React.FC<FormSidebarProps> = (props) => {
                     {
                         position: 0,
                         element: (
-                            <IconButton size="small" onClick={() => setOpen(false)} sx={{ mr: 2 }}>
+                            <IconButton
+                                size="small"
+                                onClick={() => setOpen(false)}
+                                disabled={saving}
+                                sx={{ mr: 2 }}>
                                 <Icon fontSize="small">close</Icon>
                             </IconButton>
                         ),
@@ -131,7 +148,18 @@ export const MuiFormSidebar: React.FC<FormSidebarProps> = (props) => {
                 ]}
                 sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 10, px: 2 }}
             />
-            <Box sx={{ px: 2, overflow: 'auto' }}>
+            <Box sx={{ px: 2, overflow: 'auto', position: 'relative' }}>
+                {/* Mentre es desa es bloqueja la interacció de l'usuari amb un overlay amb
+                    spinner, fins que arribi la resposta del servidor. */}
+                <Backdrop
+                    open={saving}
+                    sx={{
+                        position: 'absolute',
+                        zIndex: (theme) => theme.zIndex.drawer + 1,
+                        color: '#fff',
+                    }}>
+                    <CircularProgress color="inherit" />
+                </Backdrop>
                 <MuiForm
                     resourceName={resourceName}
                     id={id}
@@ -143,7 +171,7 @@ export const MuiFormSidebar: React.FC<FormSidebarProps> = (props) => {
                 </MuiForm>
             </Box>
             <ToolbarButtons
-                buttons={formDialogButtons}
+                buttons={processedButtons}
                 handleClose={buttonCloseHandler}
                 bottomAligned
             />
