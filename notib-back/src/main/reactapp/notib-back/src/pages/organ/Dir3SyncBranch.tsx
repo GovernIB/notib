@@ -51,7 +51,7 @@ const NodeChip: React.FC<{ node: Dir3SyncNode | null; color: Dir3SyncNodeColor }
                     color: palette.dark,
                     border: '1px solid',
                     borderColor: alpha(palette.main, 0.35),
-                    '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis' },
+                    '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: 'bold' },
                 };
             }}
         />
