@@ -152,7 +152,7 @@ const NotificacioFormEnviamentEntregaPostal: React.FC<NotificacioFormProps> = ({
 const EntregaPostalFields: React.FC = () => {
 
     const { data } = useFormContext();
-    if (!data?.domiciliConcretTipus) {
+    if (data && !data?.domiciliConcretTipus) {
         data.domiciliConcretTipus = 'NACIONAL';
     }
     const nacional = data?.domiciliConcretTipus === 'NACIONAL';
