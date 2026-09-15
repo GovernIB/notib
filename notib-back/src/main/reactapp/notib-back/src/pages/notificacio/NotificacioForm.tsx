@@ -21,6 +21,7 @@ import {
 import NotificacioFormEnviaments from './NotificacioFormEnviaments';
 import NotificacioFormDocuments from './NotificacioFormDocuments';
 import GridFormField from '../../components/GridFormField';
+import { useDadesProcediment } from './DadesProcediment.tsx';
 
 const JSonButton: React.FC = () => {
     const { data } = useFormContext();
@@ -226,6 +227,7 @@ const ProcedimentServeiField: React.FC<ProcedimentServeiFieldProps> = ({ organGe
 export const NotificacioFormContent: React.FC = () => {
     const { t } = useTranslation();
     const { data, apiRef: formApiRef } = useFormContext();
+    const { agrupable } = useDadesProcediment(data);
     // Vegeu ProcedimentServeiFieldProps: evita que emplenar l'òrgan gestor a partir del
     // procediment seleccionat esborri, tot seguit, aquest mateix procediment.
     const organGestorFromProcedimentRef = React.useRef(false);
@@ -253,6 +255,15 @@ export const NotificacioFormContent: React.FC = () => {
             <Grid size={6}>
                 <ProcedimentServeiField organGestorFromProcedimentRef={organGestorFromProcedimentRef} />
             </Grid>
+            {agrupable && (
+                <GridFormField
+                    size={6}
+                    name="grupCodi"
+                    autocomplete
+                    required
+                    requestParams={data?.procediment?.id != null ? { procediment: data.procediment.id } : undefined}
+                />
+            )}
             <GridFormField size={6} name="numExpedient" />
             <GridFormField size={6} name="idioma" />
             <GridFormField size={6} name="enviamentDataProgramada" type="date" />

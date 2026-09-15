@@ -22,6 +22,7 @@ import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.anular.AnularDto;
 import es.caib.notib.logic.intf.dto.explotacio.EnviamentOrigen;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
+import es.caib.notib.logic.intf.model.validator.NotificacioGrupCodiRequired;
 import es.caib.notib.logic.intf.model.validator.NotificacioProcedimentNotNull;
 import es.caib.notib.logic.intf.model.validator.PrimerEnviamentCodiDir3ObligatoriEnviamentTipusSir;
 import lombok.Getter;
@@ -422,6 +423,10 @@ import static es.caib.notib.logic.intf.model.NotificacioResource.ACTION_ANULAR_R
 		customValidatorType = NotificacioProcedimentNotNull.class,
 		targetFields = NotificacioResource.Fields.procediment,
 		springBean = true),
+	@CustomValidation(
+		customValidatorType = NotificacioGrupCodiRequired.class,
+		targetFields = NotificacioResource.Fields.grupCodi,
+		springBean = true),
 })
 public class NotificacioResource extends BaseResource<Long> {
 
@@ -477,6 +482,7 @@ public class NotificacioResource extends BaseResource<Long> {
 	private Date caducitatOriginal;
 	@Size(max = 9)
 	private String procedimentCodiNotib;
+	@ResourceField(enumType = true)
 	@Size(max = 64)
 	private String grupCodi;
 	private NotificacioEstatEnumDto estat;

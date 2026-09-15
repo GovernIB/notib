@@ -88,6 +88,8 @@ public class EntityComprovarHelper {
 	private GrupProcSerRepository grupProcedimentRepository;
 	@Autowired
 	private ProcSerOrganRepository procedimentOrganRepository;
+	@Autowired
+	private CacheHelper cacheHelper;
 
 	public EntitatEntity comprovarEntitat(Long entitatId, boolean comprovarPermisSuper, boolean comprovarPermisAdminEntitat, boolean comprovarPermisUsuari, boolean comprovarPermisAdminLectura) throws NotFoundException {
 		return comprovarEntitat(entitatId, comprovarPermisSuper, comprovarPermisAdminEntitat, comprovarPermisUsuari, false, comprovarPermisAdminLectura);
@@ -445,10 +447,10 @@ public class EntityComprovarHelper {
 		Permission[] permisos = getPermissionsFromName(permis);
 		permisosHelper.filterGrantedAny(procediments, (ObjectIdentifierExtractor<ProcSerEntity>) AbstractPersistable::getId, ProcedimentEntity.class, permisos, auth);
 		if (!procediments.isEmpty()) {
-			return true;
+			return hasPermisGrupProcediment(procediment);
 		}
 		// 2. Comprovam si l'òrgan del procediment o algun organ pare té el permis
-		return hasPermisOrganGestor(procediment.getOrganGestor(), permis);
+		return hasPermisOrganGestor(procediment.getOrganGestor(), permis) && hasPermisGrupProcediment(procediment);
 	}
 
 	public boolean hasPermisProcedimentOrgan(Long procedimentOrganId, PermisEnum permis) {
@@ -466,7 +468,25 @@ public class EntityComprovarHelper {
 			procedimentOrgans.add(procedimentOrgan);
 			Permission[] permisos = getPermissionsFromName(permis);
 			permisosHelper.filterGrantedAny(procedimentOrgans, (ObjectIdentifierExtractor<ProcSerOrganEntity>) AbstractPersistable::getId, ProcSerOrganEntity.class, permisos, auth);
-		return !procedimentOrgans.isEmpty();
+		return !procedimentOrgans.isEmpty() && hasPermisGrupProcediment(procedimentOrgan.getProcSer());
+	}
+
+	/**
+	 * Comprova que, si el procediment està configurat amb grups, l'usuari actual tengui algun rol que coincideixi
+	 * amb el codi d'algun dels grups vinculats al procediment. Si el procediment no està configurat amb grups
+	 * sempre retorna true.
+	 *
+	 * @param procediment el procediment a comprovar.
+	 * @return true si el procediment no està configurat amb grups o si l'usuari té accés a algun dels seus grups.
+	 */
+	private boolean hasPermisGrupProcediment(ProcSerEntity procediment) {
+
+		if (!procediment.isAgrupar()) {
+			return true;
+		}
+		var usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
+		var grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
+		return procSerRepository.countProcedimentsByEntitatAndGrupAndIds(procediment.getEntitat(), grups, List.of(procediment.getId())) > 0;
 	}
 
 	public Permission[] getPermissionsFromName(PermisEnum permis) {

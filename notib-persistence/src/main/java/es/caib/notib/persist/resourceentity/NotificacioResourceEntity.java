@@ -198,12 +198,11 @@ public class NotificacioResourceEntity extends BaseAuditableResourceEntity<Notif
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "procorgan_not_fk"))
 	private ProcedimentOrganGestorResourceEntity procedimentOrganGestor;
 
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(
 		name = "grup_id",
 		referencedColumnName = "id",
-		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "grup_fk"),
-		nullable = false)
+		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "grup_fk"))
 	private GrupResourceEntity grup;
 
 	@OneToMany(
@@ -298,7 +297,6 @@ public class NotificacioResourceEntity extends BaseAuditableResourceEntity<Notif
 		this.caducitat = resource.getCaducitat();
 		this.caducitatOriginal = resource.getCaducitatOriginal();
 		this.procedimentCodiNotib = resource.getProcedimentCodiNotib();
-//		this.grupCodi = resource.getGrupCodi();
 		this.estat = resource.getEstat();
 		this.estatDate = resource.getEstatDate();
 		this.tipusUsuari = resource.getTipusUsuari();

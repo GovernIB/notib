@@ -25,6 +25,7 @@ import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.exception.ResourceNotCreatedException;
+import es.caib.notib.logic.intf.base.model.FieldOption;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
@@ -39,6 +40,7 @@ import es.caib.notib.logic.intf.service.AccioMassivaService;
 import es.caib.notib.logic.intf.service.CallbackService;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
+import es.caib.notib.logic.intf.service.GrupService;
 import es.caib.notib.logic.intf.service.JustificantService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.notificacions.AmpliarTerminiRemesaActionExecutor;
@@ -75,6 +77,7 @@ import es.caib.notib.persist.resourcerepository.EventResourceRepository;
 import es.caib.notib.persist.resourcerepository.NotificacioEnviamentResourceRepository;
 import es.caib.notib.persist.resourcerepository.NotificacioResourceRepository;
 import es.caib.notib.persist.resourcerepository.PersonaResourceRepository;
+import es.caib.notib.persist.resourcerepository.GrupResourceRepository;
 import es.caib.notib.persist.resourcerepository.ProcedimentOrganGestorResourceRepository;
 import es.caib.notib.persist.resourcerepository.UsuariResourceRepository;
 import lombok.RequiredArgsConstructor;
@@ -118,6 +121,8 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 	private final CallbackResourceRepository callbackResourceRepository;
 	private final PersonaResourceRepository personaResourceRepository;
 	private final ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository;
+	private final GrupResourceRepository grupResourceRepository;
+	private final GrupService grupService;
 	private final JustificantService justificantService;
 	private final NotificacioService notificacioService;
 	private final EnviamentService enviamentService;
@@ -130,6 +135,7 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 
 		register(null, new NotificacioResourceServiceImpl.InitOnChangeLogicProcessor());
 		register(NotificacioResource.Fields.organGestor, new NotificacioResourceServiceImpl.OrganGestorOnChangeLogicProcessor());
+		register(NotificacioResource.Fields.grupCodi, new NotificacioResourceServiceImpl.GrupCodiFieldOptionsProvider());
 		register(NotificacioResource.Fields.caducitat, new NotificacioResourceServiceImpl.CaducitatOnChangeLogicProcessor());
 		register(NotificacioResource.Fields.caducitatDiesNaturals, new NotificacioResourceServiceImpl.CaducitatOnChangeLogicProcessor());
 		register(NotificacioResource.PERSPECTIVE_DOCUMENTS_NOTIFICACIO, new DocumentPerspectiveApplicator());
@@ -235,6 +241,7 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 		entity.setReferencia(UUID.randomUUID().toString());
 		entity.setProcedimentCodiNotib(entity.getProcediment().getCodi());
 		emplenarProcedimentOrganGestor(entity);
+		emplenarGrup(entity, resource);
 		checkCreatePermission(entity);
 		if (resource.getDocumentsInfo() != null) {
 			saveDocuments(entity, resource.getDocumentsInfo());
@@ -357,6 +364,32 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 		if (entity.getProcediment() != null && entity.getProcediment().isComu() && entity.getOrganGestor() != null) {
 			var procedimentOrganGestor = procedimentOrganGestorResourceRepository.findByProcedimentAndOrganGestor(entity.getProcediment(), entity.getOrganGestor());
 			procedimentOrganGestor.ifPresent(entity::setProcedimentOrganGestor);
+		}
+	}
+
+	private void emplenarGrup(NotificacioResourceEntity entity, NotificacioResource resource) {
+
+		if (resource.getGrupCodi() == null) {
+			return;
+		}
+		var grup = grupResourceRepository.findByEntitatAndCodi(entity.getEntitat(), resource.getGrupCodi());
+		grup.ifPresent(entity::setGrup);
+	}
+
+	/*
+	 * Retorna els grups del procediment indicat pel paràmetre "procediment" als quals l'usuari actual te accés,
+	 * reaprofitant la mateixa lògica que ja s'utilitza al formulari JSP (GrupServiceImpl.findByProcedimentAndUsuariGrups).
+	 */
+	class GrupCodiFieldOptionsProvider implements FieldOptionsProvider {
+		@Override
+		public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
+			if (requestParameterMap == null || requestParameterMap.get("procediment") == null) {
+				return new ArrayList<>();
+			}
+			var procedimentId = Long.valueOf(requestParameterMap.get("procediment")[0]);
+			return grupService.findByProcedimentAndUsuariGrups(procedimentId).stream().
+					map(g -> new FieldOption(g.getCodi(), g.getNom())).
+					collect(Collectors.toList());
 		}
 	}
 

@@ -35,11 +35,14 @@ public interface ProcedimentResourceRepository extends BaseRepository<Procedimen
 		"AND (:tipus IS NULL OR p.tipus = :tipus) " +
 		"AND p.id IN (:ids) " +
 		"AND p.comu = false " +
-		"AND p.actiu = true ")
+		"AND p.actiu = true " +
+		"AND (p.agrupar = false " +
+		"     OR EXISTS (SELECT 1 FROM ProcedimentGrupResourceEntity pg WHERE pg.procediment = p AND pg.grup.codi IN (:grups)))")
 	List<Long> findIdsByEntitatIdAndTipusAndIdInAndComuFalseAndActiuTrue(
 		@Param("entitatId") Long entitatId,
 		@Param("tipus") ProcSerTipusEnum tipus,
-		@Param("ids") Set<Long> ids);
+		@Param("ids") Set<Long> ids,
+		@Param("grups") List<String> grups);
 
     List<ProcedimentResourceEntity> findByIdNotLikeAndCodi(Long id, String codi);
 
