@@ -103,13 +103,18 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 		AuthenticationHelper authenticationHelper,
 		NotibPermissionHelper notibPermissionHelper,
 		AclHelper aclHelper,
-		PagadorPostalResourceRepository pagadorPostalResourceRepository, EntitatResourceRepository entitatResourceRepository,
+		PagadorPostalResourceRepository pagadorPostalResourceRepository,
+		EntitatResourceRepository entitatResourceRepository,
 		PagadorCieResourceRepository pagadorCieResourceRepository,
 		EntregaCieResourceRepository entregaCieResourceRepository,
 		ProcedimentResourceRepository procedimentResourceRepository,
 		OrganGestorResourceRepository organGestorResourceRepository,
-		ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository, PaginacioHelper paginacioHelper,
-		ProcedimentService procedimentService, ServeiService serveiService, OrganGestorService organGestorService, GrupService grupService) {
+		ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository,
+		PaginacioHelper paginacioHelper,
+		ProcedimentService procedimentService,
+		ServeiService serveiService,
+		OrganGestorService organGestorService,
+		GrupService grupService) {
 
 		super(userSessionHelper, authenticationHelper, notibPermissionHelper);
 		this.aclHelper = aclHelper;

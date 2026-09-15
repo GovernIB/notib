@@ -92,17 +92,11 @@ const NotificacioFormEnviamentPersona: React.FC<{ index?: number; indexKey?: num
     );
 };
 
-type Pais = {
-    value: string;
-    description: string;
-};
-
 type NotificacioFormProps = {
     forceEntregaPostalActiva: boolean;
-    paisos: Pais[];
 };
 
-const NotificacioFormEnviamentEntregaPostal: React.FC<NotificacioFormProps> = ({ forceEntregaPostalActiva, paisos }) => {
+const NotificacioFormEnviamentEntregaPostal: React.FC<NotificacioFormProps> = ({ forceEntregaPostalActiva }) => {
 
     const [currentEntregaPostalFieldValidationErrors, setCurrentEntregaPostalFieldValidationErrors] = React.useState<any[]>();
     const { fieldErrors: parentFieldErrors, apiRef: parentFormApiRef,} = useFormContext();
@@ -146,7 +140,7 @@ const NotificacioFormEnviamentEntregaPostal: React.FC<NotificacioFormProps> = ({
                     commonFieldComponentProps={{size: 'small'}}
                     componentProps={{sx: {mb: 3}}}
                 >
-                    <EntregaPostalFields paisos={paisos} />
+                    <EntregaPostalFields />
                 </MuiForm>
                     </Grid>
                 </>
@@ -155,10 +149,7 @@ const NotificacioFormEnviamentEntregaPostal: React.FC<NotificacioFormProps> = ({
     );
 
 };
-type EntregaPostalFieldsProps = {
-    paisos: Pais[];
-};
-const EntregaPostalFields: React.FC<EntregaPostalFieldsProps> = ({paisos}) => {
+const EntregaPostalFields: React.FC = () => {
 
     const { data } = useFormContext();
     if (!data?.domiciliConcretTipus) {
@@ -194,8 +185,8 @@ const EntregaPostalFields: React.FC<EntregaPostalFieldsProps> = ({paisos}) => {
                     <GridFormField size={4} name="domiciliPorta" />
                     <GridFormField size={4} name="domiciliBloc" />
                     <GridFormField size={4} name="domiciliCodiPostal" required />
-                    <GridFormField size={6} name="domiciliPaisCodiIso" type="enum" options={paisos} required />
-                    <GridFormField size={6} name="domiciliProvinciaCodi" required={nacional || apCorreus} />
+                    <GridFormField size={6} name="domiciliPaisCodiIso" autocomplete required />
+                    <GridFormField size={6} name="domiciliProvinciaCodi" autocomplete required={nacional || apCorreus} />
                     <GridFormField size={6} name="domiciliMunicipiCodiIne" required={nacional || apCorreus} />
                     <GridFormField size={6} name="domiciliPoblacio" required />
                     <GridFormField size={6} name="domiciliComplement" />
@@ -220,10 +211,6 @@ const NotificacioFormEnviament: React.FC<{ index: number; indexKey: number; hand
     // const [forceEntregaPostalActiva, setForceEntregaPostalActiva] = React.useState(false);
 
     const { forceEntregaPostalActiva } = useDadesProcediment(parentFormData);
-    const paisos = [
-        { value: "ES", description: "Spain" },
-        { value: "FR", description: "France" }
-    ]
     React.useEffect(() => {
         const errorPrefix = 'enviamentsInfo[' + index + ']';
         const currentEnviamentFieldValidationErrors = parentFieldErrors
@@ -315,7 +302,7 @@ const NotificacioFormEnviament: React.FC<{ index: number; indexKey: number; hand
                                     </Button>
                                 </Grid>
                             )}
-                           <NotificacioFormEnviamentEntregaPostal forceEntregaPostalActiva={forceEntregaPostalActiva} paisos={paisos}/>
+                           <NotificacioFormEnviamentEntregaPostal forceEntregaPostalActiva={forceEntregaPostalActiva}/>
 
                         </Grid>
                     </MuiForm>

@@ -5,6 +5,7 @@ import es.caib.notib.client.domini.EntregaPostalVia;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
+import es.caib.notib.logic.intf.base.annotation.ResourceField;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
@@ -74,8 +75,10 @@ public class EntregaPostalResource extends BaseResource<Long> {
 	private String domiciliMunicipiCodiIne;
 	private String domiciliMunicipiNom;
 	private String domiciliCodiPostal;
+	@ResourceField(enumType = true)
 	private String domiciliProvinciaCodi;
 	private String domiciliProvinciaNom;
+	@ResourceField(enumType = true)
 	private String domiciliPaisCodiIso; // ISO-3166
 	private String domiciliPaisNom;
 	private String domiciliLinea1;
