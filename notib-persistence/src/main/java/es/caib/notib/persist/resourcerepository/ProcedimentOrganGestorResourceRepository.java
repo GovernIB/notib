@@ -36,13 +36,16 @@ public interface ProcedimentOrganGestorResourceRepository extends BaseRepository
 		"AND (:comu IS NULL OR pog.procediment.comu = :comu) " +
 		"AND pog.organGestor.id IN (:organGestorIds) " +
 //		"AND (:organGestorIds IS NULL OR pog.organGestor.id IN (:organGestorIds)) " +
-		"AND pog.id IN (:ids)")
+		"AND pog.id IN (:ids) " +
+		"AND (pog.procediment.agrupar = false " +
+		"     OR EXISTS (SELECT 1 FROM ProcedimentGrupResourceEntity pg WHERE pg.procediment = pog.procediment AND pg.grup.codi IN (:grups)))")
 	Set<Long> findIdsComprovacioPermisos(
 		@Param("entitatId") Long entitatId,
 		@Param("tipus") ProcSerTipusEnum tipus,
 		@Param("requireDirectPermission") Boolean requireDirectPermission,
 		@Param("comu") Boolean comu,
 		@Param("organGestorIds") Set<Long> organGestorIds,
-		@Param("ids") Set<Long> ids);
+		@Param("ids") Set<Long> ids,
+		@Param("grups") List<String> grups);
 
 }

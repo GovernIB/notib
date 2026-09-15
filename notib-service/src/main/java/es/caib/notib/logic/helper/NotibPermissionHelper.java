@@ -36,6 +36,7 @@ public class NotibPermissionHelper {
 	private final AclHelper aclHelper;
 	private final UserSessionHelper userSessionHelper;
 	private final AuthenticationHelper authenticationHelper;
+	private final CacheHelper cacheHelper;
 	private final OrganGestorResourceRepository organGestorResourceRepository;
 	private final ProcedimentResourceRepository procedimentResourceRepository;
 	private final ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository;
@@ -227,10 +228,12 @@ public class NotibPermissionHelper {
 			List.of(permission),
 			aclHelper.getCurrentUserSids().toArray(Sid[]::new)).
 			stream().map(Long::valueOf).collect(Collectors.toSet());
-		// Només retorna els procediments/serveis no comuns que existeixen a la base de dades.
+		// Només retorna els procediments/serveis no comuns que existeixen a la base de dades i, si estan
+		// configurats amb grups, sobre els quals l'usuari actual te accés a algun dels grups.
 		Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
 		ProcSerTipusEnum procSerTipus = getProcSerTipusForQuery(isServei);
-		return procedimentResourceRepository.findIdsByEntitatIdAndTipusAndIdInAndComuFalseAndActiuTrue(currentEntitatId, procSerTipus, idsWithPermission);
+		var grups = cacheHelper.findRolsUsuariAmbCodi(authenticationHelper.getCurrentUserName());
+		return procedimentResourceRepository.findIdsByEntitatIdAndTipusAndIdInAndComuFalseAndActiuTrue(currentEntitatId, procSerTipus, idsWithPermission, grups);
 	}
 
 	/**
@@ -322,11 +325,13 @@ public class NotibPermissionHelper {
 	 */
 	private Set<Long> procedimentOrganGestorIdsWithRequireDirectPermission(Set<Long> idsWithPermission, boolean requireDirectPermission, Boolean isServei) {
 
-		// Només retorna les combinacions procediment/servei comuns que existeixen a la base de dades.
+		// Només retorna les combinacions procediment/servei comuns que existeixen a la base de dades i, si el
+		// procediment/servei està configurat amb grups, sobre els quals l'usuari actual te accés a algun dels grups.
 		var currentEntitatId = userSessionHelper.getCurrentEntitatId();
 		var procSerTipus = getProcSerTipusForQuery(isServei);
 		var organGestorIds = !requireDirectPermission ? organGestorWithProcedimentsComunsPermission() : null;
-		return procedimentOrganGestorResourceRepository.findIdsComprovacioPermisos(currentEntitatId, procSerTipus, requireDirectPermission, true, organGestorIds, idsWithPermission);
+		var grups = cacheHelper.findRolsUsuariAmbCodi(authenticationHelper.getCurrentUserName());
+		return procedimentOrganGestorResourceRepository.findIdsComprovacioPermisos(currentEntitatId, procSerTipus, requireDirectPermission, true, organGestorIds, idsWithPermission, grups);
 	}
 
 	private Set<Long> organGestorWithProcedimentsComunsPermission() {
