@@ -20,9 +20,9 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ProcedimentGrupResourceEntity
-	extends BaseAuditableResourceEntity<ProcedimentGrupResource>
-	implements AdminEntitatResourceEntity<ProcedimentGrupResource> {
+public class ProcedimentGrupResourceEntity extends BaseAuditableResourceEntity<ProcedimentGrupResource>
+//	implements AdminEntitatResourceEntity<ProcedimentGrupResource>
+{
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(
@@ -38,8 +38,8 @@ public class ProcedimentGrupResourceEntity
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "grup_pro_fk"))
 	private GrupResourceEntity grup;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinFormula("(select pro.entitat from " + BaseConfig.DB_PREFIX + "procediment pro where pro.id = procediment)")
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinFormula(value = "(select pro.entitat from " + BaseConfig.DB_PREFIX + "procediment pro where pro.id = procediment)", referencedColumnName = "id")
 	private EntitatResourceEntity entitat;
 
 	@Builder

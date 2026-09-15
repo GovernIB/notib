@@ -8,6 +8,8 @@ import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.model.ProcedimentResource;
 import es.caib.notib.logic.procSer.ComuOnChangeLogicProcessor;
+import es.caib.notib.logic.service.GrupServiceImpl;
+import es.caib.notib.logic.service.OrganGestorServiceImpl;
 import es.caib.notib.logic.service.ProcedimentServiceImpl;
 import es.caib.notib.logic.service.ServeiServiceImpl;
 import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
@@ -70,6 +72,9 @@ class ProcedimentResourceServiceImplTest {
 	private ProcedimentServiceImpl procedimentService;
 	@Mock
 	private ServeiServiceImpl serveiService;
+	@Mock
+	private OrganGestorServiceImpl organGestorService;
+	private GrupServiceImpl grupService;
 
 	@BeforeEach
 	void setUp() {
@@ -87,7 +92,9 @@ class ProcedimentResourceServiceImplTest {
 			procedimentOrganGestorResourceRepository,
 			paginacioHelper,
 			procedimentService,
-			serveiService
+			serveiService,
+			organGestorService,
+			grupService
 		);
 	}
 

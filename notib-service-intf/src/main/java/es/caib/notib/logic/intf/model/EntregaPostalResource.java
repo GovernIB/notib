@@ -14,8 +14,6 @@ import es.caib.notib.logic.intf.dto.NotificaDomiciliTipusEnumDto;
 import es.caib.notib.logic.intf.dto.cie.CieCertificacioArxiuTipus;
 import es.caib.notib.logic.intf.dto.cie.CieCertificacioTipus;
 import es.caib.notib.logic.intf.model.validator.entregaPostal.EntregaPostalRequiredFields;
-import es.caib.notib.logic.intf.model.validator.procediment.CodiProcedimentNoRepetit;
-import es.caib.notib.logic.intf.model.validator.procediment.NomProcedimentNoRepetit;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -109,6 +107,7 @@ public class EntregaPostalResource extends BaseResource<Long> {
 	private String cieDatatErrorDescripcio;
 	private Date cieEstatDataActualitzacio;
 	private String cieCertificacioArxiuNom;
+
 }
 
 

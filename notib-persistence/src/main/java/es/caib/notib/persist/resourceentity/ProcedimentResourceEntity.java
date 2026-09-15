@@ -20,9 +20,7 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ProcedimentResourceEntity
-	extends BaseAuditableResourceEntity<ProcedimentResource>
-	implements AdminEntitatResourceEntity<ProcedimentResource> {
+public class ProcedimentResourceEntity extends BaseAuditableResourceEntity<ProcedimentResource> implements AdminEntitatResourceEntity<ProcedimentResource> {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "tipus", length = 32, nullable = false, updatable = false)

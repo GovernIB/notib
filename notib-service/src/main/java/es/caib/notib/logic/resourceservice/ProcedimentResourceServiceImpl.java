@@ -15,6 +15,7 @@ import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.model.ProcedimentResource;
 import es.caib.notib.logic.intf.resourceservice.ProcedimentResourceService;
 import es.caib.notib.logic.intf.service.GrupService;
+import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.intf.service.ProcedimentService;
 import es.caib.notib.logic.intf.service.ServeiService;
@@ -52,6 +53,9 @@ import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -172,7 +176,8 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 			var isServei = filter.contains("tipus:'SERVEI'");
 			Long filtreOrgan = null;
 			try {
-				filtreOrgan = filter.contains("organGestor:") ? Long.valueOf(filter.split("organGestor:")[1]) : null;
+				var organId = Optional.ofNullable(Pattern.compile("organGestor\\s*:\\s*(\\d+)").matcher(filter)).filter(Matcher::find).map(matcher -> Long.parseLong(matcher.group(1)));
+				filtreOrgan = organId.orElse(null);
 			} catch (Exception ex) {
 				log.error("[ProcedimentResourceServiceImpl.entityRepositoryFindEntities] Error aplicant el filtre organGestor id " + filter, ex);
 			}
