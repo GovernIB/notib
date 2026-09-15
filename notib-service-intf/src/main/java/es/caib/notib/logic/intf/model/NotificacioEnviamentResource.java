@@ -246,7 +246,7 @@ public class NotificacioEnviamentResource extends BaseResource<Long> {
 	private ResourceReference<PersonaResource, Long> titular;
 	private ResourceReference<PersonaResource, Long> representant;
 	//private ResourceReference<NotificacioEventResource, Long> ultimaEvent;
-	//private ResourceReference<EntregaPostalResource, Long> entregaPostal;
+	private ResourceReference<EntregaPostalResource, Long> entregaPostal;
 
 	/*
 	 * Camps per a que el front pugui enviar la informació necessària per a crear la notificació.
@@ -257,6 +257,7 @@ public class NotificacioEnviamentResource extends BaseResource<Long> {
 	@Valid
 	private List<PersonaResource> representantsInfo;
 
+	@Valid
 	private EntregaPostalResource entregaPostalInfo;
 
 	// Camps calculats

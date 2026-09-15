@@ -1,7 +1,6 @@
 package es.caib.notib.logic.intf.model.validator;
 
 import es.caib.notib.client.domini.InteressatTipus;
-import es.caib.notib.logic.intf.base.util.I18nUtil;
 import es.caib.notib.logic.intf.base.validation.CustomValidator;
 import es.caib.notib.logic.intf.model.PersonaResource;
 
@@ -12,7 +11,7 @@ import javax.validation.ConstraintValidatorContext;
  *
  * @author Límit Tecnologies
  */
-public class PersonaInteressatTipusRequiredFields implements CustomValidator<PersonaResource> {
+public class PersonaInteressatTipusRequiredFields extends ValidatorHelper implements CustomValidator<PersonaResource> {
 
 	@Override
 	public boolean validate(PersonaResource value, ConstraintValidatorContext context) {
@@ -36,28 +35,6 @@ public class PersonaInteressatTipusRequiredFields implements CustomValidator<Per
 		}
 		context.disableDefaultConstraintViolation();
 		return valid;
-	}
-
-	public String getMessage() {
-		return "{javax.validation.constraints.NotEmpty.message}";
-	}
-
-	private boolean validateNotNull(
-		String fieldName,
-		Object value,
-		boolean valid,
-		ConstraintValidatorContext context) {
-		if (value == null) {
-			context.
-				buildConstraintViolationWithTemplate(
-					I18nUtil.getInstance().getI18nMessage(
-						getMessage().substring(1, getMessage().length() - 1).trim())).
-				addPropertyNode(fieldName).
-				addConstraintViolation();
-			return false;
-		} else {
-			return valid;
-		}
 	}
 
 }

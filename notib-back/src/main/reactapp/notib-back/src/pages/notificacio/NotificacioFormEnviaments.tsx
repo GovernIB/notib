@@ -7,9 +7,10 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Icon from '@mui/material/Icon';
 import IconButton from '@mui/material/IconButton';
-import {MuiForm, useFormApiRef, useFormContext, useResourceApiService} from 'reactlib';
+import {MuiForm, useFormApiRef, useFormContext} from 'reactlib';
 import Dir3SearchInput from '../../components/Dir3SearchInput';
 import GridFormField from '../../components/GridFormField';
+import { useDadesProcediment } from './DadesProcediment.tsx'
 
 const NotificacioFormEnviamentPersonaFormContent: React.FC<{ interessat?: boolean }> = (props) => {
     const { interessat } = props;
@@ -91,9 +92,19 @@ const NotificacioFormEnviamentPersona: React.FC<{ index?: number; indexKey?: num
     );
 };
 
-const   NotificacioFormEnviamentEntregaPostal: React.FC<{ forceEntregaPostalActiva: boolean; }> = ({ forceEntregaPostalActiva }) => {
+type Pais = {
+    value: string;
+    description: string;
+};
 
-    const [currentPersonaFieldValidationErrors, setCurrentPersonaFieldValidationErrors] = React.useState<any[]>();
+type NotificacioFormProps = {
+    forceEntregaPostalActiva: boolean;
+    paisos: Pais[];
+};
+
+const NotificacioFormEnviamentEntregaPostal: React.FC<NotificacioFormProps> = ({ forceEntregaPostalActiva, paisos }) => {
+
+    const [currentEntregaPostalFieldValidationErrors, setCurrentEntregaPostalFieldValidationErrors] = React.useState<any[]>();
     const { fieldErrors: parentFieldErrors, apiRef: parentFormApiRef,} = useFormContext();
     const { t } = useTranslation();
     const formApiRef = useFormApiRef();
@@ -106,12 +117,11 @@ const   NotificacioFormEnviamentEntregaPostal: React.FC<{ forceEntregaPostalActi
     }, [forceEntregaPostalActiva, formApiRef]);
     React.useEffect(() => {
         const errorPrefix = 'entregaPostalInfo';
-        const currentPersonaFieldValidationErrors = parentFieldErrors
+        const currentEntregaPostalFieldValidationErrors = parentFieldErrors
             ?.filter((e) => e.field.startsWith(errorPrefix))
             .map((e) => ({ ...e, field: e.field.substring(errorPrefix.length + 1) }));
-        setCurrentPersonaFieldValidationErrors(currentPersonaFieldValidationErrors);
+        setCurrentEntregaPostalFieldValidationErrors(currentEntregaPostalFieldValidationErrors);
     }, [parentFieldErrors]);
-
     const handleDataChange = (data: any) => {
         parentFormApiRef.current?.setFieldValue('entregaPostalInfo', data);
     };
@@ -122,7 +132,7 @@ const   NotificacioFormEnviamentEntregaPostal: React.FC<{ forceEntregaPostalActi
                 <>
                     <Grid size={12}>
                         <Typography variant="h6" sx={{mt: 3, mb: 2, borderBottom: 1, borderColor: 'divider'}}>
-                            {t('page.notificacio.form.tabs.metodesEnviament')}
+                            {t('page.notificacio.form.entregaPostal.title')}
                         </Typography>
                     </Grid>
 
@@ -130,26 +140,34 @@ const   NotificacioFormEnviamentEntregaPostal: React.FC<{ forceEntregaPostalActi
                 <MuiForm
                     resourceName="entregaPostalResource"
                     onDataChange={handleDataChange}
-                    validationErrors={currentPersonaFieldValidationErrors}
+                    validationErrors={currentEntregaPostalFieldValidationErrors}
                     initOnChangeRequest
                     hiddenToolbar
                     commonFieldComponentProps={{size: 'small'}}
                     componentProps={{sx: {mb: 3}}}
                 >
-                    <EntregaPostalFields />
+                    <EntregaPostalFields paisos={paisos} />
                 </MuiForm>
                     </Grid>
                 </>
             }
         </>
     );
-};
 
-const EntregaPostalFields = () => {
+};
+type EntregaPostalFieldsProps = {
+    paisos: Pais[];
+};
+const EntregaPostalFields: React.FC<EntregaPostalFieldsProps> = ({paisos}) => {
 
     const { data } = useFormContext();
+    if (!data?.domiciliConcretTipus) {
+        data.domiciliConcretTipus = 'NACIONAL';
+    }
+    const nacional = data?.domiciliConcretTipus === 'NACIONAL';
+    const estranger = data?.domiciliConcretTipus === 'ESTRANGER';
+    const apCorreus = data?.domiciliConcretTipus === 'APARTAT_CORREUS';
     const senseNormalitzar = data?.domiciliConcretTipus === 'SENSE_NORMALITZAR';
-
     return (
         <Grid container spacing={2}  sx={{
             width: '100%',
@@ -159,33 +177,34 @@ const EntregaPostalFields = () => {
             <Grid size={6}></Grid>
             {senseNormalitzar ? (
                 <>
-                    <GridFormField size={12} name="linea1" />
-                    <GridFormField size={12} name="linea2" />
-                    <GridFormField size={12} name="codiPostalNorm" />
+                    <GridFormField size={12} name="domiciliLinea1" required />
+                    <GridFormField size={12} name="domiciliLinea2" required />
+                    <GridFormField size={12} name="domiciliCodiPostal" required />
                 </>
             ) : (
                 <>
-                    <GridFormField size={4} name="viaTipus" />
-                    <GridFormField size={8} name="viaNom" />
-                    <GridFormField size={4} name="apartatCorreus" />
-                    <GridFormField size={4} name="numeroCasa" />
-                    <GridFormField size={4} name="puntKm" />
-                    <GridFormField size={4} name="portal" />
-                    <GridFormField size={4} name="escala" />
-                    <GridFormField size={4} name="planta" />
-                    <GridFormField size={4} name="porta" />
-                    <GridFormField size={4} name="bloc" />
-                    <GridFormField size={4} name="codiPostal" />
-                    <GridFormField size={6} name="paisCodi" />
-                    <GridFormField size={6} name="provincia" />
-                    <GridFormField size={6} name="municipiCodi" />
-                    <GridFormField size={6} name="poblacio" />
-                    <GridFormField size={12} name="complement" />
+                    <GridFormField size={4} name="domiciliViaTipus" required={nacional}/>
+                    <GridFormField size={8} name="domiciliViaNom" required={nacional || estranger}/>
+                    <GridFormField size={4} name="domiciliApartatCorreus" required={apCorreus} />
+                    <GridFormField size={4} name="domiciliNumeracioNumero" required={nacional} />
+                    <GridFormField size={4} name="domiciliNumeracioPuntKm" required={nacional} />
+                    <GridFormField size={4} name="domiciliPortal" />
+                    <GridFormField size={4} name="domiciliEscala" />
+                    <GridFormField size={4} name="domiciliPlanta" />
+                    <GridFormField size={4} name="domiciliPorta" />
+                    <GridFormField size={4} name="domiciliBloc" />
+                    <GridFormField size={4} name="domiciliCodiPostal" required />
+                    <GridFormField size={6} name="domiciliPaisCodiIso" type="enum" options={paisos} required />
+                    <GridFormField size={6} name="domiciliProvinciaCodi" required={nacional || apCorreus} />
+                    <GridFormField size={6} name="domiciliMunicipiCodiIne" required={nacional || apCorreus} />
+                    <GridFormField size={6} name="domiciliPoblacio" required />
+                    <GridFormField size={6} name="domiciliComplement" />
                 </>
             )}
         </Grid>
     );
 };
+
 
 const NotificacioFormEnviament: React.FC<{ index: number; indexKey: number; handleRemove: (indexKey: number) => void; canDelete?: boolean; }> = (props) => {
 
@@ -196,26 +215,15 @@ const NotificacioFormEnviament: React.FC<{ index: number; indexKey: number; hand
     const [currentEnviamentFieldValidationErrors, setCurrentEnviamentFieldValidationErrors] = React.useState<any[]>();
     const [currentEnviamentGlobalValidationErrors, setCurrentEnviamentGlobalValidationErrors] = React.useState<any[]>();
     const {data: parentFormData, fieldErrors: parentFieldErrors, apiRef: parentFormApiRef,} = useFormContext();
-    const {isReady: apiIsReady, getOne: apiGetOne,} = useResourceApiService('procedimentResource');
+    // const {isReady: apiIsReady, artifactAction: apiAction,} = useResourceApiService('procedimentResource');
 
-    const [forceEntregaPostalActiva, setForceEntregaPostalActiva] = React.useState(false);
+    // const [forceEntregaPostalActiva, setForceEntregaPostalActiva] = React.useState(false);
 
-    React.useEffect(() => {
-
-        const procediment = parentFormData?.procediment;
-        if (!apiIsReady || !procediment?.id) {
-            setForceEntregaPostalActiva(false);
-            return;
-        }
-        apiGetOne(procediment.id).then((resposta: any) => {
-            setForceEntregaPostalActiva(Boolean(true));
-            // setForceEntregaPostalActiva(Boolean(resposta?.entregaPostalActiva));
-        }).catch((error: any) => {
-            console.error(error);
-            setForceEntregaPostalActiva(false);
-        });
-    }, [apiIsReady, apiGetOne, parentFormData?.procediment?.id]);
-
+    const { forceEntregaPostalActiva } = useDadesProcediment(parentFormData);
+    const paisos = [
+        { value: "ES", description: "Spain" },
+        { value: "FR", description: "France" }
+    ]
     React.useEffect(() => {
         const errorPrefix = 'enviamentsInfo[' + index + ']';
         const currentEnviamentFieldValidationErrors = parentFieldErrors
@@ -307,8 +315,7 @@ const NotificacioFormEnviament: React.FC<{ index: number; indexKey: number; hand
                                     </Button>
                                 </Grid>
                             )}
-                            <GridFormField size={12} name="ambEntregaDeh" />
-                           <NotificacioFormEnviamentEntregaPostal forceEntregaPostalActiva={forceEntregaPostalActiva}/>
+                           <NotificacioFormEnviamentEntregaPostal forceEntregaPostalActiva={forceEntregaPostalActiva} paisos={paisos}/>
 
                         </Grid>
                     </MuiForm>

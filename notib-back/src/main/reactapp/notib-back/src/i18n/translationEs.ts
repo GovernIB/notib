@@ -498,6 +498,9 @@ const translationEs = {
                             'Está la primera página del documento preparada para el ensobrado?',
                     },
                 },
+                entregaPostal: {
+                    title: "Entrega postal"
+                },
                 camps: {
                     procediment: 'Procedimiento',
                     servei: 'Servicio',

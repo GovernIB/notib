@@ -20,7 +20,7 @@ const NotificacioMassivaResumDialogContent: React.FC<{ id: any }> = (props) => {
 
     React.useEffect(() => {
         if (apiIsReady) {
-            apiGetOne(id, {perspectives: ['RESUM_NOTIFACIO_MASSIVA'],}).then(setNotificacio);
+            apiGetOne(id, {perspectives: ['RESUM_NOTIFACIO_MASSIVA']}).then(setNotificacio);
         }
     }, [apiIsReady, id]);
 

@@ -1,7 +1,9 @@
 package es.caib.notib.logic.intf.dto;
 
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
@@ -9,10 +11,13 @@ import java.util.List;
 
 /**
  * Informació d'una entitat.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Getter @Setter @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+@NoArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class EntitatDto extends EntitatDataDto {
 
 	private boolean activa;
@@ -27,7 +32,7 @@ public class EntitatDto extends EntitatDataDto {
 			return llibre + " - " + (llibreNom != null ? llibreNom : "");
 		return "";
 	}
-	
+
 	public int getPermisosCount() {
 		if  (permisos == null)
 			return 0;

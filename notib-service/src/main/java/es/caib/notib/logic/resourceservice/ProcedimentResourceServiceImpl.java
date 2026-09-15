@@ -12,12 +12,14 @@ import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
 import es.caib.notib.logic.intf.dto.CodiValorOrganGestorComuDto;
 import es.caib.notib.logic.intf.dto.PermisEnum;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
-import es.caib.notib.logic.intf.model.OrganGestorResource;
 import es.caib.notib.logic.intf.model.ProcedimentResource;
 import es.caib.notib.logic.intf.resourceservice.ProcedimentResourceService;
+import es.caib.notib.logic.intf.service.GrupService;
+import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.intf.service.ProcedimentService;
 import es.caib.notib.logic.intf.service.ServeiService;
 import es.caib.notib.logic.procSer.ComuOnChangeLogicProcessor;
+import es.caib.notib.logic.procediments.DadesProcedimentActionExecutor;
 import es.caib.notib.logic.procediments.NetejerCacheActionExecutor;
 import es.caib.notib.logic.procediments.ProcedimentActivarActionExecutor;
 import es.caib.notib.logic.procediments.ProcedimentActualitzarActionExecutor;
@@ -72,6 +74,8 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 	private final PaginacioHelper paginacioHelper;
 	private final ProcedimentService procedimentService;
 	private final ServeiService serveiService;
+	private final OrganGestorService organGestorService;
+	private final GrupService grupService;
 
 	@PostConstruct
 	public void init() {
@@ -85,6 +89,7 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 		register(ProcedimentResource.PROCEDIMENT_ACTUALITZAR_ACTION_CODE, new ProcedimentActualitzarActionExecutor(entitatResourceRepository, userSessionHelper, procedimentService));
 		register(ProcedimentResource.PROCEDIMENT_SYNC_MANUAL_ACTION_CODE, new ProcedimentSyncManualActionExecutor(procedimentService));
 		register(ProcedimentResource.PROCEDIMENT_SYNC_AUTO_ACTION_CODE, new ProcedimentSyncAutoActionExecutor(procedimentService));
+		register(ProcedimentResource.PROCEDIMENT_DADES_PROCEDIMENT_ACTION_CODE, new DadesProcedimentActionExecutor(organGestorService, grupService, userSessionHelper));
 		register(ProcedimentResource.Fields.comu, new ComuOnChangeLogicProcessor(organGestorResourceRepository, userSessionHelper));
 
 	}
@@ -100,7 +105,7 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 		ProcedimentResourceRepository procedimentResourceRepository,
 		OrganGestorResourceRepository organGestorResourceRepository,
 		ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository, PaginacioHelper paginacioHelper,
-		ProcedimentService procedimentService, ServeiService serveiService) {
+		ProcedimentService procedimentService, ServeiService serveiService, OrganGestorService organGestorService, GrupService grupService) {
 
 		super(userSessionHelper, authenticationHelper, notibPermissionHelper);
 		this.aclHelper = aclHelper;
@@ -114,6 +119,8 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 		this.paginacioHelper = paginacioHelper;
 		this.procedimentService = procedimentService;
 		this.serveiService = serveiService;
+		this.organGestorService = organGestorService;
+		this.grupService = grupService;
 	}
 
 	@Override

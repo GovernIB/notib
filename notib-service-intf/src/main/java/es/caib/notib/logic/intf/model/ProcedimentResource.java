@@ -137,6 +137,17 @@ import java.util.Date;
 					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN })
 			}
 		),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = ProcedimentResource.PROCEDIMENT_DADES_PROCEDIMENT_ACTION_CODE,
+			requiresId = true,
+			formClass = ProcedimentResource.ProcedimentResourceFilter.class,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN, BaseConfig.ROLE_USER })
+			}
+		),
 	}
 )
 @CustomValidation.List({
@@ -162,6 +173,7 @@ public class ProcedimentResource extends BaseResource<Long> {
 	public static final String PROCEDIMENT_ACTUALITZAR_ACTION_CODE = "PROCEDIMENT_ACTUALITZAR";
 	public static final String PROCEDIMENT_SYNC_MANUAL_ACTION_CODE = "PROCEDIMENT_SYNC_MANUAL";
 	public static final String PROCEDIMENT_SYNC_AUTO_ACTION_CODE = "PROCEDIMENT_SYNC_AUTO";
+	public static final String PROCEDIMENT_DADES_PROCEDIMENT_ACTION_CODE = "DADES_PROCEDIMENT";
 
 	@NotNull
 	private ProcSerTipusEnum tipus;

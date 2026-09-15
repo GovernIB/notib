@@ -515,6 +515,9 @@ const translationCa = {
                             "Està la primera pàgina del document preparada per l'ensobrat?",
                     },
                 },
+                entregaPostal: {
+                    title: "Entrega postal"
+                },
                 camps: {
                     procediment: 'Procediment',
                     servei: 'Servei',

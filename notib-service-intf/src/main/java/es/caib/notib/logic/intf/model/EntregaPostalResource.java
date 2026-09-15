@@ -8,14 +8,22 @@ import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
+import es.caib.notib.logic.intf.base.validation.CustomValidation;
 import es.caib.notib.logic.intf.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificaDomiciliTipusEnumDto;
 import es.caib.notib.logic.intf.dto.cie.CieCertificacioArxiuTipus;
 import es.caib.notib.logic.intf.dto.cie.CieCertificacioTipus;
+import es.caib.notib.logic.intf.model.validator.entregaPostal.EntregaPostalRequiredFields;
+import es.caib.notib.logic.intf.model.validator.procediment.CodiProcedimentNoRepetit;
+import es.caib.notib.logic.intf.model.validator.procediment.NomProcedimentNoRepetit;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -23,9 +31,12 @@ import java.util.Date;
  *
  * @author Límit Tecnologies
  */
+@Builder
+@AllArgsConstructor
 @Getter
 @Setter
 @NoArgsConstructor
+@FieldNameConstants
 @ResourceConfig(
 	descriptionField = "id",
 	accessConstraints = {
@@ -40,9 +51,13 @@ import java.util.Date;
 		),
 	}
 )
+@CustomValidation.List({
+	@CustomValidation(customValidatorType = EntregaPostalRequiredFields.class, springBean = true)
+})
 public class EntregaPostalResource extends BaseResource<Long> {
 
 	private NotificaDomiciliTipusEnumDto domiciliTipus;
+	@NotNull
 	private NotificaDomiciliConcretTipus domiciliConcretTipus;
 	private EntregaPostalVia domiciliViaTipus;
 	private String domiciliViaNom;

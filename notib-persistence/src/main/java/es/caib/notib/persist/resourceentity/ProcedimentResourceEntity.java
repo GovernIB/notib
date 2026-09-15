@@ -129,6 +129,7 @@ public class ProcedimentResourceEntity
 	}
 
 	public EntregaCieResourceEntity getEntregaCieEfectiva() {
+
 		if (entregaCie != null) {
 			return entregaCie;
 		}
@@ -142,6 +143,51 @@ public class ProcedimentResourceEntity
 		}
 
 		return null;
+	}
+
+	public boolean isEntregaCieVigent() {
+
+		if (entregaCie != null && entregaCie.getPagadorPostal() != null && entregaCie.getPagadorCie() != null) {
+			return checkEntregaCieProcSer();
+		}
+		EntregaCieResourceEntity entrega;
+		if (organGestor != null) {
+			entrega = organGestor.getEntregaCie();
+			if (entrega != null && entrega.getPagadorPostal() != null && entrega.getPagadorCie() != null) {
+				return checkEntregaCieOrgan();
+			}
+		}
+		entrega = entitat.getEntregaCie();
+		if (entrega != null && entrega.getPagadorPostal() != null && entrega.getPagadorCie() != null) {
+			return checkEntregaCieEntitat();
+		}
+		return true;
+	}
+
+	private boolean checkEntregaCieOrgan() {
+
+		var d = new Date();
+		var entrega = organGestor.getEntregaCie();
+		var opData = entrega.getPagadorPostal().getContracteDataVig();
+		var cieData = entrega.getPagadorCie().getContracteDataVig();
+		return opData != null && cieData != null && d.before(opData) && d.before(cieData);
+	}
+
+	private boolean checkEntregaCieProcSer() {
+
+		var d = new Date();
+		var opData = entregaCie.getPagadorPostal().getContracteDataVig();
+		var cieData = entregaCie.getPagadorCie().getContracteDataVig();
+		return opData != null && cieData != null && d.before(opData) && d.before(cieData);
+	}
+
+	private boolean checkEntregaCieEntitat() {
+
+		var entrega = entitat.getEntregaCie();
+		var d = new Date();
+		var opData = entrega.getPagadorPostal().getContracteDataVig();
+		var cieData = entrega.getPagadorCie().getContracteDataVig();
+		return opData != null && cieData != null && d.before(opData) && d.before(cieData);
 	}
 
 }

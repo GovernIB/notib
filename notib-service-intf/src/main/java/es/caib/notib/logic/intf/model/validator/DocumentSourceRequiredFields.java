@@ -11,7 +11,7 @@ import javax.validation.ConstraintValidatorContext;
  *
  * @author Límit Tecnologies
  */
-public class DocumentSourceRequiredFields implements CustomValidator<DocumentResource> {
+public class DocumentSourceRequiredFields extends ValidatorHelper implements CustomValidator<DocumentResource> {
 
 	@Override
 	public boolean validate(DocumentResource value, ConstraintValidatorContext context) {
@@ -28,27 +28,4 @@ public class DocumentSourceRequiredFields implements CustomValidator<DocumentRes
 		context.disableDefaultConstraintViolation();
 		return valid;
 	}
-
-	public String getMessage() {
-		return "{javax.validation.constraints.NotEmpty.message}";
-	}
-
-	private boolean validateNotNull(
-		String fieldName,
-		Object value,
-		boolean valid,
-		ConstraintValidatorContext context) {
-		if (value == null) {
-			context.
-				buildConstraintViolationWithTemplate(
-					I18nUtil.getInstance().getI18nMessage(
-						getMessage().substring(1, getMessage().length() - 1).trim())).
-				addPropertyNode(fieldName).
-				addConstraintViolation();
-			return false;
-		} else {
-			return valid;
-		}
-	}
-
 }

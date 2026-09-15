@@ -168,17 +168,16 @@ const ProcedimentServeiField: React.FC<ProcedimentServeiFieldProps> = ({ organGe
         }
         apiGetOne(procediment.id)
             .then((resposta: any) => {
-                console.log(resposta);
-                formApiRef.current?.setFieldValue('entregaPostalActiva', true);
                 // Un procediment/servei no comú sempre pertany a un únic òrgan gestor: l'emplenam
                 // automàticament perquè l'usuari no l'hagi de triar dues vegades.
                 if (!resposta.comu && resposta.organGestor?.id !== data.organGestor?.id) {
                     organGestorFromProcedimentRef.current = true;
                     formApiRef.current?.setFieldValue('organGestor', resposta.organGestor);
+
                 }
             })
             .catch((error: any) => console.error(error));
-        }, [apiIsReady, data.procediment, data.entregaPostalActiva, apiGetOne]);
+        }, [apiIsReady, data.procediment, apiGetOne]);
 
     if (data.enviamentTipus === 'SIR') {
         return (
