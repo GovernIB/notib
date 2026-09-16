@@ -148,10 +148,17 @@ export const AuthProvider = (props: AuthProviderProps) => {
     const signOut = loading
         ? undefined
         : () => {
-              fetch(signOutUrl).finally(() => {
-                  debug && logConsole.debug('Tancament de sessió');
-                  window.location.href = logoutUrl;
-              });
+              // NO facis un fetch() cap a signOutUrl: aquesta petició acaba amb una cadena de
+              // redireccions cap a l'"end session endpoint" de Keycloak (origen diferent). fetch()
+              // només hi envia les cookies (i, per tant, la cookie de sessió SSO de Keycloak) quan la
+              // petició és al mateix origen que la pàgina; en creuar d'origen via redirecció, el
+              // navegador no les hi adjunta (mode "same-origin", el per defecte de fetch), de manera
+              // que Keycloak mai arriba a tancar la sessió SSO real. Resultat: la sessió local
+              // s'invalida però la SSO es manté viva, i en refrescar l'aplicació hi torna a entrar
+              // silenciosament amb el mateix usuari. Cal fer-hi una navegació completa del navegador
+              // (com aquesta), que sí que hi adjunta les cookies pertinents a cada salt.
+              debug && logConsole.debug('Tancament de sessió');
+              window.location.href = signOutUrl;
           };
     const context = {
         isLoading: loading,
