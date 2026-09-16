@@ -274,6 +274,7 @@ export const ProcedimentGrid = () => {
                 toolbarHideCreate={isRoleAdminLectura ? true : undefined}
                 rowLink="form/{{id}}"
                 rowUpdateLink="form/{{id}}"
+                rowUpdateShowInMenu
                 rowHideUpdateButton={isRoleAdminLectura}
                 rowHideDeleteButton={isRoleAdminLectura}
                 rowAdditionalActions={rowAdditionalActions}

@@ -42,8 +42,9 @@ const EntitatFormTabAplicacionsFormContent: React.FC = () => {
             <GridFormField size={4} name="usuariCodi" />
             <Grid size={8} />
             <GridFormField size={12} name="callbackUrl" />
-            <GridFormField size={6} name="activa" />
-            <GridFormField size={6} name="headerCsrf" />
+            <GridFormField size={4} name="activa" />
+            <GridFormField size={4} name="aplicarLimitEnviaments" />
+            <GridFormField size={4} name="headerCsrf" />
             <GridFormField size={6} name="horariLaboralInici" />
             <GridFormField size={6} name="horariLaboralFi" />
             <GridFormField size={6} name="maxEnviamentsMinutLaboral" />

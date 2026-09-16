@@ -38,7 +38,7 @@ const columns = [
         flex: 1,
         renderCell: (params: any) => {
             return (
-                <LinkToTab id={params.id} tab={1}>
+                <LinkToTab id={params.id} tab={1} clickEnabled>
                     <Chip label={params.value} color={params.value ? 'primary' : undefined} size="small"/>
                 </LinkToTab>
             );
@@ -49,7 +49,7 @@ const columns = [
         flex: 1,
         renderCell: (params: any) => {
             return (
-                <LinkToTab id={params.id} tab={2}>
+                <LinkToTab id={params.id} tab={2} clickEnabled>
                     <Chip label={params.value} color={params.value ? 'primary' : undefined} size="small"/>
                 </LinkToTab>
             );

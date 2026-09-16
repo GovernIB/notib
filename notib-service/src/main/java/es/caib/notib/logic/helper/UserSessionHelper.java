@@ -7,7 +7,6 @@ import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
 import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
 import es.caib.notib.persist.resourcerepository.EntitatResourceRepository;
 import es.caib.notib.persist.resourcerepository.OrganGestorResourceRepository;
-import liquibase.pro.packaged.M;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

@@ -16,9 +16,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-public class PagadorCieFormatFullaResourceServiceImpl
-	extends BaseAdminEntitatResourceServiceImpl<PagadorCieFormatFullaResource, PagadorCieFormatFullaResourceEntity>
-	implements PagadorCieFormatFullaResourceService {
+public class PagadorCieFormatFullaResourceServiceImpl extends BaseAdminEntitatResourceServiceImpl<PagadorCieFormatFullaResource, PagadorCieFormatFullaResourceEntity> implements PagadorCieFormatFullaResourceService {
 
 	public PagadorCieFormatFullaResourceServiceImpl(
 		UserSessionHelper userSessionHelper,
