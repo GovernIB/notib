@@ -1,9 +1,11 @@
-package es.caib.notib.client; /**
- * 
+/**
+ *
  */
+package es.caib.notib.client;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import es.caib.notib.client.domini.AppInfo;
 import es.caib.notib.client.domini.DadesConsulta;
 import es.caib.notib.client.domini.Idioma;
@@ -21,15 +23,13 @@ import es.caib.notib.client.domini.consulta.Arxiu;
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 /**
  * Client REST v2 per al servei de notificacions de NOTIB.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -37,8 +37,6 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 
 	private static final String NOTIFICACIOV2_SERVICE_PATH = "/interna/notificacio/v2";
 	private static final String CONSULTAV2_SERVICE_PATH = "/interna/consulta/v2";
-	private static final String COMUNICACIONS = "/comunicacions/";
-	private static final String NOTIFICACIONS = "/notificacions/";
 	private static final String PROCEDIMENTS = "/interna/procediment";
 
 	private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -124,10 +122,8 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 
 		String urlAmbMetode = baseUrl + "/interna/api/rest/appinfo";
 		try {
-			restClient = generarClient();
-			var wt = restClient.target(urlAmbMetode);
-			var json = wt.request(MediaType.APPLICATION_JSON).get(String.class);
-			return getMapper().readValue(json, AppInfo.class);
+			jerseyClient = generarClient();
+			return clientGet(urlAmbMetode, AppInfo.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
@@ -144,32 +140,27 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	public RespostaAltaV2 alta(NotificacioV2 notificacio) {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/alta";
-			ObjectMapper mapper  = getMapper();
-			String body = mapper.writeValueAsString(notificacio);
-			restClient = generarClient();
-			log.debug("Missatge REST enviat: " + body);
-			var wt = restClient.target(urlAmbMetode);
-			var r = wt.request(MediaType.APPLICATION_JSON).post(Entity.json(body)).readEntity(RespostaAltaV2.class);
-			log.debug("Missatge REST rebut: " + r);
-			return r;
+			return clientPost(urlAmbMetode, notificacio, RespostaAltaV2.class);
+		} catch (UniformInterfaceException ue) {
+			RespostaAltaV2 respostaAlta = new RespostaAltaV2();
+			ClientResponse response = ue.getResponse();
+
+			if (response != null && response.getStatus() == 401) {
+				respostaAlta.setError(true);
+				respostaAlta.setErrorDescripcio("[CLIENT] Hi ha hagut un problema d'autenticació: "  + ue.getMessage());
+				return respostaAlta;
+			}
+			throw new RuntimeException(ue);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
 	}
 
-
 	public RespuestaAmpliarPlazoOE ampliarPlazoOE(AmpliarPlazoOE ampliarPlazo) {
 
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/ampliarPlazo";
-			ObjectMapper mapper  = getMapper();
-			String body = mapper.writeValueAsString(ampliarPlazo);
-			restClient = generarClient();
-			log.debug("Missatge REST enviat: " + body);
-			var wt = restClient.target(urlAmbMetode);
-			var r = wt.request(MediaType.APPLICATION_JSON).post(Entity.json(body)).readEntity(RespuestaAmpliarPlazoOE.class);
-			log.debug("Missatge REST rebut: " + r);
-			return r;
+			return clientPost(urlAmbMetode, ampliarPlazo, RespuestaAmpliarPlazoOE.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
@@ -184,10 +175,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	public RespostaConsultaEstatNotificacioV2 consultaEstatNotificacio(String identificador) {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaEstatNotificacio/" + identificador;
-			restClient = generarClient();
-			var wt = restClient.target(urlAmbMetode);
-			var json = wt.request(MediaType.APPLICATION_JSON).get(String.class);
-			return getMapper().readValue(json, RespostaConsultaEstatNotificacioV2.class);
+			return clientGet(urlAmbMetode, RespostaConsultaEstatNotificacioV2.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
@@ -202,10 +190,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	public RespostaConsultaEstatEnviamentV2 consultaEstatEnviament(String referencia) {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaEstatEnviament/" + referencia;
-			restClient = generarClient();
-			var wt = restClient.target(urlAmbMetode);
-			var json = wt.request(MediaType.APPLICATION_JSON).get(String.class);
-			return getMapper().readValue(json, RespostaConsultaEstatEnviamentV2.class);
+			return clientGet(urlAmbMetode, RespostaConsultaEstatEnviamentV2.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
@@ -220,13 +205,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	public RespostaConsultaDadesRegistreV2 consultaDadesRegistre(DadesConsulta dadesConsulta) {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaDadesRegistre";
-			ObjectMapper mapper  = getMapper();
-			String body = mapper.writeValueAsString(dadesConsulta);
-			restClient = generarClient();
-			var wt = restClient.target(urlAmbMetode);
-			var r = wt.request(MediaType.APPLICATION_JSON).post(Entity.json(body)).readEntity(RespostaConsultaDadesRegistreV2.class);
-			log.debug("Missatge REST rebut: " + r);
-			return r;
+			return clientPost(urlAmbMetode, dadesConsulta, RespostaConsultaDadesRegistreV2.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
@@ -257,7 +236,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 
 	public RespostaConsultaV2 comunicacionsByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida) {
 		try {
-			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + COMUNICACIONS + dniTitular;
+			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/comunicacions/" + dniTitular;
 			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
 			return getMapper().readValue(json, RespostaConsultaV2.class);
 		} catch (Exception ex) {
@@ -267,7 +246,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 
 	public RespostaConsultaV2 notificacionsByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida) {
 		try {
-			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + NOTIFICACIONS + dniTitular;
+			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/notificacions/" + dniTitular;
 			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
 			return getMapper().readValue(json, RespostaConsultaV2.class);
 		} catch (Exception ex) {
@@ -277,7 +256,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 
 	public RespostaConsultaV2 comunicacionsPendentsByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida) {
 		try {
-			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + COMUNICACIONS + dniTitular + "/pendents";
+			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/comunicacions/" + dniTitular + "/pendents";
 			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
 			return getMapper().readValue(json, RespostaConsultaV2.class);
 		} catch (Exception ex) {
@@ -287,7 +266,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 
 	public RespostaConsultaV2 notificacionsPendentsByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida) {
 		try {
-			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + NOTIFICACIONS + dniTitular + "/pendents";
+			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/notificacions/" + dniTitular + "/pendents";
 			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
 			return getMapper().readValue(json, RespostaConsultaV2.class);
 		} catch (Exception ex) {
@@ -297,7 +276,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 
 	public RespostaConsultaV2 comunicacionsLlegidesByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida) {
 		try {
-			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + COMUNICACIONS + dniTitular + "/llegides";
+			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/comunicacions/" + dniTitular + "/llegides";
 			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
 			return getMapper().readValue(json, RespostaConsultaV2.class);
 		} catch (Exception ex) {
@@ -306,14 +285,70 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	}
 
 	public RespostaConsultaV2 notificacionsLlegidesByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida) {
-
 		try {
-			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + NOTIFICACIONS + dniTitular + "/llegides";
+			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/notificacions/" + dniTitular + "/llegides";
 			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
 			return getMapper().readValue(json, RespostaConsultaV2.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
+	}
+
+	public Arxiu getDocument(String notificacioId) {
+
+		try {
+			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/document/" + notificacioId;
+			jerseyClient = generarClient();
+			String json = jerseyClient.resource(urlAmbMetode)
+					.queryParam("notificacioId", notificacioId != null ? notificacioId : "")
+					.type("application/json").get(String.class);
+			return getMapper().readValue(json, Arxiu.class);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	public Arxiu getCertificacio(String enviamentId) {
+
+		try {
+			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/certificacio/" + enviamentId;
+			jerseyClient = generarClient();
+			String json = jerseyClient.resource(urlAmbMetode).
+					queryParam("enviamentId", enviamentId != null ? enviamentId : "")
+					.type("application/json").get(String.class);
+			return getMapper().readValue(json, Arxiu.class);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	public Arxiu getJustificant(String enviamentId) {
+
+		try {
+			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/justificant/" + enviamentId;
+			jerseyClient = generarClient();
+			String json = jerseyClient.resource(urlAmbMetode).
+					queryParam("enviamentId", enviamentId != null ? enviamentId : "")
+					.type("application/json").get(String.class);
+			return getMapper().readValue(json, Arxiu.class);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	private String getConsultaJsonString(Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida, String urlAmbMetode) throws Exception {
+
+		jerseyClient = generarClient();
+		return jerseyClient.
+				resource(urlAmbMetode).
+				queryParam("dataInicial", dataInicial != null ? sdf.format(dataInicial) : "").
+				queryParam("dataFinal", dataInicial != null ? sdf.format(dataFinal) : "").
+				queryParam("visibleCarpeta", visibleCarpeta != null ? (visibleCarpeta ? "si" : "no") : "").
+				queryParam("lang", lang != null ? lang.name() : "").
+				queryParam("pagina", pagina != null ? pagina.toString() : "").
+				queryParam("mida", mida != null ? mida.toString() : "").
+				type("application/json").
+				get(String.class);
 	}
 
 	public List<Procediment> getProcedimentsByEntitat(String codiEntitat) {
@@ -349,61 +384,4 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 			throw new RuntimeException(ex);
 		}
 	}
-
-	public Arxiu getDocument(String notificacioId) {
-
-		try {
-			var urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/document/" + notificacioId;
-			restClient = generarClient();
-			String json = restClient.target(urlAmbMetode)
-					.queryParam("notificacioId", notificacioId != null ? notificacioId : "")
-					.request(MediaType.APPLICATION_JSON).get(String.class);
-			return getMapper().readValue(json, Arxiu.class);
-		} catch (Exception ex) {
-			throw new RuntimeException(ex);
-		}
-	}
-
-	public Arxiu getCertificacio(String enviamentId) {
-
-		try {
-			var urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/certificacio/" + enviamentId;
-			restClient = generarClient();
-			String json = restClient.target(urlAmbMetode).
-					queryParam("enviamentId", enviamentId != null ? enviamentId : "")
-					.request(MediaType.APPLICATION_JSON).get(String.class);
-			return getMapper().readValue(json, Arxiu.class);
-		} catch (Exception ex) {
-			throw new RuntimeException(ex);
-		}
-	}
-
-	public Arxiu getJustificant(String enviamentId) {
-
-		try {
-			var urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/justificant/" + enviamentId;
-			restClient = generarClient();
-			String json = restClient.target(urlAmbMetode).
-					queryParam("enviamentId", enviamentId != null ? enviamentId : "")
-					.request(MediaType.APPLICATION_JSON).get(String.class);
-			return getMapper().readValue(json, Arxiu.class);
-		} catch (Exception ex) {
-			throw new RuntimeException(ex);
-		}
-	}
-
-	private String getConsultaJsonString(Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida, String urlAmbMetode)  {
-
-		restClient = generarClient();
-		return restClient.target(urlAmbMetode)
-				.queryParam("dataInicial", dataInicial != null ? sdf.format(dataInicial) : "")
-				.queryParam("dataFinal", dataInicial != null ? sdf.format(dataFinal) : "")
-				.queryParam("visibleCarpeta", visibleCarpeta != null ? (visibleCarpeta ? "si" : "no") : "")
-				.queryParam("lang", lang != null ? lang.name() : "")
-				.queryParam("pagina", pagina != null ? pagina.toString() : "")
-				.queryParam("mida", mida != null ? mida.toString() : "")
-				.request(MediaType.APPLICATION_JSON)
-				.get(String.class);
-	}
-
 }

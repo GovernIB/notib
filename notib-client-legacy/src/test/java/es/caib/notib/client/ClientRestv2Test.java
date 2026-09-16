@@ -1,25 +1,17 @@
 package es.caib.notib.client;
 
-import es.caib.notib.client.domini.AppInfo;
-import es.caib.notib.client.domini.DadesConsulta;
-import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.client.domini.EnviamentReferenciaV2;
-import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
-import es.caib.notib.client.domini.NotificacioEstatEnum;
-import es.caib.notib.client.domini.NotificacioV2;
-import es.caib.notib.client.domini.RespostaAltaV2;
-import es.caib.notib.client.domini.RespostaConsultaDadesRegistreV2;
-import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
-import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
-import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
+import es.caib.notib.client.domini.*;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.Envios;
+import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Base64;
 import org.junit.Before;
-import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
+
 
 import javax.xml.datatype.DatatypeConfigurationException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,21 +30,22 @@ import static org.junit.Assert.*;
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ClientRestv2Test extends ClientBaseTest {
 
-	private static final String URL = "http://localhost:8080/notibapi";
-	private static final String USERNAME = "u999000";
-	private static final String PASSWORD = "u999000";
-//	private static final String URL = "https://dev.caib.es/notib2api";
-//	private static final String USERNAME = "e18225486x";
-//	private static final String PASSWORD = "limit";
+//		private static final String URL = "http://localhost:8080/notib";
+//	private static final String URL = "http://localhost:8080/notibapi";
+//	private static final String USERNAME = "admin";
+//	private static final String PASSWORD = "admin";
+//	private static final String USERNAME = "u999000";
+//	private static final String PASSWORD = "u999000";
 
+
+	private static final String URL = "https://dev.caib.es/notibapi";
+	private static final String USERNAME = "$ripea_notib_dev";
+	private static final String PASSWORD = "ripea_notib_dev";
 
 	// Indicar si el servidor esta configurat en mode síncron
 	private static final boolean SYNC_MODE = false;
-
-	private String identificacdor;
 
 	/*
 	@Rule
@@ -72,16 +65,18 @@ public class ClientRestv2Test extends ClientBaseTest {
 	}
 
 	@Test
-	public void alta() throws DatatypeConfigurationException, IOException {
+	public void test() throws DatatypeConfigurationException, IOException, DecoderException {
 
 		String notificacioId = Long.toString(System.currentTimeMillis());
 		RespostaAltaV2 respostaAlta = client.alta(generarNotificacioV2(notificacioId, 1, false));
+
 		assertNotNull(respostaAlta);
 		if (respostaAlta.isError()) {
 			System.out.println(">>> Reposta amb error: " + respostaAlta.getErrorDescripcio());
 		} else {
 			System.out.println(">>> Reposta Ok");
 		}
+
 		assertFalse(respostaAlta.isError());
 		assertNull(respostaAlta.getErrorDescripcio());
 		assertNotNull(respostaAlta.getReferencies());
@@ -97,20 +92,19 @@ public class ClientRestv2Test extends ClientBaseTest {
 	@Test
 	public void ampliarPlazo() throws DatatypeConfigurationException, IOException {
 
-		var envios = new Envios();
+		Envios envios = new Envios();
 		envios.getIdentificador().add("5894cf6f-aa62-461a-b59e-3858796f3f3f");
-		var ampliacio = new AmpliarPlazoOE();
+		AmpliarPlazoOE ampliacio = new AmpliarPlazoOE();
 		ampliacio.setEnvios(envios);
 		ampliacio.setMotivo("Test");
 		ampliacio.setPlazo(2);
-		var resposta = client.ampliarPlazoOE(ampliacio);
+		RespuestaAmpliarPlazoOE resposta = client.ampliarPlazoOE(ampliacio);
 		assertNotNull(resposta);
 		assertTrue(resposta.isOk());
 	}
 
 	@Test
-	public void testConsultaEstatNotificacio() throws DatatypeConfigurationException, IOException {
-
+	public void testConsultaEstatNotificacio() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 		String notificacioId = Long.toString(System.currentTimeMillis());
 		RespostaAltaV2 respostaAlta = client.alta(generarNotificacioV2(notificacioId,1,false));
@@ -120,7 +114,6 @@ public class ClientRestv2Test extends ClientBaseTest {
 		List<EnviamentReferenciaV2> referencies = respostaAlta.getReferencies();
 		assertEquals(1, referencies.size());
 		assertNotNull(referencies.get(0).getReferencia());
-
 
 		// When
 		RespostaConsultaEstatNotificacioV2 respostaConsultaEstatNotificacio = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
@@ -136,11 +129,14 @@ public class ClientRestv2Test extends ClientBaseTest {
 	}
 
 	@Test
-	public void testConsultaEstatEnviament() throws DatatypeConfigurationException, IOException {
-
+	public void testConsultaEstatEnviament() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 		String notificacioId = Long.toString(System.currentTimeMillis());
-		RespostaAltaV2 respostaAlta = client.alta(generarNotificacioV2(notificacioId, 1, false));
+		RespostaAltaV2 respostaAlta = client.alta(
+				generarNotificacioV2(
+						notificacioId,
+						1,
+						false));
 		assertFalse(respostaAlta.isError());
 		assertNull(respostaAlta.getErrorDescripcio());
 		assertNotNull(respostaAlta.getReferencies());
@@ -149,7 +145,8 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertNotNull(referencies.get(0).getReferencia());
 
 		// When
-		RespostaConsultaEstatEnviamentV2 respostaConsultaEstatEnviament = client.consultaEstatEnviament(referencies.get(0).getReferencia());
+		RespostaConsultaEstatEnviamentV2 respostaConsultaEstatEnviament = client.consultaEstatEnviament(
+				referencies.get(0).getReferencia());
 		assertNotNull(respostaConsultaEstatEnviament);
 		if (respostaConsultaEstatEnviament.isError()) {
 			System.out.println(">>> Reposta amb error: " + respostaConsultaEstatEnviament.getErrorDescripcio());
@@ -161,8 +158,8 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertNull(respostaConsultaEstatEnviament.getErrorDescripcio());
 	}
 
-//	@Test
-	public void testConsultaEstatEnviament_donadaReferencia() throws DatatypeConfigurationException, IOException {
+	//	@Test
+	public void testConsultaEstatEnviament_donadaReferencia() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 		String referencia = "8vzkicPP5FQ=";
 
@@ -179,8 +176,8 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertNull(respostaConsultaEstatEnviament.getErrorDescripcio());
 	}
 
-//	@Test
-	public void testConsultaDadesRegistre() throws DatatypeConfigurationException, IOException {
+	//	@Test
+	public void testConsultaDadesRegistre() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 		DadesConsulta dadesConsulta = new DadesConsulta();
 		dadesConsulta.setReferencia("8vzkicPP5FQ=");
@@ -198,13 +195,12 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertNull(resposta.getErrorDescripcio());
 	}
 
-//	@Test
-	public void testConsultaJustificant() throws DatatypeConfigurationException, IOException {
-
+		@Test
+	public void testConsultaJustificant() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 
 		// When
-		RespostaConsultaJustificantEnviament resposta = client.consultaJustificantEnviament("2b3538f5-bf9a-4db1-8f9c-9e984320d31f");
+		RespostaConsultaJustificantEnviament resposta = client.consultaJustificantEnviament("6ecd3f66-f863-4e2e-911b-efcd592ea88b");
 		if (resposta.isError()) {
 			System.out.println(">>> Reposta amb error: " + resposta.getErrorDescripcio());
 		} else {
@@ -215,12 +211,15 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertFalse(resposta.isError());
 		assertNull(resposta.getErrorDescripcio());
 
-//		FileOutputStream outputStream = new FileOutputStream("/justificant.pdf");
-//		outputStream.write(new BASE64Decoder().decodeBuffer(new String(resposta.getJustificant().getContingut())));
+		System.out.println("Fitxer base64: " + resposta.getJustificant().getContingut());
+		System.out.println("Fitxer string base64: " + new String(resposta.getJustificant().getContingut()));
+//
+		FileOutputStream outputStream = new FileOutputStream("/tmp/justificant.pdf");
+		outputStream.write(Base64.decodeBase64(new String(resposta.getJustificant().getContingut())));
 	}
 
 	@Test
-	public void testConsultaAppInfo() throws DatatypeConfigurationException, IOException {
+	public void testConsultaAppInfo() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 
 		// When
@@ -233,7 +232,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertNotNull(resposta.getVersio());
 	}
 
-//	@Test
+	//	@Test
 	public void testCarga1() {
 		for (int i = 0; i < 200000; i++) {
 			System.out.println("Execució 1");
@@ -241,7 +240,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		}
 	}
 
-//	@Test
+	//	@Test
 	public void testCarga2() {
 		for (int i = 0; i < 200000; i++) {
 			System.out.println("Execució 2");
@@ -249,7 +248,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		}
 	}
 
-//	@Test
+	//	@Test
 	public void testCarga3() {
 		for (int i = 0; i < 200000; i++) {
 			System.out.println("Execució 3");
@@ -257,7 +256,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		}
 	}
 
-//	@Test
+	//	@Test
 	public void testCarga4() {
 		for (int i = 0; i < 200000; i++) {
 			System.out.println("Execució 4");
@@ -265,7 +264,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		}
 	}
 
-//	@Test
+	//	@Test
 	public void testCarga5() {
 		for (int i = 0; i < 200000; i++) {
 			System.out.println("Execució 5");
@@ -273,7 +272,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		}
 	}
 
-//	@Test
+	//	@Test
 	public void testCarga6() {
 		for (int i = 0; i < 200000; i++) {
 			System.out.println("Execució 6");
@@ -281,7 +280,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		}
 	}
 
-//	@Test
+	//	@Test
 	public void testCarga7() {
 		for (int i = 0; i < 200000; i++) {
 			System.out.println("Execució 7");
@@ -289,7 +288,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		}
 	}
 
-//	@Test
+	//	@Test
 	public void testCarga8() {
 		for (int i = 0; i < 200000; i++) {
 			System.out.println("Execució 8");
@@ -297,7 +296,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		}
 	}
 
-//	@Test
+	//	@Test
 	public void testCarga9() {
 		for (int i = 0; i < 200000; i++) {
 			System.out.println("Execució 9");
@@ -305,7 +304,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		}
 	}
 
-//	@Test
+	//	@Test
 	public void testCarga10() {
 		for (int i = 0; i < 200000; i++) {
 			System.out.println("Execució 10");
@@ -330,8 +329,16 @@ public class ClientRestv2Test extends ClientBaseTest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = false;
 
-		NotificacioV2 notificacio = generaNotificacio("Test emissió 01", numDestinataris, numDestinataris, ambEnviamentPostal, tipusEnviamentPostal,
-														ambEnviamentDEH, ambEnviamentDEHObligat, ambRetard);
+		NotificacioV2 notificacio = generaNotificacio(
+				"Test emissió 01",
+				numDestinataris,
+				numDestinataris,
+				ambEnviamentPostal,
+				tipusEnviamentPostal,
+				ambEnviamentDEH,
+				ambEnviamentDEHObligat,
+				ambRetard);
+
 		realitzarIComprovarEmissio(notificacio);
 	}
 
@@ -463,14 +470,15 @@ public class ClientRestv2Test extends ClientBaseTest {
 	}
 
 	private void realitzarIComprovarEmissio(NotificacioV2 notificacio) {
-
 		RespostaAltaV2 respostaAlta = client.alta(notificacio);
 		assertNotNull(respostaAlta);
 		assertFalse(respostaAlta.getErrorDescripcio(), respostaAlta.isError());
 
 		List<EnviamentReferenciaV2> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
-		assertThat(referencies.size(), is(notificacio.getEnviaments().size()));
+		assertThat(
+				referencies.size(),
+				is(notificacio.getEnviaments().size()));
 
 		// Consulta estat notificacio
 		RespostaConsultaEstatNotificacioV2 respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
@@ -620,7 +628,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 	public void pruebaEmision07() throws Exception {
 		// Petició CON MAS DE UN DESTINATARIO
 
-		int numDestinataris = 1;
+		int numDestinataris = 3;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
 		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
@@ -690,11 +698,109 @@ public class ClientRestv2Test extends ClientBaseTest {
 	}
 
 
+//	private RespostaAlta alta(
+//			NotificacioV2 notificacio) {
+//		try {
+//			String urlAmbMetode = URL + "/api/services/notificacioV2/alta";
+//			ObjectMapper mapper  = new ObjectMapper();
+//			String body = mapper.writeValueAsString(notificacio);
+//			Client jerseyClient = generarClient();
+//			if (USERNAME != null) {
+//				autenticarClient(
+//						jerseyClient,
+//						urlAmbMetode,
+//						USERNAME,
+//						PASSWORD);
+//			}
+//			String json = jerseyClient.
+//					resource(urlAmbMetode).
+//					type("application/json").
+//					post(String.class, body);
+//			return mapper.readValue(json, RespostaAlta.class);
+//		} catch (UniformInterfaceException ue) {
+//			RespostaAlta respostaAlta = new RespostaAlta();
+//			ClientResponse response = ue.getResponse();
+//
+//			if (response != null && response.getStatus() == 401) {
+//				respostaAlta.setError(true);
+//				respostaAlta.setErrorDescripcio("[CLIENT] Hi ha hagut un problema d'autenticació: "  + ue.getMessage());
+//				return respostaAlta;
+//			}
+//			throw new RuntimeException(ue);
+//		} catch (Exception ex) {
+//			throw new RuntimeException(ex);
+//		}
+//	}
+//
+//	private Client generarClient() {
+//		Client jerseyClient = Client.create();
+//		jerseyClient.setConnectTimeout(connecTimeout);
+//		jerseyClient.setReadTimeout(readTimeout);
+//		//jerseyClient.addFilter(new LoggingFilter(System.out));
+//		jerseyClient.addFilter(
+//				new ClientFilter() {
+//					private ArrayList<Object> cookies;
+//					@Override
+//					public ClientResponse handle(ClientRequest request) throws ClientHandlerException {
+//						if (cookies != null) {
+//							request.getHeaders().put("Cookie", cookies);
+//						}
+//						ClientResponse response = getNext().handle(request);
+//						if (response.getCookies() != null) {
+//							if (cookies == null) {
+//								cookies = new ArrayList<Object>();
+//							}
+//							cookies.addAll(response.getCookies());
+//						}
+//						return response;
+//					}
+//				}
+//		);
+//		jerseyClient.addFilter(
+//				new ClientFilter() {
+//					@Override
+//					public ClientResponse handle(ClientRequest request) throws ClientHandlerException {
+//						ClientHandler ch = getNext();
+//						ClientResponse resp = ch.handle(request);
+//
+//						if (resp.getStatusInfo().getFamily() != Response.Status.Family.REDIRECTION) {
+//							return resp;
+//						} else {
+//							String redirectTarget = resp.getHeaders().getFirst("Location");
+//							request.setURI(UriBuilder.fromUri(redirectTarget).build());
+//							return ch.handle(request);
+//						}
+//					}
+//				}
+//		);
+//		return jerseyClient;
+//	}
+//
+//	private void autenticarClient(
+//			Client jerseyClient,
+//			String urlAmbMetode,
+//			String username,
+//			String password) throws InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
+//		if (!autenticacioBasic) {
+//			jerseyClient.resource(urlAmbMetode).get(String.class);
+//			Form form = new Form();
+//			form.putSingle("j_username", username);
+//			form.putSingle("j_password", password);
+//			jerseyClient.
+//					resource(URL + "/j_security_check").
+//					type("application/x-www-form-urlencoded").
+//					post(form);
+//		} else {
+//			jerseyClient.addFilter(
+//					new HTTPBasicAuthFilter(username, password));
+//		}
+//	}
+
+
 	@Test
-	public void consultaEstatNotificacioTest() throws DatatypeConfigurationException, IOException {
+	public void consultaEstatNotificacioTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
-//		String referencia = "43573ddf-4f26-40d9-ae80-5bc9dcafbb96";
-		String referencia = "a88ad1c6-4e79-4287-b781-ffd689e4a6de";
+		String referencia = "3b455842-056a-4af7-8946-1a333d5ba9a9";
 
 		// When
 		RespostaConsultaEstatNotificacioV2 respostaConsultaEstatNotificacio = client.consultaEstatNotificacio(referencia);
@@ -710,34 +816,42 @@ public class ClientRestv2Test extends ClientBaseTest {
 	}
 
 	@Test
-	public void consultaEstatEnviamentTest() throws DatatypeConfigurationException, IOException {
+	public void consultaEstatEnviamentTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
-//		String referencia = "8f7271df-e62a-4754-945c-9e52259f646e";
-		String referencia = "c6ebf96f-f0f1-4f2c-b39c-cfd61510ba46";
+		String referencia = "49b0c90a-8a87-48dc-a14e-5e3aaa844f27";
 
 		// When
 		RespostaConsultaEstatEnviamentV2 respostaConsultaEstatEnviament = client.consultaEstatEnviament(referencia);
 		assertNotNull(respostaConsultaEstatEnviament);
-		var msg = respostaConsultaEstatEnviament.isError() ? ">>> Reposta amb error: " + respostaConsultaEstatEnviament.getErrorDescripcio() : ">>> Reposta Ok";
-		System.out.println(msg);
+		if (respostaConsultaEstatEnviament.isError()) {
+			System.out.println(">>> Reposta amb error: " + respostaConsultaEstatEnviament.getErrorDescripcio());
+		} else {
+			System.out.println(">>> Reposta Ok");
+		}
 		System.out.println(">>> Informació enviament: " + respostaConsultaEstatEnviament.toString());
 		assertFalse(respostaConsultaEstatEnviament.isError());
 		assertNull(respostaConsultaEstatEnviament.getErrorDescripcio());
 
 		// SEGONA PETICIÓ AMB diferent sessió??
-		client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD, false);
-		respostaConsultaEstatEnviament = client.consultaEstatEnviament(referencia);
-		msg = respostaConsultaEstatEnviament.isError() ? ">>> Reposta amb error: " + respostaConsultaEstatEnviament.getErrorDescripcio() : ">>> Reposta Ok";
-		System.out.println(msg);
+//		client = NotificacioRestClientFactory.getRestClientV2(
+//				URL,
+//				USERNAME,
+//				PASSWORD,
+//				true);
+//		respostaConsultaEstatEnviament = client.consultaEstatEnviament(referencia);
+//		if (respostaConsultaEstatEnviament.isError()) {
+//			System.out.println(">>> Reposta amb error: " + respostaConsultaEstatEnviament.getErrorDescripcio());
+//		} else {
+//			System.out.println(">>> Reposta Ok");
+//		}
 
 	}
 
 	@Test
-	public void consultaDadesRegistreTest() throws DatatypeConfigurationException, IOException {
-
+	public void consultaDadesRegistreTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 		DadesConsulta dadesConsulta = new DadesConsulta();
-		dadesConsulta.setReferencia("409efeb4-b517-42f3-8021-af4e9f8eed65");
+		dadesConsulta.setReferencia("49b0c90a-8a87-48dc-a14e-5e3aaa844f27");
 		dadesConsulta.setAmbJustificant(true);
 
 		// When
@@ -761,9 +875,9 @@ public class ClientRestv2Test extends ClientBaseTest {
 	}
 
 	@Test
-	public void consultaJustificantTest() throws DatatypeConfigurationException, IOException {
+	public void consultaJustificantTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
-		String identificador = "32dda4e2-9c75-41a8-97aa-4b419a7dda91";
+		String identificador = "3b455842-056a-4af7-8946-1a333d5ba9a9";
 
 		// When
 		RespostaConsultaJustificantEnviament resposta = client.consultaJustificantEnviament(identificador);
@@ -781,7 +895,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 	@Test
 	public void consultaProcedimentsEntitat() {
 
-		var procediments = client.getProcedimentsByEntitat("CAIB");
+		List<Procediment> procediments = client.getProcedimentsByEntitat("CAIB");
 		assertFalse(procediments == null);
 		assertFalse(procediments.isEmpty());
 	}
@@ -789,7 +903,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 	@Test
 	public void consultaProcedimentsEntitatCieActiu() {
 
-		var procediments = client.getProcedimentsCieByEntitat("CAIB");
+		List<Procediment> procediments = client.getProcedimentsCieByEntitat("CAIB");
 		assertFalse(procediments == null);
 		assertFalse(procediments.isEmpty());
 	}
@@ -797,7 +911,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 	@Test
 	public void isProcedimentEntregaCieActiva() {
 
-		var actiu = client.isProcedimentEntregaCieActiva("2313620", "CAIB", "A04006334");
+		Boolean actiu = client.isProcedimentEntregaCieActiva("2313620", "CAIB", "A04006334");
 		assertFalse(actiu == null);
 		assertTrue(actiu);
 	}

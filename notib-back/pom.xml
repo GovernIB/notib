@@ -196,7 +196,7 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>notib-client-intf</artifactId>
-			<version>${project.version}</version>
+			<version>${notib-client.version}</version>
 		</dependency>
 	</dependencies>
 	<profiles>
@@ -294,7 +294,7 @@
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>notib-client-intf</artifactId>
-					<version>${project.version}</version>
+					<version>${notib-client.version}</version>
 					<scope>provided</scope>
 				</dependency>
 			</dependencies>

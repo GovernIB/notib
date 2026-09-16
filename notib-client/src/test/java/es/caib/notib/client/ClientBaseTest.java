@@ -3,9 +3,20 @@
  */
 package es.caib.notib.client;
 
-import es.caib.notib.client.domini.*;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Base64;
+import es.caib.notib.client.domini.DocumentV2;
+import es.caib.notib.client.domini.EntregaDeh;
+import es.caib.notib.client.domini.EntregaPostalV2;
+import es.caib.notib.client.domini.EntregaPostalVia;
+import es.caib.notib.client.domini.EnviamentV2;
+import es.caib.notib.client.domini.EnviamentTipus;
+import es.caib.notib.client.domini.InteressatTipus;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
+import es.caib.notib.client.domini.ServeiTipus;
+import es.caib.notib.client.domini.NotificacioV2;
+import es.caib.notib.client.domini.OrigenEnum;
+import es.caib.notib.client.domini.PersonaV2;
+import es.caib.notib.client.domini.TipusDocumentalEnum;
+import es.caib.notib.client.domini.ValidesaEnum;
 import org.apache.commons.io.IOUtils;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -14,6 +25,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -34,35 +46,24 @@ public class ClientBaseTest {
 	protected static final String USUARI_CODI = "u999000";
 	protected static final NotificaDomiciliConcretTipus TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipus.NACIONAL;
 
-	protected static boolean ENVIAMENT_AMB_DESTINATARIS = false;
-	protected static int NUM_DESTINATARIS = 1;
-
 	// LOCAL data
 //	Entitat: A04013511 (DGTIC) ò A04003003 (Govern)
 	protected static final String ENTITAT_DIR3CODI = "A04003003";
-	protected static final String ENTITAT_DESACTIVADA = "A17002943"; // LOCAL
-    protected static final String ENTITAT_ERROR = "test"; // LOCAL
-	protected static final String ORGAN_CODI = "A04027005";
-	protected static final String ORGAN_CODI_CIE = "A04019898"; // LOCAL
-	protected static final String IDENTIFICADOR_PROCEDIMENT = "894623"; // LOCAL
-	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "877908"; // LOCAL
+	protected static final String ORGAN_CODI = "A04003749";
+	protected static final String ORGAN_CODI_CIE = "A04026958"; // LOCAL
+	protected static final String IDENTIFICADOR_PROCEDIMENT = "216076"; // LOCAL
+	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "215981"; // LOCAL
 
 
 	// DEV data
 //	protected static final String ENTITAT_DIR3CODI = "A04003003";
-//	protected static final String ENTITAT_DESACTIVADA = "A04013511";
-//	protected static final String ENTITAT_ERROR = "test1";
-//	protected static final String ORGAN_CODI = "A04013529";
-//	protected static final String ORGAN_CODI_CIE = "A04013529";
-//	protected static final String IDENTIFICADOR_PROCEDIMENT = "874105"; // DEV
-//	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "874106"; // DEV
+//	protected static final String ORGAN_CODI = "A04026953";
+//	protected static final String ORGAN_CODI_CIE = "A04026953";
+//	protected static final String IDENTIFICADOR_PROCEDIMENT = "896953"; // LOCAL
+//	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "896953"; // DEV
 
 
-
-	protected NotificacioV2 generarNotificacioV2(
-			String notificacioId,
-			int numEnviaments,
-			boolean ambEnviamentPostal) throws IOException {
+	protected NotificacioV2 generarNotificacioV2(String notificacioId, int numDestinataris, boolean ambEnviamentPostal) throws DatatypeConfigurationException, IOException {
 
 		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 		NotificacioV2 notificacio = new NotificacioV2();
@@ -78,8 +79,8 @@ public class ClientBaseTest {
 		notificacio.setCaducitat(new Date(System.currentTimeMillis() + 12 * 24 * 3600 * 1000));
 		DocumentV2 document = new DocumentV2();
 		document.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
-
-		String arxiuB64 = Base64.encodeBase64String(arxiuBytes);
+		
+		String arxiuB64 = Base64.getEncoder().encodeToString(arxiuBytes);
 		document.setContingutBase64(arxiuB64);
 //		document.setUuid("8f3e508c-d304-4502-bd45-2061b47d3eda");
 //		document.setUuid("fb341a96-2cbf-4ec8-b7dd-08a1817c4b32");
@@ -87,40 +88,38 @@ public class ClientBaseTest {
 //		document.setUrl("asdfas");
 		document.setNormalitzat(false);
 //		document.setGenerarCsv(false);
-
+		
 		notificacio.setDocument(document);
 		notificacio.setProcedimentCodi(ambEnviamentPostal ? IDENTIFICADOR_PROCEDIMENT_CIE : IDENTIFICADOR_PROCEDIMENT);
-		for (int i = 0; i < numEnviaments; i++) {
+		for (int i = 0; i < numDestinataris; i++) {
 			EnviamentV2 enviament = new EnviamentV2();
 			PersonaV2 titular = new PersonaV2();
-			titular.setNom("NomTitular" + numEnviaments);
-			titular.setLlinatge1("Llinatge1Titular" + numEnviaments);
-			titular.setLlinatge2("Llinatge2Titular" + numEnviaments);
+			titular.setNom("Nom");
+			titular.setLlinatge1("Llinatge1");
+			titular.setLlinatge2("Llinatge2");
 			if (i == 0) {
-				titular.setNif("00000000T");
+				titular.setNif("12345678z");
+				titular.setEmail("proves@limit.es");
 			}
 			titular.setInteressatTipus(i != 0 ? InteressatTipus.FISICA_SENSE_NIF : InteressatTipus.FISICA);
-//			titular.setInteressatTipus(InteressatTipus.ADMINISTRACIO);
 			if (titular.getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
 				titular.setDir3Codi(ENTITAT_DIR3CODI);
 			}
 			enviament.setTitular(titular);
-			if (ENVIAMENT_AMB_DESTINATARIS) {
-
-				for (int foo=0;foo<NUM_DESTINATARIS;foo++) {
-					PersonaV2 destinatari = new PersonaV2();
-					destinatari.setNom("NomDestinatari" + foo);
-					destinatari.setLlinatge1("Llinatge1Destintari" + foo);
-					destinatari.setLlinatge2("Llinatge2Destintari");
-					destinatari.setNif("12345678z");
+//			PersonaV2 destinatari = new PersonaV2();
+//			destinatari.setNom("melcior");
+//			destinatari.setLlinatge1("Andreu");
+//			destinatari.setLlinatge2("Nadal");
+//			destinatari.setNif("18225486x");
+//			destinatari.setTelefon("666020202");
+//			destinatari.setEmail("sandreu@limit.es");
 //			destinatari.setInteressatTipus(InteressatTipus.ADMINISTRACIO);
-					destinatari.setInteressatTipus(InteressatTipus.FISICA);
-					if (destinatari.getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
-						destinatari.setDir3Codi(ORGAN_SIR_CODI);
-					}
-					enviament.getDestinataris().add(destinatari);
-				}
-			}
+//			if (destinatari.getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
+//				destinatari.setDir3Codi(ORGAN_SIR_CODI);
+//			}
+//			if (i == 0) {
+//				enviament.getDestinataris().add(destinatari);
+//			}
 			if (ambEnviamentPostal) {
 				EntregaPostalV2 entregaPostal = new EntregaPostalV2();
 				if (NotificaDomiciliConcretTipus.SENSE_NORMALITZAR.equals(TIPUS_ENTREGA_POSTAL)) {
@@ -161,42 +160,34 @@ public class ClientBaseTest {
 	}
 
 	private InputStream getContingutNotificacioAdjunt() {
-		return getClass().getResourceAsStream(
-				"/es/caib/notib/client/notificacio_adjunt.pdf");
+		return getClass().getResourceAsStream("/es/caib/notib/client/notificacio_adjunt.pdf");
 	}
-
+	
 	protected InputStream getContingutNotificacioAdjuntTxt() {
-		return getClass().getResourceAsStream(
-				"/es/caib/notib/client/notificacio_adjunt.txt");
+		return getClass().getResourceAsStream("/es/caib/notib/client/notificacio_adjunt.txt");
 	}
-
-	protected InputStream getContingutNotificacioAdjuntZip() {
-		return getClass().getResourceAsStream(
-				"/es/caib/notib/client/blank.zip");
-	}
-
+	
 	protected InputStream getContingutNotificacioAdjuntGrande() {
-		return getClass().getResourceAsStream(
-				"/es/caib/notib/client/notificacio_adjunt_grande.pdf");
+		return getClass().getResourceAsStream("/es/caib/notib/client/notificacio_adjunt_grande.pdf");
 	}
 
 	protected InputStream getContingutNotificacioAdjuntFirmat() {
-		return getClass().getResourceAsStream(
-				"/es/caib/notib/client/notificacio_adjunt_firmat.pdf");
+		return getClass().getResourceAsStream("/es/caib/notib/client/notificacio_adjunt_firmat.pdf");
 	}
 
 	protected InputStream getContingutNotificacioAdjuntFirmatInvalid() {
-		return getClass().getResourceAsStream(
-				"/es/caib/notib/client/notificacio_adjunt_firmat_invalid.pdf");
+		return getClass().getResourceAsStream("/es/caib/notib/client/notificacio_adjunt_firmat_invalid.pdf");
 	}
 
 	private XMLGregorianCalendar toXmlGregorianCalendar(Date date) throws DatatypeConfigurationException {
+
 		GregorianCalendar c = new GregorianCalendar();
 		c.setTime(date);
 		return DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
 	}
-
+	
 	protected List<DocumentV2> crearArxius(Integer numeroArxius, NotificacioV2 notificacioV2, String notificacioId, byte[] arxiuBytes) {
+
 		List<DocumentV2>  documents = new ArrayList<>();
 //		List<String> extensionsDisponibles = Arrays.asList(new String[] {"jpg", "jpeg", "odt", "odp", "ods", "odg", "docx", "xlsx", "pptx", "pdf", "png", "rtf", "svg", "tiff", "txt", "xml", "xsig", "csig", "html", "csv"});;
 		if(numeroArxius >= 0 && numeroArxius < 5) {
@@ -205,10 +196,10 @@ public class ClientBaseTest {
 //				if(notificacioV2.getEnviamentTipus() == EnviamentTipusEnum.COMUNICACIO ) {
 //					formatFile= extensionsDisponibles.get(new Random().nextInt(extensionsDisponibles.size()));
 //				}
-
+				 
 				DocumentV2 document = new DocumentV2();
 				document.setArxiuNom("documentArxiuNom_["+i+"]" + notificacioId + "."+ formatFile);
-				String arxiuB64 = Base64.encodeBase64String(arxiuBytes);
+				String arxiuB64 = Base64.getEncoder().encodeToString(arxiuBytes);
 				document.setContingutBase64(arxiuB64);
 				document.setNormalitzat(false);
 				document.setModoFirma(false);
@@ -218,17 +209,14 @@ public class ClientBaseTest {
 				documents.add(document);
 			}
 		}
-
+		
 		return documents;
-
+		
 	}
-
-
-	protected List<NotificacioV2> generarMultiplesNotificacioV2(
-			Integer numeroDeNotificacions,
-			int numDestinataris,
-			boolean ambEnviamentPostal) throws DatatypeConfigurationException, IOException, DecoderException {
-
+	
+	
+	protected List<NotificacioV2> generarMultiplesNotificacioV2(Integer numeroDeNotificacions, int numDestinataris, boolean ambEnviamentPostal) throws DatatypeConfigurationException, IOException {
+		
 		List<Integer> repetits = new ArrayList<>();
 		List<NotificacioV2> notificacions = new ArrayList<>();
 		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
@@ -237,7 +225,7 @@ public class ClientBaseTest {
 			Integer iNotificacioId = generarRandomNoRepetit(repetits, numeroDeNotificacions);
 			repetits.add(iNotificacioId);
 			String notificacioId = "CARGA_MASIVA_" +  iNotificacioId;
-
+			
 			NotificacioV2 notificacio = new NotificacioV2();
 			notificacio.setEmisorDir3Codi(ENTITAT_DIR3CODI);
 			boolean comunicacioAdministracio = false;
@@ -251,14 +239,14 @@ public class ClientBaseTest {
 			notificacio.setUsuariCodi(USUARI_CODI);
 //			notificacio.setComunicacioTipus(ComunicacioTipusEnum.ASINCRON);
 			notificacio.setOrganGestor(ORGAN_CODI);
-
+			
 			int random = new Random().nextInt(4);
 			if(random == 2) {
 				notificacio.setConcepte("Error registre_" + notificacioId);
 			}else {
 				notificacio.setConcepte("concepte_" + notificacioId);
 			}
-
+			
 			notificacio.setDescripcio("descripcio_" + notificacioId);
 			notificacio.setEnviamentDataProgramada(null);
 			notificacio.setRetard(5);
@@ -269,36 +257,36 @@ public class ClientBaseTest {
 				documents = crearArxius(random, notificacio, notificacioId.toString(), arxiuBytes);
 			else
 				documents = crearArxius(1, notificacio, notificacioId.toString(), arxiuBytes);
-
-
+			
+			
 			switch (documents.size()) {
-				case 1:
-					notificacio.setDocument(documents.get(0));
-					break;
-				case 2:
-					notificacio.setDocument(documents.get(0));
-					notificacio.setDocument2(documents.get(1));
-					break;
-				case 3:
-					notificacio.setDocument(documents.get(0));
-					notificacio.setDocument2(documents.get(1));
-					notificacio.setDocument3(documents.get(2));
-					break;
-				case 4:
-					notificacio.setDocument(documents.get(0));
-					notificacio.setDocument2(documents.get(1));
-					notificacio.setDocument3(documents.get(2));
-					notificacio.setDocument4(documents.get(3));
-					break;
-				case 5:
-					notificacio.setDocument(documents.get(0));
-					notificacio.setDocument2(documents.get(1));
-					notificacio.setDocument3(documents.get(2));
-					notificacio.setDocument4(documents.get(3));
-					notificacio.setDocument5(documents.get(4));
-					break;
+            case 1:
+            	notificacio.setDocument(documents.get(0));
+                break;
+            case 2:
+            	notificacio.setDocument(documents.get(0));
+            	notificacio.setDocument2(documents.get(1));
+                break;
+            case 3:
+            	notificacio.setDocument(documents.get(0));
+            	notificacio.setDocument2(documents.get(1));
+            	notificacio.setDocument3(documents.get(2));
+                break;
+            case 4:
+            	notificacio.setDocument(documents.get(0));
+            	notificacio.setDocument2(documents.get(1));
+            	notificacio.setDocument3(documents.get(2));
+            	notificacio.setDocument4(documents.get(3));
+                break;
+            case 5:
+            	notificacio.setDocument(documents.get(0));
+            	notificacio.setDocument2(documents.get(1));
+            	notificacio.setDocument3(documents.get(2));
+            	notificacio.setDocument4(documents.get(3));
+            	notificacio.setDocument5(documents.get(4));
+                break;
 			}
-
+			
 			for (int h = 0; h < numDestinataris; h++) {
 				EnviamentV2 enviament = new EnviamentV2();
 				PersonaV2 titular = new PersonaV2();
@@ -372,9 +360,7 @@ public class ClientBaseTest {
 		return notificacions;
 	}
 
-	protected NotificacioV2 generarNotificacio(
-			int numDestinataris,
-			boolean ambEnviamentPostal) throws DatatypeConfigurationException, IOException, DecoderException {
+	protected NotificacioV2 generarNotificacio(int numDestinataris, boolean ambEnviamentPostal) throws DatatypeConfigurationException, IOException {
 
 		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 
@@ -514,10 +500,11 @@ public class ClientBaseTest {
 	}
 
 	private Integer generarRandomNoRepetit(List<Integer> repetits, Integer numeroDeNotificacions) {
-		Integer index = new Random().nextInt(numeroDeNotificacions);
-		while(repetits.contains(index)) {
-			index = new Random().nextInt(numeroDeNotificacions);
-		}
+
+		 Integer index = new Random().nextInt(numeroDeNotificacions);
+	      while(repetits.contains(index)) {
+	    	  index = new Random().nextInt(numeroDeNotificacions);
+	      }
 		return index;
 	}
 
@@ -530,7 +517,7 @@ public class ClientBaseTest {
 			NotificaDomiciliConcretTipus tipusEnviamentPostal,
 			boolean ambEnviamentDEH,
 			boolean ambEnviamentDEHObligat,
-			boolean ambRetard) throws IOException, DecoderException, DatatypeConfigurationException {
+			boolean ambRetard) throws IOException, DatatypeConfigurationException {
 
 		String notificacioId = Long.toString(System.currentTimeMillis());
 		NotificacioV2 notificacioV2 = generarNotificacio(
@@ -544,9 +531,9 @@ public class ClientBaseTest {
 				ambEnviamentDEHObligat,
 				true);
 
-		if (!ambRetard)
+		if (!ambRetard) {
 			notificacioV2.setRetard(0);
-
+		}
 
 		return notificacioV2;
 
@@ -561,7 +548,7 @@ public class ClientBaseTest {
 			NotificaDomiciliConcretTipus tipusEnviamentPostal,
 			boolean ambEnviamentDEH,
 			boolean enviamentDEHObligat,
-			boolean ambTipusInteressat) throws IOException, DecoderException, DatatypeConfigurationException {
+			boolean ambTipusInteressat) throws IOException, DatatypeConfigurationException {
 
 		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 		NotificacioV2 notificacio = new NotificacioV2();
@@ -578,7 +565,7 @@ public class ClientBaseTest {
 		DocumentV2 document = new DocumentV2();
 		document.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
 
-		String arxiuB64 = Base64.encodeBase64String(arxiuBytes);
+		String arxiuB64 = Base64.getEncoder().encodeToString(arxiuBytes);
 		document.setContingutBase64(arxiuB64);
 //		document.setUuid("8f3e508c-d304-4502-bd45-2061b47d3eda");
 //		document.setUuid("fb341a96-2cbf-4ec8-b7dd-08a1817c4b32");

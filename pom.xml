@@ -29,6 +29,7 @@
 		<docker.image.prefix>280421</docker.image.prefix>
 		<junit.jupiter.version>5.9.3</junit.jupiter.version>
 		<comanda.version>1.0.0</comanda.version>
+		<notib-client.version>2.1.0</notib-client.version>
 		<notib.context>notib</notib.context>
 		<implementation.vendor>Límit Tecnologies</implementation.vendor>
 		<java.compiler.version>11</java.compiler.version>
@@ -125,8 +126,7 @@
 		<module>notib-ejb</module>
 		<module>notib-ear</module>
 		<module>notib-client</module>
-        <module>notib-client-2</module>
-		<module>notib-client-jaxrs</module>
+		<module>notib-client-legacy</module>
 		<module>notib-client-intf</module>
 	</modules>
 	<build>
