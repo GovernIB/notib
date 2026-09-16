@@ -18,6 +18,7 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -56,7 +57,14 @@ public class PermisosCacheable {
         var hasPermisAdminEntitat = permisosHelper.isGrantedAny(auth, EntitatEntity.class, new Permission[] {ExtendedPermission.ADMINISTRADORENTITAT});
         var hasPermisAdminLectura = permisosHelper.isGrantedAny(auth, EntitatEntity.class, new Permission[] {ExtendedPermission.ADMINISTRADORLECTURA});
         var hasPermisAplicacioEntitat = permisosHelper.isGrantedAny(auth, EntitatEntity.class, new Permission[] {ExtendedPermission.APLICACIO});
-        var hasPermisAdminOrgan = permisosHelper.isGrantedAny(auth, OrganGestorEntity.class, new Permission[] {ExtendedPermission.ADMINISTRADOR});
+        // NOT_ADMIN_ORGAN es basa en BasePermission.ADMINISTRATION (i no en l'antic ExtendedPermission.ADMINISTRADOR):
+        // és el permís que realment escriu la pantalla de permisos actual en concedir "Administració" sobre un
+        // òrgan gestor (AclEntryResourceServiceImpl.isAdminAllowed() -> PermissionEnum.ADMINISTRATION), i el que
+        // comproven consistentment tots els *ResourceServiceImpl per a "isRoleAdminOrgan" (p.ex.
+        // NotibPermissionHelper.currentOrganGestorPermissionAllowed(BasePermission.ADMINISTRATION)). Amb
+        // ADMINISTRADOR (una màscara diferent, no escrita mai per aquesta pantalla) un usuari amb permís
+        // d'administració sobre un òrgan mai obtenia el rol NOT_ADMIN_ORGAN ni, per tant, el ROLE_ORGAN.
+        var hasPermisAdminOrgan = permisosHelper.isGrantedAny(auth, OrganGestorEntity.class, new Permission[] {BasePermission.ADMINISTRATION});
 
         Map<RolEnumDto, Boolean> hasPermisos = new HashMap<>();
         hasPermisos.put(RolEnumDto.tothom, hasPermisUsuariEntitat);

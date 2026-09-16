@@ -83,11 +83,30 @@ public class NotibPermissionHelper {
 		if (isRoleSuper) {
 			return null;
 		}
+		if (isRoleAdminOrgan) {
+			// Un administrador d'òrgan no necessàriament té el permís PERM2 (administració) concedit
+			// directament sobre l'entitat -és un permís més ampli que el d'administrar només un òrgan
+			// concret-, per tant l'accés es determina a partir de les entitats propietàries dels òrgans
+			// gestors que administra, no per un permís directe sobre l'entitat.
+			var organGestorIds = aclHelper.findIdsWithAnyPermission(
+					AclHelper.ORGAN_GESTOR_CLASS,
+					List.of(BasePermission.ADMINISTRATION),
+					aclHelper.getCurrentUserSids().toArray(Sid[]::new));
+			if (!organGestorIds.isEmpty()) {
+				var entitatIds = organGestorResourceRepository.findEntitatIdsByIdIn(
+						organGestorIds.stream().map(Long::valueOf).collect(Collectors.toSet()));
+				if (!entitatIds.isEmpty()) {
+					return filterProperty + " in (" +
+							entitatIds.stream().map(String::valueOf).collect(Collectors.joining(",")) + ")";
+				}
+			}
+			return filterProperty + " is null";
+		}
 		// Es calcula el permís a comprovar depenent del rol actual
 		Permission permission = null;
 		if (isRoleUser) {
 			permission = ExtendedPermission.PERM0;
-		} else if (isRoleAdmin || isRoleAdminOrgan) {
+		} else if (isRoleAdmin) {
 			permission = ExtendedPermission.PERM2;
 		} else if (isRoleAdminLectura) {
 			permission = ExtendedPermission.PERMX;

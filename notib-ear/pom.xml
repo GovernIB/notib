@@ -118,7 +118,7 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>notib-client-intf</artifactId>
-			<version>${project.version}</version>
+			<version>${notib-client.version}</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -232,6 +232,7 @@
 						<version>0.42.1</version>
 						<configuration>
 							<verbose>true</verbose>
+							<dockerHost>unix:///run/user/1000/podman/podman.sock</dockerHost>
 							<images>
 								<image>
 									<name>${docker.image.name}</name>
@@ -302,6 +303,7 @@
 											<tag>latest</tag>
 											<tag>${project.version}</tag>
 										</tags>
+										<cleanup>none</cleanup>
 									</build>
 								</image>
 							</images>
@@ -394,6 +396,7 @@
 											<tag>latest</tag>
 											<tag>${project.version}</tag>
 										</tags>
+										<cleanup>none</cleanup>
 									</build>
 								</image>
 							</images>

@@ -401,12 +401,20 @@ public class HalFormsConfig {
 		Set<Class<ReadonlyResourceController>> resourceControllerClasses) {
 		return resourceControllerClasses.stream().
 			filter(rc -> {
+				// Es comprova mutableCheck ABANS de resoldre els arguments genèrics: si mutable=true i rc
+				// no implementa MutableResourceController (p.ex. Dir3ResourceController, únicament
+				// ReadonlyResourceController), GenericTypeResolver.resolveTypeArguments(rc,
+				// MutableResourceController.class) no troba cap argument (rc no en deriva) i
+				// TypeUtil.getArgumentClassFromGenericSuperclass hi llença NullPointerException.
 				boolean mutableCheck = !mutable || MutableResourceController.class.isAssignableFrom(rc);
+				if (!mutableCheck) {
+					return false;
+				}
 				Class<?> controllerResourceClass = TypeUtil.getArgumentClassFromGenericSuperclass(
 					rc,
 					mutable ? MutableResourceController.class : ReadonlyResourceController.class,
 					0);
-				return mutableCheck && controllerResourceClass.equals(resourceClass);
+				return controllerResourceClass.equals(resourceClass);
 			}).findFirst();
 	}
 
