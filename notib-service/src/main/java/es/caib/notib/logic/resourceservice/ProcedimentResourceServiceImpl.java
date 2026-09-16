@@ -172,7 +172,10 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 		} else if (authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN)) {
 			var organ = userSessionHelper.getCurrentOrganGestor();
 			if (organ != null) {
-				filter += " and organGestor: " + organ.getId();
+				// "organGestor" (sense ".id") és una propietat d'entitat (ManyToOne): spring-filter
+				// intenta convertir el literal a un OrganGestorResourceEntity i falla amb
+				// InternalFilterException. Cal filtrar per l'id, no per l'entitat sencera.
+				filter += " and organGestor.id: " + organ.getId();
 			}
 			Specification<ProcedimentResourceEntity> specification = toFindProcessedSpecification(quickFilter, filter, namedQueries);
 			procediments = procedimentResourceRepository.findAll(specification, processedSort);
