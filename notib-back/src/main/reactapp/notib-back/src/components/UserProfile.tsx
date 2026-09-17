@@ -6,6 +6,8 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import Icon from '@mui/material/Icon';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+import Chip from '@mui/material/Chip';
+import Stack from '@mui/material/Stack';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import ToggleButton from '@mui/material/ToggleButton';
 import 'dayjs/locale/ca';
@@ -125,6 +127,24 @@ const EstilMenuSelector: React.FC = () => {
     );
 };
 
+// Mostra, a mode informatiu (no editable, com el desplegable deshabilitat de l'antiga interfície
+// JSP), tots els rols que té concedits l'usuari actual -no només el seleccionat actualment a la
+// capçalera, que ja es veu al selector de rol.
+const UserRolsField: React.FC = () => {
+    const { t } = useTranslation();
+    const { rolesAvailable } = useNotibContext();
+    return (
+        <Grid size={12}>
+            <ToggleFieldLabel label={t('component.UserProfile.rols')} />
+            <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
+                {rolesAvailable?.map((rol) => (
+                    <Chip key={rol} label={t(`component.RoleSelector.role.${rol}`)} size="small" />
+                ))}
+            </Stack>
+        </Grid>
+    );
+};
+
 const UserProfileForm: React.FC = () => {
     const { t } = useTranslation();
     return (
@@ -134,6 +154,7 @@ const UserProfileForm: React.FC = () => {
                 <GridFormField size={8} name="nomSencer" disabled />
                 <GridFormField size={6} name="email" disabled />
                 <GridFormField size={6} name="emailAlt" />
+                <UserRolsField />
             </CardData>
 
             <CardData title={t('component.UserProfile.correu')} icon="email" variant="h6">

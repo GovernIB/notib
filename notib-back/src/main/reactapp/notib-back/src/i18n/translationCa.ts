@@ -1180,6 +1180,7 @@ const translationCa = {
             perfil: "Perfil de l'usuari",
             auto: 'Automàtic',
             dades: 'Dades',
+            rols: 'Rols',
             correu: 'Notificacions per correu',
             general: 'Configuració general',
             tema: 'Aparença',

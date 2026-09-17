@@ -1156,6 +1156,7 @@ const translationEs = {
             perfil: "Perfil del usuario",
             auto: "Automático",
             dades: 'Datos',
+            rols: 'Roles',
             correu: 'Notificaciones por correo',
             general: 'Configuración general',
             tema: 'Apariencia',
