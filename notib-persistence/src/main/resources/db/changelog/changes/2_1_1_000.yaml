@@ -458,3 +458,14 @@ databaseChangeLog:
                 -   sql: "INSERT INTO ${db_prefix}CONFIG (id,POSITION, KEY, VALUE, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE, TYPE_CODE, CONFIG_GROUP_ID, CONFIG_TYPE_ID, CONFIGURABLE)
                             VALUES (${db_prefix}HIBERNATE_SEQ.NEXTVAL, 21, 'es.caib.notib.app.interficie.react.defecte', 'true', 0, 'Indica si en accedir a l''aplicació (/notibback) s''ha de mostrar per defecte la interfície nova (React) enlloc de la clàssica (JSP)', 'GENERAL', 'BOOL',
                             (SELECT ID FROM ${db_prefix}CONFIG_GROUP g WHERE g.code = 'GENERAL'), (SELECT ID FROM ${db_prefix}CONFIG_TYPE t WHERE t.code = 'BOOL'), 0);"
+
+    -   changeSet:
+            id: 2_1_1_000-27
+            author: limit
+            changes:
+                - addColumn:
+                      tableName: ${db_prefix}accio_massiva
+                      columns:
+                          - column:
+                                name: estat
+                                type: varchar(50 ${varcharUnit})
