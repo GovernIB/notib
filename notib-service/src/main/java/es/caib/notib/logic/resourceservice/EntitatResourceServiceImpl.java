@@ -162,7 +162,14 @@ public class EntitatResourceServiceImpl extends BaseMutableResourceService<Entit
 		@Override
 		public void applySingle(String code, EntitatResourceEntity entity, EntitatResource resource) throws PerspectiveApplicationException {
 
-			boolean isRoleUser = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_USER);
+			// Es determina pel rol seleccionat a la capçalera (no per isCurrentUserInRole): un usuari pot
+			// tenir concedits més d'un rol alhora (p.ex. usuari i administrador d'òrgan), i
+			// isCurrentUserInRole(ROLE_USER) seguia essent true encara que estigués treballant amb el rol
+			// d'administrador d'òrgan seleccionat, mostrant el botó de "nova remesa" fora del rol usuari.
+			var rolActual = userSessionHelper.getCurrentRol();
+			boolean isRoleUser = rolActual != null
+					? BaseConfig.ROLE_USER.equals(rolActual)
+					: authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_USER);
 			Long currentEntitatId = userSessionHelper.getCurrentEntitatId();
 			// Només els usuaris normals poden crear remeses
 			if (!isRoleUser || currentEntitatId == null) {

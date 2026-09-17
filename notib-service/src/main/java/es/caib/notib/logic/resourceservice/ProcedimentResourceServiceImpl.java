@@ -51,6 +51,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -202,7 +203,19 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 				procediments = procediments.stream().filter(ProcedimentResourceEntity::isActiu).collect(Collectors.toList());
 			}
 			if (!Strings.isNullOrEmpty(quickFilter)) {
-				procediments = procediments.stream().filter(p -> !Strings.isNullOrEmpty(p.getNom()) && p.getNom().toLowerCase().contains(quickFilter)).collect(Collectors.toList());
+				// Cal fer minúscules també el quickFilter (no només el nom): si l'usuari escriu alguna
+				// majúscula (p.ex. "Llicència") mai coincidia amb el nom ja convertit a minúscules. I cal
+				// dividir per paraules i exigir que hi siguin totes (en qualsevol ordre/posició), no que hi
+				// aparegui tot el text cercat com un únic substring contigu: amb noms llargs de procediment,
+				// cercar per diverses paraules del nom no trobava mai res.
+				var quickFilterTokens = quickFilter.toLowerCase().trim().split("\\s+");
+				procediments = procediments.stream().
+						filter(p -> !Strings.isNullOrEmpty(p.getNom())).
+						filter(p -> {
+							var nom = p.getNom().toLowerCase();
+							return Arrays.stream(quickFilterTokens).allMatch(nom::contains);
+						}).
+						collect(Collectors.toList());
 			}
 		} else {
 			return new PageImpl<>(new ArrayList<>(), pageable, 0);

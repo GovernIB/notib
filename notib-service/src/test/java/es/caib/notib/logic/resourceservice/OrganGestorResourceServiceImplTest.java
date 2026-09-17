@@ -11,7 +11,9 @@ import es.caib.notib.logic.intf.base.exception.ActionExecutionException;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.model.OrganGestorDir3Sync;
 import es.caib.notib.logic.intf.model.OrganGestorResource;
+import es.caib.notib.logic.intf.dto.CodiValorDto;
 import es.caib.notib.logic.intf.service.OrganGestorService;
+import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
 import es.caib.notib.persist.resourceentity.EntregaCieResourceEntity;
 import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
@@ -60,6 +62,7 @@ class OrganGestorResourceServiceImplTest {
 	@Mock private PagadorCieResourceRepository pagadorCieRepo;
 	@Mock private EntregaCieResourceRepository entregaCieRepo;
 	@Mock private OrganGestorService organGestorService;
+	@Mock private PermisosService permisosService;
 
 	private OrganGestorResourceServiceImpl service;
 
@@ -77,7 +80,8 @@ class OrganGestorResourceServiceImplTest {
 			pagadorPostalRepo,
 			pagadorCieRepo,
 			entregaCieRepo,
-			organGestorService
+			organGestorService,
+			permisosService
 		);
 	}
 
@@ -96,8 +100,10 @@ class OrganGestorResourceServiceImplTest {
 	@Test
 	void shouldAddFilterWhenNotAdminAndPermissionsExist() {
 		when(authenticationHelper.isCurrentUserInRole(any())).thenReturn(false);
-		when(notibPermissionHelper.organGestorIdsWithPermissionRecursive(any()))
-			.thenReturn(List.of(1L, 2L));
+		when(userSessionHelper.getCurrentEntitatId()).thenReturn(1L);
+		when(authenticationHelper.getCurrentUserName()).thenReturn("usuari");
+		when(permisosService.getOrgansAmbPermis(eq(1L), eq("usuari"), eq(true)))
+			.thenReturn(List.of(CodiValorDto.builder().codi("1").valor("Organ 1").build()));
 		String result = service.additionalSpringFilter(
 			"base",
 			new String[]{OrganGestorResource.NAMED_QUERY_PERM_READ}

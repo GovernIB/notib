@@ -118,13 +118,15 @@ const NotificacioAddButton: React.FC = () => {
     const open = Boolean(anchorEl);
     const handleClick = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);;
     const handleClose = () => setAnchorEl(null);
-    const crearAny = currentEntitat?.crearNotificacions || currentEntitat?.crearComunicacions || currentEntitat?.crearComunicacions;
+    const crearAny = currentEntitat?.crearNotificacions || currentEntitat?.crearComunicacions || currentEntitat?.crearSir;
+    if (!currentEntitatLoading && !crearAny) {
+        return null;
+    }
     return (
         <>
             <Button
                 variant="contained"
                 loading={currentEntitatLoading}
-                disabled={!crearAny}
                 startIcon={<Icon>add</Icon>}
                 onClick={handleClick}
                 sx={{ mr: 1 }}

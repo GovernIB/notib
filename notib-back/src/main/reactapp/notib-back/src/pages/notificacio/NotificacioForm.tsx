@@ -73,7 +73,10 @@ const useProcSerOptionsRequest = (type: string, organGestorId?: number | string)
                     springFilterBuilder.eq('actiu', true),
                     organGestorId != null
                         ? springFilterBuilder.or(
-                              springFilterBuilder.eq('organGestor', organGestorId),
+                              // "organGestor" (sense ".id") és una propietat d'entitat (ManyToOne): spring-filter
+                              // intenta convertir el literal a un OrganGestorResourceEntity i falla amb
+                              // InternalFilterException. Cal filtrar per l'id, no per l'entitat sencera.
+                              springFilterBuilder.eq('organGestor.id', organGestorId),
                               springFilterBuilder.eq('comu', true)
                           )
                         : ''

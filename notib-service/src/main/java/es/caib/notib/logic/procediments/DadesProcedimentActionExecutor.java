@@ -34,7 +34,13 @@ public class DadesProcedimentActionExecutor implements BaseMutableResourceServic
 			var dadesProcediment = new DadesProcediment();
 			dadesProcediment.setEntregaCieActiva(true);
 			dadesProcediment.setOrganCodi(entity.isComu() ? params.getOrganGestor() != null ? params.getOrganGestor().getId() : null : entity.getOrganGestor().getId());
-			dadesProcediment.setCaducitat(CaducitatHelper.sumarDiesNaturals(entity.getCaducitat()));
+			// entity.getCaducitat() és un camp opcional (Integer, nullable): un procediment sense caducitat
+			// configurada hi té null. CaducitatHelper.sumarDiesNaturals(int) desempaqueta l'argument, i
+			// DadesProcediment.setCaducitat(Date) crida SimpleDateFormat.format(null) -totes dues coses
+			// llencen NullPointerException si es criden amb null en lloc de deixar-ho sense establir.
+			if (entity.getCaducitat() != null) {
+				dadesProcediment.setCaducitat(CaducitatHelper.sumarDiesNaturals(entity.getCaducitat()));
+			}
 			dadesProcediment.setCaducitatDiesNaturals(entity.getCaducitat());
 			dadesProcediment.setRetard(entity.getRetard());
 			dadesProcediment.setAgrupable(entity.isAgrupar());
@@ -50,7 +56,11 @@ public class DadesProcedimentActionExecutor implements BaseMutableResourceServic
 				entitatDto.setId(entitatActual.getId());
 				var organ = organGestorService.findById(entitatActual.getId(), Long.valueOf(codi));
 				var cieActiuPerPare = organGestorService.entregaCieActivaPerPare(entitatDto, organ.getCodi());
-				dadesProcediment.setEntregaCieActiva(organ.isEntregaCieActiva() || cieActiuPerPare);
+				// NO sobreescriure: cal combinar amb el valor ja establert (entity.isEntregaCieActivaAlgunNivell()),
+				// no descartar-lo. Amb una assignació directa, un procediment amb l'entrega CIE activa a nivell
+				// propi deixava de mostrar l'opció d'entrega postal si l'òrgan seleccionat no la tenia activa
+				// (ni cap dels seus pares), perquè aquest valor "true" quedava sobreescrit per un "false".
+				dadesProcediment.setEntregaCieActiva(dadesProcediment.isEntregaCieActiva() || organ.isEntregaCieActiva() || cieActiuPerPare);
 			}
 			return dadesProcediment;
 		} catch (Exception ex) {

@@ -213,7 +213,7 @@ const ContentFilter: React.FC<{openByDefault?: boolean}> = ({openByDefault}) => 
     if (organId) {
         procedimentFiltre = filterBuilder.and(
                             filterBuilder.or(filterBuilder.eq('tipus', `'PROCEDIMENT'`), filterBuilder.eq('tipus', `'SERVEI'`)),
-                            filterBuilder.eq('organGestor', organId));
+                            filterBuilder.eq('organGestor.id', organId));
     } else {
         procedimentFiltre = filterBuilder.or(filterBuilder.eq('tipus', `'PROCEDIMENT'`), filterBuilder.eq('tipus', `'SERVEI'`));
     }

@@ -7,7 +7,6 @@ import es.caib.notib.logic.intf.base.exception.ResourceNotCreatedException;
 import es.caib.notib.logic.intf.base.exception.ResourceNotUpdatedException;
 import es.caib.notib.logic.intf.base.model.Resource;
 import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
-import es.caib.notib.logic.intf.base.util.HttpRequestUtil;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.persist.resourcerepository.OrganGestorResourceRepository;
 import es.caib.notib.persist.resourcerepository.ProcedimentOrganGestorResourceRepository;
@@ -15,7 +14,6 @@ import es.caib.notib.persist.resourcerepository.ProcedimentResourceRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid;
@@ -40,11 +38,6 @@ public class NotibPermissionHelper {
 	private final OrganGestorResourceRepository organGestorResourceRepository;
 	private final ProcedimentResourceRepository procedimentResourceRepository;
 	private final ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository;
-	// Mateixa propietat que WebSecurityConfig.selectedRoleHttpHeader, per a poder determinar el rol
-	// actualment seleccionat directament per capçalera i evitar dependre de si l'Authentication ja té
-	// les autoritats correctament restringides a únicament aquest rol.
-	@Value("${" + BaseConfig.PROP_SECURITY_ROLE_HTTP_HEADER + ":X-App-Role}")
-	private String selectedRoleHttpHeader;
 
 	/**
 	 * Crea una expressió Spring Filter per a consultar únicament les entitats sobre les que es tenen permisos.
@@ -124,7 +117,7 @@ public class NotibPermissionHelper {
 	}
 
 	private String getRolActualHttpHeader() {
-		return HttpRequestUtil.getCurrentHttpRequest().map(r -> r.getHeader(selectedRoleHttpHeader)).orElse(null);
+		return userSessionHelper.getCurrentRol();
 	}
 
 	/**

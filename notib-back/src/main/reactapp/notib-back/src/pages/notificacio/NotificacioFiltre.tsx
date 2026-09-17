@@ -49,9 +49,9 @@ const ContentFilter: React.FC<{openByDefault?: boolean, notificacionsEsborrades:
     let serveiFiltre;
     if (organId) {
         procedimentFiltre = springFilterBuilder.and(springFilterBuilder.eq('tipus', `'PROCEDIMENT'`),
-                                                    springFilterBuilder.and(springFilterBuilder.eq('organGestor', organId)));
+                                                    springFilterBuilder.and(springFilterBuilder.eq('organGestor.id', organId)));
         serveiFiltre = springFilterBuilder.and(springFilterBuilder.eq('tipus', `'SERVEI'`),
-                                                springFilterBuilder.and(springFilterBuilder.eq('organGestor', organId)));
+                                                springFilterBuilder.and(springFilterBuilder.eq('organGestor.id', organId)));
     } else {
         procedimentFiltre = springFilterBuilder.and(springFilterBuilder.eq('tipus', `'PROCEDIMENT'`));
         serveiFiltre = springFilterBuilder.and(springFilterBuilder.eq('tipus', `'SERVEI'`));

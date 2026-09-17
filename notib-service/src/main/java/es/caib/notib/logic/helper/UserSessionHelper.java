@@ -1,5 +1,7 @@
 package es.caib.notib.logic.helper;
 
+import es.caib.notib.logic.intf.base.config.BaseConfig;
+import es.caib.notib.logic.intf.base.util.HttpRequestUtil;
 import es.caib.notib.logic.intf.base.util.ThreadLocalUtil;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.model.UserSession;
@@ -7,12 +9,10 @@ import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
 import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
 import es.caib.notib.persist.resourcerepository.EntitatResourceRepository;
 import es.caib.notib.persist.resourcerepository.OrganGestorResourceRepository;
-import liquibase.pro.packaged.M;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 /**
  * Helper per a obtenir informació de la sessió d'usuari (capçalera HTTP).
@@ -26,6 +26,24 @@ public class UserSessionHelper {
 
 	private final EntitatResourceRepository entitatResourceRepository;
 	private final OrganGestorResourceRepository organGestorResourceRepository;
+
+	// Mateixa propietat que WebSecurityConfig.selectedRoleHttpHeader / NotibPermissionHelper: es llegeix
+	// directament de la capçalera de la petició (no de l'Authentication) perquè un usuari pot tenir més
+	// d'un rol concedit alhora (p.ex. usuari i administrador de lectura); comprovar isCurrentUserInRole
+	// per separat no garanteix que es tracti únicament del rol amb el que s'està treballant actualment
+	// (el seleccionat al desplegable de rol de la capçalera de l'aplicació React).
+	@Value("${" + BaseConfig.PROP_SECURITY_ROLE_HTTP_HEADER + ":X-App-Role}")
+	private String selectedRoleHttpHeader;
+
+	/**
+	 * Retorna el rol actualment seleccionat (el del desplegable de rol de la capçalera de l'aplicació
+	 * React), llegit directament de la capçalera HTTP corresponent.
+	 *
+	 * @return el rol seleccionat, o null si la petició no en porta cap (p.ex. no prové de la SPA de React).
+	 */
+	public String getCurrentRol() {
+		return HttpRequestUtil.getCurrentHttpRequest().map(r -> r.getHeader(selectedRoleHttpHeader)).orElse(null);
+	}
 
 	/**
 	 * Retorna l'id d'entitat actual.

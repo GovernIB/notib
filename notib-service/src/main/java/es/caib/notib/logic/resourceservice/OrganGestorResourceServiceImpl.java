@@ -13,12 +13,14 @@ import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.exception.PerspectiveApplicationException;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
+import es.caib.notib.logic.intf.dto.CodiValorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.model.OrganGestorDir3Sync;
 import es.caib.notib.logic.intf.model.OrganGestorResource;
 import es.caib.notib.logic.intf.model.SseEvent;
 import es.caib.notib.logic.intf.resourceservice.OrganGestorResourceService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
+import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.logic.organs.AdminOrgansAmbPermisActionExecutor;
 import es.caib.notib.logic.organs.OficinesSyncActionExecutor;
 import es.caib.notib.logic.organs.OrganGestorDir3SyncJsonReportGenerator;
@@ -64,6 +66,7 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 	private final PagadorCieResourceRepository pagadorCieResourceRepository;
 	private final EntregaCieResourceRepository entregaCieResourceRepository;
 	private final OrganGestorService organGestorService;
+	private final PermisosService permisosService;
 
 	public OrganGestorResourceServiceImpl(
 		UserSessionHelper userSessionHelper,
@@ -77,7 +80,8 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 		PagadorPostalResourceRepository pagadorPostalResourceRepository,
 		PagadorCieResourceRepository pagadorCieResourceRepository,
 		EntregaCieResourceRepository entregaCieResourceRepository,
-		OrganGestorService organGestorService) {
+		OrganGestorService organGestorService,
+		PermisosService permisosService) {
 
 		super(userSessionHelper, authenticationHelper, notibPermissionHelper);
 		this.aclHelper = aclHelper;
@@ -89,6 +93,7 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 		this.pagadorCieResourceRepository = pagadorCieResourceRepository;
 		this.entregaCieResourceRepository = entregaCieResourceRepository;
 		this.organGestorService = organGestorService;
+		this.permisosService = permisosService;
 	}
 
 	@PostConstruct
@@ -110,9 +115,28 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
 
 		var superFilter = super.additionalSpringFilter(currentSpringFilter, namedQueries);
-		var isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
-		var isRoleAdminLectura = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN_LECTURA);
-		var isRoleAdminOrgan = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN);
+		// Es determina el rol pel qual s'ha de filtrar directament per la capçalera del rol seleccionat
+		// (userSessionHelper.getCurrentRol()), en lloc de isCurrentUserInRole: un usuari pot tenir
+		// concedits més d'un rol alhora (p.ex. usuari i administrador d'entitat, habitual en usuaris de
+		// prova), i comprovar-los per separat no garanteix que es filtri únicament pel rol amb el que
+		// s'està treballant actualment -amb isCurrentUserInRole, un usuari amb rol "tothom" seleccionat
+		// però amb el rol d'administrador també concedit veia el desplegable d'òrgans sense cap filtre de
+		// permisos (s'aplicava la branca d'isRoleAdmin, pensada per a qui treballa com a administrador).
+		// Si la petició no ve identificada per capçalera (p.ex. no prové de la SPA de React) es recorre als
+		// rols concedits a l'Authentication actual.
+		var rolActual = userSessionHelper.getCurrentRol();
+		boolean isRoleAdmin;
+		boolean isRoleAdminLectura;
+		boolean isRoleAdminOrgan;
+		if (rolActual != null) {
+			isRoleAdmin = BaseConfig.ROLE_ADMIN.equals(rolActual);
+			isRoleAdminLectura = BaseConfig.ROLE_ADMIN_LECTURA.equals(rolActual);
+			isRoleAdminOrgan = BaseConfig.ROLE_ORGAN.equals(rolActual);
+		} else {
+			isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
+			isRoleAdminLectura = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN_LECTURA);
+			isRoleAdminOrgan = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN);
+		}
 		if (isRoleAdminOrgan && notibPermissionHelper.currentOrganGestorPermissionAllowed(BasePermission.ADMINISTRATION)) {
 			var currentOrganGestorId = userSessionHelper.getCurrentOrganGestorId();
 			return superFilter + " and id: " + currentOrganGestorId;
@@ -123,7 +147,7 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 		String filter = superFilter;
 		var namedQueriesList = Arrays.asList(namedQueries);
 		if (namedQueriesList.contains(OrganGestorResource.NAMED_QUERY_PERM_READ) || namedQueriesList.contains(OrganGestorResource.NAMED_QUERY_PERM_READ_VIGENT)) {
-			filter = addIdsWithPermissionFilterExpression(ExtendedPermission.READ, filter);
+			filter = addOrgansAmbPermisFilterExpression(filter);
 			if (namedQueriesList.contains(OrganGestorResource.NAMED_QUERY_PERM_READ_VIGENT)) {
 				// Al desplegable de l'alta de notificacions/remeses no s'han de mostrar els òrgans no vigents;
 				// als filtres de cerca (NAMED_QUERY_PERM_READ) es mantenen visibles per poder consultar
@@ -326,6 +350,32 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 		}
 		entity.getEntregaCie().setPagadorPostal(pagadorPostal.get());
 		entity.getEntregaCie().setPagadorCie(pagadorCie.get());
+	}
+
+	/*
+	 * Igual que el desplegable JSP de l'alta de notificacions/remeses per al rol usuari
+	 * (NotificacioFormController.fillNotificacioModel -> PermisosService.getOrgansAmbPermis): a
+	 * diferència d'addIdsWithPermissionFilterExpression (només permís directe sobre l'òrgan i els seus
+	 * descendents), aquí calen també els òrgans dels procediments/serveis sobre els que es té permís i
+	 * els òrgans amb permís concedit sobre una combinació procediment comú - òrgan (a més dels seus
+	 * descendents). En lloc de reimplementar aquest càlcul (bastant elaborat: unions de
+	 * procediments/serveis amb permís directe/comú/per la combinació, filtres de vigència, expansió a
+	 * fills...) es reutilitza el mateix servei legacy que ja fa servir la interfície JSP, per garantir
+	 * que ambdues interfícies mostrin exactament els mateixos òrgans.
+	 */
+	private String addOrgansAmbPermisFilterExpression(String filter) {
+
+		var entitatId = userSessionHelper.getCurrentEntitatId();
+		var usuariCodi = authenticationHelper.getCurrentUserName();
+		if (entitatId == null || usuariCodi == null) {
+			return concatenaFiltresAnd(filter, "id: -1");
+		}
+		var organs = permisosService.getOrgansAmbPermis(entitatId, usuariCodi, true);
+		if (organs.isEmpty()) {
+			return concatenaFiltresAnd(filter, "id: -1");
+		}
+		var joinedIds = organs.stream().map(CodiValorDto::getCodi).collect(Collectors.joining(","));
+		return concatenaFiltresAnd(filter, "id in (" + joinedIds + ")");
 	}
 
 	private String addIdsWithPermissionFilterExpression(Permission permission, String filter) {
