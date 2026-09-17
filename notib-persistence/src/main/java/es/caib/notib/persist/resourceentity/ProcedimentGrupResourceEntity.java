@@ -21,7 +21,7 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 public class ProcedimentGrupResourceEntity extends BaseAuditableResourceEntity<ProcedimentGrupResource>
-//	implements AdminEntitatResourceEntity<ProcedimentGrupResource>
+	implements AdminEntitatResourceEntity<ProcedimentGrupResource>
 {
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)

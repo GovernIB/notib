@@ -42,6 +42,8 @@ public class AplicacioResourceEntity extends BaseAuditableResourceEntity<Aplicac
 	private Integer maxEnviamentsDiaLaboral;
 	@Column(name = "max_env_dia_no_laboral", nullable = false)
 	private Integer maxEnviamentsDiaNoLaboral;
+	@Column(name = "aplicar_limit_env", nullable = false)
+	private boolean aplicarLimitEnviaments = true;
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(

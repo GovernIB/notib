@@ -83,6 +83,7 @@ public class AplicacioResource extends BaseResource<Long> {
 	private Integer maxEnviamentsDiaLaboral;
 	@NotNull
 	private Integer maxEnviamentsDiaNoLaboral;
+	private boolean aplicarLimitEnviaments;
 
 	@NotNull
 	private ResourceReference<EntitatResource, Long> entitat;

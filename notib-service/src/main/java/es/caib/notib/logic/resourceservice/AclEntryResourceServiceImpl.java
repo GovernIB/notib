@@ -24,6 +24,7 @@ import es.caib.notib.persist.resourcerepository.OrganGestorResourceRepository;
 import es.caib.notib.persist.resourcerepository.ProcedimentOrganGestorResourceRepository;
 import es.caib.notib.persist.resourcerepository.ProcedimentResourceRepository;
 import joptsimple.internal.Strings;
+import liquibase.pro.packaged.T;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -539,23 +540,22 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 		return true;
 	}
 
-	private <T> Comparator<T> createGetterBasedComparator(Sort sort) {
-		return sort.stream().map(this::<T>createComparatorForOrder).reduce(Comparator::thenComparing).orElse((a, b) -> 0);
+	private Comparator<AclEntryResourceEntity> createGetterBasedComparator(Sort sort) {
+		return sort.stream().map(this::createComparatorForOrder).reduce(Comparator::thenComparing).orElse((a, b) -> 0);
 	}
 
-	@SuppressWarnings("unchecked")
-	private <T> Comparator<T> createComparatorForOrder(Sort.Order order) {
+	private Comparator<AclEntryResourceEntity> createComparatorForOrder(Sort.Order order) {
 		switch (order.getProperty()) {
-			case "subjectType":
-				return (Comparator<T>) createComparator(AclEntryResourceEntity::getSidGrantedAuthority, order.getDirection());
-			case "subjectValue":
-				return (Comparator<T>) createComparator(AclEntryResourceEntity::getSidName, order.getDirection());
+			case "sidGrantedAuthority":
+				return createComparator(AclEntryResourceEntity::getSidGrantedAuthority, order.getDirection());
+			case "sidName":
+				return createComparator(AclEntryResourceEntity::getSidName, order.getDirection());
 			default:
 				return (a, b) -> 0;
 		}
 	}
 
-	private <T, U extends Comparable<U>> Comparator<T> createComparator(Function<T, U> extractor, Sort.Direction direction) {
+	private <U extends Comparable<U>> Comparator<AclEntryResourceEntity> createComparator(Function<AclEntryResourceEntity, U> extractor, Sort.Direction direction) {
 		return (a, b) -> {
 			U valueA = extractor.apply(a);
 			U valueB = extractor.apply(b);
@@ -565,10 +565,12 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 			if (valueA == null) {
 				return direction == Sort.Direction.ASC ? -1 : 1;
 			}
-			if (valueB == null) {
-				return direction == Sort.Direction.ASC ? 1 : -1;
+			int result;
+			if (valueA instanceof String && valueB instanceof String) {
+				result = ((String) valueA).compareToIgnoreCase((String) valueB);
+			} else {
+				result = valueA.compareTo(valueB);
 			}
-			int result = valueA.compareTo(valueB);
 			return direction == Sort.Direction.ASC ? result : -result;
 		};
 	}
