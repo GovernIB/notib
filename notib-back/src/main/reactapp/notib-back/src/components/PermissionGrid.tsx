@@ -56,7 +56,7 @@ const PermissionGrid: React.FC<{
             {
                 headerName: t('component.PermissionGrid.tipus'),
                 field: 'sidGrantedAuthority',
-                sortable: false,
+                sortable: true,
                 flex: 1,
                 valueFormatter: (value: any) =>
                     value
@@ -77,7 +77,7 @@ const PermissionGrid: React.FC<{
             },
             {
                 field: 'sidName',
-                sortable: false,
+                sortable: true,
                 flex: 4,
                 renderEditCell: (params: any) => {
                     return (
