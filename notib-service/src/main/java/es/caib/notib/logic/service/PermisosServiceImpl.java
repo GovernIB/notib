@@ -41,6 +41,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Classe que implementa els metodes per consultar i editar les configuracions de l'aplicació.
@@ -139,6 +140,34 @@ public class PermisosServiceImpl implements PermisosService {
             return getOrgansAmbPermisDirecte(entitat, grups, permis);
         } catch (Exception ex) {
             log.error("Error obtenint permisos de " + permis.name() + " d'òrgan per l'usuari " + usuariCodi + " a l'entitat " + entitatId, ex);
+            throw ex;
+        }
+    }
+
+    // Nota: no reutilitzar getOrgansAmbPermis(Long, String, boolean) per a la pantalla de permisos
+    // d'usuari: aquell mètode ("PerNotificar") només inclou un òrgan si en resulta d'utilitat per a
+    // l'alta de notificacions/remeses (és a dir, si té algun procediment propi o n'hi arriba a través
+    // dels seus fills, o té permís comú/comunicacions-sense-procediment) -no simplement perquè l'òrgan
+    // en si tingui un permís concedit. Un òrgan purament administratiu, sense cap procediment associat
+    // (ni propi ni d'un fill), quedava exclòs encara que se li hagués concedit un permís directe.
+    @Override
+    @Transactional(readOnly = true)
+    public List<CodiValorDto> getOrgansAmbPermisDirecteQualsevol(Long entitatId, String usuariCodi) {
+
+        try {
+            var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+            var grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
+            List<Permission> permisos = new ArrayList<>();
+            for (var permisEnum : PermisEnum.values()) {
+                permisos.add(entityComprovarHelper.getPermissionFromName(permisEnum));
+            }
+            permisos.add(ExtendedPermission.COMUNICACIO_SENSE_PROCEDIMENT);
+            var organs = getOrgansAmbPermis(entitat, permisos.toArray(new Permission[0]), grups, true);
+            return organs.stream().
+                    map(o -> CodiValorDto.builder().codi(o.getId() + "").valor(o.getCodi() + " - " + o.getNom()).build()).
+                    collect(Collectors.toList());
+        } catch (Exception ex) {
+            log.error("Error obtenint els òrgans amb permís directe per l'usuari " + usuariCodi + " a l'entitat " + entitatId, ex);
             throw ex;
         }
     }
@@ -306,6 +335,25 @@ public class PermisosServiceImpl implements PermisosService {
             return getProcSerAmPermis(entitatId, usuariCodi, permisos, ProcSerTipusEnum.PROCEDIMENT, permis.isPermisNotCom(), !PermisEnum.CONSULTA.equals(permis));
         } catch (Exception ex) {
             log.error("Error obtenint permisos de " + permis.name() + " de procediments per l'usuari " + usuariCodi + " a l'entitat " + entitatId, ex);
+            throw ex;
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CodiValorOrganGestorComuDto> getServeisAmbPermis(Long entitatId, String usuariCodi) {
+
+        try {
+            var permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(PermisEnum.COMUNS),
+                    entityComprovarHelper.getPermissionFromName(PermisEnum.CONSULTA),
+                    entityComprovarHelper.getPermissionFromName(PermisEnum.COMUNICACIO),
+                    entityComprovarHelper.getPermissionFromName(PermisEnum.COMUNICACIO_SIR),
+                    entityComprovarHelper.getPermissionFromName(PermisEnum.ADMIN),
+                    entityComprovarHelper.getPermissionFromName(PermisEnum.GESTIO),
+                    entityComprovarHelper.getPermissionFromName(PermisEnum.NOTIFICACIO)};
+            return getProcSerAmPermis(entitatId, usuariCodi, permisos, ProcSerTipusEnum.SERVEI, true, false);
+        } catch (Exception ex) {
+            log.error("Error obtenint permisos de serveis per l'usuari " + usuariCodi + " a l'entitat " + entitatId, ex);
             throw ex;
         }
     }

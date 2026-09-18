@@ -3,6 +3,8 @@ package es.caib.notib.logic.resourceservice;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
+import es.caib.notib.logic.helper.CacheHelper;
+import es.caib.notib.logic.helper.PermisosHelper;
 import es.caib.notib.logic.intf.model.UsuariResource;
 import es.caib.notib.logic.intf.model.auth.NotibAuthenticationDetails;
 import es.caib.notib.logic.intf.resourceservice.UsuariResourceService;
@@ -33,6 +35,23 @@ public class UsuariResourceServiceImpl
 
 	private final AuthenticationHelper authenticationHelper;
 	private final UsuariResourceRepository usuariResourceRepository;
+	private final CacheHelper cacheHelper;
+	private final PermisosHelper permisosHelper;
+
+	@Override
+	protected void afterConversion(UsuariResourceEntity entity, UsuariResource resource) {
+		// Rols/grups (no els NOT_XXX de l'aplicació, que ja es mostren al selector de rol de la
+		// capçalera) que l'usuari té assignats i que s'utilitzen en algun permís (ACL) concedit -es
+		// mostren al perfil de l'usuari amb el codi, sense traduir. Només es calcula per l'usuari
+		// autenticat actual (l'únic cas d'ús, la seva pròpia pantalla de perfil): calcular-ho també
+		// per cada fila d'un llistat d'usuaris hi afegiria una crida al plugin de directori extern per
+		// usuari mostrat.
+		if (!Objects.equals(entity.getCodi(), authenticationHelper.getCurrentUserName())) {
+			return;
+		}
+		var rols = cacheHelper.findRolsUsuariAmbCodi(entity.getCodi());
+		resource.setRolsAmbPermis(permisosHelper.filterRolsAmbAlgunPermis(rols));
+	}
 
 	@Override
 	public void refresh() {

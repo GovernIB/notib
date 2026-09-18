@@ -122,6 +122,22 @@ const useLocalStorage = (...keyParts: any[]) => {
     return {getValue, setValue,};
 };
 
+// es.caib.notib.client.domini.NumElementsPaginaDefecte: l'enum no té cap @JsonValue, per tant l'"id"
+// de cada opció (options) que arriba del backend és el NOM de la constant (p.ex. "DEU"), no el número
+// que representa. Abans es feia Number.parseInt(...) sobre la DESCRIPCIÓ (el text traduït de l'opció,
+// no l'id), assumint que sempre coincidiria amb el número -cosa que només és certa si la traducció
+// s'ha resolt correctament; si per qualsevol motiu (p.ex. una petició molt inicial abans que la sessió/
+// idioma estiguin del tot establerts) la traducció no es troba, el fallback retorna el nom de l'enum
+// tal qual ("DEU"), i parseInt-ejar-lo dona NaN per a totes les opcions alhora. Es fa un mapeig explícit
+// per id (estable, independent de l'idioma) en lloc de dependre del text traduït.
+const NUM_ELEMENTS_PAGINA_PER_ID: Record<string, number> = {
+    DEU: 10,
+    VINT: 20,
+    CINQUANTA: 50,
+    CENT: 100,
+    DOSCENTSCINQUANTA: 250,
+};
+
 const useCurrentUser = () => {
 
     const {isReady: apiIsReady, find: apiFind, currentFields: apiFields,} = useResourceApiService('usuariResource');
@@ -137,7 +153,11 @@ const useCurrentUser = () => {
             }
         });
         const gridPageSizeOptionsField = apiFields?.find((f) => f.name === 'numElementsPaginaDefecte');
-        const gridPageSizeOptions = gridPageSizeOptionsField != null ? Object.values(gridPageSizeOptionsField?.options).map((v: any) => Number.parseInt(v)) : [10, 20, 50, 100];
+        const gridPageSizeOptions = gridPageSizeOptionsField != null
+            ? Object.keys(gridPageSizeOptionsField.options)
+                  .map((id) => NUM_ELEMENTS_PAGINA_PER_ID[id])
+                  .filter((n): n is number => n != null)
+            : [10, 20, 50, 100, 250];
         if (!gridPageSizeOptions.includes(-1)) {
             gridPageSizeOptions.unshift(-1);
         }

@@ -1,6 +1,6 @@
 package es.caib.notib.logic.intf.resourceservice;
 
-import es.caib.notib.logic.intf.base.service.ReadonlyResourceService;
+import es.caib.notib.logic.intf.base.service.MutableResourceService;
 import es.caib.notib.logic.intf.model.UsuariPermisResource;
 
 /**
@@ -8,5 +8,5 @@ import es.caib.notib.logic.intf.model.UsuariPermisResource;
  *
  * @author Límit Tecnologies
  */
-public interface UsuariPermisResourceService extends ReadonlyResourceService<UsuariPermisResource, String> {
+public interface UsuariPermisResourceService extends MutableResourceService<UsuariPermisResource, String> {
 }

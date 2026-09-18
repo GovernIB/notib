@@ -62,6 +62,20 @@ public interface PermisosService {
     @PreAuthorize("isAuthenticated()")
     List<CodiValorDto> getOrgansAmbPermis(Long entitatId, String usuariCodi, boolean incloureNoVigents);
 
+    /**
+     * Retorna els òrgans gestors amb algun permís concedit directament (a l'usuari o a algun dels seus
+     * rols/grups), sigui quin sigui el tipus de permís -a diferència de {@link #getOrgansAmbPermis(Long, String, boolean)},
+     * no requereix que l'òrgan (ni cap dels seus descendents) tingui cap procediment associat. Pensat
+     * per a pantalles d'auditoria de permisos (p.ex. "permisos d'usuari"), no per a desplegables d'alta
+     * de notificacions.
+     *
+     * @param entitatId identificador de l'entitat.
+     * @param usuariCodi codi de l'usuari.
+     * @return la llista d'òrgans amb algun permís directe concedit.
+     */
+    @PreAuthorize("isAuthenticated()")
+    List<CodiValorDto> getOrgansAmbPermisDirecteQualsevol(Long entitatId, String usuariCodi);
+
     @PreAuthorize("isAuthenticated()")
     List<CodiValorDto> getOrgansAmbPermisPerConsulta(Long entitatId, String usuariCodi, PermisEnum permis);
 
@@ -92,6 +106,9 @@ public interface PermisosService {
 
     @PreAuthorize("isAuthenticated()")
     List<CodiValorOrganGestorComuDto> getProcedimentsAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis);
+
+    @PreAuthorize("isAuthenticated()")
+    List<CodiValorOrganGestorComuDto> getServeisAmbPermis(Long entitatId, String usuariCodi);
 
     @PreAuthorize("isAuthenticated()")
     List<CodiValorOrganGestorComuDto> getServeisAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis);

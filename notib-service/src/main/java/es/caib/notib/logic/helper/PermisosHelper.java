@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 /**
@@ -205,6 +206,24 @@ public class PermisosHelper {
 			}
 		}
 		return sids;
+	}
+
+	/**
+	 * Filtra una llista de codis de rols/grups, retornant únicament els que s'han fet servir alguna
+	 * vegada com a principal (GrantedAuthoritySid) d'una entrada ACL -és a dir, els que tenen
+	 * efectivament algun permís concedit en algun lloc de l'aplicació.
+	 *
+	 * @param rols els codis de rol/grup a filtrar.
+	 * @return la sublista dels codis que tenen algun permís concedit.
+	 */
+	public List<String> filterRolsAmbAlgunPermis(List<String> rols) {
+
+		if (rols == null || rols.isEmpty()) {
+			return new ArrayList<>();
+		}
+		return aclSidRepository.findRolesSid(rols).stream().
+				map(AclSidEntity::getSid).
+				collect(Collectors.toList());
 	}
 
 	/**

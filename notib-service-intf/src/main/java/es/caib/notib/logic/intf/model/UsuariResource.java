@@ -17,6 +17,7 @@ import lombok.experimental.FieldNameConstants;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Informació d'un usuari de l'aplicació.
@@ -66,6 +67,10 @@ public class UsuariResource extends BaseResource<String> {
 	protected ResourceReference<EntitatResource, Long> entitatDefecte;
 	protected ResourceReference<OrganGestorResource, Long> organDefecte;
 	protected ResourceReference<ProcedimentResource, Long> procedimentDefecte;
+	// Codis de rol/grup (no rols NOT_XXX de l'aplicació, que ja es mostren al selector de rol de la
+	// capçalera) que l'usuari té assignats i que s'utilitzen en algun permís (ACL) concedit -calculat,
+	// no persistit; vegeu UsuariResourceServiceImpl.afterConversion.
+	protected List<String> rolsAmbPermis;
 
 	public String getId() {
 		return codi;

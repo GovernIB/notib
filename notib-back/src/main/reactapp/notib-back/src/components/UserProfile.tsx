@@ -129,16 +129,24 @@ const EstilMenuSelector: React.FC = () => {
 
 // Mostra, a mode informatiu (no editable, com el desplegable deshabilitat de l'antiga interfície
 // JSP), tots els rols que té concedits l'usuari actual -no només el seleccionat actualment a la
-// capçalera, que ja es veu al selector de rol.
+// capçalera, que ja es veu al selector de rol. Inclou tant els rols NOT_XXX de l'aplicació
+// (rolesAvailable, ja calculats per al selector de rol) com els rols/grups que l'usuari té assignats
+// i que s'utilitzen en algun permís (ACL) -rolsAmbPermis, calculat pel backend
+// (UsuariResourceServiceImpl.afterConversion). Es mostra el codi del rol tal qual, sense traduir: a
+// diferència del selector de rol (on l'usuari ha d'entendre l'opció que està triant), aquí l'objectiu
+// és que es reconegui exactament el codi configurat (p.ex. per comparar-lo amb un permís concedit).
 const UserRolsField: React.FC = () => {
     const { t } = useTranslation();
     const { rolesAvailable } = useNotibContext();
+    const { data } = useFormContext();
+    const rolsAmbPermis: string[] = data?.rolsAmbPermis ?? [];
+    const rols = Array.from(new Set([...(rolesAvailable ?? []), ...rolsAmbPermis]));
     return (
         <Grid size={12}>
             <ToggleFieldLabel label={t('component.UserProfile.rols')} />
             <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
-                {rolesAvailable?.map((rol) => (
-                    <Chip key={rol} label={t(`component.RoleSelector.role.${rol}`)} size="small" />
+                {rols.map((rol) => (
+                    <Chip key={rol} label={rol} size="small" />
                 ))}
             </Stack>
         </Grid>

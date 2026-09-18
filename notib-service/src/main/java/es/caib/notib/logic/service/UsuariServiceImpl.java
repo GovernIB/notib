@@ -49,12 +49,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.acls.domain.SpringCacheBasedAclCache;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -186,11 +190,29 @@ public class UsuariServiceImpl implements UsuariService {
 
         try {
             var permisosUsuari = new PermisosUsuari();
-            var organsAmbPermis = permisosService.getOrgansAmbPermis(entitat.getId(), usuariCodi, true);
+            var rols = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
+            // permisosService.getOrgansAmbPermis (com getProcedimentsAmbPermis més avall) determina
+            // finalment quins òrgans/procediments es consideren cridant PermisosHelper.getObjectsIdsWithPermission,
+            // que SEMPRE fa servir SecurityContextHolder.getContext().getAuthentication() -és a dir,
+            // l'ADMINISTRADOR que està consultant aquesta pantalla-, mai l'usuari (usuariCodi) que
+            // s'està inspeccionant. Si l'abast de permisos de l'administrador no cobreix el mateix
+            // conjunt d'òrgans/procediments que l'usuari (p.ex. un administrador d'òrgan consultant un
+            // altre usuari), els permisos d'aquest -tant els seus directes com els concedits a un dels
+            // seus rols- ni tan sols arriben a la llista de candidats, encara que el filtratge posterior
+            // (permis.getPrincipal().equals(usuariCodi) || rols.contains(permis.getPrincipal())) sigui
+            // correcte. Cal substituir temporalment l'Authentication per la de l'usuari a inspeccionar
+            // únicament durant aquestes dues consultes.
+            //
+            // Per a l'apartat d'òrgans es fa servir getOrgansAmbPermisDirecteQualsevol i no
+            // getOrgansAmbPermis: aquest darrer ("PerNotificar") només inclou un òrgan si en resulta
+            // útil per l'alta de notificacions (té algun procediment propi o d'un descendent, o permís
+            // comú/comunicacions-sense-procediment) -no simplement perquè l'òrgan en si tingui un
+            // permís concedit. Un òrgan purament administratiu sense cap procediment associat quedava
+            // exclòs encara que tingués un permís directe (p.ex. ADMIN) concedit.
+            var organsAmbPermis = asUsuari(usuariCodi, rols, () -> permisosService.getOrgansAmbPermisDirecteQualsevol(entitat.getId(), usuariCodi));
             Map<String, List<PermisDto>> permisosOrgans = new HashMap<>();
             Map<String, List<String>> organsFills = new HashMap<>();
             List<String> organsFillsNom = new ArrayList<>();
-            var rols = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
             List<PermisDto> p;
             var isOrganAdmin = organAdmin != null;
             OrganGestorDto organEntity;
@@ -230,38 +252,30 @@ public class UsuariServiceImpl implements UsuariService {
             permisosUsuari.setPermisosOrgans(map);
             map = objectMapper.writeValueAsString(organsFills);
             permisosUsuari.setOrgansFills(map);
-            var procedimentsAmbPermis = permisosService.getProcedimentsAmbPermis(entitat.getId(), usuariCodi);
+            var procedimentsAmbPermis = asUsuari(usuariCodi, rols, () -> permisosService.getProcedimentsAmbPermis(entitat.getId(), usuariCodi));
+            var serveisAmbPermis = asUsuari(usuariCodi, rols, () -> permisosService.getServeisAmbPermis(entitat.getId(), usuariCodi));
+            // Procediments i serveis comparteixen exactament la mateixa estructura de permisos (directe i
+            // per òrgan) i ja es distingeixen a la UI per la columna "Tipus" -es processen conjuntament.
+            List<CodiValorOrganGestorComuDto> procSersAmbPermis = new ArrayList<>();
+            procSersAmbPermis.addAll(procedimentsAmbPermis);
+            procSersAmbPermis.addAll(serveisAmbPermis);
             Map<String, List<PermisDto>> permisosProcediment = new HashMap<>();
             Map<String, List<CodiValorOrganGestorComuDto>> procSerOrgan = new HashMap<>();
             List<PermisCodivalorOrganGestorComu> procSerOrganList = new ArrayList<>();
-            for (var procediment : procedimentsAmbPermis) {
+            for (var procediment : procSersAmbPermis) {
                 if (isOrganAdmin && !organAdmin.getCodi().equals(procediment.getOrganGestor())) {
                     continue;
                 }
-                var permisos = procedimentService.permisFind(entitat.getId(), false, procediment.getId(), procediment.getOrganGestor(), procediment.getOrganGestor(), null, null);
-                if (permisos.isEmpty()) {
-                    var organ = organGestorService.findByCodi(entitat.getId(), procediment.getOrganGestor());
-					if (organ == null) {
-						continue;
-					}
-                    var permisosOrgan = organGestorService.permisFind(entitat.getId(), organ.getId());
-                    if (permisosOrgan.isEmpty()) {
-                        var organFill = organsAmbPermis.stream().filter(x -> x.getCodi().equals(organ.getId()+"")).collect(Collectors.toList());
-                        if (organFill.isEmpty()) {
-                            continue;
-                        }
-                        var fill = organFill.get(0);
-                        var key = organsFills.keySet().stream().filter(o -> !organsFills.get(o).stream().filter(c -> c.equals(fill.getValor())).collect(Collectors.toList()).isEmpty()).collect(Collectors.toList());
-                        if (!key.isEmpty())
-                            permisosOrgan = permisosOrgans.get(key.get(0));
-                    }
-                    for (var permisOrgan : permisosOrgan) {
-                        if (permisOrgan.getPrincipal().equals(usuariCodi) || rols.contains(permisOrgan.getPrincipal())) {
-                            procSerOrganList.add(PermisCodivalorOrganGestorComu.builder().codiValor(procediment).permis(permisOrgan).build());
-                        }
-                    }
-                    continue;
-                }
+                // El permís directe (sobre el procediment) i el permís heretat via òrgan gestor no són
+                // excloents: un procediment pot tenir permís directe assignat i, alhora, ser abastable
+                // a través del permís del seu òrgan (o d'un ascendent). Cal comprovar-los per separat,
+                // sense que la presència d'un descarti la comprovació de l'altre.
+                // organActual (5è paràmetre) s'ha de passar a null i no procediment.getOrganGestor():
+                // per a un procediment comú (sense òrgan gestor propi) aquest camp val "" (no null), i
+                // ProcedimentServiceImpl.findPermisProcedimentOrganByProcediment només inclou els
+                // permisos per-òrgan de "" (cap organisme real), descartant TOTS els permisos concedits
+                // per a qualsevol òrgan concret -exactament el cas que volem auditar aquí.
+                var permisos = procedimentService.permisFind(entitat.getId(), false, procediment.getId(), procediment.getOrganGestor(), null, null, null);
                 p = new ArrayList<>();
                 for (var permis : permisos) {
                     if (permis.getPrincipal().equals(usuariCodi) || rols.contains(permis.getPrincipal())) {
@@ -269,8 +283,30 @@ public class UsuariServiceImpl implements UsuariService {
                         p.add(permis);
                     }
                 }
-                if (!permisos.isEmpty()) {
+                if (!p.isEmpty()) {
                     permisosProcediment.put(procediment.getCodi(), p);
+                }
+                var organ = organGestorService.findByCodi(entitat.getId(), procediment.getOrganGestor());
+				if (organ == null) {
+					continue;
+				}
+                var permisosOrgan = organGestorService.permisFind(entitat.getId(), organ.getId());
+                if (permisosOrgan.isEmpty()) {
+                    // L'òrgan del procediment no té permís directe: cercam quin ascendent (clau
+                    // d'organsFills) té aquest òrgan com a descendent, per heretar el seu permís.
+                    var organNomAmbCodi = organ.getCodi() + " - " + organ.getNom();
+                    var key = organsFills.keySet().stream()
+                            .filter(o -> organsFills.get(o).contains(organNomAmbCodi))
+                            .collect(Collectors.toList());
+                    if (key.isEmpty()) {
+                        continue;
+                    }
+                    permisosOrgan = permisosOrgans.get(key.get(0));
+                }
+                for (var permisOrgan : permisosOrgan) {
+                    if (permisOrgan.getPrincipal().equals(usuariCodi) || rols.contains(permisOrgan.getPrincipal())) {
+                        procSerOrganList.add(PermisCodivalorOrganGestorComu.builder().codiValor(procediment).permis(permisOrgan).build());
+                    }
                 }
             }
             map = objectMapper.writeValueAsString(permisosProcediment);
@@ -280,6 +316,25 @@ public class UsuariServiceImpl implements UsuariService {
         } catch (Exception ex) {
             log.error("Error obtinguent else permisos de l'usuari " + usuariCodi + " de l'entitat " + entitat.getCodi(), ex);
             return new PermisosUsuari();
+        }
+    }
+
+    /**
+     * Executa l'acció indicada substituint temporalment l'Authentication del SecurityContext per una
+     * que representa l'usuari indicat (i els seus rols), i restaurant sempre l'original en acabar -encara
+     * que l'acció llenci una excepció-, per no filtrar mai aquesta identitat substituta a la resta del
+     * processament de la petició.
+     */
+    private <T> T asUsuari(String usuariCodi, List<String> rols, Supplier<T> action) {
+
+        var originalAuth = SecurityContextHolder.getContext().getAuthentication();
+        try {
+            var authorities = rols.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+            SecurityContextHolder.getContext().setAuthentication(
+                    new UsernamePasswordAuthenticationToken(usuariCodi, null, authorities));
+            return action.get();
+        } finally {
+            SecurityContextHolder.getContext().setAuthentication(originalAuth);
         }
     }
 

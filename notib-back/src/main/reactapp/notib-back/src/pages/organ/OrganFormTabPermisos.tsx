@@ -14,13 +14,13 @@ const PermissionForm: React.FC = () => {
     const doFieldChange = (targetValue: boolean) => {
         const permisos = [
             'readAllowed',
-            'perm1Allowed',
-            'perm2Allowed',
-            'perm3Allowed',
+            'adminAllowed',
             'perm4Allowed',
             'perm5Allowed',
             'perm6Allowed',
             'perm7Allowed',
+            'perm8Allowed',
+            'perm9Allowed',
         ];
 
         permisos.forEach((nomPermis) => {
@@ -67,7 +67,7 @@ const PermissionForm: React.FC = () => {
             />
             <GridFormField size={9} name="sidName" disabled={data?.id} />
             <PermissionGridSwitch
-                name="adminAllowed"
+                name="perm1Allowed"
                 label={t('page.organs.form.permisos.administrador')}
                 tooltip={t('page.organs.form.permisos.administradorTooltip')}
                 icon={<Icon>person_add_alt_1</Icon>}
@@ -90,7 +90,7 @@ const PermissionForm: React.FC = () => {
             />
             <Grid size={1} />
             <PermissionGridSwitch
-                name="perm1Allowed"
+                name="perm4Allowed"
                 label={t('page.organs.form.permisos.processar')}
                 tooltip={t('page.organs.form.permisos.processarTooltip')}
                 icon={<Icon>check_box</Icon>}
@@ -98,7 +98,7 @@ const PermissionForm: React.FC = () => {
             />
             <Grid size={1} />
             <PermissionGridSwitch
-                name="perm2Allowed"
+                name="adminAllowed"
                 label={t('page.organs.form.permisos.gestio')}
                 tooltip={t('page.organs.form.permisos.gestioTooltip')}
                 icon={<Icon>settings</Icon>}
@@ -106,7 +106,7 @@ const PermissionForm: React.FC = () => {
             />
             <Grid size={1} />
             <PermissionGridSwitch
-                name="perm3Allowed"
+                name="perm6Allowed"
                 label={t('page.organs.form.permisos.comuns')}
                 tooltip={t('page.organs.form.permisos.comunsTooltip')}
                 icon={<Icon>public</Icon>}
@@ -114,7 +114,7 @@ const PermissionForm: React.FC = () => {
             />
             <Grid size={1} />
             <PermissionGridSwitch
-                name="perm4Allowed"
+                name="perm5Allowed"
                 label={t('page.organs.form.permisos.notificacions')}
                 tooltip={t('page.organs.form.permisos.notificacionsTooltip')}
                 icon={<Icon>gavel</Icon>}
@@ -122,7 +122,7 @@ const PermissionForm: React.FC = () => {
             />
             <Grid size={1} />
             <PermissionGridSwitch
-                name="perm5Allowed"
+                name="perm8Allowed"
                 label={t('page.organs.form.permisos.comunicacions')}
                 tooltip={t('page.organs.form.permisos.comunicacionsTooltip')}
                 icon={<MailOutlineIcon />}
@@ -130,7 +130,7 @@ const PermissionForm: React.FC = () => {
             />
             <Grid size={1} />
             <PermissionGridSwitch
-                name="perm6Allowed"
+                name="perm7Allowed"
                 label={t('page.organs.form.permisos.sir')}
                 tooltip={t('page.organs.form.permisos.sirTooltip')}
                 icon={<Icon>email</Icon>}
@@ -138,7 +138,7 @@ const PermissionForm: React.FC = () => {
             />
             <Grid size={1} />
             <PermissionGridSwitch
-                name="perm7Allowed"
+                name="perm9Allowed"
                 label={t('page.organs.form.permisos.comSenseProc')}
                 tooltip={t('page.organs.form.permisos.comSenseProcTooltip')}
                 icon={<Icon>send</Icon>}
@@ -155,7 +155,7 @@ const OrganFormTabPermisos: React.FC = () => {
     const permissionEntries = [
         {
             headerName: t('page.organs.form.permisos.administrador'),
-            field: 'adminAllowed',
+            field: 'perm1Allowed',
             renderHeader: () => (
                 <Tooltip
                     title={t('page.organs.form.permisos.administradorTooltip')}
@@ -185,7 +185,7 @@ const OrganFormTabPermisos: React.FC = () => {
         },
         {
             headerName: t('page.organs.form.permisos.processar'),
-            field: 'perm1Allowed',
+            field: 'perm4Allowed',
             renderHeader: () => (
                 <Tooltip
                     title={t('page.organs.form.permisos.processarTooltip')}
@@ -200,7 +200,7 @@ const OrganFormTabPermisos: React.FC = () => {
         },
         {
             headerName: t('page.organs.form.permisos.gestio'),
-            field: 'perm2Allowed',
+            field: 'adminAllowed',
             renderHeader: () => (
                 <Tooltip title={t('page.organs.form.permisos.gestioTooltip')} arrow placement="top">
                     <Icon color="action">settings</Icon>
@@ -211,7 +211,7 @@ const OrganFormTabPermisos: React.FC = () => {
         },
         {
             headerName: t('page.organs.form.permisos.comuns'),
-            field: 'perm3Allowed',
+            field: 'perm6Allowed',
             renderHeader: () => (
                 <Tooltip title={t('page.organs.form.permisos.comunsTooltip')} arrow placement="top">
                     <Icon color="action">public</Icon>
@@ -222,7 +222,7 @@ const OrganFormTabPermisos: React.FC = () => {
         },
         {
             headerName: t('page.organs.form.permisos.notificacions'),
-            field: 'perm4Allowed',
+            field: 'perm5Allowed',
             renderHeader: () => (
                 <Tooltip
                     title={t('page.organs.form.permisos.notificacionsTooltip')}
@@ -237,7 +237,7 @@ const OrganFormTabPermisos: React.FC = () => {
         },
         {
             headerName: t('page.organs.form.permisos.comunicacions'),
-            field: 'perm5Allowed',
+            field: 'perm8Allowed',
             renderHeader: () => (
                 <Tooltip
                     title={t('page.organs.form.permisos.comunicacionsTooltip')}
@@ -252,7 +252,7 @@ const OrganFormTabPermisos: React.FC = () => {
         },
         {
             headerName: t('page.organs.form.permisos.sir'),
-            field: 'perm6Allowed',
+            field: 'perm7Allowed',
             renderHeader: () => (
                 <Tooltip title={t('page.organs.form.permisos.sirTooltip')} arrow placement="top">
                     <Icon color="action">email</Icon>
@@ -263,7 +263,7 @@ const OrganFormTabPermisos: React.FC = () => {
         },
         {
             headerName: t('page.organs.form.permisos.comSenseProc'),
-            field: 'perm7Allowed',
+            field: 'perm9Allowed',
             renderHeader: () => (
                 <Tooltip
                     title={t('page.organs.form.permisos.comSenseProcTooltip')}
