@@ -195,7 +195,7 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 		}
 
 		for(NotificacioEnviamentEntity enviament : this.getEnviaments()) {
-			if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
+			if(enviament.getTitular() == null || !enviament.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
 				return false;
 			}
 		}

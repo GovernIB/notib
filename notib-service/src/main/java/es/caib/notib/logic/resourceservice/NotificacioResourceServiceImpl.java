@@ -328,6 +328,11 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 		if (enviament.getRepresentantsInfo() != null) {
 			enviament.getRepresentantsInfo().forEach(r -> saveDestinatari(enviamentCreat, r));
 		}
+		// Cal fer flush del titular abans de tornar: LegacyHelper.altaNotificacio (cridat just
+		// després des d'afterCreateSave) carrega aquest mateix registre amb un altre EntityManager
+		// find() per id, que no dispara auto-flush i quedaria cachejat amb titular_id a NULL si
+		// encara no s'ha escrit a BD, provocant un NPE més endavant a isComunicacioSir().
+		notificacioEnviamentResourceRepository.saveAndFlush(enviamentCreat);
 		return enviamentCreat.getId();
 	}
 

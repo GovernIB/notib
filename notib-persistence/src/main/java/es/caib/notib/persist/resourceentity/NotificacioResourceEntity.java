@@ -274,7 +274,7 @@ public class NotificacioResourceEntity extends BaseAuditableResourceEntity<Notif
 		}
 
 		for(var enviament : this.getEnviaments()) {
-			if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
+			if(enviament.getTitular() == null || !enviament.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
 				return false;
 			}
 		}

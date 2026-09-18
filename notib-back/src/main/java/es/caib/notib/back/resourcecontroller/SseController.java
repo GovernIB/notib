@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -103,6 +104,14 @@ public class SseController extends BaseController {
 						emitter.complete();
 						sseEventService.removeListener(queue.get(), listenerId.get());
 					}
+				} catch (IOException ex) {
+					// El client ja no està connectat (pipe trencat, timeout, pestanya tancada...).
+					// No es crida completeWithError: dispararia un forward a la pàgina d'error sobre
+					// una resposta SSE ja compromesa, que falla i genera soroll als logs
+					// (ErrorPageFilter "Cannot forward to error page ... Broken pipe"). L'emitter
+					// mateix dispararà onError/onCompletion, igual que fa sendHeartbeat.
+					log.debug("SSE: connexió ja tancada en enviar l'event", ex);
+					sseEventService.removeListener(queue.get(), listenerId.get());
 				} catch (Exception ex) {
 					emitter.completeWithError(ex);
 					sseEventService.removeListener(queue.get(), listenerId.get());
