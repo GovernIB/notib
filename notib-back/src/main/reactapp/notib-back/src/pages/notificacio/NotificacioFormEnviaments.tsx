@@ -12,10 +12,19 @@ import Dir3SearchInput from '../../components/Dir3SearchInput';
 import GridFormField from '../../components/GridFormField';
 import { useDadesProcediment } from './DadesProcediment.tsx'
 
-const NotificacioFormEnviamentPersonaFormContent: React.FC<{ interessat?: boolean }> = (props) => {
-    const { interessat } = props;
+const NotificacioFormEnviamentPersonaFormContent: React.FC<{ interessat?: boolean, isSir?: boolean }> = (props) => {
+
+    const { interessat, isSir } = props;
     const { t } = useTranslation();
-    const { data } = useFormContext();
+    const { data, apiRef } = useFormContext();
+    React.useEffect(() => {
+        if (isSir) {
+            apiRef.current?.setFieldValue('interessatTipus', 'ADMINISTRACIO');
+        }
+    }, [isSir]);
+    if (isSir) {
+        return <Dir3SearchInput name="dir3Codi" denominacio="nom"nif="nif" required />
+    }
     return (
         <Grid container spacing={2}>
             <Grid size={12} sx={{ mb: 1 }}>
@@ -43,9 +52,9 @@ const NotificacioFormEnviamentPersonaFormContent: React.FC<{ interessat?: boolea
     );
 };
 
-const NotificacioFormEnviamentPersona: React.FC<{ index?: number; indexKey?: number; interessat?: boolean; }> = (props) => {
+const NotificacioFormEnviamentPersona: React.FC<{ index?: number; indexKey?: number; interessat?: boolean; isSir?: boolean }> = (props) => {
 
-    const { index, indexKey, interessat } = props;
+    const { index, indexKey, interessat, isSir } = props;
     const [currentPersonaFieldValidationErrors, setCurrentPersonaFieldValidationErrors] = React.useState<any[]>();
     const {
         data: parentFormData,
@@ -87,7 +96,7 @@ const NotificacioFormEnviamentPersona: React.FC<{ index?: number; indexKey?: num
             commonFieldComponentProps={{ size: 'small' }}
             componentProps={{ sx: { mb: 3 } }}
         >
-            <NotificacioFormEnviamentPersonaFormContent interessat={interessat} />
+            <NotificacioFormEnviamentPersonaFormContent interessat={interessat} isSir={isSir} />
         </MuiForm>
     );
 };
@@ -239,6 +248,8 @@ const NotificacioFormEnviament: React.FC<{ index: number; indexKey: number; hand
         }
     };
 
+    const isSir = parentFormData?.enviamentTipus === 'SIR';
+
     return (
         <Paper sx={{ px: 2, py: 1, mb: 2 }}>
             <Grid container spacing={2}>
@@ -281,16 +292,16 @@ const NotificacioFormEnviament: React.FC<{ index: number; indexKey: number; hand
                     >
                         <Grid container spacing={2}>
                             <GridFormField size={12} name="serveiTipus" />
-                            {parentFormData?.enviamentTipus === 'SIR' && (
-                                <Grid size={12}>
-                                    <Dir3SearchInput name="sirTitularDir3Codi" required />
-                                </Grid>
-                            )}
-                            {parentFormData?.enviamentTipus !== 'SIR' && (
+                            {/*{parentFormData?.enviamentTipus === 'SIR' && (*/}
+                            {/*    <Grid size={12}>*/}
+                            {/*        <Dir3SearchInput name="sirTitularDir3Codi" required />*/}
+                            {/*    </Grid>*/}
+                            {/*)}*/}
+                            {/*{parentFormData?.enviamentTipus !== 'SIR' && (*/}
                                 <Grid size={12} sx={{ mt: 1 }}>
-                                    <NotificacioFormEnviamentPersona interessat />
+                                    <NotificacioFormEnviamentPersona interessat isSir={isSir}/>
                                     {ambRepresentant && (<NotificacioFormEnviamentPersona index={0} indexKey={indexKey}/>)}
-                                    <Button
+                                    {!isSir && (<Button
                                         variant="contained"
                                         startIcon={<Icon>{ambRepresentant ? 'remove' : 'add'}</Icon>}
                                         onClick={() => setAmbRepresentant((r) => !r)}
@@ -299,9 +310,9 @@ const NotificacioFormEnviament: React.FC<{ index: number; indexKey: number; hand
                                         {ambRepresentant
                                             ? t('page.notificacio.form.interessats.remove')
                                             : t('page.notificacio.form.interessats.add')}
-                                    </Button>
+                                    </Button>)}
                                 </Grid>
-                            )}
+                            {/*)}*/}
                            <NotificacioFormEnviamentEntregaPostal forceEntregaPostalActiva={forceEntregaPostalActiva}/>
 
                         </Grid>

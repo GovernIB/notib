@@ -285,6 +285,7 @@ public class NotificacioEnviamentResource extends BaseResource<Long> {
 	private String estatColor;
 	private ResourceReference<EventResource, Long> ultimEvent;
 	private EventResource ultimEventInfo;
+	private boolean sir;
 
 	public String getNotificaCertificacioArxiuNom() {
 		return !StringUtils.isEmpty(notificaReferencia) ?  "certificacio_" + notificaReferencia + ".pdf" : null;

@@ -17,7 +17,7 @@ import {generateGridRowStylesFromMap, getGridRowColorClass, NOTIFICACIO_ESTAT_EN
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import CustomDetailPanelToggle from "../../utils/CustomDetailPanelToggle.tsx";
 import ContentFilter, {useSpringFilterBuilder} from "./NotificacioFiltre.tsx";
-import useSseRowRefresh from "../../hooks/useSseRowRefresh";
+// import useSseRowRefresh from "../../hooks/useSseRowRefresh";
 
 const useDataGridColumns = (datagridApiRef: any,
                                                             notificacionsEsborrades: boolean,
@@ -59,11 +59,12 @@ const useDataGridColumns = (datagridApiRef: any,
                 field: 'procediment',
                 flex:1,
                 width: 180,
-                renderCell: (params: any) => {
-                    const letter = params.row.procediment != null ? 'P' : 'S';
-                    const title = letter === 'P' ? t('page.notificacio.grid.procediment') : t('page.notificacio.grid.servei');
-                    return (<><Chip label={letter} size="small" title={title} sx={{ mr: 1 }} />{params.formattedValue}</>);
-                },
+                // renderCell: (params: any) => {
+                //     console.log(params);
+                //     const letter = params.row.procediment != null ? 'P' : 'S';
+                //     const title = letter === 'P' ? t('page.notificacio.grid.procediment') : t('page.notificacio.grid.servei');
+                //     return (<><Chip label={letter} size="small" title={title} sx={{ mr: 1 }} />{params.formattedValue}</>);
+                // },
             },
             ...(notificacioErrorRegistre || notificacioCallbackError ? [] : [{
                 field: 'numExpedient',
@@ -317,7 +318,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
     // Actualitza automàticament, via SSE, les files de remeses visibles quan el seu estat canvia
     // al servidor (p.ex. per una resposta de Notifica, un event de registre, un callback...), sense
     // necessitat que l'usuari refresqui el llistat manualment.
-    useSseRowRefresh('notificacioResource', datagridApiRef, 'REMESA_ENVIAMENT_ESTAT', 'NOTIFICACIO_ESTAT_CANVIAT');
+    // useSseRowRefresh('notificacioResource', datagridApiRef, 'REMESA_ENVIAMENT_ESTAT', 'NOTIFICACIO_ESTAT_CANVIAT');
     const springFilterBuilder = useSpringFilterBuilder();
     const [searchParams] = useSearchParams();
     const referencia = searchParams.get('referencia');

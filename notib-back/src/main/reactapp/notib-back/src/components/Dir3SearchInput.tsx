@@ -65,8 +65,9 @@ const Dir3SearchFilterContent: React.FC = () => {
     );
 };
 
-export const Dir3SearchInput: React.FC<{ name: string; required?: true }> = (props) => {
-    const { name, required } = props;
+export const Dir3SearchInput: React.FC<{ name: string, denominacio:string, nif: string; required?: true }> = (props) => {
+
+    const { name, denominacio, nif, required } = props;
     const [dir3Name, setDir3Name] = React.useState<string>();
     const { apiRef: formApiRef } = useFormContext();
     const gridDialogApiRef = useMuiDataGridDialogApiRef();
@@ -131,8 +132,11 @@ export const Dir3SearchInput: React.FC<{ name: string; required?: true }> = (pro
         gridDialogApiRef.current
             ?.show()
             .then((value) => {
+                const nom = value.denominacio ? value.denominacio : value.denominacionCooficial;
                 formApiRef.current?.setFieldValue(name, value.codi);
-                setDir3Name(value.denominacio);
+                formApiRef.current?.setFieldValue(denominacio, nom);
+                formApiRef.current?.setFieldValue(nif, value.cif);
+                setDir3Name(nom);
             })
             .catch(() => {});
     };

@@ -113,46 +113,74 @@ export const NOTIFICACIO_ESTAT_ENUM_MAP: Record<string, MapConfigItem> = {
 // es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto
 export const NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP: Record<string, MapConfigItem> = {
     VALID: {
-        translationKey: 'utils.estatConfig.VALID',
+        translationKey: 'utils.estatConfig.NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP.VALID',
+        icona: "V",
+        color: "#c1bcbc"
     },
     RESERVA: {
-        translationKey: 'utils.estatConfig.RESERVA',
+        translationKey: 'utils.estatConfig.NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP.RESERVA',
+        icona: "R",
+        color: "#c1bcbc"
     },
     PENDENT: {
-        translationKey: 'utils.estatConfig.PENDENT',
+        translationKey: 'utils.estatConfig.NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP.PENDENT',
+        icona: "P",
+        color: "#c1bcbc"
     },
     OFICI_EXTERN: {
-        translationKey: 'utils.estatConfig.OFICI_EXTERN',
+        translationKey: 'utils.estatConfig.NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP.OFICI_EXTERN',
+        icona: "E",
+        color: "#c1bcbc"
     },
     OFICI_INTERN: {
-        translationKey: 'utils.estatConfig.OFICI_INTERN',
+        translationKey: 'utils.estatConfig.NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP.OFICI_INTERN',
+        icona: "I",
+        color: "#c1bcbc"
     },
     OFICI_ACCEPTAT: {
-        translationKey: 'utils.estatConfig.OFICI_ACCEPTAT',
+        translationKey: 'utils.estatConfig.NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP.OFICI_ACCEPTAT',
+        icona: "A",
+        color: "#999999"
     },
     DISTRIBUIT: {
-        translationKey: 'utils.estatConfig.DISTRIBUIT',
+        translationKey: 'utils.estatConfig.NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP.DISTRIBUIT',
+        icona: "D",
+        color: "#999999"
     },
     ANULAT: {
-        translationKey: 'utils.estatConfig.ANULAT',
+        translationKey: 'utils.estatConfig.NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP.ANULAT',
+        icona: "X",
+        color: "#955959"
     },
     RECTIFICAT: {
-        translationKey: 'utils.estatConfig.RECTIFICAT',
+        translationKey: 'utils.estatConfig.NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP.RECTIFICAT',
+        icona: "RC",
+        color: "#c1bcbc"
     },
     REBUTJAT: {
-        translationKey: 'utils.estatConfig.REBUTJAT',
+        translationKey: 'utils.estatConfig.NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP.REBUTJAT',
+        icona: "RB",
+        color: "#955959"
     },
     REENVIAT: {
-        translationKey: 'utils.estatConfig.REENVIAT',
+        translationKey: 'utils.estatConfig.NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP.REENVIAT',
+        icona: "RE",
+        color: "#c1bcbc"
     },
     DISTRIBUINT: {
-        translationKey: 'utils.estatConfig.DISTRIBUINT',
+        translationKey: 'utils.estatConfig.NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP.DISTRIBUINT',
+        icona: "DT",
+        color: "#c1bcbc"
     },
     OFICI_SIR: {
-        translationKey: 'utils.estatConfig.OFICI_SIR',
+        translationKey: 'utils.estatConfig.NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP.OFICI_SIR',
+        icona: "S",
+        color: "#c1bcbc"
     },
     ENVIAT_NOTIFICAR: {
-        translationKey: 'utils.estatConfig.ENVIAT_NOTIFICAR',
+        translationKey: 'utils.estatConfig.NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP.ENVIAT_NOTIFICAR',
+        icona: "EN",
+        color: "#c1bcbc"
     },
 };
 

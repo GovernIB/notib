@@ -75,12 +75,16 @@ const RegistreEstats: React.FC<{ registreEstat: any[] }> = ({ registreEstat }) =
 };
 
 // L'Estat Principal i l'Anul·lació
-const EstatPrincipal: React.FC<{ estatEnum: string; nomEstat: string; anulat?: string }> = (
-    props
-) => {
-    const { estatEnum, nomEstat, anulat } = props;
-    const configEstat = NOTIFICACIO_ESTAT_ENUM_MAP[estatEnum];
+const EstatPrincipal: React.FC<{ estatEnum: string; nomEstat: string; anulat?: string, sir: boolean, registreEstat: string }> = (props) => {
 
+    const { estatEnum, nomEstat, anulat, sir, registreEstat } = props;
+    let configEstat = NOTIFICACIO_ESTAT_ENUM_MAP[estatEnum];
+    if (sir && registreEstat) {
+        configEstat.icona = NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP[registreEstat].icona;
+    }
+    console.log(sir);
+    console.log(registreEstat);
+    console.log(configEstat.icona);
     return (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {!anulat ? (
@@ -271,8 +275,8 @@ export const NotificacioEstatGrid: React.FC<NotificacioEstatRenderProps> = (prop
     return (
         <Box sx={{width: '100%', display: 'flex', flexDirection: 'row', p: 0.5, alignItems: 'flex-start',}}>
             <Box sx={{ flex: 10, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                <RegistreEstats registreEstat={estatObjecte?.registreEstat} />
-                <EstatPrincipal estatEnum={estatEnum} nomEstat={estatObjecte?.nomEstat} anulat={estatObjecte?.anulat}/>
+                {estatObjecte?.sir && <RegistreEstats registreEstat={estatObjecte?.registreEstat} />}
+                <EstatPrincipal estatEnum={estatEnum} nomEstat={estatObjecte?.nomEstat} anulat={estatObjecte?.anulat} sir={estatObjecte?.sir} registreEstat={estatObjecte?.registreEstat}/>
                 <ErrorsIAvisos
                     eventError={estatObjecte?.eventError}
                     callbackFiReintents={estatObjecte?.callbackFiReintents}
@@ -329,15 +333,9 @@ export const NotificacioEstatDetall: React.FC<{ notificacio: any }> = (props) =>
                             if (enviament.notificat == true) {
                                 textEnviament = t('utils.estatConfig.ESTAT_ENUM_MAP.NOTIFICADA');
                             } else if (notificacio?.comunicacioSir) {
-                                textEnviament = t(
-                                    NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP[enviament.registreEstat]
-                                        .translationKey
-                                );
+                                textEnviament = t(NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP[enviament.registreEstat].translationKey);
                             } else {
-                                textEnviament = t(
-                                    ENVIAMENT_ESTAT_MAP[enviament.notificaEstat].translationKey
-                                );
-                            }
+                                textEnviament = t(ENVIAMENT_ESTAT_MAP[enviament.notificaEstat].translationKey);}
 
                             // Si finalment no s'ha pogut calcular cap text
                             if (!textEnviament) {

@@ -15,6 +15,7 @@ import {Box, Tooltip} from "@mui/material";
 import WarningIcon from "@mui/icons-material/Warning";
 import ErrorIcon from "@mui/icons-material/Error";
 import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
+import {NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP} from "../../utils/estatConfig.tsx";
 
 export const NotificacioGridEnviaments: React.FC<{ id: any }> = (props) => {
 
@@ -78,7 +79,8 @@ export const NotificacioGridEnviaments: React.FC<{ id: any }> = (props) => {
                                 </TableCell>
                                 <TableCell component="th" scope="row" sx={{borderLeft: "1.5px solid " + enviament.estatColor}}>
                                     <Box sx={{display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap'}}>
-                                        {t('utils.estatConfig.ENVIAMENT_ESTAT_MAP.' + enviament.notificaEstat)}
+                                        {!enviament.sir && t('utils.estatConfig.ENVIAMENT_ESTAT_MAP.' + enviament.notificaEstat)}
+                                        {enviament.sir && t(NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP[enviament.registreEstat].translationKey)}
                                         {!enviament?.ultimEventInfo?.ultimEventCie && (<>
                                             {enviament?.ultimEventInfo?.error && (
                                                 <Tooltip title={enviament.ultimEventInfo.errorDescripcio} arrow>

@@ -270,7 +270,7 @@ databaseChangeLog:
                                     name: procediment_id
                                     type: bigint
                 -   sql:
-                        "UPDATE ${db_prefix}NOTIFICACIO_ENV_TABLE t SET t.PROCEDIMENT_ID = (SELECT ID FROM ${db_prefix}PROCEDIMENT p WHERE p.codi = t.PROCEDIMENT_CODI_NOTIB);"
+                        "UPDATE ${db_prefix}NOTIFICACIO_ENV_TABLE t SET t.PROCEDIMENT_ID = (SELECT n.procediment_id FROM ${db_prefix}notificacio n WHERE n.id= t.notificacio_id);"
     -   changeSet:
             id: 2_1_1_000-15
             author: limit

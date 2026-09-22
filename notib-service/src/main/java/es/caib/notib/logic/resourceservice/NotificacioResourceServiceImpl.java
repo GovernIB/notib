@@ -239,7 +239,7 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 		entity.setComunicacioTipus(NotificacioComunicacioTipusEnumDto.ASINCRON);
 		entity.setEstat(NotificacioEstatEnumDto.PENDENT);
 		entity.setReferencia(UUID.randomUUID().toString());
-		entity.setProcedimentCodiNotib(entity.getProcediment().getCodi());
+		entity.setProcedimentCodiNotib(entity.getProcediment() != null ? entity.getProcediment().getCodi() : null);
 		emplenarProcedimentOrganGestor(entity);
 		emplenarGrup(entity, resource);
 		checkCreatePermission(entity);
@@ -305,7 +305,7 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 		var procedimentPermission = notibPermissionHelper.getProcedimentNotificacioCreatePermission(entity.getEnviamentTipus());
 		var ids = notibPermissionHelper.getIdsToCheckNotificacioPermission(organPermission, procedimentPermission);
 		var organGestorId = entity.getOrganGestor().getId();
-		var procedimentId = entity.getProcediment().getId();
+		var procedimentId = entity.getProcediment() != null ? entity.getProcediment().getId() : null;
 		var procedimentOrganGestorId = entity.getProcedimentOrganGestor() != null ? entity.getProcedimentOrganGestor().getId() : null;
 		var permissionGranted = (organGestorId != null && ids.getOrganGestorIds().contains(organGestorId)) || // a)
 			(procedimentId != null && ids.getProcedimentNoComuIds().contains(procedimentId)) || // b)
@@ -360,6 +360,10 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 	}
 
 	private PersonaResourceEntity saveDestinatari(NotificacioEnviamentResourceEntity enviament, PersonaResource destinatari) {
+
+		if (EnviamentTipus.SIR.equals(enviament.getNotificacio().getEnviamentTipus()) && destinatari == null) {
+
+		}
 		// Crea el destinatari a la base de dades.
 		return personaResourceRepository.save(PersonaResourceEntity.builder().resource(destinatari).enviament(enviament).build());
 	}
