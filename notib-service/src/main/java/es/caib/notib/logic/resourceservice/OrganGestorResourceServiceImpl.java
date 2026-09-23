@@ -187,7 +187,8 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 			map(Map.Entry::getKey).
 			collect(Collectors.toSet());
 		if (eligibleIds.isEmpty()) {
-			return "id: -1";
+//			return "id: -1";
+			return "";
 		}
 		return "id in (" + eligibleIds.stream().map(Object::toString).collect(Collectors.joining(",")) + ")";
 	}

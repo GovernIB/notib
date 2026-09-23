@@ -116,7 +116,9 @@ public class NotificacioEnviamentResourceServiceImpl extends BaseMutableResource
 		var organGestor = entity.getNotificacio().getOrganGestor();
 		var procediment = entity.getNotificacio().getProcediment();
 		resource.setNotificacioOrganGestor(ResourceReference.toResourceReference(organGestor.getId(), organGestor.getCodiNom()));
-		resource.setNotificacioProcediment(ResourceReference.toResourceReference(procediment.getId(), procediment.getNom()));
+		if (procediment != null) {
+			resource.setNotificacioProcediment(ResourceReference.toResourceReference(procediment.getId(), procediment.getNom()));
+		}
 		resource.setReferenciaNotificacio(entity.getNotificacio().getReferencia());
 		resource.setAnulable(entity.isAnulable());
 		resource.setNotificacioEstat(entity.getNotificacio().getEstat());

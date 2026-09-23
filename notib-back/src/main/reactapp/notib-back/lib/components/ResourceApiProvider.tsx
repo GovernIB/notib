@@ -1343,6 +1343,7 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
     const bearerTokenActive = authContext?.bearerTokenActive;
     const getToken = authContext?.getToken;
     const kettingClientRef = React.useRef<Client>(undefined);
+    const indexAbortControllerRef = React.useRef<AbortController>(undefined);
     const openAnswerRequiredDialogRef = React.useRef<OpenAnswerRequiredDialogFn>(undefined);
     const [httpHeaders, setHttpHeaders] = React.useState<Record<string, string>[]>();
     const [currentLanguage, setCurrentLanguage] = useControlledUncontrolledState<
@@ -1383,6 +1384,12 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
     };
     const refreshApiIndex = React.useCallback(() => {
         if (kettingClientRef.current) {
+            // Cancel·la (marca com a obsoleta) qualsevol petició a l'índex encara en curs, perquè si
+            // aquesta es resol després d'aquesta nova no sobreescrigui l'estat amb una resposta vella
+            // (p. ex. una consulta feta abans de tenir la capçalera X-App-Role amb el rol seleccionat).
+            indexAbortControllerRef.current?.abort();
+            const abortController = new AbortController();
+            indexAbortControllerRef.current = abortController;
             setIsIndexLoading(true);
             setIndexError(undefined);
             if (debug) {
@@ -1394,11 +1401,17 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
             setIndexState(undefined);
             getPromiseFromResourceLink(kettingClientRef.current.go(indexPath), undefined, true)
                 .then((response: State) => {
+                    if (abortController.signal.aborted) {
+                        return;
+                    }
                     setIndexState(response);
                     setIsIndexLoading(false);
                     setOffline(false);
                 })
                 .catch((error: Error & { status?: number }) => {
+                    if (abortController.signal.aborted) {
+                        return;
+                    }
                     setIndexError(error);
                     setIsIndexLoading(false);
                     handleApiConnectionError(error, authContextRef, logConsole, setOffline);

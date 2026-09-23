@@ -110,6 +110,26 @@ export const NOTIFICACIO_ESTAT_ENUM_MAP: Record<string, MapConfigItem> = {
     },
 };
 
+export const getEnviatSirConfig = (value: string): MapConfigItem => ({
+    translationKey: 'utils.estatConfig.ESTAT_ENUM_MAP.ENVIAT_SIR',
+    icona: (
+        <Avatar
+            variant="rounded"
+            sx={{
+                width: 16,
+                height: 16,
+                fontSize: '10px',
+                fontWeight: 'bold',
+                backgroundColor: '#5bc0de',
+                color: 'white',
+            }}
+        >
+            {value}
+        </Avatar>
+    ),
+    color: '#5bc0de',
+});
+
 // es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto
 export const NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP: Record<string, MapConfigItem> = {
     VALID: {

@@ -87,7 +87,7 @@ const useDataGridColumns = (datagridApiRef: any,
                 width: 225,
                 renderCell: (params: any) => {
                     const estatJson = params?.formattedValue;
-                    return (<NotificacioEstatGrid estatJson={estatJson} estatEnum={params?.row?.estat} notificacioId={params?.row?.id} refreshGrid={refreshGrid}/>);
+                    return (<NotificacioEstatGrid estatJson={estatJson} estatEnum={params?.row?.estat} notificacioId={params?.row?.id} refreshGrid={refreshGrid} sir={params?.row.enviamentTipus === 'SIR'}/>);
                 },
             }]),
             ...(noEsTaulaRemeses ? [] : [{

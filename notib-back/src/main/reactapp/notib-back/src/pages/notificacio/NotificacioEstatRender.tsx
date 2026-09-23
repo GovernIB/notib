@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Chip, Tooltip, Typography } from '@mui/material';
+import { Box, Tooltip, Typography } from '@mui/material';
 import MailIcon from '@mui/icons-material/Mail';
 import BlockIcon from '@mui/icons-material/Block';
 import WarningIcon from '@mui/icons-material/Warning';
@@ -8,6 +8,7 @@ import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import {
     ENVIAMENT_ESTAT_MAP,
+    getEnviatSirConfig,
     NOTIFICACIO_ESTAT_ENUM_MAP,
     NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP,
 } from '../../utils/estatConfig';
@@ -19,7 +20,8 @@ export type NotificacioEstatRenderProps = {
     estatJson: any;
     estatEnum: string;
     notificacioId: number,
-    refreshGrid: any
+    refreshGrid: any,
+    sir: boolean
 };
 
 // Gestió d'Entrega Postal
@@ -48,56 +50,46 @@ const EntregaPostal: React.FC<{ entregaPostal: any }> = ({ entregaPostal }) => {
 };
 
 // Registre d'Estats
-const RegistreEstats: React.FC<{ registreEstat: any[] }> = ({ registreEstat }) => {
-    if (!registreEstat || registreEstat.length === 0) return null;
-
-    return (
-        <Box sx={{ display: 'flex', gap: 0.5 }}>
-            {registreEstat.map((registre: any, index: number) => (
-                <Tooltip key={index} title={registre.title} arrow>
-                    <Chip
-                        label={registre?.label}
-                        size="small"
-                        sx={{
-                            height: '20px',
-                            backgroundColor: registre?.backgroundColor,
-                            color: 'white',
-                            borderRadius: '4px',
-                            fontSize: '11px',
-                            px: '5px',
-                            '& .MuiChip-label': { padding: 0 },
-                        }}
-                    />
-                </Tooltip>
-            ))}
-        </Box>
-    );
-};
+// const RegistreEstats: React.FC<{ registreEstat: any[] }> = ({ registreEstat }) => {
+//     if (!registreEstat || registreEstat.length === 0) return null;
+//
+//     return (
+//         <Box sx={{ display: 'flex', gap: 0.5 }}>
+//             {registreEstat.map((registre: any, index: number) => (
+//                 <Tooltip key={index} title={registre.title} arrow>
+//                     <Chip
+//                         label={registre?.label}
+//                         size="small"
+//                         sx={{
+//                             height: '20px',
+//                             backgroundColor: registre?.backgroundColor,
+//                             color: 'white',
+//                             borderRadius: '4px',
+//                             fontSize: '11px',
+//                             px: '5px',
+//                             '& .MuiChip-label': { padding: 0 },
+//                         }}
+//                     />
+//                 </Tooltip>
+//             ))}
+//         </Box>
+//     );
+// };
 
 // L'Estat Principal i l'Anul·lació
-const EstatPrincipal: React.FC<{ estatEnum: string; nomEstat: string; anulat?: string, sir: boolean, registreEstat: string }> = (props) => {
+const EstatPrincipal: React.FC<{ estatEnum: string; nomEstat: string; anulat?: string, sir: boolean, registreEstat: any }> = (props) => {
 
     const { estatEnum, nomEstat, anulat, sir, registreEstat } = props;
     let configEstat = NOTIFICACIO_ESTAT_ENUM_MAP[estatEnum];
     if (sir && registreEstat) {
-        configEstat.icona = NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP[registreEstat].icona;
+        configEstat.icona = getEnviatSirConfig(registreEstat.label).icona;
     }
-    console.log(sir);
-    console.log(registreEstat);
-    console.log(configEstat.icona);
     return (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {!anulat ? (
                 <>
                     {configEstat && (
-                        <Box
-                            component="span"
-                            sx={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                color: configEstat.color,
-                            }}
-                        >
+                        <Box component="span" sx={{display: 'inline-flex', alignItems: 'center', color: configEstat.color}}>
                             {configEstat.icona}
                         </Box>
                     )}
@@ -251,7 +243,7 @@ const refrescarEstatString = async (event: React.MouseEvent<HTMLDivElement, Mous
 // Dissenyat específicament per la cel·la del Grid de Notificacions
 export const NotificacioEstatGrid: React.FC<NotificacioEstatRenderProps> = (props) => {
 
-    const { estatJson, estatEnum, notificacioId, refreshGrid } = props;
+    const { estatJson, estatEnum, notificacioId, refreshGrid, sir } = props;
     const { refrescarEstat } = useAccionsNotificacio(refreshGrid);
     const { t } = useTranslation();
     let estatObjecte: any = null;
@@ -271,12 +263,11 @@ export const NotificacioEstatGrid: React.FC<NotificacioEstatRenderProps> = (prop
     } catch (error) {
         console.error('La cadena no és un JSON vàlid:', error);
     }
-
     return (
         <Box sx={{width: '100%', display: 'flex', flexDirection: 'row', p: 0.5, alignItems: 'flex-start',}}>
             <Box sx={{ flex: 10, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                {estatObjecte?.sir && <RegistreEstats registreEstat={estatObjecte?.registreEstat} />}
-                <EstatPrincipal estatEnum={estatEnum} nomEstat={estatObjecte?.nomEstat} anulat={estatObjecte?.anulat} sir={estatObjecte?.sir} registreEstat={estatObjecte?.registreEstat}/>
+                {/*{sir && <RegistreEstats registreEstat={estatObjecte?.registreEstat} />}*/}
+                <EstatPrincipal estatEnum={estatEnum} nomEstat={estatObjecte?.nomEstat} anulat={estatObjecte?.anulat} sir={sir} registreEstat={estatObjecte?.registreEstat?.[0]}/>
                 <ErrorsIAvisos
                     eventError={estatObjecte?.eventError}
                     callbackFiReintents={estatObjecte?.callbackFiReintents}
