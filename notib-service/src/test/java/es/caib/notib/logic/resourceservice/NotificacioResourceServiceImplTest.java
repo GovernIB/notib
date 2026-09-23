@@ -259,10 +259,11 @@ class NotificacioResourceServiceImplTest {
 		enviament.setTitularInfo(new PersonaResource());
 		resource.setEnviamentsInfo(List.of(enviament));
 		NotificacioEnviamentResourceEntity saved = new NotificacioEnviamentResourceEntity();
+		saved.setNotificacio(entity);
 		when(enviamentRepo.saveAndFlush(any())).thenReturn(saved);
 		when(personaRepo.save(any())).thenReturn(new PersonaResourceEntity());
 		service.afterCreateSave(entity, resource, Map.of(), false);
-		verify(enviamentRepo).saveAndFlush(any());
+		verify(enviamentRepo, times(2)).saveAndFlush(any());
 	}
 
 	@Test
@@ -277,6 +278,7 @@ class NotificacioResourceServiceImplTest {
 		resource.setEnviamentsInfo(List.of(enviament));
 		NotificacioEnviamentResourceEntity saved = new NotificacioEnviamentResourceEntity();
 		saved.setId(11L);
+		saved.setNotificacio(entity);
 		when(enviamentRepo.saveAndFlush(any())).thenReturn(saved);
 		service.afterCreateSave(entity, resource, answers, false);
 		// Comprovem que s’ha cridat el legacyHelper amb la mateixa entitat
