@@ -677,6 +677,7 @@ const translationCa = {
                     },
                     notifica: {
                         title: 'Notific@',
+                        titleSir: "SIR",
                         datat: 'Datat',
                         certificacio: 'Certificació',
                         noEnviat: 'Aquest enviament encara no ha estat enviat',

@@ -659,6 +659,7 @@ const translationEs = {
                     },
                     notifica: {
                         title: 'Notific@',
+                        titleSir: "SIR",
                         datat: 'Datado',
                         certificacio: 'Certificación',
                         noEnviat: 'Este envío todavía no ha sido enviado',

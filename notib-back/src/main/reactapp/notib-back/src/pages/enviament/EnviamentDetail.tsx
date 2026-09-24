@@ -21,7 +21,6 @@ const EnviamentDetailDialogContent: React.FC<{ id: any }> = (props) => {
     const isRolActualAdministradorLectura = currentRole === ROLE_ADMIN_LECTURA;
     const isVisibleHistoric = currentRole === ROLE_ADMIN || currentRole === ROLE_ADMIN_LECTURA || currentRole === ROLE_ORGAN;
     const isVisibleStateMachine = currentRole === ROLE_ADMIN;
-
     const {isReady: apiIsReady, getOne: apiGetOne, currentFields: apiCurrentFields,} = useResourceApiService('notificacioEnviamentResource');
 
     React.useEffect(() => {
@@ -38,7 +37,7 @@ const EnviamentDetailDialogContent: React.FC<{ id: any }> = (props) => {
         },
         {
             id: 'tabNotifica',
-            label: t('page.enviament.detail.tab.notifica.title'),
+            label: t('page.enviament.detail.tab.notifica.' + (!enviament?.sir ? 'title' : 'titleSir')),
             content: (<EnviamentDetailTabNotifica enviament={enviament} apiCurrentFields={apiCurrentFields} isRolActualAdministradorLectura={isRolActualAdministradorLectura}/>),
         },
         {
