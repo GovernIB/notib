@@ -2,6 +2,7 @@ package es.caib.notib.back.config;
 
 import es.caib.notib.back.base.config.BaseWebSecurityConfig;
 import es.caib.notib.back.base.config.MethodSecurityConfig;
+import es.caib.notib.back.helper.OidcDiscoveryHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.util.HttpRequestUtil;
 import es.caib.notib.logic.intf.model.auth.NotibAuthenticationDetails;
@@ -69,8 +70,12 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 	private ClientRegistrationRepository clientRegistrationRepository;
 
 	// Mateixes variables d'entorn amb les que l'adaptador Keycloak de JBoss es configura al subsystem
-	// "urn:jboss:domain:keycloak:1.1" de standalone.xml (secure-deployment "notib-back.war"): no hi ha
-	// cap manera d'obtenir aquesta informació directament d'aquell adaptador des de codi de l'aplicació.
+	// "urn:jboss:domain:keycloak:1.1" de standalone.xml (secure-deployment "notib-back.war"). Només es
+	// fan servir de fallback al logout (jbossKeycloakLogoutSuccessHandler) quan encara no hi ha
+	// KeycloakSecurityContext: si es desincronitzen d'allò que realment ha emès la sessió (com ja va
+	// passar a Pinbal2 en producció, amb un IdP Soffid darrere l'adaptador), l'"end_session_endpoint"
+	// respon "Session not active" i la sessió SSO no es tanca -veure comentari a
+	// jbossKeycloakLogoutSuccessHandler().
 	@Value("${JBOSS_AUTH_URL:#{null}}")
 	private String jbossAuthUrl;
 	@Value("${JBOSS_AUTH_REALM:#{null}}")
@@ -146,9 +151,9 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 
 		return (request, response, authentication) -> {
 
-			// Cal llegir l'id_token ABANS d'invalidar la sessió (Keycloak >= 18 exigeix "id_token_hint"
-			// per fer el logout sense demanar confirmació a l'usuari), i sobretot NO criar
-			// request.logout(): a l'adaptador Keycloak d'Undertow/WildFly això fa una petició
+			// Cal llegir el KeycloakSecurityContext ABANS d'invalidar la sessió (Keycloak >= 18 exigeix
+			// "id_token_hint" per fer el logout sense demanar confirmació a l'usuari), i sobretot NO
+			// cridar request.logout(): a l'adaptador Keycloak d'Undertow/WildFly això fa una petició
 			// backchannel REAL a Keycloak (amb el refresh_token) que tanca la sessió SSO immediatament,
 			// abans que el redirect explícit de sota hi arribi mai. Com que aquesta petició backchannel
 			// mai interactua amb el navegador, la cookie de sessió SSO de Keycloak (al domini de l'IdP)
@@ -159,7 +164,9 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 			// usuari (la cookie SSO de Keycloak encara és vàlida). La sessió SSO de Keycloak l'ha de
 			// tancar únicament el redirect explícit de sota, executant-se contra una sessió que encara
 			// és viva.
-			var idTokenHint = getKeycloakIdTokenHint(request);
+			var keycloakSecurityContext = getKeycloakSecurityContext(request);
+			var idToken = keycloakSecurityContext != null ? keycloakSecurityContext.getIdToken() : null;
+			var idTokenHint = keycloakSecurityContext != null ? keycloakSecurityContext.getIdTokenString() : null;
 			var session = request.getSession(false);
 			if (session != null) {
 				try {
@@ -168,30 +175,66 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 					// Ja invalidada; res a fer.
 				}
 			}
-			if (jbossAuthUrl == null || jbossAuthRealm == null) {
+
+			// L'"issuer" es llegeix del claim "iss" del mateix id_token (l'emissor real que ha creat la
+			// sessió SSO), NO directament de jbossAuthUrl/jbossAuthRealm (com es feia abans): a Pinbal2
+			// això es va desincronitzar en un entorn real (les propietats apuntaven a un realm diferent
+			// del que l'"iss" del token indicava, per un IdP Soffid darrere l'adaptador). Com que
+			// Keycloak/Soffid indexen la sessió SSO pel realm que la va crear, cridar l'"end_session_endpoint"
+			// d'un realm diferent fa que respongui "Session not active": no tanca la sessió SSO i l'usuari
+			// hi torna a entrar en silenci. Llegint-lo sempre de l'"iss" és impossible que quedi
+			// desincronitzat; jbossAuthUrl/jbossAuthRealm només es fan servir de fallback si encara no hi
+			// ha KeycloakSecurityContext.
+			var issuerUrl = idToken != null && idToken.getIssuer() != null
+					? idToken.getIssuer()
+					: getConfiguredIssuerUrl();
+			if (issuerUrl == null) {
 				response.sendRedirect(request.getContextPath() + "/");
 				return;
 			}
-			var authUrlSensePrefix = jbossAuthUrl.endsWith("/") ? jbossAuthUrl.substring(0, jbossAuthUrl.length() - 1) : jbossAuthUrl;
+
+			// El "client_id" s'obté del claim "azp" del mateix id_token (amb quin client s'ha autenticat
+			// l'usuari), NO de jbossAuthClientId: pel mateix motiu que l'issuer, un client_id que no és
+			// el propietari de la sessió identificada per "id_token_hint" fa que l'"end_session_endpoint"
+			// respongui "Session not active".
+			var clientId = idToken != null ? idToken.getIssuedFor() : jbossAuthClientId;
+
+			// No es pot assumir que l'"end session endpoint" viu sempre a "/protocol/openid-connect/logout":
+			// és el path de Keycloak, però l'IdP real darrere l'adaptador pot ser Soffid (emula el
+			// protocol de login/token, però no necessàriament exposa el logout al mateix path). Es
+			// llegeix del document de descobriment OIDC i només es cau al path de Keycloak com a
+			// fallback si la descoberta no és accessible.
+			var endSessionEndpoint = OidcDiscoveryHelper.getEndSessionEndpoint(issuerUrl);
+			if (endSessionEndpoint == null) {
+				endSessionEndpoint = issuerUrl + "/protocol/openid-connect/logout";
+			}
 			var postLogoutRedirectUri = getBaseUrl(request) + request.getContextPath() + "/";
-			var logoutUrl = new StringBuilder(authUrlSensePrefix).
-					append("/realms/").append(jbossAuthRealm).append("/protocol/openid-connect/logout").
+			var logoutUrl = new StringBuilder(endSessionEndpoint).
 					append("?post_logout_redirect_uri=").append(URLEncoder.encode(postLogoutRedirectUri, StandardCharsets.UTF_8));
 			if (idTokenHint != null) {
 				logoutUrl.append("&id_token_hint=").append(URLEncoder.encode(idTokenHint, StandardCharsets.UTF_8));
 			}
-			if (jbossAuthClientId != null) {
-				logoutUrl.append("&client_id=").append(URLEncoder.encode(jbossAuthClientId, StandardCharsets.UTF_8));
+			if (clientId != null) {
+				logoutUrl.append("&client_id=").append(URLEncoder.encode(clientId, StandardCharsets.UTF_8));
 			}
 			response.sendRedirect(logoutUrl.toString());
 		};
 	}
 
-	private static String getKeycloakIdTokenHint(HttpServletRequest request) {
+	private String getConfiguredIssuerUrl() {
+
+		if (jbossAuthUrl == null || jbossAuthRealm == null) {
+			return null;
+		}
+		var authUrlSensePrefix = jbossAuthUrl.endsWith("/") ? jbossAuthUrl.substring(0, jbossAuthUrl.length() - 1) : jbossAuthUrl;
+		return authUrlSensePrefix + "/realms/" + jbossAuthRealm;
+	}
+
+	private static KeycloakSecurityContext getKeycloakSecurityContext(HttpServletRequest request) {
 
 		var keycloakSecurityContext = request.getAttribute(KeycloakSecurityContext.class.getName());
 		return keycloakSecurityContext instanceof KeycloakSecurityContext
-				? ((KeycloakSecurityContext) keycloakSecurityContext).getIdTokenString()
+				? (KeycloakSecurityContext) keycloakSecurityContext
 				: null;
 	}
 
@@ -261,6 +304,9 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 			@Override
 			public PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails buildDetails(HttpServletRequest context) {
 				Collection<String> j2eeUserRoles = getUserRoles(context);
+				if (!j2eeUserRoles.contains("tothom")) {
+					j2eeUserRoles.add("tothom");
+				}
 				logger.debug("Roles from ServletRequest for " + context.getUserPrincipal().getName() + ": " + j2eeUserRoles);
 				PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails result;
 				if (context.getUserPrincipal() instanceof KeycloakPrincipal) {
