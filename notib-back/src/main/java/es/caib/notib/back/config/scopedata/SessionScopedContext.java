@@ -7,6 +7,7 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tika.utils.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 
@@ -90,7 +91,7 @@ public class SessionScopedContext {
 
 
     public String getIdiomaUsuari() {
-        return this.usuariActual != null ? this.usuariActual.getIdioma() : "ca";
+        return this.usuariActual != null && !StringUtils.isBlank(usuariActual.getIdioma()) ? this.usuariActual.getIdioma() : "ca";
     }
     public String getEntitatActualCodi() {
         return this.entitatActual != null ? this.entitatActual.getCodi() : null;

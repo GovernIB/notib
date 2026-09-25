@@ -11,7 +11,7 @@ import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.util.CaseInsensitiveEnumEditor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tomcat.util.codec.binary.Base64;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomBooleanEditor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -40,7 +40,7 @@ public class ConsultaApiRestV2Controller extends BaseController {
 
 	private static final String PATH = "/api/consulta/v2";
 
-	
+
 	@GetMapping(value="/comunicacions/{dniTitular}", produces = "application/json")
 	@ResponseBody
 	public RespostaConsultaV2 comunicacionsByTitular(
@@ -52,7 +52,7 @@ public class ConsultaApiRestV2Controller extends BaseController {
 			@RequestParam (value = "lang", required = false) Idioma lang,
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
-		
+
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular)
@@ -70,7 +70,7 @@ public class ConsultaApiRestV2Controller extends BaseController {
 		logoutSession(request, response);
 		return r;
 	}
-	
+
 	@GetMapping(value="/notificacions/{dniTitular}", produces = "application/json")
 	@ResponseBody
 	public RespostaConsultaV2 notificacionsByTitular(

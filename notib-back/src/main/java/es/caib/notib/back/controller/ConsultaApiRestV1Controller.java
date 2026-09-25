@@ -8,7 +8,7 @@ import es.caib.notib.logic.intf.rest.consulta.Resposta;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.codec.binary.Base64;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -44,7 +44,7 @@ public class ConsultaApiRestV1Controller extends  BaseController {
 			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataFinal,
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
-		
+
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.COMUNICACIO).estatFinal(null)
@@ -54,7 +54,7 @@ public class ConsultaApiRestV1Controller extends  BaseController {
 		return r;
 
 	}
-	
+
 	@GetMapping(value="/notificacions/{dniTitular}", produces = "application/json")
 	@ResponseBody
 	public Resposta notificacionsByTitular(

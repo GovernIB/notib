@@ -5,9 +5,12 @@ import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.PermisosHelper;
+import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
+import es.caib.notib.logic.intf.model.OrganGestorResource;
 import es.caib.notib.logic.intf.model.UsuariResource;
 import es.caib.notib.logic.intf.model.auth.NotibAuthenticationDetails;
 import es.caib.notib.logic.intf.resourceservice.UsuariResourceService;
+import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
 import es.caib.notib.persist.resourceentity.UsuariResourceEntity;
 import es.caib.notib.persist.resourcerepository.UsuariResourceRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -80,6 +84,23 @@ public class UsuariResourceServiceImpl
 		String currentSpringFilter,
 		String[] namedQueries) {
 		return "id:'" + authenticationHelper.getCurrentUserName() + "'";
+	}
+
+	@Override
+	protected void beforeCreateEntity(UsuariResourceEntity entity, UsuariResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+		beforeCreateUpdate(entity, resource);
+	}
+
+	@Override
+	protected void beforeUpdateEntity(UsuariResourceEntity entity, UsuariResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+		beforeCreateUpdate(entity, resource);
+	}
+
+	private void beforeCreateUpdate(UsuariResourceEntity entity, UsuariResource resource) {
+
+		if (resource.getIdioma() == null && entity.getIdioma() == null) {
+			entity.setIdioma(Idioma.CA);
+		}
 	}
 
 	private UsuariResource getUsuariResourceFromAuth() {

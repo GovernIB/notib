@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * Declaració dels mètodes per a la gestió dels paràmetres de configuració de l'aplicació.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface ConfigService {
@@ -56,7 +56,7 @@ public interface ConfigService {
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	void actualitzarPropietatsJBossBdd();
 
-	@PreAuthorize("hasRole('NOT_SUPER')")
+//	@PreAuthorize("hasRole('NOT_SUPER')")
 	String getPropertyValue(String key);
 
 	@PreAuthorize("hasRole('NOT_SUPER')")

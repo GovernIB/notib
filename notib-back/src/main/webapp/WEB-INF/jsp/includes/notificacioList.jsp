@@ -1089,12 +1089,12 @@
                 </script>
             </th>
         </c:if>
-        <th data-col-name="permisProcessar" data-visible="false">
-        <th data-col-name="documentId" data-visible="false" style="visibility: hidden">
+        <th data-col-name="permisProcessar" data-visible="false"></th>
+        <th data-col-name="documentId" data-visible="false" style="visibility: hidden"></th>
             <%--        <th data-col-name="enviamentId" data-visible="false" style="visibility: hidden">--%>
-        <th data-col-name="envCerData" data-visible="false" style="visibility: hidden">
-        <th data-col-name="plazoAmpliable" data-visible="false">
-        <th data-col-name="anulable" data-visible="false">
+        <th data-col-name="envCerData" data-visible="false" style="visibility: hidden"></th>
+        <th data-col-name="plazoAmpliable" data-visible="false"></th>
+        <th data-col-name="anulable" data-visible="false"></th>
         <th data-col-name="id" data-orderable="false" data-disable-events="true" data-template="#cellAccionsTemplate" width="60px" style="z-index:99999;">
             <script id="cellAccionsTemplate" type="text/x-jsrender">
                 <div class="dropdown">

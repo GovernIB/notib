@@ -6,6 +6,7 @@ package es.caib.notib.logic.service;
 import com.codahale.metrics.json.MetricsModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
+import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.NumElementsPaginaDefecte;
 import es.caib.notib.logic.cacheable.CacheBridge;
 import es.caib.notib.logic.cacheable.PermisosCacheable;
@@ -142,7 +143,9 @@ public class AplicacioServiceImpl implements AplicacioService {
 				procedimentsCacheable.clearAuthenticationProcedimentsCaches(auth);
 				return;
 			}
-
+			if (usuari.getIdioma() == null) {
+				usuari.setIdioma(Idioma.CA.name());
+			}
 			NotibLogger.getInstance().info("[AplicacioService] Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")", log, LoggingTipus.USUARIS);
 			var dadesUsuari = cacheBridge.findUsuariAmbCodi(auth.getName());
 			if (dadesUsuari.getNomSencer() != null) {

@@ -192,7 +192,7 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
         // i per tant si s'han d'actualitzar les entitats disponibles i l'entitat actual
         var entitatsToBeUpdated = hasToBeUpdated(entitatService.getLastPermisosModificatsInstant(), sessionScopedContext.getInstantEntitatsCarregades());
         // Si encara no s'han obtingut les entitats accessibles en aquesta sessió, o s'han d'actualitzar, obtenim les entitats accessibles
-        if (sessionScopedContext.getEntitatsAccessibles() == null || entitatsToBeUpdated) {
+        if (sessionScopedContext.getEntitatsAccessibles() == null || sessionScopedContext.getEntitatsAccessibles().isEmpty() || entitatsToBeUpdated) {
             sessionScopedContext.setEntitatsAccessibles(getEntitatsAccessibles());
         }
         // Si encara no s'ha obtingut l'entitat actual en aquesta sessió, o s'han d'actualitzar les entitats, obtenim l'entitat actual
