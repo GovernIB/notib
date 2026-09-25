@@ -140,7 +140,16 @@ public class DatatablesHelper {
 							propietatNom = propietatNom.substring(0, propietatNom.indexOf("."));
 						}
 						valor = getPropietatValor(registre, propietatNom, descriptors);
-						mapRegistre.put(propietatNom, valor);
+						// Per a les columnes "utilitàries" sense propietat real (selecció, arrossegament,
+						// accions, expandir fila) el JS envia "<null>" com a "data" i getPropietatValor
+						// retorna null. Com que l'aplicació serialitza les respostes amb
+						// spring.jackson.default-property-inclusion=non_null, un valor null s'elimina de tot
+						// el mapa JSON -la clau "<null>" no arriba mai al navegador- i DataTables.net avisa
+						// "Requested unknown parameter '<null>'" perquè no la troba a l'objecte de la fila.
+						// Guardant "" en lloc de null per a aquesta columna concreta la clau es manté a la
+						// resposta sense canviar el contingut visible de la cel·la (es renderitza a part,
+						// via drawCallback/render, no a partir d'aquest valor).
+						mapRegistre.put(propietatNom, "<null>".equals(propietatNom) ? "" : valor);
 						dadesRegistre[i] = valor;
 					} catch (Exception ex) {
 						dadesRegistre[i] = "(!)";
