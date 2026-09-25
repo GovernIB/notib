@@ -267,12 +267,14 @@ export const NotificacioEstatGrid: React.FC<NotificacioEstatRenderProps> = (prop
         <Box sx={{width: '100%', display: 'flex', flexDirection: 'row', p: 0.5, alignItems: 'flex-start',}}>
             <Box sx={{ flex: 10, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                 {/*{sir && <RegistreEstats registreEstat={estatObjecte?.registreEstat} />}*/}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <EstatPrincipal estatEnum={estatEnum} nomEstat={estatObjecte?.nomEstat} anulat={estatObjecte?.anulat} sir={sir} registreEstat={estatObjecte?.registreEstat?.[0]}/>
                 <ErrorsIAvisos
                     eventError={estatObjecte?.eventError}
                     callbackFiReintents={estatObjecte?.callbackFiReintents}
                     notificacioMovilError={estatObjecte?.notificacioMovilError}
                 />
+                </Box>
                 <DataIHistoric dataEstat={estatObjecte?.dataEstat} notificaEstats={estatObjecte?.notificaEstats}
                 />
             </Box>
