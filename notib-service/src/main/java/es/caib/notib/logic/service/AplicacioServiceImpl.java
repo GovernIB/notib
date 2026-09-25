@@ -144,7 +144,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 				return;
 			}
 			if (usuari.getIdioma() == null) {
-				usuari.setIdioma(Idioma.CA.name());
+				usuari.setIdioma(Idioma.CA.name().toLowerCase());
 			}
 			NotibLogger.getInstance().info("[AplicacioService] Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")", log, LoggingTipus.USUARIS);
 			var dadesUsuari = cacheBridge.findUsuariAmbCodi(auth.getName());
