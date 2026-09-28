@@ -549,7 +549,7 @@
 					return;
 				}
 				$("#saveForm").attr("disabled", true);
-				let entregaPostal = viewModel.ambEntregaCIE && $('[id*="].entregaPostal.activa"]').toArray().some(x => {console.log(x); return x.checked});
+				let entregaPostal = viewModel.ambEntregaCIE && $('[id*="].entregaPostal.activa"]').toArray().some(x => return x.checked);
 				let procId = document.getElementById("procedimentId").value;
 				let organCodi = document.getElementById("organGestor").value;
 				$.ajax({
@@ -598,25 +598,25 @@
 			});
 		}
 
-		//Consulta al arxiu de los identificadores CSV o Uuid 
-		//para comprobar si existe el documento y sus metadatos	
+		//Consulta al arxiu de los identificadores CSV o Uuid
+		//para comprobar si existe el documento y sus metadatos
 		$(".docArxiu").focusout(function() {
-			
+
 			if (!consultarFocusout)
 				return;
-			
+
 			let inputElement = $(this);
 			let inputElementValue = $(this).val().trim();
 			let indexId = $(this).attr("id").split("[")[1].substring(0,1);
 
 			resetWarningIErrorsDocArxiu(indexId);
-			
+
 			let esCsv = $(this).attr("id").toLowerCase().includes("csv");
-			
+
 			if (inputElementValue == '' || inputElementValue == null) {
 				return;
 			}
-			
+
 			if (!esCsv) { //Uuid validació
 				var uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 				if (!inputElementValue.match(uuidPattern)){
@@ -682,7 +682,7 @@
 				}
 				});
 		});
-		
+
 		$("#saveForm").click(function(event) {
 
 			event.stopImmediatePropagation();
@@ -750,7 +750,7 @@
 				$("#form").submit();
 			}
 		});
-		
+
 		$(".docArxiu").on('change', function() {
 			consultarFocusout = true;
 			let indexId = $(this).attr("id").split("[")[1].substring(0,1);
@@ -769,7 +769,7 @@
 			} else {
 				isWindowReload[id] = false;
 			}
-	
+
 			activarCampsMetadades(id);
 			if ($(this).val() == 'CSV') {
 				$('#input-origen-csv_' + id).removeClass('hidden');
@@ -1664,7 +1664,7 @@
 			</div>
 <%-- 			<form:hidden path="procedimentId" value="${procediment.id}" /> --%>
 			<form:hidden path="emisorDir3Codi" id="emisorDir3Codi" value="${entitat.dir3Codi}" />
-			
+
 			<!-- CONCEPTE -->
 			<div class="row">
 				<div class="col-md-12">
@@ -1672,25 +1672,25 @@
 								   inputMaxLength="${concepteSize}" inputMinLength="3"/>
 				</div>
 			</div>
-			
+
 			<!-- DESCRIPCIÓ -->
 			<div class="row">
 				<div class="col-md-12">
 					<not:inputTextarea name="descripcio" textKey="notificacio.form.camp.descripcio" labelSize="2" inputMaxLength="${descripcioSize}"/>
 				</div>
 			</div>
-			
+
 			<!-- ORGAN -->
 			<div class="row">
 				<div class="col-md-12">
-					<not:inputSelect 
-						name="organGestor" 
+					<not:inputSelect
+						name="organGestor"
 						textKey="notificacio.form.camp.organEmisor"
-						required="true" 
-						optionItems="${organsGestors}" 
-						optionValueAttribute="codi" 
+						required="true"
+						optionItems="${organsGestors}"
+						optionValueAttribute="codi"
 						optionTextAttribute="valor"
-						labelSize="2" 
+						labelSize="2"
 						emptyOption="true"
 						optionMinimumResultsForSearch="2"
 						emptyOptionTextKey="notificacio.form.camp.organ.emisor.select"/>
@@ -1715,11 +1715,11 @@
 			<!-- PROCEDIMENT -->
 			<div id="procedimentRow" class="row">
 				<div class="col-md-12">
-					<not:inputSelect 
-						name="procedimentId" 
-						textKey="notificacio.form.camp.procediment" 
+					<not:inputSelect
+						name="procedimentId"
+						textKey="notificacio.form.camp.procediment"
 						required="${enviamentTipus == 'NOTIFICACIO'}"
-						optionItems="${procediments}" 
+						optionItems="${procediments}"
 						optionValueAttribute="id"
 						optionTextAttribute="valor"
 						labelSize="2"
@@ -1745,7 +1745,7 @@
 							emptyOptionTextKey="notificacio.form.camp.servei.select"/>
 				</div>
 			</div>
-			
+
 			<!-- GRUP -->
 			<div id="grups" class="row <c:if test='${empty grups}'>hidden</c:if>">
 				<div class="col-md-12">
@@ -1818,7 +1818,7 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<!-- ENVIAMENT -->
 		<div class="container-fluid">
 			<div class="title">
@@ -1838,7 +1838,7 @@
 							</div>
 							<cdiv>
 							<input type="hidden" name="enviaments[${j}].id" value="${enviament.id}"/>
-						
+
 							<!-- TIPUS DE SERVEI -->
 							<c:if test="${enviamentTipus != 'SIR'}">
 							<div class="col-md-6">
@@ -1857,7 +1857,7 @@
 								</div>
 							</div>
 							</c:if>
-							
+
 							<!-- TITULAR -->
 							<div class="titular">
 								<div class="col-md-12 title-envios">
@@ -1867,7 +1867,7 @@
 									<hr/>
 								</div>
 <%-- 								<input class="col-md-6 rowId hidden" type="input" id="rowId" value="${j}"/> --%>
-								
+
 								<div class="personaForm">
 									<div class='rowId'><input class='hidden' value="${j}"/></div>
 									<div style="clear: both">
@@ -1894,7 +1894,7 @@
 										<div class="col-md-6 nif">
 											<not:inputText name="enviaments[${j}].titular.nif" generalClass="titularNif" textKey="notificacio.form.camp.titular.nif"/>
 										</div>
-										
+
 										<!-- NOM / RAÓ SOCIAL -->
 										<div class="col-md-6 rao nomInput">
 											<not:inputText name="enviaments[${j}].titular.nomInput" textKey="notificacio.form.camp.titular.nom.sol" required="true" inputMaxLength="${nomSize}" showsize="true"/>
@@ -1906,35 +1906,35 @@
 										<div class="col-md-6 llinatge1">
 											<not:inputText name="enviaments[${j}].titular.llinatge1" textKey="notificacio.form.camp.titular.llinatge1" required="true" inputMaxLength="${llinatge1Size}" showsize="true"/>
 										</div>
-										
+
 										<!-- SEGON LLINATGE -->
 										<div class="col-md-6 llinatge2">
 											<not:inputText name="enviaments[${j}].titular.llinatge2" textKey="notificacio.form.camp.titular.llinatge2" inputMaxLength="${llinatge2Size}" showsize="true"/>
 										</div>
-										
+
 										<!-- EMAIL -->
 										<c:if test="${enviamentTipus != 'SIR'}">
 										<div class="col-md-6 email">
 											<not:inputText name="enviaments[${j}].titular.email" textKey="notificacio.form.camp.titular.email" inputMaxLength="${emailSize}" showsize="true"/>
 										</div>
 										</c:if>
-										
+
 										<!-- TELÈFON -->
 <%--										<div class="col-md-6">--%>
 <%--											<not:inputText name="enviaments[${j}].titular.telefon" textKey="notificacio.form.camp.titular.telefon" inputMaxLength="${telefonSize}" showsize="true"/>--%>
 <%--										</div>--%>
-										
+
 										<!-- CODI DIR3 -->
 										<div class="col-md-6 dir3Codi hidden">
 											<not:inputTextSearch  name="enviaments[${j}].titular.dir3CodiInput" funcio="obrirModalOrganismes('Tit-${j}', '${urlOrganigrama}', '${urlComunitatsAutonomes}','${urlNivellAdministracions}', '${urlCercaUnitats}')" searchButton="searchOrganTit${j}" textKey="notificacio.form.camp.titular.dir3codi" required="true" readonly="true" value=""/>
 <%-- 											value="${fn:join(enviaments[j].titular.dir3Codi, enviaments[j].titular.nom)} "/> --%>
 										</div>
-										
+
 										<div class="col-md-6 codiDir3 hidden">
 <%-- 											<not:inputTextSearch  funcio="obrirModalOrganismes(${j}, '${urlOrganigrama}', '${urlComunitatsAutonomes}','${urlNivellAdministracions}','${urlCercaUnitats}')" name="enviaments[${j}].titular.dir3Codi" searchButton="searchOrgan" textKey="notificacio.form.camp.titular.dir3codi" required="true"/> --%>
 											<not:inputText name="enviaments[${j}].titular.dir3Codi" textKey="notificacio.form.camp.titular.dir3codi" required="true"/>
 										</div>
-										
+
 										<!-- INCAPACITAT -->
 										<c:if test="${isTitularAmbIncapacitat}">
 											<div class="col-md-12 incapacitat">
@@ -1944,7 +1944,7 @@
 									</div>
 								</div>
 							</div>
-							
+
 							<!-- DESTINATARIS -->
 							<c:if test="${enviamentTipus != 'SIR'}">
 								<c:set var="enviament" value="${enviament}" scope="request" />
@@ -2085,7 +2085,7 @@
 <%--												</c:otherwise>--%>
 <%--											</c:choose>	--%>
 <%--											</div>--%>
-										</div>	
+										</div>
 										<div class="senseNormalitzar" style="display:none">
 											<div class="col-md-6">
 												<not:inputTextarea name="enviaments[${j}].entregaPostal.linea1" textKey="notificacio.form.camp.entregapostal.linea1" required="true"/>
@@ -2558,13 +2558,13 @@
 					<h4 class="modal-title"><spring:message code="notificacio.form.dir3.cercar.organismes"/></h4>
 				</div>
 				<div class="modal-body body" style="padding-top: 0px;">
-					
+
 				<div id='dialeg_organs' style='padding: 0px;'>
 					<input type="hidden" id="titular" value="">
 					<input type="hidden" id="organigrama" value="">
-					 
 
-					 
+
+
 					<div class="row margebaix" style="margin-top:20px;">
 						<div class="col-sm-6">
 							<div class="form-group">
@@ -2582,7 +2582,7 @@
 								</div>
 							</div>
 						</div>
-					
+
 					</div>
 					<div class="row margebaix">
 						<div class="col-sm-6">
@@ -2605,7 +2605,7 @@
 									<select id="o_comunitat" type="search" onchange="comunitatAutonomaChange(this.value, '${urlProvincies}')" class="form-control">
 										<option value=""></option>
 				    				</select>
-				    				
+
 								</div>
 							</div>
 						</div>
@@ -2641,7 +2641,7 @@
 <!-- 							<span onclick="limpiarLocalitat(false)" class="fa fa-trash"></span> -->
 <!-- 						</div> -->
 					</div>
-				
+
 					<div id="results" class="row" style="background-color: white; height: 240px; border: 1px solid #CCC; margin: 0px; overflow-y: scroll" >
 						<div class="loading-screen" style="text-align: center; width:100%; height: 0%;;">
 								<div class="processing-icon" style="position: relative; top: 40px; text-align: center;">
@@ -2658,16 +2658,16 @@
 							</thead>
 							<tbody id="rOrgans">
 							</tbody>
-						
+
 						</table>
 					</div>
 					<div id="resultatsTotal"  class="hidden subtitle">
 						<label><spring:message code="comu.resultats" /></label><label id="total"></label>
-						
+
 					</div>
 				</div>
 			</div>
-				
+
 				<div class="modal-footer">
 					<button id="btnNetejar" onclick="netejar(true, '${urlCercaUnitats}')" type="submit" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
 					<button id="cerrarModal" type="button" class="btn btn-default" data-dismiss="modal"><spring:message code="comu.boto.cancelar" /></button>
@@ -2676,4 +2676,4 @@
 			</div>
 		</div>
 	</div>
-</body> 
+</body>

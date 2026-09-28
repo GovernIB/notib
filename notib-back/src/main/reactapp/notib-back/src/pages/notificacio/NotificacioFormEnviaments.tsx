@@ -161,8 +161,16 @@ const NotificacioFormEnviamentEntregaPostal: React.FC<NotificacioFormProps> = ({
 const EntregaPostalFields: React.FC = () => {
 
     const { data } = useFormContext();
-    if (data && !data?.domiciliConcretTipus) {
-        data.domiciliConcretTipus = 'NACIONAL';
+    if (data) {
+        if (!data?.domiciliConcretTipus) {
+            data.domiciliConcretTipus = 'NACIONAL';
+        }
+        if (!data?.domiciliPaisCodiIso) {
+            data.domiciliPaisCodiIso = 'ES';
+        }
+        if (!data?.domiciliProvinciaCodi) {
+            data.domiciliProvinciaCodi = '07';
+        }
     }
     const nacional = data?.domiciliConcretTipus === 'NACIONAL';
     const estranger = data?.domiciliConcretTipus === 'ESTRANGER';
@@ -194,7 +202,7 @@ const EntregaPostalFields: React.FC = () => {
                     <GridFormField size={4} name="domiciliPorta" />
                     <GridFormField size={4} name="domiciliBloc" />
                     <GridFormField size={4} name="domiciliCodiPostal" required />
-                    <GridFormField size={6} name="domiciliPaisCodiIso" autocomplete required />
+                    <GridFormField size={6} name="domiciliPaisCodiIso" autocomplete required  />
                     <GridFormField size={6} name="domiciliProvinciaCodi" autocomplete required={nacional || apCorreus} />
                     <GridFormField size={6} name="domiciliMunicipiCodiIne" required={nacional || apCorreus} />
                     <GridFormField size={6} name="domiciliPoblacio" required />
