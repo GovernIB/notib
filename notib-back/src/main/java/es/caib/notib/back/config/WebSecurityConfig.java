@@ -69,19 +69,10 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 	@Autowired(required = false)
 	private ClientRegistrationRepository clientRegistrationRepository;
 
-	// Mateixes variables d'entorn amb les que l'adaptador Keycloak de JBoss es configura al subsystem
-	// "urn:jboss:domain:keycloak:1.1" de standalone.xml (secure-deployment "notib-back.war"). Només es
-	// fan servir de fallback al logout (jbossKeycloakLogoutSuccessHandler) quan encara no hi ha
-	// KeycloakSecurityContext: si es desincronitzen d'allò que realment ha emès la sessió (com ja va
-	// passar a Pinbal2 en producció, amb un IdP Soffid darrere l'adaptador), l'"end_session_endpoint"
-	// respon "Session not active" i la sessió SSO no es tanca -veure comentari a
-	// jbossKeycloakLogoutSuccessHandler().
-	@Value("${JBOSS_AUTH_URL:#{null}}")
-	private String jbossAuthUrl;
-	@Value("${JBOSS_AUTH_REALM:#{null}}")
-	private String jbossAuthRealm;
-	@Value("${JBOSS_AUTH_CLIENTID:#{null}}")
-	private String jbossAuthClientId;
+	@Value("${es.caib.notib.auth.url:#{null}}")
+	private String authUrl;
+	@Value("${es.caib.notib.auth.realm:#{null}}")
+	private String authRealm;
 
 	@Override
 	protected void customHttpSecurityConfiguration(HttpSecurity http) throws Exception {
@@ -177,14 +168,14 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 			}
 
 			// L'"issuer" es llegeix del claim "iss" del mateix id_token (l'emissor real que ha creat la
-			// sessió SSO), NO directament de jbossAuthUrl/jbossAuthRealm (com es feia abans): a Pinbal2
+			// sessió SSO), NO directament de les propietats de configuració: a Pinbal2
 			// això es va desincronitzar en un entorn real (les propietats apuntaven a un realm diferent
 			// del que l'"iss" del token indicava, per un IdP Soffid darrere l'adaptador). Com que
 			// Keycloak/Soffid indexen la sessió SSO pel realm que la va crear, cridar l'"end_session_endpoint"
 			// d'un realm diferent fa que respongui "Session not active": no tanca la sessió SSO i l'usuari
 			// hi torna a entrar en silenci. Llegint-lo sempre de l'"iss" és impossible que quedi
-			// desincronitzat; jbossAuthUrl/jbossAuthRealm només es fan servir de fallback si encara no hi
-			// ha KeycloakSecurityContext.
+			// desincronitzat; es.caib.notib.auth.url/es.caib.notib.auth.realm només es fan servir de
+			// fallback si encara no hi ha KeycloakSecurityContext.
 			var issuerUrl = idToken != null && idToken.getIssuer() != null
 					? idToken.getIssuer()
 					: getConfiguredIssuerUrl();
@@ -194,10 +185,10 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 			}
 
 			// El "client_id" s'obté del claim "azp" del mateix id_token (amb quin client s'ha autenticat
-			// l'usuari), NO de jbossAuthClientId: pel mateix motiu que l'issuer, un client_id que no és
+			// l'usuari), NO d'una propietat de configuració: pel mateix motiu que l'issuer, un client_id que no és
 			// el propietari de la sessió identificada per "id_token_hint" fa que l'"end_session_endpoint"
 			// respongui "Session not active".
-			var clientId = idToken != null ? idToken.getIssuedFor() : jbossAuthClientId;
+			var clientId = idToken != null ? idToken.getIssuedFor() : null;
 
 			// No es pot assumir que l'"end session endpoint" viu sempre a "/protocol/openid-connect/logout":
 			// és el path de Keycloak, però l'IdP real darrere l'adaptador pot ser Soffid (emula el
@@ -223,11 +214,11 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 
 	private String getConfiguredIssuerUrl() {
 
-		if (jbossAuthUrl == null || jbossAuthRealm == null) {
+		if (authUrl == null || authRealm == null) {
 			return null;
 		}
-		var authUrlSensePrefix = jbossAuthUrl.endsWith("/") ? jbossAuthUrl.substring(0, jbossAuthUrl.length() - 1) : jbossAuthUrl;
-		return authUrlSensePrefix + "/realms/" + jbossAuthRealm;
+		var authUrlSensePrefix = authUrl.endsWith("/") ? authUrl.substring(0, authUrl.length() - 1) : authUrl;
+		return authUrlSensePrefix + "/realms/" + authRealm;
 	}
 
 	private static KeycloakSecurityContext getKeycloakSecurityContext(HttpServletRequest request) {
