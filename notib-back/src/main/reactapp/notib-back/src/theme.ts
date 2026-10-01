@@ -37,9 +37,9 @@ const sharedComponents = {
 export const lightTheme = createTheme({
     palette: {
         mode: 'light',
-        primary: { main: '#497e3a' },
+        primary: { main: '#4697e7' },
         customBackground: '#f5f5f5',
-        greyBackground: '#f5f5f5',
+        greyBackground: '#4697e7',
     },
     components: sharedComponents,
 });
@@ -47,9 +47,9 @@ export const lightTheme = createTheme({
 export const darkTheme = createTheme({
     palette: {
         mode: 'dark',
-        primary: { main: '#86e56c' },
+        primary: { main: '#4697e7' },
         customBackground: '#121212',
-        greyBackground: '#222222',
+        greyBackground: '#4697e7',
     },
     components: sharedComponents,
 });

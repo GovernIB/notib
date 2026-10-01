@@ -12,7 +12,7 @@ import AccionsMassives, {MenuOption, MenuOptionDivider, useAccionsMassives} from
 import ButtonDetailExpandColapse from '../../components/ButtonDetailExpandColapse';
 import {DataCommonAdditionalAction} from '../../../lib/components/mui/datacommon/MuiDataCommon';
 import {NotificacioEstatGrid} from './NotificacioEstatRender';
-import {useAccionsNotificacio} from '../accions/AccionsNotificacio';
+import {useAccionsNotificacio, useRefrescarEstat} from '../accions/AccionsNotificacio';
 import {generateGridRowStylesFromMap, getGridRowColorClass, NOTIFICACIO_ESTAT_ENUM_MAP,} from '../../utils/estatConfig';
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import CustomDetailPanelToggle from "../../utils/CustomDetailPanelToggle.tsx";
@@ -23,7 +23,7 @@ const useDataGridColumns = (datagridApiRef: any,
                                                             notificacionsEsborrades: boolean,
                                                             notificacioErrorRegistre: boolean,
                                                             notificacioCallbackError: boolean,
-                                                            refreshGrid: unknown) => {
+                                                            refrescarEstat: (id: number) => void) => {
 
     const noEsTaulaRemeses = notificacionsEsborrades || notificacioErrorRegistre || notificacioCallbackError;
     const { t } = useTranslation();
@@ -87,8 +87,9 @@ const useDataGridColumns = (datagridApiRef: any,
                 width: 225,
                 renderCell: (params: any) => {
                     const estatJson = params?.formattedValue;
-                    return (<NotificacioEstatGrid estatJson={estatJson} estatEnum={params?.row?.estat} notificacioId={params?.row?.id} refreshGrid={refreshGrid} sir={params?.row.enviamentTipus === 'SIR'}/>);
-                },
+                    return (<NotificacioEstatGrid estatJson={estatJson} estatEnum={params?.row?.estat}
+                                                  notificacioId={params?.row?.id} refrescarEstat={refrescarEstat}
+                                                  sir={params?.row.enviamentTipus === 'SIR'} />);                },
             }]),
             ...(noEsTaulaRemeses ? [] : [{
                 ...GRID_DETAIL_PANEL_TOGGLE_COL_DEF,
@@ -106,7 +107,7 @@ const useDataGridColumns = (datagridApiRef: any,
                 ),
             }]),
         ] as MuiDataGridColDef[],
-        [datagridApiRef, notificacionsEsborrades, notificacioErrorRegistre, notificacioCallbackError, t]
+        [datagridApiRef, notificacionsEsborrades, notificacioErrorRegistre, notificacioCallbackError, t, refrescarEstat]
     );
     return columns;
 };
@@ -308,13 +309,14 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
     const { dialogComponent, onDetailClick } = useNotificacioDetailDialog(notificacionsEsborrades);
     const { dialogComponentErrorRegistre, onDetailClickErrorRegistre } = useRemesesErrorRegistreDetailDialog();
     const { dialogComponentErrorCallback, onDetailClickErrorCallback } = useRemesesErrorCallbackDetailDialog();
-    const { currentActions: apiCurrentActions } = useResourceApiService('notificacioResource');
+    const { currentActions: apiCurrentActions, artifactAction } = useResourceApiService('notificacioResource');
     const isCreateLinkPresent = !isRoleAdminLectura && apiCurrentActions?.['create'] != null;
     const datagridApiRef = useGridApiRef();
     const apiRef = useMuiDataGridApiRef();
     const [reloadKey, setReloadKey] = React.useState(0);
     const refreshGrid = React.useCallback(() => setReloadKey(k => k + 1), []);
-    const columns = useDataGridColumns(datagridApiRef, notificacionsEsborrades, notificacionsErrorRegistre, notificacionsCallbackError, refreshGrid);
+    const refrescarEstat = useRefrescarEstat(refreshGrid, artifactAction);
+    const columns = useDataGridColumns(datagridApiRef, notificacionsEsborrades, notificacionsErrorRegistre, notificacionsCallbackError, refrescarEstat);
     // Actualitza automàticament, via SSE, les files de remeses visibles quan el seu estat canvia
     // al servidor (p.ex. per una resposta de Notifica, un event de registre, un callback...), sense
     // necessitat que l'usuari refresqui el llistat manualment.

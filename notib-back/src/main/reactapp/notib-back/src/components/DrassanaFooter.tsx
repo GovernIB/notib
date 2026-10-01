@@ -4,6 +4,8 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { toolbarBackgroundStyle } from 'reactlib';
 import drassanaLogo from '../assets/drassana.png';
+import {Link} from "react-router-dom";
+import {useTranslation} from "react-i18next";
 
 type DrassanaFooterProps = {
     title: string;
@@ -12,11 +14,14 @@ type DrassanaFooterProps = {
 };
 
 export const DrassanaFooter: React.FC<DrassanaFooterProps> = (props) => {
+
     const { title, backgroundColor, style } = props;
     const toolbarRef = React.useRef<HTMLDivElement | null>(null);
     const [buildTimestamp, setBuildTimestamp] = React.useState<string | null>(null);
     const [scmRevision, setScmRevision] = React.useState<string | null>(null);
     const [comandaVersion, setComandaVersion] = React.useState<string | null>(null);
+    const { t } = useTranslation();
+
     React.useEffect(() => {
         // Comprova si window.__MANIFEST__ ja està disponible
         if (window.__MANIFEST__) {
@@ -59,6 +64,7 @@ export const DrassanaFooter: React.FC<DrassanaFooterProps> = (props) => {
                 ...backgroundStyle,
             }}
             sx={{
+                color: '#F6F6F6',
                 minHeight: '36px !important',
                 lineHeight: '0.5em',
                 zIndex: (theme) => theme.zIndex.drawer + 100,
@@ -80,6 +86,7 @@ export const DrassanaFooter: React.FC<DrassanaFooterProps> = (props) => {
                     ({buildTimestamp} | Revisió: {scmRevision})
                 </span>
             </Typography>
+            <Link color={'#F6F6F6'} style={{color: '#F6F6F6'}} to={"/accessibilitat"}>{t('page.accessibilitat.link')}</Link>
             <Box sx={{ mr: 0, pt: 0, pr: 0, height: '36px', cursor: 'pointer' }}>
                 <img src={drassanaLogo} alt="foot_logo" style={{ maxHeight: '36px' }} />
             </Box>

@@ -41,12 +41,12 @@ const RoleSelector: React.FC = () => {
                 input: {
                     startAdornment: (
                         <InputAdornment position="start" sx={{ mr: 2 }}>
-                            <Icon>assignment_ind</Icon>
+                            <Icon fontSize="small">badge</Icon>
                         </InputAdornment>
-                    ),
-                },
+                    )
+                }
             }}
-            sx={{ mr: 1 }}
+            sx={{ mr: 1, '& fieldset': { border: 'none !important' }}}
         >
             {rolesAvailable.map((rol) => (
                 <MenuItem key={rol} value={rol}>

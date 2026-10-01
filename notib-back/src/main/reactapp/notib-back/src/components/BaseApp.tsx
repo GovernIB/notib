@@ -22,13 +22,9 @@ import {
     useResourceApiContext,
     useMuiFormDialogApiRef,
 } from 'reactlib';
-import {useNotibContext, ROLE_SUPER, ROLE_ORGAN} from './NotibContext';
 import AppFormFieldReference from './AppFormFieldReference';
 import Offline from './Offline';
-import RoleSelector from './RoleSelector';
-import EntitatSelector from './EntitatSelector';
 import { UserProfileMenu, UserProfileFormDialog } from './UserProfile';
-import OrganSelector from "./OrganSelector.tsx";
 import SwitchInterfaceMenuItem from './SwitchInterfaceMenuItem';
 
 export type MenuEntryWithResource = MenuEntry & {
@@ -186,7 +182,6 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
     const navigate = useNavigate();
     const location = useLocation();
     const theme = useTheme();
-    const { currentRole } = useNotibContext();
     const baseAppMenuEntries = useBaseAppMenuEntries(menuEntries);
     const formDialogApiRef = useMuiFormDialogApiRef();
     const i18nHandleLanguageChange = (language?: string) => {
@@ -255,15 +250,12 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             headerAppbarBackgroundColor={appbarBackgroundColor}
             headerAppbarBackgroundImg={appbarBackgroundImg}
             headerAdditionalComponents={[
-                ...(currentRole === ROLE_ORGAN ? [<OrganSelector key="organ_selector" />] : []),
-                ...(currentRole !== ROLE_SUPER ? [<EntitatSelector key="entitat_selector" />] : []),
-                <RoleSelector key="role_selector" />
+                <SwitchInterfaceMenuItem key="fast_rewind" />,
             ]}
             headerAdditionalAuthComponents={[
                 <Box key="user_profile" sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
                     <UserProfileMenu formDialogApiRef={formDialogApiRef} />
                 </Box>,
-                <SwitchInterfaceMenuItem key="switch_interface" />,
             ]}
             offline={<Offline />}
             footer={footer}

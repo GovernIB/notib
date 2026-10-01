@@ -25,9 +25,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class OrganGestorResourceEntity
-	extends BaseAuditableResourceEntity<OrganGestorResource>
-	implements AdminEntitatResourceEntity<OrganGestorResource> {
+public class OrganGestorResourceEntity extends BaseAuditableResourceEntity<OrganGestorResource> implements AdminEntitatResourceEntity<OrganGestorResource> {
 
 	@Column(name = "codi", length = 64, nullable = false)
 	protected String codi;

@@ -20,7 +20,7 @@ public interface NotificacioResourceRepository extends BaseRepository<Notificaci
 	 * un SELECT addicional per fila (N+1) en lloc d'un JOIN en la mateixa consulta de la pàgina.
 	 * Spring Data ja s'encarrega d'ometre l'EntityGraph a la consulta de COUNT (paginació).
 	 */
-	@EntityGraph(attributePaths = "taula")
+	@EntityGraph(attributePaths = {"taula", "entitat", "organGestor", "procediment", "document"})
 	@Override
 	Page<NotificacioResourceEntity> findAll(Specification<NotificacioResourceEntity> spec, Pageable pageable);
 
