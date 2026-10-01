@@ -32,6 +32,7 @@ import Metriques from "./pages/metriques/Metriques.tsx";
 import PermisosUsuariGrid from "./pages/usuaris/PermisosUsuariGrid.tsx";
 import PagadorPostalForm from "./pages/pagadorPostal/PagadorPostalForm.tsx";
 import PagadorsPostalsGrid from "./pages/pagadorPostal/PagadorsPostalsGrid.tsx";
+import Accessibilitat from "./pages/Accesibilitat.tsx";
 
 export const router = createBrowserRouter(
     [
@@ -229,6 +230,10 @@ export const router = createBrowserRouter(
                     children: [
                         { index: true, element: <MonitorSistema/> },
                     ],
+                },
+                {
+                    path: 'accessibilitat',
+                    element: <Accessibilitat />,
                 },
                 {
                     path: '*',
