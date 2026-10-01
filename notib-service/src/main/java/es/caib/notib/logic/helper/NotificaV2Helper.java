@@ -1079,6 +1079,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 	private SincronizarEnvioWsPortType getSincronizarEnvioWs(String apiKey) throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
 
+		var logMissatge = configHelper.getConfigAsBoolean("es.caib.notib.log.tipus.NOTIFICA_SOAP");
 		return new WsClientHelper<SincronizarEnvioWsPortType>().generarClientWs(
 				getClass().getResource("/es/caib/notib/logic/wsdl/SincronizarEnvio.wsdl"),
 				getNotificaSincronitzarUrlProperty(),
@@ -1086,7 +1087,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				apiKey,	// Username
 				apiKey,	// Password
 				null,
-				false,
+				logMissatge,
 				true,
 				false,
 				SincronizarEnvioWsPortType.class,
