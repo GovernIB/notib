@@ -76,3 +76,101 @@ ALTER TABLE not_usuari ADD COLUMN estil_menu VARCHAR(16) DEFAULT 'TEMA' NOT NULL
 
 -- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-27::limit
 ALTER TABLE not_accio_massiva ADD COLUMN estat VARCHAR(50);
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-28::limit
+CREATE INDEX not_NOTIF_ENT_CREATED_I ON not_NOTIFICACIO(ENTITAT_ID, CREATEDDATE);
+
+-- Índexs de clau forana que ja creaven els scripts històrics però no el changelog inicial. Si ja existeixen
+-- (amb aquest nom o amb un índex que comenci per la mateixa columna), no es crea cap índex duplicat.
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-30::limit
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_index i
+          JOIN pg_class t ON t.oid = i.indrelid
+          JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = i.indkey[0]
+         WHERE t.relname = 'not_notificacio_env' AND a.attname = 'notificacio_id') THEN
+        CREATE INDEX IF NOT EXISTS not_notificacio_notdest_fk_i ON not_notificacio_env(notificacio_id);
+    END IF;
+END $$;
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-31::limit
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_index i
+          JOIN pg_class t ON t.oid = i.indrelid
+          JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = i.indkey[0]
+         WHERE t.relname = 'not_persona' AND a.attname = 'notificacio_env_id') THEN
+        CREATE INDEX IF NOT EXISTS not_persona_notenv_id_index ON not_persona(notificacio_env_id);
+    END IF;
+END $$;
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-32::limit
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_index i
+          JOIN pg_class t ON t.oid = i.indrelid
+          JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = i.indkey[0]
+         WHERE t.relname = 'not_notificacio_event' AND a.attname = 'notificacio_env_id') THEN
+        CREATE INDEX IF NOT EXISTS not_notdest_notevent_fk_i ON not_notificacio_event(notificacio_env_id);
+    END IF;
+END $$;
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-33::limit
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_index i
+          JOIN pg_class t ON t.oid = i.indrelid
+          JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = i.indkey[0]
+         WHERE t.relname = 'not_notificacio' AND a.attname = 'organ_gestor') THEN
+        CREATE INDEX IF NOT EXISTS not_notif_organ_fk_i ON not_notificacio(organ_gestor);
+    END IF;
+END $$;
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-34::limit
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_index i
+          JOIN pg_class t ON t.oid = i.indrelid
+          JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = i.indkey[0]
+         WHERE t.relname = 'not_notificacio' AND a.attname = 'createdby_codi') THEN
+        CREATE INDEX IF NOT EXISTS not_notificacio_creatby_i ON not_notificacio(createdby_codi);
+    END IF;
+END $$;
+
+-- Índexs per ordenar el llistat de remeses per concepte, número d'expedient, usuari creador i tipus d'enviament
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-35::limit
+CREATE INDEX IF NOT EXISTS not_notif_ent_concepte_i ON not_notificacio(entitat_id, deleted, concepte);
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-36::limit
+CREATE INDEX IF NOT EXISTS not_notif_ent_numexp_i ON not_notificacio(entitat_id, deleted, registre_num_expedient);
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-37::limit
+CREATE INDEX IF NOT EXISTS not_notif_ent_creatby_i ON not_notificacio(entitat_id, deleted, createdby_codi);
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-38::limit
+CREATE INDEX IF NOT EXISTS not_notif_ent_envtipus_i ON not_notificacio(entitat_id, deleted, env_tipus);
+
+-- Índexs per ordenar el llistat de remeses per data d'enviament, números de registre i titular (camps de
+-- not_notificacio_table). Inclouen ID perquè també s'indexin les files amb el camp nul.
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-39::limit
+CREATE INDEX IF NOT EXISTS not_table_envdate_i ON not_notificacio_table(enviada_date, id);
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-40::limit
+CREATE INDEX IF NOT EXISTS not_table_regnums_i ON not_notificacio_table(registre_nums, id);
+
+-- El changeset 2_1_1_000-41 (índex per titular) només s'aplica a Oracle: a PostgreSQL una entrada d'índex
+-- B-tree no pot superar ~2700 bytes i el titular pot arribar a 4000.
+
+-- Índex per al COUNT del llistat de remeses dels usuaris sense rol d'administrador (filtres de permisos i
+-- "només les meves"): es resol llegint només l'índex
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-43::limit
+CREATE INDEX IF NOT EXISTS not_notif_ent_permis_i ON not_notificacio(entitat_id, deleted, organ_gestor, procediment_id, procediment_organ_id, createdby_codi);

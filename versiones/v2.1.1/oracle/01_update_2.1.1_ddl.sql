@@ -76,3 +76,83 @@ ALTER TABLE not_usuari ADD estil_menu VARCHAR2(16 CHAR) DEFAULT 'TEMA' NOT NULL;
 
 -- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-27::limit
 ALTER TABLE not_accio_massiva ADD estat VARCHAR2(50 CHAR);
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-28::limit
+CREATE INDEX not_NOTIF_ENT_CREATED_I ON not_NOTIFICACIO(ENTITAT_ID, CREATEDDATE);
+
+-- Índexs de clau forana que ja creaven els scripts històrics però no el changelog inicial. Si ja existeixen
+-- (amb aquest nom o sobre les mateixes columnes), s'ignora l'error i no es crea cap índex duplicat.
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-30::limit
+BEGIN
+    EXECUTE IMMEDIATE 'CREATE INDEX not_NOTIFICACIO_NOTDEST_FK_I ON not_NOTIFICACIO_ENV(NOTIFICACIO_ID)';
+EXCEPTION WHEN OTHERS THEN
+    IF SQLCODE NOT IN (-955, -1408) THEN RAISE; END IF;
+END;
+/
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-31::limit
+BEGIN
+    EXECUTE IMMEDIATE 'CREATE INDEX not_PERSONA_NOTENV_ID_INDEX ON not_PERSONA(NOTIFICACIO_ENV_ID)';
+EXCEPTION WHEN OTHERS THEN
+    IF SQLCODE NOT IN (-955, -1408) THEN RAISE; END IF;
+END;
+/
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-32::limit
+BEGIN
+    EXECUTE IMMEDIATE 'CREATE INDEX not_NOTDEST_NOTEVENT_FK_I ON not_NOTIFICACIO_EVENT(NOTIFICACIO_ENV_ID)';
+EXCEPTION WHEN OTHERS THEN
+    IF SQLCODE NOT IN (-955, -1408) THEN RAISE; END IF;
+END;
+/
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-33::limit
+BEGIN
+    EXECUTE IMMEDIATE 'CREATE INDEX not_NOTIF_ORGAN_FK_I ON not_NOTIFICACIO(ORGAN_GESTOR)';
+EXCEPTION WHEN OTHERS THEN
+    IF SQLCODE NOT IN (-955, -1408) THEN RAISE; END IF;
+END;
+/
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-34::limit
+BEGIN
+    EXECUTE IMMEDIATE 'CREATE INDEX not_NOTIFICACIO_CREATBY_I ON not_NOTIFICACIO(CREATEDBY_CODI)';
+EXCEPTION WHEN OTHERS THEN
+    IF SQLCODE NOT IN (-955, -1408) THEN RAISE; END IF;
+END;
+/
+
+-- Índexs per ordenar el llistat de remeses per concepte, número d'expedient, usuari creador i tipus d'enviament
+-- Els de text són índexs NLSSORT: la sessió ordena amb l'NLS_SORT de la JVM (CATALAN amb una JVM ca_ES) i un
+-- ORDER BY de text només pot fer servir un índex amb el mateix NLS_SORT.
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-35::limit
+CREATE INDEX not_NOTIF_ENT_CONCEPTE_I ON not_NOTIFICACIO(ENTITAT_ID, DELETED, NLSSORT(CONCEPTE, 'NLS_SORT=CATALAN'));
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-36::limit
+CREATE INDEX not_NOTIF_ENT_NUMEXP_I ON not_NOTIFICACIO(ENTITAT_ID, DELETED, NLSSORT(REGISTRE_NUM_EXPEDIENT, 'NLS_SORT=CATALAN'));
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-37::limit
+CREATE INDEX not_NOTIF_ENT_CREATBY_I ON not_NOTIFICACIO(ENTITAT_ID, DELETED, NLSSORT(CREATEDBY_CODI, 'NLS_SORT=CATALAN'));
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-38::limit
+CREATE INDEX not_NOTIF_ENT_ENVTIPUS_I ON not_NOTIFICACIO(ENTITAT_ID, DELETED, ENV_TIPUS);
+
+-- Índexs per ordenar el llistat de remeses per data d'enviament, números de registre i titular (camps de
+-- not_notificacio_table). Inclouen ID perquè també s'indexin les files amb el camp nul.
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-39::limit
+CREATE INDEX not_TABLE_ENVDATE_I ON not_NOTIFICACIO_TABLE(ENVIADA_DATE, ID);
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-40::limit
+CREATE INDEX not_TABLE_REGNUMS_I ON not_NOTIFICACIO_TABLE(NLSSORT(REGISTRE_NUMS, 'NLS_SORT=CATALAN'), ID);
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-41::limit
+CREATE INDEX not_TABLE_TITULAR_I ON not_NOTIFICACIO_TABLE(NLSSORT(TITULAR, 'NLS_SORT=CATALAN'), ID);
+
+-- Índex per al COUNT del llistat de remeses dels usuaris sense rol d'administrador (filtres de permisos i
+-- "només les meves"): es resol llegint només l'índex
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-43::limit
+CREATE INDEX not_NOTIF_ENT_PERMIS_I ON not_NOTIFICACIO(ENTITAT_ID, DELETED, ORGAN_GESTOR, PROCEDIMENT_ID, PROCEDIMENT_ORGAN_ID, CREATEDBY_CODI);

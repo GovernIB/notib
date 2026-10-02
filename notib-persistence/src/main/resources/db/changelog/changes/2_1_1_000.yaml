@@ -23,6 +23,25 @@ databaseChangeLog:
             name: varcharUnit
             value: ''
             dbms: postgresql
+    # Índexs per ordenar columnes de text. A Oracle, la sessió ordena amb l'NLS_SORT de la JVM (CATALAN amb
+    # una JVM ca_ES) i un ORDER BY de text només pot fer servir un índex NLSSORT amb el mateix NLS_SORT.
+    # A PostgreSQL l'índex normal ja segueix la collation de la base de dades.
+    -   property:
+            name: ordreTextInici
+            value: "NLSSORT("
+            dbms: oracle
+    -   property:
+            name: ordreTextFi
+            value: ",'NLS_SORT=CATALAN')"
+            dbms: oracle
+    -   property:
+            name: ordreTextInici
+            value: ''
+            dbms: postgresql
+    -   property:
+            name: ordreTextFi
+            value: ''
+            dbms: postgresql
     -   changeSet:
             id: 2_1_1_000-1
             author: limit
@@ -469,3 +488,356 @@ databaseChangeLog:
                           - column:
                                 name: estat
                                 type: varchar(50 ${varcharUnit})
+
+    -   changeSet:
+            id: 2_1_1_000-28
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   indexExists:
+                                tableName: ${db_prefix}NOTIFICACIO
+                                indexName: ${db_prefix}NOTIF_ENT_CREATED_I
+            changes:
+                # Llistat de remeses: tota consulta filtra per entitat i ordena per data de creació
+                -   createIndex:
+                        tableName: ${db_prefix}NOTIFICACIO
+                        indexName: ${db_prefix}NOTIF_ENT_CREATED_I
+                        columns:
+                            -   column:
+                                    name: ENTITAT_ID
+                            -   column:
+                                    name: CREATEDDATE
+
+    -   changeSet:
+            id: 2_1_1_000-29
+            author: limit
+            changes:
+                -   sql: "INSERT INTO ${db_prefix}CONFIG (id,POSITION, KEY, VALUE, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE, TYPE_CODE, CONFIG_GROUP_ID, CONFIG_TYPE_ID, CONFIGURABLE)
+                            VALUES (${db_prefix}HIBERNATE_SEQ.NEXTVAL, 22, 'es.caib.notib.app.llistat.remeses.estat.asincron', 'true', 0, 'Indica si la columna estat del llistat de remeses (interfície React) pendent d''actualitzar s''ha de calcular de manera asíncrona i enviar al navegador quan estigui llesta (true), o calcular-la abans de retornar el llistat (false)', 'GENERAL', 'BOOL',
+                            (SELECT ID FROM ${db_prefix}CONFIG_GROUP g WHERE g.code = 'GENERAL'), (SELECT ID FROM ${db_prefix}CONFIG_TYPE t WHERE t.code = 'BOOL'), 0);"
+
+    # Índex de clau forana que ja creaven els scripts SQL històrics però no el changelog inicial:
+    # sense ell, amb volum, cada consulta recorre tota la taula. Es comprova per columnes perquè
+    # l'entorn pot tenir l'índex equivalent amb un altre nom.
+    -   changeSet:
+            id: 2_1_1_000-30
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   indexExists:
+                                tableName: ${db_prefix}NOTIFICACIO_ENV
+                                columnNames: NOTIFICACIO_ID
+            changes:
+                # Enviaments d'una remesa (càlcul de la columna estat, detall, llistat d'enviaments)
+                -   createIndex:
+                        tableName: ${db_prefix}NOTIFICACIO_ENV
+                        indexName: ${db_prefix}NOTIFICACIO_NOTDEST_FK_I
+                        columns:
+                            -   column:
+                                    name: NOTIFICACIO_ID
+
+    # Índex de clau forana que ja creaven els scripts SQL històrics però no el changelog inicial:
+    # sense ell, amb volum, cada consulta recorre tota la taula. Es comprova per columnes perquè
+    # l'entorn pot tenir l'índex equivalent amb un altre nom.
+    -   changeSet:
+            id: 2_1_1_000-31
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   indexExists:
+                                tableName: ${db_prefix}PERSONA
+                                columnNames: NOTIFICACIO_ENV_ID
+            changes:
+                # Titular i destinataris d'un enviament
+                -   createIndex:
+                        tableName: ${db_prefix}PERSONA
+                        indexName: ${db_prefix}PERSONA_NOTENV_ID_INDEX
+                        columns:
+                            -   column:
+                                    name: NOTIFICACIO_ENV_ID
+
+    # Índex de clau forana que ja creaven els scripts SQL històrics però no el changelog inicial:
+    # sense ell, amb volum, cada consulta recorre tota la taula. Es comprova per columnes perquè
+    # l'entorn pot tenir l'índex equivalent amb un altre nom.
+    -   changeSet:
+            id: 2_1_1_000-32
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   indexExists:
+                                tableName: ${db_prefix}NOTIFICACIO_EVENT
+                                columnNames: NOTIFICACIO_ENV_ID
+            changes:
+                # Events d'un enviament
+                -   createIndex:
+                        tableName: ${db_prefix}NOTIFICACIO_EVENT
+                        indexName: ${db_prefix}NOTDEST_NOTEVENT_FK_I
+                        columns:
+                            -   column:
+                                    name: NOTIFICACIO_ENV_ID
+
+    # Índex de clau forana que ja creaven els scripts SQL històrics però no el changelog inicial:
+    # sense ell, amb volum, cada consulta recorre tota la taula. Es comprova per columnes perquè
+    # l'entorn pot tenir l'índex equivalent amb un altre nom.
+    -   changeSet:
+            id: 2_1_1_000-33
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   indexExists:
+                                tableName: ${db_prefix}NOTIFICACIO
+                                columnNames: ORGAN_GESTOR
+            changes:
+                # Filtre de permisos per òrgan gestor del llistat de remeses
+                -   createIndex:
+                        tableName: ${db_prefix}NOTIFICACIO
+                        indexName: ${db_prefix}NOTIF_ORGAN_FK_I
+                        columns:
+                            -   column:
+                                    name: ORGAN_GESTOR
+
+    # Índex de clau forana que ja creaven els scripts SQL històrics però no el changelog inicial:
+    # sense ell, amb volum, cada consulta recorre tota la taula. Es comprova per columnes perquè
+    # l'entorn pot tenir l'índex equivalent amb un altre nom.
+    -   changeSet:
+            id: 2_1_1_000-34
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   indexExists:
+                                tableName: ${db_prefix}NOTIFICACIO
+                                columnNames: CREATEDBY_CODI
+            changes:
+                # Filtre "només les meves" del llistat de remeses
+                -   createIndex:
+                        tableName: ${db_prefix}NOTIFICACIO
+                        indexName: ${db_prefix}NOTIFICACIO_CREATBY_I
+                        columns:
+                            -   column:
+                                    name: CREATEDBY_CODI
+
+    # Ordenació del llistat de remeses per concepte: amb l'índex, Oracle/PostgreSQL llegeixen les
+    # files ja ordenades i s'aturen a la mida de pàgina, en lloc d'ordenar totes les remeses de l'entitat.
+    -   changeSet:
+            id: 2_1_1_000-35
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   indexExists:
+                                tableName: ${db_prefix}NOTIFICACIO
+                                indexName: ${db_prefix}NOTIF_ENT_CONCEPTE_I
+            changes:
+                -   createIndex:
+                        tableName: ${db_prefix}NOTIFICACIO
+                        indexName: ${db_prefix}NOTIF_ENT_CONCEPTE_I
+                        columns:
+                            -   column:
+                                    name: ENTITAT_ID
+                            -   column:
+                                    name: DELETED
+                            -   column:
+                                    name: ${ordreTextInici}CONCEPTE${ordreTextFi}
+                                    computed: true
+
+    # Ordenació del llistat de remeses per número d'expedient: amb l'índex, Oracle/PostgreSQL llegeixen les
+    # files ja ordenades i s'aturen a la mida de pàgina, en lloc d'ordenar totes les remeses de l'entitat.
+    -   changeSet:
+            id: 2_1_1_000-36
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   indexExists:
+                                tableName: ${db_prefix}NOTIFICACIO
+                                indexName: ${db_prefix}NOTIF_ENT_NUMEXP_I
+            changes:
+                -   createIndex:
+                        tableName: ${db_prefix}NOTIFICACIO
+                        indexName: ${db_prefix}NOTIF_ENT_NUMEXP_I
+                        columns:
+                            -   column:
+                                    name: ENTITAT_ID
+                            -   column:
+                                    name: DELETED
+                            -   column:
+                                    name: ${ordreTextInici}REGISTRE_NUM_EXPEDIENT${ordreTextFi}
+                                    computed: true
+
+    # Ordenació del llistat de remeses per usuari creador: amb l'índex, Oracle/PostgreSQL llegeixen les
+    # files ja ordenades i s'aturen a la mida de pàgina, en lloc d'ordenar totes les remeses de l'entitat.
+    -   changeSet:
+            id: 2_1_1_000-37
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   indexExists:
+                                tableName: ${db_prefix}NOTIFICACIO
+                                indexName: ${db_prefix}NOTIF_ENT_CREATBY_I
+            changes:
+                -   createIndex:
+                        tableName: ${db_prefix}NOTIFICACIO
+                        indexName: ${db_prefix}NOTIF_ENT_CREATBY_I
+                        columns:
+                            -   column:
+                                    name: ENTITAT_ID
+                            -   column:
+                                    name: DELETED
+                            -   column:
+                                    name: ${ordreTextInici}CREATEDBY_CODI${ordreTextFi}
+                                    computed: true
+
+    # Ordenació del llistat de remeses per tipus d'enviament: amb l'índex, Oracle/PostgreSQL llegeixen les
+    # files ja ordenades i s'aturen a la mida de pàgina, en lloc d'ordenar totes les remeses de l'entitat.
+    -   changeSet:
+            id: 2_1_1_000-38
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   indexExists:
+                                tableName: ${db_prefix}NOTIFICACIO
+                                indexName: ${db_prefix}NOTIF_ENT_ENVTIPUS_I
+            changes:
+                -   createIndex:
+                        tableName: ${db_prefix}NOTIFICACIO
+                        indexName: ${db_prefix}NOTIF_ENT_ENVTIPUS_I
+                        columns:
+                            -   column:
+                                    name: ENTITAT_ID
+                            -   column:
+                                    name: DELETED
+                            -   column:
+                                    name: ENV_TIPUS
+
+    # Ordenació del llistat de remeses per data d'enviament (camp de not_notificacio_table, unida amb INNER JOIN).
+    # S'hi afegeix ID perquè l'índex inclogui també les files amb ENVIADA_DATE nul (Oracle no indexa les
+    # entrades amb totes les columnes nul·les) i es pugui recórrer per ordenar tota la consulta.
+    -   changeSet:
+            id: 2_1_1_000-39
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   indexExists:
+                                tableName: ${db_prefix}NOTIFICACIO_TABLE
+                                indexName: ${db_prefix}TABLE_ENVDATE_I
+            changes:
+                -   createIndex:
+                        tableName: ${db_prefix}NOTIFICACIO_TABLE
+                        indexName: ${db_prefix}TABLE_ENVDATE_I
+                        columns:
+                            -   column:
+                                    name: ENVIADA_DATE
+                            -   column:
+                                    name: ID
+
+    # Ordenació del llistat de remeses per números de registre (camp de not_notificacio_table, unida amb INNER JOIN).
+    # S'hi afegeix ID perquè l'índex inclogui també les files amb REGISTRE_NUMS nul (Oracle no indexa les
+    # entrades amb totes les columnes nul·les) i es pugui recórrer per ordenar tota la consulta.
+    -   changeSet:
+            id: 2_1_1_000-40
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   indexExists:
+                                tableName: ${db_prefix}NOTIFICACIO_TABLE
+                                indexName: ${db_prefix}TABLE_REGNUMS_I
+            changes:
+                -   createIndex:
+                        tableName: ${db_prefix}NOTIFICACIO_TABLE
+                        indexName: ${db_prefix}TABLE_REGNUMS_I
+                        columns:
+                            -   column:
+                                    name: ${ordreTextInici}REGISTRE_NUMS${ordreTextFi}
+                                    computed: true
+                            -   column:
+                                    name: ID
+
+    # Ordenació del llistat de remeses per titular (camp de not_notificacio_table, unida amb INNER JOIN).
+    # S'hi afegeix ID perquè l'índex inclogui també les files amb TITULAR nul (Oracle no indexa les
+    # entrades amb totes les columnes nul·les) i es pugui recórrer per ordenar tota la consulta.
+    # Només Oracle: a PostgreSQL una entrada d'índex B-tree no pot superar ~2700 bytes i el titular
+    # (concatenació dels titulars de tots els enviaments) pot arribar a 4000: l'INSERT fallaria.
+    -   changeSet:
+            id: 2_1_1_000-41
+            author: limit
+            dbms: oracle
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   indexExists:
+                                tableName: ${db_prefix}NOTIFICACIO_TABLE
+                                indexName: ${db_prefix}TABLE_TITULAR_I
+            changes:
+                -   createIndex:
+                        tableName: ${db_prefix}NOTIFICACIO_TABLE
+                        indexName: ${db_prefix}TABLE_TITULAR_I
+                        columns:
+                            -   column:
+                                    name: ${ordreTextInici}TITULAR${ordreTextFi}
+                                    computed: true
+                            -   column:
+                                    name: ID
+
+    # Procés inicial: crea el registre de not_notificacio_table de les remeses que no en tenen (no sortien al
+    # llistat JSP i farien inexacte el total del llistat de React, que es compta sense JOIN a la taula)
+    -   changeSet:
+            id: 2_1_1_000-42
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   sqlCheck:
+                        expectedResult: 0
+                        sql: SELECT COUNT(*) FROM ${db_prefix}PROCESSOS_INICIALS WHERE CODI = 'CREAR_REGISTRES_NOT_NOTIFICACIO_TABLE'
+            changes:
+                -   insert:
+                        tableName: ${db_prefix}PROCESSOS_INICIALS
+                        columns:
+                            -   column:
+                                    name: ID
+                                    valueNumeric: 7
+                            -   column:
+                                    name: CODI
+                                    value: CREAR_REGISTRES_NOT_NOTIFICACIO_TABLE
+                            -   column:
+                                    name: INIT
+                                    valueBoolean: true
+
+    # COUNT del llistat de remeses dels usuaris sense rol d'administrador: el filtre de permisos (òrgan,
+    # procediment o procediment comú de l'òrgan) i el de "només les meves" es resolen llegint només aquest
+    # índex, sense accedir a la taula (amb un milió de remeses, de ~0,6 s a ~0,15 s)
+    -   changeSet:
+            id: 2_1_1_000-43
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   indexExists:
+                                tableName: ${db_prefix}NOTIFICACIO
+                                indexName: ${db_prefix}NOTIF_ENT_PERMIS_I
+            changes:
+                -   createIndex:
+                        tableName: ${db_prefix}NOTIFICACIO
+                        indexName: ${db_prefix}NOTIF_ENT_PERMIS_I
+                        columns:
+                            -   column:
+                                    name: ENTITAT_ID
+                            -   column:
+                                    name: DELETED
+                            -   column:
+                                    name: ORGAN_GESTOR
+                            -   column:
+                                    name: PROCEDIMENT_ID
+                            -   column:
+                                    name: PROCEDIMENT_ORGAN_ID
+                            -   column:
+                                    name: CREATEDBY_CODI
