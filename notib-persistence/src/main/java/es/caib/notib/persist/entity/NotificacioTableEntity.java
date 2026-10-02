@@ -138,6 +138,9 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 	private String organCodi;
 	@Column(name = "ORGAN_ID")
 	private String organId;
+	// Permís per procediment del llistat de remeses (vegeu NotificacioResourceServiceImpl.springFilterWithReadPermission)
+	@Column(name = "PROCEDIMENT_ID")
+	private Long procedimentId;
 	@Column(name = "ORGAN_NOM")
 	private String organNom;
 	@Column(name = "ORGAN_ESTAT")

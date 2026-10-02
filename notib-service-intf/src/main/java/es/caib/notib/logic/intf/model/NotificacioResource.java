@@ -1,5 +1,6 @@
 package es.caib.notib.logic.intf.model;
 
+import org.springframework.data.domain.Sort;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
@@ -61,6 +62,8 @@ import static es.caib.notib.logic.intf.model.NotificacioResource.ACTION_ANULAR_R
 @ResourceConfig(
 	//descriptionField = NotificacioResource.Fields.codi,
 	//quickFilterFields = { NotificacioResource.Fields.codi, NotificacioResource.Fields.nom },
+	// Sense ordenació (p.ex. en desactivar l'ordenació d'una columna del llistat), les remeses més recents primer
+	defaultSortFields = { @ResourceConfig.ResourceSort(field = "createdDate", direction = Sort.Direction.DESC) },
 	accessConstraints = {
 		@ResourceAccessConstraint(
 			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,

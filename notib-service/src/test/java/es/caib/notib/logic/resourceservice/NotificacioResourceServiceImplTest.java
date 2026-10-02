@@ -97,6 +97,40 @@ class NotificacioResourceServiceImplTest {
 	}
 
 	@Test
+	void ordenacioTaulaShouldMapFieldsToNotificacioTable() {
+		var sort = org.springframework.data.domain.Sort.by(
+				org.springframework.data.domain.Sort.Order.desc("estatString"),
+				org.springframework.data.domain.Sort.Order.asc("organGestor"),
+				org.springframework.data.domain.Sort.Order.asc("procediment"),
+				org.springframework.data.domain.Sort.Order.desc("titular"));
+
+		var result = service.ordenacioTaula(sort);
+
+		assertEquals(org.springframework.data.domain.Sort.by(
+				org.springframework.data.domain.Sort.Order.desc("estat"),
+				org.springframework.data.domain.Sort.Order.asc("organGestorId"),
+				org.springframework.data.domain.Sort.Order.asc("procedimentId"),
+				org.springframework.data.domain.Sort.Order.desc("titular")), result);
+	}
+
+	@Test
+	void filtreTaulaShouldUseTableIdColumns() {
+		assertEquals("entitat.id:21 and (organGestorId in (1,2) or procedimentId in (3) or procedimentOrganGestorId in (4))",
+				NotificacioResourceServiceImpl.filtreTaula("entitat.id:21 and (organGestor.id in (1,2) or procediment.id in (3) or procedimentOrganGestor.id in (4))"));
+	}
+
+	@Test
+	void invertirShouldReverseEveryDirection() {
+		var sort = org.springframework.data.domain.Sort.by(
+				org.springframework.data.domain.Sort.Order.desc("createdDate"),
+				org.springframework.data.domain.Sort.Order.asc("concepte"));
+
+		assertEquals(org.springframework.data.domain.Sort.by(
+				org.springframework.data.domain.Sort.Order.asc("createdDate"),
+				org.springframework.data.domain.Sort.Order.desc("concepte")), NotificacioResourceServiceImpl.invertir(sort));
+	}
+
+	@Test
 	@SuppressWarnings("unchecked")
 	void additionalSpecificationShouldInnerJoinTaula() {
 		var spec = service.additionalSpecification(null, false);

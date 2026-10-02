@@ -72,6 +72,7 @@ import es.caib.notib.logic.notificacions.RegistrarRemesaActionExecutor;
 import es.caib.notib.persist.resourceentity.DocumentResourceEntity;
 import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
 import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
+import es.caib.notib.persist.resourceentity.NotificacioTableResourceEntity;
 import es.caib.notib.persist.resourceentity.PersonaResourceEntity;
 import es.caib.notib.persist.resourcerepository.CallbackResourceRepository;
 import es.caib.notib.persist.resourcerepository.DocumentResourceRepository;
@@ -90,7 +91,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.query.QueryUtils;
-import org.springframework.data.support.PageableExecutionUtils;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -333,6 +334,18 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 
 	// Màxim d'elements d'una clàusula IN a Oracle
 	private static final int MIDA_MAXIMA_IN = 1000;
+	// Columnes del llistat amb un nom diferent a not_notificacio_table
+	private static final Map<String, String> CAMPS_ORDENACIO_TAULA = Map.of(
+			"estatString", "estat",
+			"organGestor", "organGestorId",
+			"procediment", "procedimentId");
+	// Amb not_notificacio_table, els filtres per òrgan i procediment es fan amb les columnes de la taula: amb un JOIN
+	// a les taules d'òrgans i procediments, Oracle desdobla l'OR del filtre de permisos en una UNION i ha d'ordenar
+	// totes les remeses visibles per l'usuari en lloc de recórrer l'índex de l'ordenació
+	private static final java.util.regex.Pattern CAMPS_ID_TAULA = java.util.regex.Pattern.compile("\\b(organGestor|procediment|procedimentOrganGestor)\\.id\\b");
+	private static final ThreadLocal<Boolean> CONSULTA_TAULA = new ThreadLocal<>();
+	// Camps que not_notificacio_table té però no manté al dia: els filtres que els fan servir es fan amb not_notificacio
+	private static final java.util.regex.Pattern CAMPS_NO_FIABLES_TAULA = java.util.regex.Pattern.compile("\\bregistreEnviamentIntent\\b");
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -340,35 +353,145 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 	@Override
 	protected Page<NotificacioResourceEntity> entityRepositoryFindEntities(String quickFilter, String filter, String[] namedQueries, Pageable pageable) {
 
-		// A partir de la segona pàgina es consulten primer només els ids de la pàgina i després les remeses.
-		// Amb OFFSET, la base de dades ha de llegir i ordenar totes les files anteriors a la pàgina: amb les
-		// files senceres (i el JOIN a not_notificacio_table) l'ordenació no cap a memòria, i la darrera pàgina
-		// d'un milió de remeses tardava més de 30 s. Ordenant només els ids, entre una dècima i uns segons.
-		if (pageable.isUnpaged() || pageable.getOffset() == 0 || pageable.getPageSize() > MIDA_MAXIMA_IN) {
+		if (pageable.isUnpaged() || pageable.getPageSize() > MIDA_MAXIMA_IN) {
 			return super.entityRepositoryFindEntities(quickFilter, filter, namedQueries, pageable);
 		}
-		Specification<NotificacioResourceEntity> specification = toFindProcessedSpecification(quickFilter, filter, namedQueries);
-		var cb = entityManager.getCriteriaBuilder();
-		var idsQuery = cb.createQuery(Long.class);
-		var root = idsQuery.from(NotificacioResourceEntity.class);
-		var predicate = specification.toPredicate(root, idsQuery, cb);
-		if (predicate != null) {
-			idsQuery.where(predicate);
+		// Es filtra, s'ordena, es pagina i es compta només amb not_notificacio_table (com el llistat JSP): els filtres
+		// són sobre la mateixa taula que l'ordenació, i la base de dades pot recórrer un índex i aturar-se a la
+		// pàgina. Si el filtre o l'ordenació fan servir algun camp que la taula no té, es fa amb not_notificacio.
+		PaginaIds pagina = null;
+		if (filter == null || !CAMPS_NO_FIABLES_TAULA.matcher(filter).find()) {
+			Specification<NotificacioTableResourceEntity> specificationTaula;
+			CONSULTA_TAULA.set(true);
+			try {
+				specificationTaula = toFindProcessedSpecification(quickFilter, filter, namedQueries);
+			} finally {
+				CONSULTA_TAULA.remove();
+			}
+			pagina = consultarIds(NotificacioTableResourceEntity.class, specificationTaula, ordenacioTaula(pageable.getSort()), pageable, true);
 		}
-		idsQuery.select(root.get("id")).orderBy(QueryUtils.toOrders(toProcessedSort(pageable.getSort()), root, cb));
-		List<Long> ids = entityManager.createQuery(idsQuery)
-				.setFirstResult((int) pageable.getOffset())
-				.setMaxResults(pageable.getPageSize())
-				.getResultList();
+		if (pagina == null) {
+			Specification<NotificacioResourceEntity> specification = toFindProcessedSpecification(quickFilter, filter, namedQueries);
+			pagina = consultarIds(NotificacioResourceEntity.class, specification, toProcessedSort(pageable.getSort()), pageable, false);
+		}
+		// Les remeses de la pàgina es carreguen per id, amb la taula. Els ids ja compleixen els filtres i els permisos.
 		List<NotificacioResourceEntity> content = new ArrayList<>();
-		if (!ids.isEmpty()) {
-			// Els ids ja compleixen els filtres (i els permisos): només cal carregar-los, amb la taula
+		if (!pagina.ids.isEmpty()) {
+			var ids = pagina.ids;
 			Specification<NotificacioResourceEntity> perIds = (r, q, b) -> r.get("id").in(ids);
 			var perId = entityRepository.findAll(perIds.and(additionalSpecification(namedQueries, false))).stream()
 					.collect(Collectors.toMap(NotificacioResourceEntity::getId, Function.identity()));
 			ids.stream().map(perId::get).filter(Objects::nonNull).forEach(content::add);
 		}
-		return PageableExecutionUtils.getPage(content, pageable, () -> entityRepository.count(specification));
+		return new PageImpl<>(content, pageable, pagina.total);
+	}
+
+	@Override
+	protected <P> Specification<P> getSpringFilterSpecification(String springFilter) {
+		if (springFilter != null && Boolean.TRUE.equals(CONSULTA_TAULA.get())) {
+			springFilter = filtreTaula(springFilter);
+		}
+		return super.getSpringFilterSpecification(springFilter);
+	}
+
+	/**
+	 * Filtre per a la consulta amb not_notificacio_table: "organGestor.id" passa a "organGestorId", etc.
+	 */
+	static String filtreTaula(String springFilter) {
+		return CAMPS_ID_TAULA.matcher(springFilter).replaceAll("$1Id");
+	}
+
+	@RequiredArgsConstructor
+	private static class PaginaIds {
+		private final List<Long> ids;
+		private final long total;
+	}
+
+	/**
+	 * Compta les files de la consulta i en retorna els ids de la pàgina. Les pàgines de la segona meitat es
+	 * consulten amb l'ordenació invertida, des del final: amb OFFSET, la base de dades ha de recórrer totes les
+	 * files anteriors a la pàgina, i així la darrera pàgina costa el mateix que la primera.
+	 *
+	 * @param opcional
+	 *            si és true i la consulta no es pot construir amb aquesta entitat (algun camp del filtre o de
+	 *            l'ordenació no hi existeix), retorna null en lloc de llançar l'excepció.
+	 */
+	private <T> PaginaIds consultarIds(Class<T> entityClass, Specification<T> specification, Sort sort, Pageable pageable, boolean opcional) {
+
+		var cb = entityManager.getCriteriaBuilder();
+		var countQuery = cb.createQuery(Long.class);
+		var countRoot = countQuery.from(entityClass);
+		var idsQuery = cb.createQuery(Long.class);
+		var idsRoot = idsQuery.from(entityClass);
+		try {
+			var countPredicate = specification.toPredicate(countRoot, countQuery, cb);
+			countQuery.select(cb.count(countRoot));
+			if (countPredicate != null) {
+				countQuery.where(countPredicate);
+			}
+			var idsPredicate = specification.toPredicate(idsRoot, idsQuery, cb);
+			if (idsPredicate != null) {
+				idsQuery.where(idsPredicate);
+			}
+		} catch (RuntimeException ex) {
+			if (!opcional) {
+				throw ex;
+			}
+			log.debug("Llistat de remeses: el filtre no es pot aplicar a {}, es consulta amb not_notificacio ({})", entityClass.getSimpleName(), ex.getMessage());
+			return null;
+		}
+		long total = entityManager.createQuery(countQuery).getSingleResult();
+		long offset = pageable.getOffset();
+		if (offset >= total) {
+			return new PaginaIds(List.of(), total);
+		}
+		int mida = (int) Math.min(pageable.getPageSize(), total - offset);
+		var invertir = offset > (total - offset - mida);
+		var ordenacio = invertir ? invertir(sort) : sort;
+		try {
+			idsQuery.select(idsRoot.get("id")).orderBy(QueryUtils.toOrders(ordenacio, idsRoot, cb));
+		} catch (RuntimeException ex) {
+			if (!opcional) {
+				throw ex;
+			}
+			log.debug("Llistat de remeses: l'ordenació no es pot aplicar a {}, es consulta amb not_notificacio ({})", entityClass.getSimpleName(), ex.getMessage());
+			return null;
+		}
+		List<Long> ids = new ArrayList<>(entityManager.createQuery(idsQuery)
+				.setFirstResult((int) (invertir ? total - offset - mida : offset))
+				.setMaxResults(mida)
+				.getResultList());
+		if (invertir) {
+			java.util.Collections.reverse(ids);
+		}
+		return new PaginaIds(ids, total);
+	}
+
+	/**
+	 * Ordenació de la consulta del llistat amb not_notificacio_table: la del llistat (o la de per defecte del
+	 * recurs) amb els noms dels camps de la taula.
+	 */
+	Sort ordenacioTaula(Sort sort) {
+
+		List<Sort.Order> orders = new ArrayList<>();
+		if (sort == null || sort.isUnsorted()) {
+			getResourceDefaultSortFields(getResourceClass()).forEach(f -> orders.add(new Sort.Order(f.getDirection(), f.getField())));
+		} else {
+			sort.forEach(orders::add);
+		}
+		return Sort.by(orders.stream()
+				.map(o -> CAMPS_ORDENACIO_TAULA.containsKey(o.getProperty()) ? o.withProperty(CAMPS_ORDENACIO_TAULA.get(o.getProperty())) : o)
+				.collect(Collectors.toList()));
+	}
+
+	/**
+	 * Inverteix el sentit de cada camp de l'ordenació. Oracle i PostgreSQL posen els nuls al final en ordre
+	 * ascendent i al principi en descendent, per tant l'ordre invertit és exactament el contrari.
+	 */
+	static Sort invertir(Sort sort) {
+		return Sort.by(sort.stream()
+				.map(o -> o.with(o.isAscending() ? Sort.Direction.DESC : Sort.Direction.ASC))
+				.collect(Collectors.toList()));
 	}
 
 	@Override
