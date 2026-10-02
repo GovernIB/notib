@@ -126,9 +126,12 @@ const componentsCa = {
                 },
             },
             checkboxSelect: {
-                true: 'Si',
+                true: 'Sí',
                 false: 'No',
             },
+        },
+        onChange: {
+            error: 'Error en processar el canvi',
         },
         dialog: {
             create: 'Crear',
