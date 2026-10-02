@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -97,7 +98,13 @@ public class SseController extends BaseController {
 			// síncrona per reenviar l'últim event conegut) el necessiten: es guarda en un
 			// AtomicReference perquè totes hi tinguin accés un cop assignat.
 			var listenerId = new AtomicReference<String>();
+			// Usuari d'aquesta connexió: els events amb targetUser només s'envien a les seves connexions
+			var auth = SecurityContextHolder.getContext().getAuthentication();
+			var subscriptor = auth != null ? auth.getName() : null;
 			listenerId.set(sseEventService.addListener(queue.get(), event -> {
+				if (event.getTargetUser() != null && !event.getTargetUser().equals(subscriptor)) {
+					return;
+				}
 				try {
 					emitter.send(SseEmitter.event().name(event.getEventName().name()).data(event));
 					if (SseEvent.SseEventStatus.DONE.equals(event.getStatus()) || SseEvent.SseEventStatus.ERROR.equals(event.getStatus())) {

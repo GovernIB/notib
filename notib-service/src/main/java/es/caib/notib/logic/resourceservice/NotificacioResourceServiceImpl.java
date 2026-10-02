@@ -20,6 +20,8 @@ import es.caib.notib.logic.enviaments.EnviarCallbackActionExecutor;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.LegacyHelper;
 import es.caib.notib.logic.helper.MessageHelper;
+import es.caib.notib.logic.helper.NotificacioEstatAsyncHelper;
+import es.caib.notib.logic.helper.NotificacioListHelper;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
@@ -83,8 +85,15 @@ import es.caib.notib.persist.resourcerepository.UsuariResourceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.query.QueryUtils;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
@@ -93,10 +102,17 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.JoinType;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -129,6 +145,10 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 	private final AccioMassivaService accioMassivaService;
 	private final CallbackService callbackService;
 	private final ApplicationEventPublisher eventPublisher;
+	private final NotificacioEstatAsyncHelper notificacioEstatAsyncHelper;
+	private final NotificacioListHelper notificacioListHelper;
+
+	private static final ThreadLocal<Boolean> consultaLlistat = new ThreadLocal<>();
 
 	@PostConstruct
 	public void init() {
@@ -177,24 +197,200 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	public Page<NotificacioResource> findPage(String quickFilter, String filter, String[] namedQueries, String[] perspectives, Pageable pageable) {
+
+		// Només la càrrega del llistat pot diferir el càlcul de l'estat: altres conversions de
+		// múltiples remeses (p.ex. l'exportació) necessiten el valor definitiu
+		consultaLlistat.set(true);
+		try {
+			return super.findPage(quickFilter, filter, namedQueries, perspectives, pageable);
+		} finally {
+			consultaLlistat.remove();
+		}
+	}
+
+	@Override
 	protected NotificacioResource entityToResource(NotificacioResourceEntity entity) {
 
 		var resource = super.entityToResource(entity);
-		var estatString = entity.getEstatString();
-		if (Boolean.TRUE.equals(entity.getPerActualitzar())) {
-			// L'estat de la remesa encara no s'havia generat: el generam ara mateix perquè es
-			// pugui mostrar ja en aquesta mateixa càrrega del llistat. actualitzarColumnaEstat
-			// calcula i persisteix el nou estatString en una transacció (REQUIRES_NEW) separada
-			// de la d'aquesta petició, per la qual cosa cal emprar directament el valor que
-			// retorna en lloc de rellegir entity.getEstatString(), que no reflecteix els canvis
-			// fets a la transacció ja finalitzada de l'altre servei.
-			var estatStringActualitzat = legacyHelper.actualitzarColumnaEstat(entity);
-			if (estatStringActualitzat != null) {
-				estatString = estatStringActualitzat;
+		resource.setEstatString(entity.getEstatString());
+		return resource;
+	}
+
+	/*
+	 * Les remeses amb l'estat pendent d'actualitzar (per_actualitzar) es recalculen totes juntes en
+	 * una sola transacció, o bé de manera asíncrona (enviant el resultat via SSE) si així ho indica
+	 * la propietat es.caib.notib.app.llistat.remeses.estat.asincron.
+	 */
+	@Override
+	protected void afterConversion(List<NotificacioResourceEntity> entities, List<NotificacioResource> resources) {
+
+		emplenarPermisProcessar(entities, resources);
+		Map<Long, NotificacioResource> pendents = new LinkedHashMap<>();
+		for (int i = 0; i < entities.size(); i++) {
+			if (Boolean.TRUE.equals(entities.get(i).getPerActualitzar())) {
+				pendents.put(entities.get(i).getId(), resources.get(i));
 			}
 		}
-		resource.setEstatString(estatString);
-		return resource;
+		if (pendents.isEmpty()) {
+			return;
+		}
+		var asincron = Boolean.TRUE.equals(consultaLlistat.get()) && configHelper.getConfigAsBoolean(NotificacioEstatAsyncHelper.PROPERTY_ESTAT_ASINCRON, true);
+		if (asincron) {
+			pendents.values().forEach(r -> r.setEstatPendent(true));
+			notificacioEstatAsyncHelper.calcularEstatsAsync(pendents.keySet(), authenticationHelper.getCurrentUserName());
+			return;
+		}
+		actualitzarEstats(pendents);
+	}
+
+	@Override
+	protected void afterConversion(NotificacioResourceEntity entity, NotificacioResource resource) {
+
+		emplenarPermisProcessar(List.of(entity), List.of(resource));
+		if (Boolean.TRUE.equals(entity.getPerActualitzar())) {
+			actualitzarEstats(Map.of(entity.getId(), resource));
+		}
+	}
+
+	/*
+	 * Permís per a marcar com a processada (acció MARCAR_PROCESSAT del llistat i del detall): remeses
+	 * finalitzades sobre el procediment o l'òrgan gestor de les quals l'usuari actual té permís de
+	 * processar. És la mateixa regla que aplica NotificacioServiceImpl.marcarComProcessada
+	 * (PermisosService.hasNotificacioPermis), però calculant els codis amb permís un sol cop.
+	 */
+	private void emplenarPermisProcessar(List<NotificacioResourceEntity> entities, List<NotificacioResource> resources) {
+
+		List<String> codisAmbPermis = null;
+		for (int i = 0; i < entities.size(); i++) {
+			var entity = entities.get(i);
+			if (!NotificacioEstatEnumDto.FINALITZADA.equals(entity.getEstat())) {
+				continue;
+			}
+			if (codisAmbPermis == null) {
+				codisAmbPermis = getCodisAmbPermisProcessar();
+			}
+			var procedimentCodi = entity.getProcediment() != null ? entity.getProcediment().getCodi() : null;
+			var organCodi = entity.getOrganGestor() != null ? entity.getOrganGestor().getCodi() : null;
+			resources.get(i).setPermisProcessar(
+					(procedimentCodi != null && codisAmbPermis.contains(procedimentCodi)) ||
+					(organCodi != null && codisAmbPermis.contains(organCodi)));
+		}
+	}
+
+	private List<String> getCodisAmbPermisProcessar() {
+
+		var entitatId = userSessionHelper.getCurrentEntitatId();
+		if (entitatId == null) {
+			return List.of();
+		}
+		try {
+			return notificacioListHelper.getCodisProcedimentsAndOrgansAmpPermisProcessar(entitatId, authenticationHelper.getCurrentUserName());
+		} catch (Exception ex) {
+			log.error("Error obtenint els permisos de processar de l'usuari actual", ex);
+			return List.of();
+		}
+	}
+
+	private void actualitzarEstats(Map<Long, NotificacioResource> pendents) {
+
+		// actualitzarColumnesEstat persisteix els nous valors en una transacció (REQUIRES_NEW) separada
+		// d'aquesta, per això s'empren els valors que retorna en lloc de rellegir les entitats
+		try {
+			var estats = NotificacioEstatAsyncHelper.actualitzarColumnesEstat(legacyHelper, pendents.keySet());
+			pendents.forEach((id, resource) -> {
+				var estat = estats.get(id);
+				if (estat != null) {
+					resource.setEstatString(estat);
+				}
+			});
+		} catch (Exception ex) {
+			// Es mostra el darrer valor persistit: es tornarà a intentar a la propera consulta
+			log.error("Error actualitzant la columna estat de les remeses " + pendents.keySet(), ex);
+		}
+	}
+
+	// Columnes del llistat que no són camps de l'entitat i s'ordenen per un altre camp
+	private static final Map<String, String> CAMPS_ORDENACIO = Map.of(
+			// Valor calculat: igual que al llistat JSP, s'ordena per l'estat de la remesa
+			"estatString", "estat",
+			// Valors de not_notificacio_table (vegeu additionalSpecification)
+			"enviadaDate", "taula.enviadaDate",
+			"registreNums", "taula.registreNums",
+			"titular", "taula.titular");
+
+	@Override
+	protected Sort processSort(Sort sort) {
+
+		if (sort == null || sort.isUnsorted()) {
+			return sort;
+		}
+		return Sort.by(sort.stream()
+				.map(o -> CAMPS_ORDENACIO.containsKey(o.getProperty()) ? o.withProperty(CAMPS_ORDENACIO.get(o.getProperty())) : o)
+				.collect(Collectors.toList()));
+	}
+
+	// Màxim d'elements d'una clàusula IN a Oracle
+	private static final int MIDA_MAXIMA_IN = 1000;
+
+	@PersistenceContext
+	private EntityManager entityManager;
+
+	@Override
+	protected Page<NotificacioResourceEntity> entityRepositoryFindEntities(String quickFilter, String filter, String[] namedQueries, Pageable pageable) {
+
+		// A partir de la segona pàgina es consulten primer només els ids de la pàgina i després les remeses.
+		// Amb OFFSET, la base de dades ha de llegir i ordenar totes les files anteriors a la pàgina: amb les
+		// files senceres (i el JOIN a not_notificacio_table) l'ordenació no cap a memòria, i la darrera pàgina
+		// d'un milió de remeses tardava més de 30 s. Ordenant només els ids, entre una dècima i uns segons.
+		if (pageable.isUnpaged() || pageable.getOffset() == 0 || pageable.getPageSize() > MIDA_MAXIMA_IN) {
+			return super.entityRepositoryFindEntities(quickFilter, filter, namedQueries, pageable);
+		}
+		Specification<NotificacioResourceEntity> specification = toFindProcessedSpecification(quickFilter, filter, namedQueries);
+		var cb = entityManager.getCriteriaBuilder();
+		var idsQuery = cb.createQuery(Long.class);
+		var root = idsQuery.from(NotificacioResourceEntity.class);
+		var predicate = specification.toPredicate(root, idsQuery, cb);
+		if (predicate != null) {
+			idsQuery.where(predicate);
+		}
+		idsQuery.select(root.get("id")).orderBy(QueryUtils.toOrders(toProcessedSort(pageable.getSort()), root, cb));
+		List<Long> ids = entityManager.createQuery(idsQuery)
+				.setFirstResult((int) pageable.getOffset())
+				.setMaxResults(pageable.getPageSize())
+				.getResultList();
+		List<NotificacioResourceEntity> content = new ArrayList<>();
+		if (!ids.isEmpty()) {
+			// Els ids ja compleixen els filtres (i els permisos): només cal carregar-los, amb la taula
+			Specification<NotificacioResourceEntity> perIds = (r, q, b) -> r.get("id").in(ids);
+			var perId = entityRepository.findAll(perIds.and(additionalSpecification(namedQueries, false))).stream()
+					.collect(Collectors.toMap(NotificacioResourceEntity::getId, Function.identity()));
+			ids.stream().map(perId::get).filter(Objects::nonNull).forEach(content::add);
+		}
+		return PageableExecutionUtils.getPage(content, pageable, () -> entityRepository.count(specification));
+	}
+
+	@Override
+	protected Specification<NotificacioResourceEntity> additionalSpecification(String[] namedQueries, boolean isSingleResult) {
+
+		if (isSingleResult) {
+			return null;
+		}
+		// Els llistats carreguen not_notificacio_table (taula) amb un INNER JOIN, en la mateixa consulta
+		// (sense, el @OneToOne EAGER es carregaria amb un SELECT per fila). Ha de ser INNER i no LEFT:
+		// amb un LEFT JOIN la base de dades no pot recórrer els índexs de not_notificacio_table per
+		// ordenar-hi (data d'enviament, números de registre, titular) i ha d'ordenar totes les remeses.
+		// La consulta de COUNT (paginació) no fa el JOIN: amb un milió de remeses passa de més d'un segon
+		// a menys d'una dècima. És exacta perquè totes les remeses tenen fila a la taula: si no
+		// es pot crear, l'alta falla (NotificacioTableHelper.crearRegistre), i les remeses antigues que no
+		// en tenien es reparen en arrencar (procés inicial CREAR_REGISTRES_NOT_NOTIFICACIO_TABLE).
+		return (root, query, cb) -> {
+			if (NotificacioResourceEntity.class.equals(query.getResultType())) {
+				root.fetch("taula", JoinType.INNER);
+			}
+			return null;
+		};
 	}
 
 	@Override

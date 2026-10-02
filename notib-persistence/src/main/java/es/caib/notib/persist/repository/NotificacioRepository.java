@@ -27,6 +27,10 @@ import java.util.List;
  */
 public interface NotificacioRepository extends JpaRepository<NotificacioEntity, Long> {
 
+	// Remeses sense registre a not_notificacio_table (no surten al llistat JSP ni al de React)
+	@Query("select n.id from NotificacioEntity n where not exists (select t.id from NotificacioTableEntity t where t.id = n.id) order by n.id")
+	List<Long> findIdsSenseRegistreTaula();
+
 	@Query("select document.id from NotificacioEntity where id = :id")
 	Long findDOcumentId(@Param("id") Long id);
 

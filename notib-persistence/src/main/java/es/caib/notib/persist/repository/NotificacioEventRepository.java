@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -220,6 +221,29 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 			" and ne.fiReintents = true " +
 			" and ne.tipus = es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.CALLBACK_ENVIAMENT")
 	int countEventCallbackAmbFiReintentsByNotificacioId(@Param("notificacioId") Long notificacioId);
+
+	/**
+	 * Mateix recompte que countEventCallbackAmbFiReintentsByNotificacioId per a diverses notificacions
+	 * en una sola consulta. Retorna parelles [notificacioId, count] (només les que tenen algun event).
+	 */
+	@Query( "select ne.notificacio.id, count(ne.id) from NotificacioEventEntity ne " +
+			" where ne.notificacio.id in (:notificacioIds) " +
+			" and ne.fiReintents = true " +
+			" and ne.tipus = es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.CALLBACK_ENVIAMENT " +
+			" group by ne.notificacio.id")
+	List<Object[]> countEventCallbackAmbFiReintentsByNotificacioIds(@Param("notificacioIds") Collection<Long> notificacioIds);
+
+	/**
+	 * Darrer event API_CARPETA (el d'id més alt, com el primer de findLastApiCarpetaByEnviamentId) de
+	 * cadascun dels enviaments indicats, en una sola consulta.
+	 */
+	@Query( "select ne from NotificacioEventEntity ne " +
+			" where ne.id in (" +
+			"   select max(e.id) from NotificacioEventEntity e " +
+			"    where e.enviament.id in (:enviamentIds) " +
+			"      and e.tipus = es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.API_CARPETA " +
+			"    group by e.enviament.id)")
+	List<NotificacioEventEntity> findLastApiCarpetaByEnviamentIds(@Param("enviamentIds") Collection<Long> enviamentIds);
 
 	@Query( "from NotificacioEventEntity ne " +
 			" where ne.enviament.id = :enviamentId " +

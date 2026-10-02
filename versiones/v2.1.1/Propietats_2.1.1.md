@@ -5,6 +5,7 @@
 | `es.caib.notib.plugin.cie.https` | Indica si el servei web de CIE va sobre https | `true` |
 | `es.caib.notib.app.maxresults.selects` | Màxim nombre de resultats a mostrar a les llistes desplegables, per tal d'optimitzar les consultes | `20` |
 | `es.caib.notib.app.interficie.react.defecte` | Indica si en accedir a l'aplicació s'ha de mostrar per defecte la interfície nova (React) enlloc de la clàssica (JSP) | `false` |
+| `es.caib.notib.app.llistat.remeses.estat.asincron` | Llistat de remeses de la interfície React: si és `true`, la columna estat de les remeses pendents d'actualitzar es calcula en segon pla després de retornar el llistat i s'envia al navegador via SSE (el llistat es mostra immediatament, amb el darrer estat conegut i un indicador de càlcul en curs). Si és `false`, es calcula abans de retornar el llistat (en una sola transacció per pàgina). | `true` |
 
 > Aquestes propietats es desen a BBDD (taula `NOT_CONFIG`, creades pels scripts `02_update_2.1.1_dml.sql`). Per tant, **no** s'han d'afegir al fitxer de propietats.
 

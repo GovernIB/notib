@@ -17,7 +17,12 @@ import {generateGridRowStylesFromMap, getGridRowColorClass, NOTIFICACIO_ESTAT_EN
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import CustomDetailPanelToggle from "../../utils/CustomDetailPanelToggle.tsx";
 import ContentFilter, {useSpringFilterBuilder} from "./NotificacioFiltre.tsx";
+import useEstatRemesaAsync from '../../hooks/useEstatRemesaAsync';
 // import useSseRowRefresh from "../../hooks/useSseRowRefresh";
+
+// Ha de ser una funció estable: MUI X recalcula les mides de les files cada vegada que getRowHeight canvia
+// d'identitat, i una funció nova a cada render pot provocar un bucle infinit de renders
+const getRowHeightAuto = (): 'auto' => 'auto';
 
 const useDataGridColumns = (datagridApiRef: any,
                                                             notificacionsEsborrades: boolean,
@@ -87,7 +92,7 @@ const useDataGridColumns = (datagridApiRef: any,
                 width: 225,
                 renderCell: (params: any) => {
                     const estatJson = params?.formattedValue;
-                    return (<NotificacioEstatGrid estatJson={estatJson} estatEnum={params?.row?.estat} notificacioId={params?.row?.id} refreshGrid={refreshGrid} sir={params?.row.enviamentTipus === 'SIR'}/>);
+                    return (<NotificacioEstatGrid estatJson={estatJson} estatEnum={params?.row?.estat} estatPendent={params?.row?.estatPendent} notificacioId={params?.row?.id} refreshGrid={refreshGrid} sir={params?.row.enviamentTipus === 'SIR'}/>);
                 },
             }]),
             ...(noEsTaulaRemeses ? [] : [{
@@ -319,6 +324,8 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
     // al servidor (p.ex. per una resposta de Notifica, un event de registre, un callback...), sense
     // necessitat que l'usuari refresqui el llistat manualment.
     // useSseRowRefresh('notificacioResource', datagridApiRef, 'REMESA_ENVIAMENT_ESTAT', 'NOTIFICACIO_ESTAT_CANVIAT');
+    // Rep (via SSE) la columna estat de les remeses que el servidor calcula en segon pla
+    useEstatRemesaAsync(datagridApiRef);
     const springFilterBuilder = useSpringFilterBuilder();
     const [searchParams] = useSearchParams();
     const referencia = searchParams.get('referencia');
@@ -513,7 +520,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                 rowActionsColumnProps={{ width: 90 }}
                 rowAdditionalActions={rowAdditionalActions}
                 {...detailPanelProps}
-                getRowHeight={() => 'auto'}
+                getRowHeight={getRowHeightAuto}
                 getRowClassName={(params) => getGridRowColorClass(params.row.estat, NOTIFICACIO_ESTAT_ENUM_MAP)}
                 sx={generateGridRowStylesFromMap(NOTIFICACIO_ESTAT_ENUM_MAP)}
             />
