@@ -14,3 +14,16 @@ ALTER TABLE not_CONFIG ALTER COLUMN config_type_id SET NOT NULL;
 -- correspon (l'ALTER fallara si hi queda alguna fila NULL).
 ALTER TABLE not_PAGADOR_POSTAL ALTER COLUMN contracte_num SET NOT NULL;
 ALTER TABLE not_PAGADOR_POSTAL ALTER COLUMN facturacio_codi_client SET NOT NULL;
+
+-- not_notificacio_table: l'aplicació anterior no omple procediment_id ni actualitza organ_id quan canvia l'òrgan
+-- de la remesa, i el llistat de remeses (interfície React) hi filtra els permisos
+UPDATE not_notificacio_table t
+   SET procediment_id = n.procediment_id, organ_id = n.organ_gestor
+  FROM not_notificacio n
+ WHERE n.id = t.id
+   AND (n.procediment_id IS DISTINCT FROM t.procediment_id OR n.organ_gestor IS DISTINCT FROM t.organ_id);
+
+-- Procés inicial: crea el registre de not_notificacio_table de les remeses que l'aplicació anterior hagi creat sense
+-- (si hi falla, l'aplicació anterior no desfà l'alta de la remesa)
+DELETE FROM not_PROCESSOS_INICIALS WHERE CODI = 'CREAR_REGISTRES_NOT_NOTIFICACIO_TABLE';
+INSERT INTO not_PROCESSOS_INICIALS (ID, CODI, INIT) VALUES (7, 'CREAR_REGISTRES_NOT_NOTIFICACIO_TABLE', true);
