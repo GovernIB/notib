@@ -1,3 +1,4 @@
+import React from 'react';
 import {useBaseAppContext, useMuiActionReportLogic} from 'reactlib';
 import Grid from "@mui/material/Grid";
 import GridFormField from "../../components/GridFormField.tsx";
@@ -27,8 +28,9 @@ export const useAccionsNotificacio = (refreshGrid?: () => void) => {
         'CUSTOM'
     );
 
-    const botons = [{value: true, text: t('comu.guardar'), icon: 'save', componentProps: { variant: 'contained' }},
-        {value: false, text: t('comu.cancelar'), componentProps: { variant: 'outlined' }}];
+    // Memoritzat: useFormDialog torna a aplicar els botons quan canvia la referència de l'array (un array nou a cada render provoca un bucle infinit)
+    const botons = React.useMemo(() => [{value: true, text: t('comu.guardar'), icon: 'save', componentProps: { variant: 'contained' }},
+        {value: false, text: t('comu.cancelar'), componentProps: { variant: 'outlined' }}], [t]);
 
     const { temporalMessageShow } = useBaseAppContext();
     const { exec: anularRemesa, formDialogComponent: anularRemesaDialog } = useMuiActionReportLogic(
