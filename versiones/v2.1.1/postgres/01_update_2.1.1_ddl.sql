@@ -143,34 +143,45 @@ BEGIN
     END IF;
 END $$;
 
--- Índexs per ordenar el llistat de remeses per concepte, número d'expedient, usuari creador i tipus d'enviament
+-- Llistat de remeses (interfície React): es filtra, s'ordena, es pagina i es compta només amb
+-- not_notificacio_table, com al llistat JSP. El permís per procediment necessita el procediment de la remesa.
 
--- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-35::limit
-CREATE INDEX IF NOT EXISTS not_notif_ent_concepte_i ON not_notificacio(entitat_id, deleted, concepte);
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-44::limit
+ALTER TABLE not_notificacio_table ADD COLUMN IF NOT EXISTS procediment_id BIGINT;
+UPDATE not_notificacio_table t SET procediment_id = (SELECT n.procediment_id FROM not_notificacio n WHERE n.id = t.id);
 
--- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-36::limit
-CREATE INDEX IF NOT EXISTS not_notif_ent_numexp_i ON not_notificacio(entitat_id, deleted, registre_num_expedient);
+-- Índexs per ordenar el llistat de remeses i per al COUNT dels usuaris sense rol d'administrador (permisos i
+-- "només les meves"). Darrere la columna de l'ordenació hi ha les dels filtres de permisos i de "només les
+-- meves", i l'ID: la consulta dels ids d'una pàgina es resol llegint només l'índex.
+-- A PostgreSQL l'índex per titular no es crea: una entrada d'índex B-tree no pot superar
+-- ~2700 bytes i el titular pot arribar a 4000.
 
--- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-37::limit
-CREATE INDEX IF NOT EXISTS not_notif_ent_creatby_i ON not_notificacio(entitat_id, deleted, createdby_codi);
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-45::limit
+CREATE INDEX IF NOT EXISTS not_table_ent_created_i ON not_notificacio_table(entitat_id, deleted, createddate, organ_id, procediment_id, procediment_organ_id, createdby_codi, id);
 
--- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-38::limit
-CREATE INDEX IF NOT EXISTS not_notif_ent_envtipus_i ON not_notificacio(entitat_id, deleted, env_tipus);
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-46::limit
+CREATE INDEX IF NOT EXISTS not_table_ent_concepte_i ON not_notificacio_table(entitat_id, deleted, concepte, organ_id, procediment_id, procediment_organ_id, createdby_codi, id);
 
--- Índexs per ordenar el llistat de remeses per data d'enviament, números de registre i titular (camps de
--- not_notificacio_table). Inclouen ID perquè també s'indexin les files amb el camp nul.
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-47::limit
+CREATE INDEX IF NOT EXISTS not_table_ent_numexp_i ON not_notificacio_table(entitat_id, deleted, registre_num_expedient, organ_id, procediment_id, procediment_organ_id, createdby_codi, id);
 
--- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-39::limit
-CREATE INDEX IF NOT EXISTS not_table_envdate_i ON not_notificacio_table(enviada_date, id);
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-48::limit
+CREATE INDEX IF NOT EXISTS not_table_ent_creatby_i ON not_notificacio_table(entitat_id, deleted, createdby_codi, organ_id, procediment_id, procediment_organ_id, id);
 
--- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-40::limit
-CREATE INDEX IF NOT EXISTS not_table_regnums_i ON not_notificacio_table(registre_nums, id);
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-49::limit
+CREATE INDEX IF NOT EXISTS not_table_ent_envtipus_i ON not_notificacio_table(entitat_id, deleted, env_tipus, organ_id, procediment_id, procediment_organ_id, createdby_codi, id);
 
--- El changeset 2_1_1_000-41 (índex per titular) només s'aplica a Oracle: a PostgreSQL una entrada d'índex
--- B-tree no pot superar ~2700 bytes i el titular pot arribar a 4000.
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-50::limit
+CREATE INDEX IF NOT EXISTS not_table_ent_envdate_i ON not_notificacio_table(entitat_id, deleted, enviada_date, organ_id, procediment_id, procediment_organ_id, createdby_codi, id);
 
--- Índex per al COUNT del llistat de remeses dels usuaris sense rol d'administrador (filtres de permisos i
--- "només les meves"): es resol llegint només l'índex
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-51::limit
+CREATE INDEX IF NOT EXISTS not_table_ent_regnums_i ON not_notificacio_table(entitat_id, deleted, registre_nums, organ_id, procediment_id, procediment_organ_id, createdby_codi, id);
 
--- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-43::limit
-CREATE INDEX IF NOT EXISTS not_notif_ent_permis_i ON not_notificacio(entitat_id, deleted, organ_gestor, procediment_id, procediment_organ_id, createdby_codi);
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-53::limit
+CREATE INDEX IF NOT EXISTS not_table_ent_estat_i ON not_notificacio_table(entitat_id, deleted, estat, organ_id, procediment_id, procediment_organ_id, createdby_codi, id);
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-54::limit
+CREATE INDEX IF NOT EXISTS not_table_ent_proc_i ON not_notificacio_table(entitat_id, deleted, procediment_id, organ_id, procediment_organ_id, createdby_codi, id);
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-55::limit
+CREATE INDEX IF NOT EXISTS not_table_ent_permis_i ON not_notificacio_table(entitat_id, deleted, organ_id, procediment_id, procediment_organ_id, createdby_codi, id);

@@ -123,36 +123,49 @@ EXCEPTION WHEN OTHERS THEN
 END;
 /
 
--- Índexs per ordenar el llistat de remeses per concepte, número d'expedient, usuari creador i tipus d'enviament
--- Els de text són índexs NLSSORT: la sessió ordena amb l'NLS_SORT de la JVM (CATALAN amb una JVM ca_ES) i un
--- ORDER BY de text només pot fer servir un índex amb el mateix NLS_SORT.
+-- Llistat de remeses (interfície React): es filtra, s'ordena, es pagina i es compta només amb
+-- not_notificacio_table, com al llistat JSP. El permís per procediment necessita el procediment de la remesa.
 
--- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-35::limit
-CREATE INDEX not_NOTIF_ENT_CONCEPTE_I ON not_NOTIFICACIO(ENTITAT_ID, DELETED, NLSSORT(CONCEPTE, 'NLS_SORT=CATALAN'));
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-44::limit
+ALTER TABLE not_NOTIFICACIO_TABLE ADD PROCEDIMENT_ID NUMBER(19,0);
+UPDATE not_NOTIFICACIO_TABLE t SET PROCEDIMENT_ID = (SELECT n.PROCEDIMENT_ID FROM not_NOTIFICACIO n WHERE n.ID = t.ID);
+COMMIT;
 
--- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-36::limit
-CREATE INDEX not_NOTIF_ENT_NUMEXP_I ON not_NOTIFICACIO(ENTITAT_ID, DELETED, NLSSORT(REGISTRE_NUM_EXPEDIENT, 'NLS_SORT=CATALAN'));
+-- Índexs per ordenar el llistat de remeses i per al COUNT dels usuaris sense rol d'administrador (permisos i
+-- "només les meves"). Darrere la columna de l'ordenació hi ha les dels filtres de permisos i de "només les
+-- meves", i l'ID: la consulta dels ids d'una pàgina es resol llegint només l'índex.
+-- Els de text són índexs NLSSORT: la sessió ordena amb l'NLS_SORT de la JVM (CATALAN
+-- amb una JVM ca_ES) i un ORDER BY de text només pot fer servir un índex amb el mateix NLS_SORT.
 
--- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-37::limit
-CREATE INDEX not_NOTIF_ENT_CREATBY_I ON not_NOTIFICACIO(ENTITAT_ID, DELETED, NLSSORT(CREATEDBY_CODI, 'NLS_SORT=CATALAN'));
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-45::limit
+CREATE INDEX not_TABLE_ENT_CREATED_I ON not_NOTIFICACIO_TABLE(ENTITAT_ID, DELETED, CREATEDDATE, ORGAN_ID, PROCEDIMENT_ID, PROCEDIMENT_ORGAN_ID, CREATEDBY_CODI, ID);
 
--- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-38::limit
-CREATE INDEX not_NOTIF_ENT_ENVTIPUS_I ON not_NOTIFICACIO(ENTITAT_ID, DELETED, ENV_TIPUS);
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-46::limit
+CREATE INDEX not_TABLE_ENT_CONCEPTE_I ON not_NOTIFICACIO_TABLE(ENTITAT_ID, DELETED, NLSSORT(CONCEPTE, 'NLS_SORT=CATALAN'), ORGAN_ID, PROCEDIMENT_ID, PROCEDIMENT_ORGAN_ID, CREATEDBY_CODI, ID);
 
--- Índexs per ordenar el llistat de remeses per data d'enviament, números de registre i titular (camps de
--- not_notificacio_table). Inclouen ID perquè també s'indexin les files amb el camp nul.
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-47::limit
+CREATE INDEX not_TABLE_ENT_NUMEXP_I ON not_NOTIFICACIO_TABLE(ENTITAT_ID, DELETED, NLSSORT(REGISTRE_NUM_EXPEDIENT, 'NLS_SORT=CATALAN'), ORGAN_ID, PROCEDIMENT_ID, PROCEDIMENT_ORGAN_ID, CREATEDBY_CODI, ID);
 
--- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-39::limit
-CREATE INDEX not_TABLE_ENVDATE_I ON not_NOTIFICACIO_TABLE(ENVIADA_DATE, ID);
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-48::limit
+CREATE INDEX not_TABLE_ENT_CREATBY_I ON not_NOTIFICACIO_TABLE(ENTITAT_ID, DELETED, NLSSORT(CREATEDBY_CODI, 'NLS_SORT=CATALAN'), ORGAN_ID, PROCEDIMENT_ID, PROCEDIMENT_ORGAN_ID, ID);
 
--- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-40::limit
-CREATE INDEX not_TABLE_REGNUMS_I ON not_NOTIFICACIO_TABLE(NLSSORT(REGISTRE_NUMS, 'NLS_SORT=CATALAN'), ID);
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-49::limit
+CREATE INDEX not_TABLE_ENT_ENVTIPUS_I ON not_NOTIFICACIO_TABLE(ENTITAT_ID, DELETED, ENV_TIPUS, ORGAN_ID, PROCEDIMENT_ID, PROCEDIMENT_ORGAN_ID, CREATEDBY_CODI, ID);
 
--- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-41::limit
-CREATE INDEX not_TABLE_TITULAR_I ON not_NOTIFICACIO_TABLE(NLSSORT(TITULAR, 'NLS_SORT=CATALAN'), ID);
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-50::limit
+CREATE INDEX not_TABLE_ENT_ENVDATE_I ON not_NOTIFICACIO_TABLE(ENTITAT_ID, DELETED, ENVIADA_DATE, ORGAN_ID, PROCEDIMENT_ID, PROCEDIMENT_ORGAN_ID, CREATEDBY_CODI, ID);
 
--- Índex per al COUNT del llistat de remeses dels usuaris sense rol d'administrador (filtres de permisos i
--- "només les meves"): es resol llegint només l'índex
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-51::limit
+CREATE INDEX not_TABLE_ENT_REGNUMS_I ON not_NOTIFICACIO_TABLE(ENTITAT_ID, DELETED, NLSSORT(REGISTRE_NUMS, 'NLS_SORT=CATALAN'), ORGAN_ID, PROCEDIMENT_ID, PROCEDIMENT_ORGAN_ID, CREATEDBY_CODI, ID);
 
--- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-43::limit
-CREATE INDEX not_NOTIF_ENT_PERMIS_I ON not_NOTIFICACIO(ENTITAT_ID, DELETED, ORGAN_GESTOR, PROCEDIMENT_ID, PROCEDIMENT_ORGAN_ID, CREATEDBY_CODI);
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-52::limit
+CREATE INDEX not_TABLE_ENT_TITULAR_I ON not_NOTIFICACIO_TABLE(ENTITAT_ID, DELETED, NLSSORT(TITULAR, 'NLS_SORT=CATALAN'), ORGAN_ID, PROCEDIMENT_ID, PROCEDIMENT_ORGAN_ID, CREATEDBY_CODI, ID);
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-53::limit
+CREATE INDEX not_TABLE_ENT_ESTAT_I ON not_NOTIFICACIO_TABLE(ENTITAT_ID, DELETED, ESTAT, ORGAN_ID, PROCEDIMENT_ID, PROCEDIMENT_ORGAN_ID, CREATEDBY_CODI, ID);
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-54::limit
+CREATE INDEX not_TABLE_ENT_PROC_I ON not_NOTIFICACIO_TABLE(ENTITAT_ID, DELETED, PROCEDIMENT_ID, ORGAN_ID, PROCEDIMENT_ORGAN_ID, CREATEDBY_CODI, ID);
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-55::limit
+CREATE INDEX not_TABLE_ENT_PERMIS_I ON not_NOTIFICACIO_TABLE(ENTITAT_ID, DELETED, ORGAN_ID, PROCEDIMENT_ID, PROCEDIMENT_ORGAN_ID, CREATEDBY_CODI, ID);

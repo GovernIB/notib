@@ -622,172 +622,6 @@ databaseChangeLog:
                             -   column:
                                     name: CREATEDBY_CODI
 
-    # Ordenació del llistat de remeses per concepte: amb l'índex, Oracle/PostgreSQL llegeixen les
-    # files ja ordenades i s'aturen a la mida de pàgina, en lloc d'ordenar totes les remeses de l'entitat.
-    -   changeSet:
-            id: 2_1_1_000-35
-            author: limit
-            preConditions:
-                -   onFail: MARK_RAN
-                -   not:
-                        -   indexExists:
-                                tableName: ${db_prefix}NOTIFICACIO
-                                indexName: ${db_prefix}NOTIF_ENT_CONCEPTE_I
-            changes:
-                -   createIndex:
-                        tableName: ${db_prefix}NOTIFICACIO
-                        indexName: ${db_prefix}NOTIF_ENT_CONCEPTE_I
-                        columns:
-                            -   column:
-                                    name: ENTITAT_ID
-                            -   column:
-                                    name: DELETED
-                            -   column:
-                                    name: ${ordreTextInici}CONCEPTE${ordreTextFi}
-                                    computed: true
-
-    # Ordenació del llistat de remeses per número d'expedient: amb l'índex, Oracle/PostgreSQL llegeixen les
-    # files ja ordenades i s'aturen a la mida de pàgina, en lloc d'ordenar totes les remeses de l'entitat.
-    -   changeSet:
-            id: 2_1_1_000-36
-            author: limit
-            preConditions:
-                -   onFail: MARK_RAN
-                -   not:
-                        -   indexExists:
-                                tableName: ${db_prefix}NOTIFICACIO
-                                indexName: ${db_prefix}NOTIF_ENT_NUMEXP_I
-            changes:
-                -   createIndex:
-                        tableName: ${db_prefix}NOTIFICACIO
-                        indexName: ${db_prefix}NOTIF_ENT_NUMEXP_I
-                        columns:
-                            -   column:
-                                    name: ENTITAT_ID
-                            -   column:
-                                    name: DELETED
-                            -   column:
-                                    name: ${ordreTextInici}REGISTRE_NUM_EXPEDIENT${ordreTextFi}
-                                    computed: true
-
-    # Ordenació del llistat de remeses per usuari creador: amb l'índex, Oracle/PostgreSQL llegeixen les
-    # files ja ordenades i s'aturen a la mida de pàgina, en lloc d'ordenar totes les remeses de l'entitat.
-    -   changeSet:
-            id: 2_1_1_000-37
-            author: limit
-            preConditions:
-                -   onFail: MARK_RAN
-                -   not:
-                        -   indexExists:
-                                tableName: ${db_prefix}NOTIFICACIO
-                                indexName: ${db_prefix}NOTIF_ENT_CREATBY_I
-            changes:
-                -   createIndex:
-                        tableName: ${db_prefix}NOTIFICACIO
-                        indexName: ${db_prefix}NOTIF_ENT_CREATBY_I
-                        columns:
-                            -   column:
-                                    name: ENTITAT_ID
-                            -   column:
-                                    name: DELETED
-                            -   column:
-                                    name: ${ordreTextInici}CREATEDBY_CODI${ordreTextFi}
-                                    computed: true
-
-    # Ordenació del llistat de remeses per tipus d'enviament: amb l'índex, Oracle/PostgreSQL llegeixen les
-    # files ja ordenades i s'aturen a la mida de pàgina, en lloc d'ordenar totes les remeses de l'entitat.
-    -   changeSet:
-            id: 2_1_1_000-38
-            author: limit
-            preConditions:
-                -   onFail: MARK_RAN
-                -   not:
-                        -   indexExists:
-                                tableName: ${db_prefix}NOTIFICACIO
-                                indexName: ${db_prefix}NOTIF_ENT_ENVTIPUS_I
-            changes:
-                -   createIndex:
-                        tableName: ${db_prefix}NOTIFICACIO
-                        indexName: ${db_prefix}NOTIF_ENT_ENVTIPUS_I
-                        columns:
-                            -   column:
-                                    name: ENTITAT_ID
-                            -   column:
-                                    name: DELETED
-                            -   column:
-                                    name: ENV_TIPUS
-
-    # Ordenació del llistat de remeses per data d'enviament (camp de not_notificacio_table, unida amb INNER JOIN).
-    # S'hi afegeix ID perquè l'índex inclogui també les files amb ENVIADA_DATE nul (Oracle no indexa les
-    # entrades amb totes les columnes nul·les) i es pugui recórrer per ordenar tota la consulta.
-    -   changeSet:
-            id: 2_1_1_000-39
-            author: limit
-            preConditions:
-                -   onFail: MARK_RAN
-                -   not:
-                        -   indexExists:
-                                tableName: ${db_prefix}NOTIFICACIO_TABLE
-                                indexName: ${db_prefix}TABLE_ENVDATE_I
-            changes:
-                -   createIndex:
-                        tableName: ${db_prefix}NOTIFICACIO_TABLE
-                        indexName: ${db_prefix}TABLE_ENVDATE_I
-                        columns:
-                            -   column:
-                                    name: ENVIADA_DATE
-                            -   column:
-                                    name: ID
-
-    # Ordenació del llistat de remeses per números de registre (camp de not_notificacio_table, unida amb INNER JOIN).
-    # S'hi afegeix ID perquè l'índex inclogui també les files amb REGISTRE_NUMS nul (Oracle no indexa les
-    # entrades amb totes les columnes nul·les) i es pugui recórrer per ordenar tota la consulta.
-    -   changeSet:
-            id: 2_1_1_000-40
-            author: limit
-            preConditions:
-                -   onFail: MARK_RAN
-                -   not:
-                        -   indexExists:
-                                tableName: ${db_prefix}NOTIFICACIO_TABLE
-                                indexName: ${db_prefix}TABLE_REGNUMS_I
-            changes:
-                -   createIndex:
-                        tableName: ${db_prefix}NOTIFICACIO_TABLE
-                        indexName: ${db_prefix}TABLE_REGNUMS_I
-                        columns:
-                            -   column:
-                                    name: ${ordreTextInici}REGISTRE_NUMS${ordreTextFi}
-                                    computed: true
-                            -   column:
-                                    name: ID
-
-    # Ordenació del llistat de remeses per titular (camp de not_notificacio_table, unida amb INNER JOIN).
-    # S'hi afegeix ID perquè l'índex inclogui també les files amb TITULAR nul (Oracle no indexa les
-    # entrades amb totes les columnes nul·les) i es pugui recórrer per ordenar tota la consulta.
-    # Només Oracle: a PostgreSQL una entrada d'índex B-tree no pot superar ~2700 bytes i el titular
-    # (concatenació dels titulars de tots els enviaments) pot arribar a 4000: l'INSERT fallaria.
-    -   changeSet:
-            id: 2_1_1_000-41
-            author: limit
-            dbms: oracle
-            preConditions:
-                -   onFail: MARK_RAN
-                -   not:
-                        -   indexExists:
-                                tableName: ${db_prefix}NOTIFICACIO_TABLE
-                                indexName: ${db_prefix}TABLE_TITULAR_I
-            changes:
-                -   createIndex:
-                        tableName: ${db_prefix}NOTIFICACIO_TABLE
-                        indexName: ${db_prefix}TABLE_TITULAR_I
-                        columns:
-                            -   column:
-                                    name: ${ordreTextInici}TITULAR${ordreTextFi}
-                                    computed: true
-                            -   column:
-                                    name: ID
-
     # Procés inicial: crea el registre de not_notificacio_table de les remeses que no en tenen (no sortien al
     # llistat JSP i farien inexacte el total del llistat de React, que es compta sense JOIN a la taula)
     -   changeSet:
@@ -812,32 +646,373 @@ databaseChangeLog:
                                     name: INIT
                                     valueBoolean: true
 
-    # COUNT del llistat de remeses dels usuaris sense rol d'administrador: el filtre de permisos (òrgan,
-    # procediment o procediment comú de l'òrgan) i el de "només les meves" es resolen llegint només aquest
-    # índex, sense accedir a la taula (amb un milió de remeses, de ~0,6 s a ~0,15 s)
+    # Llistat de remeses (interfície React): es filtra, s'ordena, es pagina i es compta només amb
+    # not_notificacio_table, com al llistat JSP. El permís per procediment necessita el procediment de la remesa.
     -   changeSet:
-            id: 2_1_1_000-43
+            id: 2_1_1_000-44
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   columnExists:
+                                tableName: ${db_prefix}NOTIFICACIO_TABLE
+                                columnName: PROCEDIMENT_ID
+            changes:
+                -   addColumn:
+                        tableName: ${db_prefix}NOTIFICACIO_TABLE
+                        columns:
+                            -   column:
+                                    name: PROCEDIMENT_ID
+                                    type: ${type.pk}
+                -   sql: "UPDATE ${db_prefix}NOTIFICACIO_TABLE t SET PROCEDIMENT_ID = (SELECT n.PROCEDIMENT_ID FROM ${db_prefix}NOTIFICACIO n WHERE n.ID = t.ID)"
+
+    # Ordenació del llistat de remeses: amb l'índex, la base de dades llegeix les files ja ordenades i s'atura
+    # a la mida de pàgina. Els de text, a Oracle, són NLSSORT (vegeu les propietats ordreTextInici/ordreTextFi).
+    # Darrere la columna de l'ordenació hi ha les dels filtres de permisos i de "només les meves", i l'ID: la
+    # consulta dels ids d'una pàgina es resol llegint només l'índex, sense accedir a la taula per cada fila
+    # anterior a la pàgina (les pàgines del mig d'un milió de remeses, de ~2 s a ~0,4 s).
+    -   changeSet:
+            id: 2_1_1_000-45
             author: limit
             preConditions:
                 -   onFail: MARK_RAN
                 -   not:
                         -   indexExists:
-                                tableName: ${db_prefix}NOTIFICACIO
-                                indexName: ${db_prefix}NOTIF_ENT_PERMIS_I
+                                tableName: ${db_prefix}NOTIFICACIO_TABLE
+                                indexName: ${db_prefix}TABLE_ENT_CREATED_I
             changes:
                 -   createIndex:
-                        tableName: ${db_prefix}NOTIFICACIO
-                        indexName: ${db_prefix}NOTIF_ENT_PERMIS_I
+                        tableName: ${db_prefix}NOTIFICACIO_TABLE
+                        indexName: ${db_prefix}TABLE_ENT_CREATED_I
                         columns:
                             -   column:
                                     name: ENTITAT_ID
                             -   column:
                                     name: DELETED
                             -   column:
-                                    name: ORGAN_GESTOR
+                                    name: CREATEDDATE
+                            -   column:
+                                    name: ORGAN_ID
                             -   column:
                                     name: PROCEDIMENT_ID
                             -   column:
                                     name: PROCEDIMENT_ORGAN_ID
                             -   column:
                                     name: CREATEDBY_CODI
+                            -   column:
+                                    name: ID
+
+    -   changeSet:
+            id: 2_1_1_000-46
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   indexExists:
+                                tableName: ${db_prefix}NOTIFICACIO_TABLE
+                                indexName: ${db_prefix}TABLE_ENT_CONCEPTE_I
+            changes:
+                -   createIndex:
+                        tableName: ${db_prefix}NOTIFICACIO_TABLE
+                        indexName: ${db_prefix}TABLE_ENT_CONCEPTE_I
+                        columns:
+                            -   column:
+                                    name: ENTITAT_ID
+                            -   column:
+                                    name: DELETED
+                            -   column:
+                                    name: ${ordreTextInici}CONCEPTE${ordreTextFi}
+                                    computed: true
+                            -   column:
+                                    name: ORGAN_ID
+                            -   column:
+                                    name: PROCEDIMENT_ID
+                            -   column:
+                                    name: PROCEDIMENT_ORGAN_ID
+                            -   column:
+                                    name: CREATEDBY_CODI
+                            -   column:
+                                    name: ID
+
+    -   changeSet:
+            id: 2_1_1_000-47
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   indexExists:
+                                tableName: ${db_prefix}NOTIFICACIO_TABLE
+                                indexName: ${db_prefix}TABLE_ENT_NUMEXP_I
+            changes:
+                -   createIndex:
+                        tableName: ${db_prefix}NOTIFICACIO_TABLE
+                        indexName: ${db_prefix}TABLE_ENT_NUMEXP_I
+                        columns:
+                            -   column:
+                                    name: ENTITAT_ID
+                            -   column:
+                                    name: DELETED
+                            -   column:
+                                    name: ${ordreTextInici}REGISTRE_NUM_EXPEDIENT${ordreTextFi}
+                                    computed: true
+                            -   column:
+                                    name: ORGAN_ID
+                            -   column:
+                                    name: PROCEDIMENT_ID
+                            -   column:
+                                    name: PROCEDIMENT_ORGAN_ID
+                            -   column:
+                                    name: CREATEDBY_CODI
+                            -   column:
+                                    name: ID
+
+    -   changeSet:
+            id: 2_1_1_000-48
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   indexExists:
+                                tableName: ${db_prefix}NOTIFICACIO_TABLE
+                                indexName: ${db_prefix}TABLE_ENT_CREATBY_I
+            changes:
+                -   createIndex:
+                        tableName: ${db_prefix}NOTIFICACIO_TABLE
+                        indexName: ${db_prefix}TABLE_ENT_CREATBY_I
+                        columns:
+                            -   column:
+                                    name: ENTITAT_ID
+                            -   column:
+                                    name: DELETED
+                            -   column:
+                                    name: ${ordreTextInici}CREATEDBY_CODI${ordreTextFi}
+                                    computed: true
+                            -   column:
+                                    name: ORGAN_ID
+                            -   column:
+                                    name: PROCEDIMENT_ID
+                            -   column:
+                                    name: PROCEDIMENT_ORGAN_ID
+                            -   column:
+                                    name: ID
+
+    -   changeSet:
+            id: 2_1_1_000-49
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   indexExists:
+                                tableName: ${db_prefix}NOTIFICACIO_TABLE
+                                indexName: ${db_prefix}TABLE_ENT_ENVTIPUS_I
+            changes:
+                -   createIndex:
+                        tableName: ${db_prefix}NOTIFICACIO_TABLE
+                        indexName: ${db_prefix}TABLE_ENT_ENVTIPUS_I
+                        columns:
+                            -   column:
+                                    name: ENTITAT_ID
+                            -   column:
+                                    name: DELETED
+                            -   column:
+                                    name: ENV_TIPUS
+                            -   column:
+                                    name: ORGAN_ID
+                            -   column:
+                                    name: PROCEDIMENT_ID
+                            -   column:
+                                    name: PROCEDIMENT_ORGAN_ID
+                            -   column:
+                                    name: CREATEDBY_CODI
+                            -   column:
+                                    name: ID
+
+    -   changeSet:
+            id: 2_1_1_000-50
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   indexExists:
+                                tableName: ${db_prefix}NOTIFICACIO_TABLE
+                                indexName: ${db_prefix}TABLE_ENT_ENVDATE_I
+            changes:
+                -   createIndex:
+                        tableName: ${db_prefix}NOTIFICACIO_TABLE
+                        indexName: ${db_prefix}TABLE_ENT_ENVDATE_I
+                        columns:
+                            -   column:
+                                    name: ENTITAT_ID
+                            -   column:
+                                    name: DELETED
+                            -   column:
+                                    name: ENVIADA_DATE
+                            -   column:
+                                    name: ORGAN_ID
+                            -   column:
+                                    name: PROCEDIMENT_ID
+                            -   column:
+                                    name: PROCEDIMENT_ORGAN_ID
+                            -   column:
+                                    name: CREATEDBY_CODI
+                            -   column:
+                                    name: ID
+
+    -   changeSet:
+            id: 2_1_1_000-51
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   indexExists:
+                                tableName: ${db_prefix}NOTIFICACIO_TABLE
+                                indexName: ${db_prefix}TABLE_ENT_REGNUMS_I
+            changes:
+                -   createIndex:
+                        tableName: ${db_prefix}NOTIFICACIO_TABLE
+                        indexName: ${db_prefix}TABLE_ENT_REGNUMS_I
+                        columns:
+                            -   column:
+                                    name: ENTITAT_ID
+                            -   column:
+                                    name: DELETED
+                            -   column:
+                                    name: ${ordreTextInici}REGISTRE_NUMS${ordreTextFi}
+                                    computed: true
+                            -   column:
+                                    name: ORGAN_ID
+                            -   column:
+                                    name: PROCEDIMENT_ID
+                            -   column:
+                                    name: PROCEDIMENT_ORGAN_ID
+                            -   column:
+                                    name: CREATEDBY_CODI
+                            -   column:
+                                    name: ID
+
+    # Només Oracle: a PostgreSQL una entrada d'índex B-tree no pot superar ~2700 bytes i el titular
+    # (concatenació dels titulars de tots els enviaments) pot arribar a 4000: l'INSERT fallaria.
+    -   changeSet:
+            id: 2_1_1_000-52
+            author: limit
+            dbms: oracle
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   indexExists:
+                                tableName: ${db_prefix}NOTIFICACIO_TABLE
+                                indexName: ${db_prefix}TABLE_ENT_TITULAR_I
+            changes:
+                -   createIndex:
+                        tableName: ${db_prefix}NOTIFICACIO_TABLE
+                        indexName: ${db_prefix}TABLE_ENT_TITULAR_I
+                        columns:
+                            -   column:
+                                    name: ENTITAT_ID
+                            -   column:
+                                    name: DELETED
+                            -   column:
+                                    name: ${ordreTextInici}TITULAR${ordreTextFi}
+                                    computed: true
+                            -   column:
+                                    name: ORGAN_ID
+                            -   column:
+                                    name: PROCEDIMENT_ID
+                            -   column:
+                                    name: PROCEDIMENT_ORGAN_ID
+                            -   column:
+                                    name: CREATEDBY_CODI
+                            -   column:
+                                    name: ID
+
+    -   changeSet:
+            id: 2_1_1_000-53
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   indexExists:
+                                tableName: ${db_prefix}NOTIFICACIO_TABLE
+                                indexName: ${db_prefix}TABLE_ENT_ESTAT_I
+            changes:
+                -   createIndex:
+                        tableName: ${db_prefix}NOTIFICACIO_TABLE
+                        indexName: ${db_prefix}TABLE_ENT_ESTAT_I
+                        columns:
+                            -   column:
+                                    name: ENTITAT_ID
+                            -   column:
+                                    name: DELETED
+                            -   column:
+                                    name: ESTAT
+                            -   column:
+                                    name: ORGAN_ID
+                            -   column:
+                                    name: PROCEDIMENT_ID
+                            -   column:
+                                    name: PROCEDIMENT_ORGAN_ID
+                            -   column:
+                                    name: CREATEDBY_CODI
+                            -   column:
+                                    name: ID
+
+    -   changeSet:
+            id: 2_1_1_000-54
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   indexExists:
+                                tableName: ${db_prefix}NOTIFICACIO_TABLE
+                                indexName: ${db_prefix}TABLE_ENT_PROC_I
+            changes:
+                -   createIndex:
+                        tableName: ${db_prefix}NOTIFICACIO_TABLE
+                        indexName: ${db_prefix}TABLE_ENT_PROC_I
+                        columns:
+                            -   column:
+                                    name: ENTITAT_ID
+                            -   column:
+                                    name: DELETED
+                            -   column:
+                                    name: PROCEDIMENT_ID
+                            -   column:
+                                    name: ORGAN_ID
+                            -   column:
+                                    name: PROCEDIMENT_ORGAN_ID
+                            -   column:
+                                    name: CREATEDBY_CODI
+                            -   column:
+                                    name: ID
+
+    # COUNT dels usuaris sense rol d'administrador: el filtre de permisos (òrgan, procediment o procediment
+    # comú de l'òrgan) i el de "només les meves" es resolen llegint només l'índex. També ordena per òrgan (amb l'ID,
+    # com els de l'ordenació).
+    -   changeSet:
+            id: 2_1_1_000-55
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   indexExists:
+                                tableName: ${db_prefix}NOTIFICACIO_TABLE
+                                indexName: ${db_prefix}TABLE_ENT_PERMIS_I
+            changes:
+                -   createIndex:
+                        tableName: ${db_prefix}NOTIFICACIO_TABLE
+                        indexName: ${db_prefix}TABLE_ENT_PERMIS_I
+                        columns:
+                            -   column:
+                                    name: ENTITAT_ID
+                            -   column:
+                                    name: DELETED
+                            -   column:
+                                    name: ORGAN_ID
+                            -   column:
+                                    name: PROCEDIMENT_ID
+                            -   column:
+                                    name: PROCEDIMENT_ORGAN_ID
+                            -   column:
+                                    name: CREATEDBY_CODI
+                            -   column:
+                                    name: ID
