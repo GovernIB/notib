@@ -214,7 +214,7 @@ public class PermisosServiceImpl implements PermisosService {
     }
 
     @Override
-    @CacheEvict(value = {"organsAmbPermis"}, allEntries = true)
+    @CacheEvict(value = {"organsAmbPermis", "codisPermisProcessar"}, allEntries = true)
     public void evictGetOrgansAmbPermis() {
         // evict
     }
@@ -391,9 +391,15 @@ public class PermisosServiceImpl implements PermisosService {
                 codis.add(organ.getCodi());
             }
         }
-        return not.getProcediment().getCodi() != null
-                && (PermisEnum.PROCESSAR.equals(permis) ? NotificacioEstatEnumDto.FINALITZADA.equals(not.getEstat()) : true)
-                && (codis.contains(not.getProcediment().getCodi()) || codis.contains(not.getOrganGestor().getId()));
+        if (PermisEnum.PROCESSAR.equals(permis) && !NotificacioEstatEnumDto.FINALITZADA.equals(not.getEstat())) {
+            return false;
+        }
+        // Els codis són de procediments i d'òrgans: l'òrgan s'ha de comparar pel codi (abans es
+        // comparava l'id, un Long, amb una llista de String i el permís per òrgan no comptava mai).
+        // Les notificacions sense procediment (p.ex. comunicacions) només depenen del permís per òrgan.
+        var procedimentCodi = not.getProcediment() != null ? not.getProcediment().getCodi() : null;
+        var organCodi = not.getOrganGestor() != null ? not.getOrganGestor().getCodi() : null;
+        return (procedimentCodi != null && codis.contains(procedimentCodi)) || (organCodi != null && codis.contains(organCodi));
     }
 
 

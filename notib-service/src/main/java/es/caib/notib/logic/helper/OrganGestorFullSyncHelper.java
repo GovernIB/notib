@@ -33,6 +33,7 @@ public class OrganGestorFullSyncHelper {
 
 	private final OrganGestorSyncHelper organGestorSyncHelper;
 	private final PermisosHelper permisosHelper;
+	private final CacheHelper cacheHelper;
 	private final ProcSerSyncHelper procSerSyncHelper;
 	private final OrganGestorService organGestorService;
 	private final OrganGestorRepository organGestorRepository;
@@ -113,6 +114,10 @@ public class OrganGestorFullSyncHelper {
 			publish(eventName, 95, "Error sincronitzant oficines SIR: " + ex.getMessage());
 		}
 
+		// Òrgans, permisos migrats, procediments i serveis poden haver canviat: es buiden les caches
+		// de permisos (també si alguna de les fases no crítiques ha fallat, perquè les anteriors sí
+		// que poden haver modificat dades)
+		cacheHelper.evictCachesPermisosOrgansProcediments();
 		publish(eventName, 100, "Sincronització completada", SseEvent.SseEventStatus.DONE);
 		return resultatOrgans;
 	}

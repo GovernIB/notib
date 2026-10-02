@@ -1175,6 +1175,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 						permisosHelper.updatePermis(procediment.getId(), ProcedimentEntity.class, permisDto);
 					}
 				}
+				cacheHelper.evictCachesPermisosOrgansProcediments();
 				totbe = true;
 				integracioHelper.addAccioOk(info);
 			} catch (Exception ex) {

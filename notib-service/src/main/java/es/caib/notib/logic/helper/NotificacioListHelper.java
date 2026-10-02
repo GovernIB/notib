@@ -17,6 +17,7 @@ import es.caib.notib.persist.repository.ProcedimentRepository;
 import es.caib.notib.persist.repository.ServeiRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -67,6 +68,9 @@ public class NotificacioListHelper {
         return paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
     }
 
+    // Cache pròpia de TTL curt (veure ehcache.xml) en lloc de la cache "organsAmbPermis" de
+    // PermisosService.getOrgansAmbPermis, desactivada al #1082
+    @Cacheable(value = "codisPermisProcessar", key = "#entitatId.toString().concat('-').concat(#usuariCodi)")
     public List<String> getCodisProcedimentsAndOrgansAmpPermisProcessar(Long entitatId, String usuariCodi) {
         List<String> codis = new ArrayList<>();
         var procSersAmbPermis = permisosService.getProcSersAmbPermis(entitatId, usuariCodi, PermisEnum.PROCESSAR);

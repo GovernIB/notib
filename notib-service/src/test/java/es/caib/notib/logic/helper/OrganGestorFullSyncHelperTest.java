@@ -50,6 +50,7 @@ class OrganGestorFullSyncHelperTest {
 	void sincronitzarTotShouldRunAllPhasesAndPublishDoneAtTheEnd() throws Exception {
 		// given
 		var permisosHelper = Mockito.mock(PermisosHelper.class);
+		var cacheHelper = Mockito.mock(CacheHelper.class);
 		var procSerSyncHelper = Mockito.mock(ProcSerSyncHelper.class);
 		var organGestorService = Mockito.mock(OrganGestorService.class);
 		var organGestorRepository = Mockito.mock(OrganGestorRepository.class);
@@ -80,7 +81,7 @@ class OrganGestorFullSyncHelperTest {
 				return buidaResultatOrgans();
 			});
 
-		var helper = new OrganGestorFullSyncHelper(organGestorSyncHelper, permisosHelper, procSerSyncHelper,
+		var helper = new OrganGestorFullSyncHelper(organGestorSyncHelper, permisosHelper, cacheHelper, procSerSyncHelper,
 			organGestorService, organGestorRepository, progressEventService);
 		var entitat = novaEntitat();
 
@@ -92,6 +93,7 @@ class OrganGestorFullSyncHelperTest {
 		Mockito.verify(procSerSyncHelper).actualitzaProcediments(Mockito.any(), Mockito.any());
 		Mockito.verify(procSerSyncHelper).actualitzaServeis(Mockito.any(), Mockito.any());
 		Mockito.verify(organGestorService).syncOficinesSIR(1L);
+		Mockito.verify(cacheHelper).evictCachesPermisosOrgansProcediments();
 		var eventCaptor = ArgumentCaptor.forClass(SseEvent.class);
 		Mockito.verify(progressEventService, Mockito.atLeastOnce())
 			.publishEvent(Mockito.eq(SseEventService.SseQueue.PROGRESS), eventCaptor.capture());
@@ -134,13 +136,14 @@ class OrganGestorFullSyncHelperTest {
 		a01Alie.addNou(successorAlie);
 
 		var permisosHelper = Mockito.mock(PermisosHelper.class);
+		var cacheHelper = Mockito.mock(CacheHelper.class);
 		var procSerSyncHelper = Mockito.mock(ProcSerSyncHelper.class);
 		var organGestorService = Mockito.mock(OrganGestorService.class);
 		var organGestorRepository = Mockito.mock(OrganGestorRepository.class);
 		Mockito.when(organGestorRepository.findByCodiIn(Mockito.anyList())).thenReturn(List.of(a01Propi, a01Alie));
 		var progressEventService = Mockito.mock(SseEventService.class);
 
-		var helper = new OrganGestorFullSyncHelper(organGestorSyncHelper, permisosHelper, procSerSyncHelper,
+		var helper = new OrganGestorFullSyncHelper(organGestorSyncHelper, permisosHelper, cacheHelper, procSerSyncHelper,
 			organGestorService, organGestorRepository, progressEventService);
 
 		// when
@@ -173,13 +176,14 @@ class OrganGestorFullSyncHelperTest {
 		var a01SenseSuccessor = OrganGestorEntity.builder().codi("A01").entitat(entitatSincronitzada).build();
 
 		var permisosHelper = Mockito.mock(PermisosHelper.class);
+		var cacheHelper = Mockito.mock(CacheHelper.class);
 		var procSerSyncHelper = Mockito.mock(ProcSerSyncHelper.class);
 		var organGestorService = Mockito.mock(OrganGestorService.class);
 		var organGestorRepository = Mockito.mock(OrganGestorRepository.class);
 		Mockito.when(organGestorRepository.findByCodiIn(Mockito.anyList())).thenReturn(List.of(a01SenseSuccessor));
 		var progressEventService = Mockito.mock(SseEventService.class);
 
-		var helper = new OrganGestorFullSyncHelper(organGestorSyncHelper, permisosHelper, procSerSyncHelper,
+		var helper = new OrganGestorFullSyncHelper(organGestorSyncHelper, permisosHelper, cacheHelper, procSerSyncHelper,
 			organGestorService, organGestorRepository, progressEventService);
 
 		// when
@@ -202,12 +206,13 @@ class OrganGestorFullSyncHelperTest {
 				Mockito.any(), Mockito.eq(false), Mockito.any(), Mockito.eq(false), Mockito.eq(0), Mockito.eq(40)))
 			.thenThrow(causa);
 		var permisosHelper = Mockito.mock(PermisosHelper.class);
+		var cacheHelper = Mockito.mock(CacheHelper.class);
 		var procSerSyncHelper = Mockito.mock(ProcSerSyncHelper.class);
 		var organGestorService = Mockito.mock(OrganGestorService.class);
 		var organGestorRepository = Mockito.mock(OrganGestorRepository.class);
 		var progressEventService = Mockito.mock(SseEventService.class);
 
-		var helper = new OrganGestorFullSyncHelper(organGestorSyncHelper, permisosHelper, procSerSyncHelper,
+		var helper = new OrganGestorFullSyncHelper(organGestorSyncHelper, permisosHelper, cacheHelper, procSerSyncHelper,
 			organGestorService, organGestorRepository, progressEventService);
 
 		// when: l'excepció s'ha de propagar fora de sincronitzarTot (no quedar-se engolida), perquè
@@ -220,6 +225,7 @@ class OrganGestorFullSyncHelperTest {
 		Mockito.verifyNoInteractions(permisosHelper);
 		Mockito.verifyNoInteractions(procSerSyncHelper);
 		Mockito.verifyNoInteractions(organGestorService);
+		Mockito.verifyNoInteractions(cacheHelper);
 		// ...però abans de rellançar, el flux SSE s'ha tancat amb un event ERROR terminal, no queda
 		// penjat sense terminal.
 		var eventCaptor = ArgumentCaptor.forClass(SseEvent.class);
@@ -242,6 +248,7 @@ class OrganGestorFullSyncHelperTest {
 				Mockito.any(), Mockito.eq(false), Mockito.any(), Mockito.eq(false), Mockito.eq(0), Mockito.eq(40)))
 			.thenReturn(novaResultatOrgans(new OrganGestorDir3Sync.OrganGestorDir3SyncCanviSubstitucio[] { substitucio }));
 		var permisosHelper = Mockito.mock(PermisosHelper.class);
+		var cacheHelper = Mockito.mock(CacheHelper.class);
 		var procSerSyncHelper = Mockito.mock(ProcSerSyncHelper.class);
 		var organGestorService = Mockito.mock(OrganGestorService.class);
 		var organGestorRepository = Mockito.mock(OrganGestorRepository.class);
@@ -250,7 +257,7 @@ class OrganGestorFullSyncHelperTest {
 			.thenThrow(causa);
 		var progressEventService = Mockito.mock(SseEventService.class);
 
-		var helper = new OrganGestorFullSyncHelper(organGestorSyncHelper, permisosHelper, procSerSyncHelper,
+		var helper = new OrganGestorFullSyncHelper(organGestorSyncHelper, permisosHelper, cacheHelper, procSerSyncHelper,
 			organGestorService, organGestorRepository, progressEventService);
 
 		// when
@@ -260,6 +267,7 @@ class OrganGestorFullSyncHelperTest {
 		// then
 		Mockito.verifyNoInteractions(procSerSyncHelper);
 		Mockito.verifyNoInteractions(organGestorService);
+		Mockito.verifyNoInteractions(cacheHelper);
 		var eventCaptor = ArgumentCaptor.forClass(SseEvent.class);
 		Mockito.verify(progressEventService, Mockito.atLeastOnce())
 			.publishEvent(Mockito.eq(SseEventService.SseQueue.PROGRESS), eventCaptor.capture());

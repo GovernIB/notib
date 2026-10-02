@@ -121,6 +121,21 @@ public class NotibPermissionHelper {
 	}
 
 	/**
+	 * Indica si l'usuari actual actua com a administrador de l'entitat actual: té el rol concedit,
+	 * és el rol seleccionat a la capçalera (un usuari amb diversos rols concedits pot haver
+	 * seleccionat un altre rol) i té permís d'administració sobre l'entitat.
+	 *
+	 * @return true si actua com a administrador d'entitat.
+	 */
+	public boolean isCurrentUserAdminEntitat() {
+
+		var rolActual = getRolActualHttpHeader();
+		return authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN)
+				&& (rolActual == null || BaseConfig.ROLE_ADMIN.equals(rolActual))
+				&& currentEntitatPermissionAllowed(ExtendedPermission.PERM2);
+	}
+
+	/**
 	 * Verifica si es tenen permisos per a administrar l'entitat. Si no es tenen permisos es llença una excepció
 	 * ResourceNotCreatedException o ResourceNotUpdatedException, depenent del permís que s'està comprovant.
 	 *

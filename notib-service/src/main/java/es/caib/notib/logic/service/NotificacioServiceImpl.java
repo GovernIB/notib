@@ -98,6 +98,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
+import es.caib.notib.logic.intf.base.permission.ExtendedPermission;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -136,6 +137,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Autowired
 	private PermisosService permisosService;
+	@Autowired
+	private NotibPermissionHelper notibPermissionHelper;
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
 	@Autowired
@@ -1472,7 +1475,16 @@ public class NotificacioServiceImpl implements NotificacioService {
 				log.info("PRC >> Notificacio no finalitzada");
 				throw new Exception("La notificació no es pot marcar com a processada, no esta en estat finalitzada.");
 			}
-			if (!isAdministrador && !permisosService.hasNotificacioPermis(notificacioId, notificacioEntity.getEntitat().getId(), notificacioEntity.getUsuariCodi(), PermisEnum.PROCESSAR)) {
+			// Es comprova el permís de l'usuari que fa l'acció (no el del creador de la remesa). Com a
+			// administrador, cal tenir permís d'administració sobre l'entitat de la remesa: la selecció
+			// d'una acció massiva són ids enviats pel client, no verificats contra l'entitat actual.
+			var auth = SecurityContextHolder.getContext().getAuthentication();
+			var usuariActual = auth != null ? auth.getName() : null;
+			var entitatId = notificacioEntity.getEntitat().getId();
+			var permisGranted = isAdministrador
+					? notibPermissionHelper.entitatPermissionAllowed(entitatId, ExtendedPermission.PERM2)
+					: usuariActual != null && permisosService.hasNotificacioPermis(notificacioId, entitatId, usuariActual, PermisEnum.PROCESSAR);
+			if (!permisGranted) {
 				log.info("PRC >> Sense permisos");
 				throw new Exception("La notificació no es pot marcar com a processada, l'usuari no té els permisos requerits.");
 			}

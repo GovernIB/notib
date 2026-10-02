@@ -54,6 +54,7 @@ public class ProcSerCacheable {
         var cacheNotificacioMenu = cacheManager.getCache("procsersPermisNotificacioMenu");
         var cacheComunicacioMenu = cacheManager.getCache("procsersPermisComunicacioMenu");
         var cacheComunicacioSirMenu = cacheManager.getCache("procsersPermisComunicacioSirMenu");
+        var cacheCodisPermisProcessar = cacheManager.getCache("codisPermisProcessar");
         String cacheKeyPrefix;
         for (var entitatEntity : entitatsAccessibles) {
             cacheKeyPrefix = entitatEntity.getId().toString().concat("-").concat(auth.getName()).concat("-");
@@ -69,6 +70,7 @@ public class ProcSerCacheable {
             if (cacheNotificacioMenu != null) { cacheNotificacioMenu.evict(entitatEntity.getId().toString().concat("-").concat(auth.getName()));}
             if (cacheComunicacioMenu != null) { cacheComunicacioMenu.evict(entitatEntity.getId().toString().concat("-").concat(auth.getName()));}
             if (cacheComunicacioSirMenu != null) { cacheComunicacioSirMenu.evict(entitatEntity.getId().toString().concat("-").concat(auth.getName()));}
+            if (cacheCodisPermisProcessar != null) { cacheCodisPermisProcessar.evict(entitatEntity.getId().toString().concat("-").concat(auth.getName()));}
         }
     }
 }

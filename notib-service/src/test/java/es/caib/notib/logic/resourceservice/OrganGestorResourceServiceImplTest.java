@@ -2,6 +2,7 @@ package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.helper.AclHelper;
+import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.helper.OrganGestorFullSyncHelper;
 import es.caib.notib.logic.helper.OrganGestorSyncHelper;
@@ -63,6 +64,7 @@ class OrganGestorResourceServiceImplTest {
 	@Mock private EntregaCieResourceRepository entregaCieRepo;
 	@Mock private OrganGestorService organGestorService;
 	@Mock private PermisosService permisosService;
+	@Mock private CacheHelper cacheHelper;
 
 	private OrganGestorResourceServiceImpl service;
 
@@ -81,7 +83,8 @@ class OrganGestorResourceServiceImplTest {
 			pagadorCieRepo,
 			entregaCieRepo,
 			organGestorService,
-			permisosService
+			permisosService,
+			cacheHelper
 		);
 	}
 
@@ -106,9 +109,8 @@ class OrganGestorResourceServiceImplTest {
 			.thenReturn(List.of(CodiValorDto.builder().codi("1").valor("Organ 1").build()));
 		String result = service.additionalSpringFilter(
 			"base",
-			new String[]{OrganGestorResource.NAMED_QUERY_PERM_READ},
-			false
-		);
+			new String[]{OrganGestorResource.NAMED_QUERY_PERM_READ}
+		, false);
 		assertTrue(result.contains("id in"));
 	}
 
@@ -250,6 +252,19 @@ class OrganGestorResourceServiceImplTest {
 				new OrganGestorResourceEntity(),
 				new OrganGestorResource.OrganGestorDir3SyncForm()
 			));
+	}
+
+
+	@Test
+	void createUpdateAndDeleteShouldEvictPermissionCaches() {
+		var entity = new OrganGestorResourceEntity();
+		var resource = new OrganGestorResource();
+
+		service.afterCreateSave(entity, resource, Map.of(), false);
+		service.afterUpdateSave(entity, resource, Map.of(), false);
+		service.afterDelete(entity, Map.of());
+
+		verify(cacheHelper, times(3)).evictCachesPermisosOrgansProcediments();
 	}
 
 }
