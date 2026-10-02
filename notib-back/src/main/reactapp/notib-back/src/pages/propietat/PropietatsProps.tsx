@@ -61,11 +61,14 @@ const buildCustomField = (c: any) => {
     const options = c.configTypeValue
         ? Object.fromEntries(c.configTypeValue.split(',').map((v: string) => [v, v]))
         : undefined;
+    // Les propietats BOOL arriben com a string ('true'/'false'): el checkbox necessita un boolean,
+    // ja que qualsevol string no buit (també 'false') es mostraria marcat.
+    const value = type === 'checkbox' ? String(c.value).toLowerCase() === 'true' : c.value;
     return {
         name: c.key,
         type,
         label: '',
-        value: c.value,
+        value,
         options,
     };
 };
