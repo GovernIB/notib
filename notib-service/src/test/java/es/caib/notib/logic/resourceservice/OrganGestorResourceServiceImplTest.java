@@ -93,7 +93,7 @@ class OrganGestorResourceServiceImplTest {
 	void shouldReturnSuperFilterIfAdmin() {
 		when(authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER)).thenReturn(false);
 		when(authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN)).thenReturn(true);
-		String result = service.additionalSpringFilter("base", new String[]{});
+		String result = service.additionalSpringFilter("base", new String[]{}, false);
 		assertNotNull(result);
 	}
 
@@ -106,7 +106,8 @@ class OrganGestorResourceServiceImplTest {
 			.thenReturn(List.of(CodiValorDto.builder().codi("1").valor("Organ 1").build()));
 		String result = service.additionalSpringFilter(
 			"base",
-			new String[]{OrganGestorResource.NAMED_QUERY_PERM_READ}
+			new String[]{OrganGestorResource.NAMED_QUERY_PERM_READ},
+			false
 		);
 		assertTrue(result.contains("id in"));
 	}

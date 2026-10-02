@@ -37,7 +37,7 @@ class PersonaResourceServiceImplTest {
 	// -----------------------------------
 	@Test
 	void additionalSpringFilterShouldReturnIdIsNull() {
-		String result = service.additionalSpringFilter(null, null);
+		String result = service.additionalSpringFilter(null, null, false);
 		assertEquals("id is null", result);
 	}
 

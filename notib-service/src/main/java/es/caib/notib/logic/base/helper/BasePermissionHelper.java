@@ -5,6 +5,7 @@ import es.caib.notib.logic.intf.base.annotation.ResourceArtifact;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
+import es.caib.notib.logic.intf.base.service.PermissionEvaluatorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
@@ -14,10 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -40,15 +38,22 @@ public abstract class BasePermissionHelper {
 	 *            l'id del recurs (pot ser null).
 	 * @param targetType
 	 *            la classe del recurs.
+	 * @param restapiOperation
+	 *            l'operació de l'API REST que s'està executant (pot ser null).
 	 * @param permissions
 	 *            la llista de permisos a comprovar (si és null voldrà dir que es comprovarà qualsevol permís).
+	 * @param matchType
+	 *            indica si n'hi ha prou que l'usuari tingui algun dels permisos indicats ({@link PermissionMatchType#ANY})
+	 *            o si els ha de tenir tots ({@link PermissionMatchType#ALL}).
 	 * @return true si l'usuari actual te accés al recurs o false en cas contrari.
 	 */
 	public boolean checkResourcePermission(
 			Authentication auth,
 			@Nullable Serializable targetId,
 			String targetType,
-			@Nullable BasePermission[] permissions) {
+			PermissionEvaluatorService.RestApiOperation restapiOperation,
+			@Nullable BasePermission[] permissions,
+			PermissionMatchType matchType) {
 		try {
 			Class<?> targetTypeClass = Class.forName(targetType);
 			ResourceConfig resourceConfig = targetTypeClass.getAnnotation(ResourceConfig.class);
@@ -61,7 +66,9 @@ public abstract class BasePermissionHelper {
 							null,
 							null,
 							resourceConfig.accessConstraints(),
-							permissions);
+							restapiOperation,
+							permissions,
+							matchType);
 				} else {
 					// Els recursos sense restriccions d'accés tenen l'accés permès per defecte
 					return true;
@@ -77,7 +84,8 @@ public abstract class BasePermissionHelper {
 	}
 
 	/**
-	 * Comprova els permisos per a accedir a un recurs.
+	 * Comprova els permisos per a accedir a un recurs. Si es passa més d'un permís, n'hi haurà prou que
+	 * l'usuari en tingui algun (comportament equivalent a cridar amb {@link PermissionMatchType#ANY}).
 	 *
 	 * @param targetId
 	 *            l'id del recurs (pot ser null).
@@ -96,7 +104,9 @@ public abstract class BasePermissionHelper {
 				auth,
 				targetId,
 				targetType,
-				permissions);
+				null,
+				permissions,
+				PermissionMatchType.ANY);
 	}
 
 	/**
@@ -130,7 +140,9 @@ public abstract class BasePermissionHelper {
 							type,
 							code,
 							artifact.accessConstraints(),
-							null);
+							null,
+							null,
+							PermissionMatchType.ANY);
 				} else {
 					// Els artefactes sense restriccions d'accés comproven l'accés al recurs
 					BasePermission[] permissions = new BasePermission[] {
@@ -142,7 +154,9 @@ public abstract class BasePermissionHelper {
 							auth,
 							null,
 							resourceClass.getName(),
-							permissions);
+							null,
+							permissions,
+							PermissionMatchType.ANY);
 				}
 			}
 		}
@@ -157,7 +171,9 @@ public abstract class BasePermissionHelper {
 			ResourceArtifactType type,
 			String code,
 			ResourceAccessConstraint[] accessConstraints,
-			BasePermission[] permissions) {
+			PermissionEvaluatorService.RestApiOperation restapiOperation,
+			BasePermission[] permissions,
+			PermissionMatchType matchType) {
 		ResourceAccessConstraint allowedAccessConstraint = Arrays.stream(accessConstraints).
 				filter(ac -> {
 					boolean accessContraintGranted = false;
@@ -174,6 +190,7 @@ public abstract class BasePermissionHelper {
 									resourceId,
 									resourceClass,
 									ac,
+									restapiOperation,
 									permissions);
 						} else {
 							accessContraintGranted = checkCustomResourceArtifactAccessConstraint(
@@ -185,7 +202,7 @@ public abstract class BasePermissionHelper {
 						}
 					}
 					if (accessContraintGranted) {
-						return permissions == null || isAnyPermissionGranted(permissions, ac.grantedPermissions());
+						return permissions == null || isPermissionGranted(permissions, ac.grantedPermissions(), matchType);
 					} else {
 						return false;
 					}
@@ -202,13 +219,24 @@ public abstract class BasePermissionHelper {
 	}
 
 	protected boolean isAnyPermissionGranted(
-		Permission[] permissions, // Els permisos a comprovar
-		PermissionEnum[] accessConstraintGrantedPermissions) { // La llista de permisos atorgats
+			Permission[] permissions, // Els permisos a comprovar
+			PermissionEnum[] accessConstraintGrantedPermissions) { // La llista de permisos atorgats
+		return isPermissionGranted(permissions, accessConstraintGrantedPermissions, PermissionMatchType.ANY);
+	}
+
+	protected boolean isPermissionGranted(
+			Permission[] permissions, // Els permisos a comprovar
+			PermissionEnum[] accessConstraintGrantedPermissions, // La llista de permisos atorgats
+			PermissionMatchType matchType) {
 		List<Permission> grantedPermissions = Arrays.stream(accessConstraintGrantedPermissions).
-			map(PermissionEnum::toPermission).collect(Collectors.toList());
-		return !Collections.disjoint(
-			Arrays.asList(permissions),
-			grantedPermissions);
+				map(PermissionEnum::toPermission).collect(Collectors.toList());
+		if (matchType == PermissionMatchType.ALL) {
+			return new HashSet<>(grantedPermissions).containsAll(Arrays.asList(permissions));
+		} else {
+			return !Collections.disjoint(
+					Arrays.asList(permissions),
+					grantedPermissions);
+		}
 	}
 
 	protected abstract boolean checkCustomResourceAccessConstraint(
@@ -216,6 +244,7 @@ public abstract class BasePermissionHelper {
 			Serializable resourceId,
 			Class<?> resourceClass,
 			ResourceAccessConstraint resourceAccessConstraint,
+			PermissionEvaluatorService.RestApiOperation restapiOperation,
 			BasePermission[] permissions);
 
 	protected abstract boolean checkCustomResourceArtifactAccessConstraint(

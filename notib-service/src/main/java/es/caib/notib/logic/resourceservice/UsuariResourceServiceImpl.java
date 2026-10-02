@@ -82,7 +82,7 @@ public class UsuariResourceServiceImpl
 	@Override
 	protected String additionalSpringFilter(
 		String currentSpringFilter,
-		String[] namedQueries) {
+		String[] namedQueries, boolean isSingleResult) {
 		return "id:'" + authenticationHelper.getCurrentUserName() + "'";
 	}
 

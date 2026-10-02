@@ -198,7 +198,7 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 	}
 
 	@Override
-	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries, boolean isSingleResult) {
 
 		// Condició per a mostrar només les notificacions de l'entitat actual
 		var isRolSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);

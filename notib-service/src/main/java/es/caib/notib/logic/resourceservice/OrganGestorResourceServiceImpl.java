@@ -113,9 +113,9 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 	 * seleccionada a la sessió.
 	 */
 	@Override
-	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries, boolean isSingleResult) {
 
-		var superFilter = super.additionalSpringFilter(currentSpringFilter, namedQueries);
+		var superFilter = super.additionalSpringFilter(currentSpringFilter, namedQueries, isSingleResult);
 		// Es determina el rol pel qual s'ha de filtrar directament per la capçalera del rol seleccionat
 		// (userSessionHelper.getCurrentRol()), en lloc de isCurrentUserInRole: un usuari pot tenir
 		// concedits més d'un rol alhora (p.ex. usuari i administrador d'entitat, habitual en usuaris de

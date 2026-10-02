@@ -1,5 +1,7 @@
 package es.caib.notib.logic.base.helper;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.*;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
@@ -10,6 +12,7 @@ import java.nio.file.StandardCopyOption;
  *
  * @author Límit Tecnologies
  */
+@Slf4j
 public abstract class BaseFilesHelper {
 
 	/**
@@ -27,8 +30,7 @@ public abstract class BaseFilesHelper {
 			String folder,
 			String name,
 			byte[] content) throws IOException {
-		File fitxer = new File(newFolderFile(folder, true), name);
-		try (FileOutputStream fos = new FileOutputStream(fitxer)) {
+		try (FileOutputStream fos = getSaveFileOutputStream(folder, name)) {
 			fos.write(content);
 		}
 	}
@@ -48,10 +50,27 @@ public abstract class BaseFilesHelper {
 			String folder,
 			String name,
 			ByteArrayOutputStream content) throws IOException {
-		File fitxer = new File(newFolderFile(folder, true), name);
-		try (FileOutputStream fos = new FileOutputStream(fitxer)) {
+		try (FileOutputStream fos = getSaveFileOutputStream(folder, name)) {
 			content.writeTo(fos);
 		}
+	}
+
+	/**
+	 * Obté un FileOutputStream per a desar un fitxer.
+	 *
+	 * @param folder
+	 *            la carpeta pel nou fitxer (pot ser null).
+	 * @param name
+	 *            el nom del fitxer.
+	 * @return el FileOutputStream.
+	 * @throws IOException si hi ha algun problema generant el FileOutputStream.
+	 */
+	public FileOutputStream getSaveFileOutputStream(
+			 String folder,
+			String name) throws IOException {
+		File fitxer = new File(newFolderFile(folder, true), sanitizeName(name));
+		createParentIfNotExists(fitxer);
+		return new FileOutputStream(fitxer);
 	}
 
 	/**
@@ -67,10 +86,26 @@ public abstract class BaseFilesHelper {
 	public byte[] read(
 			String folder,
 			String name) throws IOException {
-		File fitxer = new File(newFolderFile(folder, false), name);
+		File fitxer = new File(newFolderFile(folder, false), sanitizeName(name));
 		try (FileInputStream fis = new FileInputStream(fitxer)) {
 			return fis.readAllBytes();
 		}
+	}
+
+	/**
+	 * Esborra el fitxer especificat.
+	 *
+	 * @param folder
+	 *            la carpeta a on es troba fitxer (pot ser null).
+	 * @param name
+	 *            el nom del fitxer.
+	 * @throws IOException si hi ha algun problema esborrant el fitxer.
+	 */
+	public void delete(
+			String folder,
+			String name) throws IOException {
+		File fitxer = new File(newFolderFile(folder, false), sanitizeName(name));
+		Files.delete(fitxer.toPath());
 	}
 
 	/**
@@ -85,7 +120,7 @@ public abstract class BaseFilesHelper {
 	public boolean exists(
 			String folder,
 			String name) {
-		File fitxer = new File(newFolderFile(folder, false), name);
+		File fitxer = new File(newFolderFile(folder, false), sanitizeName(name));
 		return fitxer.exists();
 	}
 
@@ -110,8 +145,8 @@ public abstract class BaseFilesHelper {
 			String targetFolder,
 			String targetName,
 			boolean replace) throws IOException {
-		File source = new File(newFolderFile(sourceFolder, false), sourceName);
-		File target = new File(newFolderFile(targetFolder, false), targetName);
+		File source = new File(newFolderFile(sourceFolder, false), sanitizeName(sourceName));
+		File target = new File(newFolderFile(targetFolder, false), sanitizeName(targetName));
 		CopyOption[] options = replace ? new CopyOption[] { StandardCopyOption.REPLACE_EXISTING } : null;
 		Files.copy(
 				source.toPath(),
@@ -140,8 +175,8 @@ public abstract class BaseFilesHelper {
 			String targetFolder,
 			String targetName,
 			boolean replace) throws IOException {
-		File source = new File(newFolderFile(sourceFolder, false), sourceName);
-		File target = new File(newFolderFile(targetFolder, false), targetName);
+		File source = new File(newFolderFile(sourceFolder, false), sanitizeName(sourceName));
+		File target = new File(newFolderFile(targetFolder, false), sanitizeName(targetName));
 		CopyOption[] options = replace ? new CopyOption[] { StandardCopyOption.REPLACE_EXISTING } : null;
 		Files.move(
 				source.toPath(),
@@ -163,10 +198,11 @@ public abstract class BaseFilesHelper {
 		String files = getFilesPath();
 		String path;
 		if (folder != null) {
+			String sanitizedFolder = sanitizeName(folder);
 			if (files.endsWith("/")) {
-				path = files + folder;
+				path = files + sanitizedFolder;
 			} else {
-				path = files + "/" + folder;
+				path = files + "/" + sanitizedFolder;
 			}
 		} else {
 			path = files;
@@ -174,6 +210,28 @@ public abstract class BaseFilesHelper {
 		File target = new File(path);
 		if (createIfNotExists) target.mkdirs();
 		return target;
+	}
+
+	/**
+	 * Substitueix el caràcter "/" per "_" en un nom de fitxer o de carpeta, per evitar que
+	 * s'interpreti com un separador de camins i es puguin crear o accedir fitxers fora de la
+	 * carpeta esperada.
+	 *
+	 * @param name
+	 *            el nom del fitxer o de la carpeta.
+	 * @return el nom sanejat, o null si el nom especificat és null.
+	 */
+	protected String sanitizeName(String name) {
+		return name != null ? name.replace("/", "_") : null;
+	}
+
+	protected void createParentIfNotExists(File file) {
+		File parentFile = file.getParentFile();
+		if (!parentFile.exists()) {
+			if (!file.getParentFile().mkdirs()) {
+				log.error("Couldn't create folder {}", parentFile);
+			}
+		}
 	}
 
 	protected abstract String getFilesPath();

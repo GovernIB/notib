@@ -41,7 +41,7 @@ public class PersonaResourceServiceImpl
 	@Override
 	protected String additionalSpringFilter(
 		String currentSpringFilter,
-		String[] namedQueries) {
+		String[] namedQueries, boolean isSingleResult) {
 		return "id is null";
 	}
 

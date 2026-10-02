@@ -76,7 +76,7 @@ public class NotificacioEnviamentResourceServiceImpl extends BaseMutableResource
 	}
 
 	@Override
-	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries, boolean isSingleResult) {
 
 		// Condició per a mostrar només les notificacions de l'entitat actual
 		var entitatFilter = "notificacio.entitat.id:" + userSessionHelper.getCurrentEntitatId();

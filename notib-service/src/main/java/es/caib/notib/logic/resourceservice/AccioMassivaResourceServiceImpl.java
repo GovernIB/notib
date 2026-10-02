@@ -76,7 +76,7 @@ public class AccioMassivaResourceServiceImpl extends BaseMutableResourceService<
 	}
 
 	@Override
-	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries, boolean isSingleResult) {
 
 		// Condició per a mostrar només les notificacions de l'entitat actual
 		var isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);

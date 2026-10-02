@@ -83,7 +83,7 @@ class NotificacioResourceServiceImplTest {
 				new ArrayList<>(),
 				new ArrayList<>(),
 				new ArrayList<>()));
-		String result = service.additionalSpringFilter("", null);
+		String result = service.additionalSpringFilter("", null, false);
 		assertEquals("entitat.id:1 and createdBy:'usuari1'", result);
 	}
 
@@ -95,7 +95,7 @@ class NotificacioResourceServiceImplTest {
 				new ArrayList<>(List.of(10L)),
 				new ArrayList<>(),
 				new ArrayList<>()));
-		String result = service.additionalSpringFilter("", null);
+		String result = service.additionalSpringFilter("", null, false);
 		assertEquals("entitat.id:1 and (organGestor.id in (10))", result);
 	}
 
@@ -107,7 +107,7 @@ class NotificacioResourceServiceImplTest {
 				new ArrayList<>(),
 				new ArrayList<>(List.of(5L)),
 				new ArrayList<>()));
-		String result = service.additionalSpringFilter("", null);
+		String result = service.additionalSpringFilter("", null, false);
 		assertEquals("entitat.id:1 and (procediment.id in (5))", result);
 	}
 
@@ -119,7 +119,7 @@ class NotificacioResourceServiceImplTest {
 				new ArrayList<>(),
 				new ArrayList<>(),
 				new ArrayList<>(List.of(7L, 8L))));
-		String result = service.additionalSpringFilter("", null);
+		String result = service.additionalSpringFilter("", null, false);
 		assertEquals("entitat.id:1 and (procedimentOrganGestor.id in (7,8))", result);
 	}
 
@@ -131,7 +131,7 @@ class NotificacioResourceServiceImplTest {
 				new ArrayList<>(List.of(10L)),
 				new ArrayList<>(List.of(20L)),
 				new ArrayList<>(List.of(30L))));
-		String result = service.additionalSpringFilter("", null);
+		String result = service.additionalSpringFilter("", null, false);
 		assertEquals("entitat.id:1 and (organGestor.id in (10) or procediment.id in (20) or procedimentOrganGestor.id in (30))", result);
 	}
 

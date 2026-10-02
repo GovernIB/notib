@@ -30,7 +30,7 @@ class GrupResourceServiceImplTest {
 	@Test
 	void additionalSpringFilterShouldReturnNullByDefault() {
 		when(userSessionHelper.getCurrentEntitatId()).thenReturn(1L);
-		String filter = service.additionalSpringFilter(null, null);
+		String filter = service.additionalSpringFilter(null, null, false);
 		assertEquals("entitat.id:" + 1L, filter);
 	}
 

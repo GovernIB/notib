@@ -134,9 +134,9 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 	}
 
 	@Override
-	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries, boolean isSingleResult) {
 
-		var superFilter = super.additionalSpringFilter(currentSpringFilter, namedQueries);
+		var superFilter = super.additionalSpringFilter(currentSpringFilter, namedQueries, isSingleResult);
 		var isRoleAdminOrgan = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN);
 		if (isRoleAdminOrgan && notibPermissionHelper.currentOrganGestorPermissionAllowed(BasePermission.ADMINISTRATION)) {
 			var permisComuns = notibPermissionHelper.currentOrganGestorPermissionAllowed(ExtendedPermission.PERM3);

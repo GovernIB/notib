@@ -36,6 +36,7 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -93,6 +94,13 @@ public class CustomHalFormsPropertyFactory {
 		}
 
 		HalFormsOptionsFactory optionsFactory = configuration.getOptionsFactory();
+
+		// Els formularis sense cos (p.ex. molts GET) no tenen tipus d'entrada ni camps
+		Class<?> inputPayloadType = model.getInput().getType();
+		Map<String, Object> values = inputPayloadType != null ?
+				HalFormsUtil.getNewResourceValues(
+						(Class<? extends Serializable>)inputPayloadType,
+						resourceServiceLocator) : Collections.emptyMap();
 
 		return model.createProperties((payload, metadata) -> {
 
@@ -155,8 +163,6 @@ public class CustomHalFormsPropertyFactory {
 
 			HalFormsOptions options = optionsFactory.getOptions(payload, metadata);
 
-			Map<String, Object> values = HalFormsUtil.getNewResourceValues(payload.getType(), resourceServiceLocator);
-
 			HalFormsProperty property = new HalFormsProperty()
 					.withName(metadata.getName())
 					.withRequired(metadata.isRequired()) //
@@ -167,7 +173,7 @@ public class CustomHalFormsPropertyFactory {
 					.withMaxLength(maxLength)
 					.withRegex(lookupRegex(metadata)) //
 					.withType(inputType) //
-					.withValue(options != null ? options.getSelectedValue() : values.get(metadata.getName())) //
+					.withValue(options != null && options.getSelectedValue() != null ? options.getSelectedValue() : values.get(metadata.getName())) //
 					.withOptions(options);
 
 			if (options != null && options.getMaxItems() == null) {

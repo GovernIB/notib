@@ -30,10 +30,7 @@ import org.springframework.util.ReflectionUtils;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -50,7 +47,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class HalFormsConfig {
 
 	@Autowired(required = false)
-	private Set<ReadonlyResourceController> resourceControllers;
+	private Set<? extends ReadonlyResourceController<?, ?>> resourceControllers;
 	@Autowired
 	private ResourceServiceLocator resourceServiceLocator;
 	@Autowired
@@ -58,21 +55,21 @@ public class HalFormsConfig {
 
 	@Bean
 	HalFormsConfiguration halFormsConfiguration() {
-		Set<Class<ReadonlyResourceController>> resourceControllerClasses = null;
+		Set<Class<? extends ReadonlyResourceController<?, ?>>> resourceControllerClasses = null;
 		if (resourceControllers != null) {
 			resourceControllerClasses = resourceControllers.stream().
-					map(rc -> (Class<ReadonlyResourceController>) rc.getClass()).
+					map(rc -> (Class<? extends ReadonlyResourceController<?, ?>>)rc.getClass()).
 					collect(Collectors.toSet());
 		}
 		return createHalFormsConfiguration(resourceControllerClasses);
 	}
 
 	private HalFormsConfiguration createHalFormsConfiguration(
-			Set<Class<ReadonlyResourceController>> resourceControllerClasses) {
+			Set<Class<? extends ReadonlyResourceController<?, ?>>> resourceControllerClasses) {
 		HalFormsConfiguration halFormsConfiguration = new HalFormsConfiguration();
 		if (resourceControllerClasses != null) {
-			for (Class<ReadonlyResourceController> rc: resourceControllerClasses) {
-				Class<?> resourceClass = TypeUtil.getArgumentClassFromGenericSuperclass(
+			for (Class<? extends ReadonlyResourceController<?, ?>> rc: resourceControllerClasses) {
+				Class<? extends Serializable> resourceClass = TypeUtil.getArgumentClassFromGenericSuperclass(
 						rc,
 						ReadonlyResourceController.class,
 						0);
@@ -82,10 +79,10 @@ public class HalFormsConfig {
 		return halFormsConfiguration;
 	}
 
-	private HalFormsConfiguration withResourceClass(
+	private <R extends Resource<ID>, ID extends Serializable> HalFormsConfiguration withResourceClass(
 			HalFormsConfiguration halFormsConfiguration,
-			Class<?> resourceClass,
-			Set<Class<ReadonlyResourceController>> resourceControllerClasses) {
+			Class<? extends Serializable> resourceClass,
+			Set<Class<? extends ReadonlyResourceController<?, ?>>> resourceControllerClasses) {
 		MutableHolder<HalFormsConfiguration> halFormsConfigurationHolder = new MutableHolder<>(halFormsConfiguration);
 		ReflectionUtils.doWithFields(
 				resourceClass,
@@ -98,7 +95,7 @@ public class HalFormsConfig {
 				resourceClass,
 				field -> configurationWithResourceReferenceOptions(
 						halFormsConfigurationHolder,
-						resourceClass,
+						(Class<R>)resourceClass,
 						null,
 						field,
 						resourceControllerClasses),
@@ -107,7 +104,7 @@ public class HalFormsConfig {
 				resourceClass,
 				field -> configurationWithFieldEnumOptions(
 						halFormsConfigurationHolder,
-						resourceClass,
+						(Class<R>)resourceClass,
 						null,
 						field,
 						resourceControllerClasses),
@@ -127,7 +124,7 @@ public class HalFormsConfig {
 							artifact.formClass(),
 							field -> configurationWithResourceReferenceOptions(
 									halFormsConfigurationHolder,
-									resourceClass,
+									(Class<R>)resourceClass,
 									artifact,
 									field,
 									resourceControllerClasses),
@@ -136,7 +133,7 @@ public class HalFormsConfig {
 							artifact.formClass(),
 							field -> configurationWithFieldEnumOptions(
 									halFormsConfigurationHolder,
-									resourceClass,
+									(Class<R>)resourceClass,
 									artifact,
 									field,
 									resourceControllerClasses),
@@ -149,7 +146,7 @@ public class HalFormsConfig {
 
 	private void configurationWithEnumOptions(
 			MutableHolder<HalFormsConfiguration> halFormsConfigurationHolder,
-			Class<?> resourceClass,
+			Class<? extends Serializable> resourceClass,
 			Field resourceField) {
 		log.debug("New HAL-FORMS enum options (class={}, field={})", resourceClass, resourceField.getName());
 		halFormsConfigurationHolder.setValue(
@@ -170,12 +167,12 @@ public class HalFormsConfig {
 						}));
 	}
 
-	private void configurationWithResourceReferenceOptions(
+	private <R extends Resource<ID>, ID extends Serializable> void configurationWithResourceReferenceOptions(
 			MutableHolder<HalFormsConfiguration> halFormsConfigurationHolder,
-			Class<?> resourceClass,
+			Class<R> resourceClass,
 			ResourceArtifact artifact,
 			Field resourceField,
-			Set<Class<ReadonlyResourceController>> resourceControllerClasses) {
+			Set<Class<? extends ReadonlyResourceController<?, ?>>> resourceControllerClasses) {
 		Class<?> optionsResourceClass = artifact != null ? artifact.formClass() : resourceClass;
 		log.debug("New HAL-FORMS resource reference options (class={}, field={})", optionsResourceClass, resourceField.getName());
 		halFormsConfigurationHolder.setValue(
@@ -201,12 +198,12 @@ public class HalFormsConfig {
 						}));
 	}
 
-	private void configurationWithFieldEnumOptions(
+	private <R extends Resource<ID>, ID extends Serializable> void configurationWithFieldEnumOptions(
 			MutableHolder<HalFormsConfiguration> halFormsConfigurationHolder,
-			Class<?> resourceClass,
+			Class<R> resourceClass,
 			ResourceArtifact artifact,
 			Field resourceField,
-			Set<Class<ReadonlyResourceController>> resourceControllerClasses) {
+			Set<Class<? extends ReadonlyResourceController<?, ?>>> resourceControllerClasses) {
 		Class<?> optionsResourceClass = artifact != null ? artifact.formClass() : resourceClass;
 		log.debug("New HAL-FORMS field enum options (class={}, field={})", resourceClass, resourceField.getName());
 		halFormsConfigurationHolder.setValue(
@@ -268,15 +265,15 @@ public class HalFormsConfig {
 				toArray(FieldOption[]::new);
 	}
 
-	private Link getRemoteOptionsLink(
-			Class<?> resourceClass,
+	private <R extends Resource<ID>, ID extends Serializable> Link getRemoteOptionsLink(
+			Class<R> resourceClass,
 			ResourceArtifact artifact,
 			Field resourceField,
-			Set<Class<ReadonlyResourceController>> resourceControllerClasses) {
-		Optional<Class<ReadonlyResourceController>> resourceControllerClass = findResourceControllerClass(
-			resourceClass,
-			false,
-			resourceControllerClasses);
+			Set<Class<? extends ReadonlyResourceController<?, ?>>> resourceControllerClasses) {
+		Optional<Class<? extends ReadonlyResourceController<?, ?>>> resourceControllerClass = findResourceControllerClass(
+				resourceClass,
+				false,
+				resourceControllerClasses);
 		if (resourceControllerClass.isPresent()) {
 			Link findLink = getFindLinkWithSelfRel(
 					resourceControllerClass.get(),
@@ -308,18 +305,18 @@ public class HalFormsConfig {
 		}
 	}
 
-	private Link getRemoteFieldEnumOptionsLink(
-			Class<?> resourceClass,
+	private <R extends Resource<ID>, ID extends Serializable> Link getRemoteFieldEnumOptionsLink(
+			Class<R> resourceClass,
 			ResourceArtifact artifact,
 			Field resourceField,
-			Set<Class<ReadonlyResourceController>> resourceControllerClasses) {
-		Optional<Class<ReadonlyResourceController>> resourceControllerClass = findResourceControllerClass(
-			resourceClass,
-			artifact == null,
-			resourceControllerClasses);
+			Set<Class<? extends ReadonlyResourceController<?, ?>>> resourceControllerClasses) {
+		Optional<Class<? extends ReadonlyResourceController<?, ?>>> resourceControllerClass = findResourceControllerClass(
+				resourceClass,
+				artifact == null,
+				resourceControllerClasses);
 		if (resourceControllerClass.isPresent()) {
 			if (artifact == null) {
-				Class<MutableResourceController> mutableResourceControllerClass = (Class<MutableResourceController>)((Class<?>)resourceControllerClass.get());
+				Class<? extends MutableResourceController<?, ?>> mutableResourceControllerClass = (Class<? extends MutableResourceController<?, ?>>)(resourceControllerClass.get());
 				return linkTo(methodOn(mutableResourceControllerClass).fieldEnumOptionsFind(resourceField.getName())).
 						withRel(IanaLinkRelations.SELF_VALUE);
 			} else {
@@ -340,14 +337,13 @@ public class HalFormsConfig {
 	}
 
 	private Link getFindLinkWithSelfRel(
-			Class<?> resourceControllerClass,
+			Class<? extends ReadonlyResourceController<?, ?>> resourceControllerClass,
 			ResourceArtifact artifact,
 			String resourceFieldName) {
-		Class<ReadonlyResourceController> readonlyResourceControllerClass = (Class<ReadonlyResourceController>)resourceControllerClass;
 		boolean isMutableResourceController = MutableResourceController.class.isAssignableFrom(resourceControllerClass);
 		if (artifact == null) {
 			if (isMutableResourceController) {
-				Class<MutableResourceController> mutableResourceControllerClass = (Class<MutableResourceController>)resourceControllerClass;
+				Class<? extends MutableResourceController<?, ?>> mutableResourceControllerClass = (Class<? extends MutableResourceController<?, ?>>)resourceControllerClass;
 				return linkTo(methodOn(mutableResourceControllerClass).fieldOptionsFind(
 						resourceFieldName,
 						null,
@@ -360,7 +356,7 @@ public class HalFormsConfig {
 			}
 		} else if (artifact.type() == ResourceArtifactType.ACTION) {
 			if (isMutableResourceController) {
-				Class<MutableResourceController> mutableResourceControllerClass = (Class<MutableResourceController>)resourceControllerClass;
+				Class<? extends MutableResourceController<?, ?>> mutableResourceControllerClass = (Class<? extends MutableResourceController<?, ?>>)resourceControllerClass;
 				return linkTo(methodOn(mutableResourceControllerClass).artifactActionFieldOptionsFind(
 						artifact.code(),
 						resourceFieldName,
@@ -373,7 +369,7 @@ public class HalFormsConfig {
 				return null;
 			}
 		} else if (artifact.type() == ResourceArtifactType.REPORT) {
-			return linkTo(methodOn(readonlyResourceControllerClass).artifactReportFieldOptionsFind(
+			return linkTo(methodOn(resourceControllerClass).artifactReportFieldOptionsFind(
 					artifact.code(),
 					resourceFieldName,
 					null,
@@ -382,7 +378,7 @@ public class HalFormsConfig {
 					null,
 					null)).withRel(IanaLinkRelations.SELF_VALUE);
 		} else if (artifact.type() == ResourceArtifactType.FILTER) {
-			return linkTo(methodOn(readonlyResourceControllerClass).artifactFilterFieldOptionsFind(
+			return linkTo(methodOn(resourceControllerClass).artifactFilterFieldOptionsFind(
 					artifact.code(),
 					resourceFieldName,
 					null,
@@ -395,27 +391,29 @@ public class HalFormsConfig {
 		}
 	}
 
-	private Optional<Class<ReadonlyResourceController>> findResourceControllerClass(
-		Class<?> resourceClass,
-		boolean mutable,
-		Set<Class<ReadonlyResourceController>> resourceControllerClasses) {
-		return resourceControllerClasses.stream().
-			filter(rc -> {
-				// Es comprova mutableCheck ABANS de resoldre els arguments genèrics: si mutable=true i rc
-				// no implementa MutableResourceController (p.ex. Dir3ResourceController, únicament
-				// ReadonlyResourceController), GenericTypeResolver.resolveTypeArguments(rc,
-				// MutableResourceController.class) no troba cap argument (rc no en deriva) i
-				// TypeUtil.getArgumentClassFromGenericSuperclass hi llença NullPointerException.
-				boolean mutableCheck = !mutable || MutableResourceController.class.isAssignableFrom(rc);
-				if (!mutableCheck) {
-					return false;
-				}
-				Class<?> controllerResourceClass = TypeUtil.getArgumentClassFromGenericSuperclass(
+	private <R extends Resource<ID>, ID extends Serializable> Optional<Class<? extends ReadonlyResourceController<?, ?>>> findResourceControllerClass(
+			Class<R> resourceClass,
+			boolean mutable,
+			Set<Class<? extends ReadonlyResourceController<?, ?>>> resourceControllerClasses) {
+		List<Class<? extends ReadonlyResourceController<?, ?>>> matching = resourceControllerClasses.stream().
+				filter(rc -> {
+			Class<?> controllerResourceClass = TypeUtil.getArgumentClassFromGenericSuperclass(
 					rc,
-					mutable ? MutableResourceController.class : ReadonlyResourceController.class,
+					ReadonlyResourceController.class,
 					0);
-				return controllerResourceClass.equals(resourceClass);
-			}).findFirst();
+			return controllerResourceClass.equals(resourceClass);
+		}).
+				collect(Collectors.toList());
+		if (mutable) {
+			return matching.stream().filter(MutableResourceController.class::isAssignableFrom).findFirst();
+		}
+		// Si hi ha diversos controllers pel mateix recurs (p.e. un de mutable i un altre de només
+		// lectura, com passa quan es publica un controller públic de només consulta), preferim
+		// sempre el mutable de manera determinista, en lloc de confiar en l'ordre no garantit del Set.
+		return matching.stream().
+				filter(MutableResourceController.class::isAssignableFrom).
+				findFirst().
+				or(() -> matching.stream().findFirst());
 	}
 
 	private String getRemoteOptionsPromptField(Field field) {

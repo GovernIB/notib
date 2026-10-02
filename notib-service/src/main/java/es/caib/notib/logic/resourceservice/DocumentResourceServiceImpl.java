@@ -27,7 +27,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	 * resultat.
 	 */
 	@Override
-	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries, boolean isSingleResult) {
 		return "id is null";
 	}
 

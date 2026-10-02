@@ -28,7 +28,7 @@ public class AplicacioResourceServiceImpl extends BaseMutableResourceService<Apl
 	private final AplicacioResourceRepository aplicacioResourceRepository;
 
 	@Override
-	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries, boolean isSingleResult) {
 		return notibPermissionHelper.entitatAdditionalSpringFilter("entitat.id");
 	}
 

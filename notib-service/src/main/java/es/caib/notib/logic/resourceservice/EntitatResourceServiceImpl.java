@@ -78,7 +78,7 @@ public class EntitatResourceServiceImpl extends BaseMutableResourceService<Entit
 	}
 
 	@Override
-	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries, boolean isSingleResult) {
 		return notibPermissionHelper.entitatAdditionalSpringFilter("id");
 	}
 

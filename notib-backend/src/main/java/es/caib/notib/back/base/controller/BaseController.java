@@ -38,7 +38,10 @@ public abstract class BaseController {
 	public boolean forbiddenOnChangeLogic() {
 		return false;
 	}
-	public boolean forbiddenArtifactLogic() {
+    public boolean forbiddenSyncLogic() {
+        return false;
+    }
+	public boolean forbiddenArtifactsLogic() {
 		return false;
 	}
 	public boolean forbiddenFieldsLogic() {

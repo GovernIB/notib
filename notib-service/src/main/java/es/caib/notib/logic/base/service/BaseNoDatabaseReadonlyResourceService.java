@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.Serializable;
 
 /**
- * Servei amb la funcionalitat básica per a la gestió d'un recurs que no s'emmagatzema a base de daddes i que només es
+ * Servei amb la funcionalitat básica per a la gestió d'un recurs que no s'emmagatzema a base de dades i que només es
  * pot consultar.
  *
  * @param <R> classe del recurs.
