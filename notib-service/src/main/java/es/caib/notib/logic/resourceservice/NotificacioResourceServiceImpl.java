@@ -72,6 +72,7 @@ import es.caib.notib.logic.notificacions.RegistrarRemesaActionExecutor;
 import es.caib.notib.persist.resourceentity.DocumentResourceEntity;
 import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
 import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
+import es.caib.notib.persist.dialect.OracleCaibDialect;
 import es.caib.notib.persist.resourceentity.NotificacioTableResourceEntity;
 import es.caib.notib.persist.resourceentity.PersonaResourceEntity;
 import es.caib.notib.persist.resourcerepository.CallbackResourceRepository;
@@ -449,7 +450,9 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 		var invertir = offset > (total - offset - mida);
 		var ordenacio = invertir ? invertir(sort) : sort;
 		try {
-			idsQuery.select(idsRoot.get("id")).orderBy(QueryUtils.toOrders(ordenacio, idsRoot, cb));
+			idsQuery.select(idsRoot.get("id")).orderBy(NotificacioTableResourceEntity.class.equals(entityClass)
+					? ordresTaula(ordenacio, idsRoot, cb)
+					: QueryUtils.toOrders(ordenacio, idsRoot, cb));
 		} catch (RuntimeException ex) {
 			if (!opcional) {
 				throw ex;
@@ -465,6 +468,35 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 			java.util.Collections.reverse(ids);
 		}
 		return new PaginaIds(ids, total);
+	}
+
+	/**
+	 * Ordres de la consulta del llistat amb not_notificacio_table. Els camps de text s'ordenen amb la funció
+	 * ordre_text del dialecte (a Oracle, NLSSORT amb NLS_SORT=GENERIC_M): l'ordre alfabètic no depèn de l'idioma
+	 * de la sessió, i coincideix amb l'expressió dels índexs d'ordenació de la taula.
+	 */
+	private List<javax.persistence.criteria.Order> ordresTaula(Sort sort, javax.persistence.criteria.Root<?> root, javax.persistence.criteria.CriteriaBuilder cb) {
+
+		var ambFuncioText = isFuncioOrdreTextDisponible();
+		List<javax.persistence.criteria.Order> ordres = new ArrayList<>();
+		for (var order : sort) {
+			if (order.getProperty().contains(".")) {
+				ordres.addAll(QueryUtils.toOrders(Sort.by(order), root, cb));
+				continue;
+			}
+			javax.persistence.criteria.Expression<?> expressio = root.get(order.getProperty());
+			if (ambFuncioText && String.class.equals(expressio.getJavaType())) {
+				expressio = cb.function(OracleCaibDialect.FUNCIO_ORDRE_TEXT, String.class, expressio);
+			}
+			ordres.add(order.isAscending() ? cb.asc(expressio) : cb.desc(expressio));
+		}
+		return ordres;
+	}
+
+	// Si el dialecte de Hibernate configurat no és un dels de Notib, la funció no existeix i s'ordena per la columna
+	private boolean isFuncioOrdreTextDisponible() {
+		return entityManager.getEntityManagerFactory().unwrap(org.hibernate.engine.spi.SessionFactoryImplementor.class)
+				.getSqlFunctionRegistry().findSQLFunction(OracleCaibDialect.FUNCIO_ORDRE_TEXT) != null;
 	}
 
 	/**

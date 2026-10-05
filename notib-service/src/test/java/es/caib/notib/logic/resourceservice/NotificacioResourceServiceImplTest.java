@@ -120,6 +120,42 @@ class NotificacioResourceServiceImplTest {
 	}
 
 	@Test
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	void ordresTaulaShouldUseOrdreTextOnlyForTextFields() throws Exception {
+		var entityManager = mock(javax.persistence.EntityManager.class);
+		var emf = mock(javax.persistence.EntityManagerFactory.class);
+		var sessionFactory = mock(org.hibernate.engine.spi.SessionFactoryImplementor.class);
+		var funcions = mock(org.hibernate.dialect.function.SQLFunctionRegistry.class);
+		when(entityManager.getEntityManagerFactory()).thenReturn(emf);
+		when(emf.unwrap(org.hibernate.engine.spi.SessionFactoryImplementor.class)).thenReturn(sessionFactory);
+		when(sessionFactory.getSqlFunctionRegistry()).thenReturn(funcions);
+		when(funcions.findSQLFunction("ordre_text")).thenReturn(mock(org.hibernate.dialect.function.SQLFunction.class));
+		var camp = NotificacioResourceServiceImpl.class.getDeclaredField("entityManager");
+		camp.setAccessible(true);
+		camp.set(service, entityManager);
+		var root = mock(javax.persistence.criteria.Root.class);
+		var cb = mock(javax.persistence.criteria.CriteriaBuilder.class);
+		var concepte = mock(javax.persistence.criteria.Path.class);
+		when(concepte.getJavaType()).thenReturn((Class) String.class);
+		var createdDate = mock(javax.persistence.criteria.Path.class);
+		when(createdDate.getJavaType()).thenReturn((Class) java.time.LocalDateTime.class);
+		when(root.get("concepte")).thenReturn(concepte);
+		when(root.get("createdDate")).thenReturn(createdDate);
+		var funcio = mock(javax.persistence.criteria.Expression.class);
+		when(cb.function("ordre_text", String.class, concepte)).thenReturn(funcio);
+
+		var metode = NotificacioResourceServiceImpl.class.getDeclaredMethod("ordresTaula",
+				org.springframework.data.domain.Sort.class, javax.persistence.criteria.Root.class, javax.persistence.criteria.CriteriaBuilder.class);
+		metode.setAccessible(true);
+		metode.invoke(service, org.springframework.data.domain.Sort.by(
+				org.springframework.data.domain.Sort.Order.desc("concepte"),
+				org.springframework.data.domain.Sort.Order.asc("createdDate")), root, cb);
+
+		verify(cb).desc(funcio);
+		verify(cb).asc(createdDate);
+	}
+
+	@Test
 	void estatEnviantShouldHaveOrdinalUsedByChangelog() {
 		// El changeset 2_1_1_000-56 calcula ESTAT_LLISTAT amb l'ordinal d'ENVIANT
 		assertEquals(11, NotificacioEstatEnumDto.ENVIANT.ordinal());

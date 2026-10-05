@@ -23,8 +23,9 @@ databaseChangeLog:
             name: varcharUnit
             value: ''
             dbms: postgresql
-    # Índexs per ordenar columnes de text. A Oracle, la sessió ordena amb l'NLS_SORT de la JVM (CATALAN amb
-    # una JVM ca_ES) i un ORDER BY de text només pot fer servir un índex NLSSORT amb el mateix NLS_SORT.
+    # Índexs per ordenar columnes de text. A Oracle són índexs NLSSORT amb l'ordenació alfabètica multilingüe
+    # GENERIC_M, la mateixa que fa servir el llistat de remeses (funció ordre_text d'OracleCaibDialect): així
+    # l'ordre no depèn de l'NLS_SORT de la sessió (que el driver JDBC pren de l'idioma de la JVM).
     # A PostgreSQL l'índex normal ja segueix la collation de la base de dades.
     -   property:
             name: ordreTextInici
@@ -32,7 +33,7 @@ databaseChangeLog:
             dbms: oracle
     -   property:
             name: ordreTextFi
-            value: ",'NLS_SORT=CATALAN')"
+            value: ",'NLS_SORT=GENERIC_M')"
             dbms: oracle
     -   property:
             name: ordreTextInici
