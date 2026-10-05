@@ -336,7 +336,7 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 	private static final int MIDA_MAXIMA_IN = 1000;
 	// Columnes del llistat amb un nom diferent a not_notificacio_table
 	private static final Map<String, String> CAMPS_ORDENACIO_TAULA = Map.of(
-			"estatString", "estat",
+			"estatString", "estatLlistat",
 			"organGestor", "organGestorId",
 			"procediment", "procedimentId");
 	// Amb not_notificacio_table, els filtres per òrgan i procediment es fan amb les columnes de la taula: amb un JOIN

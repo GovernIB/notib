@@ -112,6 +112,8 @@ public class NotificacioTableHelper {
                 .numExpedient(notificacio.getNumExpedient())
                 .concepte(notificacio.getConcepte())
                 .estat(notificacio.getEstat())
+                .estatLlistat(NotificacioEstatEnumDto.PENDENT.equals(notificacio.getEstat()) && notificacio.getRegistreEnviamentIntent() == 0
+                        ? NotificacioEstatEnumDto.ENVIANT : notificacio.getEstat())
                 .estatDate(notificacio.getEstatDate())
                 .estatProcessatDate(notificacio.getEstatProcessatDate())
                 .entitatNom(notificacio.getEntitat().getNom())

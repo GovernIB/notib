@@ -1016,3 +1016,55 @@ databaseChangeLog:
                                     name: CREATEDBY_CODI
                             -   column:
                                     name: ID
+
+    # Estat que mostra la columna estat del llistat de remeses (interfície React), per ordenar-hi: ENVIANT si la
+    # remesa està pendent sense intents de registre ni error de Notifica, o si no l'estat de la remesa (ordinal de
+    # NotificacioEstatEnumDto; ENVIANT = 11). Es calcula alhora que ESTAT_STRING (NotificacioTableMapper).
+    -   changeSet:
+            id: 2_1_1_000-56
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   columnExists:
+                                tableName: ${db_prefix}NOTIFICACIO_TABLE
+                                columnName: ESTAT_LLISTAT
+            changes:
+                -   addColumn:
+                        tableName: ${db_prefix}NOTIFICACIO_TABLE
+                        columns:
+                            -   column:
+                                    name: ESTAT_LLISTAT
+                                    type: INTEGER
+                -   sql: "UPDATE ${db_prefix}NOTIFICACIO_TABLE SET ESTAT_LLISTAT = CASE WHEN ESTAT = 0 AND COALESCE(REGISTRE_ENV_INTENT, 0) = 0 AND NOTIFICA_ERROR_DATE IS NULL THEN 11 ELSE ESTAT END"
+
+    -   changeSet:
+            id: 2_1_1_000-57
+            author: limit
+            preConditions:
+                -   onFail: MARK_RAN
+                -   not:
+                        -   indexExists:
+                                tableName: ${db_prefix}NOTIFICACIO_TABLE
+                                indexName: ${db_prefix}TABLE_ENT_ESTLLIST_I
+            changes:
+                -   createIndex:
+                        tableName: ${db_prefix}NOTIFICACIO_TABLE
+                        indexName: ${db_prefix}TABLE_ENT_ESTLLIST_I
+                        columns:
+                            -   column:
+                                    name: ENTITAT_ID
+                            -   column:
+                                    name: DELETED
+                            -   column:
+                                    name: ESTAT_LLISTAT
+                            -   column:
+                                    name: ORGAN_ID
+                            -   column:
+                                    name: PROCEDIMENT_ID
+                            -   column:
+                                    name: PROCEDIMENT_ORGAN_ID
+                            -   column:
+                                    name: CREATEDBY_CODI
+                            -   column:
+                                    name: ID

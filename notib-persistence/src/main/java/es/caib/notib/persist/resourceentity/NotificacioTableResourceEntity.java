@@ -140,6 +140,8 @@ public class NotificacioTableResourceEntity implements AdminEntitatResourceEntit
 	private Integer estatMask;
 	@Column(name = "estat_string", length = 512)
 	private String estatString;
+	@Column(name = "estat_llistat")
+	private NotificacioEstatEnumDto estatLlistat;
 	@Column(name = "document_id")
 	private Long documentId;
 	@Column(name = "env_cer_data")

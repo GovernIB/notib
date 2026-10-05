@@ -278,6 +278,8 @@ public abstract class NotificacioTableMapper {
             not.setDocumentId(dto.getDocumentId());
             not.setEnvCerData(dto.getEnvCerData());
             not.setEstatString(dto.getEstatString());
+            // Estat que mostra la columna (el mateix que getColumnaEstatJson), per ordenar el llistat per estat
+            not.setEstatLlistat(dto.isEnviant() ? NotificacioEstatEnumDto.ENVIANT : dto.getEstat());
 //            not.setEstatJson(dto.getEstatJson());
             var rNums = !registreNums.toString().isEmpty() ? registreNums.substring(0, registreNums.length()-2) : "";
             if (rNums.length() > 2000) {

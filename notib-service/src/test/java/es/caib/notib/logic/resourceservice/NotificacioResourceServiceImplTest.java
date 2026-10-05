@@ -107,7 +107,7 @@ class NotificacioResourceServiceImplTest {
 		var result = service.ordenacioTaula(sort);
 
 		assertEquals(org.springframework.data.domain.Sort.by(
-				org.springframework.data.domain.Sort.Order.desc("estat"),
+				org.springframework.data.domain.Sort.Order.desc("estatLlistat"),
 				org.springframework.data.domain.Sort.Order.asc("organGestorId"),
 				org.springframework.data.domain.Sort.Order.asc("procedimentId"),
 				org.springframework.data.domain.Sort.Order.desc("titular")), result);
@@ -117,6 +117,12 @@ class NotificacioResourceServiceImplTest {
 	void filtreTaulaShouldUseTableIdColumns() {
 		assertEquals("entitat.id:21 and (organGestorId in (1,2) or procedimentId in (3) or procedimentOrganGestorId in (4))",
 				NotificacioResourceServiceImpl.filtreTaula("entitat.id:21 and (organGestor.id in (1,2) or procediment.id in (3) or procedimentOrganGestor.id in (4))"));
+	}
+
+	@Test
+	void estatEnviantShouldHaveOrdinalUsedByChangelog() {
+		// El changeset 2_1_1_000-56 calcula ESTAT_LLISTAT amb l'ordinal d'ENVIANT
+		assertEquals(11, NotificacioEstatEnumDto.ENVIANT.ordinal());
 	}
 
 	@Test
