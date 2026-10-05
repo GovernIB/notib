@@ -146,11 +146,10 @@ INSERT INTO not_CONFIG (id,POSITION, KEY, VALUE, JBOSS_PROPERTY, DESCRIPTION, GR
 -- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-27::limit
 ALTER TABLE not_accio_massiva ADD estat VARCHAR2(50 CHAR);
 
+-- 05_update_2.1.1_ddl.sql
+
 -- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-28::limit
 CREATE INDEX not_NOTIF_ENT_CREATED_I ON not_NOTIFICACIO(ENTITAT_ID, CREATEDDATE);
-
--- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-29::limit
-INSERT INTO not_CONFIG (id,POSITION, KEY, VALUE, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE, TYPE_CODE, CONFIG_GROUP_ID, CONFIG_TYPE_ID, CONFIGURABLE) VALUES (not_HIBERNATE_SEQ.NEXTVAL, 22, 'es.caib.notib.app.llistat.remeses.estat.asincron', 'true', 0, 'Indica si la columna estat del llistat de remeses (interfície React) pendent d''actualitzar s''ha de calcular de manera asíncrona i enviar al navegador quan estigui llesta (true), o calcular-la abans de retornar el llistat (false)', 'GENERAL', 'BOOL', (SELECT ID FROM not_CONFIG_GROUP g WHERE g.code = 'GENERAL'), (SELECT ID FROM not_CONFIG_TYPE t WHERE t.code = 'BOOL'), 0);
 
 -- Índexs de clau forana que ja creaven els scripts històrics però no el changelog inicial. Si ja existeixen
 -- (amb aquest nom o sobre les mateixes columnes), s'ignora l'error i no es crea cap índex duplicat.
@@ -195,12 +194,35 @@ EXCEPTION WHEN OTHERS THEN
 END;
 /
 
--- Llistat de remeses (interfície React): es filtra, s'ordena, es pagina i es compta només amb
--- not_notificacio_table, com al llistat JSP. El permís per procediment necessita el procediment de la remesa.
+-- Columnes de not_notificacio_table per al llistat de remeses: PROCEDIMENT_ID (filtre de permisos per
+-- procediment) i ESTAT_LLISTAT (estat que mostra la columna estat, per ordenar-hi). Les omple
+-- 06_update_2.1.1_dml.sql.
 
 -- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-44::limit
 ALTER TABLE not_NOTIFICACIO_TABLE ADD PROCEDIMENT_ID NUMBER(19,0);
-UPDATE not_NOTIFICACIO_TABLE t SET PROCEDIMENT_ID = (SELECT n.PROCEDIMENT_ID FROM not_NOTIFICACIO n WHERE n.ID = t.ID);
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-56::limit
+ALTER TABLE not_NOTIFICACIO_TABLE ADD ESTAT_LLISTAT INTEGER;
+
+-- 06_update_2.1.1_dml.sql
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-29::limit
+INSERT INTO not_CONFIG (id,POSITION, KEY, VALUE, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE, TYPE_CODE, CONFIG_GROUP_ID, CONFIG_TYPE_ID, CONFIGURABLE) VALUES (not_HIBERNATE_SEQ.NEXTVAL, 22, 'es.caib.notib.app.llistat.remeses.estat.asincron', 'true', 0, 'Indica si la columna estat del llistat de remeses (interfície React) pendent d''actualitzar s''ha de calcular de manera asíncrona i enviar al navegador quan estigui llesta (true), o calcular-la abans de retornar el llistat (false)', 'GENERAL', 'BOOL', (SELECT ID FROM not_CONFIG_GROUP g WHERE g.code = 'GENERAL'), (SELECT ID FROM not_CONFIG_TYPE t WHERE t.code = 'BOOL'), 0);
+
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-42::limit
+-- Procés inicial: crea el registre de not_notificacio_table de les remeses que no en tenen
+INSERT INTO not_PROCESSOS_INICIALS (ID, CODI, INIT) VALUES (7, 'CREAR_REGISTRES_NOT_NOTIFICACIO_TABLE', 1);
+
+-- Columnes noves de not_notificacio_table, en una sola passada per la taula i abans de crear-ne els índexs
+-- (07_update_2.1.1_ddl.sql): PROCEDIMENT_ID, el de la remesa, i ESTAT_LLISTAT, ENVIANT (ordinal 11) si la
+-- remesa està pendent sense intents de registre ni error de Notifica, o si no l'estat de la remesa.
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-44::limit
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-56::limit
+UPDATE not_NOTIFICACIO_TABLE t
+   SET PROCEDIMENT_ID = (SELECT n.PROCEDIMENT_ID FROM not_NOTIFICACIO n WHERE n.ID = t.ID),
+       ESTAT_LLISTAT = CASE WHEN ESTAT = 0 AND COALESCE(REGISTRE_ENV_INTENT, 0) = 0 AND NOTIFICA_ERROR_DATE IS NULL THEN 11 ELSE ESTAT END;
+
+-- 07_update_2.1.1_ddl.sql
 
 -- Índexs per ordenar el llistat de remeses i per al COUNT dels usuaris sense rol d'administrador (permisos i
 -- "només les meves"). Darrere la columna de l'ordenació hi ha les dels filtres de permisos i de "només les
@@ -241,6 +263,5 @@ CREATE INDEX not_TABLE_ENT_PROC_I ON not_NOTIFICACIO_TABLE(ENTITAT_ID, DELETED, 
 -- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-55::limit
 CREATE INDEX not_TABLE_ENT_PERMIS_I ON not_NOTIFICACIO_TABLE(ENTITAT_ID, DELETED, ORGAN_ID, PROCEDIMENT_ID, PROCEDIMENT_ORGAN_ID, CREATEDBY_CODI, ID);
 
--- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-42::limit
--- Procés inicial: crea el registre de not_notificacio_table de les remeses que no en tenen
-INSERT INTO not_PROCESSOS_INICIALS (ID, CODI, INIT) VALUES (7, 'CREAR_REGISTRES_NOT_NOTIFICACIO_TABLE', 1);
+-- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-57::limit
+CREATE INDEX not_TABLE_ENT_ESTLLIST_I ON not_NOTIFICACIO_TABLE(ENTITAT_ID, DELETED, ESTAT_LLISTAT, ORGAN_ID, PROCEDIMENT_ID, PROCEDIMENT_ORGAN_ID, CREATEDBY_CODI, ID);

@@ -27,3 +27,9 @@ UPDATE not_notificacio_table t
 -- (si hi falla, l'aplicació anterior no desfà l'alta de la remesa)
 DELETE FROM not_PROCESSOS_INICIALS WHERE CODI = 'CREAR_REGISTRES_NOT_NOTIFICACIO_TABLE';
 INSERT INTO not_PROCESSOS_INICIALS (ID, CODI, INIT) VALUES (7, 'CREAR_REGISTRES_NOT_NOTIFICACIO_TABLE', true);
+
+-- estat_llistat de not_notificacio_table: l'aplicació anterior actualitza estat_string però no aquesta columna,
+-- per la qual s'ordena la columna estat del llistat de remeses (interfície React)
+UPDATE not_notificacio_table
+   SET estat_llistat = CASE WHEN estat = 0 AND COALESCE(registre_env_intent, 0) = 0 AND notifica_error_date IS NULL THEN 11 ELSE estat END
+ WHERE estat_llistat IS DISTINCT FROM (CASE WHEN estat = 0 AND COALESCE(registre_env_intent, 0) = 0 AND notifica_error_date IS NULL THEN 11 ELSE estat END);
