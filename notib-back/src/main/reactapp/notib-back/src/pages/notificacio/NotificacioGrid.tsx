@@ -321,11 +321,14 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
     const isCreateLinkPresent = !isRoleAdminLectura && apiCurrentActions?.['create'] != null;
     const datagridApiRef = useGridApiRef();
     const apiRef = useMuiDataGridApiRef();
-    const [reloadKey, setReloadKey] = React.useState(0);
-    const refreshGrid = React.useCallback(() => setReloadKey(k => k + 1), []);
-    // Refrescar l'estat d'una remesa torna a carregar les dades sense remuntar el grid (com fa refreshGrid,
-    // canviant-ne la key): així es conserven l'ordenació, la pàgina i els filtres aplicats
+    // Refrescar l'estat d'una remesa o executar una acció massiva torna a carregar les dades sense remuntar el
+    // grid (canviant-ne la key): així es conserven l'ordenació, la pàgina i els filtres aplicats
     const refrescarLlistat = React.useCallback(() => apiRef.current?.refresh?.(), [apiRef]);
+    // Després d'una acció massiva, a més, es buida la selecció (les remeses seleccionades ja s'han processat)
+    const refrescarDespresAccioMassiva = React.useCallback(() => {
+        datagridApiRef.current?.setRowSelectionModel({ type: 'include', ids: new Set() });
+        refrescarLlistat();
+    }, [datagridApiRef, refrescarLlistat]);
     const refrescarEstat = useRefrescarEstat(refrescarLlistat, artifactAction);
     const columns = useDataGridColumns(datagridApiRef, notificacionsEsborrades, notificacionsErrorRegistre, notificacionsCallbackError, refrescarEstat);
     // Actualitza automàticament, via SSE, les files de remeses visibles quan el seu estat canvia
@@ -471,7 +474,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
     return (
         <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
             <MuiDataGrid
-                key={`${currentRole}-${notificacionsEsborrades}-${notificacionsErrorRegistre}-${notificacionsCallbackError}-${reloadKey}`}
+                key={`${currentRole}-${notificacionsEsborrades}-${notificacionsErrorRegistre}-${notificacionsCallbackError}`}
                 datagridApiRef={datagridApiRef}
                 apiRef={apiRef}
                 title={t('page.notificacio.grid.title') + (titolSecundari || "")}
@@ -515,7 +518,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                     ...(notificacionsEsborrades || (isRoleAdminLectura && notificacionsErrorRegistre) ? []
                         : [{
                             position: 2,
-                            element: <MassiveActionsButton apiRef={datagridApiRef} notificacionsErrorRegistre={notificacionsErrorRegistre} notificacionsCallbackError={notificacionsCallbackError} refresh={refreshGrid}/>,
+                            element: <MassiveActionsButton apiRef={datagridApiRef} notificacionsErrorRegistre={notificacionsErrorRegistre} notificacionsCallbackError={notificacionsCallbackError} refresh={refrescarDespresAccioMassiva}/>,
                         }]),
                     ...(!notificacioMassiva ? []
                         : [{
