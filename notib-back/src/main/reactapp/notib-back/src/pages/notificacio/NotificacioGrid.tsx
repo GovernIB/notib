@@ -323,7 +323,10 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
     const apiRef = useMuiDataGridApiRef();
     const [reloadKey, setReloadKey] = React.useState(0);
     const refreshGrid = React.useCallback(() => setReloadKey(k => k + 1), []);
-    const refrescarEstat = useRefrescarEstat(refreshGrid, artifactAction);
+    // Refrescar l'estat d'una remesa torna a carregar les dades sense remuntar el grid (com fa refreshGrid,
+    // canviant-ne la key): així es conserven l'ordenació, la pàgina i els filtres aplicats
+    const refrescarLlistat = React.useCallback(() => apiRef.current?.refresh?.(), [apiRef]);
+    const refrescarEstat = useRefrescarEstat(refrescarLlistat, artifactAction);
     const columns = useDataGridColumns(datagridApiRef, notificacionsEsborrades, notificacionsErrorRegistre, notificacionsCallbackError, refrescarEstat);
     // Actualitza automàticament, via SSE, les files de remeses visibles quan el seu estat canvia
     // al servidor (p.ex. per una resposta de Notifica, un event de registre, un callback...), sense
