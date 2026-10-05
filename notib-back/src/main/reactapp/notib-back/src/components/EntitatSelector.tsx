@@ -16,8 +16,18 @@ const EntitatSelector: React.FC = () => {
             onChange={handleEntitatChange}
             size="small"
             select
-            slotProps={{input: {startAdornment: (<InputAdornment position="start" sx={{ mr: 2 }}><Icon>layers</Icon></InputAdornment>)}}}
-            sx={{ mr: 1 }}
+            slotProps={
+                {
+                    input: {
+                        startAdornment: (
+                            <InputAdornment position="start" sx={{ mr: 2 }}>
+                                <Icon fontSize="small">account_balance</Icon>
+                            </InputAdornment>
+                        )
+                    }
+                }
+            }
+            sx={{ mr: 1, '& fieldset': { border: 'none !important' }, padding: 0 }}
         >
             {entitatsAvailable.map(e => (
                 <MenuItem key={e.id} value={e.id}>

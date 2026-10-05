@@ -12,9 +12,9 @@ const SwitchInterfaceMenuItem: React.FC = () => {
     // No es crida preventDefault: es marca la preferència i es deixa navegar l'enllaç amb normalitat.
     const handleClick = () => markInterficiePreference('jsp');
     return (
-        <MenuItem component="a" href={getClassicAppUrl()} onClick={handleClick} sx={{ width: '100%' }}>
+        <MenuItem component="a" href={getClassicAppUrl()} onClick={handleClick} sx={{  float: "left" }}>
             <ListItemIcon>
-                <Icon fontSize="small">swap_horiz</Icon>
+                <Icon fontSize="small">fast_rewind</Icon>
             </ListItemIcon>
             <ListItemText>{t('component.SwitchInterface.classica')}</ListItemText>
         </MenuItem>

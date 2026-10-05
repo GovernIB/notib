@@ -4,8 +4,22 @@ import Grid from "@mui/material/Grid";
 import GridFormField from "../../components/GridFormField.tsx";
 import {useTranslation} from "react-i18next";
 import {TemporalMessageSeverity} from "../../../lib/components/BaseAppContext.tsx";
+import React from "react";
 
-export const useAccionsNotificacio = (refreshGrid?: () => void) => {
+export const useRefrescarEstat = (
+    refreshGrid?: () => void,
+    artifactAction?: (id: any, args: any) => Promise<any>
+) => {
+    const { t } = useTranslation();
+    const { temporalMessageShow } = useBaseAppContext();
+    return React.useCallback((id: number) => {
+        artifactAction?.(id, { code: 'REFRESCAR_ESTAT' })
+            .then(() => { refreshGrid?.(); })
+            .catch((e: { message: string }) => temporalMessageShow(null, e?.message, 'error'));
+    }, [artifactAction, refreshGrid, t, temporalMessageShow]);
+};
+
+export const useAccionsNotificacio = () => {
 
     const { t } = useTranslation();
     const { exec: descarregarJustificantEnviament } = useMuiActionReportLogic(
@@ -189,31 +203,31 @@ export const useAccionsNotificacio = (refreshGrid?: () => void) => {
         'RECUPERAR_REMESA',
     );
 
-    const { exec: refrescarEstat } = useMuiActionReportLogic(
-        'notificacioResource',
-        'REFRESCAR_ESTAT',
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        () => {
-            if (refreshGrid) {
-                refreshGrid();
-            }
-        },
-        undefined,
-        undefined,
-        true
-    );
+    // const { exec: refrescarEstat } = useMuiActionReportLogic(
+    //     'notificacioResource',
+    //     'REFRESCAR_ESTAT',
+    //     undefined,
+    //     undefined,
+    //     undefined,
+    //     undefined,
+    //     undefined,
+    //     undefined,
+    //     undefined,
+    //     undefined,
+    //     undefined,
+    //     undefined,
+    //     undefined,
+    //     undefined,
+    //     undefined,
+    //     () => {
+    //         if (refreshGrid) {
+    //             refreshGrid();
+    //         }
+    //     },
+    //     undefined,
+    //     undefined,
+    //     true
+    // );
 
     return { descarregarJustificantEnviament,
              descarregarDocumentEnviat,
@@ -223,8 +237,9 @@ export const useAccionsNotificacio = (refreshGrid?: () => void) => {
              marcarProcessat, marcarProcessatDialog,
              esborrarRemesa,
              recuperarRemesa,
-             refrescarEstat,
+             // refrescarEstat,
     };
+
 };
 
 export default useAccionsNotificacio;

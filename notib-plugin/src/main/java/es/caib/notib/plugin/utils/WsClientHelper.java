@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.plugin.utils;
 
@@ -51,7 +51,7 @@ import java.util.Set;
 /**
  * Utilitat per a instanciar clients per al servei d'enviament
  * de contingut a bústies.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -227,6 +227,9 @@ public class WsClientHelper<T> {
 			System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", "true");
 			System.setProperty("com.sun.xml.ws.transport.http.HttpAdapter.dump", "true");
 			System.setProperty("com.sun.xml.internal.ws.transport.http.HttpAdapter.dump", "true");
+
+			System.setProperty("com.sun.xml.ws.transport.http.HttpAdapter.dumpTreshold", "9999999");
+			System.setProperty("com.sun.xml.internal.ws.transport.http.HttpAdapter.dumpTreshold", "9999999");
 		}
 		// Configura handlers addicionals
 		for (var handler : handlers) {

@@ -51,7 +51,8 @@ export const getEnvApiUrl = () => {
     return (window.location.protocol + '//' + window.location.host + ':' + window.location.port + envApiSuffix);
 };
 
-const isAuthUrlPresent = envVar('VITE_AUTH_URL', envVars) != null;
+// const isAuthUrlPresent = envVar('VITE_AUTH_URL', envVars) != null;
+const isAuthUrlPresent = Boolean(envVar('VITE_AUTH_URL', envVars));
 const AuthProvider = isAuthUrlPresent ? OidcAuthProvider : ContainerAuthProvider;
 const version = '0.0.0';
 

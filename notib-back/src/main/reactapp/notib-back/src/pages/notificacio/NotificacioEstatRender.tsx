@@ -13,7 +13,6 @@ import {
     NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP,
 } from '../../utils/estatConfig';
 import { useTranslation } from 'react-i18next';
-import useAccionsNotificacio from "../accions/AccionsNotificacio.tsx";
 import {ROLE_USER, useNotibContext} from "../../components/NotibContext.ts";
 
 export type NotificacioEstatRenderProps = {
@@ -21,7 +20,7 @@ export type NotificacioEstatRenderProps = {
     estatEnum: string;
     estatPendent?: boolean;
     notificacioId: number,
-    refreshGrid: any,
+    refrescarEstat: (id: number) => void,
     sir: boolean
 };
 
@@ -244,8 +243,7 @@ const refrescarEstatString = async (event: React.MouseEvent<HTMLDivElement, Mous
 // Dissenyat específicament per la cel·la del Grid de Notificacions
 export const NotificacioEstatGrid: React.FC<NotificacioEstatRenderProps> = (props) => {
 
-    const { estatJson, estatEnum, estatPendent, notificacioId, refreshGrid, sir } = props;
-    const { refrescarEstat } = useAccionsNotificacio(refreshGrid);
+    const { estatJson, estatEnum, estatPendent, notificacioId, refrescarEstat, sir } = props;
     const { t } = useTranslation();
     let estatObjecte: any = null;
     const { currentRole} = useNotibContext();

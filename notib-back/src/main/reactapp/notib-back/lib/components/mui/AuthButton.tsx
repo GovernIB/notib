@@ -14,6 +14,10 @@ import { useTheme } from '@mui/material/styles';
 import { TextAvatar } from './Avatars';
 import { useBaseAppContext } from '../BaseAppContext';
 import { useAuthContext } from '../AuthContext';
+import OrganSelector from "../../../src/components/OrganSelector.tsx";
+import EntitatSelector from "../../../src/components/EntitatSelector.tsx";
+import RoleSelector from "../../../src/components/RoleSelector.tsx";
+import {ROLE_ORGAN, ROLE_SUPER, useNotibContext} from "../../../src/components/NotibContext.ts";
 
 type AuthButtonProps = {
     badgeIcon?: string;
@@ -98,26 +102,21 @@ const LoginButton: React.FC = () => {
 };
 
 const LoggedInUserButton: React.FC<AuthButtonProps> = (props) => {
+
     const { badgeIcon, additionalComponents } = props;
     const { t } = useBaseAppContext();
+    const { currentRole } = useNotibContext();
     const apiRef = React.useRef<AuthButtonApi>(undefined);
     const buttonRef = React.useRef<HTMLButtonElement>(null);
     const { getTokenParsed, signOut } = useAuthContext();
     const [tokenParsed, setTokenParsed] = React.useState<any>();
     const [menuOpened, setMenuOpened] = React.useState(false);
-    React.useEffect(() => {
-        setTokenParsed(getTokenParsed());
-    }, []);
+    React.useEffect(() => setTokenParsed(getTokenParsed()), []);
     const id = menuOpened ? 'auth-menu' : undefined;
-    const handleIconButtonClick = () => {
-        setMenuOpened(true);
-    };
-    const handleMenuClose = () => {
-        setMenuOpened(false);
-    };
-    apiRef.current = {
-        close: handleMenuClose,
-    };
+    const handleIconButtonClick = () => setMenuOpened(true);
+    const handleMenuClose = () => setMenuOpened(false);
+    apiRef.current = {close: handleMenuClose};
+
     return (
         <AuthButtonContext.Provider value={{ apiRef }}>
             <IconBadge icon={badgeIcon}>
@@ -141,14 +140,7 @@ const LoggedInUserButton: React.FC<AuthButtonProps> = (props) => {
                 MenuListProps={{
                     'aria-labelledby': 'auth-button',
                 }}>
-                <MenuItem
-                    disableRipple
-                    sx={{
-                        '&.MuiButtonBase-root:hover': {
-                            bgcolor: 'transparent',
-                            cursor: 'default',
-                        },
-                    }}>
+                <MenuItem disableRipple sx={{'&.MuiButtonBase-root:hover': {bgcolor: 'transparent', cursor: 'default'}}}>
                     <ListItemAvatar>
                         <UserAvatar />
                     </ListItemAvatar>
@@ -160,6 +152,20 @@ const LoggedInUserButton: React.FC<AuthButtonProps> = (props) => {
                 <Divider />
                 {additionalComponents}
                 {additionalComponents && <Divider />}
+                {(currentRole === ROLE_ORGAN &&
+                    <MenuItem sx={{padding:0}}>
+                        <OrganSelector key="organ_selector" />
+                    </MenuItem>
+                )}
+                {(currentRole !== ROLE_SUPER &&
+                    <MenuItem sx={{padding:0}}>
+                        <EntitatSelector key="entitat_selector" />
+                    </MenuItem>
+                )}
+                <MenuItem sx={{padding:0}} >
+                    <RoleSelector key="role_selector"/>
+                </MenuItem>
+                <Divider />
                 <MenuItem onClick={() => signOut?.()}>
                     <ListItemIcon>
                         <Icon fontSize="small">logout</Icon>

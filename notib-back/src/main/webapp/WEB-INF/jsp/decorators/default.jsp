@@ -286,11 +286,11 @@
 									</c:when>
 								</c:choose>
 							</li>
-							<li>
-								<a id="mu_versio_nova" href="<c:url value="/reactapp/"/>" onclick="document.cookie='notibInterficie=react;path=<c:url value="/"/>;max-age=31536000';">
-									<i class="fa fa-exchange"></i> <spring:message code="decorator.menu.accions.versionova"/>
-								</a>
-							</li>
+<%--							<li>--%>
+<%--								<a id="mu_versio_nova" href="<c:url value="/reactapp/"/>" onclick="document.cookie='notibInterficie=react;path=<c:url value="/"/>;max-age=31536000';">--%>
+<%--									<i class="fa fa-exchange"></i> <spring:message code="decorator.menu.accions.versionova"/>--%>
+<%--								</a>--%>
+<%--							</li>--%>
 							<li>
 								<a id="mu_logout" href="<c:url value="/logout"/>">
 									<i class="fa fa-power-off"></i> <spring:message code="decorator.menu.accions.desconectar"/>
@@ -303,7 +303,11 @@
 				<div class="clearfix"></div>
 				<div class="btn-toolbar navbar-btn navbar-right">
 					<div class="btn-group">
-
+						<div class="btn-group">
+							<a id="mu_versio_nova" class="btn btn-default" href="<c:url value="/reactapp/"/>" onclick="document.cookie='notibInterficie=react;path=<c:url value="/"/>;max-age=31536000';">
+								<i class="fa fa-folder"></i> <spring:message code="decorator.menu.accions.versionova"/>
+							</a>
+						</div>
 						<c:choose>
 							<c:when test="${isRolActualAdministrador}">
 								<div class="btn-group">

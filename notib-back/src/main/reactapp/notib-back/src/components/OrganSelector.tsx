@@ -16,8 +16,17 @@ const OrganSelector: React.FC = () => {
             onChange={handleOrganChange}
             size="small"
             select
-            slotProps={{input: {startAdornment: (<InputAdornment position="start" sx={{ mr: 2 }}><Icon>account_tree</Icon></InputAdornment>)}}}
-            sx={{ mr: 1 }}
+            slotProps={
+                {
+                    input: {
+                        startAdornment: (
+                            <InputAdornment position="start" sx={{ mr: 2 }}>
+                                <Icon fontSize="small">account_tree</Icon>
+                            </InputAdornment>
+                        )
+                    }
+                }}
+            sx={{ mr: 1, '& fieldset': { border: 'none !important' }}}
         >
             {organsAvailable.map(o => (
                 <MenuItem key={o.id} value={o.id}>
