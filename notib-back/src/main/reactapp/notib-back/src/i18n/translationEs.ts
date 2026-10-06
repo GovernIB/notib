@@ -1107,7 +1107,12 @@ const translationEs = {
             title: 'Página no encontrada',
             toHome: 'Ir al inicio',
         },
+        sitemap: {
+            title: "Mapa del sitio web",
+            desc: "Acceso directo a todas las secciones principales de la aplicación."
+        },
         accessibilitat: {
+            utilitat: "Ver mapa del sitio web y accesibilidad",
             link: "Accesibilidad",
             title: "Declaración de Accesibilidad",
             intro: {
@@ -1131,33 +1136,30 @@ const translationEs = {
             noAccesible: {
                 title: "Lista de contenido no accesible y explicación del motivo",
                 item1: {
-                    title: "Identificación del idioma principal",
-                    desc1: "El código de idioma usado para identificar el idioma principal no es un código correcto.",
-                    desc2: "En el código fuente generado se ha comprobado que el atributo lang del nodo HTML tiene valor \"ca\", que es válido como código de idioma de IANA. Es posible que el error venga dado porque puede haber textos puntuales (los que se guardan en base de datos introducidos por el usuario) que no se adecúan al idioma indicado, o porque por arquitectura, la gestión del idioma se realiza a través de la sesión de usuario y el contexto de la aplicación React, no mediante atributos estáticos en el HTML. Como medida compensatoria, el atributo \"lang\" se inyecta dinámicamente en el contenedor principal según el idioma seleccionado por el usuario.",
+                    title: "Ausencia de un encabezado principal H1",
+                    desc1: "Los elementos de encabezado (H1...H6) sirven para identificar los títulos de las diferentes secciones en las que se estructura un documento. El nivel empleado en cada encabezado es lo que definirá la estructura jerárquica de las secciones del documento. Por tanto, esta estructura de encabezados y los niveles empleados ha de ser correcta reflejando la estructura lógica del contenido de la página, identificando como encabezados todos los títulos de sección, sin emplear elementos de encabezado únicamente para crear efectos de presentación y sin saltarse niveles intermedios al descender en la jerarquia de encabezados. En todas las páginas debe haber al menos un encabezado de nivel H1 que se corresponda con el título principal del contenido de la página. Una estructura correcta de encabezados es de gran importancia ya que las aplicaciones de usuario y los productos de apoyo, como los lectores de pantalla, pueden proporcionar mecanismos especiales de navegación que permitan a los usuarios acceder de forma rápida a las distintas secciones que componen una página web (p. ej. mediante una índice o mapa del documento con accesos directos a las diferentes secciones del mismo).",
                 },
                 item2: {
-                    title: "Formularios y etiquetas",
-                    desc1: "No se realiza la asociación explícita adecuadamente entre controles y etiquetas.",
-                    desc2: "En los campos de formulario de tipo selector, el identificador del input no coincide con el atributo \"for\" de la etiqueta. El validador utilizado reporta estrictamente el error, aunque la librería Material UI (MUI) declara cumplir con la normativa de accesibilidad WCAG 2.1; en este caso solo lo cumple parcialmente compensándolo con el atributo \"aria-labelledby\", que proporciona un nombre accesible correcto para lectores de pantalla.",
+                    title: "Lista no ordenada mal construida",
+                    desc1: "Las listas no ordenadas se deben identificar mediante el elemento UL y únicamente deben contener elementos LI para identificar cada uno de los elementos de la lista. No puede haber otro tipo de elementos como hijos directos del elemento UL. La estructura de las listas ha de ser correcta para asegurar que ésta",
                 },
                 item3: {
-                    title: "Múltiples vías de navegación",
-                    desc1: "Ausencia de un enlace al mapa web y de un buscador en el sitio.",
-                    desc2: "Nivel de advertencia al no proporcionar algún método complementario de navegación como un mapa web o una opción de búsqueda en el sitio web.",
+                    title: "Presencia de listas no ordenadas vacías.",
+                    desc1: "Las listas no ordenadas se deben identificar mediante el elemento UL y cada uno de sus items mediante elementos LI, que siempre deben aparecer. No deben emplearse elementos de lista UL que carezcan de items. Si en un momento dado una lista carece de items entonces en lugar de mostrarse como una lista sin elementos hijos (sin elementos LI) deberá eliminarse de la página. La estructura de las listas ha de ser correcta para asegurar que éstas ",
                 },
             },
             preparacio: {
                 title: "Preparación de la presente declaración",
                 elaborat: "Esta declaración se ha elaborado mediante autoevaluación realizada por el equipo de desarrollo utilizando la herramienta automatizada: Rastreador Web del Observatorio de Accesibilidad Web.",
-                dataPrep: "Fecha de preparación: 01/05/2026",
+                dataPrep: "Fecha de preparación: 05/05/2026",
                 darreraRevisio: "Última revisión: 05/05/2026",
                 properaRevisio: "Próxima revisión programada: 05/05/2027",
                 norma: "Norma de referencia: UNE-EN 301549:2022, niveles A y AA",
                 resultatTitle: "Resultado",
                 puntuacioLabel: "Puntuación media del sitio web",
-                puntuacioVal: "8.16",
+                puntuacioVal: "8.20",
                 nivellLabel: "Nivel de adecuación estimado",
-                nivellVal: "A",
+                nivellVal: "AA",
                 situacioLabel: "Situación de cumplimiento estimada",
                 situacioVal: "Parcialmente conforme",
                 responsive: "El sitio web está diseñado para su visualización responsive, de manera que se visualiza de forma óptima en dispositivos tableta y móviles.",

@@ -5,6 +5,7 @@ import { GridPage, MuiDataGrid } from 'reactlib';
 import { useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid.tsx';
 import GridFormField from '../../components/GridFormField.tsx';
 import {ROLE_ADMIN_LECTURA, useNotibContext} from "../../components/NotibContext.ts";
+import PageTitle from "../../components/PageTitle.tsx";
 
 const columns = [
     {
@@ -37,24 +38,27 @@ export const Grups: React.FC = () => {
     const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
-        <GridPage>
-            <MuiDataGrid
-                title={t('page.grups.grid.title')}
-                resourceName="grupResource"
-                columns={columns}
-                paginationActive
-                persistentStateActive
-                persistentStateClearPageSortPropsOnTopLevelRouteChange
-                {...pageSizeOptionsDataGridProps}
-                toolbarType="upper"
-                popupEditActive
-                popupEditFormContent={<GrupForm />}
-                popupEditFormDialogResourceTitle={t('page.grups.grid.popupResourceTitle')}
-                toolbarHideCreate={isRoleAdminLectura ? true : undefined}
-                rowHideUpdateButton={isRoleAdminLectura}
-                rowHideDeleteButton={isRoleAdminLectura}
-            />
-        </GridPage>
+        <>
+            <PageTitle title={t('page.grups.grid.title')}></PageTitle>
+            <GridPage>
+                <MuiDataGrid
+                    title={t('page.grups.grid.title')}
+                    resourceName="grupResource"
+                    columns={columns}
+                    paginationActive
+                    persistentStateActive
+                    persistentStateClearPageSortPropsOnTopLevelRouteChange
+                    {...pageSizeOptionsDataGridProps}
+                    toolbarType="upper"
+                    popupEditActive
+                    popupEditFormContent={<GrupForm />}
+                    popupEditFormDialogResourceTitle={t('page.grups.grid.popupResourceTitle')}
+                    toolbarHideCreate={isRoleAdminLectura ? true : undefined}
+                    rowHideUpdateButton={isRoleAdminLectura}
+                    rowHideDeleteButton={isRoleAdminLectura}
+                />
+            </GridPage>
+        </>
     );
 };
 

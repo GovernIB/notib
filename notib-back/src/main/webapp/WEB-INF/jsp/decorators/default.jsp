@@ -30,12 +30,20 @@
 	pageContext.setAttribute("organsProcNoSincronitzats", sessionScopedContext.getOrgansProcNoSincronitzats());
 	pageContext.setAttribute("organsServNoSincronitzats", sessionScopedContext.getOrgansServNoSincronitzats());
 %>
+<%-- Idioma principal del document, per a que els lectors de pantalla utilitzin l'entonacio correcta --%>
+<c:set var="idiomaDocument" value="${fn:toLowerCase(sessionScopedContext.idiomaUsuari)}"/>
+<c:if test="${empty idiomaDocument}">
+	<c:set var="idiomaDocument" value="${fn:toLowerCase(pageContext.locale.language)}"/>
+</c:if>
+<c:if test="${empty idiomaDocument}">
+	<c:set var="idiomaDocument" value="ca"/>
+</c:if>
 <c:set var="hiHaEntitats" value="${fn:length(sessionEntitats) > 0}"/>
 <c:set var="hiHaMesEntitats" value="${fn:length(sessionEntitats) > 1}"/>
 <c:set var="hiHaOrgans" value="${fn:length(sessionOrgans) > 0}"/>
 <c:set var="hiHaMesOrgans" value="${fn:length(sessionOrgans) > 1}"/>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="${idiomaDocument}">
 <head>
 	<meta charset="utf-8">
 	<title>Notib - <decorator:title default="Benvinguts" /></title>
@@ -496,7 +504,12 @@
 	</div>
 </div>
 <div class="container container-foot container-custom">
-	<div class="pull-left app-version"><p>NOTIB v<not:versio/></p></div>
+	<div class="pull-left app-version">
+		<p>NOTIB v<not:versio/></p>
+		<a id="oawSitemapLink" href="<c:url value="/reactapp/sitemap"/>"><spring:message code="decorator.footer.sitemap"/></a>
+		<span aria-hidden="true"> | </span>
+		<a id="oawAccessibilitatLink" href="<c:url value="/reactapp/accessibilitat"/>"><spring:message code="decorator.footer.accessibilitat"/></a>
+	</div>
 	<div class="pull-right govern-footer">
 		<p>
 			<c:choose>

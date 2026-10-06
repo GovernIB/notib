@@ -20,6 +20,7 @@ import {useAccionsCallbacks} from "../accions/AccionsCallbacks.tsx";
 import {GridApiPro, useGridApiRef} from "@mui/x-data-grid-pro";
 import {ROLE_ADMIN_LECTURA, ROLE_USER, useNotibContext} from "../../components/NotibContext.ts";
 import AccionsMassives, {MenuOption, useAccionsMassives} from "../../components/AccionsMassives.tsx";
+import PageTitle from "../../components/PageTitle.tsx";
 
 
 const columns: MuiDataGridColDef[] = [
@@ -218,32 +219,35 @@ const CallbackPendentsGrid = () => {
     const [reloadKey, setReloadKey] = React.useState(0);
     const refreshGrid = React.useCallback(() => setReloadKey(k => k + 1), []);
     return (
-        <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
-            <MuiDataGrid
-                key={reloadKey}
-                title={t('page.callbacks.pendents.grid.title')}
-                resourceName="callbackResource"
-                datagridApiRef={datagridApiRef}
-                columns={columns}
-                rowAdditionalActions={rowAdditionalActions}
-                paginationActive
-                selectionActive
-                rowHideUpdateButton
-                persistentStateActive
-                persistentStateClearPageSortPropsOnTopLevelRouteChange
-               {...filterDataGridProps}
-               {...pageSizeOptionsDataGridProps}
-                toolbarType="upper"
-                toolbarHideCreate
-                toolbarElementsWithPositions={[
-                    ...(amagarEntrada ? []
-                        : [{
-                            position: 2,
-                            element: <MassiveActionsButton apiRef={datagridApiRef} refresh={refreshGrid}/>,
-                        }])
-                ]}
-            />
-        </GridPage>
+        <>
+            <PageTitle title={t('page.callbacks.pendents.grid.title')}></PageTitle>
+            <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
+                <MuiDataGrid
+                    key={reloadKey}
+                    title={t('page.callbacks.pendents.grid.title')}
+                    resourceName="callbackResource"
+                    datagridApiRef={datagridApiRef}
+                    columns={columns}
+                    rowAdditionalActions={rowAdditionalActions}
+                    paginationActive
+                    selectionActive
+                    rowHideUpdateButton
+                    persistentStateActive
+                    persistentStateClearPageSortPropsOnTopLevelRouteChange
+                   {...filterDataGridProps}
+                   {...pageSizeOptionsDataGridProps}
+                    toolbarType="upper"
+                    toolbarHideCreate
+                    toolbarElementsWithPositions={[
+                        ...(amagarEntrada ? []
+                            : [{
+                                position: 2,
+                                element: <MassiveActionsButton apiRef={datagridApiRef} refresh={refreshGrid}/>,
+                            }])
+                    ]}
+                />
+            </GridPage>
+        </>
     );
 }
 

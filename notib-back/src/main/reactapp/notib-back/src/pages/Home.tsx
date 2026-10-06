@@ -5,6 +5,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { useTheme } from '@mui/material/styles';
 import { BasePage } from 'reactlib';
+import PageTitle from "../components/PageTitle.tsx";
 
 const HomeToolbar = () => {
     const theme = useTheme();
@@ -36,13 +37,14 @@ const HomeToolbar = () => {
 };
 
 const Home: React.FC = () => {
-    return (
+    return (<>
+        <PageTitle title={'Home'}></PageTitle>
         <BasePage toolbar={<HomeToolbar />}>
             <Grid container spacing={2}>
                 <Grid size={12} sx={{ mb: 1 }}></Grid>
             </Grid>
         </BasePage>
-    );
+    </>);
 };
 
 export default Home;

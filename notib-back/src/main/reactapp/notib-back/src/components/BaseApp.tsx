@@ -59,7 +59,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, RouterLinkProps>((itemPr
     return <RouterLink ref={ref} {...itemProps} role={undefined} />;
 });
 
-const filterMenuEntries = (
+export const filterMenuEntries = (
     menuEntries: MenuEntryWithResource[] | undefined,
     resourceNames?: string[]
 ): MenuEntry[] | undefined => {

@@ -14,6 +14,7 @@ import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRend
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils.ts';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid.tsx';
 import { ROLE_ADMIN_LECTURA, useNotibContext } from '../../components/NotibContext.ts';
+import PageTitle from "../../components/PageTitle.tsx";
 
 const columns = [
     {
@@ -90,40 +91,28 @@ export const PagadorsPostalsGrid: React.FC = () => {
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
 
     return (
-        <GridPage>
-            {/*<MuiDataGrid*/}
-            {/*    title={t('page.pagadorPostal.grid.title')}*/}
-            {/*    resourceName="pagadorPostalResource"*/}
-            {/*    columns={columns}*/}
-            {/*    paginationActive*/}
-            {/*    persistentStateActive*/}
-            {/*    persistentStateClearPageSortPropsOnTopLevelRouteChange*/}
-            {/*    {...filterDataGridProps}*/}
-            {/*    {...pageSizeOptionsDataGridProps}*/}
-            {/*    toolbarType="upper"*/}
-            {/*    popupEditActive*/}
-            {/*    popupEditFormContent={<PagadorPostalForm />}*/}
-            {/*    popupEditFormDialogResourceTitle={t('page.pagadorPostal.grid.popupResourceTitle')}*/}
-            {/*    rowHideUpdateButton={isRoleAdminLectura}*/}
-            {/*/>*/}
-            <MuiDataGrid
-                title={t('page.pagadorPostal.grid.title')}
-                resourceName="pagadorPostalResource"
-                columns={columns}
-                paginationActive
-                persistentStateActive
-                persistentStateClearPageSortPropsOnTopLevelRouteChange
-                {...filterDataGridProps}
-                {...pageSizeOptionsDataGridProps}
-                toolbarType="upper"
-                toolbarCreateLink="form"
-                toolbarHideCreate={isRoleAdminLectura ? true : undefined}
-                rowLink="form/{{id}}"
-                rowUpdateLink="form/{{id}}"
-                rowHideUpdateButton={isRoleAdminLectura}
-                rowHideDeleteButton={isRoleAdminLectura}
-            />
-        </GridPage>
+        <>
+            <PageTitle title={t('page.pagadorPostal.grid.title')}></PageTitle>
+            <GridPage>
+                <MuiDataGrid
+                    title={t('page.pagadorPostal.grid.title')}
+                    resourceName="pagadorPostalResource"
+                    columns={columns}
+                    paginationActive
+                    persistentStateActive
+                    persistentStateClearPageSortPropsOnTopLevelRouteChange
+                    {...filterDataGridProps}
+                    {...pageSizeOptionsDataGridProps}
+                    toolbarType="upper"
+                    toolbarCreateLink="form"
+                    toolbarHideCreate={isRoleAdminLectura ? true : undefined}
+                    rowLink="form/{{id}}"
+                    rowUpdateLink="form/{{id}}"
+                    rowHideUpdateButton={isRoleAdminLectura}
+                    rowHideDeleteButton={isRoleAdminLectura}
+                />
+            </GridPage>
+        </>
     );
 };
 

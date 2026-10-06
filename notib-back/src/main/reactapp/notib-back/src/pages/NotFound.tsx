@@ -5,10 +5,12 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { BasePage } from 'reactlib';
 import notFound from '../assets/not_found.svg';
+import PageTitle from "../components/PageTitle.tsx";
 
 const NotFound = () => {
     const { t } = useTranslation();
-    return (
+    return (<>
+        <PageTitle title={'Not found'}></PageTitle>
         <BasePage expandHeight>
             <Box
                 sx={{
@@ -25,7 +27,7 @@ const NotFound = () => {
                 </Button>
             </Box>
         </BasePage>
-    );
+    </>);
 };
 
 export default NotFound;

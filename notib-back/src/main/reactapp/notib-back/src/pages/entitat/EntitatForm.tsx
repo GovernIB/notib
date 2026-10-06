@@ -27,6 +27,7 @@ import GridFormField from '../../components/GridFormField';
 import { useTabParam } from '../../hooks/useSearchParams';
 import Button from "@mui/material/Button";
 import {Icon, Tooltip} from "@mui/material";
+import PageTitle from "../../components/PageTitle.tsx";
 
 const useEntitatId = () => {
 
@@ -305,14 +306,16 @@ export const EntitatForm: React.FC = () => {
 
     const { t } = useTranslation();
     const { isReady, id, hiddenBackButton } = useEntitatId();
+    const titol = id != null ? t('page.entitats.form.titleUpdate') : t('page.entitats.form.titleCreate');
     const [subtitle, setSubtitle] = React.useState<string>();
     return (
-        isReady && (
+        isReady && (<>
+            <PageTitle title={titol}></PageTitle>
             <FormPage>
                 <MuiForm
                     resourceName="entitatResource"
                     id={id}
-                    title={id != null ? t('page.entitats.form.titleUpdate') : t('page.entitats.form.titleCreate')}
+                    title={titol}
                     hiddenBackButton={hiddenBackButton ? true : undefined}
                     toolbarSubtitle={id != null ? subtitle : undefined}
                     createLink="./{{id}}"
@@ -323,7 +326,7 @@ export const EntitatForm: React.FC = () => {
                     <EntitatFormContent setSubtitle={setSubtitle} />
                 </MuiForm>
             </FormPage>
-        )
+        </>)
     );
 };
 

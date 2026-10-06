@@ -86,6 +86,7 @@ export const DrassanaFooter: React.FC<DrassanaFooterProps> = (props) => {
                     ({buildTimestamp} | Revisió: {scmRevision})
                 </span>
             </Typography>
+            <Link color={'#F6F6F6'} style={{color: '#F6F6F6', marginRight: '10px'}} to={"/sitemap"}>{t('page.sitemap.title')}</Link>
             <Link color={'#F6F6F6'} style={{color: '#F6F6F6'}} to={"/accessibilitat"}>{t('page.accessibilitat.link')}</Link>
             <Box sx={{ mr: 0, pt: 0, pr: 0, height: '36px', cursor: 'pointer' }}>
                 <img src={drassanaLogo} alt="foot_logo" style={{ maxHeight: '36px' }} />

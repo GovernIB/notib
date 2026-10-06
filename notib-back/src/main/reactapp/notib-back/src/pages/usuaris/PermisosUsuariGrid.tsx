@@ -7,6 +7,7 @@ import {useDatagridFilterProps, useDatagridPageSizeOptionsProps} from '../../hoo
 import {GRID_DETAIL_PANEL_TOGGLE_COL_DEF} from "@mui/x-data-grid-pro";
 import CustomDetailPanelToggle from "../../utils/CustomDetailPanelToggle.tsx";
 import PermisosUsuariDetail from "./PermisosUsuariDetail.tsx";
+import PageTitle from "../../components/PageTitle.tsx";
 
 
 const springFilterBuilder = (data: any) => filterBuilder.and(filterBuilder.like('codi', data.codi));
@@ -80,31 +81,34 @@ export const PermisosUsuariGrid = () => {
 
 
     return (
-        <GridPage>
-            <MuiDataGrid
-                title={t('page.usuaris.permisos.grid.title')}
-                resourceName="usuariPermisResource"
-                columns={columns}
-                paginationActive
-                className="permisos-grid"
-                persistentStateActive
-                persistentStateClearPageSortPropsOnTopLevelRouteChange
-                {...filterDataGridProps}
-                {...pageSizeOptionsDataGridProps}
-                toolbarType="upper"
-                rowHideUpdateButton
-                getDetailPanelContent={({ row }) => <PermisosUsuariDetail id={row.id} />}
-                getDetailPanelHeight={() => 'auto'}
-                sx={{
-                    '&.permisos-grid .MuiDataGrid-row:not(:first-of-type)': {
-                        borderTop: '2px solid rgb(80, 80, 80)',
-                    },
-                    '&.permisos-grid .permisos-detail-grid .MuiDataGrid-row:not(:first-of-type)': {
-                        borderTop: 'none !important',
-                    },
-                }}
-            />
-        </GridPage>
+        <>
+            <PageTitle title={t('page.usuaris.permisos.grid.title')}></PageTitle>
+            <GridPage>
+                <MuiDataGrid
+                    title={t('page.usuaris.permisos.grid.title')}
+                    resourceName="usuariPermisResource"
+                    columns={columns}
+                    paginationActive
+                    className="permisos-grid"
+                    persistentStateActive
+                    persistentStateClearPageSortPropsOnTopLevelRouteChange
+                    {...filterDataGridProps}
+                    {...pageSizeOptionsDataGridProps}
+                    toolbarType="upper"
+                    rowHideUpdateButton
+                    getDetailPanelContent={({ row }) => <PermisosUsuariDetail id={row.id} />}
+                    getDetailPanelHeight={() => 'auto'}
+                    sx={{
+                        '&.permisos-grid .MuiDataGrid-row:not(:first-of-type)': {
+                            borderTop: '2px solid rgb(80, 80, 80)',
+                        },
+                        '&.permisos-grid .permisos-detail-grid .MuiDataGrid-row:not(:first-of-type)': {
+                            borderTop: 'none !important',
+                        },
+                    }}
+                />
+            </GridPage>
+        </>
     );
 };
 

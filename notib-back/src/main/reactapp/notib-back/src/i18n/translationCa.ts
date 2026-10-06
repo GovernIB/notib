@@ -1131,7 +1131,12 @@ const translationCa = {
             title: 'Pàgina no trobada',
             toHome: "Anar a l'inici",
         },
+        sitemap: {
+            title: "Mapa del lloc web",
+            desc: "Accés directe a totes les seccions principals de l’aplicació."
+        },
         accessibilitat: {
+            utilitat: "Veure mapa del lloc web i accessibilitat",
             link: "Accessibilitat",
             title: "Declaració d'Accessibilitat",
             intro: {
@@ -1155,33 +1160,30 @@ const translationCa = {
             noAccesible: {
                 title: "Llista de contingut no accessible i explicació del motiu",
                 item1: {
-                    title: "Identificació de l'idioma principal",
-                    desc1: "El codi d'idioma usat per identificar l'idioma principal no és un codi correcte.",
-                    desc2: "En el codi font generat s'ha comprovat que l'atribut lang del node HTML té valor \"ca\", que és vàlid com a codi d'idioma de IANA. És possible que l'error vingui donat perquè pugui haver-hi textos puntuals (els que es guarden a la BBDD introduïts per l'usuari) que no s'adeqüen a l'idioma indicat, o perquè per arquitectura, la gestió de l'idioma es realitza a través de la sessió d'usuari i el context de l'aplicació React, no mitjançant atributs estàtics a l'HTML. Com a mesura compensatòria, l'atribut \"lang\" s'injecta dinàmicament al contenidor principal segons l'idioma seleccionat per l'usuari.",
+                    title: "Absència d’un encapçalament principal H1",
+                    desc1: "Els elements d’encapçalament (H1...H6) serveixen per identificar els títols de les diferents seccions en què s’estructura un document. El nivell emprat en cada encapçalament és el que definirà l’estructura jeràrquica de les seccions del document. Per tant, aquesta estructura d’encapçalaments i els nivells emprats han de ser correctes i han de reflectir l’estructura lògica del contingut de la pàgina. Cal identificar com a encapçalaments tots els títols de secció, sense emprar elements d’encapçalament únicament per crear efectes de presentació i sense saltar-se nivells intermedis en baixar en la jerarquia d’encapçalaments. A totes les pàgines hi ha d’haver com a mínim un encapçalament de nivell H1 que es correspongui amb el títol principal del contingut de la pàgina. Una estructura correcta d’encapçalaments és molt important, ja que les aplicacions d’usuari i els productes de suport, com ara els lectors de pantalla, poden proporcionar mecanismes especials de navegació que permetin als usuaris accedir ràpidament a les diferents seccions que componen una pàgina web (per exemple, mitjançant un índex o mapa del document amb accessos directes a les diferents seccions).",
                 },
                 item2: {
-                    title: "Formularis i etiquetes",
-                    desc1: "No es realitza l'associació explícita adequadament entre controls i etiquetes.",
-                    desc2: "Als camps de formulari de tipus selector, l'identificador del input no coincideix amb l'atribut \"for\" de l'etiqueta. El validador utilitzat reporta estrictament l'error, tot i que la llibreria Material UI (MUI) declara complir amb la normativa d'accessibilitat WCAG 2.1; en aquest cas només ho compleix parcialment compensant-ho amb l'atribut \"aria-labelledby\", que proporciona un nom accessible correcte per als lectors de pantalla.",
+                    title: "Llista no ordenada mal construïda",
+                    desc1: "Les llistes no ordenades s’han d’identificar mitjançant l’element UL i només han de contenir elements LI per identificar cadascun dels elements de la llista. No hi pot haver cap altre tipus d’elements com a fills directes de l’element UL. L’estructura de les llistes ha de ser correcta per garantir que aquesta",
                 },
                 item3: {
-                    title: "Múltiples vies de navegació",
-                    desc1: "Absència d'un enllaç al mapa web i d'un cercador al lloc.",
-                    desc2: "Nivell d'advertència en no proporcionar cap mètode complementari de navegació com un mapa web o una opció de cerca al lloc web.",
+                    title: "Presència de llistes no ordenades buides",
+                    desc1: "Les llistes no ordenades s’han d’identificar mitjançant l’element UL i cadascun dels seus elements mitjançant elements LI, que sempre hi han d’aparèixer. No s’han d’emprar elements de llista UL que no continguin cap element. Si en un moment determinat una llista no conté cap element, en lloc de mostrar-se com una llista sense elements fills (sense elements LI), s’ha d’eliminar de la pàgina. L’estructura de les llistes ha de ser correcta per garantir que aquestes",
                 },
             },
             preparacio: {
                 title: "Preparació de la present declaració",
                 elaborat: "Aquesta declaració s'ha elaborat mitjançant autoavaluació realitzada per l'equip de desenvolupament utilitzant l'eina automatitzada: Rastrejador Web de l'Observatori d'Accessibilitat Web.",
-                dataPrep: "Data de preparació: 01/05/2026",
-                darreraRevisio: "Darrera revisió: 05/05/2026",
-                properaRevisio: "Propera revisió programada: 05/05/2027",
+                dataPrep: "Data de preparació: 05/10/2026",
+                darreraRevisio: "Darrera revisió: 05/10/2026",
+                properaRevisio: "Propera revisió programada: 05/10/2027",
                 norma: "Norma de referència: UNE-EN 301549:2022, nivells A i AA",
                 resultatTitle: "Resultat",
                 puntuacioLabel: "Puntuació mitjana del lloc web",
-                puntuacioVal: "8.16",
+                puntuacioVal: "8.20",
                 nivellLabel: "Nivell d'adequació estimat",
-                nivellVal: "A",
+                nivellVal: "AA",
                 situacioLabel: "Situació de compliment estimada",
                 situacioVal: "Parcialment conforme",
                 responsive: "El lloc web està dissenyat per a la seva visualització responsive, de manera que es visualitza de forma òptima en dispositius tauleta i mòbils.",

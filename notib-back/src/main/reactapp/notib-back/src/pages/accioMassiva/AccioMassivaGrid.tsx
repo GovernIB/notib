@@ -8,6 +8,7 @@ import {Box, Chip, Grid, Icon, IconButton} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import AccioMassivaGridEnviaments from "./AccioMassivaGridElements.tsx";
 import CustomDetailPanelToggle from "../../utils/CustomDetailPanelToggle.tsx";
+import PageTitle from "../../components/PageTitle.tsx";
 
 
 const useDataGridColumns = () => {
@@ -134,23 +135,27 @@ export const AccioMassivaGrid = () => {
         <ContentFilter />
     );
 
-    return (<GridPage>
-        <MuiDataGrid
-            title={t('page.accioMassiva.grid.title')}
-            resourceName="accioMassivaResource"
-            columns={columns}
-            defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
-            paginationActive
-            persistentStateActive
-            persistentStateClearPageSortPropsOnTopLevelRouteChange
-            {...filterDataGridProps}
-            {...pageSizeOptionsDataGridProps}
-            toolbarType="upper"
-            getDetailPanelContent={({ row }) => <AccioMassivaGridEnviaments id={row.id} tipusElementSeleccionat={row.tipusElementSeleccionat}/>}
-            getDetailPanelHeight={() => 'auto'}
+    return (
+        <>
+            <PageTitle title={t('page.accioMassiva.grid.title')}></PageTitle>
+            <GridPage>
+            <MuiDataGrid
+                title={t('page.accioMassiva.grid.title')}
+                resourceName="accioMassivaResource"
+                columns={columns}
+                defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
+                paginationActive
+                persistentStateActive
+                persistentStateClearPageSortPropsOnTopLevelRouteChange
+                {...filterDataGridProps}
+                {...pageSizeOptionsDataGridProps}
+                toolbarType="upper"
+                getDetailPanelContent={({ row }) => <AccioMassivaGridEnviaments id={row.id} tipusElementSeleccionat={row.tipusElementSeleccionat}/>}
+                getDetailPanelHeight={() => 'auto'}
 
-        />
-        </GridPage>);
+            />
+            </GridPage>
+        </>);
 }
 
 export default AccioMassivaGrid;

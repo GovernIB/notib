@@ -19,6 +19,7 @@ import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../h
 import { useAccionsProcediment } from '../accions/AccionsProcediment';
 import { DataCommonAdditionalAction } from '../../../lib/components/mui/datacommon/MuiDataCommon.tsx';
 import React from "react";
+import PageTitle from "../../components/PageTitle.tsx";
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -258,40 +259,43 @@ export const ProcedimentGrid = () => {
         },
     ];
     return (
-        <GridPage>
-            <MuiDataGrid
-                title={t('page.procediments.grid.title')}
-                resourceName="procedimentResource"
-                columns={columns}
-                fixedFilter={"tipus:'PROCEDIMENT' and entitat.id:" + currentEntitatId}
-                paginationActive
-                persistentStateActive
-                persistentStateClearPageSortPropsOnTopLevelRouteChange
-                {...filterDataGridProps}
-                {...pageSizeOptionsDataGridProps}
-                toolbarType="upper"
-                toolbarCreateLink="form"
-                toolbarHideCreate={isRoleAdminLectura ? true : undefined}
-                rowLink="form/{{id}}"
-                rowUpdateLink="form/{{id}}"
-                rowUpdateShowInMenu
-                rowHideUpdateButton={isRoleAdminLectura}
-                rowHideDeleteButton={isRoleAdminLectura}
-                rowAdditionalActions={rowAdditionalActions}
-                apiRef={dataGridApiRef}
-                toolbarElementsWithPositions={ !isRoleAdmin ? [] : [
-                    {
-                        position: 2,
-                        element: <NetejarCacheActionButton dataGridApiRef={dataGridApiRef} />,
+        <>
+            <PageTitle title={t('page.procediments.grid.title')}></PageTitle>
+            <GridPage>
+                <MuiDataGrid
+                    title={t('page.procediments.grid.title')}
+                    resourceName="procedimentResource"
+                    columns={columns}
+                    fixedFilter={"tipus:'PROCEDIMENT' and entitat.id:" + currentEntitatId}
+                    paginationActive
+                    persistentStateActive
+                    persistentStateClearPageSortPropsOnTopLevelRouteChange
+                    {...filterDataGridProps}
+                    {...pageSizeOptionsDataGridProps}
+                    toolbarType="upper"
+                    toolbarCreateLink="form"
+                    toolbarHideCreate={isRoleAdminLectura ? true : undefined}
+                    rowLink="form/{{id}}"
+                    rowUpdateLink="form/{{id}}"
+                    rowUpdateShowInMenu
+                    rowHideUpdateButton={isRoleAdminLectura}
+                    rowHideDeleteButton={isRoleAdminLectura}
+                    rowAdditionalActions={rowAdditionalActions}
+                    apiRef={dataGridApiRef}
+                    toolbarElementsWithPositions={ !isRoleAdmin ? [] : [
+                        {
+                            position: 2,
+                            element: <NetejarCacheActionButton dataGridApiRef={dataGridApiRef} />,
 
-                    } ,
-                    {
-                        position: 2,
-                        element: <ProcedimentSyncActionButton dataGridApiRef={dataGridApiRef} />,
-                    }
-                ]}
-            />
-        </GridPage>
+                        } ,
+                        {
+                            position: 2,
+                            element: <ProcedimentSyncActionButton dataGridApiRef={dataGridApiRef} />,
+                        }
+                    ]}
+                />
+            </GridPage>
+        </>
     );
 };
 

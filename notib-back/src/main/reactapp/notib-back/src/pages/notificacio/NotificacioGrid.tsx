@@ -17,6 +17,7 @@ import {generateGridRowStylesFromMap, getGridRowColorClass, NOTIFICACIO_ESTAT_EN
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import CustomDetailPanelToggle from "../../utils/CustomDetailPanelToggle.tsx";
 import ContentFilter, {useSpringFilterBuilder} from "./NotificacioFiltre.tsx";
+import PageTitle from "../../components/PageTitle.tsx";
 // import useSseRowRefresh from "../../hooks/useSseRowRefresh";
 
 const useDataGridColumns = (datagridApiRef: any,
@@ -455,7 +456,8 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                 getDetailPanelContent: ({ row }: any) => (<NotificacioGridEnviaments id={row.id} />),
                 getDetailPanelHeight: () => 'auto' as const,
             } : {};
-    return (
+    return (<>
+        <PageTitle title={t('page.notificacio.grid.title')}></PageTitle>
         <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
             <MuiDataGrid
                 key={`${currentRole}-${notificacionsEsborrades}-${notificacionsErrorRegistre}-${notificacionsCallbackError}-${reloadKey}`}
@@ -526,7 +528,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
             {ampliarTerminiDialog}
             {marcarProcessatDialog}
         </GridPage>
-    );
+    </>);
 };
 
 export default NotificacioGrid;

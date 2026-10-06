@@ -17,6 +17,7 @@ import { useNotificacioMassivaResumDialog } from './NotificacioMassivaResumDialo
 import {useNavigate} from "react-router-dom";
 import {ROLE_ADMIN_LECTURA, ROLE_USER, useNotibContext} from "../../components/NotibContext.ts";
 import {TemporalMessageSeverity} from "../../../lib/components/BaseAppContext.tsx";
+import PageTitle from "../../components/PageTitle.tsx";
 
 const iconOk= React.cloneElement(<Icon>check</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center"} });
 const iconError= React.cloneElement(<Icon>close</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center" } });
@@ -328,25 +329,27 @@ export const NotifiacioMassivaGrid = () => {
     };
 
     return (
-        <GridPage>
-            <MuiDataGrid
-                title={t('page.notificacioMassiva.grid.title')}
-                resourceName="notificacioMassivaResource"
-                columns={columns}
-                defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
-                paginationActive
-                persistentStateActive
-                persistentStateClearPageSortPropsOnTopLevelRouteChange
-                {...filterDataGridProps}
-                {...pageSizeOptionsDataGridProps}
-                toolbarType="upper"
-                toolbarCreateLink="form"
-                rowAdditionalActions={rowAdditionalActions()}
-                rowUpdateLink="form/{{id}}"
-            />
-            {dialogComponent}
-        </GridPage>
-
+        <>
+            <PageTitle title={t('page.notificacioMassiva.grid.title')}></PageTitle>
+            <GridPage>
+                <MuiDataGrid
+                    title={t('page.notificacioMassiva.grid.title')}
+                    resourceName="notificacioMassivaResource"
+                    columns={columns}
+                    defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
+                    paginationActive
+                    persistentStateActive
+                    persistentStateClearPageSortPropsOnTopLevelRouteChange
+                    {...filterDataGridProps}
+                    {...pageSizeOptionsDataGridProps}
+                    toolbarType="upper"
+                    toolbarCreateLink="form"
+                    rowAdditionalActions={rowAdditionalActions()}
+                    rowUpdateLink="form/{{id}}"
+                />
+                {dialogComponent}
+            </GridPage>
+        </>
     );
 };
 

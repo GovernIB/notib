@@ -8,6 +8,7 @@ import { FormApiRef, GridPage, useDebounce, useFormApiRef } from 'reactlib';
 import { PropietatsGroups } from './PropietatsGroups';
 import { PropietatsProps } from './PropietatsProps';
 import { Box, Tooltip } from '@mui/material';
+import PageTitle from "../../components/PageTitle.tsx";
 
 const PropietatsQuickFilter: React.FC<{
     onChange: (quickFilter: string | undefined) => void;
@@ -61,10 +62,14 @@ const PropietatsQuickFilter: React.FC<{
 };
 
 const Propietats: React.FC = () => {
+
+    const { t } = useTranslation();
     const [quickFilter, setQuickFilter] = React.useState<string>();
     const [selectedGroup, setSelectedGroup] = React.useState<any>();
     const formApiRef = useFormApiRef();
     return (
+        <>
+        <PageTitle title={t('app.menu.propietats')}></PageTitle>
         <GridPage disableMargins>
             <Box
                 id="contingutGeneral"
@@ -133,6 +138,7 @@ const Propietats: React.FC = () => {
                 </Box>
             </Box>
         </GridPage>
+    </>
     );
 };
 

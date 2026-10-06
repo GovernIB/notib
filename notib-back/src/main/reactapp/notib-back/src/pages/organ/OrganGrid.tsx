@@ -35,6 +35,7 @@ import { CardData } from '../../components/CardData';
 // Amagat: substituït pel botó "Actualitzar òrgans i procediments" (OrganGridDir3SyncActionButton)
 // import OrgansProcedimentsSyncActionButton from './OrgansProcedimentsSyncActionButton';
 import {ROLE_ADMIN_LECTURA, useNotibContext} from '../../components/NotibContext';
+import PageTitle from "../../components/PageTitle.tsx";
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -514,56 +515,59 @@ export const OrganGrid = () => {
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
-        <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
-            <MuiDataGrid
-                // MUI-X no admet bé canviar treeData/getTreeDataPath/apiRef en calent sobre la mateixa
-                // instància del grid (dona "No getTreeDataPath given" en canviar de vista): forçam un
-                // remuntatge complet del grid en canviar entre vista en arbre i vista de taula.
-                key={treeDataViewActive ? 'tree' : 'flat'}
-                title={t('page.organs.grid.title')}
-                resourceName="organGestorResource"
-                columns={columns}
-                fixedFilter={"entitat.id:" + currentEntitatId}
-                {...treeDataProps}
-                // La vista en arbre i la vista de taula tenen columnes diferents (useColumns), per
-                // això la clau inclou quina de les dues està activa: en cas contrari l'estat
-                // persistit d'una es sobreescriuria incorrectament amb el de l'altra.
-                persistentStateKey={'organGestorResource-' + (treeDataViewActive ? 'tree' : 'flat')}
-                persistentStateActive
-                persistentStateClearPageSortPropsOnTopLevelRouteChange
-                {...filterDataGridProps}
-                {...pageSizeOptionsDataGridProps}
-                toolbarType="upper"
-                popupEditActive
-                popupEditFormContent={<OrganFormContent />}
-                popupEditFormDialogResourceTitle={t('page.organs.grid.popupDialogTitle')}
-                popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
-                toolbarHideCreate={isRoleAdminLectura ? true : undefined}
-                rowHideUpdateButton={isRoleAdminLectura}
-                rowHideDeleteButton={isRoleAdminLectura}
-                toolbarElementsWithPositions={[
-                    {
-                        position: 1,
-                        element: viewSwitchComponent,
-                    },
-                    {
-                        position: 2,
-                        element: <OficinesSyncActionButton dataGridApiRef={dataGridApiRef} />,
-                    },
-                    {
-                        position: 2,
-                        element: <OrganGridDir3SyncActionButton dataGridApiRef={dataGridApiRef} />,
-                    },
-                    // Amagat: substituït pel botó "Actualitzar òrgans i procediments" (OrganGridDir3SyncActionButton)
-                    // {
-                    //     position: 2,
-                    //     element: <OrgansProcedimentsSyncActionButton dataGridApiRef={dataGridApiRef} />,
-                    // },
-                ]}
-                apiRef={dataGridApiRef}
-                density="compact"
-            />
-        </GridPage>
+        <>
+            <PageTitle title={t('page.organs.grid.title')}></PageTitle>
+            <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
+                <MuiDataGrid
+                    // MUI-X no admet bé canviar treeData/getTreeDataPath/apiRef en calent sobre la mateixa
+                    // instància del grid (dona "No getTreeDataPath given" en canviar de vista): forçam un
+                    // remuntatge complet del grid en canviar entre vista en arbre i vista de taula.
+                    key={treeDataViewActive ? 'tree' : 'flat'}
+                    title={t('page.organs.grid.title')}
+                    resourceName="organGestorResource"
+                    columns={columns}
+                    fixedFilter={"entitat.id:" + currentEntitatId}
+                    {...treeDataProps}
+                    // La vista en arbre i la vista de taula tenen columnes diferents (useColumns), per
+                    // això la clau inclou quina de les dues està activa: en cas contrari l'estat
+                    // persistit d'una es sobreescriuria incorrectament amb el de l'altra.
+                    persistentStateKey={'organGestorResource-' + (treeDataViewActive ? 'tree' : 'flat')}
+                    persistentStateActive
+                    persistentStateClearPageSortPropsOnTopLevelRouteChange
+                    {...filterDataGridProps}
+                    {...pageSizeOptionsDataGridProps}
+                    toolbarType="upper"
+                    popupEditActive
+                    popupEditFormContent={<OrganFormContent />}
+                    popupEditFormDialogResourceTitle={t('page.organs.grid.popupDialogTitle')}
+                    popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
+                    toolbarHideCreate={isRoleAdminLectura ? true : undefined}
+                    rowHideUpdateButton={isRoleAdminLectura}
+                    rowHideDeleteButton={isRoleAdminLectura}
+                    toolbarElementsWithPositions={[
+                        {
+                            position: 1,
+                            element: viewSwitchComponent,
+                        },
+                        {
+                            position: 2,
+                            element: <OficinesSyncActionButton dataGridApiRef={dataGridApiRef} />,
+                        },
+                        {
+                            position: 2,
+                            element: <OrganGridDir3SyncActionButton dataGridApiRef={dataGridApiRef} />,
+                        },
+                        // Amagat: substituït pel botó "Actualitzar òrgans i procediments" (OrganGridDir3SyncActionButton)
+                        // {
+                        //     position: 2,
+                        //     element: <OrgansProcedimentsSyncActionButton dataGridApiRef={dataGridApiRef} />,
+                        // },
+                    ]}
+                    apiRef={dataGridApiRef}
+                    density="compact"
+                />
+            </GridPage>
+        </>
     );
 };
 

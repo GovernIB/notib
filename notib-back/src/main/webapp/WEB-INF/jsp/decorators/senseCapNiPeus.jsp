@@ -1,10 +1,19 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib tagdir="/WEB-INF/tags/notib" prefix="not" %>
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator"%>
 
+<%-- Idioma principal del document, per a que els lectors de pantalla utilitzin l'entonacio correcta --%>
+<c:set var="idiomaDocument" value="${fn:toLowerCase(sessionScopedContext.idiomaUsuari)}"/>
+<c:if test="${empty idiomaDocument}">
+	<c:set var="idiomaDocument" value="${fn:toLowerCase(pageContext.locale.language)}"/>
+</c:if>
+<c:if test="${empty idiomaDocument}">
+	<c:set var="idiomaDocument" value="ca"/>
+</c:if>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="${idiomaDocument}">
 <head>
 	<meta charset="utf-8">
 	<title><decorator:title default="Benvinguts" /></title>
@@ -33,7 +42,7 @@
 				async: false,
 			    url: '<c:url value="/usuari/configuracio/idioma"/>',
 			    success: function(data) {
-			    	userLanguage =  data; 
+			    	userLanguage =  data;
 			    }
 			  });
 	    }
@@ -42,6 +51,11 @@
 	<decorator:head />
 </head>
 <body style="padding-top: 1em;">
+	<nav aria-label="<spring:message code='decorator.footer.utilitat'/>">
+		<a id="oawSitemapLinkError" href="<c:url value="/reactapp/sitemap"/>"><spring:message code="decorator.footer.sitemap"/></a>
+		<span aria-hidden="true"> | </span>
+		<a id="oawAccessibilitatLinkError" href="<c:url value="/reactapp/accessibilitat"/>"><spring:message code="decorator.footer.accessibilitat"/></a>
+	</nav>
 	<div class="container-nocappeus">
 		<div id="contingut-missatges"><not:missatges/></div>
 		<decorator:body />

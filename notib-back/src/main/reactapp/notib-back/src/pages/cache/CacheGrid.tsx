@@ -3,6 +3,7 @@ import {useTranslation} from 'react-i18next';
 import {GridPage, MuiDataGrid, MuiDataGridColDef, useBaseAppContext, useMuiDataGridApiRef, useResourceApiService,} from 'reactlib';
 import {Badge, Button, Icon} from "@mui/material";
 import {GridApiPro, useGridApiRef} from "@mui/x-data-grid-pro";
+import PageTitle from "../../components/PageTitle.tsx";
 
 const useCacheAction = (apiRef: React.RefObject<GridApiPro | null>, refresh?: () => void) => {
 
@@ -67,41 +68,44 @@ export const CacheGrid = () => {
         },
     ];
     return (
-        <GridPage>
-            <MuiDataGrid
-                title={t('page.cache.grid.title')}
-                datagridApiRef={datagridApiRef}
-                resourceName="cacheResource"
-                columns={columns}
-                toolbarHideQuickFilter
-                toolbarType="upper"
-                rowHideUpdateButton
-                rowHideDeleteButton
-                rowAdditionalActions={accions}
-                selectionActive
-                rowSelectionModel={{type: 'include', ids: selectedRows,}}
-                onRowSelectionModelChange={rowSelectionModel => setSelectedRows(new Set(rowSelectionModel?.ids ?? []))}
-                toolbarElementsWithPositions={[
-                    {
-                        position: 2,
-                        element: (
-                            <Badge badgeContent={selectedRows.size} color="primary">
-                                <Button
-                                    variant="outlined"
-                                    color="primary"
-                                    startIcon={<Icon>delete</Icon>}
-                                    disabled={selectedRows.size === 0}
-                                    onClick={() => restartAll([...selectedRows], true)}
-                                    sx={{ textTransform: 'none' }}
-                                >
-                                    {t('page.cache.accions.buidarMassiu')}
-                                </Button>
-                            </Badge>
-                        ),
-                    },
-                ]}
-            />
-        </GridPage>
+        <>
+            <PageTitle title={t('page.cache.grid.title')}></PageTitle>
+            <GridPage>
+                <MuiDataGrid
+                    title={t('page.cache.grid.title')}
+                    datagridApiRef={datagridApiRef}
+                    resourceName="cacheResource"
+                    columns={columns}
+                    toolbarHideQuickFilter
+                    toolbarType="upper"
+                    rowHideUpdateButton
+                    rowHideDeleteButton
+                    rowAdditionalActions={accions}
+                    selectionActive
+                    rowSelectionModel={{type: 'include', ids: selectedRows,}}
+                    onRowSelectionModelChange={rowSelectionModel => setSelectedRows(new Set(rowSelectionModel?.ids ?? []))}
+                    toolbarElementsWithPositions={[
+                        {
+                            position: 2,
+                            element: (
+                                <Badge badgeContent={selectedRows.size} color="primary">
+                                    <Button
+                                        variant="outlined"
+                                        color="primary"
+                                        startIcon={<Icon>delete</Icon>}
+                                        disabled={selectedRows.size === 0}
+                                        onClick={() => restartAll([...selectedRows], true)}
+                                        sx={{ textTransform: 'none' }}
+                                    >
+                                        {t('page.cache.accions.buidarMassiu')}
+                                    </Button>
+                                </Badge>
+                            ),
+                        },
+                    ]}
+                />
+            </GridPage>
+        </>
     );
 };
 

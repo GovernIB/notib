@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html lang="ca">
     <head>
         <meta charset="UTF-8" />
         <link rel="icon" type="image/svg+xml" href="/logo_caib.svg" />
@@ -24,8 +24,29 @@
         <script type="text/javascript" src="/notibback/authToken"></script>
         <script type="text/javascript" src="/notibback/authRoles"></script>
         <title>notib-back</title>
-    </head>
+
+		<style>
+			/* Ocult visualment pero accessible (screen-reader only / sr-only) */
+			.oaw-utility-nav {
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				padding: 0;
+				margin: -1px;
+				overflow: hidden;
+				clip: rect(0, 0, 0, 0);
+				white-space: nowrap;
+				border: 0;
+			}
+			.oaw-utility-nav a { color: #F6F6F6; }
+			.oaw-utility-nav a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+		</style>
+	</head>
     <body>
+	<nav id="oawUtilityNav" class="oaw-utility-nav" data-i18n-aria-label="page.accessibilitat.utilitat">
+		<a id="oawSitemapLink" data-route="sitemap" href="/notibback/reactapp/sitemap" data-i18n="page.sitemap.title">Mapa del lloc web</a>
+		<a id="oawAccessibilitatLink" data-route="accessibilitat" href="/notibback/reactapp/accessibilitat" data-i18n="page.accessibilitat.link">Accessibilitat</a>
+	</nav>
         <div id="root"></div>
         <script type="module" src="/src/main.tsx"></script>
     </body>

@@ -27,6 +27,7 @@ import useAccionsNotificacio from "../accions/AccionsNotificacio.tsx";
 import {ROLE_ADMIN_LECTURA, useNotibContext} from "../../components/NotibContext.ts";
 import {GridApiPro, useGridApiRef} from "@mui/x-data-grid-pro";
 import useSseRowRefresh from "../../hooks/useSseRowRefresh";
+import PageTitle from "../../components/PageTitle.tsx";
 
 const columns = [
     {
@@ -288,74 +289,77 @@ const EnviamentGrid = () => {
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     const {anularRemesa,  anularRemesaDialog, ampliarTermini, ampliarTerminiDialog } = useAccionsNotificacio();
     return (
-        <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
-            <MuiDataGrid
-                key={`${reloadKey}`}
-                datagridApiRef={datagridApiRef}
-                apiRef={gridApiRef}
-                title={t('page.enviament.grid.title')}
-                resourceName="notificacioEnviamentResource"
-                columns={columns}
-                defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
-                paginationActive
-                selectionActive
-                persistentStateActive
-                persistentStateClearPageSortPropsOnTopLevelRouteChange
-                {...filterDataGridProps}
-                {...pageSizeOptionsDataGridProps}
-                toolbarType="upper"
-                toolbarElementsWithPositions={[
-                    {
-                        position: 2,
-                        element: <MassiveActionsButton apiRef={datagridApiRef} refresh={refreshGrid} />,
-                    },
-                ]}
-                onRowClick={(params) => onDetailClick(params.id)}
-                rowActionsColumnIndex={19}
-                rowAdditionalActions={[
-                    {
-                        label: t('page.enviament.grid.detalls'),
-                        title: t('page.enviament.grid.detalls'),
-                        icon: 'info',
-                        showInMenu: true,
-                        onClick: (id) => onDetailClick(id),
-                    },
-                    {
-                        label: t('page.enviament.grid.remesa'),
-                        title: t('page.enviament.grid.remesa'),
-                        icon: 'info',
-                        showInMenu: true,
-                        onClick: (row) => onNotificacioDetailClick(row?.notificacio?.id),
-                    },
-                    {
-                        label: t('page.enviament.grid.anular'),
-                        title: t('page.enviament.grid.anular'),
-                        icon: 'do_disturb',
-                        showInMenu: true,
-                        onClick: (id, row) => {
-                            anularRemesa(row?.notificacio?.id, t('page.notificacio.grid.accions.anular.modalTitle'), {enviamentId:id})
+        <>
+            <PageTitle title={t('page.enviament.grid.title')}></PageTitle>
+            <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
+                <MuiDataGrid
+                    key={`${reloadKey}`}
+                    datagridApiRef={datagridApiRef}
+                    apiRef={gridApiRef}
+                    title={t('page.enviament.grid.title')}
+                    resourceName="notificacioEnviamentResource"
+                    columns={columns}
+                    defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
+                    paginationActive
+                    selectionActive
+                    persistentStateActive
+                    persistentStateClearPageSortPropsOnTopLevelRouteChange
+                    {...filterDataGridProps}
+                    {...pageSizeOptionsDataGridProps}
+                    toolbarType="upper"
+                    toolbarElementsWithPositions={[
+                        {
+                            position: 2,
+                            element: <MassiveActionsButton apiRef={datagridApiRef} refresh={refreshGrid} />,
                         },
-                        hidden: row => !row.isAnulable
-                    },
-                    {
-                        label: t('page.enviament.grid.ampliarTermini'),
-                        title: t('page.enviament.grid.ampliarTermini'),
-                        icon: 'calendar_month',
-                        showInMenu: true,
-                        onClick: (id, row) => {
-                            ampliarTermini(row?.notificacio?.id, t('page.notificacio.grid.accions.ampliarTermini.modalTitle'), {enviamentId:id, caducitat: row.caducitat})
+                    ]}
+                    onRowClick={(params) => onDetailClick(params.id)}
+                    rowActionsColumnIndex={19}
+                    rowAdditionalActions={[
+                        {
+                            label: t('page.enviament.grid.detalls'),
+                            title: t('page.enviament.grid.detalls'),
+                            icon: 'info',
+                            showInMenu: true,
+                            onClick: (id) => onDetailClick(id),
                         },
-                        hidden: row => currentRole === 'NOT_ADMIN_LECTURA' || row?.entregaPostalActiva || row?.notifcacioEstat !== 'ENVIADA',
-                    },
-                ]}
-                getRowClassName={(params) => getGridRowColorClass(params.row.notificaEstat, ENVIAMENT_ESTAT_MAP)}
-                sx={generateGridRowStylesFromMap(ENVIAMENT_ESTAT_MAP)}
-            />
-            {enviamentDialogComponent}
-            {notificacioDialogComponent}
-            {anularRemesaDialog}
-            {ampliarTerminiDialog}
-        </GridPage>
+                        {
+                            label: t('page.enviament.grid.remesa'),
+                            title: t('page.enviament.grid.remesa'),
+                            icon: 'info',
+                            showInMenu: true,
+                            onClick: (row) => onNotificacioDetailClick(row?.notificacio?.id),
+                        },
+                        {
+                            label: t('page.enviament.grid.anular'),
+                            title: t('page.enviament.grid.anular'),
+                            icon: 'do_disturb',
+                            showInMenu: true,
+                            onClick: (id, row) => {
+                                anularRemesa(row?.notificacio?.id, t('page.notificacio.grid.accions.anular.modalTitle'), {enviamentId:id})
+                            },
+                            hidden: row => !row.isAnulable
+                        },
+                        {
+                            label: t('page.enviament.grid.ampliarTermini'),
+                            title: t('page.enviament.grid.ampliarTermini'),
+                            icon: 'calendar_month',
+                            showInMenu: true,
+                            onClick: (id, row) => {
+                                ampliarTermini(row?.notificacio?.id, t('page.notificacio.grid.accions.ampliarTermini.modalTitle'), {enviamentId:id, caducitat: row.caducitat})
+                            },
+                            hidden: row => currentRole === 'NOT_ADMIN_LECTURA' || row?.entregaPostalActiva || row?.notifcacioEstat !== 'ENVIADA',
+                        },
+                    ]}
+                    getRowClassName={(params) => getGridRowColorClass(params.row.notificaEstat, ENVIAMENT_ESTAT_MAP)}
+                    sx={generateGridRowStylesFromMap(ENVIAMENT_ESTAT_MAP)}
+                />
+                {enviamentDialogComponent}
+                {notificacioDialogComponent}
+                {anularRemesaDialog}
+                {ampliarTerminiDialog}
+            </GridPage>
+        </>
     );
 };
 

@@ -16,6 +16,7 @@ import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
 import { useContentDialog } from '../../../lib/components/mui/Dialog';
 import MonitorIntegracioParamDetail from './MonitorIntegracioParamDetail';
 import ChipEstat from '../../components/ChipEstat';
+import PageTitle from "../../components/PageTitle.tsx";
 
 // INTERFACES
 interface MonitorProps {
@@ -264,29 +265,32 @@ export const MonitorIntegracioGrid = () => {
     }, [apiCurrentFields]);
 
     return (
-        <GridPage>
-            <MuiDataGrid
-                title={t('page.integracio.grid.title')}
-                resourceName="monitorIntegracioResource"
-                columns={columns}
-                fixedFilter={staticFilter}
-                paginationActive
-                toolbarHideQuickFilter
-                readOnly
-                toolbarType="upper"
-                toolbarAdditionalRow={
-                    <MonitorIntegracioGridFilter
-                        options={options}
-                        report={report}
-                        selectedTab={selectedTab}
-                        onTabChange={setSelectedTab}
-                    />
-                }
-                onRowClick={(params: any) => openDialog(params.id)}
-                sx={{ '& .MuiDataGrid-row': { cursor: 'pointer' } }}
-            />
-            {dialog}
-        </GridPage>
+        <>
+            <PageTitle title={t('page.integracio.grid.title')}></PageTitle>
+            <GridPage>
+                <MuiDataGrid
+                    title={t('page.integracio.grid.title')}
+                    resourceName="monitorIntegracioResource"
+                    columns={columns}
+                    fixedFilter={staticFilter}
+                    paginationActive
+                    toolbarHideQuickFilter
+                    readOnly
+                    toolbarType="upper"
+                    toolbarAdditionalRow={
+                        <MonitorIntegracioGridFilter
+                            options={options}
+                            report={report}
+                            selectedTab={selectedTab}
+                            onTabChange={setSelectedTab}
+                        />
+                    }
+                    onRowClick={(params: any) => openDialog(params.id)}
+                    sx={{ '& .MuiDataGrid-row': { cursor: 'pointer' } }}
+                />
+                {dialog}
+            </GridPage>
+        </>
     );
 };
 

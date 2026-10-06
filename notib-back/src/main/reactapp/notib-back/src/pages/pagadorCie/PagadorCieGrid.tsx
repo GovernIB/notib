@@ -15,6 +15,8 @@ import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRend
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 import { ROLE_ADMIN_LECTURA, useNotibContext } from '../../components/NotibContext';
+import PageTitle from "../../components/PageTitle.tsx";
+import React from "react";
 
 const columns = [
     {
@@ -102,25 +104,28 @@ export const PagadorCieGrid: React.FC = () => {
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
-        <GridPage>
-            <MuiDataGrid
-                title={t('page.pagadorCie.grid.title')}
-                resourceName="pagadorCieResource"
-                columns={columns}
-                paginationActive
-                persistentStateActive
-                persistentStateClearPageSortPropsOnTopLevelRouteChange
-                {...filterDataGridProps}
-                {...pageSizeOptionsDataGridProps}
-                toolbarType="upper"
-                toolbarCreateLink="form"
-                toolbarHideCreate={isRoleAdminLectura ? true : undefined}
-                rowLink="form/{{id}}"
-                rowUpdateLink="form/{{id}}"
-                rowHideUpdateButton={isRoleAdminLectura}
-                rowHideDeleteButton={isRoleAdminLectura}
-            />
-        </GridPage>
+        <>
+            <PageTitle title={t('page.pagadorCie.grid.title')}></PageTitle>
+            <GridPage>
+                <MuiDataGrid
+                    title={t('page.pagadorCie.grid.title')}
+                    resourceName="pagadorCieResource"
+                    columns={columns}
+                    paginationActive
+                    persistentStateActive
+                    persistentStateClearPageSortPropsOnTopLevelRouteChange
+                    {...filterDataGridProps}
+                    {...pageSizeOptionsDataGridProps}
+                    toolbarType="upper"
+                    toolbarCreateLink="form"
+                    toolbarHideCreate={isRoleAdminLectura ? true : undefined}
+                    rowLink="form/{{id}}"
+                    rowUpdateLink="form/{{id}}"
+                    rowHideUpdateButton={isRoleAdminLectura}
+                    rowHideDeleteButton={isRoleAdminLectura}
+                />
+            </GridPage>
+        </>
     );
 };
 

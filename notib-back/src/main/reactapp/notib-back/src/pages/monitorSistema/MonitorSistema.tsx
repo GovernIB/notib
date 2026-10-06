@@ -4,6 +4,7 @@ import CustomTabs from '../../components/CustomTabs.tsx';
 import SistemaTab from './SistemaTab.tsx';
 import FilsExecucioTab from './FilsExecucioTab.tsx';
 import TasquesSegonPlaTab from './TasquesSegonPlaTab.tsx';
+import PageTitle from "../../components/PageTitle.tsx";
 
 const MonitorSistema: React.FC = () => {
     const { t } = useTranslation();
@@ -24,7 +25,10 @@ const MonitorSistema: React.FC = () => {
             content: <TasquesSegonPlaTab />,
         },
     ];
-    return <CustomTabs tabs={tabs} />;
+    return (<>
+                <PageTitle title={t('page.integracio.detall.monitorSistema')}></PageTitle>
+                <CustomTabs tabs={tabs} />
+            </>);
 };
 
 export default MonitorSistema;

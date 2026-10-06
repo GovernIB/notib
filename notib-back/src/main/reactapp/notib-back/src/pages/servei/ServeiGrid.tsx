@@ -16,6 +16,7 @@ import GridFormField, { GridButtonField } from '../../components/GridFormField';
 import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 import React from "react";
+import PageTitle from "../../components/PageTitle.tsx";
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -200,37 +201,40 @@ export const ProcedimentGrid = () => {
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
-        <GridPage>
-            <MuiDataGrid
-                title={t('page.serveis.grid.title')}
-                resourceName="procedimentResource"
-                columns={columns}
-                fixedFilter={"tipus:'SERVEI' and entitat.id:" + currentEntitatId}
-                paginationActive
-                persistentStateActive
-                persistentStateClearPageSortPropsOnTopLevelRouteChange
-                {...filterDataGridProps}
-                {...pageSizeOptionsDataGridProps}
-                toolbarType="upper"
-                toolbarCreateLink="form"
-                toolbarHideCreate={isRoleAdminLectura ? true : undefined}
-                rowLink="form/{{id}}"
-                rowUpdateLink="form/{{id}}"
-                rowHideUpdateButton={isRoleAdminLectura}
-                rowHideDeleteButton={isRoleAdminLectura}
-                toolbarElementsWithPositions={ !isRoleAdmin ? [] : [
-                    {
-                        position: 2,
-                        element: <NetejarCacheActionButton dataGridApiRef={dataGridApiRef} />,
+        <>
+            <PageTitle title={t('page.serveis.grid.title')}></PageTitle>
+            <GridPage>
+                <MuiDataGrid
+                    title={t('page.serveis.grid.title')}
+                    resourceName="procedimentResource"
+                    columns={columns}
+                    fixedFilter={"tipus:'SERVEI' and entitat.id:" + currentEntitatId}
+                    paginationActive
+                    persistentStateActive
+                    persistentStateClearPageSortPropsOnTopLevelRouteChange
+                    {...filterDataGridProps}
+                    {...pageSizeOptionsDataGridProps}
+                    toolbarType="upper"
+                    toolbarCreateLink="form"
+                    toolbarHideCreate={isRoleAdminLectura ? true : undefined}
+                    rowLink="form/{{id}}"
+                    rowUpdateLink="form/{{id}}"
+                    rowHideUpdateButton={isRoleAdminLectura}
+                    rowHideDeleteButton={isRoleAdminLectura}
+                    toolbarElementsWithPositions={ !isRoleAdmin ? [] : [
+                        {
+                            position: 2,
+                            element: <NetejarCacheActionButton dataGridApiRef={dataGridApiRef} />,
 
-                    } ,
-                    {
-                        position: 2,
-                        element: <ProcedimentSyncActionButton dataGridApiRef={dataGridApiRef} />,
-                    }
-                ]}
-            />
-        </GridPage>
+                        } ,
+                        {
+                            position: 2,
+                            element: <ProcedimentSyncActionButton dataGridApiRef={dataGridApiRef} />,
+                        }
+                    ]}
+                />
+            </GridPage>
+        </>
     );
 };
 

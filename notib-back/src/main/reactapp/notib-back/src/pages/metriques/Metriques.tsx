@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography";
 import { BarChart } from '@mui/x-charts';
 import Button from "@mui/material/Button";
 import Icon from "@mui/material/Icon";
+import PageTitle from "../../components/PageTitle.tsx";
 
 export function MetriquesBars({ items }: { items: any }) {
 
@@ -194,6 +195,7 @@ export const Metriques = () => {
         apiGetOne("metriques").then((resposta) => setMetriques(JSON.parse(resposta?.metriques)));
     }, [apiIsReady, apiGetOne]);
     return (<>
+        <PageTitle title={t('page.metriques.grid.title')}></PageTitle>
         <Box sx={{display: "flex", justifyContent: "space-between", marginBottom: "15px"}}>
             <Typography variant="h6">{t("page.metriques.title")}</Typography>
             <Box sx={{textAlign: "right", width: "220px", display: "flex", justifyContent: "space-between"}}>
@@ -207,9 +209,8 @@ export const Metriques = () => {
                     buttonIcon="file_download"/>
             </Box>
         </Box>
-            <MetriquesBars items={metriques}/>
-    </>
-    );
+        <MetriquesBars items={metriques}/>
+    </>);
 };
 
 export const ImportJsonButton = ({ onRead }: { onRead: (content: string) => void })=> {
