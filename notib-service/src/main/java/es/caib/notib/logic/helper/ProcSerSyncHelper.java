@@ -45,6 +45,8 @@ import java.util.Map;
 public class ProcSerSyncHelper {
 
 	@Autowired
+	private CacheHelper cacheHelper;
+	@Autowired
 	private AvisRepository avisRepository;
 	@Autowired
 	private ProcedimentRepository procedimentRepository;
@@ -119,6 +121,8 @@ public class ProcSerSyncHelper {
 			progres.setProcedimentsObtinguts(procedimentsGda);
 			processarProcediments(entitat, procedimentsGda, progres, avisosProcedimentsOrgans);
 			procSerHelper.deshabilitarProcedimentsNoActius(procedimentsGda, entitat.getCodi(), progres);
+			// Procediments creats, modificats (òrgan, comú...) o deshabilitats: els permisos en cache poden haver canviat
+			cacheHelper.evictCachesPermisosOrgansProcediments();
 			progres.setTotalFinal(procedimentRepository.countByEntitatId(entitatDto.getId()));
 			progres.setActiusFinal(procedimentRepository.countByEntitatIdAndActiuTrue(entitatDto.getId()));
 			progres.setInactiusFinal(procedimentRepository.countByEntitatIdAndActiuFalse(entitatDto.getId()));
@@ -447,6 +451,8 @@ public class ProcSerSyncHelper {
 			progres.setProcedimentsObtinguts(procedimentsGda);
 			processarServeis(entitat, procedimentsGda, progres, avisosServeisOrgans);
 			procSerHelper.deshabilitarServeisNoActius(procedimentsGda, entitat.getCodi(), progres);
+			// Serveis creats, modificats (òrgan, comú...) o deshabilitats: els permisos en cache poden haver canviat
+			cacheHelper.evictCachesPermisosOrgansProcediments();
 			progres.setTotalFinal(serveiRepository.countByEntitatId(entitatDto.getId()));
 			progres.setActiusFinal(serveiRepository.countByEntitatIdAndActiuTrue(entitatDto.getId()));
 			progres.setInactiusFinal(serveiRepository.countByEntitatIdAndActiuFalse(entitatDto.getId()));

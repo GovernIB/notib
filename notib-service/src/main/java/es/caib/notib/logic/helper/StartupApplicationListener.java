@@ -41,6 +41,8 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
     private EnviamentSmService smService;
     @Autowired
     private CallbackService callbackService;
+    @Autowired
+    private NotificacioTableReparacioHelper notificacioTableReparacioHelper;
 
     private Authentication auth;
 
@@ -69,6 +71,12 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
                         break;
                     case AFEGIR_CALLBACKS_CUA_JMS:
                         callbackService.processarPendentsJms();
+                        break;
+                    case CREAR_REGISTRES_NOT_NOTIFICACIO_TABLE:
+                        if (!notificacioTableReparacioHelper.crearRegistresQueFalten()) {
+                            // Queda pendent: es tornarà a intentar al pròxim arrencament
+                            continue;
+                        }
                         break;
                     default:
                         log.error("Procés inicial no definit");

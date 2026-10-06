@@ -17,8 +17,13 @@ import {generateGridRowStylesFromMap, getGridRowColorClass, NOTIFICACIO_ESTAT_EN
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import CustomDetailPanelToggle from "../../utils/CustomDetailPanelToggle.tsx";
 import ContentFilter, {useSpringFilterBuilder} from "./NotificacioFiltre.tsx";
+import useEstatRemesaAsync from '../../hooks/useEstatRemesaAsync';
 import PageTitle from "../../components/PageTitle.tsx";
 // import useSseRowRefresh from "../../hooks/useSseRowRefresh";
+
+// Ha de ser una funció estable: MUI X recalcula les mides de les files cada vegada que getRowHeight canvia
+// d'identitat, i una funció nova a cada render pot provocar un bucle infinit de renders
+const getRowHeightAuto = (): 'auto' => 'auto';
 
 const useDataGridColumns = (datagridApiRef: any,
                                                             notificacionsEsborrades: boolean,
@@ -88,8 +93,11 @@ const useDataGridColumns = (datagridApiRef: any,
                 width: 225,
                 renderCell: (params: any) => {
                     const estatJson = params?.formattedValue;
-                    return (<NotificacioEstatGrid estatJson={estatJson} estatEnum={params?.row?.estat}
-                                                  notificacioId={params?.row?.id} refrescarEstat={refrescarEstat}
+                    return (<NotificacioEstatGrid estatJson={estatJson}
+                                                  estatEnum={params?.row?.estat}
+                                                  estatPendent={params?.row?.estatPendent}
+                                                  notificacioId={params?.row?.id}
+                                                  refrescarEstat={refrescarEstat}
                                                   sir={params?.row.enviamentTipus === 'SIR'} />);                },
             }]),
             ...(noEsTaulaRemeses ? [] : [{
@@ -314,14 +322,22 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
     const isCreateLinkPresent = !isRoleAdminLectura && apiCurrentActions?.['create'] != null;
     const datagridApiRef = useGridApiRef();
     const apiRef = useMuiDataGridApiRef();
-    const [reloadKey, setReloadKey] = React.useState(0);
-    const refreshGrid = React.useCallback(() => setReloadKey(k => k + 1), []);
-    const refrescarEstat = useRefrescarEstat(refreshGrid, artifactAction);
+    // Refrescar l'estat d'una remesa o executar una acció massiva torna a carregar les dades sense remuntar el
+    // grid (canviant-ne la key): així es conserven l'ordenació, la pàgina i els filtres aplicats
+    const refrescarLlistat = React.useCallback(() => apiRef.current?.refresh?.(), [apiRef]);
+    // Després d'una acció massiva, a més, es buida la selecció (les remeses seleccionades ja s'han processat)
+    const refrescarDespresAccioMassiva = React.useCallback(() => {
+        datagridApiRef.current?.setRowSelectionModel({ type: 'include', ids: new Set() });
+        refrescarLlistat();
+    }, [datagridApiRef, refrescarLlistat]);
+    const refrescarEstat = useRefrescarEstat(refrescarLlistat, artifactAction);
     const columns = useDataGridColumns(datagridApiRef, notificacionsEsborrades, notificacionsErrorRegistre, notificacionsCallbackError, refrescarEstat);
     // Actualitza automàticament, via SSE, les files de remeses visibles quan el seu estat canvia
     // al servidor (p.ex. per una resposta de Notifica, un event de registre, un callback...), sense
     // necessitat que l'usuari refresqui el llistat manualment.
     // useSseRowRefresh('notificacioResource', datagridApiRef, 'REMESA_ENVIAMENT_ESTAT', 'NOTIFICACIO_ESTAT_CANVIAT');
+    // Rep (via SSE) la columna estat de les remeses que el servidor calcula en segon pla
+    useEstatRemesaAsync(datagridApiRef);
     const springFilterBuilder = useSpringFilterBuilder();
     const [searchParams] = useSearchParams();
     const referencia = searchParams.get('referencia');
@@ -460,7 +476,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
         <PageTitle title={t('page.notificacio.grid.title')}></PageTitle>
         <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
             <MuiDataGrid
-                key={`${currentRole}-${notificacionsEsborrades}-${notificacionsErrorRegistre}-${notificacionsCallbackError}-${reloadKey}`}
+                key={`${currentRole}-${notificacionsEsborrades}-${notificacionsErrorRegistre}-${notificacionsCallbackError}`}
                 datagridApiRef={datagridApiRef}
                 apiRef={apiRef}
                 title={t('page.notificacio.grid.title') + (titolSecundari || "")}
@@ -504,7 +520,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                     ...(notificacionsEsborrades || (isRoleAdminLectura && notificacionsErrorRegistre) ? []
                         : [{
                             position: 2,
-                            element: <MassiveActionsButton apiRef={datagridApiRef} notificacionsErrorRegistre={notificacionsErrorRegistre} notificacionsCallbackError={notificacionsCallbackError} refresh={refreshGrid}/>,
+                            element: <MassiveActionsButton apiRef={datagridApiRef} notificacionsErrorRegistre={notificacionsErrorRegistre} notificacionsCallbackError={notificacionsCallbackError} refresh={refrescarDespresAccioMassiva}/>,
                         }]),
                     ...(!notificacioMassiva ? []
                         : [{
@@ -517,7 +533,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                 rowActionsColumnProps={{ width: 90 }}
                 rowAdditionalActions={rowAdditionalActions}
                 {...detailPanelProps}
-                getRowHeight={() => 'auto'}
+                getRowHeight={getRowHeightAuto}
                 getRowClassName={(params) => getGridRowColorClass(params.row.estat, NOTIFICACIO_ESTAT_ENUM_MAP)}
                 sx={generateGridRowStylesFromMap(NOTIFICACIO_ESTAT_ENUM_MAP)}
             />

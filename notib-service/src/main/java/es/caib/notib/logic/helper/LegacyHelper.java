@@ -9,6 +9,7 @@ import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.mapper.NotificacioTableMapper;
 import es.caib.notib.persist.entity.NotificacioEntity;
+import es.caib.notib.persist.entity.NotificacioTableEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.persist.repository.NotificacioTableViewRepository;
@@ -28,7 +29,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -244,32 +249,57 @@ public class LegacyHelper {
 
 	private final NotificacioTableViewRepository notificacioTableViewRepository;
 	private final NotificacioTableMapper notificacioTableMapper;
-	private final NotificacioListHelper notificacioListHelper;
-	private final CacheHelper cacheHelper;
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public String actualitzarColumnaEstat(NotificacioResourceEntity entity) {
 
-		var notificacio = notificacioRepository.findById(entity.getId()).orElseThrow();
-		return actualitzarColumnaEstat(notificacio);
-
+		return actualitzarColumnesEstat(List.of(entity.getId())).get(entity.getId());
 	}
 
 	public String actualitzarColumnaEstat(NotificacioEntity entity) {
 
-		var entitat = entity.getEntitat();
-		var tableEntity = notificacioTableViewRepository.findById(entity.getId()).get();
+		var tableEntity = notificacioTableViewRepository.findById(entity.getId()).orElseThrow();
 		if (!tableEntity.isPerActualitzar()) {
 			return null;
 		}
-		if (tableEntity.getEnviaments() == null) {
-			tableEntity.setEnviaments(new java.util.LinkedHashSet<>(entity.getEnviaments()));
+		actualitzarColumnesEstat(List.of(tableEntity));
+		return tableEntity.getEstatString();
+	}
+
+	/**
+	 * Recalcula, en una única transacció, la columna estat de les remeses indicades que la tenen
+	 * pendent d'actualitzar (per_actualitzar) i la persisteix a not_notificacio_table.
+	 *
+	 * @param notificacioIds
+	 *            ids de les remeses.
+	 * @return el valor de la columna estat de cada remesa trobada (recalculat o, si no estava
+	 *            pendent d'actualitzar, el que ja tenia), indexat per id.
+	 */
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public Map<Long, String> actualitzarColumnesEstat(Collection<Long> notificacioIds) {
+
+		var tableEntities = notificacioTableViewRepository.findAllById(notificacioIds);
+		actualitzarColumnesEstat(tableEntities.stream().filter(NotificacioTableEntity::isPerActualitzar).collect(Collectors.toList()));
+		Map<Long, String> estats = new HashMap<>();
+		tableEntities.forEach(t -> estats.put(t.getId(), t.getEstatString()));
+		return estats;
+	}
+
+	private void actualitzarColumnesEstat(List<NotificacioTableEntity> tableEntities) {
+
+		if (tableEntities.isEmpty()) {
+			return;
 		}
-		var permisos = notificacioListHelper.getCodisProcedimentsAndOrgansAmpPermisProcessar(entitat.getId(), tableEntity.getUsuariCodi());
-		var organigrama = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
-		notificacioTableMapper.toNotificacionsTableItemDto(List.of(tableEntity), permisos, organigrama);
-		var reloaded =  notificacioTableViewRepository.findById(tableEntity.getId()).orElseThrow();
-		return reloaded.getEstatString();
+		for (var tableEntity : tableEntities) {
+			if (tableEntity.getEnviaments() == null) {
+				tableEntity.setEnviaments(new LinkedHashSet<>(tableEntity.getNotificacio().getEnviaments()));
+			}
+		}
+		// Els permisos de processar i l'estat dels òrgans només s'empren per emplenar el DTO de
+		// llistat (permisProcessar, organEstat), no intervenen en cap dels camps que es persisteixen
+		// a not_notificacio_table (estatString, registreNums, documentId...). Calcular-los aquí
+		// suposava consultes d'ACL per cada remesa sense cap efecte.
+		notificacioTableMapper.actualitzarEstatsEnBloc(tableEntities);
 	}
 
 }

@@ -86,6 +86,7 @@ public class ObjectMappingHelper {
 					Field targetField = ReflectionUtils.findField(target.getClass(), sourceField.getName());
 					if (targetField != null) {
 						if (targetField.getType().isPrimitive() && sourceField.get(source) == null) {
+							targetField.setAccessible(true);
 							if (targetField.getType() == boolean.class) {
 								targetField.setBoolean(target, false);
 							} else if (targetField.getType() == int.class) {

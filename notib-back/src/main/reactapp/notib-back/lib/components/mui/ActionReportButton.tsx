@@ -3,12 +3,17 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Icon from '@mui/material/Icon';
 import Badge from '@mui/material/Badge';
-import {FormI18nKeys} from '../form/Form';
-import {useActionDialogButtons, useConfirmDialogButtons, useReportDialogButtons,} from '../AppButtons';
-import {DialogButton, useBaseAppContext} from '../BaseAppContext';
-import {ExportFileType} from '../ResourceApiContext';
-import {useResourceApiService} from '../ResourceApiProvider';
-import {FormDialogCloseFn, FormDialogSubmitFn, useFormDialog} from './form/FormDialog';
+import { FormI18nKeys } from '../form/Form';
+import {
+    useActionDialogButtons,
+    useReportDialogButtons,
+    useConfirmDialogButtons,
+    useCloseDialogButtons,
+} from '../AppButtons';
+import { useBaseAppContext, DialogButton } from '../BaseAppContext';
+import { ExportFileType } from '../ResourceApiContext';
+import { useResourceApiService } from '../ResourceApiProvider';
+import { useFormDialog, FormDialogSubmitFn, FormDialogCloseFn } from './form/FormDialog';
 
 export type ActionReportCustomButtonProps = {
     disabled?: boolean;
@@ -197,9 +202,11 @@ export const useActionReportLogic = (
     formDialogLiveButtons?: DialogButton[]
 ): ActionReportLogicResult => {
     const { t, messageDialogShow, temporalMessageShow, saveAs } = useBaseAppContext();
+    const [finished, setFinished] = React.useState<boolean>(false);
     const actionDialogButtons = useActionDialogButtons();
     const reportDialogButtons = useReportDialogButtons();
     const confirmDialogButtons = useConfirmDialogButtons();
+    const closeDialogButtons = useCloseDialogButtons();
     const {
         isReady: apiIsReady,
         artifacts: apiArtifacts,
@@ -208,63 +215,71 @@ export const useActionReportLogic = (
     } = useResourceApiService(resourceName);
     const execAction: FormDialogSubmitFn = (id: any, data: any) =>
         new Promise((resolve, reject) => {
-            if (action == null) {
+            if (action != null) {
+                const requestArgs = {
+                    id,
+                    code: action,
+                    data: { ...formAdditionalDataArg, ...data },
+                };
+                setFinished(false);
+                apiArtifactAction(id, requestArgs)
+                    .then((result: any) => {
+                        if (onSuccess) {
+                            onSuccess(result);
+                        } else {
+                            temporalMessageShow(null, t('actionreport.action.success'), 'success');
+                        }
+                        resolve(formDialogResultProcessor?.(result));
+                        setFinished(true);
+                    })
+                    .catch((error) => {
+                        onError?.(error);
+                        reject(error);
+                    })
+                    .finally(() => setFinished(true));
+            } else {
                 console.error("Couldn't exec action without code");
-                return;
             }
-            const requestArgs = {
-                id,
-                code: action,
-                data: {...formAdditionalDataArg, ...data},
-            };
-            apiArtifactAction(id, requestArgs)
-                .then((result: any) => {
-                    if (onSuccess) {
-                        onSuccess(result);
-                    } else {
-                        temporalMessageShow(null, t('actionreport.action.success'), 'success');
-                    }
-                    resolve(formDialogResultProcessor?.(result));
-                })
-                .catch((error) => {
-                    onError?.(error);
-                    reject(error);
-                });
         });
     const generateReport: FormDialogSubmitFn = (id: any, data: any) =>
         new Promise((resolve, reject) => {
-            if (report == null) {
+            if (report != null) {
+                const requestArgs = {
+                    id,
+                    code: report,
+                    data: { ...formAdditionalDataArg, ...data },
+                    fileType: reportFileType,
+                };
+                setFinished(false);
+                apiArtifactReport(id, requestArgs)
+                    .then((result: any) => {
+                        const blob = result?.blob instanceof Blob ? result.blob : new Blob([JSON.stringify(result.blob, null, 2)], {type: "application/json; charset=utf-8"});
+                        saveAs?.(blob, result.fileName);
+                        if (onSuccess) {
+                            onSuccess(result);
+                        } else {
+                            temporalMessageShow(null, t('actionreport.report.success'), 'success');
+                        }
+                        resolve(formDialogResultProcessor?.(result));
+                    })
+                    .catch((error) => {
+                        onError?.(error);
+                        reject(error);
+                    })
+                    .finally(() => setFinished(true));
+            } else {
                 console.error("Couldn't generate report without code");
-                return;
             }
-            const requestArgs = {
-                id,
-                code : report,
-                data: {...formAdditionalDataArg, ...data},
-                fileType: reportFileType,
-            };
-            apiArtifactReport(id, requestArgs)
-                .then((result: any) => {
-                    const blob = result?.blob instanceof Blob ? result.blob : new Blob([JSON.stringify(result.blob, null, 2)], {type: "application/json; charset=utf-8"});
-                    saveAs?.(blob, result.fileName);
-                    if (onSuccess) {
-                        onSuccess(result);
-                    } else {
-                        temporalMessageShow(null, t('actionreport.report.success'), 'success');
-                    }
-                    resolve(formDialogResultProcessor?.(result));
-                })
-                .catch((error) => {
-                    onError?.(error);
-                    reject(error);
-                });
         });
+    const dialogButtons = finished
+        ? closeDialogButtons
+        : (formDialogButtons ??
+          (action ? actionDialogButtons : report ? reportDialogButtons : undefined));
     const [formDialogShow, formDialogComponent, formDialogClose] = useFormDialog(
         resourceName,
         action ? 'ACTION' : report ? 'REPORT' : undefined,
         action ? action : report ? report : undefined,
-        formDialogButtons ??
-            (action ? actionDialogButtons : report ? reportDialogButtons : undefined),
+        dialogButtons,
         action ? execAction : generateReport,
         action ? t('actionreport.action.error') : t('actionreport.report.error'),
         null,

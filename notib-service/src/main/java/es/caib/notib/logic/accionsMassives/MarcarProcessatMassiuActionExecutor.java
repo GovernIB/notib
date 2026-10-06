@@ -2,8 +2,8 @@ package es.caib.notib.logic.accionsMassives;
 
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
+import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
-import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.ActionExecutionException;
 import es.caib.notib.logic.intf.dto.MarcarProcessat;
 import es.caib.notib.logic.intf.dto.RespostaActionExecutor;
@@ -25,6 +25,7 @@ public class MarcarProcessatMassiuActionExecutor implements BaseMutableResourceS
 	private final AccioMassivaService accioMassivaService;
 	private final UserSessionHelper userSessionHelper;
 	private final AuthenticationHelper authenticationHelper;
+	private final NotibPermissionHelper notibPermissionHelper;
 
 	@Override
 	public RespostaActionExecutor exec(String code, NotificacioResourceEntity entity, MarcarProcessat params) throws ActionExecutionException {
@@ -34,7 +35,7 @@ public class MarcarProcessatMassiuActionExecutor implements BaseMutableResourceS
 		}
 		try {
 			var entitatActual = userSessionHelper.getCurrentEntitatId();
-			var isAdminEntitat = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
+			var isAdminEntitat = notibPermissionHelper.isCurrentUserAdminEntitat();
 			var accio = AccioMassivaExecucio.builder()
 							.isAdminEntitat(isAdminEntitat)
 							.tipus(AccioMassivaTipus.MARCAR_PROCESSADES)

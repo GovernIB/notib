@@ -61,7 +61,7 @@ class AplicacioResourceServiceImplTest {
 	void additionalSpringFilterShouldReturnHelperValue() {
 		when(notibPermissionHelper.entitatAdditionalSpringFilter("entitat.id"))
 			.thenReturn("customFilter");
-		String result = service.additionalSpringFilter("currentFilter", new String[]{});
+		String result = service.additionalSpringFilter("currentFilter", new String[]{}, false);
 		assertEquals("customFilter", result);
 		verify(notibPermissionHelper).entitatAdditionalSpringFilter("entitat.id");
 	}

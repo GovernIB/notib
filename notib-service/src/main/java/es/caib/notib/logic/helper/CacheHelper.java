@@ -21,6 +21,8 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
@@ -227,7 +229,7 @@ public class CacheHelper {
 		return cacheManager.getCacheNames();
 	}
 
-	@CacheEvict(value = {"procserAmbPermis", "procedimentsAmbPermis", "serveisAmbPermis", "procsersPermisNotificacioMenu", "procsersPermisComunicacioMenu", "procsersPermisComunicacioSirMenu"}, allEntries = true)
+	@CacheEvict(value = {"procserAmbPermis", "procedimentsAmbPermis", "serveisAmbPermis", "procsersPermisNotificacioMenu", "procsersPermisComunicacioMenu", "procsersPermisComunicacioSirMenu", "codisPermisProcessar"}, allEntries = true)
 	public void evictFindProcedimentServeisWithPermis() {
 		//evictFindProcedimentServeisWithPermis
 	}
@@ -235,6 +237,43 @@ public class CacheHelper {
 	@CacheEvict(value = {"organsPermisPerProcedimentComu", "procserOrgansCodisAmbPermis"}, allEntries = true)
 	public void evictFindProcedimentsOrganWithPermis() {
 		//evictFindProcedimentsOrganWithPermis
+	}
+
+	// Caches de permisos sobre òrgans i procediments/serveis de tots els usuaris: les mateixes que
+	// buida la gestió de permisos (OrganGestorServiceImpl/ProcedimentServiceImpl.permisUpdate)
+	private static final String[] CACHES_PERMISOS_ORGANS_PROCEDIMENTS = {
+			"organsAmbPermis", "organsAmbPermisPerConsulta", "codisPermisProcessar",
+			"procserAmbPermis", "procedimentsAmbPermis", "serveisAmbPermis",
+			"procsersPermisNotificacioMenu", "procsersPermisComunicacioMenu", "procsersPermisComunicacioSirMenu",
+			"organsPermisPerProcedimentComu", "procserOrgansCodisAmbPermis" };
+
+	/**
+	 * Buida les caches de permisos sobre òrgans i procediments/serveis de tots els usuaris. S'ha de
+	 * cridar sempre que canviïn permisos (ACL) d'òrgans o procediments, o els propis òrgans i
+	 * procediments (sincronitzacions). Si hi ha una transacció activa, es tornen a buidar quan es
+	 * confirma: una consulta concurrent feta abans del commit hi podria haver desat valors antics.
+	 */
+	public void evictCachesPermisosOrgansProcediments() {
+
+		buidarCachesPermisosOrgansProcediments();
+		if (TransactionSynchronizationManager.isSynchronizationActive()) {
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+				@Override
+				public void afterCommit() {
+					buidarCachesPermisosOrgansProcediments();
+				}
+			});
+		}
+	}
+
+	private void buidarCachesPermisosOrgansProcediments() {
+
+		for (var nom : CACHES_PERMISOS_ORGANS_PROCEDIMENTS) {
+			var cache = cacheManager.getCache(nom);
+			if (cache != null) {
+				cache.clear();
+			}
+		}
 	}
 
 	@CacheEvict(value = {"organsAmbPermis", "organsAmbPermisPerConsulta"}, allEntries = true)

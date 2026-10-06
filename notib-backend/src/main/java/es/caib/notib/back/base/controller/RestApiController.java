@@ -11,6 +11,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,9 +44,10 @@ public class RestApiController {
 		List<Class<? extends Resource<?>>> allowedResourceClasses = resourceApiService.resourceFindAllowed();
 		List<Link> indexLinks = new ArrayList<>();
 		if (baseControllers != null) {
-			List<Link> controllerLinks = baseControllers.stream()
-				.filter(bc -> bc.isVisibleInApiIndex() && isBaseControllerAllowed(bc, allowedResourceClasses))
-				.map(BaseController::getIndexLink).collect(Collectors.toList());
+			List<Link> controllerLinks = baseControllers.stream().
+					filter(bc -> bc.isVisibleInApiIndex() && isBaseControllerAllowed(bc, allowedResourceClasses)).
+					map(BaseController::getIndexLink).
+					collect(Collectors.toList());
 			indexLinks.addAll(controllerLinks);
 		}
 		indexLinks.add(0, linkTo(ClassUtils.getUserClass(methodOn(getClass()).index())).withSelfRel());

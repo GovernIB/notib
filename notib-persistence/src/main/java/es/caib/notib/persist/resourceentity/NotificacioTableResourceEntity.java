@@ -23,6 +23,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -47,6 +50,36 @@ public class NotificacioTableResourceEntity implements AdminEntitatResourceEntit
 	@Id
 	@Column(name = "id")
 	private Long id;
+
+	// Camps per filtrar, ordenar i comptar el llistat de remeses només amb aquesta taula (vegeu
+	// NotificacioResourceServiceImpl.entityRepositoryFindEntities). Tenen el mateix nom que a
+	// NotificacioResourceEntity perquè els filtres del llistat s'hi apliquin sense canvis. Les columnes
+	// que també es mapegen amb un altre camp són de només lectura.
+	@Column(name = "createddate")
+	private LocalDateTime createdDate;
+	@Column(name = "createdby_codi", length = 64)
+	private String createdBy;
+	@Column(name = "caducitat")
+	@Temporal(TemporalType.DATE)
+	private Date caducitat;
+	@Column(name = "organ_id", insertable = false, updatable = false)
+	private Long organGestorId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "organ_id", insertable = false, updatable = false)
+	private OrganGestorResourceEntity organGestor;
+	@Column(name = "procediment_id", insertable = false, updatable = false)
+	private Long procedimentId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "procediment_id", insertable = false, updatable = false)
+	private ProcedimentResourceEntity procediment;
+	@Column(name = "procediment_organ_id", insertable = false, updatable = false)
+	private Long procedimentOrganGestorId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "procediment_organ_id", insertable = false, updatable = false)
+	private ProcedimentOrganGestorResourceEntity procedimentOrganGestor;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "notificacio_massiva_id", insertable = false, updatable = false)
+	private NotificacioMassivaResourceEntity notificacioMassiva;
 
 	@Column(name = "tipus_usuari")
 	private TipusUsuariEnumDto tipusUsuari;
@@ -107,6 +140,8 @@ public class NotificacioTableResourceEntity implements AdminEntitatResourceEntit
 	private Integer estatMask;
 	@Column(name = "estat_string", length = 512)
 	private String estatString;
+	@Column(name = "estat_llistat")
+	private NotificacioEstatEnumDto estatLlistat;
 	@Column(name = "document_id")
 	private Long documentId;
 	@Column(name = "env_cer_data")

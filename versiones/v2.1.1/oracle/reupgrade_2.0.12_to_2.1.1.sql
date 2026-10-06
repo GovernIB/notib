@@ -14,3 +14,21 @@ ALTER TABLE not_CONFIG MODIFY config_type_id NOT NULL;
 -- correspon (l'ALTER fallara si hi queda alguna fila NULL).
 ALTER TABLE not_PAGADOR_POSTAL MODIFY contracte_num NOT NULL;
 ALTER TABLE not_PAGADOR_POSTAL MODIFY facturacio_codi_client NOT NULL;
+
+-- not_notificacio_table: l'aplicació anterior no omple PROCEDIMENT_ID ni actualitza ORGAN_ID quan canvia l'òrgan
+-- de la remesa, i el llistat de remeses (interfície React) hi filtra els permisos
+UPDATE not_NOTIFICACIO_TABLE t
+   SET (PROCEDIMENT_ID, ORGAN_ID) = (SELECT n.PROCEDIMENT_ID, n.ORGAN_GESTOR FROM not_NOTIFICACIO n WHERE n.ID = t.ID)
+ WHERE EXISTS (SELECT 1 FROM not_NOTIFICACIO n WHERE n.ID = t.ID
+                 AND (DECODE(n.PROCEDIMENT_ID, t.PROCEDIMENT_ID, 0, 1) = 1 OR DECODE(n.ORGAN_GESTOR, t.ORGAN_ID, 0, 1) = 1));
+
+-- Procés inicial: crea el registre de not_notificacio_table de les remeses que l'aplicació anterior hagi creat sense
+-- (si hi falla, l'aplicació anterior no desfà l'alta de la remesa)
+DELETE FROM not_PROCESSOS_INICIALS WHERE CODI = 'CREAR_REGISTRES_NOT_NOTIFICACIO_TABLE';
+INSERT INTO not_PROCESSOS_INICIALS (ID, CODI, INIT) VALUES (7, 'CREAR_REGISTRES_NOT_NOTIFICACIO_TABLE', 1);
+
+-- ESTAT_LLISTAT de not_notificacio_table: l'aplicació anterior actualitza ESTAT_STRING però no aquesta columna,
+-- per la qual s'ordena la columna estat del llistat de remeses (interfície React)
+UPDATE not_NOTIFICACIO_TABLE
+   SET ESTAT_LLISTAT = CASE WHEN ESTAT = 0 AND COALESCE(REGISTRE_ENV_INTENT, 0) = 0 AND NOTIFICA_ERROR_DATE IS NULL THEN 11 ELSE ESTAT END
+ WHERE DECODE(ESTAT_LLISTAT, CASE WHEN ESTAT = 0 AND COALESCE(REGISTRE_ENV_INTENT, 0) = 0 AND NOTIFICA_ERROR_DATE IS NULL THEN 11 ELSE ESTAT END, 0, 1) = 1;

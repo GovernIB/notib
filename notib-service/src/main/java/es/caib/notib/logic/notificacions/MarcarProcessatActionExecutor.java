@@ -2,6 +2,7 @@ package es.caib.notib.logic.notificacions;
 
 import com.google.common.base.Strings;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
+import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.intf.dto.MarcarProcessatReposta;
 import es.caib.notib.logic.intf.base.exception.ActionExecutionException;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
@@ -20,12 +21,13 @@ import java.util.Map;
 public class MarcarProcessatActionExecutor implements BaseMutableResourceService.ActionExecutor<NotificacioResourceEntity, MarcarProcessat, MarcarProcessatReposta> {
 
 	private final NotificacioService notificacioService;
+	private final NotibPermissionHelper notibPermissionHelper;
 
 	@Override
 	public MarcarProcessatReposta exec(String code, NotificacioResourceEntity entity, MarcarProcessat params) throws ActionExecutionException {
 
 		try {
-			var msg = notificacioService.marcarComProcessada(entity.getId(), params.getMotiu(), true);
+			var msg = notificacioService.marcarComProcessada(entity.getId(), params.getMotiu(), notibPermissionHelper.isCurrentUserAdminEntitat());
 			return MarcarProcessatReposta.builder().error(!Strings.isNullOrEmpty(msg)).errorDescripcio(msg).build();
 		} catch (Exception ex) {
 			var msg = "Error inesperat marcant com a processat ";

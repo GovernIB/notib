@@ -82,7 +82,7 @@ public class CallbackResourceServiceImpl extends BaseMutableResourceService<Call
 
 
 	@Override
-	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries, boolean isSingleResult) {
 
 		// Condició per a mostrar només els callbackss de l'entitat actual
 		var isRoleSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);

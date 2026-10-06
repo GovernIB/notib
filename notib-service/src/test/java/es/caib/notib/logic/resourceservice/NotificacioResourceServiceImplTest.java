@@ -48,6 +48,9 @@ class NotificacioResourceServiceImplTest {
 	@Mock private LegacyHelper legacyHelper;
 	@Mock private NotibPermissionHelper notibPermissionHelper;
 	@Mock private ApplicationEventPublisher eventPublisher;
+	@Mock private ConfigHelper configHelper;
+	@Mock private NotificacioEstatAsyncHelper notificacioEstatAsyncHelper;
+	@Mock private NotificacioListHelper notificacioListHelper;
 
 	@InjectMocks
 	private NotificacioResourceServiceImpl service;
@@ -75,6 +78,127 @@ class NotificacioResourceServiceImplTest {
 	// =====================================================
 
 	@Test
+	void processSortShouldMapCalculatedColumns() {
+		var sort = org.springframework.data.domain.Sort.by(
+				org.springframework.data.domain.Sort.Order.desc("estatString"),
+				org.springframework.data.domain.Sort.Order.asc("enviadaDate"),
+				org.springframework.data.domain.Sort.Order.asc("registreNums"),
+				org.springframework.data.domain.Sort.Order.desc("titular"),
+				org.springframework.data.domain.Sort.Order.asc("concepte"));
+
+		var result = service.processSort(sort);
+
+		assertEquals(org.springframework.data.domain.Sort.by(
+				org.springframework.data.domain.Sort.Order.desc("estat"),
+				org.springframework.data.domain.Sort.Order.asc("taula.enviadaDate"),
+				org.springframework.data.domain.Sort.Order.asc("taula.registreNums"),
+				org.springframework.data.domain.Sort.Order.desc("taula.titular"),
+				org.springframework.data.domain.Sort.Order.asc("concepte")), result);
+	}
+
+	@Test
+	void ordenacioTaulaShouldMapFieldsToNotificacioTable() {
+		var sort = org.springframework.data.domain.Sort.by(
+				org.springframework.data.domain.Sort.Order.desc("estatString"),
+				org.springframework.data.domain.Sort.Order.asc("organGestor"),
+				org.springframework.data.domain.Sort.Order.asc("procediment"),
+				org.springframework.data.domain.Sort.Order.desc("titular"));
+
+		var result = service.ordenacioTaula(sort);
+
+		assertEquals(org.springframework.data.domain.Sort.by(
+				org.springframework.data.domain.Sort.Order.desc("estatLlistat"),
+				org.springframework.data.domain.Sort.Order.asc("organGestorId"),
+				org.springframework.data.domain.Sort.Order.asc("procedimentId"),
+				org.springframework.data.domain.Sort.Order.desc("titular")), result);
+	}
+
+	@Test
+	void filtreTaulaShouldUseTableIdColumns() {
+		assertEquals("entitat.id:21 and (organGestorId in (1,2) or procedimentId in (3) or procedimentOrganGestorId in (4))",
+				NotificacioResourceServiceImpl.filtreTaula("entitat.id:21 and (organGestor.id in (1,2) or procediment.id in (3) or procedimentOrganGestor.id in (4))"));
+	}
+
+	@Test
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	void ordresTaulaShouldUseOrdreTextOnlyForTextFields() throws Exception {
+		var entityManager = mock(javax.persistence.EntityManager.class);
+		var emf = mock(javax.persistence.EntityManagerFactory.class);
+		var sessionFactory = mock(org.hibernate.engine.spi.SessionFactoryImplementor.class);
+		var funcions = mock(org.hibernate.dialect.function.SQLFunctionRegistry.class);
+		when(entityManager.getEntityManagerFactory()).thenReturn(emf);
+		when(emf.unwrap(org.hibernate.engine.spi.SessionFactoryImplementor.class)).thenReturn(sessionFactory);
+		when(sessionFactory.getSqlFunctionRegistry()).thenReturn(funcions);
+		when(funcions.findSQLFunction("ordre_text")).thenReturn(mock(org.hibernate.dialect.function.SQLFunction.class));
+		var camp = NotificacioResourceServiceImpl.class.getDeclaredField("entityManager");
+		camp.setAccessible(true);
+		camp.set(service, entityManager);
+		var root = mock(javax.persistence.criteria.Root.class);
+		var cb = mock(javax.persistence.criteria.CriteriaBuilder.class);
+		var concepte = mock(javax.persistence.criteria.Path.class);
+		when(concepte.getJavaType()).thenReturn((Class) String.class);
+		var createdDate = mock(javax.persistence.criteria.Path.class);
+		when(createdDate.getJavaType()).thenReturn((Class) java.time.LocalDateTime.class);
+		when(root.get("concepte")).thenReturn(concepte);
+		when(root.get("createdDate")).thenReturn(createdDate);
+		var funcio = mock(javax.persistence.criteria.Expression.class);
+		when(cb.function("ordre_text", String.class, concepte)).thenReturn(funcio);
+
+		var metode = NotificacioResourceServiceImpl.class.getDeclaredMethod("ordresTaula",
+				org.springframework.data.domain.Sort.class, javax.persistence.criteria.Root.class, javax.persistence.criteria.CriteriaBuilder.class);
+		metode.setAccessible(true);
+		metode.invoke(service, org.springframework.data.domain.Sort.by(
+				org.springframework.data.domain.Sort.Order.desc("concepte"),
+				org.springframework.data.domain.Sort.Order.asc("createdDate")), root, cb);
+
+		verify(cb).desc(funcio);
+		verify(cb).asc(createdDate);
+	}
+
+	@Test
+	void estatEnviantShouldHaveOrdinalUsedByChangelog() {
+		// El changeset 2_1_1_000-56 calcula ESTAT_LLISTAT amb l'ordinal d'ENVIANT
+		assertEquals(11, NotificacioEstatEnumDto.ENVIANT.ordinal());
+	}
+
+	@Test
+	void invertirShouldReverseEveryDirection() {
+		var sort = org.springframework.data.domain.Sort.by(
+				org.springframework.data.domain.Sort.Order.desc("createdDate"),
+				org.springframework.data.domain.Sort.Order.asc("concepte"));
+
+		assertEquals(org.springframework.data.domain.Sort.by(
+				org.springframework.data.domain.Sort.Order.asc("createdDate"),
+				org.springframework.data.domain.Sort.Order.desc("concepte")), NotificacioResourceServiceImpl.invertir(sort));
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	void additionalSpecificationShouldInnerJoinTaula() {
+		var spec = service.additionalSpecification(null, false);
+		var root = (javax.persistence.criteria.Root<NotificacioResourceEntity>) mock(javax.persistence.criteria.Root.class);
+		var cb = mock(javax.persistence.criteria.CriteriaBuilder.class);
+
+		// Consulta de la pàgina: fetch (la taula es carrega a la mateixa consulta)
+		var query = mock(javax.persistence.criteria.CriteriaQuery.class);
+		when(query.getResultType()).thenReturn((Class) NotificacioResourceEntity.class);
+		assertNull(spec.toPredicate(root, query, cb));
+		verify(root).fetch("taula", javax.persistence.criteria.JoinType.INNER);
+
+		// Consulta de COUNT: sense JOIN
+		var countQuery = mock(javax.persistence.criteria.CriteriaQuery.class);
+		when(countQuery.getResultType()).thenReturn((Class) Long.class);
+		spec.toPredicate(root, countQuery, cb);
+		verify(root, never()).join(anyString(), any(javax.persistence.criteria.JoinType.class));
+		verify(root, times(1)).fetch(anyString(), any(javax.persistence.criteria.JoinType.class));
+	}
+
+	@Test
+	void additionalSpecificationShouldBeNull_whenSingleResult() {
+		assertNull(service.additionalSpecification(null, true));
+	}
+
+	@Test
 	void additionalSpringFilterShouldReturnNoResults_whenNoPermissions() {
 		when(userSessionHelper.getCurrentEntitatId()).thenReturn(1L);
 		when(authenticationHelper.getCurrentUserName()).thenReturn("usuari1");
@@ -83,7 +207,7 @@ class NotificacioResourceServiceImplTest {
 				new ArrayList<>(),
 				new ArrayList<>(),
 				new ArrayList<>()));
-		String result = service.additionalSpringFilter("", null);
+		String result = service.additionalSpringFilter("", null, false);
 		assertEquals("entitat.id:1 and createdBy:'usuari1'", result);
 	}
 
@@ -95,7 +219,7 @@ class NotificacioResourceServiceImplTest {
 				new ArrayList<>(List.of(10L)),
 				new ArrayList<>(),
 				new ArrayList<>()));
-		String result = service.additionalSpringFilter("", null);
+		String result = service.additionalSpringFilter("", null, false);
 		assertEquals("entitat.id:1 and (organGestor.id in (10))", result);
 	}
 
@@ -107,7 +231,7 @@ class NotificacioResourceServiceImplTest {
 				new ArrayList<>(),
 				new ArrayList<>(List.of(5L)),
 				new ArrayList<>()));
-		String result = service.additionalSpringFilter("", null);
+		String result = service.additionalSpringFilter("", null, false);
 		assertEquals("entitat.id:1 and (procediment.id in (5))", result);
 	}
 
@@ -119,7 +243,7 @@ class NotificacioResourceServiceImplTest {
 				new ArrayList<>(),
 				new ArrayList<>(),
 				new ArrayList<>(List.of(7L, 8L))));
-		String result = service.additionalSpringFilter("", null);
+		String result = service.additionalSpringFilter("", null, false);
 		assertEquals("entitat.id:1 and (procedimentOrganGestor.id in (7,8))", result);
 	}
 
@@ -131,7 +255,7 @@ class NotificacioResourceServiceImplTest {
 				new ArrayList<>(List.of(10L)),
 				new ArrayList<>(List.of(20L)),
 				new ArrayList<>(List.of(30L))));
-		String result = service.additionalSpringFilter("", null);
+		String result = service.additionalSpringFilter("", null, false);
 		assertEquals("entitat.id:1 and (organGestor.id in (10) or procediment.id in (20) or procedimentOrganGestor.id in (30))", result);
 	}
 
@@ -393,6 +517,177 @@ class NotificacioResourceServiceImplTest {
 			target
 		);
 		assertNotNull(target.getCaducitat());
+	}
+
+
+	// =====================================================
+	// afterConversion (columna estat)
+	// =====================================================
+
+	@Test
+	void afterConversionShouldCalculateEstatsInOneCall_whenNotAsync() {
+		var e1 = entitatAmbEstat(10L, "vell1", true);
+		var e2 = entitatAmbEstat(11L, "actual", false);
+		var e3 = entitatAmbEstat(12L, "vell3", true);
+		var r1 = resourceAmbEstat("vell1");
+		var r2 = resourceAmbEstat("actual");
+		var r3 = resourceAmbEstat("vell3");
+		when(legacyHelper.actualitzarColumnesEstat(Set.of(10L, 12L))).thenReturn(Map.of(10L, "nou1", 12L, "nou3"));
+
+		service.afterConversion(List.of(e1, e2, e3), List.of(r1, r2, r3));
+
+		verify(legacyHelper, times(1)).actualitzarColumnesEstat(any());
+		verifyNoInteractions(notificacioEstatAsyncHelper);
+		assertEquals("nou1", r1.getEstatString());
+		assertEquals("actual", r2.getEstatString());
+		assertEquals("nou3", r3.getEstatString());
+		assertFalse(r1.isEstatPendent());
+	}
+
+	@Test
+	void afterConversionShouldKeepPreviousEstat_whenCalculationFails() {
+		var e1 = entitatAmbEstat(10L, "vell1", true);
+		var r1 = resourceAmbEstat("vell1");
+		when(legacyHelper.actualitzarColumnesEstat(any())).thenThrow(new RuntimeException("error"));
+
+		assertDoesNotThrow(() -> service.afterConversion(List.of(e1), List.of(r1)));
+		assertEquals("vell1", r1.getEstatString());
+	}
+
+	@Test
+	void afterConversionShouldDeferEstats_whenListAndAsyncEnabled() throws Exception {
+		var e1 = entitatAmbEstat(10L, "vell1", true);
+		var e2 = entitatAmbEstat(11L, "actual", false);
+		var r1 = resourceAmbEstat("vell1");
+		var r2 = resourceAmbEstat("actual");
+		when(configHelper.getConfigAsBoolean(NotificacioEstatAsyncHelper.PROPERTY_ESTAT_ASINCRON, true)).thenReturn(true);
+		when(authenticationHelper.getCurrentUserName()).thenReturn("usuari1");
+
+		consultaLlistat().set(true);
+		try {
+			service.afterConversion(List.of(e1, e2), List.of(r1, r2));
+		} finally {
+			consultaLlistat().remove();
+		}
+
+		verify(notificacioEstatAsyncHelper).calcularEstatsAsync(Set.of(10L), "usuari1");
+		verify(legacyHelper, never()).actualitzarColumnesEstat(any());
+		assertTrue(r1.isEstatPendent());
+		assertEquals("vell1", r1.getEstatString());
+		assertFalse(r2.isEstatPendent());
+	}
+
+	@Test
+	void afterConversionShouldCalculateSynchronously_whenListAndAsyncDisabled() throws Exception {
+		var e1 = entitatAmbEstat(10L, "vell1", true);
+		var r1 = resourceAmbEstat("vell1");
+		when(configHelper.getConfigAsBoolean(NotificacioEstatAsyncHelper.PROPERTY_ESTAT_ASINCRON, true)).thenReturn(false);
+		when(legacyHelper.actualitzarColumnesEstat(Set.of(10L))).thenReturn(Map.of(10L, "nou1"));
+
+		consultaLlistat().set(true);
+		try {
+			service.afterConversion(List.of(e1), List.of(r1));
+		} finally {
+			consultaLlistat().remove();
+		}
+
+		verifyNoInteractions(notificacioEstatAsyncHelper);
+		assertEquals("nou1", r1.getEstatString());
+		assertFalse(r1.isEstatPendent());
+	}
+
+	@Test
+	void afterConversionSingleShouldCalculateSynchronously() {
+		var e1 = entitatAmbEstat(10L, "vell1", true);
+		var r1 = resourceAmbEstat("vell1");
+		when(legacyHelper.actualitzarColumnesEstat(Set.of(10L))).thenReturn(Map.of(10L, "nou1"));
+
+		service.afterConversion(e1, r1);
+
+		verifyNoInteractions(notificacioEstatAsyncHelper);
+		assertEquals("nou1", r1.getEstatString());
+	}
+
+	@Test
+	void afterConversionShouldSetPermisProcessar_onlyForFinalitzadaWithProcedimentOrOrganPermission() {
+		var e1 = entitatFinalitzable(1L, NotificacioEstatEnumDto.FINALITZADA, "PROC_OK", "ORG_NO");
+		var e2 = entitatFinalitzable(2L, NotificacioEstatEnumDto.FINALITZADA, "PROC_NO", "ORG_OK");
+		var e3 = entitatFinalitzable(3L, NotificacioEstatEnumDto.FINALITZADA, null, "ORG_OK");
+		var e4 = entitatFinalitzable(4L, NotificacioEstatEnumDto.FINALITZADA, "PROC_NO", "ORG_NO");
+		var e5 = entitatFinalitzable(5L, NotificacioEstatEnumDto.ENVIADA, "PROC_OK", "ORG_OK");
+		var resources = List.of(new NotificacioResource(), new NotificacioResource(), new NotificacioResource(), new NotificacioResource(), new NotificacioResource());
+		when(userSessionHelper.getCurrentEntitatId()).thenReturn(7L);
+		when(authenticationHelper.getCurrentUserName()).thenReturn("usuari1");
+		when(notificacioListHelper.getCodisProcedimentsAndOrgansAmpPermisProcessar(7L, "usuari1")).thenReturn(List.of("PROC_OK", "ORG_OK"));
+
+		service.afterConversion(List.of(e1, e2, e3, e4, e5), resources);
+
+		assertTrue(resources.get(0).isPermisProcessar());
+		assertTrue(resources.get(1).isPermisProcessar());
+		assertTrue(resources.get(2).isPermisProcessar());
+		assertFalse(resources.get(3).isPermisProcessar());
+		assertFalse(resources.get(4).isPermisProcessar());
+		// Els codis amb permís es calculen un sol cop per pàgina
+		verify(notificacioListHelper, times(1)).getCodisProcedimentsAndOrgansAmpPermisProcessar(any(), any());
+	}
+
+	@Test
+	void afterConversionShouldNotQueryPermisProcessar_whenNoFinalitzada() {
+		var e1 = entitatFinalitzable(1L, NotificacioEstatEnumDto.ENVIADA, "PROC_OK", "ORG_OK");
+
+		service.afterConversion(List.of(e1), List.of(new NotificacioResource()));
+
+		verifyNoInteractions(notificacioListHelper);
+	}
+
+	@Test
+	void afterConversionSingleShouldSetPermisProcessar() {
+		var e1 = entitatFinalitzable(1L, NotificacioEstatEnumDto.FINALITZADA, "PROC_OK", "ORG_NO");
+		var r1 = new NotificacioResource();
+		when(userSessionHelper.getCurrentEntitatId()).thenReturn(7L);
+		when(authenticationHelper.getCurrentUserName()).thenReturn("usuari1");
+		when(notificacioListHelper.getCodisProcedimentsAndOrgansAmpPermisProcessar(7L, "usuari1")).thenReturn(List.of("PROC_OK"));
+
+		service.afterConversion(e1, r1);
+
+		assertTrue(r1.isPermisProcessar());
+	}
+
+	private NotificacioResourceEntity entitatFinalitzable(Long id, NotificacioEstatEnumDto estat, String procedimentCodi, String organCodi) {
+		var e = entitatAmbEstat(id, "estat", false);
+		e.setEstat(estat);
+		if (procedimentCodi != null) {
+			var procediment = new ProcedimentResourceEntity();
+			procediment.setCodi(procedimentCodi);
+			e.setProcediment(procediment);
+		}
+		var organ = new OrganGestorResourceEntity();
+		organ.setCodi(organCodi);
+		e.setOrganGestor(organ);
+		return e;
+	}
+
+	private NotificacioResourceEntity entitatAmbEstat(Long id, String estatString, boolean perActualitzar) {
+		var taula = new NotificacioTableResourceEntity();
+		taula.setEstatString(estatString);
+		taula.setPerActualitzar(perActualitzar);
+		var e = new NotificacioResourceEntity();
+		e.setId(id);
+		e.setTaula(taula);
+		return e;
+	}
+
+	private NotificacioResource resourceAmbEstat(String estatString) {
+		var r = new NotificacioResource();
+		r.setEstatString(estatString);
+		return r;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static ThreadLocal<Boolean> consultaLlistat() throws Exception {
+		var field = NotificacioResourceServiceImpl.class.getDeclaredField("consultaLlistat");
+		field.setAccessible(true);
+		return (ThreadLocal<Boolean>) field.get(null);
 	}
 
 }

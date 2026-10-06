@@ -2,6 +2,7 @@ package es.caib.notib.logic.base.helper;
 
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
 import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
+import es.caib.notib.logic.intf.base.service.PermissionEvaluatorService;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,7 @@ public class PermissionHelper extends BasePermissionHelper {
 			Serializable resourceId,
 			Class<?> resourceClass,
 			ResourceAccessConstraint resourceAccessConstraint,
+			PermissionEvaluatorService.RestApiOperation restapiOperation,
 			BasePermission[] permissions) {
 		return false;
 	}

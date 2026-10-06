@@ -251,8 +251,9 @@ export const useAccionsMassives = ( resource: string, refresh?: () => void) => {
         massiveAction(ids, 'REINTENTAR_REGISTRE_MASSIU', t('page.accioMassiva.accions.reintentarRegistre.ok'), seleccioTipus);
     }
 
-    const botons = [{value: true, text: t('comu.guardar'), icon: 'save', componentProps: {variant: 'contained'}},
-        {value: false, text: t('comu.cancelar'), componentProps: {variant: 'outlined'}}];
+    // Memoritzat: useFormDialog torna a aplicar els botons quan canvia la referència de l'array (un array nou a cada render provoca un bucle infinit)
+    const botons = React.useMemo(() => [{value: true, text: t('comu.guardar'), icon: 'save', componentProps: {variant: 'contained'}},
+        {value: false, text: t('comu.cancelar'), componentProps: {variant: 'outlined'}}], [t]);
 
     const {exec: marcarProcessatMassiu, formDialogComponent: marcarProcessatMassiuDialog} = useMuiActionReportLogic(
         'notificacioResource',

@@ -5,7 +5,9 @@ package es.caib.notib.persist.dialect;
 
 import es.caib.notib.persist.audit.AbstractAuditableEntity;
 import org.hibernate.dialect.PostgreSQL9Dialect;
+import org.hibernate.dialect.function.SQLFunctionTemplate;
 import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
 
 /**
  * Dialecte de Hibernate per a la base de dades Postgres per a permetre
@@ -19,6 +21,8 @@ public class PostgreSqlCaibDialect extends PostgreSQL9Dialect {
 	public PostgreSqlCaibDialect() {
 		super();
 		registerFunction("bitand", new PostgresBitwiseAndSQLFunction("bitand", IntegerType.INSTANCE));
+		// A PostgreSQL el text s'ordena amb la collation de la base de dades, la mateixa dels índexs
+		registerFunction(OracleCaibDialect.FUNCIO_ORDRE_TEXT, new SQLFunctionTemplate(StringType.INSTANCE, "?1"));
 	}
 
 	@Override

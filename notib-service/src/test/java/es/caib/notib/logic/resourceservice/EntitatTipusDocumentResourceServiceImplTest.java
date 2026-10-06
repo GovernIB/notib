@@ -32,7 +32,7 @@ class EntitatTipusDocumentResourceServiceImplTest {
 	void additionalSpringFilterShouldCallPermissionHelper() {
 		String expectedFilter = "filter123";
 		when(notibPermissionHelper.entitatAdditionalSpringFilter("entitat.id")).thenReturn(expectedFilter);
-		String result = service.additionalSpringFilter(null, null);
+		String result = service.additionalSpringFilter(null, null, false);
 		assertEquals(expectedFilter, result);
 		verify(notibPermissionHelper).entitatAdditionalSpringFilter("entitat.id");
 	}

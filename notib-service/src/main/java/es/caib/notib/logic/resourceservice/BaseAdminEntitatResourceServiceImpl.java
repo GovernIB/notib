@@ -43,7 +43,7 @@ public abstract class BaseAdminEntitatResourceServiceImpl<R extends Resource<Lon
 	 * seleccionada a la sessió.
 	 */
 	@Override
-	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries, boolean isSingleResult) {
 
 		var isRoleSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);
 		if (isRoleSuper) {

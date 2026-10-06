@@ -2,6 +2,7 @@ package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.helper.AclHelper;
+import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
@@ -43,6 +44,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class ProcedimentResourceServiceImplTest {
 
+	@Mock private CacheHelper cacheHelper;
 	@Mock
 	private AclHelper aclHelper;
 	@Mock
@@ -94,7 +96,8 @@ class ProcedimentResourceServiceImplTest {
 			procedimentService,
 			serveiService,
 			organGestorService,
-			grupService
+			grupService,
+			cacheHelper
 		);
 	}
 
@@ -210,6 +213,19 @@ class ProcedimentResourceServiceImplTest {
 		assertFalse(target.isFieldEntregaCieHidden());
 		assertFalse(target.isFieldOrganGestorDisabled());
 		assertNull(target.getOrganGestor());
+	}
+
+
+	@Test
+	void createUpdateAndDeleteShouldEvictPermissionCaches() {
+		var entity = new ProcedimentResourceEntity();
+		var resource = new ProcedimentResource();
+
+		service.afterCreateSave(entity, resource, Map.of(), false);
+		service.afterUpdateSave(entity, resource, Map.of(), false);
+		service.afterDelete(entity, Map.of());
+
+		verify(cacheHelper, times(3)).evictCachesPermisosOrgansProcediments();
 	}
 
 }

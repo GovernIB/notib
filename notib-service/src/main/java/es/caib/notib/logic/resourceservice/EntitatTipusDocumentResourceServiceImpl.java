@@ -30,7 +30,7 @@ public class EntitatTipusDocumentResourceServiceImpl
 	@Override
 	protected String additionalSpringFilter(
 		String currentSpringFilter,
-		String[] namedQueries) {
+		String[] namedQueries, boolean isSingleResult) {
 		return notibPermissionHelper.entitatAdditionalSpringFilter("entitat.id");
 	}
 

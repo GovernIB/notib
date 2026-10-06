@@ -571,6 +571,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			ti = tf;
 			progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.permisos"));
 			permisosHelper.actualitzarPermisosOrgansObsolets(unitatsWs, organsDividits, organsFusionats, organsSubstituits, progres);
+			cacheHelper.evictCachesPermisosOrgansProcediments();
 			progres.setProgres(45);
 			tf = System.currentTimeMillis();
 			progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage(AUTO_TEMPS_TEXT, new Object[]{(tf - ti)}));

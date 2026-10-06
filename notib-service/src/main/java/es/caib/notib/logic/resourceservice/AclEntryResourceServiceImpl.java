@@ -3,6 +3,7 @@ package es.caib.notib.logic.resourceservice;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.cacheable.PermisosCacheable;
+import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.AclHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
@@ -71,6 +72,7 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 	private final AuthenticationHelper authenticationHelper;
 	private final UserSessionHelper userSessionHelper;
 	private final PermisosCacheable permisosCacheable;
+	private final CacheHelper cacheHelper;
 	private final ProcedimentResourceRepository procedimentResourceRepository;
 	private final OrganGestorResourceRepository organGestorResourceRepository;
 	private final ProcedimentOrganGestorResourceRepository procedimentOrganGestorResourceRepository;
@@ -246,11 +248,15 @@ public class AclEntryResourceServiceImpl extends BaseMutableResourceService<AclE
 
 	// Els permisos concedits/revocats aquí (entitat, òrgan gestor, procediment) es reflecteixen a les
 	// caches de permisos de tots els usuaris (getPermisosEntitatsUsuariActual, entitats i òrgans gestors
-	// accessibles), perquè el canvi sigui visible sense haver de tornar a iniciar sessió.
+	// accessibles), perquè el canvi sigui visible sense haver de tornar a iniciar sessió. També es buiden
+	// les mateixes caches de permisos d'òrgans i procediments que buida la gestió de permisos clàssica
+	// (OrganGestorServiceImpl/ProcedimentServiceImpl.permisUpdate): procediments/serveis i òrgans amb
+	// permís, i codis amb permís de processar (veure CacheHelper.evictCachesPermisosOrgansProcediments).
 	private void evictPermisosCaches() {
 		permisosCacheable.evictAllPermisosEntitatsUsuariActual();
 		permisosCacheable.evictAllFindEntitatsAccessiblesUsuari();
 		permisosCacheable.evictAllFindOrgansGestorsAccessiblesUsuari();
+		cacheHelper.evictCachesPermisosOrgansProcediments();
 	}
 
 	/*

@@ -1,5 +1,6 @@
 package es.caib.notib.logic.intf.model;
 
+import org.springframework.data.domain.Sort;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
@@ -61,6 +62,8 @@ import static es.caib.notib.logic.intf.model.NotificacioResource.ACTION_ANULAR_R
 @ResourceConfig(
 	//descriptionField = NotificacioResource.Fields.codi,
 	//quickFilterFields = { NotificacioResource.Fields.codi, NotificacioResource.Fields.nom },
+	// Sense ordenació (p.ex. en desactivar l'ordenació d'una columna del llistat), les remeses més recents primer
+	defaultSortFields = { @ResourceConfig.ResourceSort(field = "createdDate", direction = Sort.Direction.DESC) },
 	accessConstraints = {
 		@ResourceAccessConstraint(
 			type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
@@ -532,6 +535,10 @@ public class NotificacioResource extends BaseResource<Long> {
 	private ResourceReference<DocumentResource, Long> document3;
 	private ResourceReference<DocumentResource, Long> document4;
 	private ResourceReference<DocumentResource, Long> document5;
+	// NotificacioMassivaResource no té descriptionField: sense aquesta configuració, el mapeig del
+	// llistat registrava un avís per cada remesa d'una notificació massiva. S'empra l'id perquè no
+	// cal inicialitzar l'entitat referenciada (la descripció no es mostra enlloc).
+	@ResourceField(descriptionField = "id")
 	private ResourceReference<NotificacioMassivaResource, Long> notificacioMassiva;
 	/*private ResourceReference<ProcedimentOrganResource, Long> procedimentOrgan;*/
 
@@ -559,6 +566,9 @@ public class NotificacioResource extends BaseResource<Long> {
 	// Camps provinents de NotificacioTable
 	private Date enviadaDate;
 	private String estatString;
+	// Cert si estatString és el darrer valor persistit però la remesa està pendent de recalcular-lo
+	// de manera asíncrona: el valor actualitzat arribarà via SSE (veure NotificacioEstatAsyncHelper)
+	private boolean estatPendent;
 	private String registreNums;
 	private String titular;
 	private String notificaIds;

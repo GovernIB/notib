@@ -55,7 +55,9 @@ public class SseEventServiceImpl implements SseEventService {
 			// Procés acabat: no ha de quedar cap estat resident que es reenviï a un listener futur
 			// d'una execució posterior, no relacionada, d'aquesta mateixa cua.
 			lastEvents.remove(queue.name());
-		} else {
+		} else if (event.getTargetUser() == null) {
+			// Els events adreçats a un usuari concret (p.ex. estats de remesa calculats per a la seva
+			// consulta) no són progrés d'un procés: no s'han de reenviar a un listener futur.
 			lastEvents.put(queue.name(), event);
 		}
 		var listeners = consumers.get(queue.name());

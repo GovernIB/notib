@@ -5,7 +5,6 @@ import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.base.service.BaseReadonlyResourceService;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.MessageHelper;
-import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.intf.base.exception.PerspectiveApplicationException;
 import es.caib.notib.logic.intf.dto.CallbackEstatEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioErrorTipusEnumDto;
@@ -45,7 +44,6 @@ public class NotificacioDetallPerspectiveApplicator implements BaseReadonlyResou
 	private final CallbackResourceRepository callbackResourceRepository;
 	private final EventResourceRepository eventResourceRepository;
 	private final MessageHelper messageHelper;
-	private final NotibPermissionHelper notibPermissionHelper;
 	private final UsuariResourceRepository usuariResourceRepository;
 
 	@Override
@@ -56,7 +54,7 @@ public class NotificacioDetallPerspectiveApplicator implements BaseReadonlyResou
 		var llindarDies = configHelper.getConfigAsInteger("es.caib.notib.llindar.dies.enviament.remeses");
 		resource.setNotificacioAntiga(DatesUtils.isNowAfterDate(entity.getCreatedDate(), llindarDies));
 		resource.setComunicacioSir(entity.isComunicacioSir());
-		resource.setPermisProcessar(hasPermisProcessar(entity));
+		// permisProcessar ja s'emplena a NotificacioResourceServiceImpl.afterConversion (getOne)
 		var createdBy = usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null);
 		if (createdBy != null) {
 			resource.setCreatedByNom(createdBy.getNomSencer());
@@ -157,10 +155,6 @@ public class NotificacioDetallPerspectiveApplicator implements BaseReadonlyResou
 
 	}
 
-
-	private boolean hasPermisProcessar(NotificacioResourceEntity notificacio) {
-		return notibPermissionHelper.organGestorPermissionAllowed(notificacio.getOrganGestor().getId(), es.caib.notib.logic.intf.acl.ExtendedPermission.PROCESSAR);
-	}
 
 	private NotificacioErrorTipusEnumDto getErrorTipus(EventResourceEntity lastErrorEvent) {
 

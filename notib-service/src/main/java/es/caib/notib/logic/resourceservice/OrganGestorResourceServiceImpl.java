@@ -2,6 +2,7 @@ package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.helper.AclHelper;
+import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.helper.OrganGestorFullSyncHelper;
@@ -59,6 +60,7 @@ import java.util.stream.Collectors;
 public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServiceImpl<OrganGestorResource, OrganGestorResourceEntity> implements OrganGestorResourceService {
 
 	private final AclHelper aclHelper;
+	private final CacheHelper cacheHelper;
 	private final OrganGestorSyncHelper organGestorSyncHelper;
 	private final OrganGestorFullSyncHelper organGestorFullSyncHelper;
 	private final EntitatResourceRepository entitatResourceRepository;
@@ -82,7 +84,8 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 		PagadorCieResourceRepository pagadorCieResourceRepository,
 		EntregaCieResourceRepository entregaCieResourceRepository,
 		OrganGestorService organGestorService,
-		PermisosService permisosService) {
+		PermisosService permisosService,
+		CacheHelper cacheHelper) {
 
 		super(userSessionHelper, authenticationHelper, notibPermissionHelper);
 		this.aclHelper = aclHelper;
@@ -95,6 +98,7 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 		this.entregaCieResourceRepository = entregaCieResourceRepository;
 		this.organGestorService = organGestorService;
 		this.permisosService = permisosService;
+		this.cacheHelper = cacheHelper;
 	}
 
 	@PostConstruct
@@ -113,9 +117,9 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 	 * seleccionada a la sessió.
 	 */
 	@Override
-	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries, boolean isSingleResult) {
 
-		var superFilter = super.additionalSpringFilter(currentSpringFilter, namedQueries);
+		var superFilter = super.additionalSpringFilter(currentSpringFilter, namedQueries, isSingleResult);
 		// Es determina el rol pel qual s'ha de filtrar directament per la capçalera del rol seleccionat
 		// (userSessionHelper.getCurrentRol()), en lloc de isCurrentUserInRole: un usuari pot tenir
 		// concedits més d'un rol alhora (p.ex. usuari i administrador d'entitat, habitual en usuaris de
@@ -223,6 +227,23 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 	@Override
 	protected void beforeUpdateSave(OrganGestorResourceEntity entity, OrganGestorResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
 		beforeCreateUpdate(entity, resource);
+	}
+
+	// Els permisos en cache depenen de les dades dels òrgans gestors: es buiden en qualsevol alta,
+	// modificació o esborrat, igual que fa la gestió clàssica
+	@Override
+	protected void afterCreateSave(OrganGestorResourceEntity entity, OrganGestorResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
+		cacheHelper.evictCachesPermisosOrgansProcediments();
+	}
+
+	@Override
+	protected void afterUpdateSave(OrganGestorResourceEntity entity, OrganGestorResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
+		cacheHelper.evictCachesPermisosOrgansProcediments();
+	}
+
+	@Override
+	protected void afterDelete(OrganGestorResourceEntity entity, Map<String, AnswerRequiredException.AnswerValue> answers) {
+		cacheHelper.evictCachesPermisosOrgansProcediments();
 	}
 
 	/**

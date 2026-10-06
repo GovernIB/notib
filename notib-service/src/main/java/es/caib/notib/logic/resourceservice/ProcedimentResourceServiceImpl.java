@@ -2,6 +2,7 @@ package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.helper.AclHelper;
+import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
@@ -69,6 +70,7 @@ import java.util.stream.Collectors;
 public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServiceImpl<ProcedimentResource, ProcedimentResourceEntity> implements ProcedimentResourceService {
 
 	private final AclHelper aclHelper;
+	private final CacheHelper cacheHelper;
 	private final PagadorPostalResourceRepository pagadorPostalResourceRepository;
 	private final EntitatResourceRepository entitatResourceRepository;
 	private final PagadorCieResourceRepository pagadorCieResourceRepository;
@@ -115,7 +117,8 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 		ProcedimentService procedimentService,
 		ServeiService serveiService,
 		OrganGestorService organGestorService,
-		GrupService grupService) {
+		GrupService grupService,
+		CacheHelper cacheHelper) {
 
 		super(userSessionHelper, authenticationHelper, notibPermissionHelper);
 		this.aclHelper = aclHelper;
@@ -131,12 +134,13 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 		this.serveiService = serveiService;
 		this.organGestorService = organGestorService;
 		this.grupService = grupService;
+		this.cacheHelper = cacheHelper;
 	}
 
 	@Override
-	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries, boolean isSingleResult) {
 
-		var superFilter = super.additionalSpringFilter(currentSpringFilter, namedQueries);
+		var superFilter = super.additionalSpringFilter(currentSpringFilter, namedQueries, isSingleResult);
 		var isRoleAdminOrgan = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN);
 		if (isRoleAdminOrgan && notibPermissionHelper.currentOrganGestorPermissionAllowed(BasePermission.ADMINISTRATION)) {
 			var permisComuns = notibPermissionHelper.currentOrganGestorPermissionAllowed(ExtendedPermission.PERM3);
@@ -270,6 +274,23 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 		entregaCie.setPagadorPostal(pagadorPostal.get());
 		entregaCie.setPagadorCie(pagadorCie.get());
 		entregaCieResourceRepository.save(entregaCie);
+	}
+
+	// Els permisos en cache depenen de les dades dels procediments o serveis (òrgan gestor, comú, actiu...): es buiden en qualsevol alta,
+	// modificació o esborrat, igual que fa la gestió clàssica
+	@Override
+	protected void afterCreateSave(ProcedimentResourceEntity entity, ProcedimentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
+		cacheHelper.evictCachesPermisosOrgansProcediments();
+	}
+
+	@Override
+	protected void afterUpdateSave(ProcedimentResourceEntity entity, ProcedimentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
+		cacheHelper.evictCachesPermisosOrgansProcediments();
+	}
+
+	@Override
+	protected void afterDelete(ProcedimentResourceEntity entity, Map<String, AnswerRequiredException.AnswerValue> answers) {
+		cacheHelper.evictCachesPermisosOrgansProcediments();
 	}
 
 	@Override

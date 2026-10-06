@@ -154,7 +154,7 @@ class EntitatResourceServiceImplTest {
 		when(notibPermissionHelper.entitatAdditionalSpringFilter("id"))
 			.thenReturn(expectedFilter);
 		// when
-		String result = service.additionalSpringFilter("currentFilter", new String[]{});
+		String result = service.additionalSpringFilter("currentFilter", new String[]{}, false);
 		// then
 		assertEquals(expectedFilter, result);
 		verify(notibPermissionHelper).entitatAdditionalSpringFilter("id");

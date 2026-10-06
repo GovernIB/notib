@@ -78,7 +78,7 @@ public class NotificacioMassivaResourceServiceImpl extends BaseMutableResourceSe
 	}
 
 	@Override
-	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries, boolean isSingleResult) {
 
 		// TODO FALTA LES CONDICIONS PER QUINES MASSIVES POT VEURE L'USUARI
 		// Condició per a mostrar només les notificacions massives de l'entitat actual

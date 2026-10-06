@@ -29,16 +29,16 @@ public abstract class BaseAuditableEntity<R extends Resource<?>, PK extends Seri
 		implements AuditableEntity {
 
 	@CreatedBy
-	@Column(name = "createdby_codi", length = 64, nullable = false)
+	@Column(name = "created_by", length = 64, nullable = false)
 	private String createdBy;
 	@CreatedDate
-	@Column(name = "createddate", nullable = false)
+	@Column(name = "created_date", nullable = false)
 	private LocalDateTime createdDate;
 	@LastModifiedBy
-	@Column(name = "lastmodifiedby_codi", length = 64)
+	@Column(name = "lastmodified_by", length = 64)
 	private String lastModifiedBy;
 	@LastModifiedDate
-	@Column(name = "lastmodifieddate")
+	@Column(name = "lastmodified_date")
 	private LocalDateTime lastModifiedDate;
 
 	@Override

@@ -1,12 +1,14 @@
 package es.caib.notib.back.base.util;
 
 import es.caib.notib.logic.intf.base.exception.ComponentNotFoundException;
+import es.caib.notib.logic.intf.base.model.Resource;
 import es.caib.notib.logic.intf.base.service.MutableResourceService;
 import es.caib.notib.logic.intf.base.service.ReadonlyResourceService;
 import es.caib.notib.logic.intf.base.util.TypeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 /**
@@ -20,9 +22,9 @@ public class ResourceServiceLocator {
 	@Autowired(required = false)
 	private Collection<ReadonlyResourceService<?, ?>> readonlyResourceServices;
 
-	public ReadonlyResourceService<?, ?> getReadOnlyEntityResourceServiceForResourceClass(
-			Class<?> resourceClass) throws ComponentNotFoundException {
-		ReadonlyResourceService<?, ?> resourceServiceFound = null;
+	public <R extends Resource<ID>, ID extends Serializable> ReadonlyResourceService<R, ID> getReadOnlyEntityResourceServiceForResourceClass(
+			Class<? extends Serializable> resourceClass) throws ComponentNotFoundException {
+		ReadonlyResourceService<R, ID> resourceServiceFound = null;
 		if (readonlyResourceServices != null) {
 			for (ReadonlyResourceService<?, ?> resourceService: readonlyResourceServices) {
 				Class<?> serviceResourceClass = TypeUtil.getArgumentClassFromGenericSuperclass(
@@ -30,7 +32,7 @@ public class ResourceServiceLocator {
 						ReadonlyResourceService.class,
 						0);
 				if (resourceClass.equals(serviceResourceClass)) {
-					resourceServiceFound = resourceService;
+					resourceServiceFound = (ReadonlyResourceService<R, ID>)resourceService;
 					break;
 				}
 			}
@@ -42,11 +44,11 @@ public class ResourceServiceLocator {
 		}
 	}
 
-	public MutableResourceService<?, ?> getMutableEntityResourceServiceForResourceClass(
-			Class<?> resourceClass) throws ComponentNotFoundException {
-		ReadonlyResourceService<?, ?> readOnlyService = getReadOnlyEntityResourceServiceForResourceClass(resourceClass);
+	public <R extends Resource<ID>, ID extends Serializable> MutableResourceService<R, ID> getMutableEntityResourceServiceForResourceClass(
+			Class<? extends Serializable> resourceClass) throws ComponentNotFoundException {
+		ReadonlyResourceService<R, ID> readOnlyService = getReadOnlyEntityResourceServiceForResourceClass(resourceClass);
 		if (readOnlyService instanceof MutableResourceService) {
-			return (MutableResourceService<?, ?>)readOnlyService;
+			return (MutableResourceService<R, ID>)readOnlyService;
 		} else {
 			throw new ComponentNotFoundException(resourceClass, "MutableResourceService for resource class " + resourceClass.getName());
 		}

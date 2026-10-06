@@ -22,7 +22,7 @@ class DocumentResourceServiceImplTest {
 
 	@Test
 	void additionalSpringFilterShouldReturnIdIsNull() {
-		String filter = service.additionalSpringFilter(null, null);
+		String filter = service.additionalSpringFilter(null, null, false);
 		assertEquals("id is null", filter);
 	}
 

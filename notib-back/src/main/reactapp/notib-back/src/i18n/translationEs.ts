@@ -538,6 +538,7 @@ const translationEs = {
                 dades: {
                     title: 'Datos de la notificación',
                     refrescar: "Refrescar la columna estado",
+                    calculant: "Calculando el estado actualizado...",
                     anulada: "La remesa tiene uno o más envíos anulados",
                     errorCanviEstat: "Ha habido error notificando al cliente del cambio de estado...",
                     justificant: 'Justificante',

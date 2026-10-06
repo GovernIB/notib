@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Tooltip, Typography } from '@mui/material';
+import { Box, CircularProgress, Tooltip, Typography } from '@mui/material';
 import MailIcon from '@mui/icons-material/Mail';
 import BlockIcon from '@mui/icons-material/Block';
 import WarningIcon from '@mui/icons-material/Warning';
@@ -18,6 +18,7 @@ import {ROLE_USER, useNotibContext} from "../../components/NotibContext.ts";
 export type NotificacioEstatRenderProps = {
     estatJson: any;
     estatEnum: string;
+    estatPendent?: boolean;
     notificacioId: number,
     refrescarEstat: (id: number) => void,
     sir: boolean
@@ -242,7 +243,7 @@ const refrescarEstatString = async (event: React.MouseEvent<HTMLDivElement, Mous
 // Dissenyat específicament per la cel·la del Grid de Notificacions
 export const NotificacioEstatGrid: React.FC<NotificacioEstatRenderProps> = (props) => {
 
-    const { estatJson, estatEnum, notificacioId, refrescarEstat, sir } = props;
+    const { estatJson, estatEnum, estatPendent, notificacioId, refrescarEstat, sir } = props;
     const { t } = useTranslation();
     let estatObjecte: any = null;
     const { currentRole} = useNotibContext();
@@ -253,9 +254,16 @@ export const NotificacioEstatGrid: React.FC<NotificacioEstatRenderProps> = (prop
                                         <RefreshIcon color="info" sx={{fontSize: '16px'}}/>
                                     </Tooltip>
                                 </Box>);
+    // L'estat mostrat és el darrer conegut i el servidor n'està calculant un d'actualitzat
+    const calculant = estatPendent ? (<Box sx={{display: "flex", justifyContent: "flex-end"}}>
+                                    <Tooltip title={t('page.notificacio.detail.dades.calculant')} arrow>
+                                        <CircularProgress size={12} />
+                                    </Tooltip>
+                                </Box>) : null;
+    const accio = calculant ?? (!isRoleUser ? refrescar : null);
     try {
         if (!estatJson) {
-            return !isRoleUser ? refrescar : null;
+            return accio;
         }
         estatObjecte = JSON.parse(estatJson);
     } catch (error) {
@@ -279,7 +287,7 @@ export const NotificacioEstatGrid: React.FC<NotificacioEstatRenderProps> = (prop
             <Box sx={{flex: 2, display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-start',}}>
                 <EntregaPostal entregaPostal={estatObjecte?.entregaPostal} />
             </Box>
-            {!isRoleUser && refrescar}
+            {accio}
         </Box>
     );
 };

@@ -138,6 +138,9 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 	private String organCodi;
 	@Column(name = "ORGAN_ID")
 	private String organId;
+	// Permís per procediment del llistat de remeses (vegeu NotificacioResourceServiceImpl.springFilterWithReadPermission)
+	@Column(name = "PROCEDIMENT_ID")
+	private Long procedimentId;
 	@Column(name = "ORGAN_NOM")
 	private String organNom;
 	@Column(name = "ORGAN_ESTAT")
@@ -163,6 +166,9 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 
 	@Column(name = "ESTAT_STRING", length = 2000)
 	private String estatString;
+	// Estat que mostra la columna estat del llistat de remeses, per ordenar-hi (es desa amb ESTAT_STRING, vegeu NotificacioTableMapper)
+	@Column(name = "ESTAT_LLISTAT")
+	private NotificacioEstatEnumDto estatLlistat;
 	@Column(name = "DOCUMENT_ID")
 	private Long documentId;
 	@Column(name = "ENV_CER_DATA")

@@ -81,6 +81,13 @@
 	<cache alias="organsAmbPermis" uses-template="default" />
 	<cache alias="organsAmbPermisPerConsulta" uses-template="default"/>
 	<cache alias="organsPermisPerProcedimentComu" uses-template="default" />
+	<!-- Codis de procediments i òrgans amb permís de processar (només per mostrar l'acció al llistat de
+	     remeses: l'acció torna a comprovar el permís). TTL curt per limitar el temps amb dades antigues. -->
+	<cache alias="codisPermisProcessar" uses-template="default">
+		<expiry>
+			<ttl unit="seconds">300</ttl>
+		</expiry>
+	</cache>
 
 	<!-- Procediment-òrgan -->
 	<cache alias="procserOrgansCodisAmbPermis" uses-template="default" />

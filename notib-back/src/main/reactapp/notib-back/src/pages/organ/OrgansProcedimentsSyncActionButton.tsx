@@ -44,7 +44,8 @@ export const OrgansProcedimentsSyncActionButton: React.FC<{ dataGridApiRef: MuiD
         }
     });
 
-    const formDialogButtons = [
+    // Memoritzat: useFormDialog torna a aplicar els botons quan canvia la referència de l'array (un array nou a cada render provoca un bucle infinit)
+    const formDialogButtons = React.useMemo(() => [
         {
             value: false,
             text: t('page.organs.grid.syncCombined.cancelar'),
@@ -56,7 +57,7 @@ export const OrgansProcedimentsSyncActionButton: React.FC<{ dataGridApiRef: MuiD
             icon: 'sync',
             componentProps: { variant: 'contained' },
         },
-    ];
+    ], [t]);
 
     return (
         <MuiActionReportButton

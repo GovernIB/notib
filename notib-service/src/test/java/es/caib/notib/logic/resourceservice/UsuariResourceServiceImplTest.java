@@ -47,7 +47,7 @@ class UsuariResourceServiceImplTest {
 	@Test
 	void additionalSpringFilterShouldReturnFilterWithUsername() {
 		when(authenticationHelper.getCurrentUserName()).thenReturn("user1");
-		String result = service.additionalSpringFilter("", new String[]{});
+		String result = service.additionalSpringFilter("", new String[]{}, false);
 		assertEquals("id:'user1'", result);
 	}
 

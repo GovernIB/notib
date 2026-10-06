@@ -6,9 +6,9 @@ import es.caib.notib.logic.base.helper.ObjectMappingHelper;
 import es.caib.notib.logic.base.helper.ResourceEntityMappingHelper;
 import es.caib.notib.logic.base.springfilter.FilterSpecification;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
+import es.caib.notib.logic.intf.base.annotation.ResourceArtifact;
 import es.caib.notib.logic.intf.base.annotation.ResourceField;
 import es.caib.notib.logic.intf.base.exception.*;
-import es.caib.notib.logic.intf.base.annotation.ResourceArtifact;
 import es.caib.notib.logic.intf.base.model.*;
 import es.caib.notib.logic.intf.base.service.ReadonlyResourceService;
 import es.caib.notib.logic.intf.base.util.StringUtil;
@@ -90,14 +90,27 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 				throw new IllegalStateException("Couldn't find BaseRepository<" + entityClass + ", " + pkClass + ">");
 			}
 		} else {
-			entityRepository = (BaseRepository<E, ID>)applicationContext.getBean(beanNames[0]);
+			entityRepository = (BaseRepository<E, ID>) applicationContext.getBean(beanNames[0]);
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * <p>Internament, el mètode segueix aquestes passes:
+	 * <ol>
+	 *   <li>Crida al mètode beforeGetOne.</li>
+	 *   <li>Consulta l'entitat de base de dades.</li>
+	 *   <li>Crida al mètode beforeConversion.</li>
+	 *   <li>Converteix l'entitat en el recurs.</li>
+	 *   <li>Crida al mètode afterConversion.</li>
+	 *   <li>Aplica les perspectives al recurs.</li>
+	 * </ol>
+	 */
 	@Override
 	@Transactional(readOnly = true)
-	public R getOne(ID id, String[] perspectives) throws ResourceNotFoundException {
-
+	public R getOne(
+			ID id,
+			String[] perspectives) throws ResourceNotFoundException {
 		log.debug("Getting single resource (id={}, perspectives={})", id, perspectives);
 		beforeGetOne(perspectives);
 		E entity = getEntity(id);
@@ -110,6 +123,18 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		return response;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * <p>Internament, el mètode aplica els filtres i les perspectives en aquest ordre:
+	 * <ol>
+	 *   <li>Crida al mètode beforeFind.</li>
+	 *   <li>Fa la consulta a la base de dades amb els filtres i paginació especificats.</li>
+	 *   <li>Crida al mètode beforeConversion.</li>
+	 *   <li>Converteix la llista d'entitats en recursos.</li>
+	 *   <li>Crida al mètode afterConversion.</li>
+	 *   <li>Aplica les perspectives a cada recurs.</li>
+	 * </ol>
+	 */
 	@Override
 	@Transactional(readOnly = true)
 	public Page<R> findPage(
@@ -164,6 +189,9 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		return response;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	@Transactional(readOnly = true)
 	public DownloadableFile export(
@@ -179,7 +207,8 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		log.debug(
 				"Querying entities for export with filter and pagination (" +
 						"quickFilter={}, filter={}, namedQueries={}, " +
-						"perspectives={}, pageable={}, fieldNamesAndLabels={}, fileType={})",
+						"perspectives={}, pageable={}, fieldNamesAndLabels={}, " +
+						"fileType={})",
 				quickFilter,
 				filter,
 				Arrays.toString(namedQueries),
@@ -220,6 +249,9 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		return exportFile;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	@Transactional(readOnly = true)
 	public DownloadableFile fieldDownload(
@@ -242,6 +274,9 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	@Transactional(readOnly = true)
 	public List<es.caib.notib.logic.intf.base.model.ResourceArtifact> artifactFindAll(ResourceArtifactType type) {
@@ -292,6 +327,9 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		return artifacts;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	@Transactional(readOnly = true)
 	public es.caib.notib.logic.intf.base.model.ResourceArtifact artifactGetOne(
@@ -346,6 +384,9 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		throw new ArtifactNotFoundException(getResourceClass(), type, code);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	@Transactional(readOnly = true)
 	public <P extends Serializable> Map<String, Object> artifactOnChange(
@@ -395,6 +436,9 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	@Transactional(readOnly = true)
 	public List<FieldOption> artifactFieldEnumOptions(
@@ -421,6 +465,9 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	@Transactional(readOnly = true)
 	public <P extends Serializable> List<?> artifactReportGenerateData(
@@ -453,6 +500,9 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	@Transactional(readOnly = true)
 	public DownloadableFile artifactReportGenerateFile(
@@ -512,8 +562,8 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		} else {
 			String idToString = id != null ? id.toString() : "<null>";
 			String idMessage = idToString;
-			String additionalSpringFilter = additionalSpringFilter(null, null);
-			Specification<E> additionalSpecification = additionalSpecification(null);
+			String additionalSpringFilter = additionalSpringFilter(null, null, true);
+			Specification<E> additionalSpecification = additionalSpecification(null, true);
 			if (additionalSpringFilter != null && !additionalSpringFilter.trim().isEmpty()) {
 				idMessage = "{" +
 						"id=" + idToString + ", " +
@@ -532,30 +582,39 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		return entities.stream().map(this::entityToResource).collect(Collectors.toList());
 	}
 
-	protected void applyPerspectives(List<E> entities, List<R> resources, String[] perspectives) throws ArtifactNotFoundException {
-
+	protected void applyPerspectives(
+			List<E> entities,
+			List<R> resources,
+			String[] perspectives) throws ArtifactNotFoundException {
 		Arrays.stream(perspectives).forEach(p -> {
 			PerspectiveApplicator<E, R> perspectiveApplicator = perspectiveApplicatorMap.get(p);
-			if (perspectiveApplicator == null) {
+			if (perspectiveApplicator != null) {
+				boolean modified = perspectiveApplicator.applyMultiple(p, entities, resources);
+				if (!modified) {
+					IntStream.range(0, entities.size()).forEach(i -> {
+						perspectiveApplicator.applySingle(
+								p,
+								entities.get(i),
+								resources.get(i));
+					});
+				}
+			} else {
 				throw new ArtifactNotFoundException(getResourceClass(), ResourceArtifactType.PERSPECTIVE, p);
-			}
-			var modified = perspectiveApplicator.applyMultiple(p, entities, resources);
-			if (!modified) {
-				IntStream.range(0, entities.size()).forEach(i -> {
-					perspectiveApplicator.applySingle(p, entities.get(i), resources.get(i));
-				});
 			}
 		});
 	}
 
-	protected void applyPerspectives(E entity, R resource, String[] perspectives) {
-
+	protected void applyPerspectives(
+			E entity,
+			R resource,
+			String[] perspectives) {
 		Arrays.stream(perspectives).forEach(p -> {
 			PerspectiveApplicator<E, R> perspectiveApplicator = perspectiveApplicatorMap.get(p);
-			if (perspectiveApplicator == null) {
+			if (perspectiveApplicator != null) {
+				perspectiveApplicator.applySingle(p, entity, resource);
+			} else {
 				throw new ArtifactNotFoundException(getResourceClass(), ResourceArtifactType.PERSPECTIVE, p);
 			}
-			perspectiveApplicator.applySingle(p, entity, resource);
 		});
 	}
 
@@ -565,8 +624,9 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			return Arrays.stream(resourceAnnotation.defaultSortFields()).
 					map(s -> new SortedField(s.field(), s.direction())).
 					collect(Collectors.toList());
+		} else {
+			return Collections.emptyList();
 		}
-		return Collections.emptyList();
 	}
 
 	protected void onChangeCheckIfFieldExists(Class<?> formClass, String fieldName) {
@@ -704,39 +764,134 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		}
 	}
 
+	/**
+	 * Retorna una expressió Spring Filter que s'aplica a totes les consultes d'aquest recurs a la base de dades.
+	 *
+	 * @param currentSpringFilter
+	 *            el filtre actual
+	 * @param namedQueries
+	 *            la llista de namedQueries de la petició
+	 * @param isSingleResult
+	 *            indica si s'està consultant un sol element.
+	 * @return l'expressió Spring Filter (si es retorna null no s'aplicarà cap expressió addicional)
+	 */
 	protected String additionalSpringFilter(
 			String currentSpringFilter,
-			String[] namedQueries) {
+			String[] namedQueries,
+			boolean isSingleResult) {
 		return null;
 	}
 
-	protected Specification<E> additionalSpecification(String[] namedQueries) {
+	/**
+	 * Retorna una specification que s'aplica a totes les consultes d'aquest recurs a la base de dades.
+	 *
+	 * @param namedQueries
+	 *            la llista de namedQueries de la petició
+	 * @param isSingleResult
+	 *            indica si s'està consultant un sol element.
+	 * @return la specification (si es retorna null no s'aplicarà cap specification)
+	 */
+	protected Specification<E> additionalSpecification(String[] namedQueries, boolean isSingleResult) {
 		return null;
 	}
 
+	/**
+	 * Converteix una namedQuery a una expressió Spring Filter.
+	 *
+	 * @param namedQuery
+	 *            la namedQuery a convertir
+	 * @return l'expressió Spring Filter (si es retorna null no s'aplicarà cap expressió addicional)
+	 */
 	protected String namedQueryToSpringFilter(String namedQuery) {
 		return null;
 	}
+
+	/**
+	 * Converteix una namedQuery a una specification.
+	 *
+	 * @param namedQuery
+	 *            la namedQuery a convertir
+	 * @return la specification (si es retorna null no s'aplicarà cap specification)
+	 * @param <P> el tipus de la specification
+	 */
 	protected <P> Specification<P> namedQueryToSpecification(String namedQuery) {
 		return null;
 	}
 
+	/**
+	 * Modifica l'specification abans d'executar la consulta de base de dades.
+	 *
+	 * @param specification
+	 *            la specification a processar
+	 * @return la specification processada
+	 * @param <P> el tipus de la specification
+	 */
 	protected <P> Specification<P> processSpecification(Specification<P> specification) {
 		return specification;
 	}
 
+	/**
+	 * Modifica l'ordenació abans d'aplicar-la a la consulta de base de dades.
+	 *
+	 * @param sort
+	 *            l'ordenació a processar
+	 * @return l'ordenació a processada
+	 */
 	protected Sort processSort(Sort sort) {
 		return sort;
 	}
 
+	/**
+	 * Mètode que s'executa abans de consultar un recurs pel seu identificador.
+	 *
+	 * @param perspectives
+	 *            la llista de perspectives a aplicar a la consulta
+	 */
 	protected void beforeGetOne(String[] perspectives) {}
+
+	/**
+	 * Mètode que s'executa abans de consultar múltiples recursos.
+	 *
+	 * @param quickFilter
+	 *            filtre ràpid en format text (pot ser {@code null})
+	 * @param springFilter
+	 *            consulta en format Spring Filter (pot ser {@code null})
+	 * @param namedQueries
+	 *            llista de noms de consultes a aplicar (pot ser {@code null})
+	 * @param pageable
+	 *            paràmetres de paginació i ordenació (no pot ser {@code null})
+	 */
 	protected void beforeFind(
 			String quickFilter,
 			String springFilter,
 			String[] namedQueries,
 			Pageable pageable) {}
+
+	/**
+	 * Mètode que s'executa abans de convertir l'entitat en recurs.
+	 *
+	 * @param entity
+	 *            la informació de l'entitat
+	 */
 	protected void beforeConversion(E entity) {}
+
+	/**
+	 * Mètode que s'executa després de convertir l'entitat en recurs.
+	 *
+	 * @param entity
+	 *            la informació de l'entitat
+	 * @param resource
+	 *            la informació del recurs
+	 */
 	protected void afterConversion(E entity, R resource) {}
+
+	/**
+	 * Mètode que s'executa abans de convertir múltiples entitats en recursos.
+	 * Si no es sobreescriu aquest mètode es cridarà a beforeConversion amb cada entitat.
+	 *
+	 * @param entities
+	 *            la llista d'entitats
+	 */
 	protected void beforeConversion(List<E> entities) {
 		if (entities != null) {
 			for (E entity: entities) {
@@ -744,6 +899,16 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			}
 		}
 	}
+
+	/**
+	 * Mètode que s'executa després de convertir múltiples entitats en recursos.
+	 * Si no es sobreescriu aquest mètode es cridarà a afterConversion amb cada entitat-recurs.
+	 *
+	 * @param entities
+	 *            la llista d'entitats
+	 * @param resources
+	 *            la llista de recursos
+	 */
 	protected void afterConversion(List<E> entities, List<R> resources) {
 		if (resources != null) {
 			for (int i = 0; i < resources.size(); i++) {
@@ -819,7 +984,9 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		}
 	}
 
-	protected void register(String reportCode, ReportGenerator<E, ?, ?> reportGenerator) {
+	protected void register(
+			String reportCode,
+			ReportGenerator<E, ?, ?> reportGenerator) {
 		if (artifactIsPresentInResourceConfig(ResourceArtifactType.REPORT, reportCode)) {
 			reportGeneratorMap.put(reportCode, reportGenerator);
 		} else {
@@ -856,7 +1023,9 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		}
 	}
 
-	protected void register(String fieldName, FieldDownloader<E> fieldDownloader) {
+	protected void register(
+			String fieldName,
+			FieldDownloader<E> fieldDownloader) {
 		fieldDownloaderMap.put(fieldName, fieldDownloader);
 	}
 
@@ -869,33 +1038,59 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		return entityRepository.findOne(specification);
 	}
 
-	protected Page<E> entityRepositoryFindEntities(String quickFilter, String filter, String[] namedQueries, Pageable pageable) {
-
-		Specification<E> specification = toFindProcessedSpecification(quickFilter, filter, namedQueries);
+	protected Page<E> entityRepositoryFindEntities(
+			String quickFilter,
+			String filter,
+			String[] namedQueries,
+			Pageable pageable) {
+		Specification<E> specification = toFindProcessedSpecification(
+				quickFilter,
+				filter,
+				namedQueries);
 		log.debug("Consulta amb specification ({})", specification);
 		Sort processedSort = toProcessedSort(pageable.getSort());
 		if (pageable.isUnpaged()) {
 			List<E> resultList = entityRepository.findAll(specification, processedSort);
 			return new PageImpl<>(resultList, pageable, resultList.size());
+		} else {
+			Pageable processedPageable = PageRequest.of(
+					pageable.getPageNumber(),
+					pageable.getPageSize(),
+					processedSort);
+			return entityRepository.findAll(specification, processedPageable);
 		}
-		Pageable processedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), processedSort);
-		return entityRepository.findAll(specification, processedPageable);
 	}
 
 	protected Specification<E> toGetOneProcessedSpecification(ID id) {
-
 		Specification<E> processedSpecification = new PkSpec<>(id);
-		String additionalSpringFilter = additionalSpringFilter(null, null);
-		processedSpecification = appendSpecificationWithAnd(processedSpecification, getSpringFilterSpecification(additionalSpringFilter));
-		return appendSpecificationWithAnd(processedSpecification, additionalSpecification(null));
+		String additionalSpringFilter = additionalSpringFilter(null, null, true);
+		processedSpecification = appendSpecificationWithAnd(
+				processedSpecification,
+				getSpringFilterSpecification(additionalSpringFilter));
+		return appendSpecificationWithAnd(
+				processedSpecification,
+				additionalSpecification(null, true));
 	}
 
-	protected <P> Specification<P> toFindProcessedSpecification(String quickFilter, String filter, String[] namedQueries) {
-
-		Specification<P> processedSpecification = getSpringFilterSpecification(buildSpringFilterForQuickFilter(getResourceClass(), null, quickFilter));
-		processedSpecification = appendSpecificationWithAnd(processedSpecification, getSpringFilterSpecification(filter));
-		processedSpecification = appendSpecificationWithAnd(processedSpecification, getSpringFilterSpecification(additionalSpringFilter(filter, namedQueries)));
-		processedSpecification = appendSpecificationWithAnd(processedSpecification, (Specification<P>)additionalSpecification(namedQueries));
+	protected <P> Specification<P> toFindProcessedSpecification(
+			String quickFilter,
+			String filter,
+			String[] namedQueries) {
+		Specification<P> processedSpecification = getSpringFilterSpecification(
+				buildSpringFilterForQuickFilter(
+						getResourceClass(),
+						null,
+						quickFilter));
+		processedSpecification = appendSpecificationWithAnd(
+				processedSpecification,
+				getSpringFilterSpecification(filter));
+		processedSpecification = appendSpecificationWithAnd(
+				processedSpecification,
+				getSpringFilterSpecification(
+						additionalSpringFilter(filter, namedQueries, false)));
+		processedSpecification = appendSpecificationWithAnd(
+				processedSpecification,
+				(Specification<P>)additionalSpecification(namedQueries, false));
 		if (namedQueries != null) {
 			for (String namedQuery: namedQueries) {
 				Specification<P> namedSpecification;
@@ -905,7 +1100,9 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 				} else {
 					namedSpecification = namedQueryToSpecification(namedQuery);
 				}
-				processedSpecification = appendSpecificationWithAnd(processedSpecification, namedSpecification);
+				processedSpecification = appendSpecificationWithAnd(
+						processedSpecification,
+						namedSpecification);
 			}
 		}
 		Specification<P> finalSpecification = processSpecification(processedSpecification);
@@ -913,7 +1110,11 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	}
 
 	protected <P> Specification<P> getSpringFilterSpecification(String springFilter) {
-		return springFilter != null ? new FilterSpecification<>(springFilter) : null;
+		if (springFilter != null) {
+			return new FilterSpecification<>(springFilter);
+		} else {
+			return null;
+		}
 	}
 
 	protected <P> Specification<P> appendSpecificationWithAnd(
@@ -1411,7 +1612,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		 * Retorna l'arxiu associat.
 		 *
 		 * @param entity
-		 *            l'entitat amb els valors previs a la modificació.
+		 *            l'entitat de base de dades.
 		 * @param fieldName
 		 *            el nom del camp de l'entitat.
 		 * @param out

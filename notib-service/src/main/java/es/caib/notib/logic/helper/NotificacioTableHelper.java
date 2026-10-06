@@ -15,6 +15,7 @@ import es.caib.notib.persist.entity.NotificacioTableEntity;
 import es.caib.notib.persist.repository.EnviamentTableRepository;
 import es.caib.notib.persist.repository.NotificacioEventRepository;
 import es.caib.notib.persist.repository.NotificacioMassivaRepository;
+import es.caib.notib.persist.repository.NotificacioRepository;
 import es.caib.notib.persist.repository.NotificacioTableViewRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.EnumUtils;
@@ -36,6 +37,8 @@ public class NotificacioTableHelper {
     @Autowired
     private NotificacioMassivaRepository notificacioMassivaRepository;
     @Autowired
+    private NotificacioRepository notificacioRepository;
+    @Autowired
     private EnviamentTableRepository enviamentTableRepository;
     @Autowired
     private SseEventService sseEventService;
@@ -54,71 +57,88 @@ public class NotificacioTableHelper {
     }
 
 
+    /**
+     * Crea el registre d'una remesa que no en té (vegeu NotificacioTableReparacioHelper). El registre
+     * conserva l'usuari i la data de creació de la remesa, que el llistat JSP mostra i permet filtrar.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void crearRegistreEnTransaccioNova(Long notificacioId) {
+        var notificacio = notificacioRepository.findById(notificacioId).orElse(null);
+        if (notificacio == null) {
+            return;
+        }
+        var registre = crearRegistre(notificacio);
+        // Després de l'INSERT: l'auditoria només omple aquests camps en crear l'entitat
+        notificacioTableViewRepository.flush();
+        notificacio.getCreatedBy().ifPresent(registre::setCreatedBy);
+        notificacio.getCreatedDate().ifPresent(registre::setCreatedDate);
+    }
+
     @Transactional(propagation = Propagation.MANDATORY)
     public NotificacioTableEntity crearRegistre(NotificacioEntity notificacio){
 
         log.info(String.format("[NOTIF-TABLE] Cream el registre de la notificacio [Id: %d]", notificacio.getId()));
-        try {
-            // Camps calcaulats a partir de valors dels enviaments
-            StringBuilder titular = new StringBuilder();
+        // Si falla, l'error es propaga i es desfà l'alta de la remesa: una remesa sense registre a
+        // not_notificacio_table no surt al llistat JSP i faria inexacte el total del llistat de React
+        // Camps calcaulats a partir de valors dels enviaments
+        StringBuilder titular = new StringBuilder();
 //            var notificaIds = "";
-            Integer estatMask;
-            var entregaPostal = true;
-            if (notificacio.getEnviaments() != null) {
-                for (NotificacioEnviamentEntity e : notificacio.getEnviaments()) {
-                    if (e.getTitular() != null) {
-                        titular.append(e.getTitular().getNomFormatted()).append(", ");
-                    }
-                    entregaPostal = entregaPostal && e.getEntregaPostal() != null;
+        Integer estatMask;
+        var entregaPostal = true;
+        if (notificacio.getEnviaments() != null) {
+            for (NotificacioEnviamentEntity e : notificacio.getEnviaments()) {
+                if (e.getTitular() != null) {
+                    titular.append(e.getTitular().getNomFormatted()).append(", ");
                 }
-                if (titular.length() > 2)
-                    titular = new StringBuilder(titular.substring(0, titular.length() - 2));
+                entregaPostal = entregaPostal && e.getEntregaPostal() != null;
             }
-            estatMask = NotificacioEstatEnumDto.ENVIANT.getMask();
+            if (titular.length() > 2)
+                titular = new StringBuilder(titular.substring(0, titular.length() - 2));
+        }
+        estatMask = NotificacioEstatEnumDto.ENVIANT.getMask();
 
-            var tableViewItem = NotificacioTableEntity.builder()
-                    .notificacio(notificacio)
-                    .entitat(notificacio.getEntitat())
-                    .procedimentCodiNotib(notificacio.getProcedimentCodiNotib())
-                    .procedimentOrgan(notificacio.getProcedimentOrgan())
-                    .usuariCodi(notificacio.getUsuariCodi())
-                    .grupCodi(notificacio.getGrupCodi())
-                    .tipusUsuari(notificacio.getTipusUsuari())
-                    .caducitat(notificacio.getCaducitat())
-                    .notificaErrorData(null)
-                    .notificaErrorDescripcio(null)
-                    .enviamentTipus(notificacio.getEnviamentTipus())
-                    .numExpedient(notificacio.getNumExpedient())
-                    .concepte(notificacio.getConcepte())
-                    .estat(notificacio.getEstat())
-                    .estatDate(notificacio.getEstatDate())
-                    .estatProcessatDate(notificacio.getEstatProcessatDate())
-                    .entitatNom(notificacio.getEntitat().getNom())
-                    .procedimentCodi(notificacio.getProcediment() != null ? notificacio.getProcediment().getCodi() : null)
-                    .procedimentNom(notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : null)
-                    .procedimentIsComu(notificacio.getProcediment() != null && notificacio.getProcediment().isComu())
-                    .procedimentRequirePermission(notificacio.getProcediment() != null && notificacio.getProcediment().isRequireDirectPermission())
-                    .procedimentTipus(notificacio.getProcediment() != null ? notificacio.getProcediment().getTipus() : null)
-                    .organCodi(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getCodi() : null)
+        var tableViewItem = NotificacioTableEntity.builder()
+                .notificacio(notificacio)
+                .entitat(notificacio.getEntitat())
+                .procedimentCodiNotib(notificacio.getProcedimentCodiNotib())
+                .procedimentOrgan(notificacio.getProcedimentOrgan())
+                .usuariCodi(notificacio.getUsuariCodi())
+                .grupCodi(notificacio.getGrupCodi())
+                .tipusUsuari(notificacio.getTipusUsuari())
+                .caducitat(notificacio.getCaducitat())
+                .notificaErrorData(null)
+                .notificaErrorDescripcio(null)
+                .enviamentTipus(notificacio.getEnviamentTipus())
+                .numExpedient(notificacio.getNumExpedient())
+                .concepte(notificacio.getConcepte())
+                .estat(notificacio.getEstat())
+                .estatLlistat(NotificacioEstatEnumDto.PENDENT.equals(notificacio.getEstat()) && notificacio.getRegistreEnviamentIntent() == 0
+                        ? NotificacioEstatEnumDto.ENVIANT : notificacio.getEstat())
+                .estatDate(notificacio.getEstatDate())
+                .estatProcessatDate(notificacio.getEstatProcessatDate())
+                .entitatNom(notificacio.getEntitat().getNom())
+                .procedimentId(notificacio.getProcediment() != null ? notificacio.getProcediment().getId() : null)
+                .procedimentCodi(notificacio.getProcediment() != null ? notificacio.getProcediment().getCodi() : null)
+                .procedimentNom(notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : null)
+                .procedimentIsComu(notificacio.getProcediment() != null && notificacio.getProcediment().isComu())
+                .procedimentRequirePermission(notificacio.getProcediment() != null && notificacio.getProcediment().isRequireDirectPermission())
+                .procedimentTipus(notificacio.getProcediment() != null ? notificacio.getProcediment().getTipus() : null)
+                .organCodi(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getCodi() : null)
 					.organId(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getId() + "" : null)
 					.organNom(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getNom() : null)
-                    .organEstat(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getEstat() : null)
-                    .isErrorLastEvent(false)
-                    .notificacioMassiva(notificacio.getNotificacioMassivaEntity())
-                    .enviadaDate(getEnviadaDate(notificacio))
-                    .referencia(notificacio.getReferencia())
-                    .titular(titular.toString())
+                .organEstat(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getEstat() : null)
+                .isErrorLastEvent(false)
+                .notificacioMassiva(notificacio.getNotificacioMassivaEntity())
+                .enviadaDate(getEnviadaDate(notificacio))
+                .referencia(notificacio.getReferencia())
+                .titular(titular.toString())
 //                    .notificaIds(notificaIds)
-                    .registreNums("")
-                    .estatMask(estatMask)
-                    .entregaPostal(entregaPostal)
-                    .perActualitzar(true)
-                    .build();
-            return notificacioTableViewRepository.save(tableViewItem);
-        } catch (Exception ex) {
-            log.error("No ha estat possible crear la informació de la notificació " + notificacio.getId(), ex);
-        	return null;
-		}
+                .registreNums("")
+                .estatMask(estatMask)
+                .entregaPostal(entregaPostal)
+                .perActualitzar(true)
+                .build();
+        return notificacioTableViewRepository.save(tableViewItem);
     }
 
     @Transactional(propagation = Propagation.MANDATORY)
@@ -306,11 +326,13 @@ public class NotificacioTableHelper {
             tableViewItem.setEstatDate(notificacio.getEstatDate());
             tableViewItem.setEstatProcessatDate(notificacio.getEstatProcessatDate());
             tableViewItem.setEntitatNom(notificacio.getEntitat().getNom());
+            tableViewItem.setProcedimentId(notificacio.getProcediment() != null ? notificacio.getProcediment().getId() : null);
             tableViewItem.setProcedimentCodi(notificacio.getProcediment() != null ? notificacio.getProcediment().getCodi() : null);
             tableViewItem.setProcedimentNom(notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : null);
             tableViewItem.setProcedimentIsComu(notificacio.getProcediment() != null && notificacio.getProcediment().isComu());
             tableViewItem.setProcedimentRequirePermission(notificacio.getProcediment() != null && notificacio.getProcediment().isRequireDirectPermission());
             tableViewItem.setProcedimentTipus(notificacio.getProcediment() != null ? notificacio.getProcediment().getTipus() : null);
+            tableViewItem.setOrganId(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getId() + "" : null);
             tableViewItem.setOrganCodi(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getCodi() : null);
             tableViewItem.setOrganNom(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getNom() : null);
             tableViewItem.setOrganEstat(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getEstat() : null);

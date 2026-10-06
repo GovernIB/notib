@@ -20,6 +20,8 @@ import es.caib.notib.logic.enviaments.EnviarCallbackActionExecutor;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.LegacyHelper;
 import es.caib.notib.logic.helper.MessageHelper;
+import es.caib.notib.logic.helper.NotificacioEstatAsyncHelper;
+import es.caib.notib.logic.helper.NotificacioListHelper;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
@@ -70,6 +72,8 @@ import es.caib.notib.logic.notificacions.RegistrarRemesaActionExecutor;
 import es.caib.notib.persist.resourceentity.DocumentResourceEntity;
 import es.caib.notib.persist.resourceentity.NotificacioEnviamentResourceEntity;
 import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
+import es.caib.notib.persist.dialect.OracleCaibDialect;
+import es.caib.notib.persist.resourceentity.NotificacioTableResourceEntity;
 import es.caib.notib.persist.resourceentity.PersonaResourceEntity;
 import es.caib.notib.persist.resourcerepository.CallbackResourceRepository;
 import es.caib.notib.persist.resourcerepository.DocumentResourceRepository;
@@ -83,8 +87,15 @@ import es.caib.notib.persist.resourcerepository.UsuariResourceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.query.QueryUtils;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
@@ -93,10 +104,17 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.JoinType;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -129,6 +147,10 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 	private final AccioMassivaService accioMassivaService;
 	private final CallbackService callbackService;
 	private final ApplicationEventPublisher eventPublisher;
+	private final NotificacioEstatAsyncHelper notificacioEstatAsyncHelper;
+	private final NotificacioListHelper notificacioListHelper;
+
+	private static final ThreadLocal<Boolean> consultaLlistat = new ThreadLocal<>();
 
 	@PostConstruct
 	public void init() {
@@ -140,7 +162,7 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 		register(NotificacioResource.Fields.caducitatDiesNaturals, new NotificacioResourceServiceImpl.CaducitatOnChangeLogicProcessor());
 		register(NotificacioResource.PERSPECTIVE_DOCUMENTS_NOTIFICACIO, new DocumentPerspectiveApplicator());
 		register(NotificacioResource.PERSPECTIVE_ENVIAMENTS_NOTIFICACIO, new EnviamentPerspectiveApplicator());
-		register(NotificacioResource.PERSPECTIVE_NOTIFICACIO_DETALL, new NotificacioDetallPerspectiveApplicator(notificacioEnviamentResourceRepository, configHelper, callbackResourceRepository, eventResourceRepository, messageHelper, notibPermissionHelper, usuariResourceRepository));
+		register(NotificacioResource.PERSPECTIVE_NOTIFICACIO_DETALL, new NotificacioDetallPerspectiveApplicator(notificacioEnviamentResourceRepository, configHelper, callbackResourceRepository, eventResourceRepository, messageHelper, usuariResourceRepository));
 		register(NotificacioResource.PERSPECTIVE_OPERADORS_CIE_POSTAL, new OperadorPostalCiePerspectiveApplicator());
 		register(NotificacioResource.PERSPECTIVE_GRUP, new GrupPerspectiveApplicator());
 		register(NotificacioResource.REPORT_DESCARREGAR_JUSTIFICANT_NOTIFICACIO, new JusitficantEnviamentReportGenerator(justificantService));
@@ -151,7 +173,7 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 		register(NotificacioResource.REPORT_DESCARREGAR_CERTIFICACIO_MASSIU, new CertificacioMassiuReportGenerator(accioMassivaService, notificacioService, userSessionHelper, authenticationHelper));
 		register(NotificacioResource.ACTION_ANULAR_REMESA, new AnularRemesaActionExecutor(notificacioService));
 		register(NotificacioResource.ACTION_AMPLIAR_TERMINI, new AmpliarTerminiRemesaActionExecutor(notificacioService));
-		register(NotificacioResource.ACTION_MARCAR_PROCESSAT, new MarcarProcessatActionExecutor(notificacioService));
+		register(NotificacioResource.ACTION_MARCAR_PROCESSAT, new MarcarProcessatActionExecutor(notificacioService, notibPermissionHelper));
 		register(NotificacioResource.ACTION_ESBORRAR_REMESA, new EsborrarRemesaActionExecutor(notificacioService, messageHelper));
 		register(NotificacioResource.ACTION_RECUPERAR_REMESA, new RecuperarRemesaActionExecutor(notificacioService, messageHelper));
 		register(NotificacioResource.ACTION_ENVIAR_CALLBACK, new EnviarCallbackActionExecutor(callbackService));
@@ -170,35 +192,364 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 		register(NotificacioResource.ACTION_REACTIVAR_CALLBACKS_MASSIU, new ReactivarCallbacksMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper, enviamentService));
 		register(NotificacioResource.ACTION_REENVIAR_CALLBACKS_MASSIU, new ReenviarCallbacksMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper, enviamentService));
 		register(NotificacioResource.ACTION_ENVIAR_NOTIFICACIONS_MOVIL_MASSIU, new EnviarNotificacionsMovilMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper, enviamentService));
-		register(NotificacioResource.ACTION_MARCAR_PROCESSAT_MASSIU, new MarcarProcessatMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper));
+		register(NotificacioResource.ACTION_MARCAR_PROCESSAT_MASSIU, new MarcarProcessatMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper, notibPermissionHelper));
 		register(NotificacioResource.ACTION_ANULAR_MASSIU, new AnularMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper));
 		register(NotificacioResource.ACTION_AMPLIAR_TERMINI_MASSIU, new AmpliarTerminiMassiuActionExecutor(accioMassivaService, userSessionHelper, authenticationHelper));
 		register(NotificacioResource.REFRESCAR_ESTAT, new RefrescarEstatActionExecutor(legacyHelper));
 	}
 
 	@Override
-	protected NotificacioResource entityToResource(NotificacioResourceEntity entity) {
+	@Transactional(readOnly = true)
+	public Page<NotificacioResource> findPage(String quickFilter, String filter, String[] namedQueries, String[] perspectives, Pageable pageable) {
 
-		var resource = super.entityToResource(entity);
-		var estatString = entity.getEstatString();
-		if (Boolean.TRUE.equals(entity.getPerActualitzar())) {
-			// L'estat de la remesa encara no s'havia generat: el generam ara mateix perquè es
-			// pugui mostrar ja en aquesta mateixa càrrega del llistat. actualitzarColumnaEstat
-			// calcula i persisteix el nou estatString en una transacció (REQUIRES_NEW) separada
-			// de la d'aquesta petició, per la qual cosa cal emprar directament el valor que
-			// retorna en lloc de rellegir entity.getEstatString(), que no reflecteix els canvis
-			// fets a la transacció ja finalitzada de l'altre servei.
-			var estatStringActualitzat = legacyHelper.actualitzarColumnaEstat(entity);
-			if (estatStringActualitzat != null) {
-				estatString = estatStringActualitzat;
-			}
+		// Només la càrrega del llistat pot diferir el càlcul de l'estat: altres conversions de
+		// múltiples remeses (p.ex. l'exportació) necessiten el valor definitiu
+		consultaLlistat.set(true);
+		try {
+			return super.findPage(quickFilter, filter, namedQueries, perspectives, pageable);
+		} finally {
+			consultaLlistat.remove();
 		}
-		resource.setEstatString(estatString);
-		return resource;
 	}
 
 	@Override
-	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+	protected NotificacioResource entityToResource(NotificacioResourceEntity entity) {
+
+		var resource = super.entityToResource(entity);
+		resource.setEstatString(entity.getEstatString());
+		return resource;
+	}
+
+	/*
+	 * Les remeses amb l'estat pendent d'actualitzar (per_actualitzar) es recalculen totes juntes en
+	 * una sola transacció, o bé de manera asíncrona (enviant el resultat via SSE) si així ho indica
+	 * la propietat es.caib.notib.app.llistat.remeses.estat.asincron.
+	 */
+	@Override
+	protected void afterConversion(List<NotificacioResourceEntity> entities, List<NotificacioResource> resources) {
+
+		emplenarPermisProcessar(entities, resources);
+		Map<Long, NotificacioResource> pendents = new LinkedHashMap<>();
+		for (int i = 0; i < entities.size(); i++) {
+			if (Boolean.TRUE.equals(entities.get(i).getPerActualitzar())) {
+				pendents.put(entities.get(i).getId(), resources.get(i));
+			}
+		}
+		if (pendents.isEmpty()) {
+			return;
+		}
+		var asincron = Boolean.TRUE.equals(consultaLlistat.get()) && configHelper.getConfigAsBoolean(NotificacioEstatAsyncHelper.PROPERTY_ESTAT_ASINCRON, true);
+		if (asincron) {
+			pendents.values().forEach(r -> r.setEstatPendent(true));
+			notificacioEstatAsyncHelper.calcularEstatsAsync(pendents.keySet(), authenticationHelper.getCurrentUserName());
+			return;
+		}
+		actualitzarEstats(pendents);
+	}
+
+	@Override
+	protected void afterConversion(NotificacioResourceEntity entity, NotificacioResource resource) {
+
+		emplenarPermisProcessar(List.of(entity), List.of(resource));
+		if (Boolean.TRUE.equals(entity.getPerActualitzar())) {
+			actualitzarEstats(Map.of(entity.getId(), resource));
+		}
+	}
+
+	/*
+	 * Permís per a marcar com a processada (acció MARCAR_PROCESSAT del llistat i del detall): remeses
+	 * finalitzades sobre el procediment o l'òrgan gestor de les quals l'usuari actual té permís de
+	 * processar. És la mateixa regla que aplica NotificacioServiceImpl.marcarComProcessada
+	 * (PermisosService.hasNotificacioPermis), però calculant els codis amb permís un sol cop.
+	 */
+	private void emplenarPermisProcessar(List<NotificacioResourceEntity> entities, List<NotificacioResource> resources) {
+
+		List<String> codisAmbPermis = null;
+		for (int i = 0; i < entities.size(); i++) {
+			var entity = entities.get(i);
+			if (!NotificacioEstatEnumDto.FINALITZADA.equals(entity.getEstat())) {
+				continue;
+			}
+			if (codisAmbPermis == null) {
+				codisAmbPermis = getCodisAmbPermisProcessar();
+			}
+			var procedimentCodi = entity.getProcediment() != null ? entity.getProcediment().getCodi() : null;
+			var organCodi = entity.getOrganGestor() != null ? entity.getOrganGestor().getCodi() : null;
+			resources.get(i).setPermisProcessar(
+					(procedimentCodi != null && codisAmbPermis.contains(procedimentCodi)) ||
+					(organCodi != null && codisAmbPermis.contains(organCodi)));
+		}
+	}
+
+	private List<String> getCodisAmbPermisProcessar() {
+
+		var entitatId = userSessionHelper.getCurrentEntitatId();
+		if (entitatId == null) {
+			return List.of();
+		}
+		try {
+			return notificacioListHelper.getCodisProcedimentsAndOrgansAmpPermisProcessar(entitatId, authenticationHelper.getCurrentUserName());
+		} catch (Exception ex) {
+			log.error("Error obtenint els permisos de processar de l'usuari actual", ex);
+			return List.of();
+		}
+	}
+
+	private void actualitzarEstats(Map<Long, NotificacioResource> pendents) {
+
+		// actualitzarColumnesEstat persisteix els nous valors en una transacció (REQUIRES_NEW) separada
+		// d'aquesta, per això s'empren els valors que retorna en lloc de rellegir les entitats
+		try {
+			var estats = NotificacioEstatAsyncHelper.actualitzarColumnesEstat(legacyHelper, pendents.keySet());
+			pendents.forEach((id, resource) -> {
+				var estat = estats.get(id);
+				if (estat != null) {
+					resource.setEstatString(estat);
+				}
+			});
+		} catch (Exception ex) {
+			// Es mostra el darrer valor persistit: es tornarà a intentar a la propera consulta
+			log.error("Error actualitzant la columna estat de les remeses " + pendents.keySet(), ex);
+		}
+	}
+
+	// Columnes del llistat que no són camps de l'entitat i s'ordenen per un altre camp
+	private static final Map<String, String> CAMPS_ORDENACIO = Map.of(
+			// Valor calculat: igual que al llistat JSP, s'ordena per l'estat de la remesa
+			"estatString", "estat",
+			// Valors de not_notificacio_table (vegeu additionalSpecification)
+			"enviadaDate", "taula.enviadaDate",
+			"registreNums", "taula.registreNums",
+			"titular", "taula.titular");
+
+	@Override
+	protected Sort processSort(Sort sort) {
+
+		if (sort == null || sort.isUnsorted()) {
+			return sort;
+		}
+		return Sort.by(sort.stream()
+				.map(o -> CAMPS_ORDENACIO.containsKey(o.getProperty()) ? o.withProperty(CAMPS_ORDENACIO.get(o.getProperty())) : o)
+				.collect(Collectors.toList()));
+	}
+
+	// Màxim d'elements d'una clàusula IN a Oracle
+	private static final int MIDA_MAXIMA_IN = 1000;
+	// Columnes del llistat amb un nom diferent a not_notificacio_table
+	private static final Map<String, String> CAMPS_ORDENACIO_TAULA = Map.of(
+			"estatString", "estatLlistat",
+			"organGestor", "organGestorId",
+			"procediment", "procedimentId");
+	// Amb not_notificacio_table, els filtres per òrgan i procediment es fan amb les columnes de la taula: amb un JOIN
+	// a les taules d'òrgans i procediments, Oracle desdobla l'OR del filtre de permisos en una UNION i ha d'ordenar
+	// totes les remeses visibles per l'usuari en lloc de recórrer l'índex de l'ordenació
+	private static final java.util.regex.Pattern CAMPS_ID_TAULA = java.util.regex.Pattern.compile("\\b(organGestor|procediment|procedimentOrganGestor)\\.id\\b");
+	private static final ThreadLocal<Boolean> CONSULTA_TAULA = new ThreadLocal<>();
+	// Camps que not_notificacio_table té però no manté al dia: els filtres que els fan servir es fan amb not_notificacio
+	private static final java.util.regex.Pattern CAMPS_NO_FIABLES_TAULA = java.util.regex.Pattern.compile("\\bregistreEnviamentIntent\\b");
+
+	@PersistenceContext
+	private EntityManager entityManager;
+
+	@Override
+	protected Page<NotificacioResourceEntity> entityRepositoryFindEntities(String quickFilter, String filter, String[] namedQueries, Pageable pageable) {
+
+		if (pageable.isUnpaged() || pageable.getPageSize() > MIDA_MAXIMA_IN) {
+			return super.entityRepositoryFindEntities(quickFilter, filter, namedQueries, pageable);
+		}
+		// Es filtra, s'ordena, es pagina i es compta només amb not_notificacio_table (com el llistat JSP): els filtres
+		// són sobre la mateixa taula que l'ordenació, i la base de dades pot recórrer un índex i aturar-se a la
+		// pàgina. Si el filtre o l'ordenació fan servir algun camp que la taula no té, es fa amb not_notificacio.
+		PaginaIds pagina = null;
+		if (filter == null || !CAMPS_NO_FIABLES_TAULA.matcher(filter).find()) {
+			Specification<NotificacioTableResourceEntity> specificationTaula;
+			CONSULTA_TAULA.set(true);
+			try {
+				specificationTaula = toFindProcessedSpecification(quickFilter, filter, namedQueries);
+			} finally {
+				CONSULTA_TAULA.remove();
+			}
+			pagina = consultarIds(NotificacioTableResourceEntity.class, specificationTaula, ordenacioTaula(pageable.getSort()), pageable, true);
+		}
+		if (pagina == null) {
+			Specification<NotificacioResourceEntity> specification = toFindProcessedSpecification(quickFilter, filter, namedQueries);
+			pagina = consultarIds(NotificacioResourceEntity.class, specification, toProcessedSort(pageable.getSort()), pageable, false);
+		}
+		// Les remeses de la pàgina es carreguen per id, amb la taula. Els ids ja compleixen els filtres i els permisos.
+		List<NotificacioResourceEntity> content = new ArrayList<>();
+		if (!pagina.ids.isEmpty()) {
+			var ids = pagina.ids;
+			Specification<NotificacioResourceEntity> perIds = (r, q, b) -> r.get("id").in(ids);
+			var perId = entityRepository.findAll(perIds.and(additionalSpecification(namedQueries, false))).stream()
+					.collect(Collectors.toMap(NotificacioResourceEntity::getId, Function.identity()));
+			ids.stream().map(perId::get).filter(Objects::nonNull).forEach(content::add);
+		}
+		return new PageImpl<>(content, pageable, pagina.total);
+	}
+
+	@Override
+	protected <P> Specification<P> getSpringFilterSpecification(String springFilter) {
+		if (springFilter != null && Boolean.TRUE.equals(CONSULTA_TAULA.get())) {
+			springFilter = filtreTaula(springFilter);
+		}
+		return super.getSpringFilterSpecification(springFilter);
+	}
+
+	/**
+	 * Filtre per a la consulta amb not_notificacio_table: "organGestor.id" passa a "organGestorId", etc.
+	 */
+	static String filtreTaula(String springFilter) {
+		return CAMPS_ID_TAULA.matcher(springFilter).replaceAll("$1Id");
+	}
+
+	@RequiredArgsConstructor
+	private static class PaginaIds {
+		private final List<Long> ids;
+		private final long total;
+	}
+
+	/**
+	 * Compta les files de la consulta i en retorna els ids de la pàgina. Les pàgines de la segona meitat es
+	 * consulten amb l'ordenació invertida, des del final: amb OFFSET, la base de dades ha de recórrer totes les
+	 * files anteriors a la pàgina, i així la darrera pàgina costa el mateix que la primera.
+	 *
+	 * @param opcional
+	 *            si és true i la consulta no es pot construir amb aquesta entitat (algun camp del filtre o de
+	 *            l'ordenació no hi existeix), retorna null en lloc de llançar l'excepció.
+	 */
+	private <T> PaginaIds consultarIds(Class<T> entityClass, Specification<T> specification, Sort sort, Pageable pageable, boolean opcional) {
+
+		var cb = entityManager.getCriteriaBuilder();
+		var countQuery = cb.createQuery(Long.class);
+		var countRoot = countQuery.from(entityClass);
+		var idsQuery = cb.createQuery(Long.class);
+		var idsRoot = idsQuery.from(entityClass);
+		try {
+			var countPredicate = specification.toPredicate(countRoot, countQuery, cb);
+			countQuery.select(cb.count(countRoot));
+			if (countPredicate != null) {
+				countQuery.where(countPredicate);
+			}
+			var idsPredicate = specification.toPredicate(idsRoot, idsQuery, cb);
+			if (idsPredicate != null) {
+				idsQuery.where(idsPredicate);
+			}
+		} catch (RuntimeException ex) {
+			if (!opcional) {
+				throw ex;
+			}
+			log.debug("Llistat de remeses: el filtre no es pot aplicar a {}, es consulta amb not_notificacio ({})", entityClass.getSimpleName(), ex.getMessage());
+			return null;
+		}
+		long total = entityManager.createQuery(countQuery).getSingleResult();
+		long offset = pageable.getOffset();
+		if (offset >= total) {
+			return new PaginaIds(List.of(), total);
+		}
+		int mida = (int) Math.min(pageable.getPageSize(), total - offset);
+		var invertir = offset > (total - offset - mida);
+		var ordenacio = invertir ? invertir(sort) : sort;
+		try {
+			idsQuery.select(idsRoot.get("id")).orderBy(NotificacioTableResourceEntity.class.equals(entityClass)
+					? ordresTaula(ordenacio, idsRoot, cb)
+					: QueryUtils.toOrders(ordenacio, idsRoot, cb));
+		} catch (RuntimeException ex) {
+			if (!opcional) {
+				throw ex;
+			}
+			log.debug("Llistat de remeses: l'ordenació no es pot aplicar a {}, es consulta amb not_notificacio ({})", entityClass.getSimpleName(), ex.getMessage());
+			return null;
+		}
+		List<Long> ids = new ArrayList<>(entityManager.createQuery(idsQuery)
+				.setFirstResult((int) (invertir ? total - offset - mida : offset))
+				.setMaxResults(mida)
+				.getResultList());
+		if (invertir) {
+			java.util.Collections.reverse(ids);
+		}
+		return new PaginaIds(ids, total);
+	}
+
+	/**
+	 * Ordres de la consulta del llistat amb not_notificacio_table. Els camps de text s'ordenen amb la funció
+	 * ordre_text del dialecte (a Oracle, NLSSORT amb NLS_SORT=GENERIC_M): l'ordre alfabètic no depèn de l'idioma
+	 * de la sessió, i coincideix amb l'expressió dels índexs d'ordenació de la taula.
+	 */
+	private List<javax.persistence.criteria.Order> ordresTaula(Sort sort, javax.persistence.criteria.Root<?> root, javax.persistence.criteria.CriteriaBuilder cb) {
+
+		var ambFuncioText = isFuncioOrdreTextDisponible();
+		List<javax.persistence.criteria.Order> ordres = new ArrayList<>();
+		for (var order : sort) {
+			if (order.getProperty().contains(".")) {
+				ordres.addAll(QueryUtils.toOrders(Sort.by(order), root, cb));
+				continue;
+			}
+			javax.persistence.criteria.Expression<?> expressio = root.get(order.getProperty());
+			if (ambFuncioText && String.class.equals(expressio.getJavaType())) {
+				expressio = cb.function(OracleCaibDialect.FUNCIO_ORDRE_TEXT, String.class, expressio);
+			}
+			ordres.add(order.isAscending() ? cb.asc(expressio) : cb.desc(expressio));
+		}
+		return ordres;
+	}
+
+	// Si el dialecte de Hibernate configurat no és un dels de Notib, la funció no existeix i s'ordena per la columna
+	private boolean isFuncioOrdreTextDisponible() {
+		return entityManager.getEntityManagerFactory().unwrap(org.hibernate.engine.spi.SessionFactoryImplementor.class)
+				.getSqlFunctionRegistry().findSQLFunction(OracleCaibDialect.FUNCIO_ORDRE_TEXT) != null;
+	}
+
+	/**
+	 * Ordenació de la consulta del llistat amb not_notificacio_table: la del llistat (o la de per defecte del
+	 * recurs) amb els noms dels camps de la taula.
+	 */
+	Sort ordenacioTaula(Sort sort) {
+
+		List<Sort.Order> orders = new ArrayList<>();
+		if (sort == null || sort.isUnsorted()) {
+			getResourceDefaultSortFields(getResourceClass()).forEach(f -> orders.add(new Sort.Order(f.getDirection(), f.getField())));
+		} else {
+			sort.forEach(orders::add);
+		}
+		return Sort.by(orders.stream()
+				.map(o -> CAMPS_ORDENACIO_TAULA.containsKey(o.getProperty()) ? o.withProperty(CAMPS_ORDENACIO_TAULA.get(o.getProperty())) : o)
+				.collect(Collectors.toList()));
+	}
+
+	/**
+	 * Inverteix el sentit de cada camp de l'ordenació. Oracle i PostgreSQL posen els nuls al final en ordre
+	 * ascendent i al principi en descendent, per tant l'ordre invertit és exactament el contrari.
+	 */
+	static Sort invertir(Sort sort) {
+		return Sort.by(sort.stream()
+				.map(o -> o.with(o.isAscending() ? Sort.Direction.DESC : Sort.Direction.ASC))
+				.collect(Collectors.toList()));
+	}
+
+	@Override
+	protected Specification<NotificacioResourceEntity> additionalSpecification(String[] namedQueries, boolean isSingleResult) {
+
+		if (isSingleResult) {
+			return null;
+		}
+		// Els llistats carreguen not_notificacio_table (taula) amb un INNER JOIN, en la mateixa consulta
+		// (sense, el @OneToOne EAGER es carregaria amb un SELECT per fila). Ha de ser INNER i no LEFT:
+		// amb un LEFT JOIN la base de dades no pot recórrer els índexs de not_notificacio_table per
+		// ordenar-hi (data d'enviament, números de registre, titular) i ha d'ordenar totes les remeses.
+		// La consulta de COUNT (paginació) no fa el JOIN: amb un milió de remeses passa de més d'un segon
+		// a menys d'una dècima. És exacta perquè totes les remeses tenen fila a la taula: si no
+		// es pot crear, l'alta falla (NotificacioTableHelper.crearRegistre), i les remeses antigues que no
+		// en tenien es reparen en arrencar (procés inicial CREAR_REGISTRES_NOT_NOTIFICACIO_TABLE).
+		return (root, query, cb) -> {
+			if (NotificacioResourceEntity.class.equals(query.getResultType())) {
+				root.fetch("taula", JoinType.INNER);
+			}
+			return null;
+		};
+	}
+
+	@Override
+	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries, boolean isSingleResult) {
 
 		// Condició per a mostrar només les notificacions de l'entitat actual
 		var isRolSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);

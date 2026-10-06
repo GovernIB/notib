@@ -310,7 +310,8 @@ const OficinesSyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRef; }>
     const { dataGridApiRef } = props;
     const { t } = useTranslation();
     const { temporalMessageShow } = useBaseAppContext();
-    const formDialogButtons = [
+    // Memoritzat: useFormDialog torna a aplicar els botons quan canvia la referència de l'array (un array nou a cada render provoca un bucle infinit)
+    const formDialogButtons = React.useMemo(() => [
         {
             value: false,
             text: t('page.organs.grid.sync.oficines.cancel'),
@@ -322,7 +323,7 @@ const OficinesSyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRef; }>
             icon: 'check',
             componentProps: { variant: 'contained' },
         },
-    ];
+    ], [t]);
     return (
         <MuiActionReportButton
             resourceName="organGestorResource"
@@ -412,7 +413,8 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
         temporalMessageShow(null, t('page.organs.grid.sync.success'), 'success');
     };
 
-    const formDialogButtons = [
+    // Memoritzat: useFormDialog torna a aplicar els botons quan canvia la referència de l'array (un array nou a cada render provoca un bucle infinit)
+    const formDialogButtons = React.useMemo(() => [
         {
             value: false,
             // Un cop feta la sincronització real ja no hi ha res a cancel·lar: el botó passa a
@@ -429,7 +431,7 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
             // SIR, que poden tenir canvis pendents encara que els òrgans no en tinguin.
             componentProps: { variant: 'contained', disabled: syncCompleted },
         },
-    ];
+    ], [t, syncCompleted]);
 
     const extraActions = showResultActions && senseCanvis === false ? (
         <>

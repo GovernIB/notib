@@ -42,6 +42,8 @@ import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -87,6 +89,89 @@ public abstract class NotificacioTableMapper {
 
     ObjectMapper objectMapper = new ObjectMapper();
 
+    // Màxim d'elements d'una clàusula IN (Oracle no n'admet més de 1000)
+    private static final int MAX_IN = 1000;
+
+    /*
+     * Dades que el càlcul de la columna estat necessita per a cada notificació/enviament, carregades
+     * amb una sola consulta per a tot el lot (toNotificacionsTableItemDto) en lloc d'una per element.
+     * El mapper és un singleton compartit entre fils: es guarda per fil mentre dura la conversió.
+     */
+    private static final ThreadLocal<Prefetch> PREFETCH = new ThreadLocal<>();
+
+    // Si està actiu, les notificacions recalculades es desen sense flush i se'n fa un de sol al
+    // final del bloc: cada flush revisa totes les entitats de la sessió (remeses, enviaments,
+    // persones, events...), i fer-ne un per remesa feia el cost proporcional al quadrat del bloc
+    private static final ThreadLocal<Boolean> FLUSH_DIFERIT = new ThreadLocal<>();
+
+    /**
+     * Recalcula i desa la columna estat de les notificacions indicades (les que la tenen pendent)
+     * amb un únic flush per a totes. Si el flush falla es propaga l'excepció: la transacció del bloc
+     * queda invalidada i qui crida és responsable de reintentar-les individualment.
+     */
+    @Transactional
+    public void actualitzarEstatsEnBloc(List<NotificacioTableEntity> nots) {
+
+        FLUSH_DIFERIT.set(true);
+        try {
+            toNotificacionsTableItemDto(nots, java.util.Collections.emptyList(), java.util.Collections.emptyMap());
+            notificacioTableViewRepository.flush();
+        } finally {
+            FLUSH_DIFERIT.remove();
+        }
+    }
+
+    private static class Prefetch {
+        private final Map<Long, Long> callbacksFiReintents = new HashMap<>();
+        private final Map<Long, NotificacioEventEntity> darrerEventCarpeta = new HashMap<>();
+        private final Set<Long> enviamentsCarregats = new HashSet<>();
+        private final Set<Long> notificacionsCarregades = new HashSet<>();
+    }
+
+    private Prefetch prefetch(List<NotificacioTableEntity> nots) {
+
+        var prefetch = new Prefetch();
+        List<Long> notificacioIds = new ArrayList<>();
+        List<Long> enviamentIds = new ArrayList<>();
+        for (var not : nots) {
+            if (not == null || !not.isPerActualitzar()) {
+                continue;
+            }
+            notificacioIds.add(not.getId());
+            if (not.getEnviaments() == null) {
+                continue;
+            }
+            for (var env : not.getEnviaments()) {
+                // Mateixa condició que getNotificacioMovilError per consultar l'event
+                if (!env.isPerEmail() && env.getNotificaEstat() != null) {
+                    enviamentIds.add(env.getId());
+                }
+            }
+        }
+        for (var bloc : blocs(notificacioIds)) {
+            for (var fila : eventRepository.countEventCallbackAmbFiReintentsByNotificacioIds(bloc)) {
+                prefetch.callbacksFiReintents.put((Long) fila[0], ((Number) fila[1]).longValue());
+            }
+            prefetch.notificacionsCarregades.addAll(bloc);
+        }
+        for (var bloc : blocs(enviamentIds)) {
+            for (var event : eventRepository.findLastApiCarpetaByEnviamentIds(bloc)) {
+                prefetch.darrerEventCarpeta.put(event.getEnviament().getId(), event);
+            }
+            prefetch.enviamentsCarregats.addAll(bloc);
+        }
+        return prefetch;
+    }
+
+    private static <T> List<List<T>> blocs(List<T> elements) {
+
+        List<List<T>> blocs = new ArrayList<>();
+        for (int i = 0; i < elements.size(); i += MAX_IN) {
+            blocs.add(elements.subList(i, Math.min(i + MAX_IN, elements.size())));
+        }
+        return blocs;
+    }
+
     @Mapping(target = "registreEnviamentIntent", source = "not.registreEnviamentIntent", defaultValue = "0")
     @Mapping(target = "createdDate", source = "not.createdDate", qualifiedByName = "optionalDate")
     @Mapping(target = "createdByNom", source = "not.createdBy", qualifiedByName = "optionalUserName")
@@ -99,6 +184,21 @@ public abstract class NotificacioTableMapper {
 	public List<NotificacioTableItemDto> toNotificacionsTableItemDto(List<NotificacioTableEntity> nots, @Context List<String> codis, @Context Map<String, OrganismeDto> organs) {
 
 //    public NotificacioTableItemDto mapNotificacioTableItemDtoContext(NotificacioTableEntity not, @Context List<String> codis, @Context Map<String, OrganismeDto> organs) {
+		var prefetchActiu = PREFETCH.get() == null;
+		if (prefetchActiu) {
+			PREFETCH.set(prefetch(nots));
+		}
+		try {
+			return toNotificacionsTableItemDtoInternal(nots, codis, organs);
+		} finally {
+			if (prefetchActiu) {
+				PREFETCH.remove();
+			}
+		}
+	}
+
+	private List<NotificacioTableItemDto> toNotificacionsTableItemDtoInternal(List<NotificacioTableEntity> nots, List<String> codis, Map<String, OrganismeDto> organs) {
+
 		List<NotificacioTableItemDto> notificacions = new ArrayList<>();
 		for (var not : nots)
 		{
@@ -178,6 +278,8 @@ public abstract class NotificacioTableMapper {
             not.setDocumentId(dto.getDocumentId());
             not.setEnvCerData(dto.getEnvCerData());
             not.setEstatString(dto.getEstatString());
+            // Estat que mostra la columna (el mateix que getColumnaEstatJson), per ordenar el llistat per estat
+            not.setEstatLlistat(dto.isEnviant() ? NotificacioEstatEnumDto.ENVIANT : dto.getEstat());
 //            not.setEstatJson(dto.getEstatJson());
             var rNums = !registreNums.toString().isEmpty() ? registreNums.substring(0, registreNums.length()-2) : "";
             if (rNums.length() > 2000) {
@@ -187,7 +289,12 @@ public abstract class NotificacioTableMapper {
             not.setPerActualitzar(false);
             not.setAnulable(notificacioTableHelper.isAnulable(not.getNotificacio()));
             var inici = System.currentTimeMillis();
-            notificacioTableViewRepository.saveAndFlush(not);
+            if (Boolean.TRUE.equals(FLUSH_DIFERIT.get())) {
+                // Càlcul en bloc: es fa un únic flush al final (actualitzarEstatsEnBloc)
+                notificacioTableViewRepository.save(not);
+            } else {
+                notificacioTableViewRepository.saveAndFlush(not);
+            }
             var fi = System.currentTimeMillis();
             NotibLogger.getInstance().info("Guardar a not_table -> " + (fi - inici), log, LoggingTipus.EFICIENCIA_TAULA_REMESES);
             NotibLogger.getInstance().info("Actualitzar notificacio -> " + (fi - iniciActualitzar), log, LoggingTipus.EFICIENCIA_TAULA_REMESES);
@@ -372,7 +479,10 @@ public abstract class NotificacioTableMapper {
 
     private ObjectNode getCallbackError(NotificacioTableItemDto dto) {
 
-        int callbackFiReintents = eventRepository.countEventCallbackAmbFiReintentsByNotificacioId(dto.getId());
+        var prefetch = PREFETCH.get();
+        long callbackFiReintents = prefetch != null && prefetch.notificacionsCarregades.contains(dto.getId())
+                ? prefetch.callbacksFiReintents.getOrDefault(dto.getId(), 0L)
+                : eventRepository.countEventCallbackAmbFiReintentsByNotificacioId(dto.getId());
 //        return callbackFiReintents > 0 ? " <span class=\"fa fa-warning text-info\" title=\"" + getMessage + "callback.fi.reintents" + fiGetMessage + "\"></span>" : "";
         return objectMapper.createObjectNode().put("callbackFiReintents", callbackFiReintents > 0 ? messageHelper.getMessage("callback.fi.reintents"): "");
     }
@@ -399,12 +509,19 @@ public abstract class NotificacioTableMapper {
         StringBuilder notificacioMovilMsg = new StringBuilder();
         int multipleApiCarpetaError = 0;
         var arrayNode = objectMapper.createArrayNode();
+        var prefetch = PREFETCH.get();
         for (NotificacioEnviamentEntity env : enviaments) {
             if (env.isPerEmail() || env.getNotificaEstat() == null) {
                 continue;
             }
 
-            var eventCarpeta = eventRepository.findLastApiCarpetaByEnviamentId(env.getId());
+            List<NotificacioEventEntity> eventCarpeta;
+            if (prefetch != null && prefetch.enviamentsCarregats.contains(env.getId())) {
+                var darrer = prefetch.darrerEventCarpeta.get(env.getId());
+                eventCarpeta = darrer != null ? List.of(darrer) : List.of();
+            } else {
+                eventCarpeta = eventRepository.findLastApiCarpetaByEnviamentId(env.getId());
+            }
             if (eventCarpeta != null && !eventCarpeta.isEmpty() && eventCarpeta.get(0).isError()) {
                 multipleApiCarpetaError++;
                 notificacioMovilMsg.append(" <span style=\"color:#8a6d3b;\" class=\"fa fa-mobile fa-lg\" title=\"").append(eventCarpeta.get(0).getErrorDescripcio()).append("\"></span>\n");
