@@ -32,6 +32,7 @@ const FilsExecucioTab: React.FC = () => {
                 title=""
                 resourceName="threadInfoResource"
                 columns={columnsFils}
+                striped
                 readOnly
                 sortModel={sortModelFils}
             />

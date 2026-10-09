@@ -7,7 +7,7 @@ import {ROLE_ADMIN, ROLE_ADMIN_LECTURA, ROLE_USER, useNotibContext} from '../../
 import {useDatagridFilterProps, useDatagridPageSizeOptionsProps} from '../../hooks/useDataGrid';
 import NotificacioGridEnviaments from './NotificacioGridEnviaments';
 import {useNotificacioDetailDialog, useRemesesErrorCallbackDetailDialog, useRemesesErrorRegistreDetailDialog} from './NotificacioDetailDialog';
-import {Button, Chip, Icon, IconButton, Menu, MenuItem} from '@mui/material';
+import {Button, Chip, Icon, IconButton, Menu, MenuItem, Box, Typography} from '@mui/material';
 import AccionsMassives, {MenuOption, MenuOptionDivider, useAccionsMassives} from '../../components/AccionsMassives';
 import ButtonDetailExpandColapse from '../../components/ButtonDetailExpandColapse';
 import {DataCommonAdditionalAction} from '../../../lib/components/mui/datacommon/MuiDataCommon';
@@ -19,7 +19,9 @@ import CustomDetailPanelToggle from "../../utils/CustomDetailPanelToggle.tsx";
 import ContentFilter, {useSpringFilterBuilder} from "./NotificacioFiltre.tsx";
 import useEstatRemesaAsync from '../../hooks/useEstatRemesaAsync';
 import PageTitle from "../../components/PageTitle.tsx";
-// import useSseRowRefresh from "../../hooks/useSseRowRefresh";
+import { AppliedFilterCountChip, isFilterApplied } from 'reactlib';
+import { getMenuEntryByPath } from '../../routeAccess';  // or appropriate path
+
 
 // Ha de ser una funció estable: MUI X recalcula les mides de les files cada vegada que getRowHeight canvia
 // d'identitat, i una funció nova a cada render pot provocar un bucle infinit de renders
@@ -341,6 +343,14 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
     const springFilterBuilder = useSpringFilterBuilder();
     const [searchParams] = useSearchParams();
     const referencia = searchParams.get('referencia');
+    const [filterData, setFilterData] = React.useState<any>()
+    const appliedFilterCount = React.useMemo(
+        () => filterData ?
+            Object.keys(filterData).filter((key) => isFilterApplied(filterData[key])).length
+            : 0,
+        [filterData]
+    );
+
     const filterDataGridProps = useDatagridFilterProps(
         'notificacioResource',
         'FILTER_NOTIFICACIO',
@@ -351,8 +361,9 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                        notificacionsCallbackError={notificacionsCallbackError}
         />,
         undefined,
-        {referencia: referencia}
-    );
+        {referencia: referencia},
+        (data) => setFilterData(data)
+);
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
 
     const { descarregarJustificantEnviament,
@@ -467,6 +478,8 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
     const fixedFilter = filtreEsborrades + (filtreMassiva ? " and " + filtreMassiva : "")  + (filtreErrorRegistre ? " and " + filtreErrorRegistre : "")
                                 + (filtreCallbackError ? " and " + filtreCallbackError : "");
 
+    const { pathname } = useLocation();
+    const menuEntry = getMenuEntryByPath(pathname, currentRole, t);
 
     const detailPanelProps = !noEsTaulaRemeses ? {
                 getDetailPanelContent: ({ row }: any) => (<NotificacioGridEnviaments id={row.id} />),
@@ -479,9 +492,17 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                 key={`${currentRole}-${notificacionsEsborrades}-${notificacionsErrorRegistre}-${notificacionsCallbackError}`}
                 datagridApiRef={datagridApiRef}
                 apiRef={apiRef}
-                title={t('page.notificacio.grid.title') + (titolSecundari || "")}
+                title={
+                    <Box display="flex" alignItems="center" sx={{ gap: 1 }}>
+                        {menuEntry?.icon && <Icon fontSize="small">{menuEntry.icon}</Icon>}
+                        <Typography component="span" variant="h6" sx={{ mb: 0 }}>
+                            {t('page.notificacio.grid.title') + (titolSecundari || "")}
+                        </Typography>
+                    </Box>
+                }
                 resourceName="notificacioResource"
                 columns={columns}
+                striped
                 defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
                 paginationActive
                 popupEditUpdateActive={true}
@@ -516,6 +537,10 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                 toolbarHideCreate
                 toolbarCreateLink="form"
                 toolbarElementsWithPositions={[
+                    {
+                        position: 1,
+                        element: <AppliedFilterCountChip count={appliedFilterCount} />,
+                    },
                     ...(isCreateLinkPresent ? [{ position: 2, element: <NotificacioAddButton /> }] : []),
                     ...(notificacionsEsborrades || (isRoleAdminLectura && notificacionsErrorRegistre) ? []
                         : [{

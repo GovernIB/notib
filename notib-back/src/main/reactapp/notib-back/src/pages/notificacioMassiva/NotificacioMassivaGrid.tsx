@@ -14,10 +14,11 @@ import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../h
 import {DataCommonAdditionalAction} from "../../../lib/components/mui/datacommon/MuiDataCommon.tsx";
 import Typography from "@mui/material/Typography";
 import { useNotificacioMassivaResumDialog } from './NotificacioMassivaResumDialog';
-import {useNavigate} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import {ROLE_ADMIN_LECTURA, ROLE_USER, useNotibContext} from "../../components/NotibContext.ts";
 import {TemporalMessageSeverity} from "../../../lib/components/BaseAppContext.tsx";
 import PageTitle from "../../components/PageTitle.tsx";
+import {getMenuEntryByPath} from "../../routeAccess.ts";
 
 const iconOk= React.cloneElement(<Icon>check</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center"} });
 const iconError= React.cloneElement(<Icon>close</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center" } });
@@ -190,11 +191,11 @@ const ContentFilter: React.FC = () => {
                 <GridFormField size={2.5} name="estatProces" />
                 {isNotRoleUser && (<GridFormField size={1.75} name="createdBy" />)}
 
-                <Grid size={0.5} sx={{ textAlign: 'center' }}>
+                <Box sx={{display: 'flex', justifyContent: 'flex-end', flex:1}}>
                     <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
                         <Icon>filter_alt_off</Icon>
                     </IconButton>
-                </Grid>
+                </Box>
             </Grid>
             <Box paddingTop="15px" display="flex" justifyContent="end" fontSize="10px">
                 [<Box>{iconOk} {t('page.notificacioMassiva.grid.llegenda.numProcessats')}</Box>]
@@ -328,14 +329,26 @@ export const NotifiacioMassivaGrid = () => {
         return listActions;
     };
 
+    const { currentRole} = useNotibContext();
+    const { pathname } = useLocation();
+    const menuEntry = getMenuEntryByPath(pathname, currentRole, t);
+
     return (
         <>
             <PageTitle title={t('page.notificacioMassiva.grid.title')}></PageTitle>
             <GridPage>
                 <MuiDataGrid
-                    title={t('page.notificacioMassiva.grid.title')}
+                    title={
+                        <Box display="flex" alignItems="center" sx={{ gap: 1 }}>
+                            {menuEntry?.icon && <Icon fontSize="small">{menuEntry.icon}</Icon>}
+                            <Typography component="span" variant="h6" sx={{ mb: 0 }}>
+                                {t('page.notificacioMassiva.grid.title')}
+                            </Typography>
+                        </Box>
+                    }
                     resourceName="notificacioMassivaResource"
                     columns={columns}
+                    striped
                     defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
                     paginationActive
                     persistentStateActive

@@ -17,6 +17,10 @@ import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../h
 import { ROLE_ADMIN_LECTURA, useNotibContext } from '../../components/NotibContext';
 import PageTitle from "../../components/PageTitle.tsx";
 import React from "react";
+import Box from "@mui/material/Box";
+import {Typography} from "@mui/material";
+import {useLocation} from "react-router-dom";
+import {getMenuEntryByPath} from "../../routeAccess.ts";
 
 const columns = [
     {
@@ -82,11 +86,11 @@ const ContentFilter: React.FC = () => {
             <GridFormField size={3} name="organGestorPagador" optionRenderer={organGestorOptionRenderer} />
             <GridFormField size={1.75} name="contracteDataVigInici" />
             <GridFormField size={1.75} name="contracteDataVigFinal" />
-            <Grid size={0.5}>
+            <Box sx={{display: 'flex', justifyContent: 'flex-end', flex:1}}>
                 <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
                     <Icon>filter_alt_off</Icon>
                 </IconButton>
-            </Grid>
+            </Box>
         </Grid>
     );
 };
@@ -103,14 +107,25 @@ export const PagadorCieGrid: React.FC = () => {
         <ContentFilter />
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
+    const { pathname } = useLocation();
+    const menuEntry = getMenuEntryByPath(pathname, currentRole, t);
+
     return (
         <>
             <PageTitle title={t('page.pagadorCie.grid.title')}></PageTitle>
             <GridPage>
                 <MuiDataGrid
-                    title={t('page.pagadorCie.grid.title')}
+                    title={
+                        <Box display="flex" alignItems="center" sx={{ gap: 1 }}>
+                            {menuEntry?.icon && <Icon fontSize="small">{menuEntry.icon}</Icon>}
+                            <Typography component="span" variant="h6" sx={{ mb: 0 }}>
+                                {t('page.pagadorCie.grid.title')}
+                            </Typography>
+                        </Box>
+                    }
                     resourceName="pagadorCieResource"
                     columns={columns}
+                    striped
                     paginationActive
                     persistentStateActive
                     persistentStateClearPageSortPropsOnTopLevelRouteChange

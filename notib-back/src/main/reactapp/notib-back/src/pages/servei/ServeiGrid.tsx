@@ -17,6 +17,10 @@ import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRend
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 import React from "react";
 import PageTitle from "../../components/PageTitle.tsx";
+import Box from "@mui/material/Box";
+import {useLocation} from "react-router-dom";
+import {getMenuEntryByPath} from "../../routeAccess.ts";
+import {Typography} from "@mui/material";
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -117,9 +121,11 @@ const ContentFilter: React.FC = () => {
             <GridButtonField size={0.5} name="entregaCieActiva" icon={'email'} hiddenLabel />
             <GridButtonField size={0.5} name="manual" icon={'sync'} hiddenLabel />
             <GridButtonField size={0.5} name="requireDirectPermission" icon={'gpp_good'} hiddenLabel/>
-            <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
-                <Icon>filter_alt_off</Icon>
-            </IconButton>
+            <Box sx={{display: 'flex', justifyContent: 'flex-end', flex:1}}>
+                <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
+                    <Icon>filter_alt_off</Icon>
+                </IconButton>
+            </Box>
         </Grid>
     );
 };
@@ -167,6 +173,7 @@ const ProcedimentSyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRef;
             componentProps: { variant: 'contained' },
         },
     ], [t]);
+
     return (
         <MuiActionReportButton
             resourceName="procedimentResource"
@@ -200,15 +207,25 @@ export const ProcedimentGrid = () => {
         springFilterBuilder,
         <ContentFilter />
     );
+    const { pathname } = useLocation();
+    const menuEntry = getMenuEntryByPath(pathname, currentRole, t);
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
         <>
             <PageTitle title={t('page.serveis.grid.title')}></PageTitle>
             <GridPage>
                 <MuiDataGrid
-                    title={t('page.serveis.grid.title')}
+                    title={
+                        <Box display="flex" alignItems="center" sx={{ gap: 1 }}>
+                            {menuEntry?.icon && <Icon fontSize="small">{menuEntry.icon}</Icon>}
+                            <Typography component="span" variant="h6" sx={{ mb: 0 }}>
+                                {t('page.serveis.grid.title')}
+                            </Typography>
+                        </Box>
+                    }
                     resourceName="procedimentResource"
                     columns={columns}
+                    striped
                     fixedFilter={"tipus:'SERVEI' and entitat.id:" + currentEntitatId}
                     paginationActive
                     persistentStateActive

@@ -290,3 +290,28 @@ export const isPathAccessibleForRole = (pathname: string, role: string | undefin
     const bestMatch = matches.reduce((longest, current) => (current.to.length > longest.to.length ? current : longest));
     return !bestMatch.entry.hidden;
 };
+
+/**
+ * Busca l'entrada del menú que correspon a la ruta indicada (segons el rol) i retorna
+ * l'entrada trobada, inclòs el seu icona. S'utilitza per mostrar l'icona de la pàgina
+ * actual al títol de la graella.
+ */
+export const getMenuEntryByPath = (
+    pathname: string,
+    role: string | undefined,
+    t: TFunction
+): MenuEntryWithResource | undefined => {
+
+    const normalizedPath = stripLeadingSlashes(pathname);
+    const matches = flattenMenuEntries(getMenuEntries(role, t))
+        .filter((entry): entry is MenuEntryWithResource & { to: string } => entry.to != null)
+        .map((entry) => ({ entry, to: stripLeadingSlashes(entry.to) }))
+        .filter(({ to }) => normalizedPath === to || normalizedPath.startsWith(to + '/'));
+    if (matches.length === 0) {
+        return undefined;
+    }
+    const bestMatch = matches.reduce((longest, current) =>
+        current.to.length > longest.to.length ? current : longest
+    );
+    return bestMatch.entry;
+};

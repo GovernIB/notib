@@ -308,6 +308,10 @@ export const EntitatForm: React.FC = () => {
     const { isReady, id, hiddenBackButton } = useEntitatId();
     const titol = id != null ? t('page.entitats.form.titleUpdate') : t('page.entitats.form.titleCreate');
     const [subtitle, setSubtitle] = React.useState<string>();
+    // const { currentRole} = useNotibContext();
+    // const { pathname } = useLocation();
+    // const menuEntry = getMenuEntryByPath(pathname, currentRole, t);
+
     return (
         isReady && (<>
             <PageTitle title={titol}></PageTitle>
@@ -316,6 +320,14 @@ export const EntitatForm: React.FC = () => {
                     resourceName="entitatResource"
                     id={id}
                     title={titol}
+                    // title={
+                    //     <Box display="flex" alignItems="center" sx={{ gap: 1 }}>
+                    //         {menuEntry?.icon && <Icon fontSize="small">{menuEntry.icon}</Icon>}
+                    //         <Typography component="span" variant="h6" sx={{ mb: 0 }}>
+                    //             titol
+                    //         </Typography>
+                    //     </Box>
+                    // }
                     hiddenBackButton={hiddenBackButton ? true : undefined}
                     toolbarSubtitle={id != null ? subtitle : undefined}
                     createLink="./{{id}}"

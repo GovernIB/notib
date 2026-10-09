@@ -1,4 +1,4 @@
-import {Box, Button, ButtonGroup, Chip, Icon, Menu, MenuItem, Tooltip} from '@mui/material';
+import {Box, Button, ButtonGroup, Chip, Icon, Menu, MenuItem,} from '@mui/material';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {useBaseAppContext, useMuiActionReportLogic, useResourceApiService} from "reactlib";
@@ -76,17 +76,17 @@ const AccionsMassives: React.FC<AccionsMassivesProps> = (props) => {
 
     return (
         <>
-            <ButtonGroup variant="outlined" aria-label="Basic button group">
-                <Tooltip title={t('page.accioMassiva.accions.selectAll')} arrow>
-                    <Button color="primary" onClick={handleSelectAllGlobal}>
+            <ButtonGroup variant="contained" aria-label="Botons accions massives" >
+                {/*<Tooltip title={t('page.accioMassiva.accions.selectAll')} arrow sx={{color: 'white'}}>*/}
+                    <Button  onClick={handleSelectAllGlobal} title={t('page.accioMassiva.accions.selectAll')}>
                         <Icon fontSize='small'>check_box</Icon>
                     </Button>
-                </Tooltip>
-                <Tooltip title={t('page.accioMassiva.accions.deselectAll')} arrow>
-                    <Button color="primary" onClick={handleDeselectAllGlobal}>
+                {/*</Tooltip>*/}
+                {/*<Tooltip title={t('page.accioMassiva.accions.deselectAll')} arrow sx={{color: 'white'}}>*/}
+                    <Button variant="contained" onClick={handleDeselectAllGlobal} title={t('page.accioMassiva.accions.deselectAll')}>
                         <Icon fontSize='small'>check_box_outline_blank</Icon>
                     </Button>
-                </Tooltip>
+                {/*</Tooltip>*/}
                 <Button
                     id="basic-button"
                     aria-controls={open ? 'basic-menu' : undefined}
@@ -94,11 +94,11 @@ const AccionsMassives: React.FC<AccionsMassivesProps> = (props) => {
                     aria-expanded={open ? 'true' : undefined}
                     onClick={handleClick}
                     endIcon={<Icon>{open ? 'arrow_drop_up' : 'arrow_drop_down'}</Icon>}
-                    variant="outlined"
-                    sx={{mr: 1, textTransform: 'none'}}
+                    variant="contained"
+                    sx={{textTransform: 'none', color: "white"}}
                 >
-                    <Box sx={{display: 'flex', gap: 1, justifyContent: 'space-between'}}>
-                        <Chip label={sizeSelection} size="small" color="default"/>
+                    <Box sx={{display: 'flex', gap: 1, justifyContent: 'space-between', color: "white"}}>
+                        <Chip label={sizeSelection} size="small"/>
                         {buttonLabel}
                     </Box>
                 </Button>
@@ -114,7 +114,7 @@ const AccionsMassives: React.FC<AccionsMassivesProps> = (props) => {
             >
                 {options.map((option, index) => (
                     ('type' in option)
-                        ? (<Divider key={index}/>)
+                        ? (<Divider key={index} component="li" sx={{ my: 0.5 }} />)
                         : (<MenuItem
                             key={index}
                             onClick={() => handleOptionClick(option.onClick)}

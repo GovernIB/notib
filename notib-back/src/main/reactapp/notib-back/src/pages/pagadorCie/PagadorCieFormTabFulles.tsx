@@ -21,6 +21,7 @@ const PagadorCieFormTabFulles: React.FC = () => {
             fixedFilter={'pagadorCie.id:' + id}
             formAdditionalData={{ pagadorCie: { id } }}
             columns={columns}
+            striped
             paginationActive
             toolbarHideQuickFilter
             inlineEditActive

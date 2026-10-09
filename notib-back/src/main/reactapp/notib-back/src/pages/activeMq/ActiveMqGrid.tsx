@@ -3,6 +3,12 @@ import {useTranslation} from 'react-i18next';
 import {GridPage, MuiActionReportButton, MuiDataGrid, MuiDataGridColDef, useBaseAppContext, useMuiDataGridApiRef, useResourceApiService,} from 'reactlib';
 import {useActiveMqDetailDetailDialog} from "./ActivmeMqDetailDialog.tsx";
 import PageTitle from "../../components/PageTitle.tsx";
+import {useLocation} from "react-router-dom";
+import {getMenuEntryByPath} from "../../routeAccess.ts";
+import Box from "@mui/material/Box";
+import Icon from "@mui/material/Icon";
+import {Typography} from "@mui/material";
+import {useNotibContext} from "../../components/NotibContext.ts";
 
 
 const useActiveMqAction = (refresh?: () => void) => {
@@ -73,14 +79,26 @@ export const ActiveMqGrid = () => {
         []
     );
 
+    const { currentRole} = useNotibContext();
+    const { pathname } = useLocation();
+    const menuEntry = getMenuEntryByPath(pathname, currentRole, t);
+
     return (
         <>
             <PageTitle title={t('page.activemq.grid.title')}></PageTitle>
             <GridPage>
                 <MuiDataGrid
-                    title={t('page.activemq.grid.title')}
+                    title={
+                        <Box display="flex" alignItems="center" sx={{ gap: 1 }}>
+                            {menuEntry?.icon && <Icon fontSize="small">{menuEntry.icon}</Icon>}
+                            <Typography component="span" variant="h6" sx={{ mb: 0 }}>
+                                {t('page.activemq.grid.title')}
+                            </Typography>
+                        </Box>
+                    }
                     resourceName="activeMqResource"
                     columns={columns}
+                    striped
                     toolbarType="upper"
                     toolbarHideQuickFilter
                     checkboxSelection={false}

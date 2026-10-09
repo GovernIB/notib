@@ -156,6 +156,7 @@ const NotificacioDetailTabHistoric: React.FC<{ id: any }> = (props) => {
                 fixedFilter={'notificacioId:' + id}
                 sortModel={[{ field: 'tipusOperacio', sort: 'desc' }]}
                 columns={columns}
+                striped
                 readOnly
                 persistentStateActive
                 persistentStateClearPageSortPropsOnTopLevelRouteChange

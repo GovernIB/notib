@@ -1,9 +1,13 @@
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {GridPage, MuiDataGrid, MuiDataGridColDef, useBaseAppContext, useMuiDataGridApiRef, useResourceApiService,} from 'reactlib';
-import {Badge, Button, Icon} from "@mui/material";
+import {Badge, Button, Icon, Typography} from "@mui/material";
 import {GridApiPro, useGridApiRef} from "@mui/x-data-grid-pro";
 import PageTitle from "../../components/PageTitle.tsx";
+import {useLocation} from "react-router-dom";
+import {getMenuEntryByPath} from "../../routeAccess.ts";
+import {useNotibContext} from "../../components/NotibContext.ts";
+import Box from "@mui/material/Box";
 
 const useCacheAction = (apiRef: React.RefObject<GridApiPro | null>, refresh?: () => void) => {
 
@@ -67,15 +71,28 @@ export const CacheGrid = () => {
             onClick: restart,
         },
     ];
+
+    const { currentRole} = useNotibContext();
+    const { pathname } = useLocation();
+    const menuEntry = getMenuEntryByPath(pathname, currentRole, t);
+
     return (
         <>
             <PageTitle title={t('page.cache.grid.title')}></PageTitle>
             <GridPage>
                 <MuiDataGrid
-                    title={t('page.cache.grid.title')}
+                    title={
+                        <Box display="flex" alignItems="center" sx={{ gap: 1 }}>
+                            {menuEntry?.icon && <Icon fontSize="small">{menuEntry.icon}</Icon>}
+                            <Typography component="span" variant="h6" sx={{ mb: 0 }}>
+                                {t('page.enviament.grid.title')}
+                            </Typography>
+                        </Box>
+                    }
                     datagridApiRef={datagridApiRef}
                     resourceName="cacheResource"
                     columns={columns}
+                    striped
                     toolbarHideQuickFilter
                     toolbarType="upper"
                     rowHideUpdateButton

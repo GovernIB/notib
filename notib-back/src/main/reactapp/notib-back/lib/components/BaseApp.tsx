@@ -15,6 +15,7 @@ import {
 } from './BaseAppContext';
 import { DetailFieldCustomProps } from './detail/DetailField';
 import { useResourceApiContext } from './ResourceApiContext';
+import {useTheme} from "@mui/material/styles";
 
 export const MARGIN_UNIT_PX = 8;
 export const LIB_I18N_NS = 'reactlib';
@@ -191,26 +192,19 @@ const ContentComponentDefault: React.FC<BaseAppContentComponentProps> = (props) 
     } = props;
     const mainBoxHeight = contentExpandsToAvailableHeight ? '100vh' : undefined;
     const childrenOrOfflineComponent = !offline ? children : offlineComponent;
+    const theme = useTheme();
     return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                height: mainBoxHeight,
-            }}>
+        <div style={{display: 'flex', flexDirection: 'column', height: mainBoxHeight,}}>
             {appbarComponent}
-            <div
-                style={{
-                    display: 'flex',
-                    flexGrow: 1,
-                    minHeight: 0,
-                }}>
+            <div style={{display: 'flex', flexGrow: 1, minHeight: 0,}}>
                 <nav>{menuComponent}</nav>
                 <main
                     style={{
                         flexGrow: 1,
                         minWidth: 0,
-                        ...(!marginsDisabled ? { margin: '16px 24px' } : null),
+                        ...(!marginsDisabled ? { margin: '10px 10px 10px 10px' } : null),
+                        // backgroundColor: theme.palette.mode === 'light' ? theme.palette.grey[200] : theme.palette.grey[900]
+                        backgroundColor: theme.palette.mode === 'light' ? "white" : theme.palette.grey[900]
                     }}>
                     {appReady ? childrenOrOfflineComponent : null}
                 </main>

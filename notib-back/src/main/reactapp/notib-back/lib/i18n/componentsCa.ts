@@ -68,8 +68,8 @@ const componentsCa = {
             multiple: '{{count}} files seleccionades',
         },
         edit: {
-            save: 'Desar',
-            cancel: 'Cancel·lar',
+            save: 'Desa',
+            cancel: 'Cancel·la',
         },
         row: {
             single: 'fila',

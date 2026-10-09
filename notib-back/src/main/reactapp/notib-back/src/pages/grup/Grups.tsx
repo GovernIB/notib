@@ -6,6 +6,11 @@ import { useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid.tsx';
 import GridFormField from '../../components/GridFormField.tsx';
 import {ROLE_ADMIN_LECTURA, useNotibContext} from "../../components/NotibContext.ts";
 import PageTitle from "../../components/PageTitle.tsx";
+import {useLocation} from "react-router-dom";
+import {getMenuEntryByPath} from "../../routeAccess.ts";
+import Box from "@mui/material/Box";
+import Icon from "@mui/material/Icon";
+import {Typography} from "@mui/material";
 
 const columns = [
     {
@@ -37,14 +42,25 @@ export const Grups: React.FC = () => {
     const { currentRole } = useNotibContext();
     const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
+    const { pathname } = useLocation();
+    const menuEntry = getMenuEntryByPath(pathname, currentRole, t);
+
     return (
         <>
             <PageTitle title={t('page.grups.grid.title')}></PageTitle>
             <GridPage>
                 <MuiDataGrid
-                    title={t('page.grups.grid.title')}
+                    title={
+                        <Box display="flex" alignItems="center" sx={{ gap: 1 }}>
+                            {menuEntry?.icon && <Icon fontSize="small">{menuEntry.icon}</Icon>}
+                            <Typography component="span" variant="h6" sx={{ mb: 0 }}>
+                                {t('page.grups.grid.title')}
+                            </Typography>
+                        </Box>
+                    }
                     resourceName="grupResource"
                     columns={columns}
+                    striped
                     paginationActive
                     persistentStateActive
                     persistentStateClearPageSortPropsOnTopLevelRouteChange

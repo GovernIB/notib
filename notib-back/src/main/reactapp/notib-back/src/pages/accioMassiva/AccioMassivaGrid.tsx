@@ -4,11 +4,14 @@ import React from "react";
 import {GRID_DETAIL_PANEL_TOGGLE_COL_DEF} from "@mui/x-data-grid-pro";
 import {useDatagridFilterProps, useDatagridPageSizeOptionsProps} from "../../hooks/useDataGrid.tsx";
 import {formatEndOfDay, formatStartOfDay} from "../../utils/dateUtils.ts";
-import {Box, Chip, Grid, Icon, IconButton} from "@mui/material";
+import {Box, Chip, Grid, Icon, IconButton, Typography} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import AccioMassivaGridEnviaments from "./AccioMassivaGridElements.tsx";
 import CustomDetailPanelToggle from "../../utils/CustomDetailPanelToggle.tsx";
 import PageTitle from "../../components/PageTitle.tsx";
+import {useLocation} from "react-router-dom";
+import {getMenuEntryByPath} from "../../routeAccess.ts";
+import {useNotibContext} from "../../components/NotibContext.ts";
 
 
 const useDataGridColumns = () => {
@@ -111,11 +114,11 @@ const ContentFilter: React.FC = () => {
                 <GridFormField size={1.75} name="dataIniciFi" />
                 <GridFormField size={2.5} name="estat" />
 
-                <Grid size={0.5} sx={{ textAlign: 'center' }}>
+                <Box sx={{display: 'flex', justifyContent: 'flex-end', flex:1}}>
                     <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
                         <Icon>filter_alt_off</Icon>
                     </IconButton>
-                </Grid>
+                </Box>
             </Grid>
         </Box>
     );
@@ -135,14 +138,26 @@ export const AccioMassivaGrid = () => {
         <ContentFilter />
     );
 
+    const { currentRole} = useNotibContext();
+    const { pathname } = useLocation();
+    const menuEntry = getMenuEntryByPath(pathname, currentRole, t);
+
     return (
         <>
             <PageTitle title={t('page.accioMassiva.grid.title')}></PageTitle>
             <GridPage>
             <MuiDataGrid
-                title={t('page.accioMassiva.grid.title')}
+                title={
+                    <Box display="flex" alignItems="center" sx={{ gap: 1 }}>
+                        {menuEntry?.icon && <Icon fontSize="small">{menuEntry.icon}</Icon>}
+                        <Typography component="span" variant="h6" sx={{ mb: 0 }}>
+                            {t('page.accioMassiva.grid.title')}
+                        </Typography>
+                    </Box>
+                }
                 resourceName="accioMassivaResource"
                 columns={columns}
+                striped
                 defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
                 paginationActive
                 persistentStateActive

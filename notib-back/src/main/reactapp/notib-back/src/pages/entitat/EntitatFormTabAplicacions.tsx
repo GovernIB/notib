@@ -119,6 +119,7 @@ const EntitatFormTabAplicacions: React.FC = () => {
             fixedFilter={'entitat.id:' + id}
             formAdditionalData={{ entitat: { id } }}
             columns={columns}
+            striped
             paginationActive
             toolbarHideQuickFilter
             toolbarHide

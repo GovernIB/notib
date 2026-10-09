@@ -183,7 +183,7 @@ const MenuItem: React.FC<MenuItemProps> = (props) => {
     };
     const itemIconSx = {
         minWidth: 0,
-        ml: !shrink ? 1 : -1,
+        ml: !shrink ? 0 : -1,
         mr: !shrink ? 1 : 'auto',
         justifyContent: 'center',
     };

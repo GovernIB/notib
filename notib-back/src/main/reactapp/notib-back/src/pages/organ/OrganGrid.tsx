@@ -36,6 +36,8 @@ import { CardData } from '../../components/CardData';
 // import OrgansProcedimentsSyncActionButton from './OrgansProcedimentsSyncActionButton';
 import {ROLE_ADMIN_LECTURA, useNotibContext} from '../../components/NotibContext';
 import PageTitle from "../../components/PageTitle.tsx";
+import {useLocation} from "react-router-dom";
+import {getMenuEntryByPath} from "../../routeAccess.ts";
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -487,9 +489,11 @@ const ContentFilter: React.FC = () => {
             <GridFormField size={1.25} name="estat" />
             <GridFormField size={1} name="entregaCieActiva" />
             <GridFormField size={1} name="permetreSir" />
-            <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
-                <Icon>filter_alt_off</Icon>
-            </IconButton>
+            <Box sx={{display: 'flex', justifyContent: 'flex-end', flex:1}}>
+                <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
+                    <Icon>filter_alt_off</Icon>
+                </IconButton>
+            </Box>
         </Grid>
     );
 };
@@ -515,6 +519,9 @@ export const OrganGrid = () => {
         springFilterBuilder,
         <ContentFilter />
     );
+
+    const { pathname } = useLocation();
+    const menuEntry = getMenuEntryByPath(pathname, currentRole, t);
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
         <>
@@ -525,9 +532,17 @@ export const OrganGrid = () => {
                     // instància del grid (dona "No getTreeDataPath given" en canviar de vista): forçam un
                     // remuntatge complet del grid en canviar entre vista en arbre i vista de taula.
                     key={treeDataViewActive ? 'tree' : 'flat'}
-                    title={t('page.organs.grid.title')}
+                    title={
+                        <Box display="flex" alignItems="center" sx={{ gap: 1 }}>
+                            {menuEntry?.icon && <Icon fontSize="small">{menuEntry.icon}</Icon>}
+                            <Typography component="span" variant="h6" sx={{ mb: 0 }}>
+                                {t('page.organs.grid.title')}
+                            </Typography>
+                        </Box>
+                    }
                     resourceName="organGestorResource"
                     columns={columns}
+                    striped
                     fixedFilter={"entitat.id:" + currentEntitatId}
                     {...treeDataProps}
                     // La vista en arbre i la vista de taula tenen columnes diferents (useColumns), per

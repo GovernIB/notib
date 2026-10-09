@@ -15,6 +15,10 @@ import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils.ts';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid.tsx';
 import { ROLE_ADMIN_LECTURA, useNotibContext } from '../../components/NotibContext.ts';
 import PageTitle from "../../components/PageTitle.tsx";
+import Box from "@mui/material/Box";
+import {useLocation} from "react-router-dom";
+import {getMenuEntryByPath} from "../../routeAccess.ts";
+import {Typography} from "@mui/material";
 
 const columns = [
     {
@@ -68,11 +72,11 @@ const ContentFilter: React.FC = () => {
             <GridFormField size={1.75} name="contracteDataVigInici" />
             <GridFormField size={1.75} name="contracteDataVigFinal" />
             <GridFormField size={1.5} name="facturacioClientCodi" />
-            <Grid size={0.5}>
+            <Box sx={{display: 'flex', justifyContent: 'flex-end', flex:1}}>
                 <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
                     <Icon>filter_alt_off</Icon>
                 </IconButton>
-            </Grid>
+            </Box>
         </Grid>
     );
 };
@@ -89,15 +93,25 @@ export const PagadorsPostalsGrid: React.FC = () => {
         <ContentFilter />
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
+    const { pathname } = useLocation();
+    const menuEntry = getMenuEntryByPath(pathname, currentRole, t);
 
     return (
         <>
             <PageTitle title={t('page.pagadorPostal.grid.title')}></PageTitle>
             <GridPage>
                 <MuiDataGrid
-                    title={t('page.pagadorPostal.grid.title')}
+                    title={
+                        <Box display="flex" alignItems="center" sx={{ gap: 1 }}>
+                            {menuEntry?.icon && <Icon fontSize="small">{menuEntry.icon}</Icon>}
+                            <Typography component="span" variant="h6" sx={{ mb: 0 }}>
+                                {t('page.pagadorPostal.grid.title')}
+                            </Typography>
+                        </Box>
+                    }
                     resourceName="pagadorPostalResource"
                     columns={columns}
+                    striped
                     paginationActive
                     persistentStateActive
                     persistentStateClearPageSortPropsOnTopLevelRouteChange

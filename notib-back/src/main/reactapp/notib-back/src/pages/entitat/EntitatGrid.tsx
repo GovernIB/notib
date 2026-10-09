@@ -16,6 +16,10 @@ import GridFormField from '../../components/GridFormField';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 import { ROLE_ADMIN_LECTURA, useNotibContext } from '../../components/NotibContext';
 import PageTitle from "../../components/PageTitle.tsx";
+import Box from "@mui/material/Box";
+import {useLocation} from "react-router-dom";
+import {getMenuEntryByPath} from "../../routeAccess.ts";
+import {Typography} from "@mui/material";
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -96,9 +100,11 @@ const ContentFilter: React.FC = () => {
             <GridFormField size={1.5} name="dir3Codi" />
             <GridFormField size={1} name="activa" />
             {/* <GridFormField size={2} name="tipus" /> */}
-            <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
-                <Icon>filter_alt_off</Icon>
-            </IconButton>
+            <Box sx={{display: 'flex', justifyContent: 'flex-end', flex:1}}>
+                <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
+                    <Icon>filter_alt_off</Icon>
+                </IconButton>
+            </Box>
         </Grid>
     );
 };
@@ -113,15 +119,25 @@ export const EntitatGrid: React.FC = () => {
         springFilterBuilder,
         <ContentFilter />
     );
+    const { pathname } = useLocation();
+    const menuEntry = getMenuEntryByPath(pathname, currentRole, t);
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
         <>
             <PageTitle title={t('page.entitats.grid.title')}></PageTitle>
             <GridPage>
                 <MuiDataGrid
-                    title={t('page.entitats.grid.title')}
+                    title={
+                        <Box display="flex" alignItems="center" sx={{ gap: 1 }}>
+                            {menuEntry?.icon && <Icon fontSize="small">{menuEntry.icon}</Icon>}
+                            <Typography component="span" variant="h6" sx={{ mb: 0 }}>
+                                {t('page.entitats.grid.title')}
+                            </Typography>
+                        </Box>
+                    }
                     resourceName="entitatResource"
                     columns={columns}
+                    striped
                     paginationActive
                     persistentStateActive
                     persistentStateClearPageSortPropsOnTopLevelRouteChange

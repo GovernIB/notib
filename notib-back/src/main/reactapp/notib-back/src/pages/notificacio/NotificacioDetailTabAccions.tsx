@@ -172,7 +172,7 @@ const NotificacioDetailDialogTabAccions: React.FC<{ notificacio: any }> = (props
                             >
                                 <ListItemText primary={title} />
                             </ListItem>
-                            <Divider />
+                            <Divider component="li" sx={{ my: 0.5 }} />
                         </React.Fragment>
                     );
                 })

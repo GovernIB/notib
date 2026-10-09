@@ -66,8 +66,7 @@ export const filterMenuEntries = (
     return menuEntries
         ?.map((e) => {
             const filteredChildren = filterMenuEntries(e.children, resourceNames);
-            const passesResource =
-                e.resourceName == null || resourceNames?.includes(e.resourceName);
+            const passesResource= e.resourceName == null || resourceNames?.includes(e.resourceName);
             const passesHidden = e.hidden == null || !e.hidden;
             if (!passesResource || !passesHidden) {
                 return filteredChildren && filteredChildren.length > 0
@@ -274,6 +273,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             saveAs={saveAs}
             formFieldComponents={[{ type: 'reference', component: AppFormFieldReference }]}
             menuEntries={baseAppMenuEntries}
+            marginsDisabled={false}
         >
             <CustomLocalizationProvider>
                 <UserProfileFormDialog formDialogApiRef={formDialogApiRef} />

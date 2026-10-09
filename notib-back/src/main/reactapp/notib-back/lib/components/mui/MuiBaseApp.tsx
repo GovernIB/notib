@@ -119,7 +119,7 @@ const baseFormFieldComponents = [
     },
 ];
 
-const MuiComponentsConfigurer: React.FC = () => {
+const   MuiComponentsConfigurer: React.FC = () => {
     const [messageDialogShow, messageDialogComponent] = useMessageDialog();
     const [temporalMessageShow, temporalMessageComponent] = useTemporalMessage();
     const resourceApiContext = useOptionalResourceApiContext();

@@ -11,12 +11,15 @@ import {
     useCloseDialogButtons,
 } from 'reactlib';
 import GridFormField from '../../components/GridFormField';
-import { Badge, Box, Grid, Icon, IconButton, Tab, Tabs } from '@mui/material';
+import {Badge, Box, Grid, Icon, IconButton, Tab, Tabs, Typography} from '@mui/material';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
 import { useContentDialog } from '../../../lib/components/mui/Dialog';
 import MonitorIntegracioParamDetail from './MonitorIntegracioParamDetail';
 import ChipEstat from '../../components/ChipEstat';
 import PageTitle from "../../components/PageTitle.tsx";
+import {useLocation} from "react-router-dom";
+import {getMenuEntryByPath} from "../../routeAccess.ts";
+import {useNotibContext} from "../../components/NotibContext.ts";
 
 // INTERFACES
 interface MonitorProps {
@@ -122,11 +125,11 @@ const ContentFilter = ({ filterApiRef }: { filterApiRef: FilterApiRef }) => {
             <GridFormField size={1.5} name="codiEntitat" />
             <GridFormField size={1.25} name="tipus" />
             <GridFormField size={1} name="estat" />
-            <Grid size={0.5}>
+            <Box sx={{display: 'flex', justifyContent: 'flex-end', flex:1}}>
                 <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
                     <Icon>filter_alt_off</Icon>
                 </IconButton>
-            </Grid>
+            </Box>
         </Grid>
     );
 };
@@ -264,14 +267,26 @@ export const MonitorIntegracioGrid = () => {
         }
     }, [apiCurrentFields]);
 
+    const { currentRole} = useNotibContext();
+    const { pathname } = useLocation();
+    const menuEntry = getMenuEntryByPath(pathname, currentRole, t);
+
     return (
         <>
             <PageTitle title={t('page.integracio.grid.title')}></PageTitle>
             <GridPage>
                 <MuiDataGrid
-                    title={t('page.integracio.grid.title')}
+                    title={
+                        <Box display="flex" alignItems="center" sx={{ gap: 1 }}>
+                            {menuEntry?.icon && <Icon fontSize="small">{menuEntry.icon}</Icon>}
+                            <Typography component="span" variant="h6" sx={{ mb: 0 }}>
+                                {t('page.integracio.grid.title')}
+                            </Typography>
+                        </Box>
+                    }
                     resourceName="monitorIntegracioResource"
                     columns={columns}
+                    striped
                     fixedFilter={staticFilter}
                     paginationActive
                     toolbarHideQuickFilter

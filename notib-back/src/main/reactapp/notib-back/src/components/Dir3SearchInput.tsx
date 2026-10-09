@@ -42,8 +42,7 @@ const Dir3SearchFilterContent: React.FC = () => {
                 requestParams={data?.provincia != null ? { provincia: data?.provincia } : undefined}
             />
             <Grid size={1.5}>
-                <Button
-                    variant="outlined"
+                <Button variant="outlined"
                     onClick={() => filterApiRef.current?.clear()}
                     startIcon={<Icon>filter_alt_off</Icon>}
                     fullWidth

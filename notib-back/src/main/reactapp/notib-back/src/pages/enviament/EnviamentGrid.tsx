@@ -9,7 +9,7 @@ import {
     useMuiDataGridApiRef,
     useMuiDataGridContext,
 } from 'reactlib';
-import { Grid, IconButton } from '@mui/material';
+import {Grid, IconButton, Typography} from '@mui/material';
 import GridFormField, { GridButtonField } from '../../components/GridFormField';
 import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
@@ -22,12 +22,14 @@ import {
     generateGridRowStylesFromMap,
     getGridRowColorClass,
 } from '../../utils/estatConfig';
-import {useSearchParams} from "react-router-dom";
+import {useLocation, useSearchParams} from "react-router-dom";
 import useAccionsNotificacio from "../accions/AccionsNotificacio.tsx";
 import {ROLE_ADMIN_LECTURA, useNotibContext} from "../../components/NotibContext.ts";
 import {GridApiPro, useGridApiRef} from "@mui/x-data-grid-pro";
 import useSseRowRefresh from "../../hooks/useSseRowRefresh";
 import PageTitle from "../../components/PageTitle.tsx";
+import Box from "@mui/material/Box";
+import {getMenuEntryByPath} from "../../routeAccess.ts";
 
 const columns = [
     {
@@ -249,16 +251,14 @@ const ContentFilter: React.FC<{openByDefault?: boolean}> = ({openByDefault}) => 
                     <GridButtonField size={0.5} name="entregaPostalActiva" icon={'email'} hiddenLabel/>
                 </>
             )}
-            <Grid size={0.5} sx={{ textAlign: 'center' }}>
+            <Box sx={{display: 'flex', justifyContent: 'flex-end', flex:1}}>
                 <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
                     <Icon>filter_alt_off</Icon>
                 </IconButton>
-            </Grid>
-            <Grid size={0.5} sx={{ textAlign: 'center' }}>
                 <IconButton onClick={advancedFilterClick} title={t(advancedFilter ? 'comu.tancarFiltreAvançat' : 'comu.obrirFiltreAvançat')}>
                     <Icon sx={{ transform: advancedFilter ? 'rotate(180deg)' : 'none' }}>filter_list</Icon>
                 </IconButton>
-            </Grid>
+            </Box>
         </Grid>
     );
 };
@@ -286,6 +286,9 @@ const EnviamentGrid = () => {
         undefined,
         {referenciaEnviament: referencia}
     );
+
+    const { pathname } = useLocation();
+    const menuEntry = getMenuEntryByPath(pathname, currentRole, t);
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     const {anularRemesa,  anularRemesaDialog, ampliarTermini, ampliarTerminiDialog } = useAccionsNotificacio();
     return (
@@ -296,7 +299,15 @@ const EnviamentGrid = () => {
                     key={`${reloadKey}`}
                     datagridApiRef={datagridApiRef}
                     apiRef={gridApiRef}
-                    title={t('page.enviament.grid.title')}
+                    striped
+                    title={
+                        <Box display="flex" alignItems="center" sx={{ gap: 1 }}>
+                            {menuEntry?.icon && <Icon fontSize="small">{menuEntry.icon}</Icon>}
+                            <Typography component="span" variant="h6" sx={{ mb: 0 }}>
+                                {t('page.enviament.grid.title')}
+                            </Typography>
+                        </Box>
+                    }
                     resourceName="notificacioEnviamentResource"
                     columns={columns}
                     defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}

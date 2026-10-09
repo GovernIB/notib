@@ -86,6 +86,7 @@ const TasquesSegonPlaTab: React.FC = () => {
                 apiRef={gridApiRef}
                 resourceName="backGroundTaskResource"
                 columns={columns}
+                striped
                 sortModel={sortModelTasques}
                 toolbarHideCreate
                 toolbarElementsWithPositions={[

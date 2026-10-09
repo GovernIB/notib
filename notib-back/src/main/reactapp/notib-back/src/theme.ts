@@ -37,9 +37,10 @@ const sharedComponents = {
 export const lightTheme = createTheme({
     palette: {
         mode: 'light',
-        primary: { main: '#4697e7' },
-        customBackground: '#f5f5f5',
-        greyBackground: '#4697e7',
+        primary: { main: '#234D79' },
+        secondary: { main: '#ffffff' },
+        customBackground: '#ffffff',
+        greyBackground: '#ffffff',
     },
     components: sharedComponents,
 });
@@ -47,7 +48,7 @@ export const lightTheme = createTheme({
 export const darkTheme = createTheme({
     palette: {
         mode: 'dark',
-        primary: { main: '#4697e7' },
+        primary: { main: '#234D79' },
         customBackground: '#121212',
         greyBackground: '#4697e7',
     },
@@ -61,7 +62,7 @@ export const draculaTheme = createTheme({
     palette: {
         mode: 'dark',
         primary: { main: '#BD93F9', contrastText: '#282A36' },
-        secondary: { main: '#F8F8F2' },
+        // secondary: { main: '#F8F8F2' },
         background: { default: '#282A36', paper: '#303341' },
         text: { primary: '#F8F8F2', secondary: '#D6D6C2' },
         divider: '#7a7d8b',

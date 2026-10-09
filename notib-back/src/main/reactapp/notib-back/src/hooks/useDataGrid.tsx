@@ -44,6 +44,7 @@ export const useDatagridFilterProps = (
     content: React.ReactElement,
     minHeight: string = '40px',
     initialData?: any,
+    onDataChange?: (data: any) => void,
 ) => {
     const [autoFindDisabled, setAutoFindDisabled] = React.useState<boolean>(true);
     const handleSpringFilterChange = (springFilter: string | undefined) => {
@@ -60,6 +61,7 @@ export const useDatagridFilterProps = (
             componentProps={{ sx: { mb: 0, mt: 0 } }}
             commonFieldComponentProps={{ size: 'small' }}
             initialData={initialData}
+            onDataChange={onDataChange}
         >
             {content}
         </MuiFilter>

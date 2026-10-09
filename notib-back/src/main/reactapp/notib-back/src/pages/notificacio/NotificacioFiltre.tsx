@@ -1,11 +1,12 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
-import {Grid, Icon, IconButton} from "@mui/material";
+import { Grid, Icon, IconButton} from "@mui/material";
 import GridFormField, {GridButtonField} from "../../components/GridFormField.tsx";
 import useOrganGestorOptionRenderer from "../../components/OrganGestorOptionRenderer.tsx";
 import {springFilterBuilder, springFilterBuilder as filterBuilder, useFilterApiContext} from 'reactlib';
 import {useNotibContext} from "../../components/NotibContext.ts";
 import {formatEndOfDay, formatStartOfDay} from "../../utils/dateUtils.ts";
+import Box from "@mui/material/Box";
 
 export const useSpringFilterBuilder = () => {
 
@@ -72,11 +73,11 @@ const ContentFilter: React.FC<{openByDefault?: boolean, notificacionsEsborrades:
                 <GridFormField size={6} name="organGestor" namedQueries={`PERM_READ`} optionRenderer={organGestorOptionRenderer}/>
                 <GridFormField size={5} name="procediment" filter={procedimentFiltre}/>
                 <GridFormField size={5} name="servei" filter={serveiFiltre}/>
-                <Grid size={0.5} sx={{ textAlign: 'center' }}>
+                <Box sx={{display: 'flex', justifyContent: 'flex-end', flex:1}}>
                     <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
                         <Icon>filter_alt_off</Icon>
                     </IconButton>
-                </Grid>
+                </Box>
             </Grid>
         );
     }
@@ -90,11 +91,11 @@ const ContentFilter: React.FC<{openByDefault?: boolean, notificacionsEsborrades:
                 <GridFormField size={4} name="createdBy" />
                 <GridFormField size={2} name="dataIniciInici" />
                 <GridFormField size={2} name="dataIniciFi" />
-                <Grid size={0.5} sx={{ textAlign: 'center' }}>
+                <Box sx={{display: 'flex', justifyContent: 'flex-end', flex:1}}>
                     <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
                         <Icon>filter_alt_off</Icon>
                     </IconButton>
-                </Grid>
+                </Box>
             </Grid>
         );
     }
@@ -109,11 +110,11 @@ const ContentFilter: React.FC<{openByDefault?: boolean, notificacionsEsborrades:
                 <GridFormField size={2} name="dataIniciFi" />
                 <GridFormField size={2} name="estat" />
                 <GridFormField size={4} name="createdBy" />
-                <Grid size={0.5} sx={{ textAlign: 'center' }}>
+                <Box sx={{display: 'flex', justifyContent: 'flex-end', flex:1}}>
                     <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
                         <Icon>filter_alt_off</Icon>
                     </IconButton>
-                </Grid>
+                </Box>
             </Grid>
         );
     }
@@ -146,16 +147,15 @@ const ContentFilter: React.FC<{openByDefault?: boolean, notificacionsEsborrades:
                     <GridButtonField size={0.5} name="errorLastCallback" icon={'report_problem'} hiddenLabel/>
                 </>
             )}
-            <Grid size={0.5} sx={{ textAlign: 'center' }}>
+            <Box sx={{display: 'flex', justifyContent: 'flex-end', flex:1}}>
                 <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
+                    {/*<Chip label={"100"} size="small" color="default"/>*/}
                     <Icon>filter_alt_off</Icon>
                 </IconButton>
-            </Grid>
-            <Grid size={0.5} sx={{ textAlign: 'center' }}>
                 <IconButton onClick={advancedFilterClick} title={t(advancedFilter ? 'comu.tancarFiltreAvançat' : 'comu.obrirFiltreAvançat')}>
                     <Icon sx={{ transform: advancedFilter ? 'rotate(180deg)' : 'none' }}>filter_list</Icon>
                 </IconButton>
-            </Grid>
+            </Box>
         </Grid>
     );
 };

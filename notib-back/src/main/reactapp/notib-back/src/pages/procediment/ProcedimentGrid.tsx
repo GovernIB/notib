@@ -20,6 +20,9 @@ import { useAccionsProcediment } from '../accions/AccionsProcediment';
 import { DataCommonAdditionalAction } from '../../../lib/components/mui/datacommon/MuiDataCommon.tsx';
 import React from "react";
 import PageTitle from "../../components/PageTitle.tsx";
+import Box from "@mui/material/Box";
+import {getMenuEntryByPath} from "../../routeAccess.ts";
+import {useLocation} from "react-router-dom";
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -120,9 +123,11 @@ const ContentFilter: React.FC = () => {
             <GridButtonField size={0.5} name="entregaCieActiva" icon={'email'} hiddenLabel />
             <GridButtonField size={0.5} name="manual" icon={'sync'} hiddenLabel />
             <GridButtonField size={0.5} name="requireDirectPermission" icon={'gpp_good'} hiddenLabel/>
-            <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
-                <Icon>filter_alt_off</Icon>
-            </IconButton>
+            <Box sx={{display: 'flex', justifyContent: 'flex-end', flex:1}}>
+                <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
+                    <Icon>filter_alt_off</Icon>
+                </IconButton>
+            </Box>
         </Grid>
     );
 };
@@ -259,14 +264,25 @@ export const ProcedimentGrid = () => {
             onClick: id => syncAutoProcediment(id),
         },
     ];
+
+    const { pathname } = useLocation();
+    const menuEntry = getMenuEntryByPath(pathname, currentRole, t);
     return (
         <>
             <PageTitle title={t('page.procediments.grid.title')}></PageTitle>
             <GridPage>
                 <MuiDataGrid
-                    title={t('page.procediments.grid.title')}
+                    title={
+                        <Box display="flex" alignItems="center" sx={{ gap: 1 }}>
+                            {menuEntry?.icon && <Icon fontSize="small">{menuEntry.icon}</Icon>}
+                            <Typography component="span" variant="h6" sx={{ mb: 0 }}>
+                                {t('page.procediments.grid.title')}
+                            </Typography>
+                        </Box>
+                    }
                     resourceName="procedimentResource"
                     columns={columns}
+                    striped
                     fixedFilter={"tipus:'PROCEDIMENT' and entitat.id:" + currentEntitatId}
                     paginationActive
                     persistentStateActive

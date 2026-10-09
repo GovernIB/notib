@@ -85,6 +85,7 @@ const ActiveMqDetailDialogContent: React.FC<{ codiCua: string }> = (props) => {
             resourceName="activeMqDetailResource"
             titleDisabled
             columns={columns}
+            striped
             toolbarHideQuickFilter
             readOnly
             checkboxSelection={false}

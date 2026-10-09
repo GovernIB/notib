@@ -9,7 +9,7 @@ import {
 } from "reactlib";
 import {useTranslation} from "react-i18next";
 import Box from "@mui/material/Box";
-import {Link} from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
 import {useDatagridFilterProps, useDatagridPageSizeOptionsProps} from "../../hooks/useDataGrid.tsx";
 import React from "react";
 import {Grid, Icon, IconButton} from "@mui/material";
@@ -21,6 +21,8 @@ import {GridApiPro, useGridApiRef} from "@mui/x-data-grid-pro";
 import {ROLE_ADMIN_LECTURA, ROLE_USER, useNotibContext} from "../../components/NotibContext.ts";
 import AccionsMassives, {MenuOption, useAccionsMassives} from "../../components/AccionsMassives.tsx";
 import PageTitle from "../../components/PageTitle.tsx";
+import {getMenuEntryByPath} from "../../routeAccess.ts";
+import Typography from "@mui/material/Typography";
 
 
 const columns: MuiDataGridColDef[] = [
@@ -87,11 +89,11 @@ const ContentFilter: React.FC = () => {
                 <GridFormField size={2.5} name="estat" />
                 <GridFormField size={2.5} name="fiReintents" />
 
-                <Grid size={0.5} sx={{ textAlign: 'center' }}>
+                <Box sx={{display: 'flex', justifyContent: 'flex-end', flex:1}}>
                     <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
                         <Icon>filter_alt_off</Icon>
                     </IconButton>
-                </Grid>
+                </Box>
             </Grid>
         </Box>
     );
@@ -218,16 +220,27 @@ const CallbackPendentsGrid = () => {
     ];
     const [reloadKey, setReloadKey] = React.useState(0);
     const refreshGrid = React.useCallback(() => setReloadKey(k => k + 1), []);
+    const { pathname } = useLocation();
+    const menuEntry = getMenuEntryByPath(pathname, currentRole, t);
+
     return (
         <>
             <PageTitle title={t('page.callbacks.pendents.grid.title')}></PageTitle>
             <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
                 <MuiDataGrid
                     key={reloadKey}
-                    title={t('page.callbacks.pendents.grid.title')}
+                    title={
+                        <Box display="flex" alignItems="center" sx={{ gap: 1 }}>
+                            {menuEntry?.icon && <Icon fontSize="small">{menuEntry.icon}</Icon>}
+                            <Typography component="span" variant="h6" sx={{ mb: 0 }}>
+                                {t('page.callbacks.pendents.grid.title')}
+                            </Typography>
+                        </Box>
+                    }
                     resourceName="callbackResource"
                     datagridApiRef={datagridApiRef}
                     columns={columns}
+                    striped
                     rowAdditionalActions={rowAdditionalActions}
                     paginationActive
                     selectionActive

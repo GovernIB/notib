@@ -63,7 +63,7 @@ const MuiFormContent: React.FC<React.PropsWithChildren | any> = (props) => {
                 title: t('form.goBack.title'),
                 onClick: () => goBack(goBackLink),
                 disabled: backButtonDisabled || isSaving,
-                sx: { mr: 1 },
+                sx: { mr: 1, color: 'white' },
             }),
         });
     toolbarNodes.push(...(toolbarElementsWithPositions ?? []));
@@ -75,6 +75,7 @@ const MuiFormContent: React.FC<React.PropsWithChildren | any> = (props) => {
                 title: t('form.revert.title'),
                 onClick: () => formApiRef.current?.revert(),
                 disabled: !modified || isSaving,
+                sx: { color: 'white' }
             }),
         });
     !hiddenSaveButton &&
@@ -85,6 +86,7 @@ const MuiFormContent: React.FC<React.PropsWithChildren | any> = (props) => {
                 title: t(id != null ? 'form.update.title' : 'form.create.title'),
                 onClick: () => formApiRef.current?.save(),
                 disabled: isSaving,
+                sx: { color: 'white' }
             }),
         });
     !hiddenDeleteButton &&
@@ -95,6 +97,7 @@ const MuiFormContent: React.FC<React.PropsWithChildren | any> = (props) => {
                 title: t('form.delete.title'),
                 onClick: () => formApiRef.current?.delete(),
                 disabled: isSaving,
+                sx: { color: 'white' }
             }),
         });
     const outerBoxStyles = contentExpandsToAvailableHeight
@@ -141,6 +144,7 @@ const MuiFormContent: React.FC<React.PropsWithChildren | any> = (props) => {
                         position: 'sticky',
                         top: smallHeader ? '56px' : '64px',
                         zIndex: 10,
+                        color: 'white'
                     }}
                 />
             )}

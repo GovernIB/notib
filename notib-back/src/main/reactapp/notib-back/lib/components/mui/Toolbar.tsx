@@ -33,7 +33,7 @@ export const Toolbar: React.FC<ToolbarProps> = (props) => {
     const theme = useTheme();
     const titleElement = subtitle ? (
         <div style={{ minWidth: 0, width: '100%' }}>
-            {typeof title === 'string' ? <Typography variant="h6">{title}</Typography> : title}
+            {typeof title === 'string' ? <Typography variant="h6" component="h1">{title}</Typography> : title}
             <Typography
                 variant="body2"
                 sx={{
@@ -47,13 +47,13 @@ export const Toolbar: React.FC<ToolbarProps> = (props) => {
             </Typography>
         </div>
     ) : typeof title === 'string' ? (
-        <Typography variant="h6">{title}</Typography>
+        <Typography variant="h6" component="h1">{title}</Typography>
     ) : (
         (title as React.ReactElement)
     );
     const flexGrow = !noFlexGrow ? <div style={{ flexGrow: 1 }} /> : <></>;
-    const upperToolbarBgColor =
-        theme.palette.mode === 'light' ? theme.palette.grey[200] : theme.palette.grey[900];
+    // const upperToolbarBgColor = theme.palette.mode === 'light' ? theme.palette.grey[200] : theme.palette.grey[900];
+    const upperToolbarBgColor = "#234D79";
     const toolbarElements: React.ReactElement[] =
         title != null ? [titleElement, flexGrow] : [flexGrow];
     return (
@@ -64,14 +64,10 @@ export const Toolbar: React.FC<ToolbarProps> = (props) => {
                     width: '100%',
                     display: 'flex',
                     px: upperToolbar ? 2 : 0,
-                    ml: 0,
-                    mr: 0,
-                    mt: 0,
-                    backgroundColor: error
-                        ? red[100]
-                        : upperToolbar
-                          ? upperToolbarBgColor
-                          : undefined,
+                    // ml: "10px",
+                    // mr: "10px",
+                    // mt: 1,
+                    background: error ? red[100] : upperToolbar ? `linear-gradient(to right, #ffffff, ${upperToolbarBgColor})` : undefined,
                     ...sxProp,
                 }}>
                 {joinReactElementsWithReactElementsWithPositions(

@@ -68,8 +68,8 @@ const componentsEs = {
             multiple: '{{count}} filas seleccionadas',
         },
         edit: {
-            save: 'Guardar',
-            cancel: 'Cancelar',
+            save: 'Guarda',
+            cancel: 'Cancela',
         },
         row: {
             single: 'fila',

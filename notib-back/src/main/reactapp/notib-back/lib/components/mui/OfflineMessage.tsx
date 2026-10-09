@@ -20,7 +20,7 @@ export const OfflineMessage: React.FC = () => {
                     alignItems: 'center',
                     height: '100%',
                 }}>
-                <Typography variant="h4">
+                <Typography variant="h2">
                     <Icon color="error" fontSize="large" sx={{ mr: 1, paddingTop: '4px' }}>
                         warning
                     </Icon>

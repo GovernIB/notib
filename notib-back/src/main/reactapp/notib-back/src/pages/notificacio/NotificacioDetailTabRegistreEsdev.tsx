@@ -75,6 +75,7 @@ const NotificacioDetailTabRegistreEsdev: React.FC<{ id: any }> = (props) => {
                 resourceName="eventResource"
                 fixedFilter={'notificacio.id:' + id}
                 columns={columns}
+                striped
                 readOnly
                 getDetailPanelContent={({ row }) =>
                     (<Box sx={{ padding: '10px'}}>

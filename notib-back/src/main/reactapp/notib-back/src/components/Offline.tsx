@@ -19,7 +19,7 @@ export const Offline: React.FC = () => {
                 height: '100%',
             }}>
             <img width="5%" alt="Not found" src={offline} />
-            <Typography variant="h4">{t('component.Offline.message')}</Typography>
+            <Typography variant="h2">{t('component.Offline.message')}</Typography>
             <Button variant="contained" onClick={() => refreshApiIndex()} sx={{ mt: 2 }}>
                 {t('component.Offline.retry')}
             </Button>

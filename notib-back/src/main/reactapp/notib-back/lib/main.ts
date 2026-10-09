@@ -86,7 +86,7 @@ export { toBase64 } from './util/files';
 export { useDebounce } from './util/useDebounce';
 export { shallowEqual, deepEqual } from './util/equals';
 export * as springFilterBuilder from './util/springFilterBuilder';
-
+export { default as AppliedFilterCountChip, isFilterApplied } from './components/AppliedFilterCountChip';
 export type { DialogButton } from './components/BaseAppContext';
 export type { MenuEntry } from './components/mui/Menu';
 export type { MuiDataGridProps, MuiDataGridColDef } from './components/mui/datagrid/MuiDataGrid';

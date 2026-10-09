@@ -1182,7 +1182,7 @@ const translationCa = {
                 norma: "Norma de referència: UNE-EN 301549:2022, nivells A i AA",
                 resultatTitle: "Resultat",
                 puntuacioLabel: "Puntuació mitjana del lloc web",
-                puntuacioVal: "8.20",
+                puntuacioVal: "8.8",
                 nivellLabel: "Nivell d'adequació estimat",
                 nivellVal: "AA",
                 situacioLabel: "Situació de compliment estimada",
@@ -1392,7 +1392,9 @@ const translationCa = {
     },
     comu: {
         netejarFiltre: 'Netejar filtre',
+        netejarFiltreTitle: 'Neteja',
         filtrar: 'Filtrar',
+        filtresAplicats: 'filtres aplicats',
         obrirFiltreAvançat: 'Obrir filtre avançat',
         tancarFiltreAvançat: 'Tancar filtre avançat',
         guardar: 'Desa',

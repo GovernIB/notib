@@ -70,6 +70,7 @@ const EnviamentDetailTabRegistreEsdev: React.FC<{ id: any }> = (props) => {
                 resourceName="eventResource"
                 fixedFilter={'enviament.id:' + id}
                 columns={columns}
+                striped
                 readOnly
                 toolbarHideQuickFilter
                 getDetailPanelContent={({ row }) =>

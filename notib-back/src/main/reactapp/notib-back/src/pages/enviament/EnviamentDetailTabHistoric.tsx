@@ -192,6 +192,7 @@ const EnviamentDetailTabHistoric: React.FC<{ id: any }> = (props) => {
                 fixedFilter={'enviamentId:' + id}
                 sortModel={[{ field: 'tipusOperacio', sort: 'desc' }]}
                 columns={columns}
+                striped
                 readOnly
                 persistentStateActive
                 persistentStateClearPageSortPropsOnTopLevelRouteChange

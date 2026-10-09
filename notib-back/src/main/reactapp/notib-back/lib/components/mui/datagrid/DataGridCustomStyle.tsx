@@ -7,7 +7,7 @@ const DataGridCustomStyle = styled(MuiDataGrid)((props) => {
     const { theme, semiBordered } = props as any;
     const customStyle = {
         [`& .${gridClasses.row}.even`]: {
-            backgroundColor: theme.palette.grey[200],
+            backgroundColor: alpha(theme.palette.text.primary, 0.04) ,
             '&:hover': {
                 backgroundColor: alpha(theme.palette.primary.main, ODD_OPACITY),
                 '@media (hover: none)': {

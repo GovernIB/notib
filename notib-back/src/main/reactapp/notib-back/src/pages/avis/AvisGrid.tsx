@@ -12,6 +12,11 @@ import GridFormField from '../../components/GridFormField';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 import PageTitle from "../../components/PageTitle.tsx";
+import Box from "@mui/material/Box";
+import {useLocation} from "react-router-dom";
+import {getMenuEntryByPath} from "../../routeAccess.ts";
+import Typography from "@mui/material/Typography";
+import {useNotibContext} from "../../components/NotibContext.ts";
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -68,9 +73,11 @@ const ContentFilter: React.FC = () => {
             <GridFormField size={1.5} name="dataFinal" />
             <GridFormField size={1.5} name="avisNivell" />
             <GridFormField size={1} name="actiu" />
-            <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
-                <Icon>filter_alt_off</Icon>
-            </IconButton>
+            <Box sx={{display: 'flex', justifyContent: 'flex-end', flex:1}}>
+                <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
+                    <Icon>filter_alt_off</Icon>
+                </IconButton>
+            </Box>
         </Grid>
     );
 };
@@ -84,15 +91,27 @@ export const AvisGrid = () => {
         springFilterBuilder,
         <ContentFilter />
     );
+    const { currentRole} = useNotibContext();
+    const { pathname } = useLocation();
+    const menuEntry = getMenuEntryByPath(pathname, currentRole, t);
+
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
         <>
             <PageTitle title={t('page.avisos.grid.title')}></PageTitle>
             <GridPage>
                 <MuiDataGrid
-                    title={t('page.avisos.grid.title')}
+                    title={
+                        <Box display="flex" alignItems="center" sx={{ gap: 1 }}>
+                            {menuEntry?.icon && <Icon fontSize="small">{menuEntry.icon}</Icon>}
+                            <Typography component="span" variant="h6" sx={{ mb: 0 }}>
+                                {t('page.avisos.grid.title')}
+                            </Typography>
+                        </Box>
+                    }
                     resourceName="avisResource"
                     columns={columns}
+                    striped
                     paginationActive
                     persistentStateActive
                     persistentStateClearPageSortPropsOnTopLevelRouteChange
