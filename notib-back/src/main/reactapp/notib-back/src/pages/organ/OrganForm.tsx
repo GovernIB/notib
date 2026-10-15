@@ -8,6 +8,9 @@ import OrganFormTabPermisos from './OrganFormTabPermisos';
 import GridFormField from '../../components/GridFormField';
 import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
 import { useTabParam } from '../../hooks/useSearchParams';
+import ScreenFrame from '../../components/ScreenFrame';
+import { formScreenTitle } from '../../utils/formScreenTitle';
+import { icons } from '../../utils/icons';
 
 export const OrganFormContent: React.FC<{ setSubtitle?: (subtitle: string) => void }> = (props) => {
     const { setSubtitle } = props;
@@ -64,22 +67,25 @@ export const OrganForm: React.FC = () => {
 
     return (
         <FormPage>
-            <MuiForm
-                resourceName="organGestorResource"
-                id={id != null ? parseInt(id) : id}
-                title={
-                    id != null
-                        ? t('page.organs.form.titleUpdate')
-                        : t('page.organs.form.titleCreate')
-                }
-                toolbarSubtitle={id != null ? subtitle : undefined}
-                createLink="./{{id}}"
-                //updateLink="../../"
-                componentProps={{ style: { height: '100%' } }}
-                commonFieldComponentProps={{ size: 'small' }}
-            >
-                <OrganFormContent setSubtitle={setSubtitle} />
-            </MuiForm>
+            <ScreenFrame>
+                <MuiForm
+                    resourceName="organGestorResource"
+                    id={id != null ? parseInt(id) : id}
+                    title={formScreenTitle(
+                        icons.organ,
+                        id != null
+                            ? t('page.organs.form.titleUpdate')
+                            : t('page.organs.form.titleCreate')
+                    )}
+                    toolbarSubtitle={id != null ? subtitle : undefined}
+                    createLink="./{{id}}"
+                    //updateLink="../../"
+                    componentProps={{ style: { height: '100%' } }}
+                    commonFieldComponentProps={{ size: 'small' }}
+                >
+                    <OrganFormContent setSubtitle={setSubtitle} />
+                </MuiForm>
+            </ScreenFrame>
         </FormPage>
     );
 };

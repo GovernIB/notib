@@ -5,6 +5,8 @@ import SistemaTab from './SistemaTab.tsx';
 import FilsExecucioTab from './FilsExecucioTab.tsx';
 import TasquesSegonPlaTab from './TasquesSegonPlaTab.tsx';
 import PageTitle from "../../components/PageTitle.tsx";
+import ScreenFrame from '../../components/ScreenFrame';
+import { icons } from '../../utils/icons';
 
 const MonitorSistema: React.FC = () => {
     const { t } = useTranslation();
@@ -27,7 +29,9 @@ const MonitorSistema: React.FC = () => {
     ];
     return (<>
                 <PageTitle title={t('page.integracio.detall.monitorSistema')}></PageTitle>
-                <CustomTabs tabs={tabs} />
+                <ScreenFrame icon={icons.monitorSistema} title={t('page.integracio.detall.monitorSistema')} padded>
+                    <CustomTabs tabs={tabs} />
+                </ScreenFrame>
             </>);
 };
 

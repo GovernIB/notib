@@ -15,7 +15,8 @@ import {
 import GridFormField from '../../components/GridFormField';
 import { Box, Icon, IconButton } from '@mui/material';
 import GridToolbarButton from '../../components/GridToolbarButton';
-import {ROLE_ADMIN_LECTURA, useNotibContext} from "../../components/NotibContext.ts";
+import {ROLE_ADMIN_LECTURA, useNotibContext} from "../../components/NotibContext.ts";
+import { icons } from '../../utils/icons';
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -68,8 +69,8 @@ const ContentFilter: React.FC<{ filterApiRef: FilterApiRef; gridApiRef: MuiDataG
             <GridFormField size={1} name="activa" />
             <Grid size={1.5}>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
-                        <Icon>filter_alt_off</Icon>
+                    <IconButton onClick={handleButtonClick} title={t('comu.neteja')} aria-label={t('comu.neteja')}>
+                        <Icon>{icons.neteja}</Icon>
                     </IconButton>
                     <GridToolbarButton gridApiRef={gridApiRef} hideCreateButton={currentRole === ROLE_ADMIN_LECTURA} />
                 </Box>

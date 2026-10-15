@@ -5,7 +5,6 @@ import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import Icon from '@mui/material/Icon';
-import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -17,7 +16,6 @@ import {
     MuiDataGridColDef,
     springFilterBuilder as filterBuilder,
     useBaseAppContext,
-    useFilterApiContext,
     useMuiDataGridApiRef,
     useResourceApiService,
 } from 'reactlib';
@@ -36,6 +34,10 @@ import { CardData } from '../../components/CardData';
 // import OrgansProcedimentsSyncActionButton from './OrgansProcedimentsSyncActionButton';
 import {ROLE_ADMIN_LECTURA, useNotibContext} from '../../components/NotibContext';
 import PageTitle from "../../components/PageTitle.tsx";
+import ScreenFrame from '../../components/ScreenFrame';
+import ScreenTitle from '../../components/ScreenTitle';
+import { FilterClearButton } from '../../components/FilterButtons';
+import { icons } from '../../utils/icons';
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -472,12 +474,7 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
 };
 
 const ContentFilter: React.FC = () => {
-    const { t } = useTranslation();
-    const filterApiRef = useFilterApiContext();
     const organGestorOptionRenderer = useOrganGestorOptionRenderer();
-    const handleButtonClick = () => {
-        filterApiRef.current?.clear();
-    };
     return (
         <Grid container spacing={2}>
             <GridFormField size={1} name="codi" />
@@ -487,9 +484,7 @@ const ContentFilter: React.FC = () => {
             <GridFormField size={1.25} name="estat" />
             <GridFormField size={1} name="entregaCieActiva" />
             <GridFormField size={1} name="permetreSir" />
-            <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
-                <Icon>filter_alt_off</Icon>
-            </IconButton>
+            <FilterClearButton />
         </Grid>
     );
 };
@@ -520,54 +515,56 @@ export const OrganGrid = () => {
         <>
             <PageTitle title={t('page.organs.grid.title')}></PageTitle>
             <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
-                <MuiDataGrid
-                    // MUI-X no admet bé canviar treeData/getTreeDataPath/apiRef en calent sobre la mateixa
-                    // instància del grid (dona "No getTreeDataPath given" en canviar de vista): forçam un
-                    // remuntatge complet del grid en canviar entre vista en arbre i vista de taula.
-                    key={treeDataViewActive ? 'tree' : 'flat'}
-                    title={t('page.organs.grid.title')}
-                    resourceName="organGestorResource"
-                    columns={columns}
-                    fixedFilter={"entitat.id:" + currentEntitatId}
-                    {...treeDataProps}
-                    // La vista en arbre i la vista de taula tenen columnes diferents (useColumns), per
-                    // això la clau inclou quina de les dues està activa: en cas contrari l'estat
-                    // persistit d'una es sobreescriuria incorrectament amb el de l'altra.
-                    persistentStateKey={'organGestorResource-' + (treeDataViewActive ? 'tree' : 'flat')}
-                    persistentStateActive
-                    persistentStateClearPageSortPropsOnTopLevelRouteChange
-                    {...filterDataGridProps}
-                    {...pageSizeOptionsDataGridProps}
-                    toolbarType="upper"
-                    popupEditActive
-                    popupEditFormContent={<OrganFormContent />}
-                    popupEditFormDialogResourceTitle={t('page.organs.grid.popupDialogTitle')}
-                    popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
-                    toolbarHideCreate={isRoleAdminLectura ? true : undefined}
-                    rowHideUpdateButton={isRoleAdminLectura}
-                    rowHideDeleteButton={isRoleAdminLectura}
-                    toolbarElementsWithPositions={[
-                        {
-                            position: 1,
-                            element: viewSwitchComponent,
-                        },
-                        {
-                            position: 2,
-                            element: <OficinesSyncActionButton dataGridApiRef={dataGridApiRef} />,
-                        },
-                        {
-                            position: 2,
-                            element: <OrganGridDir3SyncActionButton dataGridApiRef={dataGridApiRef} />,
-                        },
-                        // Amagat: substituït pel botó "Actualitzar òrgans i procediments" (OrganGridDir3SyncActionButton)
-                        // {
-                        //     position: 2,
-                        //     element: <OrgansProcedimentsSyncActionButton dataGridApiRef={dataGridApiRef} />,
-                        // },
-                    ]}
-                    apiRef={dataGridApiRef}
-                    density="compact"
-                />
+                <ScreenFrame>
+                    <MuiDataGrid
+                        // MUI-X no admet bé canviar treeData/getTreeDataPath/apiRef en calent sobre la mateixa
+                        // instància del grid (dona "No getTreeDataPath given" en canviar de vista): forçam un
+                        // remuntatge complet del grid en canviar entre vista en arbre i vista de taula.
+                        key={treeDataViewActive ? 'tree' : 'flat'}
+                        title={<ScreenTitle icon={icons.organ} title={t('page.organs.grid.title')} />}
+                        resourceName="organGestorResource"
+                        columns={columns}
+                        fixedFilter={"entitat.id:" + currentEntitatId}
+                        {...treeDataProps}
+                        // La vista en arbre i la vista de taula tenen columnes diferents (useColumns), per
+                        // això la clau inclou quina de les dues està activa: en cas contrari l'estat
+                        // persistit d'una es sobreescriuria incorrectament amb el de l'altra.
+                        persistentStateKey={'organGestorResource-' + (treeDataViewActive ? 'tree' : 'flat')}
+                        persistentStateActive
+                        persistentStateClearPageSortPropsOnTopLevelRouteChange
+                        {...filterDataGridProps}
+                        {...pageSizeOptionsDataGridProps}
+                        toolbarType="upper"
+                        popupEditActive
+                        popupEditFormContent={<OrganFormContent />}
+                        popupEditFormDialogResourceTitle={t('page.organs.grid.popupDialogTitle')}
+                        popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
+                        toolbarHideCreate={isRoleAdminLectura ? true : undefined}
+                        rowHideUpdateButton={isRoleAdminLectura}
+                        rowHideDeleteButton={isRoleAdminLectura}
+                        toolbarElementsWithPositions={[
+                            {
+                                position: 1,
+                                element: viewSwitchComponent,
+                            },
+                            {
+                                position: 2,
+                                element: <OficinesSyncActionButton dataGridApiRef={dataGridApiRef} />,
+                            },
+                            {
+                                position: 2,
+                                element: <OrganGridDir3SyncActionButton dataGridApiRef={dataGridApiRef} />,
+                            },
+                            // Amagat: substituït pel botó "Actualitzar òrgans i procediments" (OrganGridDir3SyncActionButton)
+                            // {
+                            //     position: 2,
+                            //     element: <OrgansProcedimentsSyncActionButton dataGridApiRef={dataGridApiRef} />,
+                            // },
+                        ]}
+                        apiRef={dataGridApiRef}
+                        density="compact"
+                    />
+                </ScreenFrame>
             </GridPage>
         </>
     );

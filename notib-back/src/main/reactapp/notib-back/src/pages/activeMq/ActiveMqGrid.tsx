@@ -3,6 +3,9 @@ import {useTranslation} from 'react-i18next';
 import {GridPage, MuiActionReportButton, MuiDataGrid, MuiDataGridColDef, useBaseAppContext, useMuiDataGridApiRef, useResourceApiService,} from 'reactlib';
 import {useActiveMqDetailDetailDialog} from "./ActivmeMqDetailDialog.tsx";
 import PageTitle from "../../components/PageTitle.tsx";
+import ScreenFrame from '../../components/ScreenFrame';
+import ScreenTitle from '../../components/ScreenTitle';
+import { icons } from '../../utils/icons';
 
 
 const useActiveMqAction = (refresh?: () => void) => {
@@ -77,41 +80,43 @@ export const ActiveMqGrid = () => {
         <>
             <PageTitle title={t('page.activemq.grid.title')}></PageTitle>
             <GridPage>
-                <MuiDataGrid
-                    title={t('page.activemq.grid.title')}
-                    resourceName="activeMqResource"
-                    columns={columns}
-                    toolbarType="upper"
-                    toolbarHideQuickFilter
-                    checkboxSelection={false}
-                    toolbarElementsWithPositions={[{
-                        position: 2,
-                        element: <MuiActionReportButton
-                                    resourceName={"activeMqResource"}
-                                    report="DESCARREGAR_JOB_SCHEDULER_JSON"
-                                    reportFileType="CUSTOM"
-                                    title={t('page.activemq.descargarJobScheduler')}
-                                    buttonComponentProps={{variant: "contained",size:"small"}}
-                                    buttonIcon="file_download"/>
-                    }]}
-                    rowAdditionalActions={[
-                        {
-                            label: t('page.activemq.grid.missatges'),
-                            title: t('page.activemq.grid.missatges'),
-                            icon: 'info',
-                            showInMenu: true,
-                            onClick: id => onDetailClickActiveMq(id),
-                        },
-                        {
-                            label: t('page.activemq.grid.buidar'),
-                            title: t('page.activemq.grid.buidar'),
-                            icon: 'delete',
-                            showInMenu: true,
-                            onClick: id => buidar([id]),
-                        }
-                    ]}
-                />
-                {dialogComponentActiveMq}
+                <ScreenFrame>
+                    <MuiDataGrid
+                        title={<ScreenTitle icon={icons.activeMq} title={t('page.activemq.grid.title')} />}
+                        resourceName="activeMqResource"
+                        columns={columns}
+                        toolbarType="upper"
+                        toolbarHideQuickFilter
+                        checkboxSelection={false}
+                        toolbarElementsWithPositions={[{
+                            position: 2,
+                            element: <MuiActionReportButton
+                                        resourceName={"activeMqResource"}
+                                        report="DESCARREGAR_JOB_SCHEDULER_JSON"
+                                        reportFileType="CUSTOM"
+                                        title={t('page.activemq.descargarJobScheduler')}
+                                        buttonComponentProps={{variant: "contained",size:"small"}}
+                                        buttonIcon="file_download"/>
+                        }]}
+                        rowAdditionalActions={[
+                            {
+                                label: t('page.activemq.grid.missatges'),
+                                title: t('page.activemq.grid.missatges'),
+                                icon: 'info',
+                                showInMenu: true,
+                                onClick: id => onDetailClickActiveMq(id),
+                            },
+                            {
+                                label: t('page.activemq.grid.buidar'),
+                                title: t('page.activemq.grid.buidar'),
+                                icon: 'delete',
+                                showInMenu: true,
+                                onClick: id => buidar([id]),
+                            }
+                        ]}
+                    />
+                    {dialogComponentActiveMq}
+                </ScreenFrame>
             </GridPage>
         </>
     );

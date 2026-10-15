@@ -4,6 +4,9 @@ import {GridPage, MuiDataGrid, MuiDataGridColDef, useBaseAppContext, useMuiDataG
 import {Badge, Button, Icon} from "@mui/material";
 import {GridApiPro, useGridApiRef} from "@mui/x-data-grid-pro";
 import PageTitle from "../../components/PageTitle.tsx";
+import ScreenFrame from '../../components/ScreenFrame';
+import ScreenTitle from '../../components/ScreenTitle';
+import { icons } from '../../utils/icons';
 
 const useCacheAction = (apiRef: React.RefObject<GridApiPro | null>, refresh?: () => void) => {
 
@@ -71,39 +74,41 @@ export const CacheGrid = () => {
         <>
             <PageTitle title={t('page.cache.grid.title')}></PageTitle>
             <GridPage>
-                <MuiDataGrid
-                    title={t('page.cache.grid.title')}
-                    datagridApiRef={datagridApiRef}
-                    resourceName="cacheResource"
-                    columns={columns}
-                    toolbarHideQuickFilter
-                    toolbarType="upper"
-                    rowHideUpdateButton
-                    rowHideDeleteButton
-                    rowAdditionalActions={accions}
-                    selectionActive
-                    rowSelectionModel={{type: 'include', ids: selectedRows,}}
-                    onRowSelectionModelChange={rowSelectionModel => setSelectedRows(new Set(rowSelectionModel?.ids ?? []))}
-                    toolbarElementsWithPositions={[
-                        {
-                            position: 2,
-                            element: (
-                                <Badge badgeContent={selectedRows.size} color="primary">
-                                    <Button
-                                        variant="outlined"
-                                        color="primary"
-                                        startIcon={<Icon>delete</Icon>}
-                                        disabled={selectedRows.size === 0}
-                                        onClick={() => restartAll([...selectedRows], true)}
-                                        sx={{ textTransform: 'none' }}
-                                    >
-                                        {t('page.cache.accions.buidarMassiu')}
-                                    </Button>
-                                </Badge>
-                            ),
-                        },
-                    ]}
-                />
+                <ScreenFrame>
+                    <MuiDataGrid
+                        title={<ScreenTitle icon={icons.cache} title={t('page.cache.grid.title')} />}
+                        datagridApiRef={datagridApiRef}
+                        resourceName="cacheResource"
+                        columns={columns}
+                        toolbarHideQuickFilter
+                        toolbarType="upper"
+                        rowHideUpdateButton
+                        rowHideDeleteButton
+                        rowAdditionalActions={accions}
+                        selectionActive
+                        rowSelectionModel={{type: 'include', ids: selectedRows,}}
+                        onRowSelectionModelChange={rowSelectionModel => setSelectedRows(new Set(rowSelectionModel?.ids ?? []))}
+                        toolbarElementsWithPositions={[
+                            {
+                                position: 2,
+                                element: (
+                                    <Badge badgeContent={selectedRows.size} color="primary">
+                                        <Button
+                                            variant="outlined"
+                                            color="primary"
+                                            startIcon={<Icon>delete</Icon>}
+                                            disabled={selectedRows.size === 0}
+                                            onClick={() => restartAll([...selectedRows], true)}
+                                            sx={{ textTransform: 'none' }}
+                                        >
+                                            {t('page.cache.accions.buidarMassiu')}
+                                        </Button>
+                                    </Badge>
+                                ),
+                            },
+                        ]}
+                    />
+                </ScreenFrame>
             </GridPage>
         </>
     );

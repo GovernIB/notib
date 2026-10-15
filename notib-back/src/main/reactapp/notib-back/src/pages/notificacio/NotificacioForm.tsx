@@ -22,6 +22,9 @@ import NotificacioFormEnviaments from './NotificacioFormEnviaments';
 import NotificacioFormDocuments from './NotificacioFormDocuments';
 import GridFormField from '../../components/GridFormField';
 import { useDadesProcediment } from './DadesProcediment.tsx';
+import ScreenFrame from '../../components/ScreenFrame';
+import { formScreenTitle } from '../../utils/formScreenTitle';
+import { icons } from '../../utils/icons';
 
 const JSonButton: React.FC = () => {
     const { data } = useFormContext();
@@ -298,27 +301,30 @@ export const NotificacioForm: React.FC = () => {
 
     return (
         <FormPage>
-            <MuiForm
-                resourceName="notificacioResource"
-                id={id != null ? parseInt(id) : id}
-                title={
-                    id != null
-                        ? t(`page.notificacio.form.title.${type}.update`)
-                        : t(`page.notificacio.form.title.${type}.create`)
-                }
-                initOnChangeRequest
-                additionalData={type ? { enviamentTipus: type, ...initialData } : initialData}
-                onReset={handleReset}
-                apiRef={formApiRef}
-                createLink="../"
-                toolbarElementsWithPositions={[{ position: 2, element: <JSonButton /> }]}
-                componentProps={{ style: { height: '100%' } }}
-                commonFieldComponentProps={{ size: 'small' }}
-            >
-                <NotificacioFormContent />
-                <NotificacioFormEnviaments />
-                <NotificacioFormDocuments />
-            </MuiForm>
+            <ScreenFrame>
+                <MuiForm
+                    resourceName="notificacioResource"
+                    id={id != null ? parseInt(id) : id}
+                    title={formScreenTitle(
+                        icons.notificacio,
+                        id != null
+                            ? t(`page.notificacio.form.title.${type}.update`)
+                            : t(`page.notificacio.form.title.${type}.create`)
+                    )}
+                    initOnChangeRequest
+                    additionalData={type ? { enviamentTipus: type, ...initialData } : initialData}
+                    onReset={handleReset}
+                    apiRef={formApiRef}
+                    createLink="../"
+                    toolbarElementsWithPositions={[{ position: 2, element: <JSonButton /> }]}
+                    componentProps={{ style: { height: '100%' } }}
+                    commonFieldComponentProps={{ size: 'small' }}
+                >
+                    <NotificacioFormContent />
+                    <NotificacioFormEnviaments />
+                    <NotificacioFormDocuments />
+                </MuiForm>
+            </ScreenFrame>
         </FormPage>
     );
 };

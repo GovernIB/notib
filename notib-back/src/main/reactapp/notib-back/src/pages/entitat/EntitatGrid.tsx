@@ -2,20 +2,21 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
-import Icon from '@mui/material/Icon';
-import IconButton from '@mui/material/IconButton';
 import {
     GridPage,
     MuiDataGrid,
     MuiDataGridColDef,
     springFilterBuilder as filterBuilder,
-    useFilterApiContext,
 } from 'reactlib';
 import LinkToTab from '../../components/LinkToTab';
 import GridFormField from '../../components/GridFormField';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 import { ROLE_ADMIN_LECTURA, useNotibContext } from '../../components/NotibContext';
 import PageTitle from "../../components/PageTitle.tsx";
+import ScreenFrame from '../../components/ScreenFrame';
+import ScreenTitle from '../../components/ScreenTitle';
+import { FilterClearButton } from '../../components/FilterButtons';
+import { icons } from '../../utils/icons';
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -84,11 +85,6 @@ const springFilterBuilder = (data: any) => {
 };
 
 const ContentFilter: React.FC = () => {
-    const { t } = useTranslation();
-    const filterApiRef = useFilterApiContext();
-    const handleButtonClick = () => {
-        filterApiRef.current?.clear();
-    };
     return (
         <Grid container spacing={2}>
             <GridFormField size={1.5} name="codi" />
@@ -96,9 +92,7 @@ const ContentFilter: React.FC = () => {
             <GridFormField size={1.5} name="dir3Codi" />
             <GridFormField size={1} name="activa" />
             {/* <GridFormField size={2} name="tipus" /> */}
-            <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
-                <Icon>filter_alt_off</Icon>
-            </IconButton>
+            <FilterClearButton />
         </Grid>
     );
 };
@@ -118,23 +112,25 @@ export const EntitatGrid: React.FC = () => {
         <>
             <PageTitle title={t('page.entitats.grid.title')}></PageTitle>
             <GridPage>
-                <MuiDataGrid
-                    title={t('page.entitats.grid.title')}
-                    resourceName="entitatResource"
-                    columns={columns}
-                    paginationActive
-                    persistentStateActive
-                    persistentStateClearPageSortPropsOnTopLevelRouteChange
-                    {...filterDataGridProps}
-                    {...pageSizeOptionsDataGridProps}
-                    toolbarType="upper"
-                    toolbarCreateLink="form"
-                    toolbarHideCreate={isRoleAdminLectura ? true : undefined}
-                    rowLink="form/{{id}}"
-                    rowUpdateLink="form/{{id}}"
-                    rowHideUpdateButton={isRoleAdminLectura}
-                    rowHideDeleteButton={isRoleAdminLectura}
-                />
+                <ScreenFrame>
+                    <MuiDataGrid
+                        title={<ScreenTitle icon={icons.entitat} title={t('page.entitats.grid.title')} />}
+                        resourceName="entitatResource"
+                        columns={columns}
+                        paginationActive
+                        persistentStateActive
+                        persistentStateClearPageSortPropsOnTopLevelRouteChange
+                        {...filterDataGridProps}
+                        {...pageSizeOptionsDataGridProps}
+                        toolbarType="upper"
+                        toolbarCreateLink="form"
+                        toolbarHideCreate={isRoleAdminLectura ? true : undefined}
+                        rowLink="form/{{id}}"
+                        rowUpdateLink="form/{{id}}"
+                        rowHideUpdateButton={isRoleAdminLectura}
+                        rowHideDeleteButton={isRoleAdminLectura}
+                    />
+                </ScreenFrame>
             </GridPage>
         </>
     );

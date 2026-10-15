@@ -18,6 +18,15 @@ import ThemeUserProvider, { useThemeUserContext } from './components/ThemeUserPr
 import {useNotibContext, ROLE_SUPER, ROLE_APLICACIO} from './components/NotibContext';
 import { lightTheme } from './theme';
 import { getMenuEntries } from './routeAccess';
+import {
+    APPBAR_PADDING_LEFT,
+    FOOTER_HEIGHT,
+    HEADER_HEIGHT,
+    LOGO_BOX_LEFT,
+    LOGO_HEIGHT,
+    LOGO_SEPARATOR_GAP,
+    MENU_WIDTH,
+} from './utils/layout';
 
 export const envVars = {
     VITE_API_URL: import.meta.env.VITE_API_URL,
@@ -81,18 +90,51 @@ const InnerApp: React.FC = () => {
         <BaseApp
             code="NOTIB"
             logo={mode === 'light' ? goibLogoLight : goibLogoDark}
-            logoStyle={{'& img': { height: '49px' }, pl: 1, pr: '29px', borderRight: '1px solid ' + theme.palette.divider,}}
-            title={<img style={{ marginLeft: '8px', height: '49px', verticalAlign: 'middle' }} src={logoColor} alt="Notib"/>}
+            logoStyle={{
+                '& img': { height: LOGO_HEIGHT + 'px', display: 'block' },
+                // El separador vertical ha de caure sobre la vora dreta del menú obert, i omplir
+                // l'alçada de la capçalera. El botó de menú duu un marge esquerre de -12 i un dret de
+                // 16, així que la caixa del logo arrenca a LOGO_BOX_LEFT. Fixant-ne l'amplada (en
+                // comptes de deixar que la mida del logo mani) la vora cau sempre a MENU_WIDTH.
+                width: MENU_WIDTH - LOGO_BOX_LEFT + 'px',
+                boxSizing: 'border-box',
+                alignSelf: 'stretch',
+                borderRight: `1px solid ${theme.palette.divider}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                // Substitueix el mr/pt/pr de la llibreria (l'sx s'hi fusiona al final).
+                mr: 0,
+                pt: 0,
+                pl: 0,
+                pr: LOGO_SEPARATOR_GAP + 'px',
+            }}
+            title={
+                <img
+                    style={{ marginLeft: LOGO_SEPARATOR_GAP + 'px', height: LOGO_HEIGHT + 'px', verticalAlign: 'middle' }}
+                    src={logoColor}
+                    alt="Notib"
+                />
+            }
             version={version}
             availableLanguages={['ca', 'es']}
             menuEntries={(currentRoleSuperOrEntitatSelected || hasBeenSelectedRef.current) ? menuEntries : undefined}
             menuAppearance={estilMenu}
             appbarBackgroundColor={bgColor}
-            appbarStyle={{ color: textColor }}
-            footerHeight={36}
+            // El botó de menú duu ml -12, així que amb APPBAR_PADDING_LEFT queda centrat a la
+            // mateixa columna que les icones del menú lateral. L'alçada mínima substitueix els 64px
+            // que la llibreria dona a la barra.
+            appbarStyle={{
+                color: textColor,
+                paddingLeft: APPBAR_PADDING_LEFT + 'px',
+                minHeight: HEADER_HEIGHT + 'px',
+            }}
+            footerHeight={FOOTER_HEIGHT}
+            // El peu va per flux, no fixat: l'arrel de l'aplicació ocupa l'alçada de la finestra
+            // (veure frameSx a BaseApp.tsx), així que queda sempre a baix i sense tapar el contingut.
             footer={
-                <div style={{ height: '36px' }}>
-                    <DrassanaFooter title="NOTIB" backgroundColor="#5F5D5D" style={{ position: 'fixed', width: '100%', bottom: 0 }}/>
+                <div style={{ height: FOOTER_HEIGHT + 'px', overflow: 'hidden' }}>
+                    <DrassanaFooter title="NOTIB" backgroundColor="#5F5D5D" />
                 </div>
             }
         >

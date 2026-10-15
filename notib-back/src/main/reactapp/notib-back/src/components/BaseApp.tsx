@@ -26,6 +26,7 @@ import AppFormFieldReference from './AppFormFieldReference';
 import Offline from './Offline';
 import { UserProfileMenu, UserProfileFormDialog } from './UserProfile';
 import SwitchInterfaceMenuItem from './SwitchInterfaceMenuItem';
+import { MAIN_GAP, MAIN_PADDING } from '../utils/layout';
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
@@ -163,6 +164,29 @@ const getMenuColorSet = (theme: any, appearance?: string): any | undefined => {
     };
 };
 
+/**
+ * Marc de l'aplicació: l'arrel ocupa tota l'alçada de la finestra (capçalera dalt, peu baix) i només
+ * l'àrea de contingut (`<main>`) fa scroll. La llibreria només ho fa amb `100vh` a les pantalles que
+ * l'activen (GridPage), i no fixa cap marge propi quan es desactiven (`marginsDisabled`). Per això:
+ *  - `> div`: arrel del contingut de la llibreria (ContentComponentDefault, lib/components/BaseApp.tsx);
+ *  - `> div > div > main`: l'àrea de contingut. El `gap` és la separació entre els elements apilats
+ *    (la pantalla, els avisos...) i el padding, el marge de l'àrea.
+ * Si la llibreria canvia aquesta estructura, aquest és l'únic lloc a revisar.
+ */
+const frameSx = {
+    height: '100vh',
+    '& > div': { height: '100%' },
+    '& > div > div > main': {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: MAIN_GAP + 'px',
+        padding: MAIN_PADDING + 'px',
+        boxSizing: 'border-box',
+        minHeight: 0,
+        overflowY: 'auto',
+    },
+} as const;
+
 export const BaseApp: React.FC<BaseAppProps> = (props) => {
     const {
         code,
@@ -226,8 +250,20 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
                 color: menuColorSet?.textSecondary,
             },
             '& .MuiListItemButton-root': {
+                // La icona i la vora esquerra de l'entrada seleccionada prenen l'accent del joc de
+                // colors del menú (a TEMA les posa el tema, veure MuiListItemButton a theme.ts).
+                '&.Mui-selected .menu-item-icon': {
+                    color: menuColorSet?.accent,
+                },
                 '&.Mui-selected': {
                     backgroundColor: menuColorSet?.selectedBackground,
+                    boxShadow: `inset 4px 0 0 ${menuColorSet?.accent}`,
+                },
+                '&.Mui-selected:has(+ .MuiBox-root)': {
+                    boxShadow: 'none',
+                },
+                '&.Mui-selected > ::before': {
+                    background: menuColorSet?.accent,
                 },
                 '&.Mui-selected:hover': {
                     backgroundColor: menuColorSet?.selectedBackground,
@@ -239,7 +275,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         },
     };
     return (
-        <Box sx={menuColorSet ? menuColorSetSx : undefined}>
+        <Box sx={menuColorSet ? { ...frameSx, ...menuColorSetSx } : frameSx}>
         <MuiBaseApp
             code={code}
             headerTitle={title}
@@ -271,6 +307,8 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             routerUseLocationPath={useLocationPath}
             routerAnyHistoryEntryExist={anyHistoryEntryExist}
             linkComponent={Link}
+            // Els marges d'`<main>` els posa frameSx (la llibreria els deixa a 16px 24px).
+            marginsDisabled
             saveAs={saveAs}
             formFieldComponents={[{ type: 'reference', component: AppFormFieldReference }]}
             menuEntries={baseAppMenuEntries}

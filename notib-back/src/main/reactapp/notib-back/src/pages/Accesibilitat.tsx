@@ -1,7 +1,8 @@
 import React from 'react';
 import {Box, Icon, Link, Typography} from '@mui/material';
 import {useTranslation} from 'react-i18next';
-import {CardPage} from "../components/CardData.tsx";
+import ScreenFrame from "../components/ScreenFrame";
+import {icons} from "../utils/icons";
 import PageTitle from "../components/PageTitle.tsx";
 
 const SectionTitle: React.FC<{
@@ -22,7 +23,7 @@ const Accessibilitat: React.FC = () => {
 
     return (<>
             <PageTitle title={t(`${p}.title`)}></PageTitle>
-            <CardPage header={<Typography variant="h4" component="h1">{t(`${p}.title`)}</Typography>}>
+            <ScreenFrame icon={icons.accessibilitat} title={t(`${p}.title`)} padded>
                 <Box sx={{'& .MuiTypography-body1': {fontWeight: 400}}}>
                     {/* Introducció */}
                     <Box sx={{p: 1}}>
@@ -147,7 +148,7 @@ const Accessibilitat: React.FC = () => {
                         </Box>
                     </Box>
                 </Box>
-            </CardPage>
+            </ScreenFrame>
         </>);
 }
 

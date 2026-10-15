@@ -1,14 +1,12 @@
 import { useTranslation } from 'react-i18next';
 import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
-import Icon from '@mui/material/Icon';
-import IconButton from '@mui/material/IconButton';
 import {
     GridPage,
     MuiDataGrid,
     springFilterBuilder as filterBuilder,
     MuiDataGridColDef,
-    useFilterApiContext, MuiDataGridApiRef, useBaseAppContext, MuiActionReportButton, useMuiDataGridApiRef,
+    MuiDataGridApiRef, useBaseAppContext, MuiActionReportButton, useMuiDataGridApiRef,
 } from 'reactlib';
 import {ROLE_ADMIN, ROLE_ADMIN_LECTURA, useNotibContext} from '../../components/NotibContext';
 import LinkToTab from '../../components/LinkToTab';
@@ -17,6 +15,10 @@ import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRend
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 import React from "react";
 import PageTitle from "../../components/PageTitle.tsx";
+import ScreenFrame from '../../components/ScreenFrame';
+import ScreenTitle from '../../components/ScreenTitle';
+import { FilterClearButton } from '../../components/FilterButtons';
+import { icons } from '../../utils/icons';
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -103,10 +105,7 @@ const springFilterBuilder = (data: any) => {
 
 const ContentFilter: React.FC = () => {
 
-    const { t } = useTranslation();
-    const filterApiRef = useFilterApiContext();
     const organGestorOptionRenderer = useOrganGestorOptionRenderer();
-    const handleButtonClick = () => filterApiRef.current?.clear();
     return (
         <Grid container spacing={2}>
             <GridFormField size={1} name="codi" />
@@ -117,9 +116,7 @@ const ContentFilter: React.FC = () => {
             <GridButtonField size={0.5} name="entregaCieActiva" icon={'email'} hiddenLabel />
             <GridButtonField size={0.5} name="manual" icon={'sync'} hiddenLabel />
             <GridButtonField size={0.5} name="requireDirectPermission" icon={'gpp_good'} hiddenLabel/>
-            <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
-                <Icon>filter_alt_off</Icon>
-            </IconButton>
+            <FilterClearButton />
         </Grid>
     );
 };
@@ -205,35 +202,37 @@ export const ProcedimentGrid = () => {
         <>
             <PageTitle title={t('page.serveis.grid.title')}></PageTitle>
             <GridPage>
-                <MuiDataGrid
-                    title={t('page.serveis.grid.title')}
-                    resourceName="procedimentResource"
-                    columns={columns}
-                    fixedFilter={"tipus:'SERVEI' and entitat.id:" + currentEntitatId}
-                    paginationActive
-                    persistentStateActive
-                    persistentStateClearPageSortPropsOnTopLevelRouteChange
-                    {...filterDataGridProps}
-                    {...pageSizeOptionsDataGridProps}
-                    toolbarType="upper"
-                    toolbarCreateLink="form"
-                    toolbarHideCreate={isRoleAdminLectura ? true : undefined}
-                    rowLink="form/{{id}}"
-                    rowUpdateLink="form/{{id}}"
-                    rowHideUpdateButton={isRoleAdminLectura}
-                    rowHideDeleteButton={isRoleAdminLectura}
-                    toolbarElementsWithPositions={ !isRoleAdmin ? [] : [
-                        {
-                            position: 2,
-                            element: <NetejarCacheActionButton dataGridApiRef={dataGridApiRef} />,
+                <ScreenFrame>
+                    <MuiDataGrid
+                        title={<ScreenTitle icon={icons.servei} title={t('page.serveis.grid.title')} />}
+                        resourceName="procedimentResource"
+                        columns={columns}
+                        fixedFilter={"tipus:'SERVEI' and entitat.id:" + currentEntitatId}
+                        paginationActive
+                        persistentStateActive
+                        persistentStateClearPageSortPropsOnTopLevelRouteChange
+                        {...filterDataGridProps}
+                        {...pageSizeOptionsDataGridProps}
+                        toolbarType="upper"
+                        toolbarCreateLink="form"
+                        toolbarHideCreate={isRoleAdminLectura ? true : undefined}
+                        rowLink="form/{{id}}"
+                        rowUpdateLink="form/{{id}}"
+                        rowHideUpdateButton={isRoleAdminLectura}
+                        rowHideDeleteButton={isRoleAdminLectura}
+                        toolbarElementsWithPositions={ !isRoleAdmin ? [] : [
+                            {
+                                position: 2,
+                                element: <NetejarCacheActionButton dataGridApiRef={dataGridApiRef} />,
 
-                        } ,
-                        {
-                            position: 2,
-                            element: <ProcedimentSyncActionButton dataGridApiRef={dataGridApiRef} />,
-                        }
-                    ]}
-                />
+                            } ,
+                            {
+                                position: 2,
+                                element: <ProcedimentSyncActionButton dataGridApiRef={dataGridApiRef} />,
+                            }
+                        ]}
+                    />
+                </ScreenFrame>
             </GridPage>
         </>
     );

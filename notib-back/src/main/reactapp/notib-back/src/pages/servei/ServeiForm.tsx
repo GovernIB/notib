@@ -9,6 +9,9 @@ import ServeiFormTabPermisos from './ServeiFormTabPermisos';
 import GridFormField from '../../components/GridFormField';
 import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
 import { useTabParam } from '../../hooks/useSearchParams';
+import ScreenFrame from '../../components/ScreenFrame';
+import { formScreenTitle } from '../../utils/formScreenTitle';
+import { icons } from '../../utils/icons';
 
 const ServeiFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
     const { setSubtitle } = props;
@@ -86,21 +89,24 @@ export const ServeiForm: React.FC = () => {
     const [subtitle, setSubtitle] = React.useState<string>();
     return (
         <FormPage>
-            <MuiForm
-                resourceName="procedimentResource"
-                id={id != null ? parseInt(id) : id}
-                additionalData={{ tipus: 'SERVEI' }}
-                title={
-                    id != null
-                        ? t('page.serveis.form.titleUpdate')
-                        : t('page.serveis.form.titleCreate')
-                }
-                toolbarSubtitle={id != null ? subtitle : undefined}
-                componentProps={{ style: { height: '100%' } }}
-                commonFieldComponentProps={{ size: 'small' }}
-            >
-                <ServeiFormContent setSubtitle={setSubtitle} />
-            </MuiForm>
+            <ScreenFrame>
+                <MuiForm
+                    resourceName="procedimentResource"
+                    id={id != null ? parseInt(id) : id}
+                    additionalData={{ tipus: 'SERVEI' }}
+                    title={formScreenTitle(
+                        icons.servei,
+                        id != null
+                            ? t('page.serveis.form.titleUpdate')
+                            : t('page.serveis.form.titleCreate')
+                    )}
+                    toolbarSubtitle={id != null ? subtitle : undefined}
+                    componentProps={{ style: { height: '100%' } }}
+                    commonFieldComponentProps={{ size: 'small' }}
+                >
+                    <ServeiFormContent setSubtitle={setSubtitle} />
+                </MuiForm>
+            </ScreenFrame>
         </FormPage>
     );
 };

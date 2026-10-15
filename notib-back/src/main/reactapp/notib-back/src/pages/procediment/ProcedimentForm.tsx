@@ -9,6 +9,9 @@ import ProcedimentFormTabPermisos from './ProcedimentFormTabPermisos';
 import GridFormField from '../../components/GridFormField';
 import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
 import { useTabParam } from '../../hooks/useSearchParams';
+import ScreenFrame from '../../components/ScreenFrame';
+import { formScreenTitle } from '../../utils/formScreenTitle';
+import { icons } from '../../utils/icons';
 
 const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
 
@@ -76,21 +79,24 @@ export const ProcedimentForm: React.FC = () => {
     const [subtitle, setSubtitle] = React.useState<string>();
     return (
         <FormPage>
-            <MuiForm
-                resourceName="procedimentResource"
-                id={id != null ? parseInt(id) : id}
-                additionalData={{ tipus: 'PROCEDIMENT' }}
-                title={
-                    id != null
-                        ? t('page.procediments.form.titleUpdate')
-                        : t('page.procediments.form.titleCreate')
-                }
-                toolbarSubtitle={id != null ? subtitle : undefined}
-                componentProps={{ style: { height: '100%' } }}
-                commonFieldComponentProps={{ size: 'small' }}
-            >
-                <ProcedimentFormContent setSubtitle={setSubtitle} />
-            </MuiForm>
+            <ScreenFrame>
+                <MuiForm
+                    resourceName="procedimentResource"
+                    id={id != null ? parseInt(id) : id}
+                    additionalData={{ tipus: 'PROCEDIMENT' }}
+                    title={formScreenTitle(
+                        icons.procediment,
+                        id != null
+                            ? t('page.procediments.form.titleUpdate')
+                            : t('page.procediments.form.titleCreate')
+                    )}
+                    toolbarSubtitle={id != null ? subtitle : undefined}
+                    componentProps={{ style: { height: '100%' } }}
+                    commonFieldComponentProps={{ size: 'small' }}
+                >
+                    <ProcedimentFormContent setSubtitle={setSubtitle} />
+                </MuiForm>
+            </ScreenFrame>
         </FormPage>
     );
 };

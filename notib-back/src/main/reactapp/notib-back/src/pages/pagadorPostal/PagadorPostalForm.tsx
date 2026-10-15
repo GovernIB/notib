@@ -5,6 +5,9 @@ import Grid from '@mui/material/Grid';
 import {FormPage, MuiForm, useFormContext} from 'reactlib';
 import GridFormField from '../../components/GridFormField';
 import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
+import ScreenFrame from '../../components/ScreenFrame';
+import { formScreenTitle } from '../../utils/formScreenTitle';
+import { icons } from '../../utils/icons';
 
 const PagadorPostalFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
 
@@ -35,17 +38,19 @@ export const PagadorPostalForm: React.FC = () => {
     const isUpdate = id != null;
     return (
         <FormPage>
-            <MuiForm
-                resourceName="pagadorPostalResource"
-                id={isUpdate ? Number.parseInt(id) : id}
-                title={isUpdate ? t('page.pagadorPostal.form.titleUpdate') : t('page.pagadorPostal.form.titleCreate')}
-                toolbarSubtitle={isUpdate ? subtitle : undefined}
-                createLink="./{{id}}"
-                componentProps={{ style: { height: '100%' } }}
-                commonFieldComponentProps={{ size: 'small' }}
-            >
-                <PagadorPostalFormContent setSubtitle={setSubtitle} />
-            </MuiForm>
+            <ScreenFrame>
+                <MuiForm
+                    resourceName="pagadorPostalResource"
+                    id={isUpdate ? Number.parseInt(id) : id}
+                    title={formScreenTitle(icons.pagadorPostal, isUpdate ? t('page.pagadorPostal.form.titleUpdate') : t('page.pagadorPostal.form.titleCreate'))}
+                    toolbarSubtitle={isUpdate ? subtitle : undefined}
+                    createLink="./{{id}}"
+                    componentProps={{ style: { height: '100%' } }}
+                    commonFieldComponentProps={{ size: 'small' }}
+                >
+                    <PagadorPostalFormContent setSubtitle={setSubtitle} />
+                </MuiForm>
+            </ScreenFrame>
         </FormPage>
     );
 };

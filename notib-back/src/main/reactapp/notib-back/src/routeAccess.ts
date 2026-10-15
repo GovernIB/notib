@@ -1,6 +1,7 @@
 import type { TFunction } from 'i18next';
 import { ROLE_SUPER, ROLE_ADMIN, ROLE_ADMIN_LECTURA, ROLE_ORGAN, ROLE_USER, ROLE_APLICACIO } from './components/NotibContext';
 import type { MenuEntryWithResource } from './components/BaseApp';
+import { icons } from './utils/icons';
 
 // Pàgina d'informació de l'API REST de l'api interna, servida per un altre desplegament (fora de la SPA de React).
 export const APLICACIO_HOME_URL = '/notibapi/interna/swagger-ui/index.html';
@@ -13,7 +14,7 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'nouEnviamentMassiu',
             title: t('app.menu.nouEnviamentmassiu'),
             to: '/notificacio/massiva/form',
-            icon: 'add',
+            icon: icons.nouEnviamentMassiu,
             resourceName: 'notificacioMassivaResource',
             hidden: role !== ROLE_USER
         },
@@ -21,7 +22,7 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'enviamentMassiu',
             title: t('app.menu.consultaEnviamentmassiu'),
             to: '/notificacio/massiva',
-            icon: 'forward_to_inbox',
+            icon: icons.enviamentMassiu,
             resourceName: 'notificacioMassivaResource',
             hidden: role !== ROLE_USER
         },
@@ -31,7 +32,7 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'notificacionsErrorRegistre',
             title: t('app.menu.errorRegistre'),
             to: '/notificacionsErrorRegistre',
-            icon: 'error',
+            icon: icons.notificacioErrorRegistre,
             resourceName: 'notificacioResource',
             hidden: role !== ROLE_ADMIN && role !== ROLE_ADMIN_LECTURA
         },
@@ -39,7 +40,7 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'enviamentMassiu',
             title: t('app.menu.consultaEnviamentmassiu'),
             to: '/notificacio/massiva',
-            icon: 'forward_to_inbox',
+            icon: icons.enviamentMassiu,
             resourceName: 'notificacioMassivaResource',
             hidden: role !== ROLE_ADMIN && role !== ROLE_ADMIN_LECTURA
         },
@@ -47,7 +48,7 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'notificacionsEsborrades',
             title: t('app.menu.notificacioEsborrades'),
             to: '/notificacionsEsborrades',
-            icon: 'delete_outline',
+            icon: icons.notificacioEsborrada,
             resourceName: 'notificacioResource',
             hidden: role !== ROLE_ADMIN && role !== ROLE_ADMIN_LECTURA
         },
@@ -55,7 +56,7 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'callbackPendent',
             title: t('app.menu.callbackPendent'),
             to: '/callbacks',
-            icon: 'pending_actions',
+            icon: icons.callbackPendent,
             resourceName: 'callbackResource',
             hidden: role !== ROLE_ADMIN && role !== ROLE_ADMIN_LECTURA
         },
@@ -63,7 +64,7 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'accionsMassives',
             title: t('app.menu.accionsMassives'),
             to: '/accions/massives',
-            icon: 'format_list_bulleted',
+            icon: icons.accioMassiva,
             resourceName: 'accioMassivaResource',
             hidden: role !== ROLE_ADMIN && role !== ROLE_ADMIN_LECTURA
         },
@@ -71,7 +72,7 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'permisosUsuari',
             title: t('app.menu.permisosUsuari'),
             to: '/permisosUsuari',
-            icon: 'group',
+            icon: icons.permisUsuari,
             resourceName: 'usuariPermisResource',
             hidden: role !== ROLE_ADMIN && role !== ROLE_ADMIN_LECTURA && role !== ROLE_ORGAN
         }
@@ -81,7 +82,7 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'entitats',
             title: t('app.menu.entitats'),
             to: '/entitats',
-            icon: 'layers',
+            icon: icons.entitat,
             resourceName: 'entitatResource',
             hidden: role !== ROLE_SUPER
         },
@@ -89,7 +90,7 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'propietats',
             title: t('app.menu.propietats'),
             to: '/propietats',
-            icon: 'settings',
+            icon: icons.propietat,
             resourceName: 'configGroupResource',
             hidden: role !== ROLE_SUPER
         },
@@ -97,7 +98,7 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'currentEntitat',
             title: t('app.menu.currentEntitat'),
             to: '/entitats/current',
-            icon: 'my_location',
+            icon: icons.entitatActual,
             resourceName: 'entitatResource',
             hidden: role !== ROLE_ADMIN && role !== ROLE_ADMIN_LECTURA
         },
@@ -105,7 +106,7 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'organs',
             title: t('app.menu.organsGestors'),
             to: '/organs',
-            icon: 'account_tree',
+            icon: icons.organ,
             resourceName: 'organGestorResource',
             hidden: role !== ROLE_ADMIN && role !== ROLE_ADMIN_LECTURA && role !== ROLE_ORGAN
         },
@@ -113,7 +114,7 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'procediment',
             title: t('app.menu.procediments'),
             to: '/procediments',
-            icon: 'view_timeline',
+            icon: icons.procediment,
             resourceName: 'procedimentResource',
             hidden: role !== ROLE_ADMIN && role !== ROLE_ADMIN_LECTURA && role !== ROLE_ORGAN
         },
@@ -121,7 +122,7 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'servei',
             title: t('app.menu.serveis'),
             to: '/serveis',
-            icon: 'miscellaneous_services',
+            icon: icons.servei,
             resourceName: 'procedimentResource',
             hidden: role !== ROLE_ADMIN && role !== ROLE_ADMIN_LECTURA && role !== ROLE_ORGAN
         },
@@ -129,7 +130,7 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'grups',
             title: t('app.menu.grups'),
             to: '/grups',
-            icon: 'group',
+            icon: icons.grup,
             resourceName: 'grupResource',
             hidden: role !== ROLE_ADMIN && role !== ROLE_ADMIN_LECTURA && role !== ROLE_ORGAN
         },
@@ -137,7 +138,7 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'pagadorspostal',
             title: t('app.menu.pagadorsPostals'),
             to: '/pagadorspostal',
-            icon: 'markunread_mailbox',
+            icon: icons.pagadorPostal,
             resourceName: 'pagadorPostalResource',
             hidden: role !== ROLE_ADMIN && role !== ROLE_ADMIN_LECTURA
         },
@@ -145,7 +146,7 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'pagadorscie',
             title: t('app.menu.pagadorsCie'),
             to: '/pagadorscie',
-            icon: 'mark_as_unread',
+            icon: icons.pagadorCie,
             resourceName: 'pagadorCieResource',
             hidden: role !== ROLE_ADMIN && role !== ROLE_ADMIN_LECTURA
         },
@@ -153,7 +154,7 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'caches',
             title: t('app.menu.cache'),
             to: '/caches',
-            icon: 'sd_storage',
+            icon: icons.cache,
             resourceName: 'cacheResource',
             hidden: role !== ROLE_SUPER,
         }
@@ -163,7 +164,7 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'notificacionsCallbackError',
             title: t('app.menu.notificacionsCallbacksError'),
             to: '/notificacionsCallbackError',
-            icon: 'running_with_errors',
+            icon: icons.notificacioErrorCallback,
             resourceName: 'notificacioResource',
             hidden: role !== ROLE_SUPER,
         },
@@ -171,7 +172,7 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'integracions',
             title: t('app.menu.integracions'),
             to: '/integracions',
-            icon: 'build',
+            icon: icons.integracio,
             resourceName: 'monitorIntegracioResource',
             hidden: role !== ROLE_SUPER,
         },
@@ -179,7 +180,7 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'metriques',
             title: t('app.menu.metriques'),
             to: '/metriques',
-            icon: 'bar_chart',
+            icon: icons.metrica,
             resourceName: 'metriquesResource',
             hidden: role !== ROLE_SUPER,
         },
@@ -187,14 +188,14 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'monitorSistema',
             title: t('app.menu.monitorSistema'),
             to: '/monitorSistema',
-            icon: 'monitor_heart',
+            icon: icons.monitorSistema,
             hidden: role !== ROLE_SUPER,
         },
         {
             id: 'activemq',
             title: t('app.menu.activemq'),
             to: '/activemq',
-            icon: 'subscriptions',
+            icon: icons.activeMq,
             resourceName: 'activeMqResource',
             hidden: role !== ROLE_SUPER,
         },
@@ -205,7 +206,7 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'notificacions',
             title: t('app.menu.notificacions'),
             to: '/notificacions',
-            icon: 'mail',
+            icon: icons.notificacio,
             resourceName: 'notificacioResource',
             hidden: role === ROLE_SUPER
         },
@@ -213,35 +214,35 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'enviaments',
             title: t('app.menu.enviaments'),
             to: '/enviaments',
-            icon: 'send',
+            icon: icons.enviament,
             resourceName: 'notificacioEnviamentResource',
             hidden: role === ROLE_SUPER
         },
         {
             id: 'enviamentsMassius',
             title: t('app.menu.enviamentMassiu'),
-            icon: 'dashboard',
+            icon: icons.grupEnviamentMassiu,
             children: menuEnviamentMassiu,
             hidden: role !== ROLE_USER
         },
         {
             id: 'gestio',
             title: t('app.menu.gestio'),
-            icon: 'dashboard',
+            icon: icons.gestio,
             children: menuGestio,
             hidden: role !== ROLE_ADMIN && role !== ROLE_ADMIN_LECTURA
         },
         {
             id: 'monitoritza',
             title: t('app.menu.monitoritza'),
-            icon: 'monitor',
+            icon: icons.monitoritzacio,
             children: menuMonitoritza,
             hidden: role !== ROLE_SUPER
         },
         {
             id: 'config',
             title: t('app.menu.config'),
-            icon: 'settings',
+            icon: icons.configuracio,
             children: menuConfig,
             hidden: role === ROLE_USER
         },
@@ -249,7 +250,7 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'avisos',
             title: t('app.menu.avisos'),
             to: '/avisos',
-            icon: 'notifications',
+            icon: icons.avis,
             resourceName: 'avisResource',
             hidden: role !== ROLE_SUPER
         },

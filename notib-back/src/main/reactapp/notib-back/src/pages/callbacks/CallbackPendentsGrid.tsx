@@ -3,7 +3,6 @@ import {
     MuiDataGrid,
     MuiDataGridColDef,
     springFilterBuilder as filterBuilder,
-    useFilterApiContext,
     useMuiDataGridContext,
     useResourceApiService
 } from "reactlib";
@@ -12,7 +11,7 @@ import Box from "@mui/material/Box";
 import {Link} from "react-router-dom";
 import {useDatagridFilterProps, useDatagridPageSizeOptionsProps} from "../../hooks/useDataGrid.tsx";
 import React from "react";
-import {Grid, Icon, IconButton} from "@mui/material";
+import {Grid} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import {formatEndOfDay, formatStartOfDay} from "../../utils/dateUtils.ts";
 import {DataCommonAdditionalAction} from "../../../lib/components/mui/datacommon/MuiDataCommon.tsx";
@@ -21,6 +20,10 @@ import {GridApiPro, useGridApiRef} from "@mui/x-data-grid-pro";
 import {ROLE_ADMIN_LECTURA, ROLE_USER, useNotibContext} from "../../components/NotibContext.ts";
 import AccionsMassives, {MenuOption, useAccionsMassives} from "../../components/AccionsMassives.tsx";
 import PageTitle from "../../components/PageTitle.tsx";
+import ScreenFrame from '../../components/ScreenFrame';
+import ScreenTitle from '../../components/ScreenTitle';
+import { FilterClearButton } from '../../components/FilterButtons';
+import { icons } from '../../utils/icons';
 
 
 const columns: MuiDataGridColDef[] = [
@@ -68,12 +71,7 @@ const columns: MuiDataGridColDef[] = [
 
 const ContentFilter: React.FC = () => {
 
-    const { t } = useTranslation();
-    const filterApiRef = useFilterApiContext();
 
-    const handleButtonClick = () => {
-        filterApiRef.current?.clear();
-    };
 
     return (
         <Box>
@@ -87,11 +85,7 @@ const ContentFilter: React.FC = () => {
                 <GridFormField size={2.5} name="estat" />
                 <GridFormField size={2.5} name="fiReintents" />
 
-                <Grid size={0.5} sx={{ textAlign: 'center' }}>
-                    <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
-                        <Icon>filter_alt_off</Icon>
-                    </IconButton>
-                </Grid>
+                <FilterClearButton size={0.5} />
             </Grid>
         </Box>
     );
@@ -222,30 +216,32 @@ const CallbackPendentsGrid = () => {
         <>
             <PageTitle title={t('page.callbacks.pendents.grid.title')}></PageTitle>
             <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
-                <MuiDataGrid
-                    key={reloadKey}
-                    title={t('page.callbacks.pendents.grid.title')}
-                    resourceName="callbackResource"
-                    datagridApiRef={datagridApiRef}
-                    columns={columns}
-                    rowAdditionalActions={rowAdditionalActions}
-                    paginationActive
-                    selectionActive
-                    rowHideUpdateButton
-                    persistentStateActive
-                    persistentStateClearPageSortPropsOnTopLevelRouteChange
-                   {...filterDataGridProps}
-                   {...pageSizeOptionsDataGridProps}
-                    toolbarType="upper"
-                    toolbarHideCreate
-                    toolbarElementsWithPositions={[
-                        ...(amagarEntrada ? []
-                            : [{
-                                position: 2,
-                                element: <MassiveActionsButton apiRef={datagridApiRef} refresh={refreshGrid}/>,
-                            }])
-                    ]}
-                />
+                <ScreenFrame>
+                    <MuiDataGrid
+                        key={reloadKey}
+                        title={<ScreenTitle icon={icons.callbackPendent} title={t('page.callbacks.pendents.grid.title')} />}
+                        resourceName="callbackResource"
+                        datagridApiRef={datagridApiRef}
+                        columns={columns}
+                        rowAdditionalActions={rowAdditionalActions}
+                        paginationActive
+                        selectionActive
+                        rowHideUpdateButton
+                        persistentStateActive
+                        persistentStateClearPageSortPropsOnTopLevelRouteChange
+                       {...filterDataGridProps}
+                       {...pageSizeOptionsDataGridProps}
+                        toolbarType="upper"
+                        toolbarHideCreate
+                        toolbarElementsWithPositions={[
+                            ...(amagarEntrada ? []
+                                : [{
+                                    position: 2,
+                                    element: <MassiveActionsButton apiRef={datagridApiRef} refresh={refreshGrid}/>,
+                                }])
+                        ]}
+                    />
+                </ScreenFrame>
             </GridPage>
         </>
     );

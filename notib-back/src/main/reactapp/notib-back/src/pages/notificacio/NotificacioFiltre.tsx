@@ -1,7 +1,7 @@
 import React from "react";
-import {useTranslation} from "react-i18next";
-import {Grid, Icon, IconButton} from "@mui/material";
+import {Grid} from "@mui/material";
 import GridFormField, {GridButtonField} from "../../components/GridFormField.tsx";
+import { FilterAdvancedButton, FilterClearButton } from '../../components/FilterButtons';
 import useOrganGestorOptionRenderer from "../../components/OrganGestorOptionRenderer.tsx";
 import {springFilterBuilder, springFilterBuilder as filterBuilder, useFilterApiContext} from 'reactlib';
 import {useNotibContext} from "../../components/NotibContext.ts";
@@ -38,11 +38,9 @@ export const useSpringFilterBuilder = () => {
 const ContentFilter: React.FC<{openByDefault?: boolean, notificacionsEsborrades: boolean, notificacionsErrorRegistre: boolean, notificacionsCallbackError: boolean }> =
                     ({openByDefault, notificacionsEsborrades, notificacionsErrorRegistre, notificacionsCallbackError}) => {
 
-    const { t } = useTranslation();
     const filterApiRef = useFilterApiContext();
     const organGestorOptionRenderer = useOrganGestorOptionRenderer();
     const [advancedFilter, setAdvancedFilter] = React.useState(openByDefault ?? false);
-    const handleButtonClick = () => filterApiRef.current?.clear();
     const advancedFilterClick = () => setAdvancedFilter(!advancedFilter);
     const organId = filterApiRef.current?.getData()?.organGestor?.id;
     let procedimentFiltre;
@@ -72,11 +70,7 @@ const ContentFilter: React.FC<{openByDefault?: boolean, notificacionsEsborrades:
                 <GridFormField size={6} name="organGestor" namedQueries={`PERM_READ`} optionRenderer={organGestorOptionRenderer}/>
                 <GridFormField size={5} name="procediment" filter={procedimentFiltre}/>
                 <GridFormField size={5} name="servei" filter={serveiFiltre}/>
-                <Grid size={0.5} sx={{ textAlign: 'center' }}>
-                    <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
-                        <Icon>filter_alt_off</Icon>
-                    </IconButton>
-                </Grid>
+                <FilterClearButton size={0.5} />
             </Grid>
         );
     }
@@ -90,11 +84,7 @@ const ContentFilter: React.FC<{openByDefault?: boolean, notificacionsEsborrades:
                 <GridFormField size={4} name="createdBy" />
                 <GridFormField size={2} name="dataIniciInici" />
                 <GridFormField size={2} name="dataIniciFi" />
-                <Grid size={0.5} sx={{ textAlign: 'center' }}>
-                    <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
-                        <Icon>filter_alt_off</Icon>
-                    </IconButton>
-                </Grid>
+                <FilterClearButton size={0.5} />
             </Grid>
         );
     }
@@ -109,11 +99,7 @@ const ContentFilter: React.FC<{openByDefault?: boolean, notificacionsEsborrades:
                 <GridFormField size={2} name="dataIniciFi" />
                 <GridFormField size={2} name="estat" />
                 <GridFormField size={4} name="createdBy" />
-                <Grid size={0.5} sx={{ textAlign: 'center' }}>
-                    <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
-                        <Icon>filter_alt_off</Icon>
-                    </IconButton>
-                </Grid>
+                <FilterClearButton size={0.5} />
             </Grid>
         );
     }
@@ -121,7 +107,8 @@ const ContentFilter: React.FC<{openByDefault?: boolean, notificacionsEsborrades:
     return (
         <Grid container spacing={1}>
             <GridFormField size={2} name="enviamentTipus" />
-            <GridFormField size={advancedFilter ? 4 : 2.5} name="concepte" />
+            {/* Al filtre bàsic, el concepte ocupa l'espai que deixen els botons */}
+            <GridFormField size={advancedFilter ? 4 : 'grow'} name="concepte" />
             <GridFormField size={2.5} name="estat" />
             <GridFormField size={1.75} name="dataIniciInici" />
             <GridFormField size={1.75} name="dataIniciFi" />
@@ -146,16 +133,8 @@ const ContentFilter: React.FC<{openByDefault?: boolean, notificacionsEsborrades:
                     <GridButtonField size={0.5} name="errorLastCallback" icon={'report_problem'} hiddenLabel/>
                 </>
             )}
-            <Grid size={0.5} sx={{ textAlign: 'center' }}>
-                <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
-                    <Icon>filter_alt_off</Icon>
-                </IconButton>
-            </Grid>
-            <Grid size={0.5} sx={{ textAlign: 'center' }}>
-                <IconButton onClick={advancedFilterClick} title={t(advancedFilter ? 'comu.tancarFiltreAvançat' : 'comu.obrirFiltreAvançat')}>
-                    <Icon sx={{ transform: advancedFilter ? 'rotate(180deg)' : 'none' }}>filter_list</Icon>
-                </IconButton>
-            </Grid>
+            <FilterAdvancedButton open={advancedFilter} onClick={advancedFilterClick} />
+            <FilterClearButton />
         </Grid>
     );
 };

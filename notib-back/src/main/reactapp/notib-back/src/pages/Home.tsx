@@ -1,49 +1,19 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Grid from '@mui/material/Grid';
-import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import { useTheme } from '@mui/material/styles';
-import { BasePage } from 'reactlib';
 import PageTitle from "../components/PageTitle.tsx";
-
-const HomeToolbar = () => {
-    const theme = useTheme();
-    const { t } = useTranslation();
-    return (
-        <Toolbar
-            sx={{
-                width: '100%',
-                display: 'flex',
-                py: 2,
-                borderBottom: '1px solid ' + theme.palette.divider,
-            }}>
-            <div style={{ minWidth: 0, width: '100%' }}>
-                <Typography variant="h4">{t('page.home.toolbar.title')}</Typography>
-                <Typography
-                    variant="body2"
-                    sx={{
-                        color: theme.palette.text.secondary,
-                        width: '100%',
-                        overflow: 'hidden',
-                        whiteSpace: 'nowrap',
-                        textOverflow: 'ellipsis',
-                    }}>
-                    {t('page.home.toolbar.subtitle')} (v{import.meta.env.VITE_APP_VERSION})
-                </Typography>
-            </div>
-        </Toolbar>
-    );
-};
+import ScreenFrame from '../components/ScreenFrame';
+import { icons } from '../utils/icons';
 
 const Home: React.FC = () => {
+    const { t } = useTranslation();
     return (<>
         <PageTitle title={'Home'}></PageTitle>
-        <BasePage toolbar={<HomeToolbar />}>
-            <Grid container spacing={2}>
-                <Grid size={12} sx={{ mb: 1 }}></Grid>
-            </Grid>
-        </BasePage>
+        <ScreenFrame icon={icons.inici} title={t('page.home.toolbar.title')} fitContent padded>
+            <Typography variant="body2" color="text.secondary">
+                {t('page.home.toolbar.subtitle')} (v{import.meta.env.VITE_APP_VERSION})
+            </Typography>
+        </ScreenFrame>
     </>);
 };
 

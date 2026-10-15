@@ -1,14 +1,18 @@
-import {GridPage, MuiDataGrid, MuiDataGridColDef, springFilterBuilder as filterBuilder, useFilterApiContext} from "reactlib";
+import {GridPage, MuiDataGrid, MuiDataGridColDef, springFilterBuilder as filterBuilder} from "reactlib";
 import {useTranslation} from "react-i18next";
 import React from "react";
 import {GRID_DETAIL_PANEL_TOGGLE_COL_DEF} from "@mui/x-data-grid-pro";
 import {useDatagridFilterProps, useDatagridPageSizeOptionsProps} from "../../hooks/useDataGrid.tsx";
 import {formatEndOfDay, formatStartOfDay} from "../../utils/dateUtils.ts";
-import {Box, Chip, Grid, Icon, IconButton} from "@mui/material";
+import {Box, Chip, Grid, Icon} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import AccioMassivaGridEnviaments from "./AccioMassivaGridElements.tsx";
 import CustomDetailPanelToggle from "../../utils/CustomDetailPanelToggle.tsx";
 import PageTitle from "../../components/PageTitle.tsx";
+import ScreenFrame from '../../components/ScreenFrame';
+import ScreenTitle from '../../components/ScreenTitle';
+import { FilterClearButton } from '../../components/FilterButtons';
+import { icons } from '../../utils/icons';
 
 
 const useDataGridColumns = () => {
@@ -95,12 +99,7 @@ const useSpringFilterBuilder = () => {
 
 const ContentFilter: React.FC = () => {
 
-    const { t } = useTranslation();
-    const filterApiRef = useFilterApiContext();
 
-    const handleButtonClick = () => {
-        filterApiRef.current?.clear();
-    };
 
     return (
         <Box>
@@ -111,11 +110,7 @@ const ContentFilter: React.FC = () => {
                 <GridFormField size={1.75} name="dataIniciFi" />
                 <GridFormField size={2.5} name="estat" />
 
-                <Grid size={0.5} sx={{ textAlign: 'center' }}>
-                    <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
-                        <Icon>filter_alt_off</Icon>
-                    </IconButton>
-                </Grid>
+                <FilterClearButton size={0.5} />
             </Grid>
         </Box>
     );
@@ -139,21 +134,23 @@ export const AccioMassivaGrid = () => {
         <>
             <PageTitle title={t('page.accioMassiva.grid.title')}></PageTitle>
             <GridPage>
-            <MuiDataGrid
-                title={t('page.accioMassiva.grid.title')}
-                resourceName="accioMassivaResource"
-                columns={columns}
-                defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
-                paginationActive
-                persistentStateActive
-                persistentStateClearPageSortPropsOnTopLevelRouteChange
-                {...filterDataGridProps}
-                {...pageSizeOptionsDataGridProps}
-                toolbarType="upper"
-                getDetailPanelContent={({ row }) => <AccioMassivaGridEnviaments id={row.id} tipusElementSeleccionat={row.tipusElementSeleccionat}/>}
-                getDetailPanelHeight={() => 'auto'}
+                <ScreenFrame>
+                <MuiDataGrid
+                    title={<ScreenTitle icon={icons.accioMassiva} title={t('page.accioMassiva.grid.title')} />}
+                    resourceName="accioMassivaResource"
+                    columns={columns}
+                    defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
+                    paginationActive
+                    persistentStateActive
+                    persistentStateClearPageSortPropsOnTopLevelRouteChange
+                    {...filterDataGridProps}
+                    {...pageSizeOptionsDataGridProps}
+                    toolbarType="upper"
+                    getDetailPanelContent={({ row }) => <AccioMassivaGridEnviaments id={row.id} tipusElementSeleccionat={row.tipusElementSeleccionat}/>}
+                    getDetailPanelHeight={() => 'auto'}
 
-            />
+                />
+                </ScreenFrame>
             </GridPage>
         </>);
 }

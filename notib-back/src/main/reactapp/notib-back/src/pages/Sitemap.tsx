@@ -7,6 +7,8 @@ import { getMenuEntries } from '../routeAccess';
 import { filterMenuEntries } from '../components/BaseApp';
 import { useNotibContext } from '../components/NotibContext';
 import PageTitle from "../components/PageTitle.tsx";
+import ScreenFrame from '../components/ScreenFrame';
+import { icons } from '../utils/icons';
 // import { Helmet } from '@dr.pogodin/react-helmet';
 
 const SitemapList: React.FC<{ entries: MenuEntry[] }> = ({ entries }) => (
@@ -61,16 +63,15 @@ const Sitemap: React.FC = () => {
 
     return (<>
         <PageTitle title={t('page.sitemap.title')}></PageTitle>
-        <Box sx={{ maxWidth: 600, mx: 'auto', p: 3 }}>
-            <Typography variant="h4" component="h1" gutterBottom>
-                {t('page.sitemap.title')}
-            </Typography>
-            <Typography variant="body1" color="text.secondary" gutterBottom>
-                {t('page.sitemap.desc')}
-            </Typography>
-            <Divider sx={{ my: 2 }} />
-            <SitemapList entries={entries} />
-        </Box>
+        <ScreenFrame icon={icons.mapaWeb} title={t('page.sitemap.title')} padded>
+            <Box sx={{ maxWidth: 600 }}>
+                <Typography variant="body1" color="text.secondary" gutterBottom>
+                    {t('page.sitemap.desc')}
+                </Typography>
+                <Divider sx={{ my: 2 }} />
+                <SitemapList entries={entries} />
+            </Box>
+        </ScreenFrame>
         </>
     );
 };

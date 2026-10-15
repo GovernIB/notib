@@ -8,6 +8,8 @@ import { BarChart } from '@mui/x-charts';
 import Button from "@mui/material/Button";
 import Icon from "@mui/material/Icon";
 import PageTitle from "../../components/PageTitle.tsx";
+import ScreenFrame from '../../components/ScreenFrame';
+import { icons } from '../../utils/icons';
 
 export function MetriquesBars({ items }: { items: any }) {
 
@@ -196,9 +198,10 @@ export const Metriques = () => {
     }, [apiIsReady, apiGetOne]);
     return (<>
         <PageTitle title={t('page.metriques.grid.title')}></PageTitle>
-        <Box sx={{display: "flex", justifyContent: "space-between", marginBottom: "15px"}}>
-            <Typography variant="h6">{t("page.metriques.title")}</Typography>
-            <Box sx={{textAlign: "right", width: "220px", display: "flex", justifyContent: "space-between"}}>
+        <ScreenFrame
+            icon={icons.metrica}
+            title={t("page.metriques.title")}
+            actions={<>
                 <ImportJsonButton onRead={(content) => setMetriques(JSON.parse(content))}/>
                 <MuiActionReportButton
                     resourceName={"metriquesResource"}
@@ -207,9 +210,11 @@ export const Metriques = () => {
                     title={t('page.metriques.exportaJson')}
                     buttonComponentProps={{variant: "contained",size:"small"}}
                     buttonIcon="file_download"/>
-            </Box>
-        </Box>
-        <MetriquesBars items={metriques}/>
+            </>}
+            padded
+        >
+            <MetriquesBars items={metriques}/>
+        </ScreenFrame>
     </>);
 };
 

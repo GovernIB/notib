@@ -7,16 +7,20 @@ import {
     useFilterApiRef,
     useResourceApiService,
     springFilterBuilder as filterBuilder,
-    FilterApiRef,
     useCloseDialogButtons,
 } from 'reactlib';
 import GridFormField from '../../components/GridFormField';
-import { Badge, Box, Grid, Icon, IconButton, Tab, Tabs } from '@mui/material';
+import { Badge, Box, Grid, Tab, Tabs } from '@mui/material';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
 import { useContentDialog } from '../../../lib/components/mui/Dialog';
 import MonitorIntegracioParamDetail from './MonitorIntegracioParamDetail';
 import ChipEstat from '../../components/ChipEstat';
 import PageTitle from "../../components/PageTitle.tsx";
+import ScreenFrame from '../../components/ScreenFrame';
+import ScreenTitle from '../../components/ScreenTitle';
+import { FilterClearButton } from '../../components/FilterButtons';
+import FilterCount from '../../components/FilterCount';
+import { icons } from '../../utils/icons';
 
 // INTERFACES
 interface MonitorProps {
@@ -107,12 +111,7 @@ const CustomTabs = ({ options, report, selectedTab, onTabChange }: MonitorProps)
     );
 };
 
-const ContentFilter = ({ filterApiRef }: { filterApiRef: FilterApiRef }) => {
-    const { t } = useTranslation();
-
-    const handleButtonClick = () => {
-        filterApiRef.current?.clear();
-    };
+const ContentFilter = () => {
     return (
         <Grid container spacing={2}>
             <GridFormField size={1.5} name="dataInici" />
@@ -122,11 +121,7 @@ const ContentFilter = ({ filterApiRef }: { filterApiRef: FilterApiRef }) => {
             <GridFormField size={1.5} name="codiEntitat" />
             <GridFormField size={1.25} name="tipus" />
             <GridFormField size={1} name="estat" />
-            <Grid size={0.5}>
-                <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
-                    <Icon>filter_alt_off</Icon>
-                </IconButton>
-            </Grid>
+            <FilterClearButton size={0.5} />
         </Grid>
     );
 };
@@ -138,6 +133,8 @@ const MonitorIntegracioGridFilter = ({
     onTabChange,
 }: MonitorProps) => {
     const filterApiRef = useFilterApiRef();
+    // Últim Spring Filter aplicat, per al recompte de filtres de la barra de títol
+    const [springFilter, setSpringFilter] = React.useState<string | undefined>();
 
     const springFilterBuilder = (data: any) => {
         return filterBuilder.and(
@@ -158,10 +155,12 @@ const MonitorIntegracioGridFilter = ({
                 code="FILTER_MONITOR_INTEGRACIO"
                 apiRef={filterApiRef}
                 springFilterBuilder={springFilterBuilder}
+                onSpringFilterChange={setSpringFilter}
                 componentProps={{ sx: { mb: 2, mt: 0 } }}
                 commonFieldComponentProps={{ size: 'small' }}
             >
-                <ContentFilter filterApiRef={filterApiRef} />
+                <ContentFilter />
+                <FilterCount springFilter={springFilter} />
                 <CustomTabs
                     options={options}
                     report={report}
@@ -268,27 +267,29 @@ export const MonitorIntegracioGrid = () => {
         <>
             <PageTitle title={t('page.integracio.grid.title')}></PageTitle>
             <GridPage>
-                <MuiDataGrid
-                    title={t('page.integracio.grid.title')}
-                    resourceName="monitorIntegracioResource"
-                    columns={columns}
-                    fixedFilter={staticFilter}
-                    paginationActive
-                    toolbarHideQuickFilter
-                    readOnly
-                    toolbarType="upper"
-                    toolbarAdditionalRow={
-                        <MonitorIntegracioGridFilter
-                            options={options}
-                            report={report}
-                            selectedTab={selectedTab}
-                            onTabChange={setSelectedTab}
-                        />
-                    }
-                    onRowClick={(params: any) => openDialog(params.id)}
-                    sx={{ '& .MuiDataGrid-row': { cursor: 'pointer' } }}
-                />
-                {dialog}
+                <ScreenFrame>
+                    <MuiDataGrid
+                        title={<ScreenTitle icon={icons.integracio} title={t('page.integracio.grid.title')} />}
+                        resourceName="monitorIntegracioResource"
+                        columns={columns}
+                        fixedFilter={staticFilter}
+                        paginationActive
+                        toolbarHideQuickFilter
+                        readOnly
+                        toolbarType="upper"
+                        toolbarAdditionalRow={
+                            <MonitorIntegracioGridFilter
+                                options={options}
+                                report={report}
+                                selectedTab={selectedTab}
+                                onTabChange={setSelectedTab}
+                            />
+                        }
+                        onRowClick={(params: any) => openDialog(params.id)}
+                        sx={{ '& .MuiDataGrid-row': { cursor: 'pointer' } }}
+                    />
+                    {dialog}
+                </ScreenFrame>
             </GridPage>
         </>
     );

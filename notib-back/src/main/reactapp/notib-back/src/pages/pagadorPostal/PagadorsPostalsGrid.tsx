@@ -1,13 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
-import Icon from '@mui/material/Icon';
-import IconButton from '@mui/material/IconButton';
 import {
     GridPage,
     MuiDataGrid,
     springFilterBuilder as filterBuilder,
-    useFilterApiContext,
 } from 'reactlib';
 import GridFormField from '../../components/GridFormField.tsx';
 import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer.tsx';
@@ -15,6 +12,10 @@ import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils.ts';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid.tsx';
 import { ROLE_ADMIN_LECTURA, useNotibContext } from '../../components/NotibContext.ts';
 import PageTitle from "../../components/PageTitle.tsx";
+import ScreenFrame from '../../components/ScreenFrame';
+import ScreenTitle from '../../components/ScreenTitle';
+import { FilterClearButton } from '../../components/FilterButtons';
+import { icons } from '../../utils/icons';
 
 const columns = [
     {
@@ -53,12 +54,7 @@ const springFilterBuilder = (data: any) => {
 
 
 const ContentFilter: React.FC = () => {
-    const { t } = useTranslation();
-    const filterApiRef = useFilterApiContext();
     const organGestorOptionRenderer = useOrganGestorOptionRenderer();
-    const handleButtonClick = () => {
-        filterApiRef.current?.clear();
-    };
 
     return (
         <Grid container spacing={2}>
@@ -69,9 +65,7 @@ const ContentFilter: React.FC = () => {
             <GridFormField size={1.75} name="contracteDataVigFinal" />
             <GridFormField size={1.5} name="facturacioClientCodi" />
             <Grid size={0.5}>
-                <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
-                    <Icon>filter_alt_off</Icon>
-                </IconButton>
+                <FilterClearButton />
             </Grid>
         </Grid>
     );
@@ -94,23 +88,25 @@ export const PagadorsPostalsGrid: React.FC = () => {
         <>
             <PageTitle title={t('page.pagadorPostal.grid.title')}></PageTitle>
             <GridPage>
-                <MuiDataGrid
-                    title={t('page.pagadorPostal.grid.title')}
-                    resourceName="pagadorPostalResource"
-                    columns={columns}
-                    paginationActive
-                    persistentStateActive
-                    persistentStateClearPageSortPropsOnTopLevelRouteChange
-                    {...filterDataGridProps}
-                    {...pageSizeOptionsDataGridProps}
-                    toolbarType="upper"
-                    toolbarCreateLink="form"
-                    toolbarHideCreate={isRoleAdminLectura ? true : undefined}
-                    rowLink="form/{{id}}"
-                    rowUpdateLink="form/{{id}}"
-                    rowHideUpdateButton={isRoleAdminLectura}
-                    rowHideDeleteButton={isRoleAdminLectura}
-                />
+                <ScreenFrame>
+                    <MuiDataGrid
+                        title={<ScreenTitle icon={icons.pagadorPostal} title={t('page.pagadorPostal.grid.title')} />}
+                        resourceName="pagadorPostalResource"
+                        columns={columns}
+                        paginationActive
+                        persistentStateActive
+                        persistentStateClearPageSortPropsOnTopLevelRouteChange
+                        {...filterDataGridProps}
+                        {...pageSizeOptionsDataGridProps}
+                        toolbarType="upper"
+                        toolbarCreateLink="form"
+                        toolbarHideCreate={isRoleAdminLectura ? true : undefined}
+                        rowLink="form/{{id}}"
+                        rowUpdateLink="form/{{id}}"
+                        rowHideUpdateButton={isRoleAdminLectura}
+                        rowHideDeleteButton={isRoleAdminLectura}
+                    />
+                </ScreenFrame>
             </GridPage>
         </>
     );

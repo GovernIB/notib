@@ -1,4 +1,4 @@
-import { Grid, Icon, IconButton } from '@mui/material';
+import { Grid } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -6,12 +6,15 @@ import {
     MuiDataGrid,
     MuiDataGridColDef,
     springFilterBuilder as filterBuilder,
-    useFilterApiContext,
 } from 'reactlib';
 import GridFormField from '../../components/GridFormField';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 import PageTitle from "../../components/PageTitle.tsx";
+import ScreenFrame from '../../components/ScreenFrame';
+import ScreenTitle from '../../components/ScreenTitle';
+import { FilterClearButton } from '../../components/FilterButtons';
+import { icons } from '../../utils/icons';
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -55,11 +58,6 @@ const springFilterBuilder = (data: any) => {
 };
 
 const ContentFilter: React.FC = () => {
-    const { t } = useTranslation();
-    const filterApiRef = useFilterApiContext();
-    const handleButtonClick = () => {
-        filterApiRef.current?.clear();
-    };
     return (
         <Grid container spacing={2}>
             <GridFormField size={2} name="entitat" />
@@ -68,9 +66,7 @@ const ContentFilter: React.FC = () => {
             <GridFormField size={1.5} name="dataFinal" />
             <GridFormField size={1.5} name="avisNivell" />
             <GridFormField size={1} name="actiu" />
-            <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
-                <Icon>filter_alt_off</Icon>
-            </IconButton>
+            <FilterClearButton />
         </Grid>
     );
 };
@@ -89,20 +85,22 @@ export const AvisGrid = () => {
         <>
             <PageTitle title={t('page.avisos.grid.title')}></PageTitle>
             <GridPage>
-                <MuiDataGrid
-                    title={t('page.avisos.grid.title')}
-                    resourceName="avisResource"
-                    columns={columns}
-                    paginationActive
-                    persistentStateActive
-                    persistentStateClearPageSortPropsOnTopLevelRouteChange
-                    {...filterDataGridProps}
-                    {...pageSizeOptionsDataGridProps}
-                    toolbarType="upper"
-                    toolbarBulkDelete
-                    toolbarCreateLink="form"
-                    rowUpdateLink="form/{{id}}"
-                />
+                <ScreenFrame>
+                    <MuiDataGrid
+                        title={<ScreenTitle icon={icons.avis} title={t('page.avisos.grid.title')} />}
+                        resourceName="avisResource"
+                        columns={columns}
+                        paginationActive
+                        persistentStateActive
+                        persistentStateClearPageSortPropsOnTopLevelRouteChange
+                        {...filterDataGridProps}
+                        {...pageSizeOptionsDataGridProps}
+                        toolbarType="upper"
+                        toolbarBulkDelete
+                        toolbarCreateLink="form"
+                        rowUpdateLink="form/{{id}}"
+                    />
+                </ScreenFrame>
             </GridPage>
         </>
     );

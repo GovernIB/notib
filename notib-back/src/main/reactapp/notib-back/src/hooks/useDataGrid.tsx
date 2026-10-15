@@ -12,6 +12,7 @@ import {
 } from '@mui/x-data-grid-pro';
 import { MuiFilter } from 'reactlib';
 import { useNotibContext } from '../components/NotibContext';
+import FilterCount from '../components/FilterCount';
 
 export const useDatagridPageSizeOptionsProps = (
     innerScroll: boolean = true,
@@ -46,9 +47,12 @@ export const useDatagridFilterProps = (
     initialData?: any,
 ) => {
     const [autoFindDisabled, setAutoFindDisabled] = React.useState<boolean>(true);
+    // Últim Spring Filter aplicat, per al recompte de filtres de la barra de títol (FilterCount)
+    const [springFilter, setSpringFilter] = React.useState<string | undefined>();
     const handleSpringFilterChange = (springFilter: string | undefined) => {
         const springFilterEmpty = springFilter == null || springFilter === '';
         autoFindDisabled && setAutoFindDisabled(!springFilterEmpty);
+        setSpringFilter(springFilter);
     };
     const filterComponent = (
         <MuiFilter
@@ -62,6 +66,7 @@ export const useDatagridFilterProps = (
             initialData={initialData}
         >
             {content}
+            <FilterCount springFilter={springFilter} />
         </MuiFilter>
     );
     return {

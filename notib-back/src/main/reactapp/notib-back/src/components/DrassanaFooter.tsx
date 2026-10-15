@@ -6,6 +6,7 @@ import { toolbarBackgroundStyle } from 'reactlib';
 import drassanaLogo from '../assets/drassana.png';
 import {Link} from "react-router-dom";
 import {useTranslation} from "react-i18next";
+import { FOOTER_HEIGHT } from '../utils/layout';
 
 type DrassanaFooterProps = {
     title: string;
@@ -65,16 +66,18 @@ export const DrassanaFooter: React.FC<DrassanaFooterProps> = (props) => {
             }}
             sx={{
                 color: '#F6F6F6',
-                minHeight: '36px !important',
+                minHeight: FOOTER_HEIGHT + 'px !important',
                 lineHeight: '0.5em',
                 zIndex: (theme) => theme.zIndex.drawer + 100,
             }}>
             <Typography
                 variant="caption"
                 component="div"
+                noWrap
                 title={title + (comandaVersion ? ' v' + comandaVersion : '')}
                 sx={{
                     flexGrow: 1,
+                    minWidth: 0,
                     alignSelf: 'flex-start',
                     fontSize: '14px',
                     fontWeight: 'bold',
@@ -88,8 +91,8 @@ export const DrassanaFooter: React.FC<DrassanaFooterProps> = (props) => {
             </Typography>
             <Link color={'#F6F6F6'} style={{color: '#F6F6F6', marginRight: '10px'}} to={"/sitemap"}>{t('page.sitemap.title')}</Link>
             <Link color={'#F6F6F6'} style={{color: '#F6F6F6'}} to={"/accessibilitat"}>{t('page.accessibilitat.link')}</Link>
-            <Box sx={{ mr: 0, pt: 0, pr: 0, height: '36px', cursor: 'pointer' }}>
-                <img src={drassanaLogo} alt="foot_logo" style={{ maxHeight: '36px' }} />
+            <Box sx={{ mr: 0, pt: 0, pr: 0, height: FOOTER_HEIGHT + 'px', cursor: 'pointer' }}>
+                <img src={drassanaLogo} alt="foot_logo" style={{ maxHeight: FOOTER_HEIGHT + 'px' }} />
             </Box>
         </Toolbar>
     );

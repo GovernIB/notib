@@ -9,6 +9,8 @@ import { PropietatsGroups } from './PropietatsGroups';
 import { PropietatsProps } from './PropietatsProps';
 import { Box, Tooltip } from '@mui/material';
 import PageTitle from "../../components/PageTitle.tsx";
+import ScreenFrame from '../../components/ScreenFrame';
+import { icons } from '../../utils/icons';
 
 const PropietatsQuickFilter: React.FC<{
     onChange: (quickFilter: string | undefined) => void;
@@ -22,7 +24,7 @@ const PropietatsQuickFilter: React.FC<{
         onChange?.(quickFilterDebounced);
     }, [quickFilterDebounced]);
     return (
-        <Box sx={{ display: 'flex', gap: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: { xs: '240px', md: '360px' } }}>
             <TextField
                 value={quickFilter}
                 onChange={(event) => setQuickFilter(event.target.value)}
@@ -71,30 +73,12 @@ const Propietats: React.FC = () => {
         <>
         <PageTitle title={t('app.menu.propietats')}></PageTitle>
         <GridPage disableMargins>
-            <Box
-                id="contingutGeneral"
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: '100%',
-                    overflow: 'hidden',
-                }}
+            <ScreenFrame
+                icon={icons.propietat}
+                title={t('app.menu.propietats')}
+                // El cercador i el botó de desfer van a la barra de títol
+                actions={<PropietatsQuickFilter onChange={setQuickFilter} formApiRef={formApiRef} />}
             >
-                <Box
-                    id="filtre"
-                    sx={{
-                        p: 2,
-                        px: 10,
-                        mt: 1,
-                        flexShrink: 0,
-                        bgcolor: 'background.paper',
-                        borderBottom: '1px solid',
-                        borderColor: 'divider',
-                    }}
-                >
-                    <PropietatsQuickFilter onChange={setQuickFilter} formApiRef={formApiRef} />
-                </Box>
-
                 <Box
                     id="contingutPropietats"
                     sx={{
@@ -136,7 +120,7 @@ const Propietats: React.FC = () => {
                         />
                     </Box>
                 </Box>
-            </Box>
+            </ScreenFrame>
         </GridPage>
     </>
     );

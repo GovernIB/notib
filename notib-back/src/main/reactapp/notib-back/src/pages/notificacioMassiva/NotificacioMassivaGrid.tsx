@@ -1,4 +1,4 @@
-import {Box, Chip, Grid, Icon, IconButton} from '@mui/material';
+import {Box, Chip, Grid, Icon} from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -6,7 +6,7 @@ import {
     MuiDataGrid,
     MuiDataGridColDef,
     springFilterBuilder as filterBuilder, useBaseAppContext,
-    useFilterApiContext, useMuiActionReportLogic, useResourceApiService,
+    useMuiActionReportLogic, useResourceApiService,
 } from 'reactlib';
 import GridFormField from '../../components/GridFormField';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
@@ -18,6 +18,10 @@ import {useNavigate} from "react-router-dom";
 import {ROLE_ADMIN_LECTURA, ROLE_USER, useNotibContext} from "../../components/NotibContext.ts";
 import {TemporalMessageSeverity} from "../../../lib/components/BaseAppContext.tsx";
 import PageTitle from "../../components/PageTitle.tsx";
+import ScreenFrame from '../../components/ScreenFrame';
+import ScreenTitle from '../../components/ScreenTitle';
+import { FilterClearButton } from '../../components/FilterButtons';
+import { icons } from '../../utils/icons';
 
 const iconOk= React.cloneElement(<Icon>check</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center"} });
 const iconError= React.cloneElement(<Icon>close</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center" } });
@@ -177,11 +181,9 @@ const useSpringFilterBuilder = () => {
 const ContentFilter: React.FC = () => {
 
     const { t } = useTranslation();
-    const filterApiRef = useFilterApiContext();
     const { currentRole } = useNotibContext();
     const isNotRoleUser = currentRole !== ROLE_USER
 
-    const handleButtonClick = () => filterApiRef.current?.clear();
     return (
         <Box>
             <Grid container spacing={1}>
@@ -190,11 +192,7 @@ const ContentFilter: React.FC = () => {
                 <GridFormField size={2.5} name="estatProces" />
                 {isNotRoleUser && (<GridFormField size={1.75} name="createdBy" />)}
 
-                <Grid size={0.5} sx={{ textAlign: 'center' }}>
-                    <IconButton onClick={handleButtonClick} title={t('comu.netejarFiltre')}>
-                        <Icon>filter_alt_off</Icon>
-                    </IconButton>
-                </Grid>
+                <FilterClearButton size={0.5} />
             </Grid>
             <Box paddingTop="15px" display="flex" justifyContent="end" fontSize="10px">
                 [<Box>{iconOk} {t('page.notificacioMassiva.grid.llegenda.numProcessats')}</Box>]
@@ -332,22 +330,24 @@ export const NotifiacioMassivaGrid = () => {
         <>
             <PageTitle title={t('page.notificacioMassiva.grid.title')}></PageTitle>
             <GridPage>
-                <MuiDataGrid
-                    title={t('page.notificacioMassiva.grid.title')}
-                    resourceName="notificacioMassivaResource"
-                    columns={columns}
-                    defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
-                    paginationActive
-                    persistentStateActive
-                    persistentStateClearPageSortPropsOnTopLevelRouteChange
-                    {...filterDataGridProps}
-                    {...pageSizeOptionsDataGridProps}
-                    toolbarType="upper"
-                    toolbarCreateLink="form"
-                    rowAdditionalActions={rowAdditionalActions()}
-                    rowUpdateLink="form/{{id}}"
-                />
-                {dialogComponent}
+                <ScreenFrame>
+                    <MuiDataGrid
+                        title={<ScreenTitle icon={icons.enviamentMassiu} title={t('page.notificacioMassiva.grid.title')} />}
+                        resourceName="notificacioMassivaResource"
+                        columns={columns}
+                        defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
+                        paginationActive
+                        persistentStateActive
+                        persistentStateClearPageSortPropsOnTopLevelRouteChange
+                        {...filterDataGridProps}
+                        {...pageSizeOptionsDataGridProps}
+                        toolbarType="upper"
+                        toolbarCreateLink="form"
+                        rowAdditionalActions={rowAdditionalActions()}
+                        rowUpdateLink="form/{{id}}"
+                    />
+                    {dialogComponent}
+                </ScreenFrame>
             </GridPage>
         </>
     );

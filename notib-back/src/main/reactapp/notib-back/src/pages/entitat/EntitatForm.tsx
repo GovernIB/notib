@@ -28,6 +28,9 @@ import { useTabParam } from '../../hooks/useSearchParams';
 import Button from "@mui/material/Button";
 import {Icon, Tooltip} from "@mui/material";
 import PageTitle from "../../components/PageTitle.tsx";
+import ScreenFrame from '../../components/ScreenFrame';
+import { formScreenTitle } from '../../utils/formScreenTitle';
+import { icons } from '../../utils/icons';
 
 const useEntitatId = () => {
 
@@ -312,19 +315,21 @@ export const EntitatForm: React.FC = () => {
         isReady && (<>
             <PageTitle title={titol}></PageTitle>
             <FormPage>
-                <MuiForm
-                    resourceName="entitatResource"
-                    id={id}
-                    title={titol}
-                    hiddenBackButton={hiddenBackButton ? true : undefined}
-                    toolbarSubtitle={id != null ? subtitle : undefined}
-                    createLink="./{{id}}"
-                    //updateLink="../../"
-                    componentProps={{ style: { height: '100%' } }}
-                    commonFieldComponentProps={{ size: 'small' }}
-                >
-                    <EntitatFormContent setSubtitle={setSubtitle} />
-                </MuiForm>
+                <ScreenFrame>
+                    <MuiForm
+                        resourceName="entitatResource"
+                        id={id}
+                        title={formScreenTitle(hiddenBackButton ? icons.entitatActual : icons.entitat, titol)}
+                        hiddenBackButton={hiddenBackButton ? true : undefined}
+                        toolbarSubtitle={id != null ? subtitle : undefined}
+                        createLink="./{{id}}"
+                        //updateLink="../../"
+                        componentProps={{ style: { height: '100%' } }}
+                        commonFieldComponentProps={{ size: 'small' }}
+                    >
+                        <EntitatFormContent setSubtitle={setSubtitle} />
+                    </MuiForm>
+                </ScreenFrame>
             </FormPage>
         </>)
     );

@@ -19,6 +19,9 @@ import CustomDetailPanelToggle from "../../utils/CustomDetailPanelToggle.tsx";
 import ContentFilter, {useSpringFilterBuilder} from "./NotificacioFiltre.tsx";
 import useEstatRemesaAsync from '../../hooks/useEstatRemesaAsync';
 import PageTitle from "../../components/PageTitle.tsx";
+import ScreenFrame from '../../components/ScreenFrame';
+import ScreenTitle from '../../components/ScreenTitle';
+import { icons } from '../../utils/icons';
 // import useSseRowRefresh from "../../hooks/useSseRowRefresh";
 
 // Ha de ser una funció estable: MUI X recalcula les mides de les files cada vegada que getRowHeight canvia
@@ -315,6 +318,16 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
     titolSecundari = notificacionsEsborrades ? t('page.notificacio.grid.notificacionsEsborrades.title') : titolSecundari;
     titolSecundari = notificacionsErrorRegistre ? t('page.notificacio.grid.notificacionsErrorRegistre.title') : titolSecundari;
     titolSecundari = notificacionsCallbackError ? t('page.notificacio.grid.notificacionsCallbackError.title') : titolSecundari;
+    // Icona de l'entrada de menú d'on ve la pantalla (el mateix component en serveix quatre)
+    const titleIcon = notificacionsEsborrades
+        ? icons.notificacioEsborrada
+        : notificacionsErrorRegistre
+            ? icons.notificacioErrorRegistre
+            : notificacionsCallbackError
+                ? icons.notificacioErrorCallback
+                : notificacioMassiva
+                    ? icons.enviamentMassiu
+                    : icons.notificacio;
     const { dialogComponent, onDetailClick } = useNotificacioDetailDialog(notificacionsEsborrades);
     const { dialogComponentErrorRegistre, onDetailClickErrorRegistre } = useRemesesErrorRegistreDetailDialog();
     const { dialogComponentErrorCallback, onDetailClickErrorCallback } = useRemesesErrorCallbackDetailDialog();
@@ -475,74 +488,76 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
     return (<>
         <PageTitle title={t('page.notificacio.grid.title')}></PageTitle>
         <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
-            <MuiDataGrid
-                key={`${currentRole}-${notificacionsEsborrades}-${notificacionsErrorRegistre}-${notificacionsCallbackError}`}
-                datagridApiRef={datagridApiRef}
-                apiRef={apiRef}
-                title={t('page.notificacio.grid.title') + (titolSecundari || "")}
-                resourceName="notificacioResource"
-                columns={columns}
-                defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
-                paginationActive
-                popupEditUpdateActive={true}
-                // popupEditFormContent={<><NotificacioFormContent /><NotificacioFormEnviaments /><NotificacioFormDocuments /></>}
-                selectionActive={!notificacionsEsborrades ? true : undefined}
-                rowUpdateLink="form/{{id}}"
-                rowUpdateShowInMenu
-                // Aquest mateix component es fa servir per a les 4 rutes de notificacions
-                // (totes, esborrades, error de registre, error de callback), cadascuna amb un
-                // joc de columnes diferent (vegeu useDataGridColumns): la clau per defecte
-                // (basada només en resourceName) faria que l'estat persistit d'una vista es
-                // sobreescrivís incorrectament amb el d'una altra. Per això s'inclou un sufix
-                // que les distingeix.
-                persistentStateKey={
-                    'notificacioResource' +
-                    (notificacionsEsborrades
-                        ? '-esborrades'
-                        : notificacionsErrorRegistre
-                            ? '-errorRegistre'
-                            : notificacionsCallbackError
-                                ? '-callbackError'
-                                : '')
-                }
-                persistentStateClearPageSortPropsOnTopLevelRouteChange
-                persistentStateActive
-                rowHideDeleteButton
-                rowHideUpdateButton={params => (mostrarEditarBorrar(params.estat) || noEsTaulaRemeses)}
-                {...filterDataGridProps}
-                fixedFilter={fixedFilter}
-                {...pageSizeOptionsDataGridProps}
-                toolbarType="upper"
-                toolbarHideCreate
-                toolbarCreateLink="form"
-                toolbarElementsWithPositions={[
-                    ...(isCreateLinkPresent ? [{ position: 2, element: <NotificacioAddButton /> }] : []),
-                    ...(notificacionsEsborrades || (isRoleAdminLectura && notificacionsErrorRegistre) ? []
-                        : [{
-                            position: 2,
-                            element: <MassiveActionsButton apiRef={datagridApiRef} notificacionsErrorRegistre={notificacionsErrorRegistre} notificacionsCallbackError={notificacionsCallbackError} refresh={refrescarDespresAccioMassiva}/>,
-                        }]),
-                    ...(!notificacioMassiva ? []
-                        : [{
-                            position: 0,
-                            element: <IconButton onClick={()=> navigate('/notificacio/massiva')} sx={{mr:1}}><ArrowBackIosIcon /></IconButton>,
-                        }]),
-                ]}
-                onRowClick={(params) => notificacionsErrorRegistre ? onDetailClickErrorRegistre(params.id) : onDetailClick(params.id)}
-                rowActionsColumnIndex={11}
-                rowActionsColumnProps={{ width: 90 }}
-                rowAdditionalActions={rowAdditionalActions}
-                {...detailPanelProps}
-                getRowHeight={getRowHeightAuto}
-                getRowClassName={(params) => getGridRowColorClass(params.row.estat, NOTIFICACIO_ESTAT_ENUM_MAP)}
-                sx={generateGridRowStylesFromMap(NOTIFICACIO_ESTAT_ENUM_MAP)}
-            />
-            {dialogComponent}
-            {dialogComponentErrorRegistre}
-            {dialogComponentErrorCallback}
-            {anularRemesaDialog}
-            {ampliarTerminiDialog}
-            {marcarProcessatDialog}
+            <ScreenFrame>
+                <MuiDataGrid
+                    key={`${currentRole}-${notificacionsEsborrades}-${notificacionsErrorRegistre}-${notificacionsCallbackError}`}
+                    datagridApiRef={datagridApiRef}
+                    apiRef={apiRef}
+                    title={<ScreenTitle icon={titleIcon} title={t('page.notificacio.grid.title') + (titolSecundari || "")} />}
+                    resourceName="notificacioResource"
+                    columns={columns}
+                    defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
+                    paginationActive
+                    popupEditUpdateActive={true}
+                    // popupEditFormContent={<><NotificacioFormContent /><NotificacioFormEnviaments /><NotificacioFormDocuments /></>}
+                    selectionActive={!notificacionsEsborrades ? true : undefined}
+                    rowUpdateLink="form/{{id}}"
+                    rowUpdateShowInMenu
+                    // Aquest mateix component es fa servir per a les 4 rutes de notificacions
+                    // (totes, esborrades, error de registre, error de callback), cadascuna amb un
+                    // joc de columnes diferent (vegeu useDataGridColumns): la clau per defecte
+                    // (basada només en resourceName) faria que l'estat persistit d'una vista es
+                    // sobreescrivís incorrectament amb el d'una altra. Per això s'inclou un sufix
+                    // que les distingeix.
+                    persistentStateKey={
+                        'notificacioResource' +
+                        (notificacionsEsborrades
+                            ? '-esborrades'
+                            : notificacionsErrorRegistre
+                                ? '-errorRegistre'
+                                : notificacionsCallbackError
+                                    ? '-callbackError'
+                                    : '')
+                    }
+                    persistentStateClearPageSortPropsOnTopLevelRouteChange
+                    persistentStateActive
+                    rowHideDeleteButton
+                    rowHideUpdateButton={params => (mostrarEditarBorrar(params.estat) || noEsTaulaRemeses)}
+                    {...filterDataGridProps}
+                    fixedFilter={fixedFilter}
+                    {...pageSizeOptionsDataGridProps}
+                    toolbarType="upper"
+                    toolbarHideCreate
+                    toolbarCreateLink="form"
+                    toolbarElementsWithPositions={[
+                        ...(isCreateLinkPresent ? [{ position: 2, element: <NotificacioAddButton /> }] : []),
+                        ...(notificacionsEsborrades || (isRoleAdminLectura && notificacionsErrorRegistre) ? []
+                            : [{
+                                position: 2,
+                                element: <MassiveActionsButton apiRef={datagridApiRef} notificacionsErrorRegistre={notificacionsErrorRegistre} notificacionsCallbackError={notificacionsCallbackError} refresh={refrescarDespresAccioMassiva}/>,
+                            }]),
+                        ...(!notificacioMassiva ? []
+                            : [{
+                                position: 0,
+                                element: <IconButton onClick={()=> navigate('/notificacio/massiva')} sx={{mr:1}}><ArrowBackIosIcon /></IconButton>,
+                            }]),
+                    ]}
+                    onRowClick={(params) => notificacionsErrorRegistre ? onDetailClickErrorRegistre(params.id) : onDetailClick(params.id)}
+                    rowActionsColumnIndex={11}
+                    rowActionsColumnProps={{ width: 90 }}
+                    rowAdditionalActions={rowAdditionalActions}
+                    {...detailPanelProps}
+                    getRowHeight={getRowHeightAuto}
+                    getRowClassName={(params) => getGridRowColorClass(params.row.estat, NOTIFICACIO_ESTAT_ENUM_MAP)}
+                    sx={generateGridRowStylesFromMap(NOTIFICACIO_ESTAT_ENUM_MAP)}
+                />
+                {dialogComponent}
+                {dialogComponentErrorRegistre}
+                {dialogComponentErrorCallback}
+                {anularRemesaDialog}
+                {ampliarTerminiDialog}
+                {marcarProcessatDialog}
+            </ScreenFrame>
         </GridPage>
     </>);
 };

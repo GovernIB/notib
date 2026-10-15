@@ -9,6 +9,9 @@ import PagadorCieFormTabSobres from './PagadorCieFormTabSobres';
 import { useTabParam } from '../../hooks/useSearchParams';
 import GridFormField from '../../components/GridFormField';
 import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
+import ScreenFrame from '../../components/ScreenFrame';
+import { formScreenTitle } from '../../utils/formScreenTitle';
+import { icons } from '../../utils/icons';
 
 const PagadorCieFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
 
@@ -71,17 +74,19 @@ export const PagadorCieForm: React.FC = () => {
     const isUpdate = id != null;
     return (
         <FormPage>
-            <MuiForm
-                resourceName="pagadorCieResource"
-                id={isUpdate ? Number.parseInt(id) : id}
-                title={isUpdate ? t('page.pagadorCie.form.titleUpdate') : t('page.pagadorCie.form.titleCreate')}
-                toolbarSubtitle={isUpdate ? subtitle : undefined}
-                createLink="./{{id}}"
-                componentProps={{ style: { height: '100%' } }}
-                commonFieldComponentProps={{ size: 'small' }}
-            >
-                <PagadorCieFormContent setSubtitle={setSubtitle} />
-            </MuiForm>
+            <ScreenFrame>
+                <MuiForm
+                    resourceName="pagadorCieResource"
+                    id={isUpdate ? Number.parseInt(id) : id}
+                    title={formScreenTitle(icons.pagadorCie, isUpdate ? t('page.pagadorCie.form.titleUpdate') : t('page.pagadorCie.form.titleCreate'))}
+                    toolbarSubtitle={isUpdate ? subtitle : undefined}
+                    createLink="./{{id}}"
+                    componentProps={{ style: { height: '100%' } }}
+                    commonFieldComponentProps={{ size: 'small' }}
+                >
+                    <PagadorCieFormContent setSubtitle={setSubtitle} />
+                </MuiForm>
+            </ScreenFrame>
         </FormPage>
     );
 };
