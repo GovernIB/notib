@@ -1070,6 +1070,7 @@ const translationCa = {
             }
         },
         monitorSistema: {
+            title: "Monitor de sistema",
             tab: {
                 sistema: {
                     title: 'Sistema',
@@ -1182,7 +1183,7 @@ const translationCa = {
                 norma: "Norma de referència: UNE-EN 301549:2022, nivells A i AA",
                 resultatTitle: "Resultat",
                 puntuacioLabel: "Puntuació mitjana del lloc web",
-                puntuacioVal: "8.20",
+                puntuacioVal: "8.8",
                 nivellLabel: "Nivell d'adequació estimat",
                 nivellVal: "AA",
                 situacioLabel: "Situació de compliment estimada",
