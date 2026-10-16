@@ -272,6 +272,9 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
                     backgroundColor: menuColorSet?.hoverBackground,
                 },
             },
+            '& nav .MuiDrawer-root .MuiList-root .MuiList-root .MuiListItemButton-root.Mui-selected': {
+                boxShadow: 'none',
+            },
         },
     };
     return (
