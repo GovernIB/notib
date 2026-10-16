@@ -9,7 +9,6 @@ import es.caib.notib.logic.intf.base.exception.ResourceNotFoundException;
 import es.caib.notib.logic.intf.model.CacheResource;
 import es.caib.notib.logic.intf.resourceservice.CacheResourceService;
 import es.caib.notib.logic.intf.service.CacheService;
-import es.caib.notib.persist.base.entity.NoDatabaseResourceEntity;
 import es.caib.notib.persist.resourceentity.CacheResourceEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
