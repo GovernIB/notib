@@ -339,6 +339,15 @@
 							<skip>${frontend.skip}</skip>
 							<environmentVariables>
 								<VITE_APP_VERSION>${project.version}</VITE_APP_VERSION>
+								<!-- Sobreescriu sempre qualsevol valor de .env/.env.local: un build fet amb Maven
+								     (JBoss o "ide") autentica al servidor (adaptador de JBoss o oauth2Login de Spring,
+								     veure WebSecurityConfig#isJboss()), mai amb OidcAuthProvider al navegador. Així
+								     s'evita el bucle de login infinit si algú oblida comentar aquestes propietats
+								     localment. Només "npm run dev" (mode devProxy, no gestionat per Maven) les
+								     hauria de fer servir. -->
+								<VITE_AUTH_URL></VITE_AUTH_URL>
+								<VITE_AUTH_REALM></VITE_AUTH_REALM>
+								<VITE_AUTH_CLIENTID></VITE_AUTH_CLIENTID>
 							</environmentVariables>
 						</configuration>
 						<executions>

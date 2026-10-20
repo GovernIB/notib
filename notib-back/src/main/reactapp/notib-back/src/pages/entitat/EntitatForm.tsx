@@ -6,12 +6,12 @@ import Badge from '@mui/material/Badge';
 import Typography from '@mui/material/Typography';
 import Toolbar from '@mui/material/Toolbar';
 import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
 import {
+    FormField,
     FormPage,
     MuiForm,
-    MuiFormTabs,
-    MuiFormTabContent,
     TextAvatar,
     useAuthContext,
     useFormContext,
@@ -25,6 +25,7 @@ import notibLogoLight from '../../assets/notib_logo_light.png';
 import { useNotibContext } from '../../components/NotibContext';
 import GridFormField from '../../components/GridFormField';
 import { useTabParam } from '../../hooks/useSearchParams';
+import { FormTabs, FormTabContent } from '../../components/FormTabs';
 import Button from "@mui/material/Button";
 import {Icon, Tooltip} from "@mui/material";
 import PageTitle from "../../components/PageTitle.tsx";
@@ -185,48 +186,59 @@ const EntitatFormTabDades: React.FC = () => {
         <Grid container spacing={2}>
             <GridFormField size={4} name="codi" />
             <GridFormField size={4} name="tipus" />
-            <Grid size={8} />
+            <Grid size={4} sx={{ display: 'flex', justifyContent: 'flex-end', '& .MuiFormControlLabel-root': { mr: 0 } }}>
+                <FormField name="activa" typeSwitch />
+            </Grid>
             <GridFormField size={8} name="nom" />
             <Grid size={4} />
-            <GridFormField size={3} name="dir3Codi" onChange={dir3Codi => dir3Changed(dir3Codi)} />
-            <GridFormField size={3} name="dir3CodiReg" />
+            <GridFormField size={4} name="dir3Codi" onChange={dir3Codi => dir3Changed(dir3Codi)} />
+            <GridFormField size={4} name="dir3CodiReg" />
+            <Grid size={4} />
             <GridFormField size={12} name="apiKey" />
-            <GridFormField size={3} name="activa" />
-            <GridFormField size={12} name="ambEntregaDeh" />
-            <GridFormField size={3} name="entregaCieActiva" />
+            <GridFormField size={6} name="ambEntregaDeh" typeSwitch />
+            <GridFormField size={6} name="entregaCieActiva" typeSwitch />
             {data?.entregaCieActiva && (
                 <>
+                    <Grid size={6} />
                     <GridFormField size={3} name="entregaCiePagadorPostal" />
                     <GridFormField size={3} name="entregaCiePagadorCie" />
                 </>
             )}
-            <Grid size={12} />
-            <GridFormField size={3} name="llibreEntitat" onChange={() => actualitzarLlibre(data.dir3Codi)} />
-            {data?.llibreEntitat && (
+            <GridFormField size={6} name="llibreEntitat" typeSwitch onChange={() => actualitzarLlibre(data.dir3Codi)} />
+            <GridFormField size={6} name="oficinaEntitat" typeSwitch onChange={oficinaEntitat => getOficinesEntitat(oficinaEntitat, data.dir3Codi)} />
+            {(data?.llibreEntitat || data?.oficinaEntitat) && (
                 <>
-                    <Grid size={3}>
-                        <GridFormField size={12} name="llibreNom" />
-                        <Typography variant="caption" color="text.secondary" display="block" >
-                            {t("page.entitats.form.llibre.error")}
-                        </Typography>
+                    <Grid size={6}>
+                        {data?.llibreEntitat && (
+                            <>
+                                <Box sx={{ display: 'flex', gap: 1 }}>
+                                    <Box sx={{ flex: 1 }}>
+                                        <FormField name="llibreNom" />
+                                    </Box>
+                                    <Tooltip title={t("page.entitats.form.llibre.refrescar")} placement="top">
+                                        <Button variant="outlined" sx={{ minWidth: 0 }} onClick={() => getLlibreEntitat(data.dir3Codi)}>
+                                            <Icon fontSize='small'>refresh</Icon>
+                                        </Button>
+                                    </Tooltip>
+                                </Box>
+                                {!data?.llibreNom && (
+                                    <Typography variant="caption" color="text.secondary" display="block" >
+                                        {t("page.entitats.form.llibre.error")}
+                                    </Typography>
+                                )}
+                            </>
+                        )}
                     </Grid>
-                    <Tooltip title={t("page.entitats.form.llibre.refrescar")} placement="top">
-                        <Button onClick={() => getLlibreEntitat(data.dir3Codi)}>
-                            <Icon fontSize='small'>refresh</Icon>
-                        </Button>
-                    </Tooltip>
+                    <Grid size={6}>
+                        {data?.oficinaEntitat && (
+                            <FormField
+                                name="oficina"
+                                type="enum"
+                                options={oficinaOptions}
+                            />
+                        )}
+                    </Grid>
                 </>
-            )}
-            <Grid size={12} />
-            <GridFormField size={3} name="oficinaEntitat" onChange={oficinaEntitat => getOficinesEntitat(oficinaEntitat, data.dir3Codi)} />
-            {data?.oficinaEntitat && (
-                <GridFormField
-                    size={3}
-                    label=""
-                    name="oficina"
-                    type="enum"
-                    options={oficinaOptions}
-                />
             )}
             {/*{data?.oficinaEntitat && (*/}
             {/*    <select*/}
@@ -284,23 +296,23 @@ export const EntitatFormContent: React.FC<{ setSubtitle?: (subtitle: string) => 
         { label: permisosTabLabel },
     ];
     return (
-        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[2, 3, 4]} initialIndex={initialTab}>
-            <MuiFormTabContent index={0} showOnCreate>
+        <FormTabs tabs={tabs} tabIndexesWithGrids={[2, 3, 4]} initialIndex={initialTab}>
+            <FormTabContent index={0} showOnCreate>
                 <EntitatFormTabDades />
-            </MuiFormTabContent>
-            <MuiFormTabContent index={1}>
+            </FormTabContent>
+            <FormTabContent index={1}>
                 <EntitatFormTabPersonalitzar />
-            </MuiFormTabContent>
-            <MuiFormTabContent index={2}>
+            </FormTabContent>
+            <FormTabContent index={2} grid>
                 <EntitatFormTabTipusDocs />
-            </MuiFormTabContent>
-            <MuiFormTabContent index={3}>
+            </FormTabContent>
+            <FormTabContent index={3} grid>
                 <EntitatFormTabAplicacions />
-            </MuiFormTabContent>
-            <MuiFormTabContent index={4}>
+            </FormTabContent>
+            <FormTabContent index={4} grid>
                 <EntitatFormTabPermisos />
-            </MuiFormTabContent>
-        </MuiFormTabs>
+            </FormTabContent>
+        </FormTabs>
     );
 };
 

@@ -43,7 +43,7 @@ const columns: MuiDataGridColDef[] = [
         align: 'center',
         renderCell: (params: any) => {
             return (
-                <LinkToTab id={params.id} tab={2} clickEnabled>
+                <LinkToTab id={params.id} row={params.row} popup tab={2} clickEnabled>
                     <Chip label={params.value} color={params.value ? 'primary' : undefined} size="small"/>
                 </LinkToTab>
             );
@@ -55,7 +55,7 @@ const columns: MuiDataGridColDef[] = [
         align: 'center',
         renderCell: (params: any) => {
             return (
-                <LinkToTab id={params.id} tab={3} clickEnabled>
+                <LinkToTab id={params.id} row={params.row} popup tab={3} clickEnabled>
                     <Chip label={params.value} color={params.value ? 'primary' : undefined} size="small"/>
                 </LinkToTab>
             );
@@ -67,7 +67,7 @@ const columns: MuiDataGridColDef[] = [
         align: 'center',
         renderCell: (params: any) => {
             return (
-                <LinkToTab id={params.id} tab={4} clickEnabled>
+                <LinkToTab id={params.id} row={params.row} popup tab={4} clickEnabled>
                     <Chip label={params.value} color={params.value ? 'primary' : undefined} size="small"/>
                 </LinkToTab>
             );
@@ -127,7 +127,8 @@ export const EntitatGrid: React.FC = () => {
                         toolbarHideCreate={isRoleAdminLectura ? true : undefined}
                         popupEditActive
                         popupEditFormContent={<EntitatFormContent />}
-                        popupEditFormDialogResourceTitle={t('page.entitat.grid.popupResourceTitle')}
+                        popupEditFormDialogResourceTitle={t('page.entitats.grid.popupResourceTitle')}
+                        popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'xl' }}
                         rowHideUpdateButton={isRoleAdminLectura}
                         rowHideDeleteButton={isRoleAdminLectura}
                     />

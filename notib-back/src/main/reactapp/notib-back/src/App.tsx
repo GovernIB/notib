@@ -14,6 +14,7 @@ import notibLogoDark from './assets/notib_logo_dark.png';
 import { BaseApp } from './components/BaseApp';
 import DrassanaFooter from './components/DrassanaFooter';
 import NotibProvider from './components/NotibProvider';
+import FormInitialTabProvider from './components/FormInitialTabProvider';
 import ThemeUserProvider, { useThemeUserContext } from './components/ThemeUserProvider';
 import {useNotibContext, ROLE_SUPER, ROLE_APLICACIO} from './components/NotibContext';
 import { lightTheme } from './theme';
@@ -165,7 +166,9 @@ export const App = () => {
                     <CssBaseline />
                     <NotibProvider>
                         <ThemeUserProvider>
-                            <InnerApp />
+                            <FormInitialTabProvider>
+                                <InnerApp />
+                            </FormInitialTabProvider>
                         </ThemeUserProvider>
                     </NotibProvider>
                 </ThemeProvider>

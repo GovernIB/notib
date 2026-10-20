@@ -3,7 +3,7 @@ import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import {
     GridPage,
-    MuiDataGrid, MuiFormTabContent, MuiFormTabs,
+    MuiDataGrid,
     springFilterBuilder as filterBuilder, useFormContext,
 } from 'reactlib';
 import LinkToTab from '../../components/LinkToTab';
@@ -19,6 +19,7 @@ import ScreenTitle from '../../components/ScreenTitle';
 import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
 import {useTabParam} from "../../hooks/useSearchParams.ts";
+import { FormTabs, FormTabContent } from '../../components/FormTabs';
 import Badge from "@mui/material/Badge";
 import PagadorCieFormTabFulles from "./PagadorCieFormTabFulles.tsx";
 import PagadorCieFormTabSobres from "./PagadorCieFormTabSobres.tsx";
@@ -45,7 +46,7 @@ const columns = [
         flex: 1,
         renderCell: (params: any) => {
             return (
-                <LinkToTab id={params.id} tab={1} clickEnabled>
+                <LinkToTab id={params.id} row={params.row} popup tab={1} clickEnabled>
                     <Chip label={params.value} color={params.value ? 'primary' : undefined} size="small"/>
                 </LinkToTab>
             );
@@ -56,7 +57,7 @@ const columns = [
         flex: 1,
         renderCell: (params: any) => {
             return (
-                <LinkToTab id={params.id} tab={2} clickEnabled>
+                <LinkToTab id={params.id} row={params.row} popup tab={2} clickEnabled>
                     <Chip label={params.value} color={params.value ? 'primary' : undefined} size="small"/>
                 </LinkToTab>
             );
@@ -117,8 +118,8 @@ const PagadorCieFormContent: React.FC = () => {
     ];
 
     return (
-        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1, 2]} initialIndex={initialTab}>
-            <MuiFormTabContent index={0} showOnCreate>
+        <FormTabs tabs={tabs} tabIndexesWithGrids={[1, 2]} initialIndex={initialTab}>
+            <FormTabContent index={0} showOnCreate>
                 <Grid container spacing={2}>
                     <GridFormField size={6} name="nom" />
                     <Grid size={6}></Grid>
@@ -128,14 +129,14 @@ const PagadorCieFormContent: React.FC = () => {
                     <GridFormField size={6} name="contracteDataVig" />
                     <GridFormField size={6} name="cieExtern" />
                 </Grid>
-            </MuiFormTabContent>
-            <MuiFormTabContent index={1}>
+            </FormTabContent>
+            <FormTabContent index={1} grid>
                 <PagadorCieFormTabFulles />
-            </MuiFormTabContent>
-            <MuiFormTabContent index={2}>
+            </FormTabContent>
+            <FormTabContent index={2} grid>
                 <PagadorCieFormTabSobres />
-            </MuiFormTabContent>
-        </MuiFormTabs>
+            </FormTabContent>
+        </FormTabs>
     );
 };
 

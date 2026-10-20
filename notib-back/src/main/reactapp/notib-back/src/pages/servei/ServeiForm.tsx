@@ -2,12 +2,13 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import Badge from '@mui/material/Badge';
-import { MuiFormTabs, MuiFormTabContent, useFormContext } from 'reactlib';
+import { useFormContext } from 'reactlib';
 import ServeiFormTabGrups from './ServeiFormTabGrups';
 import ServeiFormTabPermisos from './ServeiFormTabPermisos';
 import GridFormField from '../../components/GridFormField';
 import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
 import { useTabParam } from '../../hooks/useSearchParams';
+import { FormTabs, FormTabContent } from '../../components/FormTabs';
 
 
 export const ServeiForm: React.FC = () => {
@@ -32,8 +33,8 @@ export const ServeiForm: React.FC = () => {
         { label: permisosTabLabel },
     ];
     return (
-        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1, 2]} initialIndex={initialTab}>
-            <MuiFormTabContent index={0} showOnCreate>
+        <FormTabs tabs={tabs} tabIndexesWithGrids={[1, 2]} initialIndex={initialTab}>
+            <FormTabContent index={0} showOnCreate>
                 <Grid container spacing={2}>
                     <GridFormField size={3} name="codi" />
                     <GridFormField size={9} name="nom" />
@@ -66,13 +67,13 @@ export const ServeiForm: React.FC = () => {
                     <GridFormField size={3} name="requireDirectPermission" />
                     <GridFormField size={2} name="manual" />
                 </Grid>
-            </MuiFormTabContent>
-            <MuiFormTabContent index={1}>
+            </FormTabContent>
+            <FormTabContent index={1} grid>
                 <ServeiFormTabGrups />
-            </MuiFormTabContent>
-            <MuiFormTabContent index={2}>
+            </FormTabContent>
+            <FormTabContent index={2} grid>
                 <ServeiFormTabPermisos />
-            </MuiFormTabContent>
-        </MuiFormTabs>
+            </FormTabContent>
+        </FormTabs>
     );
 };

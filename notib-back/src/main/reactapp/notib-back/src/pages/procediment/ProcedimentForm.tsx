@@ -2,12 +2,13 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import Badge from '@mui/material/Badge';
-import { MuiFormTabs, MuiFormTabContent, useFormContext } from 'reactlib';
+import { useFormContext } from 'reactlib';
 import ProcedimentFormTabGrups from './ProcedimentFormTabGrups';
 import ProcedimentFormTabPermisos from './ProcedimentFormTabPermisos';
 import GridFormField from '../../components/GridFormField';
 import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
 import { useTabParam } from '../../hooks/useSearchParams';
+import { FormTabs, FormTabContent } from '../../components/FormTabs';
 
 export const ProcedimentForm: React.FC = () => {
 
@@ -27,8 +28,8 @@ export const ProcedimentForm: React.FC = () => {
     const permisosTabIndex = showGrupsTab ? 2 : 1;
     const tabIndexesWithGrids = showGrupsTab ? [grupsTabIndex, permisosTabIndex] : [permisosTabIndex];
     return (
-        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={tabIndexesWithGrids} initialIndex={initialTab}>
-            <MuiFormTabContent index={0} showOnCreate>
+        <FormTabs tabs={tabs} tabIndexesWithGrids={tabIndexesWithGrids} initialIndex={initialTab}>
+            <FormTabContent index={0} showOnCreate>
                 <Grid container spacing={2}>
 
                     <GridFormField size={3} name="tipus" hidden componentProps={{type: "hidden", value: data?.tipus?? 'PROCEDIMENT'}} sx={{ display: 'none'}}/>
@@ -54,15 +55,15 @@ export const ProcedimentForm: React.FC = () => {
                     <GridFormField size={3} name="requireDirectPermission" />
                     <GridFormField size={2} name="manual" />
                 </Grid>
-            </MuiFormTabContent>
+            </FormTabContent>
             {showGrupsTab && (
-                <MuiFormTabContent index={grupsTabIndex}>
+                <FormTabContent index={grupsTabIndex} grid>
                     <ProcedimentFormTabGrups />
-                </MuiFormTabContent>
+                </FormTabContent>
             )}
-            <MuiFormTabContent index={permisosTabIndex}>
+            <FormTabContent index={permisosTabIndex} grid>
                 <ProcedimentFormTabPermisos />
-            </MuiFormTabContent>
-        </MuiFormTabs>
+            </FormTabContent>
+        </FormTabs>
     );
 };

@@ -75,7 +75,7 @@ const columns: MuiDataGridColDef[] = [
         flex: 0.6,
         renderCell: (params: any) => {
             return (
-                <LinkToTab id={params.id} tab={1} clickEnabled={params.row.agrupar}>
+                <LinkToTab id={params.id} row={params.row} popup tab={1} clickEnabled={params.row.agrupar}>
                     <Chip label={params.value} color={params.value ? 'primary' : undefined} size="small"/>
                 </LinkToTab>
             );
@@ -86,7 +86,7 @@ const columns: MuiDataGridColDef[] = [
         flex: 0.6,
         renderCell: (params: any) => {
             return (
-                <LinkToTab id={params.id} tab={params.row.agrupar ? 2 : 1} clickEnabled>
+                <LinkToTab id={params.id} row={params.row} popup tab={params.row.agrupar ? 2 : 1} clickEnabled>
                     <Chip label={params.value} color={params.value ? 'primary' : undefined} size="small"/>
                 </LinkToTab>
             );

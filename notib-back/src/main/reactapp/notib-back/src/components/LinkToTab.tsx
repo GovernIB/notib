@@ -1,14 +1,22 @@
 import { Link } from 'react-router-dom';
+import { useMuiDataGridContext } from 'reactlib';
+import { useFormInitialTabContext } from './FormInitialTabProvider';
 
 export type LinkToTabProps = {
     id: string;
     tab: number;
     clickEnabled?: boolean;
+    /** El formulari del llistat s'obre com a modal (popupEditActive) en lloc d'anar a la ruta form/{id} */
+    popup?: boolean;
+    /** Fila del llistat (necessària amb popup per saber si l'usuari pot modificar el registre) */
+    row?: any;
     children: React.ReactNode;
 };
 
 const LinkToTab = (props: LinkToTabProps) => {
-    const { id, tab, children } = props;
+    const { id, tab, popup, row, children } = props;
+    const { apiRef: dataGridApiRef } = useMuiDataGridContext();
+    const formInitialTabContext = useFormInitialTabContext();
     const targetUrl = `form/${id}?tab=${tab}`;
 
     return (
@@ -18,6 +26,10 @@ const LinkToTab = (props: LinkToTabProps) => {
                 event.stopPropagation();
                 if (!props.clickEnabled) {
                     event.preventDefault();
+                } else if (popup) {
+                    event.preventDefault();
+                    formInitialTabContext?.setInitialTab(tab);
+                    dataGridApiRef.current?.triggerUpdate(id, row);
                 }
             }}
             // onClick={(event) => event.stopPropagation()}

@@ -196,6 +196,9 @@ services:
       JBOSS_TRUSTSTORE: "/home/jboss/keystores/truststore.jks"
       JBOSS_TRUSTSTORE_PASSWORD: "${TRUSTSTORE_PASSWORD}"
 
+      es.caib.notib.auth.url: "${AUTH_URL}"
+      es.caib.notib.auth.realm: "${AUTH_REALM}"
+
       es.caib.notib.front.api.url: "${FRONT_API_URL}"
       es.caib.notib.front.auth.url: "${FRONT_AUTH_URL}"
       es.caib.notib.front.auth.realm: "${FRONT_AUTH_REALM}"
