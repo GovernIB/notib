@@ -12,7 +12,7 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import ToggleButton from '@mui/material/ToggleButton';
 import 'dayjs/locale/ca';
 import 'dayjs/locale/es';
-import { MuiFormDialog, MuiDataFormDialogApi, useBaseAppContext, useAuthContext, useFormContext } from 'reactlib';
+import { MuiFormDialog, MuiDataFormDialogApi, useBaseAppContext, useAuthContext, useAuthButtonContext, useFormContext } from 'reactlib';
 import { useNotibContext } from './NotibContext';
 import { useThemeUserContext } from './ThemeUserProvider';
 import { CardData } from './CardData';
@@ -25,7 +25,9 @@ export const UserProfileMenu: React.FC<{
     const { t } = useTranslation();
     const { getUserId: authGetUserId } = useAuthContext();
     const { removePreview } = useThemeUserContext();
+    const { apiRef: authButtonApiRef } = useAuthButtonContext();
     const showUserProfileDialog = () => {
+        authButtonApiRef.current?.close();
         // Qualsevol tancament sense desar (cancel·lar, 'x', Escape) rebutja la promesa:
         // restaurem la previsualització del tema a la configuració desada.
         formDialogApiRef.current?.show(authGetUserId()).catch(() => removePreview());

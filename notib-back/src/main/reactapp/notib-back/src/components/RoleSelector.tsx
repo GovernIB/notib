@@ -6,6 +6,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Icon from '@mui/material/Icon';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
+import { useAuthButtonContext } from 'reactlib';
 import { useNotibContext } from './NotibContext';
 import { getRoleHomePath, isExternalPath, isPathAccessibleForRole } from '../routeAccess';
 
@@ -14,9 +15,11 @@ const RoleSelector: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { rolesAvailable, currentRole, setCurrentRole } = useNotibContext();
+    const { apiRef: authButtonApiRef } = useAuthButtonContext();
 
     const handleRoleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newRole = event.target.value;
+        authButtonApiRef.current?.close();
         setCurrentRole(newRole);
         // Si la pàgina actual no és accessible amb el nou rol es redirigeix a la pantalla inicial del rol;
         // en cas contrari es manté la pàgina actual.

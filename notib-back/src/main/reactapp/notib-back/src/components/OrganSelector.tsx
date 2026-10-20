@@ -4,12 +4,17 @@ import ListItemText from '@mui/material/ListItemText';
 import Icon from '@mui/material/Icon';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
+import { useAuthButtonContext } from 'reactlib';
 import { useNotibContext } from './NotibContext';
 
 const OrganSelector: React.FC = () => {
 
     const { organsAvailable, currentOrganId, setCurrentOrganId } = useNotibContext();
-    const handleOrganChange = (event: React.ChangeEvent<HTMLInputElement>) => setCurrentOrganId(Number(event.target.value));
+    const { apiRef: authButtonApiRef } = useAuthButtonContext();
+    const handleOrganChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        authButtonApiRef.current?.close();
+        setCurrentOrganId(Number(event.target.value));
+    };
     return !organsAvailable ? null : (
         <TextField
             value={currentOrganId != null ? '' + currentOrganId : ''}

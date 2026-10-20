@@ -4,12 +4,17 @@ import ListItemText from '@mui/material/ListItemText';
 import Icon from '@mui/material/Icon';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
+import { useAuthButtonContext } from 'reactlib';
 import { useNotibContext } from './NotibContext';
 
 const EntitatSelector: React.FC = () => {
 
     const { entitatsAvailable, currentEntitatId, setCurrentEntitatId } = useNotibContext();
-    const handleEntitatChange = (event: React.ChangeEvent<HTMLInputElement>) => setCurrentEntitatId(Number(event.target.value));
+    const { apiRef: authButtonApiRef } = useAuthButtonContext();
+    const handleEntitatChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        authButtonApiRef.current?.close();
+        setCurrentEntitatId(Number(event.target.value));
+    };
     return !entitatsAvailable ? null : (
         <TextField
             value={currentEntitatId != null ? '' + currentEntitatId : ''}
