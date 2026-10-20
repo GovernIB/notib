@@ -1,12 +1,18 @@
-import { Grid } from '@mui/material';
+import { Grid, Icon, IconButton } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { GridApiPro, useGridApiRef } from '@mui/x-data-grid-pro';
 import {
     GridPage,
     MuiDataGrid,
+    MuiDataGridApiRef,
     MuiDataGridColDef,
     springFilterBuilder as filterBuilder,
+    useBaseAppContext,
+    useMuiDataGridApiRef,
+    useMuiDataGridContext,
 } from 'reactlib';
+import AccionsMassives, { MenuOption, useAccionsMassives } from '../../components/AccionsMassives';
 import GridFormField from '../../components/GridFormField';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
@@ -85,6 +91,44 @@ const AvisFormContent: React.FC = () => {
     );
 };
 
+const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null>, refresh: () => void }> = ({ apiRef, refresh }) => {
+
+    const { selection } = useMuiDataGridContext();
+    const { t } = useTranslation();
+    const { activarAvisosMassiu, desactivarAvisosMassiu, esborrarAvisosMassiu } = useAccionsMassives('avisResource', refresh);
+
+    const opcionsMenu: MenuOption[] = [
+        {
+            label: t('page.avisos.accionsMassives.activar.title'),
+            tooltip: t('page.avisos.accionsMassives.activar.title'),
+            icon: 'check_circle',
+            onClick: () => activarAvisosMassiu(selection?.ids),
+        },
+        {
+            label: t('page.avisos.accionsMassives.desactivar.title'),
+            tooltip: t('page.avisos.accionsMassives.desactivar.title'),
+            icon: 'block',
+            onClick: () => desactivarAvisosMassiu(selection?.ids),
+        },
+        {
+            label: t('page.avisos.accionsMassives.esborrar.title'),
+            tooltip: t('page.avisos.accionsMassives.esborrar.title'),
+            icon: 'delete',
+            onClick: () => esborrarAvisosMassiu(selection?.ids),
+        },
+    ];
+    return <AccionsMassives options={opcionsMenu} apiRef={apiRef} resource="avisResource" sizeSelection={selection?.ids?.size} />;
+};
+
+const AvisAddButton: React.FC<{ gridApiRef: MuiDataGridApiRef }> = ({ gridApiRef }) => {
+    const { t } = useBaseAppContext();
+    return (
+        <IconButton title={t('datacommon.create.label')} onClick={() => gridApiRef.current?.triggerCreate()}>
+            <Icon>add</Icon>
+        </IconButton>
+    );
+};
+
 export const AvisGrid = () => {
 
     const { t } = useTranslation();
@@ -95,6 +139,9 @@ export const AvisGrid = () => {
         <ContentFilter />
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
+    const datagridApiRef = useGridApiRef();
+    const gridApiRef = useMuiDataGridApiRef();
+    const refresh = React.useCallback(() => gridApiRef.current?.refresh(), [gridApiRef]);
     return (
         <>
             <PageTitle title={t('page.avisos.grid.title')}></PageTitle>
@@ -103,14 +150,21 @@ export const AvisGrid = () => {
                     <MuiDataGrid
                         title={<ScreenTitle icon={icons.avis} title={t('page.avisos.grid.title')} />}
                         resourceName="avisResource"
+                        datagridApiRef={datagridApiRef}
+                        apiRef={gridApiRef}
                         columns={columns}
                         paginationActive
                         persistentStateActive
                         persistentStateClearPageSortPropsOnTopLevelRouteChange
                         {...filterDataGridProps}
                         {...pageSizeOptionsDataGridProps}
+                        selectionActive
                         toolbarType="upper"
-                        toolbarBulkDelete
+                        toolbarHideCreate
+                        toolbarElementsWithPositions={[
+                            { position: 2, element: <MassiveActionsButton apiRef={datagridApiRef} refresh={refresh} /> },
+                            { position: 2, element: <AvisAddButton gridApiRef={gridApiRef} /> },
+                        ]}
                         popupEditActive
                         popupEditFormContent={<AvisFormContent/>}
                         popupEditFormDialogResourceTitle={t('page.avisos.grid.popupResourceTitle')}

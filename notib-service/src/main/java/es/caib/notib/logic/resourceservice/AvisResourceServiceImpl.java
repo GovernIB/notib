@@ -1,5 +1,6 @@
 package es.caib.notib.logic.resourceservice;
 
+import es.caib.notib.logic.avisos.AvisMassiuActionExecutor;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.helper.UserSessionHelper;
@@ -8,10 +9,12 @@ import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.model.AvisResource;
 import es.caib.notib.logic.intf.resourceservice.AvisResourceService;
 import es.caib.notib.persist.resourceentity.AvisResourceEntity;
+import es.caib.notib.persist.resourcerepository.AvisResourceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.Map;
 
 /**
@@ -26,7 +29,17 @@ public class AvisResourceServiceImpl extends BaseMutableResourceService<AvisReso
 
 	private final AuthenticationHelper authenticationHelper;
 	private final UserSessionHelper userSessionHelper;
+	private final AvisResourceRepository avisResourceRepository;
 //	private final EventHelper eventHelper;
+
+	@PostConstruct
+	public void init() {
+
+		var massiu = new AvisMassiuActionExecutor(avisResourceRepository);
+		register(AvisResource.ACTION_ACTIVAR_MASSIU, massiu);
+		register(AvisResource.ACTION_DESACTIVAR_MASSIU, massiu);
+		register(AvisResource.ACTION_ESBORRAR_MASSIU, massiu);
+	}
 
 	@Override
 	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries, boolean isSingleResult) {

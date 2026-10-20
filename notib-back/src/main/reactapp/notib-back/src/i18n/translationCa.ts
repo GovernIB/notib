@@ -95,7 +95,12 @@ const translationCa = {
         avisos: {
             grid: {
                 title: 'Avisos',
-                popupResourceTitle: "avís"
+                popupResourceTitle: "avís",
+            },
+            accionsMassives: {
+                activar: { title: 'Activa', ok: 'Avisos activats correctament' },
+                desactivar: { title: 'Desactiva', ok: 'Avisos desactivats correctament' },
+                esborrar: { title: 'Esborra', ok: 'Avisos esborrats correctament' },
             },
             form: {
                 titleCreate: 'Crear avís',

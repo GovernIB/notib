@@ -93,7 +93,12 @@ const translationEs = {
         avisos: {
             grid: {
                 title: 'Avisos',
-                popupResourceTitle: "aviso"
+                popupResourceTitle: "aviso",
+            },
+            accionsMassives: {
+                activar: { title: 'Activa', ok: 'Avisos activados correctamente' },
+                desactivar: { title: 'Desactiva', ok: 'Avisos desactivados correctamente' },
+                esborrar: { title: 'Borra', ok: 'Avisos borrados correctamente' },
             },
             form: {
                 titleCreate: 'Crear aviso',

@@ -40,12 +40,27 @@ import java.util.Date;
 			@ResourceArtifact(
 				type = ResourceArtifactType.FILTER,
 				code = AvisResource.FILTER_CODE,
-				formClass = AvisResource.AvisResourceFilter.class)
+				formClass = AvisResource.AvisResourceFilter.class),
+			@ResourceArtifact(
+				type = ResourceArtifactType.ACTION,
+				code = AvisResource.ACTION_ACTIVAR_MASSIU,
+				formClass = AccioMassivaParams.class),
+			@ResourceArtifact(
+				type = ResourceArtifactType.ACTION,
+				code = AvisResource.ACTION_DESACTIVAR_MASSIU,
+				formClass = AccioMassivaParams.class),
+			@ResourceArtifact(
+				type = ResourceArtifactType.ACTION,
+				code = AvisResource.ACTION_ESBORRAR_MASSIU,
+				formClass = AccioMassivaParams.class)
 		}
 )
 public class AvisResource extends BaseResource<Long> {
 
 	public static final String FILTER_CODE = "FILTER_AVIS";
+	public static final String ACTION_ACTIVAR_MASSIU = "ACTIVAR_AVIS_MASSIU";
+	public static final String ACTION_DESACTIVAR_MASSIU = "DESACTIVAR_AVIS_MASSIU";
+	public static final String ACTION_ESBORRAR_MASSIU = "ESBORRAR_AVIS_MASSIU";
 
 	@NotNull
 	@Size(max = 256)
