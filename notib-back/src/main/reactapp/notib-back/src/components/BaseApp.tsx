@@ -28,6 +28,8 @@ import { UserProfileMenu, UserProfileFormDialog } from './UserProfile';
 import SwitchInterfaceMenuItem from './SwitchInterfaceMenuItem';
 import { MAIN_GAP, MAIN_PADDING } from '../utils/layout';
 import { darkTheme, lightTheme } from '../theme';
+import { roleBadgeIcon } from '../utils/roleIcons';
+import { useNotibContext } from './NotibContext';
 import {AvisosBanner} from "./AvisosBanner.tsx";
 
 export type MenuEntryWithResource = MenuEntry & {
@@ -200,6 +202,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
     const navigate = useNavigate();
     const location = useLocation();
     const theme = useTheme();
+    const { currentRole } = useNotibContext();
     const baseAppMenuEntries = useBaseAppMenuEntries(menuEntries);
     const formDialogApiRef = useMuiFormDialogApiRef();
     const i18nHandleLanguageChange = (language?: string) => {
@@ -285,6 +288,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             headerAdditionalComponents={[
                 <SwitchInterfaceMenuItem key="fast_rewind" />,
             ]}
+            headerAuthBadgeIcon={roleBadgeIcon(currentRole)}
             headerAdditionalAuthComponents={[
                 <Box key="user_profile" sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
                     <UserProfileMenu formDialogApiRef={formDialogApiRef} />

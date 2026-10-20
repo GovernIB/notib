@@ -3,12 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemText from '@mui/material/ListItemText';
+import ListItemIcon from '@mui/material/ListItemIcon';
 import Icon from '@mui/material/Icon';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import { useAuthButtonContext } from 'reactlib';
 import { useNotibContext } from './NotibContext';
 import { getRoleHomePath, isExternalPath, isPathAccessibleForRole } from '../routeAccess';
+import { ROLE_ICONS } from '../utils/roleIcons';
 
 const RoleSelector: React.FC = () => {
     const { t } = useTranslation();
@@ -44,15 +46,22 @@ const RoleSelector: React.FC = () => {
                 input: {
                     startAdornment: (
                         <InputAdornment position="start" sx={{ mr: 2 }}>
-                            <Icon fontSize="small">badge</Icon>
+                            <Icon fontSize="small">{(currentRole && ROLE_ICONS[currentRole]) ?? 'badge'}</Icon>
                         </InputAdornment>
                     )
-                }
+                },
+                // El camp mostra només el nom del rol: la icona ja és a l'adorn d'inici
+                select: {
+                    renderValue: (value: unknown) => t(`component.RoleSelector.role.${value}`),
+                },
             }}
             sx={{ mr: 1, '& fieldset': { border: 'none !important' }}}
         >
             {rolesAvailable.map((rol) => (
                 <MenuItem key={rol} value={rol}>
+                    <ListItemIcon>
+                        <Icon fontSize="small">{ROLE_ICONS[rol] ?? 'badge'}</Icon>
+                    </ListItemIcon>
                     <ListItemText>{t(`component.RoleSelector.role.${rol}`)}</ListItemText>
                 </MenuItem>
             ))}

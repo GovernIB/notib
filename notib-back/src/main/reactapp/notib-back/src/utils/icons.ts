@@ -38,6 +38,14 @@ export const icons = {
     accessibilitat: 'accessibility_new',
     noTrobat: 'search_off',
 
+    // --- Rols (insígnia del botó d'usuari de la capçalera) ----------------------------------
+    rolSuper: 'shield',
+    rolAdmin: 'admin_panel_settings',
+    rolAdminLectura: 'visibility',
+    rolOrgan: 'account_tree',
+    rolAplicacio: 'apps',
+    rolUsuari: 'person',
+
     // --- Agrupacions del menú ----------------------------------------------------------------
     grupEnviamentMassiu: 'dashboard',
     gestio: 'dashboard',
