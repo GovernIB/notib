@@ -142,8 +142,9 @@ const NotificacioAddButton: React.FC = () => {
                 variant="contained"
                 loading={currentEntitatLoading}
                 startIcon={<Icon>add</Icon>}
+                endIcon={<Icon>{open ? 'arrow_drop_up' : 'arrow_drop_down'}</Icon>}
                 onClick={handleClick}
-                sx={{ mr: 1 }}
+                sx={{ mr: 1, textTransform: 'none'}}
             >
                 {t('page.notificacio.grid.new.title')}
             </Button>
@@ -512,12 +513,8 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                     persistentStateKey={
                         'notificacioResource' +
                         (notificacionsEsborrades
-                            ? '-esborrades'
-                            : notificacionsErrorRegistre
-                                ? '-errorRegistre'
-                                : notificacionsCallbackError
-                                    ? '-callbackError'
-                                    : '')
+                            ? '-esborrades' : notificacionsErrorRegistre
+                                ? '-errorRegistre' : notificacionsCallbackError ? '-callbackError' : '')
                     }
                     persistentStateClearPageSortPropsOnTopLevelRouteChange
                     persistentStateActive
@@ -530,7 +527,6 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                     toolbarHideCreate
                     toolbarCreateLink="form"
                     toolbarElementsWithPositions={[
-                        ...(isCreateLinkPresent ? [{ position: 2, element: <NotificacioAddButton /> }] : []),
                         ...(notificacionsEsborrades || (isRoleAdminLectura && notificacionsErrorRegistre) ? []
                             : [{
                                 position: 2,
@@ -541,6 +537,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                                 position: 0,
                                 element: <IconButton onClick={()=> navigate('/notificacio/massiva')} sx={{mr:1}}><ArrowBackIosIcon /></IconButton>,
                             }]),
+                        ...(isCreateLinkPresent ? [{ position: 2, element: <NotificacioAddButton /> }] : [])
                     ]}
                     onRowClick={(params) => notificacionsErrorRegistre ? onDetailClickErrorRegistre(params.id) : onDetailClick(params.id)}
                     rowActionsColumnIndex={11}

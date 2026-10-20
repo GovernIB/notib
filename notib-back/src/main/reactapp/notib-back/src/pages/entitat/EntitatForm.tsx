@@ -252,15 +252,14 @@ const EntitatFormTabDades: React.FC = () => {
     );
 };
 
-const EntitatFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
+export const EntitatFormContent: React.FC<{ setSubtitle?: (subtitle: string) => void }> = ({ setSubtitle = () => {} }) => {
 
-    const { setSubtitle } = props;
     const { t } = useTranslation();
     const { data } = useFormContext();
     const initialTab = useTabParam();
     React.useEffect(() => {
         setSubtitle(data?.codi + ', ' + data?.nom);
-    }, [data]);
+    }, [data, setSubtitle]);
 
     const tipusDocsTabLabel = (
         <Badge badgeContent={data.tipusDocCount} color="primary">

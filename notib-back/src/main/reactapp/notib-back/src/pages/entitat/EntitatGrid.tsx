@@ -17,6 +17,7 @@ import ScreenFrame from '../../components/ScreenFrame';
 import ScreenTitle from '../../components/ScreenTitle';
 import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
+import { EntitatFormContent } from "./EntitatForm.tsx";
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -123,10 +124,10 @@ export const EntitatGrid: React.FC = () => {
                         {...filterDataGridProps}
                         {...pageSizeOptionsDataGridProps}
                         toolbarType="upper"
-                        toolbarCreateLink="form"
                         toolbarHideCreate={isRoleAdminLectura ? true : undefined}
-                        rowLink="form/{{id}}"
-                        rowUpdateLink="form/{{id}}"
+                        popupEditActive
+                        popupEditFormContent={<EntitatFormContent />}
+                        popupEditFormDialogResourceTitle={t('page.entitat.grid.popupResourceTitle')}
                         rowHideUpdateButton={isRoleAdminLectura}
                         rowHideDeleteButton={isRoleAdminLectura}
                     />

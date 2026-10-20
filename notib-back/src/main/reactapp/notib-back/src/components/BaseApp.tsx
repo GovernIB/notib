@@ -27,6 +27,7 @@ import Offline from './Offline';
 import { UserProfileMenu, UserProfileFormDialog } from './UserProfile';
 import SwitchInterfaceMenuItem from './SwitchInterfaceMenuItem';
 import { MAIN_GAP, MAIN_PADDING } from '../utils/layout';
+import {AvisosBanner} from "./AvisosBanner.tsx";
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
@@ -318,6 +319,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         >
             <CustomLocalizationProvider>
                 <UserProfileFormDialog formDialogApiRef={formDialogApiRef} />
+                <AvisosBanner/>
                 {children}
             </CustomLocalizationProvider>
         </MuiBaseApp>

@@ -46,7 +46,7 @@ export const icons = {
 
     // --- Filtre i cerca ----------------------------------------------------------------------
     filtre: 'filter_alt',
-    neteja: 'auto_fix_normal',
+    neteja: 'filter_alt_off',
     cercaAvancadaObre: 'expand_more',
     cercaAvancadaTanca: 'expand_less',
 } as const;

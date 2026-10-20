@@ -22,6 +22,7 @@ import ScreenFrame from '../../components/ScreenFrame';
 import ScreenTitle from '../../components/ScreenTitle';
 import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
+import {ProcedimentForm} from "./ProcedimentForm.tsx";
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -272,11 +273,12 @@ export const ProcedimentGrid = () => {
                         {...filterDataGridProps}
                         {...pageSizeOptionsDataGridProps}
                         toolbarType="upper"
-                        toolbarCreateLink="form"
                         toolbarHideCreate={isRoleAdminLectura ? true : undefined}
-                        rowLink="form/{{id}}"
-                        rowUpdateLink="form/{{id}}"
+                        popupEditActive
+                        popupEditFormContent={<ProcedimentForm/>}
+                        popupEditFormDialogResourceTitle={t('page.procediments.grid.popupResourceTitle')}
                         rowUpdateShowInMenu
+                        popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
                         rowHideUpdateButton={isRoleAdminLectura}
                         rowHideDeleteButton={isRoleAdminLectura}
                         rowAdditionalActions={rowAdditionalActions}

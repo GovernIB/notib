@@ -1,28 +1,20 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import Badge from '@mui/material/Badge';
-import { FormPage, MuiForm, MuiFormTabs, MuiFormTabContent, useFormContext } from 'reactlib';
+import { MuiFormTabs, MuiFormTabContent, useFormContext } from 'reactlib';
 import ProcedimentFormTabGrups from './ProcedimentFormTabGrups';
 import ProcedimentFormTabPermisos from './ProcedimentFormTabPermisos';
 import GridFormField from '../../components/GridFormField';
 import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
 import { useTabParam } from '../../hooks/useSearchParams';
-import ScreenFrame from '../../components/ScreenFrame';
-import { formScreenTitle } from '../../utils/formScreenTitle';
-import { icons } from '../../utils/icons';
 
-const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
+export const ProcedimentForm: React.FC = () => {
 
-    const { setSubtitle } = props;
     const { t } = useTranslation();
     const { data } = useFormContext();
     const initialTab = useTabParam();
     const organGestorOptionRenderer = useOrganGestorOptionRenderer();
-    React.useEffect(() => {
-        setSubtitle(data?.codi + ', ' + data?.nom);
-    }, [data]);
     const grupsTabLabel = (<Badge badgeContent={data.grupCount} color="primary">{t('page.procediments.form.tabs.grups')}</Badge>);
     const permisosTabLabel = (<Badge badgeContent={data.aclEntryCount} color="primary">{t('page.procediments.form.tabs.permisos')}</Badge>);
     const showGrupsTab = !!data?.agrupar;
@@ -38,6 +30,8 @@ const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void
         <MuiFormTabs tabs={tabs} tabIndexesWithGrids={tabIndexesWithGrids} initialIndex={initialTab}>
             <MuiFormTabContent index={0} showOnCreate>
                 <Grid container spacing={2}>
+
+                    <GridFormField size={3} name="tipus" hidden componentProps={{type: "hidden", value: data?.tipus?? 'PROCEDIMENT'}} sx={{ display: 'none'}}/>
                     <GridFormField size={3} name="codi" />
                     <GridFormField size={9} name="nom" />
                     <GridFormField size={6} name="retard" />
@@ -72,32 +66,3 @@ const ProcedimentFormContent: React.FC<{ setSubtitle: (subtitle: string) => void
         </MuiFormTabs>
     );
 };
-
-export const ProcedimentForm: React.FC = () => {
-    const { t } = useTranslation();
-    const { id } = useParams();
-    const [subtitle, setSubtitle] = React.useState<string>();
-    return (
-        <FormPage>
-            <ScreenFrame>
-                <MuiForm
-                    resourceName="procedimentResource"
-                    id={id != null ? parseInt(id) : id}
-                    additionalData={{ tipus: 'PROCEDIMENT' }}
-                    title={formScreenTitle(
-                        icons.procediment,
-                        id != null
-                            ? t('page.procediments.form.titleUpdate')
-                            : t('page.procediments.form.titleCreate')
-                    )}
-                    toolbarSubtitle={id != null ? subtitle : undefined}
-                    componentProps={{ style: { height: '100%' } }}
-                    commonFieldComponentProps={{ size: 'small' }}
-                >
-                    <ProcedimentFormContent setSubtitle={setSubtitle} />
-                </MuiForm>
-            </ScreenFrame>
-        </FormPage>
-    );
-};
-export default ProcedimentForm;

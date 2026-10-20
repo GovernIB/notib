@@ -19,6 +19,7 @@ import ScreenFrame from '../../components/ScreenFrame';
 import ScreenTitle from '../../components/ScreenTitle';
 import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
+import {ServeiForm} from "./ServeiForm.tsx";
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -214,10 +215,10 @@ export const ProcedimentGrid = () => {
                         {...filterDataGridProps}
                         {...pageSizeOptionsDataGridProps}
                         toolbarType="upper"
-                        toolbarCreateLink="form"
                         toolbarHideCreate={isRoleAdminLectura ? true : undefined}
-                        rowLink="form/{{id}}"
-                        rowUpdateLink="form/{{id}}"
+                        popupEditActive
+                        popupEditFormContent={<ServeiForm/>}
+                        popupEditFormDialogResourceTitle={t('page.serveis.grid.popupResourceTitle')}
                         rowHideUpdateButton={isRoleAdminLectura}
                         rowHideDeleteButton={isRoleAdminLectura}
                         toolbarElementsWithPositions={ !isRoleAdmin ? [] : [

@@ -5,16 +5,12 @@ import HomeRedirect from './pages/HomeRedirect';
 import EntitatGrid from './pages/entitat/EntitatGrid';
 import EntitatForm from './pages/entitat/EntitatForm';
 import ProcedimentGrid from './pages/procediment/ProcedimentGrid';
-import ProcedimentForm from './pages/procediment/ProcedimentForm';
 import ServeiGrid from './pages/servei/ServeiGrid';
-import ServeiForm from './pages/servei/ServeiForm';
 import AvisGrid from './pages/avis/AvisGrid';
-import AvisForm from './pages/avis/AvisForm';
 import Grups from './pages/grup/Grups.tsx';
 import OrganGrid from './pages/organ/OrganGrid';
 import OrganForm from './pages/organ/OrganForm';
 import PagadorCieGrid from './pages/pagadorCie/PagadorCieGrid';
-import PagadorCieForm from './pages/pagadorCie/PagadorCieForm';
 import NotificacioGrid from './pages/notificacio/NotificacioGrid';
 import NotificacioForm from './pages/notificacio/NotificacioForm';
 import EnviamentGrid from './pages/enviament/EnviamentGrid';
@@ -30,7 +26,6 @@ import AccioMassivaGrid from "./pages/accioMassiva/AccioMassivaGrid.tsx";
 import CallbackPendentsGrid from "./pages/callbacks/CallbackPendentsGrid.tsx";
 import Metriques from "./pages/metriques/Metriques.tsx";
 import PermisosUsuariGrid from "./pages/usuaris/PermisosUsuariGrid.tsx";
-import PagadorPostalForm from "./pages/pagadorPostal/PagadorPostalForm.tsx";
 import PagadorsPostalsGrid from "./pages/pagadorPostal/PagadorsPostalsGrid.tsx";
 import Accessibilitat from "./pages/Accesibilitat.tsx";
 import Sitemap from "./pages/Sitemap.tsx";
@@ -71,39 +66,18 @@ export const router = createBrowserRouter(
                     path: 'avisos',
                     children: [
                         { index: true, element: <AvisGrid /> },
-                        {
-                            path: 'form',
-                            children: [
-                                { index: true, element: <AvisForm /> },
-                                { path: ':id', element: <AvisForm /> },
-                            ],
-                        },
                     ],
                 },
                 {
                     path: 'procediments',
                     children: [
                         { index: true, element: <ProcedimentGrid /> },
-                        {
-                            path: 'form',
-                            children: [
-                                { index: true, element: <ProcedimentForm /> },
-                                { path: ':id', element: <ProcedimentForm /> },
-                            ],
-                        },
                     ],
                 },
                 {
                     path: 'serveis',
                     children: [
                         { index: true, element: <ServeiGrid /> },
-                        {
-                            path: 'form',
-                            children: [
-                                { index: true, element: <ServeiForm /> },
-                                { path: ':id', element: <ServeiForm /> },
-                            ],
-                        },
                     ],
                 },
                 {
@@ -127,26 +101,12 @@ export const router = createBrowserRouter(
                     path: 'pagadorspostal',
                     children: [
                         { index: true, element: <PagadorsPostalsGrid /> },
-                        {
-                            path: 'form',
-                            children: [
-                                { index: true, element: <PagadorPostalForm /> },
-                                { path: ':id', element: <PagadorPostalForm /> },
-                            ],
-                        },
                     ]
                 },
                 {
                     path: 'pagadorscie',
                     children: [
                         { index: true, element: <PagadorCieGrid /> },
-                        {
-                            path: 'form',
-                            children: [
-                                { index: true, element: <PagadorCieForm /> },
-                                { path: ':id', element: <PagadorCieForm /> },
-                            ],
-                        },
                     ]
                 },
                 {

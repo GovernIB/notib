@@ -1,27 +1,21 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import Badge from '@mui/material/Badge';
-import { FormPage, MuiForm, MuiFormTabs, MuiFormTabContent, useFormContext } from 'reactlib';
+import { MuiFormTabs, MuiFormTabContent, useFormContext } from 'reactlib';
 import ServeiFormTabGrups from './ServeiFormTabGrups';
 import ServeiFormTabPermisos from './ServeiFormTabPermisos';
 import GridFormField from '../../components/GridFormField';
 import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
 import { useTabParam } from '../../hooks/useSearchParams';
-import ScreenFrame from '../../components/ScreenFrame';
-import { formScreenTitle } from '../../utils/formScreenTitle';
-import { icons } from '../../utils/icons';
 
-const ServeiFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> = (props) => {
-    const { setSubtitle } = props;
+
+export const ServeiForm: React.FC = () => {
+
     const { t } = useTranslation();
     const { data } = useFormContext();
     const initialTab = useTabParam();
     const organGestorOptionRenderer = useOrganGestorOptionRenderer();
-    React.useEffect(() => {
-        setSubtitle(data?.codi + ', ' + data?.nom);
-    }, [data]);
     const grupsTabLabel = (
         <Badge badgeContent={data.grupCount} color="primary">
             {t('page.serveis.form.tabs.grups')}
@@ -82,32 +76,3 @@ const ServeiFormContent: React.FC<{ setSubtitle: (subtitle: string) => void }> =
         </MuiFormTabs>
     );
 };
-
-export const ServeiForm: React.FC = () => {
-    const { t } = useTranslation();
-    const { id } = useParams();
-    const [subtitle, setSubtitle] = React.useState<string>();
-    return (
-        <FormPage>
-            <ScreenFrame>
-                <MuiForm
-                    resourceName="procedimentResource"
-                    id={id != null ? parseInt(id) : id}
-                    additionalData={{ tipus: 'SERVEI' }}
-                    title={formScreenTitle(
-                        icons.servei,
-                        id != null
-                            ? t('page.serveis.form.titleUpdate')
-                            : t('page.serveis.form.titleCreate')
-                    )}
-                    toolbarSubtitle={id != null ? subtitle : undefined}
-                    componentProps={{ style: { height: '100%' } }}
-                    commonFieldComponentProps={{ size: 'small' }}
-                >
-                    <ServeiFormContent setSubtitle={setSubtitle} />
-                </MuiForm>
-            </ScreenFrame>
-        </FormPage>
-    );
-};
-export default ServeiForm;

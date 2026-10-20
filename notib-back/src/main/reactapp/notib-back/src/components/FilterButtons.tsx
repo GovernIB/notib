@@ -75,7 +75,7 @@ export const FilterAdvancedButton: React.FC<FilterAdvancedButtonProps> = (props)
                 startIcon={<Icon aria-hidden>{open ? icons.cercaAvancadaTanca : icons.cercaAvancadaObre}</Icon>}
                 sx={(theme) => ({ ...filterButtonSx(theme), whiteSpace: 'nowrap' })}
             >
-                {t('comu.avancat')}
+                {t(open ? 'comu.simple' : 'comu.avancat')}
             </Button>
         </Grid>
     );

@@ -71,6 +71,20 @@ const ContentFilter: React.FC = () => {
     );
 };
 
+const PagadorPostalFormContent: React.FC = () => {
+
+    const organGestorOptionRenderer = useOrganGestorOptionRenderer();
+    return (
+        <Grid container spacing={2}>
+            <GridFormField size={12} name="nom" />
+            <GridFormField size={12} name="organGestor" optionRenderer={organGestorOptionRenderer} />
+            <GridFormField size={4} name="contracteNum" />
+            <GridFormField size={4} name="facturacioClientCodi" />
+            <GridFormField size={4} name="contracteDataVig" />
+        </Grid>
+    );
+};
+
 export const PagadorsPostalsGrid: React.FC = () => {
 
     const { t } = useTranslation();
@@ -99,10 +113,10 @@ export const PagadorsPostalsGrid: React.FC = () => {
                         {...filterDataGridProps}
                         {...pageSizeOptionsDataGridProps}
                         toolbarType="upper"
-                        toolbarCreateLink="form"
                         toolbarHideCreate={isRoleAdminLectura ? true : undefined}
-                        rowLink="form/{{id}}"
-                        rowUpdateLink="form/{{id}}"
+                        popupEditActive
+                        popupEditFormContent={<PagadorPostalFormContent/>}
+                        popupEditFormDialogResourceTitle={t('page.pagadorPostal.grid.popupResourceTitle')}
                         rowHideUpdateButton={isRoleAdminLectura}
                         rowHideDeleteButton={isRoleAdminLectura}
                     />

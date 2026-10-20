@@ -71,6 +71,20 @@ const ContentFilter: React.FC = () => {
     );
 };
 
+const AvisFormContent: React.FC = () => {
+    return (
+        <Grid container spacing={2}>
+            <GridFormField size={12} name="entitat" />
+            <GridFormField size={12} name="assumpte" />
+            <GridFormField size={12} name="missatge" type="textarea" />
+            <GridFormField size={6} name="dataInici" type="date" />
+            <GridFormField size={6} name="dataFinal" type="date" />
+            <GridFormField size={6} name="avisNivell" />
+            <GridFormField size={6} name="actiu" />
+        </Grid>
+    );
+};
+
 export const AvisGrid = () => {
 
     const { t } = useTranslation();
@@ -97,8 +111,9 @@ export const AvisGrid = () => {
                         {...pageSizeOptionsDataGridProps}
                         toolbarType="upper"
                         toolbarBulkDelete
-                        toolbarCreateLink="form"
-                        rowUpdateLink="form/{{id}}"
+                        popupEditActive
+                        popupEditFormContent={<AvisFormContent/>}
+                        popupEditFormDialogResourceTitle={t('page.avisos.grid.popupResourceTitle')}
                     />
                 </ScreenFrame>
             </GridPage>

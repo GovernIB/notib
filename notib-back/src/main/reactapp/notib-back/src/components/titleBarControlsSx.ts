@@ -32,6 +32,7 @@ export const outlinedControlBorderSx = (theme: Theme) =>
 export const titleBarControlsSx = {
     '& .MuiButton-root': {
         backgroundColor: (theme: Theme) => theme.palette.background.paper,
+        textTransform: 'none',
         // Als temes foscos el text és blanc (més contrast sobre el fons fosc del botó que el verd)
         color: (theme: Theme) => (theme.palette.mode === 'dark' ? theme.palette.text.primary : accentColor(theme)),
         // Vora visible: els botons poden caure sobre la part clara del degradat.
@@ -48,23 +49,23 @@ export const titleBarControlsSx = {
             // Sense l'opacitat que el tema o MUI donen al botó desactivat: aclaria també el fons,
             // que s'ha de veure igual que a la resta de botons.
             opacity: 1,
-            backgroundColor: (theme: Theme) => theme.palette.background.paper,
+            // backgroundColor: (theme: Theme) => theme.palette.background.paper,
             color: (theme: Theme) => theme.palette.action.disabled,
-            borderColor,
+            // borderColor,
         },
     },
     // Botons només d'icona de la llibreria (exportar, refrescar...): mateix fons i vora que els altres
     // botons, perquè es llegeixin sobre el color de la barra.
     '& .MuiIconButton-root': {
-        backgroundColor: (theme: Theme) => theme.palette.background.paper,
-        border: '1px solid',
+        // backgroundColor: (theme: Theme) => theme.palette.background.paper,
+        // border: '1px solid',
         borderColor,
-        borderRadius: '4px',
+        // borderRadius: '4px',
         padding: '5px',
         marginLeft: '4px',
         '&:hover': { backgroundColor: hoverBackground },
         '&.Mui-disabled': {
-            backgroundColor: (theme: Theme) => theme.palette.background.paper,
+            // backgroundColor: (theme: Theme) => theme.palette.background.paper,
             color: (theme: Theme) => theme.palette.action.disabled,
         },
     },

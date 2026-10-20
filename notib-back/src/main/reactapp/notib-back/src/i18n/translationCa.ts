@@ -46,6 +46,7 @@ const translationCa = {
         entitats: {
             grid: {
                 title: 'Entitats',
+                popupResourceTitle: 'entitat',
             },
             form: {
                 titleCreate: 'Crear entitat',
@@ -94,6 +95,7 @@ const translationCa = {
         avisos: {
             grid: {
                 title: 'Avisos',
+                popupResourceTitle: "avís"
             },
             form: {
                 titleCreate: 'Crear avís',
@@ -217,6 +219,7 @@ const translationCa = {
         procediments: {
             grid: {
                 title: 'Procediments',
+                popupResourceTitle: 'procediment',
                 sync: {
                     title: "Actualitzar procediments",
                     confirmacio: "Vols actualitzar els procediments amb la informació de ROLSAC?",
@@ -308,6 +311,7 @@ const translationCa = {
         serveis: {
             grid: {
                 title: 'Serveis',
+                popupResourceTitle: 'servei',
                 sync: {
                     title: "Actualizar serveis",
                     actualitzar: "Actualizar",
@@ -381,6 +385,7 @@ const translationCa = {
         pagadorCie: {
             grid: {
                 title: "Centres d'impressió i ensobrat",
+                popupResourceTitle: "centre d'impresió i ensobrat",
             },
             form: {
                 titleCreate: "Crear centre d'impressió i ensobrat",
@@ -1398,6 +1403,7 @@ const translationCa = {
         tancarFiltreAvançat: 'Tancar filtre avançat',
         neteja: 'Neteja',
         avancat: 'Avançat',
+        simple: 'Simple',
         filtresAplicats_one: '{{count}} filtre aplicat',
         filtresAplicats_other: '{{count}} filtres aplicats',
         guardar: 'Desa',

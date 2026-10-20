@@ -3,8 +3,8 @@ import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import {
     GridPage,
-    MuiDataGrid,
-    springFilterBuilder as filterBuilder,
+    MuiDataGrid, MuiFormTabContent, MuiFormTabs,
+    springFilterBuilder as filterBuilder, useFormContext,
 } from 'reactlib';
 import LinkToTab from '../../components/LinkToTab';
 import GridFormField from '../../components/GridFormField';
@@ -18,6 +18,10 @@ import ScreenFrame from '../../components/ScreenFrame';
 import ScreenTitle from '../../components/ScreenTitle';
 import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
+import {useTabParam} from "../../hooks/useSearchParams.ts";
+import Badge from "@mui/material/Badge";
+import PagadorCieFormTabFulles from "./PagadorCieFormTabFulles.tsx";
+import PagadorCieFormTabSobres from "./PagadorCieFormTabSobres.tsx";
 
 const columns = [
     {
@@ -87,6 +91,54 @@ const ContentFilter: React.FC = () => {
     );
 };
 
+const PagadorCieFormContent: React.FC = () => {
+
+    const { t } = useTranslation();
+    const { data } = useFormContext();
+    const initialTab = useTabParam();
+    const organGestorOptionRenderer = useOrganGestorOptionRenderer();
+
+    const fullesTabLabel = (
+        <Badge badgeContent={data.fullaCount} color="primary">
+            {t('page.pagadorCie.form.tabs.fulles')}
+        </Badge>
+    );
+
+    const sobresTabLabel = (
+        <Badge badgeContent={data.sobreCount} color="primary">
+            {t('page.pagadorCie.form.tabs.sobres')}
+        </Badge>
+    );
+
+    const tabs = [
+        t('page.pagadorCie.form.tabs.dades'),
+        { label: fullesTabLabel },
+        { label: sobresTabLabel },
+    ];
+
+    return (
+        <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1, 2]} initialIndex={initialTab}>
+            <MuiFormTabContent index={0} showOnCreate>
+                <Grid container spacing={2}>
+                    <GridFormField size={6} name="nom" />
+                    <Grid size={6}></Grid>
+                    <GridFormField size={6} name="organGestorEmissor" optionRenderer={organGestorOptionRenderer} />
+                    <GridFormField size={6} name="organGestorPagador" optionRenderer={organGestorOptionRenderer} />
+                    <GridFormField size={6} name="apiKey" />
+                    <GridFormField size={6} name="contracteDataVig" />
+                    <GridFormField size={6} name="cieExtern" />
+                </Grid>
+            </MuiFormTabContent>
+            <MuiFormTabContent index={1}>
+                <PagadorCieFormTabFulles />
+            </MuiFormTabContent>
+            <MuiFormTabContent index={2}>
+                <PagadorCieFormTabSobres />
+            </MuiFormTabContent>
+        </MuiFormTabs>
+    );
+};
+
 export const PagadorCieGrid: React.FC = () => {
 
     const { t } = useTranslation();
@@ -114,10 +166,10 @@ export const PagadorCieGrid: React.FC = () => {
                         {...filterDataGridProps}
                         {...pageSizeOptionsDataGridProps}
                         toolbarType="upper"
-                        toolbarCreateLink="form"
                         toolbarHideCreate={isRoleAdminLectura ? true : undefined}
-                        rowLink="form/{{id}}"
-                        rowUpdateLink="form/{{id}}"
+                        popupEditActive
+                        popupEditFormContent={<PagadorCieFormContent/>}
+                        popupEditFormDialogResourceTitle={t('page.pagadorCie.grid.popupResourceTitle')}
                         rowHideUpdateButton={isRoleAdminLectura}
                         rowHideDeleteButton={isRoleAdminLectura}
                     />
