@@ -6,6 +6,7 @@ import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.helper.OrganGestorFullSyncHelper;
 import es.caib.notib.logic.helper.OrganGestorSyncHelper;
+import es.caib.notib.logic.helper.PermisosHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.ActionExecutionException;
@@ -64,6 +65,7 @@ class OrganGestorResourceServiceImplTest {
 	@Mock private EntregaCieResourceRepository entregaCieRepo;
 	@Mock private OrganGestorService organGestorService;
 	@Mock private PermisosService permisosService;
+	@Mock private PermisosHelper permisosHelper;
 	@Mock private CacheHelper cacheHelper;
 
 	private OrganGestorResourceServiceImpl service;
@@ -84,6 +86,7 @@ class OrganGestorResourceServiceImplTest {
 			entregaCieRepo,
 			organGestorService,
 			permisosService,
+			permisosHelper,
 			cacheHelper
 		);
 	}
@@ -126,6 +129,22 @@ class OrganGestorResourceServiceImplTest {
 		when(aclHelper.count(any(), any(), any())).thenReturn(5);
 		service.afterConversion(entity, resource);
 		assertEquals(5, resource.getAclEntryCount());
+	}
+
+	@Test
+	void afterConversionListShouldSetAclCountsWithSingleQuery() {
+		OrganGestorResourceEntity e1 = new OrganGestorResourceEntity();
+		e1.setId(1L);
+		OrganGestorResourceEntity e2 = new OrganGestorResourceEntity();
+		e2.setId(2L);
+		OrganGestorResource r1 = new OrganGestorResource();
+		OrganGestorResource r2 = new OrganGestorResource();
+		when(permisosHelper.countSidsByObjectIds(AclHelper.ORGAN_GESTOR_CLASS, List.of(1L, 2L))).thenReturn(Map.of(1L, 3));
+		service.afterConversion(List.of(e1, e2), List.of(r1, r2));
+		assertEquals(3, r1.getAclEntryCount());
+		assertEquals(0, r2.getAclEntryCount());
+		verify(permisosHelper, times(1)).countSidsByObjectIds(any(), any());
+		verifyNoInteractions(aclHelper);
 	}
 
 	@Test

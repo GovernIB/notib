@@ -3,6 +3,7 @@
  */
 package es.caib.notib.logic.helper;
 
+import com.google.common.collect.Lists;
 import es.caib.notib.logic.cacheable.CacheBridge;
 import es.caib.notib.logic.intf.acl.ExtendedPermission;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
@@ -282,6 +283,55 @@ public class PermisosHelper {
 			masks.add(p.getMask());
 		}
 		return aclObjectIdentityRepository.findObjectsIdWithAnyPermissions(clazz.getName(), sids, masks);
+	}
+
+	/**
+	 * Obté els identificadors de tots els objectes de la classe especificada sobre els quals l'objecte auth indicat
+	 * té algun dels permisos. Considera els mateixos SIDs que filterGrantedAny (usuari, rols i "tothom"), però amb
+	 * una única consulta en lloc d'una lectura d'ACL per objecte.
+	 *
+	 * @param auth Authetication object to check
+	 * @param clazz Classe dels objectes a consultar
+	 * @param permissions Permisos que es vol esbrinar si conté
+	 * @return Llista dels identificadors dels objectes seleccionats
+	 */
+	public List<Long> getObjectsIdsWithPermission(Authentication auth, Class<?> clazz, Permission[] permissions) {
+
+		var sids = getSids(auth);
+		if (auth != null) {
+			aclSidRepository.findRolesSid(List.of("tothom")).stream().filter(s -> !sids.contains(s)).forEach(sids::add);
+		}
+		if (sids.isEmpty()) {
+			return new ArrayList<>();
+		}
+		List<Integer> masks = new ArrayList<>();
+		for (var p : permissions){
+			masks.add(p.getMask());
+		}
+		return aclObjectIdentityRepository.findObjectsIdWithAnyPermissions(clazz.getName(), sids, masks);
+	}
+
+	/**
+	 * Compta, per a cada objecte indicat, el nombre de SIDs (usuaris o rols) diferents amb alguna entrada a la
+	 * seva ACL. Equivalent a AclHelper.count per a una llista d'objectes, amb una consulta per cada bloc de 999
+	 * identificadors en lloc d'una lectura d'ACL per objecte.
+	 *
+	 * @param clazz Classe dels objectes a consultar
+	 * @param objectIds Identificadors dels objectes
+	 * @return Mapa identificador -> nombre de SIDs. Els objectes sense ACL no hi apareixen.
+	 */
+	public Map<Long, Integer> countSidsByObjectIds(Class<?> clazz, Collection<Long> objectIds) {
+
+		Map<Long, Integer> counts = new HashMap<>();
+		if (objectIds == null || objectIds.isEmpty()) {
+			return counts;
+		}
+		for (var ids : Lists.partition(new ArrayList<>(objectIds), 999)) {
+			for (var row : aclObjectIdentityRepository.countSidsByObjectIds(clazz.getName(), ids)) {
+				counts.put(((Number) row[0]).longValue(), ((Number) row[1]).intValue());
+			}
+		}
+		return counts;
 	}
 
 	public List<Long> getObjectsIdsWithAllPermission(Class<?> clazz, Permission[] permissions) {

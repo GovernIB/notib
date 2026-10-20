@@ -61,5 +61,14 @@ public interface AclObjectIdentityRepository extends JpaRepository<AclObjectIden
 			@Param("sids") List<AclSidEntity> sids,
 			@Param("masks") List<Integer> masks);
 
+	@Query(	"select oi.objectId, count(distinct entry.sid.id) " +
+			"from AclObjectIdentityEntity oi JOIN oi.entries entry " +
+			"where oi.classname.classname = :classname " +
+			" and  oi.objectId in (:objectIds) " +
+			"group by oi.objectId")
+	List<Object[]> countSidsByObjectIds(
+			@Param("classname") String classname,
+			@Param("objectIds") List<Long> objectIds);
+
 	AclObjectIdentityEntity findByClassnameAndObjectId(AclClassEntity classname, Long id);
 }

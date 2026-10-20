@@ -17,7 +17,7 @@ databaseChangeLog:
 - property:
       dbms: postgresql
       name: hibernateSeqNextVal
-      value: nextval('${db_prefix}HIBERNATE_SEQ}
+      value: nextval('${db_prefix}hibernate_sequence')
 - includeAll:
     path: db/changelog/init
     errorIfMissingOrEmpty: false

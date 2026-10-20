@@ -7,6 +7,7 @@ import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.helper.OrganGestorFullSyncHelper;
 import es.caib.notib.logic.helper.OrganGestorSyncHelper;
+import es.caib.notib.logic.helper.PermisosHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.ActionExecutionException;
@@ -70,6 +71,7 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 	private final EntregaCieResourceRepository entregaCieResourceRepository;
 	private final OrganGestorService organGestorService;
 	private final PermisosService permisosService;
+	private final PermisosHelper permisosHelper;
 
 	public OrganGestorResourceServiceImpl(
 		UserSessionHelper userSessionHelper,
@@ -85,6 +87,7 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 		EntregaCieResourceRepository entregaCieResourceRepository,
 		OrganGestorService organGestorService,
 		PermisosService permisosService,
+		PermisosHelper permisosHelper,
 		CacheHelper cacheHelper) {
 
 		super(userSessionHelper, authenticationHelper, notibPermissionHelper);
@@ -98,6 +101,7 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 		this.entregaCieResourceRepository = entregaCieResourceRepository;
 		this.organGestorService = organGestorService;
 		this.permisosService = permisosService;
+		this.permisosHelper = permisosHelper;
 		this.cacheHelper = cacheHelper;
 	}
 
@@ -210,6 +214,27 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 	protected void afterConversion(OrganGestorResourceEntity entity, OrganGestorResource resource) {
 
 		resource.setAclEntryCount(aclHelper.count(AclHelper.ORGAN_GESTOR_CLASS, entity.getId(), null));
+		emplenarEntregaCie(entity, resource);
+	}
+
+	// Per als llistats es calcula el nombre de permisos de tots els òrgans amb una sola consulta, en lloc de
+	// llegir l'ACL de cada òrgan (que, per als òrgans sense ACL, sempre acaba anant a la base de dades)
+	@Override
+	protected void afterConversion(List<OrganGestorResourceEntity> entities, List<OrganGestorResource> resources) {
+
+		if (resources == null || resources.isEmpty()) {
+			return;
+		}
+		var ids = entities.stream().map(OrganGestorResourceEntity::getId).collect(Collectors.toList());
+		var counts = permisosHelper.countSidsByObjectIds(AclHelper.ORGAN_GESTOR_CLASS, ids);
+		for (var i = 0; i < resources.size(); i++) {
+			resources.get(i).setAclEntryCount(counts.getOrDefault(entities.get(i).getId(), 0));
+			emplenarEntregaCie(entities.get(i), resources.get(i));
+		}
+	}
+
+	private void emplenarEntregaCie(OrganGestorResourceEntity entity, OrganGestorResource resource) {
+
 		if (entity.getEntregaCie() == null) {
 			return;
 		}

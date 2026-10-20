@@ -1,5 +1,6 @@
 package es.caib.notib.logic.cacheable;
 
+import com.google.common.collect.Lists;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.PermisEnum;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
@@ -129,14 +130,14 @@ public class PermisosCacheable {
     @Cacheable(value = "organsGestorsUsuari", key="#auth.name")
     public List<OrganGestorDto> findOrgansGestorsAccessiblesUsuari(Authentication auth) {
 
-        var organsGestors = organGestorRepository.findAll();
+        // Es consulten directament els ids dels òrgans amb permís en lloc de carregar tots els òrgans i
+        // verificar l'ACL de cadascun (una consulta per òrgan, sense cache per als òrgans sense ACL)
         Permission[] permisos = new Permission[] {ExtendedPermission.ADMINISTRADOR};
-        permisosHelper.filterGrantedAny(
-                organsGestors,
-                (PermisosHelper.ObjectIdentifierExtractor<OrganGestorEntity>) organGestor -> organGestor.getId(),
-                OrganGestorEntity.class,
-                permisos,
-                auth);
+        var organsIds = permisosHelper.getObjectsIdsWithPermission(auth, OrganGestorEntity.class, permisos);
+        List<OrganGestorEntity> organsGestors = new ArrayList<>();
+        for (var ids : Lists.partition(organsIds, 999)) {
+            organsGestors.addAll(organGestorRepository.findAllById(ids));
+        }
 
         if (getGenerarLogsPermisosOrgan()) {
             log.info("### PERMISOS - Obtenir Òrgans gestors #####################################");
