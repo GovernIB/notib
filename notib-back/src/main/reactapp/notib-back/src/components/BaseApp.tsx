@@ -10,7 +10,7 @@ import { saveAs } from 'file-saver';
 import i18n from '../i18n/i18n';
 import { useTranslation } from 'react-i18next';
 import Box from '@mui/material/Box';
-import { useTheme } from '@mui/material/styles';
+import { alpha, useTheme } from '@mui/material/styles';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/ca';
@@ -27,6 +27,7 @@ import Offline from './Offline';
 import { UserProfileMenu, UserProfileFormDialog } from './UserProfile';
 import SwitchInterfaceMenuItem from './SwitchInterfaceMenuItem';
 import { MAIN_GAP, MAIN_PADDING } from '../utils/layout';
+import { darkTheme, lightTheme } from '../theme';
 import {AvisosBanner} from "./AvisosBanner.tsx";
 
 export type MenuEntryWithResource = MenuEntry & {
@@ -126,8 +127,9 @@ const CustomLocalizationProvider = ({ children }: React.PropsWithChildren) => {
 
 // Paleta de colors del menú lateral segons l'estil escollit (MenuEstil):
 // 'TEMA' reutilitza directament la paleta activa (no retorna cap color propi),
-// 'TEMA_INVERTIT' inverteix clar/fosc respecte del tema actiu, i 'PEU' aplica
-// sempre el mateix gris fosc, igual que el peu de pàgina de l'aplicació.
+// 'TEMA_INVERTIT' pren els colors del tema contrari (clar <-> fosc), de manera que el menú
+// es veu igual que amb l'estil 'TEMA' a l'altre tema, i 'PEU' aplica sempre el mateix gris
+// fosc del peu de pàgina de l'aplicació. Tots mantenen els accents en el verd de Notib.
 const getMenuColorSet = (theme: any, appearance?: string): any | undefined => {
     if (appearance === 'PEU') {
         return {
@@ -135,33 +137,24 @@ const getMenuColorSet = (theme: any, appearance?: string): any | undefined => {
             textPrimary: '#F6F6F6',
             textSecondary: '#E5E5E5',
             divider: '#807D7D',
-            accent: '#FFFFFF',
-            selectedBackground: 'rgba(255, 255, 255, 0.12)',
+            accent: darkTheme.palette.primary.main,
+            selectedBackground: alpha(darkTheme.palette.primary.main, 0.25),
             hoverBackground: 'rgba(255, 255, 255, 0.08)',
         };
     }
     if (appearance !== 'TEMA_INVERTIT') {
         return undefined;
     }
-    if (theme.palette.mode === 'dark') {
-        return {
-            background: '#FFFFFF',
-            textPrimary: '#1F2937',
-            textSecondary: '#4B5563',
-            divider: '#D1D5DB',
-            accent: theme.palette.primary.main,
-            selectedBackground: 'rgba(25, 118, 210, 0.12)',
-            hoverBackground: 'rgba(0, 0, 0, 0.04)',
-        };
-    }
+    const invertedTheme = theme.palette.mode === 'dark' ? lightTheme : darkTheme;
+    const { palette } = invertedTheme;
     return {
-        background: '#1E293B',
-        textPrimary: '#F8FAFC',
-        textSecondary: '#CBD5E1',
-        divider: '#475569',
-        accent: '#60A5FA',
-        selectedBackground: 'rgba(96, 165, 250, 0.18)',
-        hoverBackground: 'rgba(255, 255, 255, 0.08)',
+        background: palette.background.paper,
+        textPrimary: palette.text.primary,
+        textSecondary: palette.action.active,
+        divider: palette.divider,
+        accent: palette.primary.main,
+        selectedBackground: alpha(palette.primary.main, palette.mode === 'dark' ? 0.2 : 0.1),
+        hoverBackground: palette.action.hover,
     };
 };
 
