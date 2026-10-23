@@ -9,7 +9,7 @@ const Home: React.FC = () => {
     const { t } = useTranslation();
     return (<>
         <PageTitle title={'Home'}></PageTitle>
-        <ScreenFrame icon={icons.inici} title={t('page.home.toolbar.title')} fitContent padded>
+        <ScreenFrame icon={icons.inici} title={t('page.home.toolbar.title')} fitContent>
             <Typography variant="body2" color="text.secondary">
                 {t('page.home.toolbar.subtitle')} (v{import.meta.env.VITE_APP_VERSION})
             </Typography>

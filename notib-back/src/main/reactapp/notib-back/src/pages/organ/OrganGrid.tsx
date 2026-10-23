@@ -11,7 +11,6 @@ import LinearProgress from '@mui/material/LinearProgress';
 import {
     GridPage,
     MuiActionReportButton,
-    MuiDataGrid,
     MuiDataGridApiRef,
     MuiDataGridColDef,
     springFilterBuilder as filterBuilder,
@@ -35,9 +34,9 @@ import { CardData } from '../../components/CardData';
 import {ROLE_ADMIN_LECTURA, useNotibContext} from '../../components/NotibContext';
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
-import ScreenTitle from '../../components/ScreenTitle';
 import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
+import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -515,13 +514,12 @@ export const OrganGrid = () => {
         <>
             <PageTitle title={t('page.organs.grid.title')}></PageTitle>
             <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
-                <ScreenFrame>
-                    <MuiDataGrid
+                <ScreenFrame icon={icons.organ} title={t('page.organs.grid.title')}>
+                    <StyledMuiGrid
                         // MUI-X no admet bé canviar treeData/getTreeDataPath/apiRef en calent sobre la mateixa
                         // instància del grid (dona "No getTreeDataPath given" en canviar de vista): forçam un
                         // remuntatge complet del grid en canviar entre vista en arbre i vista de taula.
                         key={treeDataViewActive ? 'tree' : 'flat'}
-                        title={<ScreenTitle icon={icons.organ} title={t('page.organs.grid.title')} />}
                         resourceName="organGestorResource"
                         columns={columns}
                         fixedFilter={"entitat.id:" + currentEntitatId}

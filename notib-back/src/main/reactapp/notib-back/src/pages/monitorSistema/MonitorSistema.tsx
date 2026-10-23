@@ -29,7 +29,7 @@ const MonitorSistema: React.FC = () => {
     ];
     return (<>
                 <PageTitle title={t('page.monitorSistema.title')}></PageTitle>
-                <ScreenFrame icon={icons.monitorSistema} title={t('page.monitorSistema.title')} padded>
+                <ScreenFrame icon={icons.monitorSistema} title={t('page.monitorSistema.title')}>
                     <CustomTabs tabs={tabs} />
                 </ScreenFrame>
             </>);

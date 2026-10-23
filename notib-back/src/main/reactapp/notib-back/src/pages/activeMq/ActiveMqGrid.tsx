@@ -1,11 +1,11 @@
 import React from 'react';
 import {useTranslation} from 'react-i18next';
-import {GridPage, MuiActionReportButton, MuiDataGrid, MuiDataGridColDef, useBaseAppContext, useMuiDataGridApiRef, useResourceApiService,} from 'reactlib';
+import {GridPage, MuiActionReportButton, MuiDataGridColDef, useBaseAppContext, useMuiDataGridApiRef, useResourceApiService,} from 'reactlib';
 import {useActiveMqDetailDetailDialog} from "./ActivmeMqDetailDialog.tsx";
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
-import ScreenTitle from '../../components/ScreenTitle';
 import { icons } from '../../utils/icons';
+import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 
 
 const useActiveMqAction = (refresh?: () => void) => {
@@ -80,9 +80,8 @@ export const ActiveMqGrid = () => {
         <>
             <PageTitle title={t('page.activemq.grid.title')}></PageTitle>
             <GridPage>
-                <ScreenFrame>
-                    <MuiDataGrid
-                        title={<ScreenTitle icon={icons.activeMq} title={t('page.activemq.grid.title')} />}
+                <ScreenFrame icon={icons.activeMq} title={t('page.activemq.grid.title')}>
+                    <StyledMuiGrid
                         resourceName="activeMqResource"
                         columns={columns}
                         toolbarType="upper"

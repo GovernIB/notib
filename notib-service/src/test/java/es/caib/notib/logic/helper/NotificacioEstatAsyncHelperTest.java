@@ -32,6 +32,7 @@ class NotificacioEstatAsyncHelperTest {
 	private LegacyHelper legacyHelper;
 	private SseEventService sseEventService;
 	private NotificacioEstatAsyncHelper helper;
+	private AvisEventHelper avisEventHelper;
 
 	@BeforeEach
 	void setUp() {
@@ -96,7 +97,7 @@ class NotificacioEstatAsyncHelperTest {
 
 	@Test
 	void estatsRemesaCalculatsShouldNotBeReplayedToNewListeners() {
-		var sse = new es.caib.notib.logic.resourceservice.SseEventServiceImpl();
+		var sse = new es.caib.notib.logic.resourceservice.SseEventServiceImpl(avisEventHelper);
 		sse.publishEvent(SseEventService.SseQueue.REMESA_ENVIAMENT_ESTAT, SseEvent.estatsRemesaCalculats(Map.of(1L, "e1"), "usuari1"));
 		var rebut = new SseEvent[1];
 		sse.addListener(SseEventService.SseQueue.REMESA_ENVIAMENT_ESTAT, e -> rebut[0] = e);

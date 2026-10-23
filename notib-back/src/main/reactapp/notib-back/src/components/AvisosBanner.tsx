@@ -7,7 +7,7 @@ import Collapse from '@mui/material/Collapse';
 import Icon from '@mui/material/Icon';
 import IconButton from '@mui/material/IconButton';
 import {MAIN_GAP} from "../utils/layout.ts";
-import {AvisSse} from "./SseClient.tsx";
+import {AvisSse, useAvisosSse} from "./SseClient.tsx";
 
 /**
  * Avisos actius de l'aplicació, damunt del contingut de la pàgina.
@@ -57,8 +57,9 @@ const AvisBanner: React.FC<{ avis: AvisSse }> = ({ avis }) => {
 };
 
 export const AvisosBanner: React.FC = () => {
-    // const avisos = useAvisosSse();
-    const avisos: any[] = [{id: 1, avisNivell: "ERRROR", missatge:"foo", assumpte: "bar" }];
+
+    const avisos = useAvisosSse();
+    // const avisos: any[] = [{id: 1, avisNivell: "ERRROR", missatge:"foo", assumpte: "bar" }];
     if (avisos.length === 0) {
         return null;
     }

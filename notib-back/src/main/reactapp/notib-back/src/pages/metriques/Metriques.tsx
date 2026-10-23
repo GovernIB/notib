@@ -211,7 +211,6 @@ export const Metriques = () => {
                     buttonComponentProps={{variant: "contained",size:"small"}}
                     buttonIcon="file_download"/>
             </>}
-            padded
         >
             <MetriquesBars items={metriques}/>
         </ScreenFrame>

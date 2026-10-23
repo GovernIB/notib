@@ -1,14 +1,11 @@
-import { Grid, Icon, IconButton } from '@mui/material';
+import { Grid } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { GridApiPro, useGridApiRef } from '@mui/x-data-grid-pro';
 import {
     GridPage,
-    MuiDataGrid,
-    MuiDataGridApiRef,
     MuiDataGridColDef,
     springFilterBuilder as filterBuilder,
-    useBaseAppContext,
     useMuiDataGridApiRef,
     useMuiDataGridContext,
 } from 'reactlib';
@@ -18,9 +15,10 @@ import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
-import ScreenTitle from '../../components/ScreenTitle';
 import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
+import AddButton from "../../components/AddButton.tsx";
+import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -120,15 +118,6 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
     return <AccionsMassives options={opcionsMenu} apiRef={apiRef} resource="avisResource" sizeSelection={selection?.ids?.size} />;
 };
 
-const AvisAddButton: React.FC<{ gridApiRef: MuiDataGridApiRef }> = ({ gridApiRef }) => {
-    const { t } = useBaseAppContext();
-    return (
-        <IconButton title={t('datacommon.create.label')} onClick={() => gridApiRef.current?.triggerCreate()}>
-            <Icon>add</Icon>
-        </IconButton>
-    );
-};
-
 export const AvisGrid = () => {
 
     const { t } = useTranslation();
@@ -146,9 +135,8 @@ export const AvisGrid = () => {
         <>
             <PageTitle title={t('page.avisos.grid.title')}></PageTitle>
             <GridPage>
-                <ScreenFrame>
-                    <MuiDataGrid
-                        title={<ScreenTitle icon={icons.avis} title={t('page.avisos.grid.title')} />}
+                <ScreenFrame icon={icons.avis} title={t('page.avisos.grid.title')}>
+                    <StyledMuiGrid
                         resourceName="avisResource"
                         datagridApiRef={datagridApiRef}
                         apiRef={gridApiRef}
@@ -163,7 +151,7 @@ export const AvisGrid = () => {
                         toolbarHideCreate
                         toolbarElementsWithPositions={[
                             { position: 2, element: <MassiveActionsButton apiRef={datagridApiRef} refresh={refresh} /> },
-                            { position: 2, element: <AvisAddButton gridApiRef={gridApiRef} /> },
+                            { position: 2, element: <AddButton gridApiRef={gridApiRef} text={t('page.avisos.grid.nou')} tooltip={t('page.avisos.grid.nouTooltip')}/> },
                         ]}
                         popupEditActive
                         popupEditFormContent={<AvisFormContent/>}

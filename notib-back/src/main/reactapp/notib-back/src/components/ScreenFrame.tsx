@@ -1,78 +1,40 @@
 import React from 'react';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import type { Theme } from '@mui/material/styles';
-import { MAIN_PADDING, SCREEN_TITLE_MIN_HEIGHT, SCREEN_TITLE_PADDING_X } from '../utils/layout';
+import Icon from '@mui/material/Icon';
+import Typography from '@mui/material/Typography';
+import { accentColor } from '../theme';
+import {
+    ICON_SIZE,
+    MAIN_GAP,
+    MAIN_PADDING,
+    SCREEN_TITLE_GAP,
+    SCREEN_TITLE_MIN_HEIGHT,
+    SCREEN_TITLE_PADDING_X,
+} from '../utils/layout';
 import type { IconName } from '../utils/icons';
-import { SCREEN_TITLE_CLASS, ScreenFrameContext } from './ScreenFrameContext';
+import { ScreenFrameContext } from './ScreenFrameContext';
 import { titleBarControlsSx } from './titleBarControlsSx';
-import ScreenTitle from './ScreenTitle';
-
-/**
- * Aspecte de la barra de títol d'una pantalla: vora esquerra en el color base i degradat del fons del
- * paper al color base. El fa servir la barra pròpia del ScreenFrame i la barra d'eines de la llibreria
- * quan fa de barra de títol (veure `screenFrameSx`).
- */
-const titleBarSx = (theme: Theme) => ({
-    minHeight: SCREEN_TITLE_MIN_HEIGHT + 'px',
-    boxSizing: 'border-box' as const,
-    paddingLeft: SCREEN_TITLE_PADDING_X + 'px',
-    paddingRight: SCREEN_TITLE_PADDING_X + 'px',
-    borderLeft: `4px solid ${theme.palette.primary.main}`,
-    borderBottom: `1px solid ${theme.palette.divider}`,
-    background: `linear-gradient(90deg, ${theme.palette.background.paper} 25%, ${theme.palette.primary.main} 75%)`,
-    ...titleBarControlsSx,
-});
-
-/**
- * Selector de la barra d'eines de la llibreria (lib/components/mui/Toolbar.tsx) que fa de barra de
- * títol: la que conté un ScreenTitle. És la de les graelles (MuiDataGrid amb `toolbarType="upper"`) i
- * la dels formularis (MuiForm).
- */
-const LIB_TITLE_TOOLBAR = `.MuiToolbar-root:has(.${SCREEN_TITLE_CLASS})`;
-
-/**
- * Ancoratges sobre el DOM de la llibreria (no es pot tocar). Si la llibreria en canvia l'estructura,
- * aquest és l'únic lloc a revisar:
- *  - La barra d'eines de la llibreria es pinta com a barra de títol. La dels formularis és enganxosa a
- *    64px (l'alçada de la capçalera de la llibreria): aquí el contenidor amb scroll és el marc, i s'hi
- *    enganxa a dalt de tot.
- *  - MuiDataGrid: la barra d'eines va dins un `div`, germà de la fila addicional (el filtre,
- *    `.toolbarAdditionalRow`) i de la graella; la llibreria hi posa 16px de marge (`m: 2`).
- *  - MuiForm: la barra d'eines és germana del contenidor dels camps, amb `m: 2, mt: 3`.
- * Els marges passen a MAIN_PADDING, com la resta de l'aplicació.
- */
-const screenFrameSx = (theme: Theme) => ({
-    [`& ${LIB_TITLE_TOOLBAR}`]: {
-        ...titleBarSx(theme),
-        top: 0,
-        // Damunt de les capçaleres enganxoses de les graelles dels formularis.
-        zIndex: 3,
-    },
-    // (`:has()` no es pot niar: aquí la barra es reconeix pel títol que conté)
-    [`& div:has(> .MuiToolbar-root .${SCREEN_TITLE_CLASS}) ~ .toolbarAdditionalRow`]: {
-        margin: `${MAIN_PADDING}px ${MAIN_PADDING}px 0`,
-    },
-    [`& div:has(> .MuiToolbar-root .${SCREEN_TITLE_CLASS}) ~ .MuiDataGrid-root`]: {
-        margin: MAIN_PADDING + 'px',
-    },
-    [`& ${LIB_TITLE_TOOLBAR} ~ .MuiBox-root`]: {
-        margin: MAIN_PADDING + 'px',
-    },
-});
 
 export type ScreenFrameProps = {
+    /** Icona del concepte (catàleg `icons` de util/icons.ts): la mateixa que l'entrada del menú. */
+    icon: IconName;
+    /** Títol de la pantalla. */
+    title: string;
     /**
-     * Icona i títol de la barra de títol pròpia del marc, per a les pantalles on la llibreria no en
-     * pinta cap. A les graelles i formularis de la llibreria el títol va a la seva barra d'eines
-     * (`title={<ScreenTitle icon={...} title={...} />}`) i aquestes propietats no s'hi posen.
+     * Subtítol de la pantalla, al costat del títol (p. ex. el codi i el nom del registre).
      */
-    icon?: IconName;
-    title?: string;
-    /** Accions pròpies de la pantalla, a la dreta de la barra de títol pròpia del marc. */
+    subtitle?: React.ReactNode;
+    /**
+     * Elements entre la icona i el títol de la barra (p. ex. el botó de tornar enrere d'un
+     * formulari). El títol es despla perquè hi càpiga.
+     */
+    beforeTitle?: React.ReactNode;
+    /**
+     * Accions pròpies de la pantalla (cercador, botons...) a la dreta de la barra de títol, per a les
+     * pantalles sense graella. Les graelles (StyledMuiGrid) ja hi superposen la seva pròpia barra d'eines.
+     */
     actions?: React.ReactNode;
-    /** Padding del contingut (per al contingut que no és de la llibreria). */
-    padded?: boolean;
     /**
      * El marc només ocupa l'alçada del seu contingut (i no tota la disponible), de manera que
      * la resta de la pantalla deixa veure el fons. Per a pantalles curtes sense graella.
@@ -82,54 +44,167 @@ export type ScreenFrameProps = {
 };
 
 /**
- * Marc d'una pantalla del backoffice: targeta amb la barra de títol (icona + títol + informació +
- * accions) a dalt i el contingut a sota.
+ * Marc d'una pantalla del backoffice: barra de títol (icona + títol + informació + accions) i, a
+ * sota, el contingut.
  *
  * Ocupa tota l'alçada disponible dins `<main>` (veure BaseApp.tsx), de manera que el títol hi queda
- * sempre visible i és el contingut qui fa scroll si no hi cap (les graelles fan scroll de les files per
- * dins).
+ * sempre visible i és el contingut qui fa scroll si no hi cap. Les graelles (StyledMuiGrid) s'hi
+ * adapten: ocupen l'alçada que sobra, fan scroll de les files per dins, hi pugen el recompte de
+ * filtres (a la barra de títol, al costat del títol) i hi superposen la seva barra d'eines (a la
+ * dreta de la barra de títol).
  *
- * La barra de títol pot ser:
- *  - la barra d'eines de la llibreria (graelles i formularis), si el seu `title` és un ScreenTitle: es
- *    pinta com a barra de títol i hi conserva els seus botons, el filtre ràpid i l'indicador d'error;
- *  - la barra pròpia del marc, si es passen `icon` i `title` (pantalles sense barra de la llibreria).
+ * Substitueix `CardPage` (components/CardData.tsx) a les pantalles d'aquesta aplicació. És el contracte
+ * de pantalla que s'ha de poder copiar tal qual a les altres apps de Drassana: cap dependència de
+ * pàgines ni de recursos, només el tema, util/layout.ts i ScreenFrameContext.ts.
  */
 export const ScreenFrame: React.FC<ScreenFrameProps> = (props) => {
-    const { icon, title, actions, padded, fitContent, children } = props;
+    const { icon, title, subtitle, beforeTitle, actions, fitContent, children } = props;
     const [infoSlot, setInfoSlot] = React.useState<HTMLElement | null>(null);
-    const context = React.useMemo(() => ({ infoSlot, setInfoSlot }), [infoSlot]);
+    const [toolbarWidth, setToolbarWidth] = React.useState(0);
+    const context = React.useMemo(
+        () => ({ infoSlot, setInfoSlot, setToolbarWidth }),
+        [infoSlot]
+    );
+    // Si el títol, el recompte i la barra d'eines no caben en una sola fila, la barra d'eines
+    // passa a una segona fila de la mateixa barra de títol (en lloc de comprimir el títol fins
+    // a fer-lo il·legible). L'amplada natural del títol surt del seu scrollWidth (és `noWrap`),
+    // i la de la barra d'eines no depèn de la fila on cau: no hi ha oscil·lació.
+    const barRef = React.useRef<HTMLDivElement>(null);
+    const titleRef = React.useRef<HTMLHeadingElement>(null);
+    const subtitleRef = React.useRef<HTMLSpanElement>(null);
+    const actionsRef = React.useRef<HTMLDivElement>(null);
+    const [wrapToolbar, setWrapToolbar] = React.useState(false);
+
+    React.useLayoutEffect(() => {
+        const bar = barRef.current;
+        const heading = titleRef.current;
+        if (!bar || !heading) {
+            return;
+        }
+        const measure = () => {
+            const info = infoSlot?.offsetWidth ?? 0;
+            const blockWidth = Math.max(heading.scrollWidth, subtitleRef.current?.scrollWidth ?? 0);
+            // Les `actions` (pantalles sense graella) també passen a la segona fila si no hi caben.
+            const actionsNatural = actionsRef.current?.scrollWidth ?? 0;
+            const extra = toolbarWidth + actionsNatural;
+            const needed =
+                2 * SCREEN_TITLE_PADDING_X +
+                ICON_SIZE +
+                SCREEN_TITLE_GAP +
+                heading.scrollWidth +
+                blockWidth +
+                (info > 0 ? SCREEN_TITLE_GAP + info : 0) +
+                extra;
+            setWrapToolbar(extra > 0 && needed > bar.clientWidth);
+        };
+        measure();
+        const observer = new ResizeObserver(measure);
+        observer.observe(bar);
+        if (infoSlot) {
+            observer.observe(infoSlot);
+        }
+        if (actionsRef.current) {
+            observer.observe(actionsRef.current);
+        }
+        if (subtitleRef.current) {
+            observer.observe(subtitleRef.current);
+        }
+        return () => observer.disconnect();
+    }, [toolbarWidth, infoSlot, title, subtitle, actions]);
+
     return (
         <ScreenFrameContext.Provider value={context}>
             <Card
+                // `position: relative`: la barra d'eines de la graella s'hi ancora (position:
+                // absolute) sobre la barra de títol, per sobre del contenidor amb scroll.
                 className="screen-frame"
-                sx={(theme) => ({
+                sx={{
+                    position: 'relative',
+                    // Fila on s'ancora la barra d'eines de la graella (veure StyledMuiGrid.tsx).
+                    '--screen-toolbar-top': wrapToolbar ? SCREEN_TITLE_MIN_HEIGHT + 'px' : '0px',
                     height: fitContent ? 'auto' : '100%',
                     flex: fitContent ? '0 1 auto' : undefined,
                     minHeight: 0,
                     display: 'flex',
                     flexDirection: 'column',
                     overflow: 'hidden',
-                    ...screenFrameSx(theme),
-                })}
+                }}
             >
-                {icon != null && title != null && (
-                    <Box sx={(theme) => ({ ...titleBarSx(theme), display: 'flex', alignItems: 'center', flex: '0 0 auto' })}>
-                        <ScreenTitle icon={icon} title={title} />
-                        {actions != null && (
-                            <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1, flex: '0 0 auto' }}>
-                                {actions}
-                            </Box>
+                <Box
+                    ref={barRef}
+                    className="screen-frame-title"
+                    sx={(theme) => ({
+                        display: 'flex',
+                        alignItems: wrapToolbar ? 'flex-start' : 'center',
+                        gap: SCREEN_TITLE_GAP + 'px',
+                        flex: '0 0 auto',
+                        // Una fila, o dues quan la barra d'eines de la graella passa a sota.
+                        height: (wrapToolbar ? 2 : 1) * SCREEN_TITLE_MIN_HEIGHT + 'px',
+                        boxSizing: 'border-box',
+                        // Cada fila mesura SCREEN_TITLE_MIN_HEIGHT: el contingut de la primera es
+                        // centra en aquesta alçada i no pas en la de la barra sencera.
+                        pt: wrapToolbar ? (SCREEN_TITLE_MIN_HEIGHT - ICON_SIZE) / 2 + 'px' : 0,
+                        pl: SCREEN_TITLE_PADDING_X + 'px',
+                        // Espai que ocupa la barra d'eines superposada de la graella, si n'hi ha i hi cap al costat del títol.
+                        pr: SCREEN_TITLE_PADDING_X + (wrapToolbar ? 0 : toolbarWidth) + 'px',
+                        // Vora lila a l'esquerra i degradat del fons del paper al color principal
+                        borderLeft: `4px solid ${theme.palette.primary.main}`,
+                        borderBottom: `1px solid ${theme.palette.divider}`,
+                        background: `linear-gradient(90deg, ${theme.palette.background.paper} 25%, ${theme.palette.primary.main} 75%)`,
+                    })}
+                >
+                    <Icon sx={(theme) => ({ fontSize: ICON_SIZE + 'px', color: accentColor(theme), flex: '0 0 auto' })}>
+                        {icon}
+                    </Icon>
+                    {beforeTitle}
+                    <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0, flex: '0 1 auto' }}>
+                        <Typography ref={titleRef} variant="h6" component="h1" noWrap sx={{ fontWeight: 600, minWidth: 0 }}>
+                            {title}
+                        </Typography>
+                        {subtitle != null && (
+                            <Typography
+                                ref={subtitleRef}
+                                variant="body2"
+                                color="text.secondary"
+                                noWrap
+                                sx={{ minWidth: 0 }}>
+                                {subtitle}
+                            </Typography>
                         )}
                     </Box>
-                )}
+                    <Box ref={setInfoSlot} sx={{ display: 'flex', alignItems: 'center', flex: '0 0 auto' }} />
+                    {actions != null && (
+                        <Box
+                            ref={actionsRef}
+                            sx={{
+                                ml: 'auto',
+                                ...(wrapToolbar && {
+                                    position: 'absolute',
+                                    top: SCREEN_TITLE_MIN_HEIGHT + 'px',
+                                    right: SCREEN_TITLE_PADDING_X + 'px',
+                                    height: SCREEN_TITLE_MIN_HEIGHT + 'px',
+                                }),
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1,
+                                flex: '0 0 auto',
+                                // Els controls cauen sobre el degradat de la barra de títol
+                                ...titleBarControlsSx,
+                            }}
+                        >
+                            {actions}
+                        </Box>
+                    )}
+                </Box>
                 <Box
                     sx={{
                         flex: '1 1 auto',
                         minHeight: 0,
                         display: 'flex',
                         flexDirection: 'column',
+                        gap: MAIN_GAP + 'px',
+                        p: MAIN_PADDING + 'px',
                         overflowY: 'auto',
-                        ...(padded ? { p: MAIN_PADDING + 'px', gap: MAIN_PADDING + 'px' } : null),
                     }}
                 >
                     {children}

@@ -63,7 +63,7 @@ const Sitemap: React.FC = () => {
 
     return (<>
         <PageTitle title={t('page.sitemap.title')}></PageTitle>
-        <ScreenFrame icon={icons.mapaWeb} title={t('page.sitemap.title')} padded>
+        <ScreenFrame icon={icons.mapaWeb} title={t('page.sitemap.title')}>
             <Box sx={{ maxWidth: 600 }}>
                 <Typography variant="body1" color="text.secondary" gutterBottom>
                     {t('page.sitemap.desc')}

@@ -64,19 +64,14 @@ export const OrganForm: React.FC = () => {
     const { t } = useTranslation();
     const { id } = useParams();
     const [subtitle, setSubtitle] = React.useState<string>();
-
+    const titol = id != null ? t('page.organs.form.titleUpdate') : t('page.organs.form.titleCreate');
     return (
         <FormPage>
-            <ScreenFrame>
+            <ScreenFrame icon={icons.organ} title={titol}>
                 <MuiForm
                     resourceName="organGestorResource"
                     id={id != null ? parseInt(id) : id}
-                    title={formScreenTitle(
-                        icons.organ,
-                        id != null
-                            ? t('page.organs.form.titleUpdate')
-                            : t('page.organs.form.titleCreate')
-                    )}
+                    title={formScreenTitle(icons.organ, titol)}
                     toolbarSubtitle={id != null ? subtitle : undefined}
                     createLink="./{{id}}"
                     //updateLink="../../"

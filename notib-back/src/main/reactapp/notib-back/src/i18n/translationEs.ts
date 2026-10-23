@@ -1,4 +1,30 @@
 const translationEs = {
+    common: {
+        save: "Guarda",
+        update: 'Modifica',
+        delete: 'Borra',
+        actualitza: "Actualiza",
+        cancel: "Cancela",
+        close: 'Cierra',
+        clear: 'Limpia',
+        filter: 'Filtra',
+        filterCount_one: '{{num}} filtro aplicado',
+        filterCount_other: '{{num}} filtros aplicados',
+        advancedSearch: 'Búsqueda avanzada',
+        advancedSearchOpen: 'Abre la búsqueda avanzada',
+        advancedSearchClose: 'Cierra la búsqueda avanzada',
+        copiat: 'Copiado correctamente',
+        refresh: 'Refresca',
+        create: 'Crea',
+        processing: 'Procesando...',
+        optionNotFound: '{{value}} - (No encontrado)',
+        boolean: {
+            true: "Si",
+            false: "No",
+        },
+        actions: "Acciones",
+        download: "Descarga",
+    },
     app: {
         loading: 'Iniciando NOTIB',
         noEntitat: 'Este usuario no tiene acceso a ninguna entidad',
@@ -94,6 +120,8 @@ const translationEs = {
             grid: {
                 title: 'Avisos',
                 popupResourceTitle: "aviso",
+                nou: 'Nuevo aviso',
+                nouTooltip: 'Crea un nuevo aviso'
             },
             accionsMassives: {
                 activar: { title: 'Activa', ok: 'Avisos activados correctamente' },
@@ -109,6 +137,8 @@ const translationEs = {
             grid: {
                 title: 'Grupos',
                 popupResourceTitle: 'grupo',
+                nou: 'Nuevo grupo',
+                nouTooltip: 'Crea un nuevo grupo'
             },
         },
         organs: {
@@ -201,6 +231,11 @@ const translationEs = {
             entitats: {
                 empty: 'Sin propiedades por entidad configuradas',
             },
+            syncJboss: {
+                label: "Sincronizar con JBoss",
+                ok: "Propiedades sincronizadas correctamente",
+                error: "Error sincronizando las propiedades"
+            }
         },
         propietatsConfiguracio: {
             grid: {
@@ -214,6 +249,8 @@ const translationEs = {
         procediments: {
             grid: {
                 title: 'Procedimientos',
+                nou: 'Nuevo procedimiento',
+                nouTooltip: 'Crea un nuevo procedimiento',
                 popupResourceTitle: 'procediment',
                 sync: {
                     title: "Actualizar procedimientos",
@@ -297,6 +334,8 @@ const translationEs = {
         serveis: {
             grid: {
                 title: 'Servicios',
+                nou: 'Nuevo servicio',
+                nouTooltip: 'Crea un nuevo servicio',
                 popupResourceTitle: 'servei',
                 sync: {
                     title: "Actualizar servicios",
@@ -355,6 +394,8 @@ const translationEs = {
         pagadorPostal: {
             grid: {
                 title: 'Operadores postales',
+                nou: "Nuevo operador",
+                nouTooltip: "Crea un nuevo operador postal",
                 popupResourceTitle: 'operador postal',
             },
             form: {
@@ -365,6 +406,8 @@ const translationEs = {
         pagadorCie: {
             grid: {
                 title: 'Centros de impresión y ensobrado',
+                nou: "Nuevo centro",
+                nouTooltip: "Crea un nuevo centro de impresión y ensobrado",
                 popupResourceTitle: "centro de impresión y ensobrado",
             },
             form: {
@@ -861,6 +904,8 @@ const translationEs = {
         notificacioMassiva: {
             grid: {
                 title: 'Consulta de envíos masivos',
+                nou: 'Nuevo envío masivo',
+                nouTooltip: 'Crea un nuevo envío masivo',
                 createdDate: 'Creada el',
                 csvFilename: 'Notifiaciones',
                 zipFilename: 'Documentos',

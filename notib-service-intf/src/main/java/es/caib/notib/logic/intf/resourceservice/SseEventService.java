@@ -1,6 +1,7 @@
 package es.caib.notib.logic.intf.resourceservice;
 
 import es.caib.notib.logic.intf.model.SseEvent;
+import es.caib.notib.logic.intf.model.sse.AvisosActiusEvent;
 
 import java.util.function.Consumer;
 
@@ -46,5 +47,22 @@ public interface SseEventService {
 		REMESA_ENVIAMENT_ESTAT,
 		TEST
 	}
+
+	/**
+	 * Notifica a totes les connexions obertes que els avisos actius han canviat.
+	 */
+	void notifyAvisosActius();
+
+	/**
+	 * Retorna els avisos actius que ha de veure un usuari que opera amb el rol i l'entitat
+	 * indicats, amb el mateix criteri que la interfície JSP ({@code AvisHelper.findAvisos}):
+	 * amb el rol de superusuari tots els avisos actius, i amb qualsevol altre rol només els
+	 * globals (sense entitat) i els de l'entitat de treball.
+	 *
+	 * @param rol rol amb què opera l'usuari.
+	 * @param entitatId identificador de l'entitat de treball, o null si no n'hi ha cap.
+	 * @return els avisos actius filtrats.
+	 */
+	AvisosActiusEvent getAvisosActius(String rol, Long entitatId);
 
 }

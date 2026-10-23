@@ -1,4 +1,30 @@
 const translationCa = {
+    common: {
+        save: "Desa",
+        update: 'Modifica',
+        delete: 'Esborra',
+        actualitza: "Actualitza",
+        cancel: "Cancel·la",
+        close: 'Tanca',
+        clear: 'Neteja',
+        filter: 'Filtra',
+        filterCount_one: '{{num}} filtre aplicat',
+        filterCount_other: '{{num}} filtres aplicats',
+        advancedSearch: 'Cerca avançada',
+        advancedSearchOpen: 'Obre la cerca avançada',
+        advancedSearchClose: 'Tanca la cerca avançada',
+        copiat: 'Copiat correctament',
+        refresh: 'Refresca',
+        create: 'Crea',
+        processing: 'Processant...',
+        optionNotFound: '{{value}} - (No trobat)',
+        boolean: {
+            true: "Si",
+            false: "No",
+        },
+        actions: "Accions",
+        download: "Descarrega",
+    },
     app: {
         loading: 'Iniciant NOTIB',
         noEntitat: 'Aquest usuari no te accés a cap entitat',
@@ -47,6 +73,8 @@ const translationCa = {
             grid: {
                 title: 'Entitats',
                 popupResourceTitle: 'entitat',
+                nou: "Nova entitat",
+                nouTooltip: "Crea una nova entitat"
             },
             form: {
                 titleCreate: 'Crear entitat',
@@ -96,6 +124,8 @@ const translationCa = {
             grid: {
                 title: 'Avisos',
                 popupResourceTitle: "avís",
+                nou: 'Nou avís',
+                nouTooltip: 'Crea un nou avís'
             },
             accionsMassives: {
                 activar: { title: 'Activa', ok: 'Avisos activats correctament' },
@@ -111,6 +141,8 @@ const translationCa = {
             grid: {
                 title: 'Grups',
                 popupResourceTitle: 'grup',
+                nou: 'Nou grup',
+                nouTooltip: 'Crea un nou grup'
             },
         },
         organs: {
@@ -211,6 +243,11 @@ const translationCa = {
             entitats: {
                 empty: 'Sense propietats per entitat configurades',
             },
+            syncJboss: {
+                label: "Sincronitzar amb JBoss",
+                ok: "Propietats sincronitzades correctament",
+                error: "Error sincronitzant les propietats"
+            }
         },
         propietatsConfiguracio: {
             grid: {
@@ -224,6 +261,8 @@ const translationCa = {
         procediments: {
             grid: {
                 title: 'Procediments',
+                nou: 'Nou procediment',
+                nouTooltip: 'Crea un nou procediment',
                 popupResourceTitle: 'procediment',
                 sync: {
                     title: "Actualitzar procediments",
@@ -316,6 +355,8 @@ const translationCa = {
         serveis: {
             grid: {
                 title: 'Serveis',
+                nou: 'Nou servei',
+                nouTooltip: 'Crea un nou servei',
                 popupResourceTitle: 'servei',
                 sync: {
                     title: "Actualizar serveis",
@@ -380,6 +421,8 @@ const translationCa = {
         pagadorPostal: {
             grid: {
                 title: 'Operadors postals',
+                nou: 'Nou operador',
+                nouTooltip: 'Crea un nou operador postal',
                 popupResourceTitle: 'operador postal',
             },
             form: {
@@ -390,6 +433,8 @@ const translationCa = {
         pagadorCie: {
             grid: {
                 title: "Centres d'impressió i ensobrat",
+                nou: "Nou centre",
+                nouTooltip: "Crea un nou centre d'impressió i ensobrat",
                 popupResourceTitle: "centre d'impresió i ensobrat",
             },
             form: {
@@ -885,6 +930,8 @@ const translationCa = {
         notificacioMassiva: {
             grid: {
                 title: 'Consulta d\'enviaments massius',
+                nou: 'Nou enviament massiu',
+                nouTooltip: 'Crea un enviament massiu',
                 createdDate: 'Creada el',
                 csvFilename: 'Notifiacions',
                 zipFilename: 'Documents',

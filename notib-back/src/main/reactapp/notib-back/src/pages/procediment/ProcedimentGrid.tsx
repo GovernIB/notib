@@ -4,7 +4,6 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import {
     GridPage,
-    MuiDataGrid,
     springFilterBuilder as filterBuilder,
     MuiDataGridColDef,
     MuiDataGridApiRef, useBaseAppContext, MuiActionReportButton, useMuiDataGridApiRef,
@@ -19,10 +18,11 @@ import { DataCommonAdditionalAction } from '../../../lib/components/mui/datacomm
 import React from "react";
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
-import ScreenTitle from '../../components/ScreenTitle';
 import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
 import {ProcedimentForm} from "./ProcedimentForm.tsx";
+import AddButton from "../../components/AddButton.tsx";
+import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -261,9 +261,8 @@ export const ProcedimentGrid = () => {
         <>
             <PageTitle title={t('page.procediments.grid.title')}></PageTitle>
             <GridPage>
-                <ScreenFrame>
-                    <MuiDataGrid
-                        title={<ScreenTitle icon={icons.procediment} title={t('page.procediments.grid.title')} />}
+                <ScreenFrame icon={icons.procediment} title={t('page.procediments.grid.title')}>
+                    <StyledMuiGrid
                         resourceName="procedimentResource"
                         columns={columns}
                         fixedFilter={"tipus:'PROCEDIMENT' and entitat.id:" + currentEntitatId}
@@ -273,8 +272,8 @@ export const ProcedimentGrid = () => {
                         {...filterDataGridProps}
                         {...pageSizeOptionsDataGridProps}
                         toolbarType="upper"
-                        toolbarHideCreate={isRoleAdminLectura ? true : undefined}
                         popupEditActive
+                        toolbarHideCreate
                         popupEditFormContent={<ProcedimentForm/>}
                         popupEditFormDialogResourceTitle={t('page.procediments.grid.popupResourceTitle')}
                         rowUpdateShowInMenu
@@ -286,13 +285,14 @@ export const ProcedimentGrid = () => {
                         toolbarElementsWithPositions={ !isRoleAdmin ? [] : [
                             {
                                 position: 2,
-                                element: <NetejarCacheActionButton dataGridApiRef={dataGridApiRef} />,
-
-                            } ,
+                                element: <NetejarCacheActionButton dataGridApiRef={dataGridApiRef} />},
                             {
                                 position: 2,
-                                element: <ProcedimentSyncActionButton dataGridApiRef={dataGridApiRef} />,
-                            }
+                                element: <ProcedimentSyncActionButton dataGridApiRef={dataGridApiRef} />},
+                            {
+                                position: 2,
+                                element: <AddButton gridApiRef={dataGridApiRef} text={t('page.procediments.grid.nou')} tooltip={t('page.procediments.grid.nouTooltip')}/>
+                            },
                         ]}
                     />
                 </ScreenFrame>

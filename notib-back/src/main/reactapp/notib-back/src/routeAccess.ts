@@ -90,7 +90,7 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             id: 'propietats',
             title: t('app.menu.propietats'),
             to: '/propietats',
-            icon: icons.propietat,
+            icon: icons.config,
             resourceName: 'configGroupResource',
             hidden: role !== ROLE_SUPER
         },

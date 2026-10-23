@@ -1,6 +1,5 @@
 import {
     GridPage,
-    MuiDataGrid,
     MuiDataGridColDef,
     springFilterBuilder as filterBuilder,
     useMuiDataGridContext,
@@ -21,9 +20,9 @@ import {ROLE_ADMIN_LECTURA, ROLE_USER, useNotibContext} from "../../components/N
 import AccionsMassives, {MenuOption, useAccionsMassives} from "../../components/AccionsMassives.tsx";
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
-import ScreenTitle from '../../components/ScreenTitle';
 import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
+import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 
 
 const columns: MuiDataGridColDef[] = [
@@ -216,10 +215,9 @@ const CallbackPendentsGrid = () => {
         <>
             <PageTitle title={t('page.callbacks.pendents.grid.title')}></PageTitle>
             <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
-                <ScreenFrame>
-                    <MuiDataGrid
+                <ScreenFrame icon={icons.callbackPendent} title={t('page.callbacks.pendents.grid.title')}>
+                    <StyledMuiGrid
                         key={reloadKey}
-                        title={<ScreenTitle icon={icons.callbackPendent} title={t('page.callbacks.pendents.grid.title')} />}
                         resourceName="callbackResource"
                         datagridApiRef={datagridApiRef}
                         columns={columns}

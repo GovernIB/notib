@@ -11,7 +11,7 @@ const NotFound = () => {
     const { t } = useTranslation();
     return (<>
         <PageTitle title={'Not found'}></PageTitle>
-        <ScreenFrame icon={icons.noTrobat} title={t('page.notFound.title')} padded>
+        <ScreenFrame icon={icons.noTrobat} title={t('page.notFound.title')}>
             <Box
                 sx={{
                     display: 'flex',

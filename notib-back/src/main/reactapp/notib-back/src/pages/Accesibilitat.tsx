@@ -23,7 +23,7 @@ const Accessibilitat: React.FC = () => {
 
     return (<>
             <PageTitle title={t(`${p}.title`)}></PageTitle>
-            <ScreenFrame icon={icons.accessibilitat} title={t(`${p}.title`)} padded>
+            <ScreenFrame icon={icons.accessibilitat} title={t(`${p}.title`)}>
                 <Box sx={{'& .MuiTypography-body1': {fontWeight: 400}}}>
                     {/* Introducció */}
                     <Box sx={{p: 1}}>

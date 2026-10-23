@@ -2,7 +2,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     GridPage,
-    MuiDataGrid,
     useFilterApiContext,
     springFilterBuilder as filterBuilder,
     useMuiDataGridApiRef,
@@ -29,8 +28,8 @@ import {GridApiPro, useGridApiRef} from "@mui/x-data-grid-pro";
 import useSseRowRefresh from "../../hooks/useSseRowRefresh";
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
-import ScreenTitle from '../../components/ScreenTitle';
 import { icons } from '../../utils/icons';
+import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 
 const columns = [
     {
@@ -284,18 +283,18 @@ const EnviamentGrid = () => {
         <>
             <PageTitle title={t('page.enviament.grid.title')}></PageTitle>
             <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
-                <ScreenFrame>
-                    <MuiDataGrid
+                <ScreenFrame icon={icons.enviament} title={t('page.enviament.grid.title')}>
+                    <StyledMuiGrid
                         key={`${reloadKey}`}
                         datagridApiRef={datagridApiRef}
                         apiRef={gridApiRef}
-                        title={<ScreenTitle icon={icons.enviament} title={t('page.enviament.grid.title')} />}
                         resourceName="notificacioEnviamentResource"
                         columns={columns}
                         defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
                         paginationActive
                         selectionActive
                         persistentStateActive
+                        toolbarHideCreate
                         persistentStateClearPageSortPropsOnTopLevelRouteChange
                         {...filterDataGridProps}
                         {...pageSizeOptionsDataGridProps}

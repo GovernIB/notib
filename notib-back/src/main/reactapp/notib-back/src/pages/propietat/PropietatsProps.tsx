@@ -21,6 +21,7 @@ import {
     FormApiRef,
     springFilterBuilder,
 } from 'reactlib';
+import {useTheme} from "@mui/material/styles";
 
 // Prefix comú a totes les claus de propietat. Les propietats configurables per entitat
 // tenen la forma PREFIX + '.' + Codi Entitat + resta de la propietat (que ja inclou el punt inicial).
@@ -70,6 +71,7 @@ const buildCustomField = (c: any) => {
         label: '',
         value,
         options,
+        disabled: c.jbossProperty
     };
 };
 
@@ -158,6 +160,7 @@ const PropsListItem: React.FC<{
                         disabled={disabled}
                         onChange={handleFieldOnChange}
                         componentProps={{
+                            disabled,
                             helperText: (
                                 <TextHighlight
                                     text={item.key}
@@ -279,13 +282,11 @@ const PropsEntitatConfigs: React.FC<{ item: any; groupId: any; highlight?: strin
     );
 };
 
-export const PropietatsProps: React.FC<{
-    quickFilter?: string;
-    group?: any;
-    formApiRef?: FormApiRef;
-}> = (props) => {
+export const PropietatsProps: React.FC<{ quickFilter?: string; group?: any; formApiRef?: FormApiRef; }> = (props) => {
+
     const { quickFilter, group, formApiRef } = props;
     const { t } = useTranslation();
+    const theme = useTheme();
     const {
         isReady: apiIsReady,
         find: apiFind,
@@ -337,7 +338,14 @@ export const PropietatsProps: React.FC<{
         customFields != null && (
             <PropsContext.Provider value={propsContextValue}>
                 <Box sx={{ px: 3 }}>
-                    <Typography variant="h6" sx={{ mb: 1 }}>
+                    <Typography
+                        variant="h6"
+                        sx={{
+                            mb: 1,
+                            pl: 2,
+                            backgroundColor: theme.palette.primary.main,
+                            color: theme.palette.common.white,
+                        }}>
                         {group.description}
                     </Typography>
                     <List component={Paper}>

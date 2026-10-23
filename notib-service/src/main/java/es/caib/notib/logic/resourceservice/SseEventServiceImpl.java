@@ -1,10 +1,14 @@
 package es.caib.notib.logic.resourceservice;
 
+import es.caib.notib.logic.helper.AvisEventHelper;
 import es.caib.notib.logic.intf.model.SseEvent;
+import es.caib.notib.logic.intf.model.sse.AvisosActiusEvent;
 import es.caib.notib.logic.intf.resourceservice.SseEventService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.UUID;
@@ -35,6 +39,8 @@ public class SseEventServiceImpl implements SseEventService {
 	// el darrer i reenviant-lo tan bon punt es registra un listener nou, el client sempre arrenca amb
 	// l'estat actual encara que s'hagi perdut la connexió a temps del primer (o dels primers) events.
 	private final Map<String, SseEvent> lastEvents = new ConcurrentHashMap<>();
+
+	private final AvisEventHelper avisEventHelper;
 
 	@Override
 	public String addListener(SseQueue queue, Consumer<SseEvent> listener) {
@@ -78,6 +84,28 @@ public class SseEventServiceImpl implements SseEventService {
 		if (listeners != null) {
 			listeners.remove(listenerId);
 		}
+	}
+
+	@Override
+	public void notifyAvisosActius() {
+		avisEventHelper.notifyAvisosActius();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public AvisosActiusEvent getAvisosActius(String rol, Long entitatId) {
+		return avisEventHelper.getAvisosActius(rol, entitatId);
+	}
+
+	/**
+	 * Un avís s'activa i es desactiva tot sol en arribar la seva data d'inici o de final, sense que
+	 * ningú no toqui la taula. Just passada la mitjanit es notifica el canvi perquè les pantalles
+	 * obertes no hagin d'esperar a una recàrrega per a veure'l.
+	 */
+	@Scheduled(cron = "1 0 0 * * *")
+	public void notifyAvisosActiusCron() {
+		log.debug("Notificació dels avisos activats o desactivats per data");
+		notifyAvisosActius();
 	}
 
 }

@@ -3,7 +3,6 @@ import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import {
     GridPage,
-    MuiDataGrid,
     springFilterBuilder as filterBuilder,
     MuiDataGridColDef,
     MuiDataGridApiRef, useBaseAppContext, MuiActionReportButton, useMuiDataGridApiRef,
@@ -16,10 +15,11 @@ import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../h
 import React from "react";
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
-import ScreenTitle from '../../components/ScreenTitle';
 import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
 import {ServeiForm} from "./ServeiForm.tsx";
+import AddButton from "../../components/AddButton.tsx";
+import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -203,11 +203,11 @@ export const ProcedimentGrid = () => {
         <>
             <PageTitle title={t('page.serveis.grid.title')}></PageTitle>
             <GridPage>
-                <ScreenFrame>
-                    <MuiDataGrid
-                        title={<ScreenTitle icon={icons.servei} title={t('page.serveis.grid.title')} />}
+                <ScreenFrame icon={icons.servei} title={t('page.serveis.grid.title')}>
+                    <StyledMuiGrid
                         resourceName="procedimentResource"
                         columns={columns}
+                        apiRef={dataGridApiRef}
                         fixedFilter={"tipus:'SERVEI' and entitat.id:" + currentEntitatId}
                         paginationActive
                         persistentStateActive
@@ -215,8 +215,8 @@ export const ProcedimentGrid = () => {
                         {...filterDataGridProps}
                         {...pageSizeOptionsDataGridProps}
                         toolbarType="upper"
-                        toolbarHideCreate={isRoleAdminLectura ? true : undefined}
                         popupEditActive
+                        toolbarHideCreate
                         popupEditFormContent={<ServeiForm/>}
                         popupEditFormDialogResourceTitle={t('page.serveis.grid.popupResourceTitle')}
                         popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
@@ -231,6 +231,10 @@ export const ProcedimentGrid = () => {
                             {
                                 position: 2,
                                 element: <ProcedimentSyncActionButton dataGridApiRef={dataGridApiRef} />,
+                            },
+                            {
+                                position: 2,
+                                element: <AddButton gridApiRef={dataGridApiRef} text={t('page.serveis.grid.nou')} tooltip={t('page.serveis.grid.nouTooltip')}/>
                             }
                         ]}
                     />

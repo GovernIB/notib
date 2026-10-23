@@ -1,9 +1,11 @@
 package es.caib.notib.logic.intf.model;
 
 import es.caib.notib.logic.intf.base.annotation.ResourceAccessConstraint;
+import es.caib.notib.logic.intf.base.annotation.ResourceArtifact;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.model.BaseResource;
+import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import es.caib.notib.logic.intf.dto.config.EntitatConfig;
@@ -38,9 +40,16 @@ import java.util.List;
 			roles = {BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ADMIN_LECTURA, BaseConfig.ROLE_ORGAN},
 			grantedPermissions = {PermissionEnum.READ}
 		)
+	},
+	artifacts = {
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = ConfigResource.ACTION_SYNC_JBOSS_CODE),
 	}
 )
 public class ConfigResource extends BaseResource<Long> {
+
+	public static final String ACTION_SYNC_JBOSS_CODE = "SYNC_JBOSS";
 
 	private String key;
 	private String value;
@@ -52,6 +61,7 @@ public class ConfigResource extends BaseResource<Long> {
 	private ResourceReference<ConfigGroupResource, Long> configGroup;
 	private ResourceReference<ConfigTypeResource, Long> configType;
 	private ResourceReference<EntitatResource, Long> entitat; // opcional
+	private String entitatCodi;
 
 	private String configTypeCode;
 	private String configTypeValue;

@@ -23,8 +23,9 @@ import NotificacioFormDocuments from './NotificacioFormDocuments';
 import GridFormField from '../../components/GridFormField';
 import { useDadesProcediment } from './DadesProcediment.tsx';
 import ScreenFrame from '../../components/ScreenFrame';
-import { formScreenTitle } from '../../utils/formScreenTitle';
 import { icons } from '../../utils/icons';
+import FormScreen from "../../components/FormScreen.tsx";
+import FormBackButton from "../../components/FormBackButton.tsx";
 
 const JSonButton: React.FC = () => {
     const { data } = useFormContext();
@@ -298,32 +299,30 @@ export const NotificacioForm: React.FC = () => {
         formApiRef.current?.setFieldValue('origen', 'WEB');
         formApiRef.current?.setFieldValue('tipusUsuari', 'INTERFICIE_WEB');
     };
-
+    const titol = id != null ? t(`page.notificacio.form.title.${type}.update`) : t(`page.notificacio.form.title.${type}.create`);
     return (
         <FormPage>
-            <ScreenFrame>
-                <MuiForm
-                    resourceName="notificacioResource"
-                    id={id != null ? parseInt(id) : id}
-                    title={formScreenTitle(
-                        icons.notificacio,
-                        id != null
-                            ? t(`page.notificacio.form.title.${type}.update`)
-                            : t(`page.notificacio.form.title.${type}.create`)
-                    )}
-                    initOnChangeRequest
-                    additionalData={type ? { enviamentTipus: type, ...initialData } : initialData}
-                    onReset={handleReset}
-                    apiRef={formApiRef}
-                    createLink="../"
-                    toolbarElementsWithPositions={[{ position: 2, element: <JSonButton /> }]}
-                    componentProps={{ style: { height: '100%' } }}
-                    commonFieldComponentProps={{ size: 'small' }}
-                >
-                    <NotificacioFormContent />
-                    <NotificacioFormEnviaments />
-                    <NotificacioFormDocuments />
-                </MuiForm>
+            <ScreenFrame icon={icons.notificacio} title={titol} beforeTitle={<FormBackButton />}>
+                <FormScreen>
+                    <MuiForm
+                        resourceName="notificacioResource"
+                        title=""
+                        id={id != null ? parseInt(id) : id}
+                        initOnChangeRequest
+                        hiddenBackButton
+                        additionalData={type ? { enviamentTipus: type, ...initialData } : initialData}
+                        onReset={handleReset}
+                        apiRef={formApiRef}
+                        createLink="../"
+                        toolbarElementsWithPositions={[{ position: 2, element: <JSonButton /> }]}
+                        componentProps={{ style: { height: '100%' } }}
+                        commonFieldComponentProps={{ size: 'small' }}
+                    >
+                        <NotificacioFormContent />
+                        <NotificacioFormEnviaments />
+                        <NotificacioFormDocuments />
+                    </MuiForm>
+                </FormScreen>
             </ScreenFrame>
         </FormPage>
     );

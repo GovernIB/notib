@@ -42,6 +42,13 @@ export const SCREEN_TITLE_PADDING_X = 16;
 /** Separació (px) entre els elements de la barra de títol: icona, títol i recompte de filtres. */
 export const SCREEN_TITLE_GAP = 12;
 
+/**
+ * Alçada mínima (px) de la zona de contingut d'una pantalla amb graella: per sota d'aquesta alçada la
+ * graella deixa de comprimir-se i és el contingut de la pantalla qui fa scroll, de manera que el
+ * títol i el peu es mantenen sempre visibles.
+ */
+export const SCREEN_GRID_MIN_HEIGHT = 320;
+
 /** Mida de les icones del menú lateral i de la barra de títol de les pantalles (px). La llibreria pinta les del menú a 20. */
 export const ICON_SIZE = 24;
 

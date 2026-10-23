@@ -14,9 +14,11 @@ import 'dayjs/locale/ca';
 import 'dayjs/locale/es';
 import { MuiFormDialog, MuiDataFormDialogApi, useBaseAppContext, useAuthContext, useAuthButtonContext, useFormContext } from 'reactlib';
 import { useNotibContext } from './NotibContext';
-import { useThemeUserContext } from './ThemeUserProvider';
 import { CardData } from './CardData';
 import GridFormField from './GridFormField';
+import {desarTemaCache, useSetTemaAplicacio} from "./TemaProvider.tsx";
+import {MenuEstil, TemaAplicacio} from "../theme.ts";
+import { normalitzaIdioma } from '../utils/idioma';
 
 export const UserProfileMenu: React.FC<{
     formDialogApiRef: React.RefObject<MuiDataFormDialogApi | null>;
@@ -24,13 +26,13 @@ export const UserProfileMenu: React.FC<{
     const { formDialogApiRef } = props;
     const { t } = useTranslation();
     const { getUserId: authGetUserId } = useAuthContext();
-    const { removePreview } = useThemeUserContext();
+    const setPreview = useSetUserPreferencesPreview();
     const { apiRef: authButtonApiRef } = useAuthButtonContext();
     const showUserProfileDialog = () => {
         authButtonApiRef.current?.close();
         // Qualsevol tancament sense desar (cancel·lar, 'x', Escape) rebutja la promesa:
         // restaurem la previsualització del tema a la configuració desada.
-        formDialogApiRef.current?.show(authGetUserId()).catch(() => removePreview());
+        formDialogApiRef.current?.show(authGetUserId()).catch(() => setPreview({}));
     };
 
     return (
@@ -57,6 +59,118 @@ const ToggleFieldLabel: React.FC<{ label?: string }> = ({ label }) => (
         {label}
     </Typography>
 );
+
+// ============================================================================
+// Preferències de l'usuari, aplicades a tota l'aplicació.
+//
+// La font de veritat és el perfil desat a la base de dades: DistribucioProvider carrega el
+// recurs de l'usuari en arrencar (useCurrentUser) i no deixa pintar res fins a tenir-lo, de
+// manera que aquí ja hi són disponibles al primer render. Damunt d'aquests valors s'hi pot
+// posar una previsualització transitòria mentre el diàleg de perfil és obert (el tema i
+// l'estil de menú s'apliquen a l'instant per poder-los veure); en tancar el diàleg la
+// previsualització desapareix i tornen a manar els valors desats.
+//
+// Per afegir una preferència nova n'hi ha prou amb declarar-la a UserPreferences i llegir-la
+// a preferenciesDesades: qui la necessiti la té amb useUserPreferences().
+export type UserPreferences = {
+    /** Codi de dues lletres en minúscules ("ca"/"es"), normalitzat des del perfil. */
+    idioma?: string;
+    temaAplicacio?: TemaAplicacio;
+    estilMenu?: MenuEstil;
+    /** Mida de pàgina per defecte de tots els llistats (veure StyledMuiGrid). */
+    numElementsPagina?: number;
+};
+
+const preferenciesDesades = (usuari: any): UserPreferences => ({
+    idioma: normalitzaIdioma(usuari?.idioma),
+    temaAplicacio: usuari?.tema,
+    estilMenu: usuari?.estilMenu,
+    numElementsPagina: usuari?.numElementsPagina,
+});
+
+const UserPreferencesContext = React.createContext<
+    { preferences: UserPreferences; setPreview: (preview: UserPreferences) => void } | undefined
+>(undefined);
+
+export const UserPreferencesProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
+
+    const { currentUser } = useNotibContext();
+    const setTemaAplicacio = useSetTemaAplicacio();
+    const [preview, setPreview] = React.useState<UserPreferences>({});
+    const desades = React.useMemo(() => preferenciesDesades(currentUser), [currentUser]);
+    // En desar el perfil, DistribucioProvider actualitza currentUser: la previsualització ha de
+    // desaparèixer perquè no tapi els valors que acaben d'arribar del servidor.
+    React.useEffect(() => setPreview({}), [desades]);
+    // Només es recorda el tema desat, no la previsualització: així la propera arrencada ja pinta
+    // amb el tema correcte (veure TemaProvider) sense ressuscitar cap canvi descartat.
+    React.useEffect(
+        () => desarTemaCache(currentUser?.id, desades.temaAplicacio),
+        [currentUser?.id, desades.temaAplicacio]
+    );
+    const preferences = React.useMemo(() => {
+        // Només tapen les claus previsualitzades amb valor; una clau a undefined ha de deixar
+        // veure la preferència desada, no esborrar-la.
+        const efectives: UserPreferences = { ...desades };
+        (Object.keys(preview) as (keyof UserPreferences)[]).forEach((clau) => {
+            if (preview[clau] !== undefined) {
+                (efectives as any)[clau] = preview[clau];
+            }
+        });
+        return efectives;
+    }, [desades, preview]);
+    // El tema efectiu (inclosa la previsualització del diàleg de perfil, que s'ha de veure a
+    // l'instant) puja al TemaProvider, que és qui munta el ThemeProvider de tota l'aplicació.
+    // Sense perfil no s'hi puja res: amb l'API caiguda DistribucioProvider pinta igualment els
+    // fills (mode offline) i s'esborraria el tema que TemaProvider ha recuperat de la memòria cau.
+    React.useEffect(() => {
+        if (currentUser != null) {
+            setTemaAplicacio(preferences.temaAplicacio);
+        }
+    }, [currentUser, preferences.temaAplicacio, setTemaAplicacio]);
+    return (
+        <UserPreferencesContext.Provider value={{ preferences, setPreview }}>
+            {children}
+        </UserPreferencesContext.Provider>
+    );
+};
+
+export const useUserPreferences = (): UserPreferences => {
+    const context = React.useContext(UserPreferencesContext);
+    if (context === undefined) {
+        throw new Error('useUserPreferences must be used within a UserPreferencesProvider');
+    }
+    return context.preferences;
+};
+
+const useSetUserPreferencesPreview = () => {
+    const context = React.useContext(UserPreferencesContext);
+    if (context === undefined) {
+        throw new Error('useSetUserPreferencesPreview must be used within a UserPreferencesProvider');
+    }
+    return context.setPreview;
+};
+
+/**
+ * Previsualitza el tema i l'estil de menú mentre s'edita el perfil, perquè es vegin a l'instant
+ * sense haver de desar. Són canvis purament de client i no toquen cap consulta.
+ *
+ * L'idioma NO es previsualitza a posta: canviar-lo obliga a tornar a demanar les etiquetes i els
+ * enumerats al servidor (base-react refà l'índex de l'API quan canvia Accept-Language), i fer-ho
+ * a cada tecla del formulari recarregava la pantalla de darrere. S'aplica en desar, quan
+ * DistribucioProvider actualitza currentUser (veure UserProfileMenu).
+ */
+const PreferencesSync: React.FC = () => {
+    const { data } = useFormContext();
+    const setPreview = useSetUserPreferencesPreview();
+    React.useEffect(() => {
+        setPreview({ temaAplicacio: data?.tema, estilMenu: data?.estilMenu });
+    }, [data?.tema, data?.estilMenu, setPreview]);
+    // En tancar el diàleg (desant o cancel·lant) es retira la previsualització i tornen a manar
+    // els valors del perfil desat.
+    React.useEffect(() => () => setPreview({}), [setPreview]);
+    return null;
+};
+
 
 // Selector del tema de l'aplicació (clar / obscur / dràcula / sistema), amb el mateix
 // aspecte de grup de botons que la resta de configuracions d'aparença.
@@ -199,7 +313,6 @@ export const UserProfileFormDialog: React.FC<{
     const { t } = useTranslation();
     const { currentLanguage, setCurrentLanguage } = useBaseAppContext();
     const { currentUser, setCurrentUser } = useNotibContext();
-    const { setPreview } = useThemeUserContext();
 
     // El tema i l'estil del menú s'apliquen a l'instant, mentre s'editen (previsualització,
     // vegeu ThemeUserProvider); en desar, currentUser s'actualitza i la previsualització es
@@ -227,9 +340,9 @@ export const UserProfileFormDialog: React.FC<{
             formComponentProps={{
                 commonFieldComponentProps: { size: 'small' },
                 onSaveSuccess: (data: any) => handleSaveSuccess(data, true),
-                onDataChange: (data: any) => setPreview({ tema: data?.tema, estilMenu: data?.estilMenu }),
             }}
         >
+            <PreferencesSync />
             <UserProfileForm />
         </MuiFormDialog>
     );

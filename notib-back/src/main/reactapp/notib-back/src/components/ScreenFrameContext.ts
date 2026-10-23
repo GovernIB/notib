@@ -18,6 +18,12 @@ export type ScreenFrameContextValue = {
     infoSlot: HTMLElement | null;
     /** El registra el títol de la pantalla (ScreenTitle) quan es munta. */
     setInfoSlot: (element: HTMLElement | null) => void;
+
+    /**
+     * La barra d'eines de la graella es superposa a la dreta de la barra de títol (veure
+     * StyledMuiGrid.tsx): n'indica l'amplada (px) perquè el títol no hi passi per sota.
+     */
+    setToolbarWidth: (width: number) => void;
 };
 
 export const ScreenFrameContext = React.createContext<ScreenFrameContextValue | undefined>(undefined);

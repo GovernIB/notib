@@ -15,7 +15,6 @@ import { BaseApp } from './components/BaseApp';
 import DrassanaFooter from './components/DrassanaFooter';
 import NotibProvider from './components/NotibProvider';
 import FormInitialTabProvider from './components/FormInitialTabProvider';
-import ThemeUserProvider, { useThemeUserContext } from './components/ThemeUserProvider';
 import {useNotibContext, ROLE_SUPER, ROLE_APLICACIO} from './components/NotibContext';
 import { lightTheme } from './theme';
 import { getMenuEntries } from './routeAccess';
@@ -28,6 +27,9 @@ import {
     LOGO_SEPARATOR_GAP,
     MENU_WIDTH,
 } from './utils/layout';
+import SseProvider from "./components/SseClient.tsx";
+import {UserPreferencesProvider, useUserPreferences} from "./components/UserProfile.tsx";
+import TemaProvider from "./components/TemaProvider.tsx";
 
 export const envVars = {
     VITE_API_URL: import.meta.env.VITE_API_URL,
@@ -68,7 +70,7 @@ const version = '0.0.0';
 
 const InnerApp: React.FC = () => {
     const { t } = useTranslation();
-    const { estilMenu } = useThemeUserContext();
+    const { estilMenu } = useUserPreferences();
     const { isReady, currentRole, currentEntitatId } = useNotibContext();
     const menuEntries = getMenuEntries(currentRole, t);
     const theme = useTheme();
@@ -165,11 +167,15 @@ export const App = () => {
                 <ThemeProvider theme={lightTheme}>
                     <CssBaseline />
                     <NotibProvider>
-                        <ThemeUserProvider>
-                            <FormInitialTabProvider>
-                                <InnerApp />
-                            </FormInitialTabProvider>
-                        </ThemeUserProvider>
+                        <SseProvider>
+                            <TemaProvider>
+                                <UserPreferencesProvider>
+                                        <FormInitialTabProvider>
+                                            <InnerApp />
+                                        </FormInitialTabProvider>
+                                </UserPreferencesProvider>
+                            </TemaProvider>
+                        </SseProvider>
                     </NotibProvider>
                 </ThemeProvider>
             </ResourceApiProvider>

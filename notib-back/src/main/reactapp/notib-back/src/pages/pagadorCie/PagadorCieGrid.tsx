@@ -3,8 +3,7 @@ import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import {
     GridPage,
-    MuiDataGrid,
-    springFilterBuilder as filterBuilder, useFormContext,
+    springFilterBuilder as filterBuilder, useFormContext, useMuiDataGridApiRef,
 } from 'reactlib';
 import LinkToTab from '../../components/LinkToTab';
 import GridFormField from '../../components/GridFormField';
@@ -15,7 +14,6 @@ import { ROLE_ADMIN_LECTURA, useNotibContext } from '../../components/NotibConte
 import PageTitle from "../../components/PageTitle.tsx";
 import React from "react";
 import ScreenFrame from '../../components/ScreenFrame';
-import ScreenTitle from '../../components/ScreenTitle';
 import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
 import {useTabParam} from "../../hooks/useSearchParams.ts";
@@ -23,6 +21,8 @@ import { FormTabs, FormTabContent } from '../../components/FormTabs';
 import Badge from "@mui/material/Badge";
 import PagadorCieFormTabFulles from "./PagadorCieFormTabFulles.tsx";
 import PagadorCieFormTabSobres from "./PagadorCieFormTabSobres.tsx";
+import AddButton from "../../components/AddButton.tsx";
+import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 
 const columns = [
     {
@@ -144,6 +144,7 @@ export const PagadorCieGrid: React.FC = () => {
 
     const { t } = useTranslation();
     const { currentRole } = useNotibContext();
+    const gridApiRef = useMuiDataGridApiRef()
     const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
     const filterDataGridProps = useDatagridFilterProps(
         'pagadorCieResource',
@@ -156,18 +157,21 @@ export const PagadorCieGrid: React.FC = () => {
         <>
             <PageTitle title={t('page.pagadorCie.grid.title')}></PageTitle>
             <GridPage>
-                <ScreenFrame>
-                    <MuiDataGrid
-                        title={<ScreenTitle icon={icons.pagadorCie} title={t('page.pagadorCie.grid.title')} />}
+                <ScreenFrame icon={icons.pagadorCie} title={t('page.pagadorCie.grid.title')}>
+                    <StyledMuiGrid
                         resourceName="pagadorCieResource"
                         columns={columns}
+                        apiRef={gridApiRef}
                         paginationActive
                         persistentStateActive
                         persistentStateClearPageSortPropsOnTopLevelRouteChange
                         {...filterDataGridProps}
                         {...pageSizeOptionsDataGridProps}
                         toolbarType="upper"
-                        toolbarHideCreate={isRoleAdminLectura ? true : undefined}
+                        toolbarHideCreate
+                        toolbarElementsWithPositions={ isRoleAdminLectura ? [] : [
+                            { position: 2, element: <AddButton gridApiRef={gridApiRef} text={t('page.pagadorCie.grid.nou')} tooltip={t('page.pagadorCie.grid.nouTooltip')} /> },
+                        ]}
                         popupEditActive
                         popupEditFormContent={<PagadorCieFormContent/>}
                         popupEditFormDialogResourceTitle={t('page.pagadorCie.grid.popupResourceTitle')}

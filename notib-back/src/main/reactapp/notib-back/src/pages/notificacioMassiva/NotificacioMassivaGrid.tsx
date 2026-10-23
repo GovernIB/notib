@@ -3,10 +3,9 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     GridPage, MuiActionReportButton,
-    MuiDataGrid,
     MuiDataGridColDef,
     springFilterBuilder as filterBuilder, useBaseAppContext,
-    useMuiActionReportLogic, useResourceApiService,
+    useMuiActionReportLogic, useMuiDataGridApiRef, useResourceApiService,
 } from 'reactlib';
 import GridFormField from '../../components/GridFormField';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
@@ -19,9 +18,9 @@ import {ROLE_ADMIN_LECTURA, ROLE_USER, useNotibContext} from "../../components/N
 import {TemporalMessageSeverity} from "../../../lib/components/BaseAppContext.tsx";
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
-import ScreenTitle from '../../components/ScreenTitle';
 import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
+import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 
 const iconOk= React.cloneElement(<Icon>check</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center"} });
 const iconError= React.cloneElement(<Icon>close</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center" } });
@@ -207,6 +206,7 @@ export const NotifiacioMassivaGrid = () => {
 
     const { t } = useTranslation();
     const springFilterBuilder = useSpringFilterBuilder();
+    const gridApiRef = useMuiDataGridApiRef();
     const { dialogComponent, onDetailClick } = useNotificacioMassivaResumDialog();
     const filterDataGridProps = useDatagridFilterProps(
         'notificacioMassivaResource',
@@ -330,11 +330,11 @@ export const NotifiacioMassivaGrid = () => {
         <>
             <PageTitle title={t('page.notificacioMassiva.grid.title')}></PageTitle>
             <GridPage>
-                <ScreenFrame>
-                    <MuiDataGrid
-                        title={<ScreenTitle icon={icons.enviamentMassiu} title={t('page.notificacioMassiva.grid.title')} />}
+                <ScreenFrame icon={icons.enviamentMassiu} title={t('page.notificacioMassiva.grid.title')} >
+                    <StyledMuiGrid
                         resourceName="notificacioMassivaResource"
                         columns={columns}
+                        apiRef={gridApiRef}
                         defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
                         paginationActive
                         persistentStateActive
@@ -342,7 +342,11 @@ export const NotifiacioMassivaGrid = () => {
                         {...filterDataGridProps}
                         {...pageSizeOptionsDataGridProps}
                         toolbarType="upper"
-                        toolbarCreateLink="form"
+                        // toolbarCreateLink="form"
+                        toolbarHideCreate
+                        // toolbarElementsWithPositions={[
+                        //     { position: 2, element: <AddButton gridApiRef={gridApiRef} text={t('page.notificacioMassiva.grid.nou')} tooltip={t('page.notificacioMassiva.grid.nouTooltip')} /> },
+                        // ]}
                         rowAdditionalActions={rowAdditionalActions()}
                         rowUpdateLink="form/{{id}}"
                     />

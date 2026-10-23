@@ -1,5 +1,6 @@
 package es.caib.notib.logic.resourceservice;
 
+import es.caib.notib.logic.helper.AvisEventHelper;
 import es.caib.notib.logic.intf.model.SseEvent;
 import es.caib.notib.logic.intf.resourceservice.SseEventService;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,10 +21,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class SseEventServiceImplTest {
 
 	private SseEventServiceImpl service;
+	private AvisEventHelper avisEventHelper;
 
 	@BeforeEach
 	void setUp() {
-		service = new SseEventServiceImpl();
+		service = new SseEventServiceImpl(avisEventHelper);
 	}
 
 	@Test

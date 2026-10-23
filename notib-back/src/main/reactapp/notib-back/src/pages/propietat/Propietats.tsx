@@ -1,64 +1,62 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import TextField from '@mui/material/TextField';
-import InputAdornment from '@mui/material/InputAdornment';
 import Icon from '@mui/material/Icon';
 import IconButton from '@mui/material/IconButton';
-import { FormApiRef, GridPage, useDebounce, useFormApiRef } from 'reactlib';
+import {FormApiRef, GridPage, useBaseAppContext, useDebounce, useFormApiRef, useResourceApiService} from 'reactlib';
 import { PropietatsGroups } from './PropietatsGroups';
 import { PropietatsProps } from './PropietatsProps';
-import { Box, Tooltip } from '@mui/material';
+import { Box } from '@mui/material';
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
 import { icons } from '../../utils/icons';
+import {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
 
 const PropietatsQuickFilter: React.FC<{
     onChange: (quickFilter: string | undefined) => void;
     formApiRef: FormApiRef;
 }> = (props) => {
-    const { onChange, formApiRef } = props;
-    const { t } = useTranslation();
+    const {onChange} = props;
+    const {t} = useTranslation();
     const [quickFilter, setQuickFilter] = React.useState<string>('');
     const quickFilterDebounced = useDebounce(quickFilter);
     React.useEffect(() => {
         onChange?.(quickFilterDebounced);
     }, [quickFilterDebounced]);
     return (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: { xs: '240px', md: '360px' } }}>
+        <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>
             <TextField
+                // Mateix aspecte que el filtre ràpid de la llibreria
+                // (lib/components/mui/datacommon/DataQuickFilter.tsx): sense etiqueta
+                // flotant, la lupa al final i el botó d'esborrar al seu costat.
+                title={t('page.propietats.find')}
                 value={quickFilter}
                 onChange={(event) => setQuickFilter(event.target.value)}
-                label={t('page.propietats.find')}
-                variant="outlined"
-                fullWidth
                 size="small"
                 slotProps={{
+                    htmlInput: {
+                        'aria-label': t('page.propietats.find'),
+                    },
                     input: {
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <Icon fontSize="small">search</Icon>
-                            </InputAdornment>
-                        ),
-                        endAdornment: quickFilter && (
-                            <InputAdornment position="end">
-                                <IconButton size="small" onClick={() => setQuickFilter('')}>
-                                    <Icon fontSize="inherit">clear</Icon>
-                                </IconButton>
-                            </InputAdornment>
+                        endAdornment: (
+                            <>
+                                {quickFilter && (
+                                    <IconButton size="small" onClick={() => setQuickFilter('')}>
+                                        <Icon fontSize="inherit">clear</Icon>
+                                    </IconButton>
+                                )}
+                                <Icon>search</Icon>
+                            </>
                         ),
                     },
                 }}
+                // Mateixa alçada que el filtre ràpid de la barra d'eines quan cau
+                // sobre la barra de títol (32px; veure StyledMuiGrid.tsx:310).
+                sx={{
+                    '& .MuiOutlinedInput-root': {height: '32px'},
+                    '& .MuiOutlinedInput-input': {pt: 0, pb: 0},
+                }}
             />
-            <Tooltip title={t('page.propietats.revert')}>
-                <IconButton
-                    size="small"
-                    onClick={() => {
-                        formApiRef.current?.revert();
-                    }}
-                >
-                    <Icon>undo</Icon>
-                </IconButton>
-            </Tooltip>
         </Box>
     );
 };
@@ -69,24 +67,37 @@ const Propietats: React.FC = () => {
     const [quickFilter, setQuickFilter] = React.useState<string>();
     const [selectedGroup, setSelectedGroup] = React.useState<any>();
     const formApiRef = useFormApiRef();
+    const { artifactAction: apiAction } = useResourceApiService('configResource');
+    const { temporalMessageShow } = useBaseAppContext();
+    const sync = () => {
+        apiAction(undefined, { code: 'SYNC_JBOSS' })
+            .then(() => {
+                temporalMessageShow(null, t('page.propietats.syncJboss.ok'), 'success');
+            }).catch((error) => temporalMessageShow(null, error.message, 'error'));
+    };
     return (
         <>
         <PageTitle title={t('app.menu.propietats')}></PageTitle>
         <GridPage disableMargins>
             <ScreenFrame
-                icon={icons.propietat}
+                icon={icons.config}
                 title={t('app.menu.propietats')}
+
                 // El cercador i el botó de desfer van a la barra de títol
-                actions={<PropietatsQuickFilter onChange={setQuickFilter} formApiRef={formApiRef} />}
+                actions={<>
+                    <PropietatsQuickFilter onChange={setQuickFilter} formApiRef={formApiRef} />
+                    <ToolbarButton
+                        title={t('page.propietats.syncJboss.label')}
+                        icon={icons.sincronitza}
+                        color="primary"
+                        onClick={sync}
+                    >
+                        {t('page.propietats.syncJboss.label')}
+                    </ToolbarButton>
+                </>
+                }
             >
-                <Box
-                    id="contingutPropietats"
-                    sx={{
-                        display: 'flex',
-                        flexGrow: 1,
-                        overflow: 'hidden',
-                    }}
-                >
+                <Box id="contingutPropietats" sx={{display: 'flex', flexGrow: 1, overflow: 'hidden'}}>
                     <Box
                         id="grup"
                         sx={{

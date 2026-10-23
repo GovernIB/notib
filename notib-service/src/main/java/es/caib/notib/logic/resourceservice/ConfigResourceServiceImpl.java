@@ -1,12 +1,14 @@
 package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
+import es.caib.notib.logic.config.SyncJBossActionExecutor;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.NotificacioEventHelper;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.exception.ResourceNotUpdatedException;
+import es.caib.notib.logic.intf.model.AvisResource;
 import es.caib.notib.logic.intf.model.ConfigResource;
 import es.caib.notib.logic.intf.resourceservice.ConfigResourceService;
 import es.caib.notib.logic.intf.service.ConfigService;
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.Map;
 
 /**
@@ -35,6 +38,13 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
 	private final CacheHelper cacheHelper;
 	private final NotibLogger logger;
 	private final ConfigService configService;
+
+	@PostConstruct
+	public void init() {
+
+		register(ConfigResource.ACTION_SYNC_JBOSS_CODE, new SyncJBossActionExecutor(configService));
+	}
+
 
 	@Override
 	protected void beforeUpdateEntity(ConfigResourceEntity entity, ConfigResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotUpdatedException {

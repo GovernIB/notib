@@ -31,6 +31,8 @@ import { darkTheme, lightTheme } from '../theme';
 import { roleBadgeIcon } from '../utils/roleIcons';
 import { useNotibContext } from './NotibContext';
 import {AvisosBanner} from "./AvisosBanner.tsx";
+import reactlibCa from "../i18n/reactlibCa.ts";
+import reactlibEs from "../i18n/reactlibEs.ts";
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
@@ -181,6 +183,9 @@ const frameSx = {
         minHeight: 0,
         overflowY: 'auto',
     },
+    '& nav .MuiDrawer-root .MuiList-root .MuiList-root .MuiListItemButton-root.Mui-selected': {
+        boxShadow: 'none',
+    },
 } as const;
 
 export const BaseApp: React.FC<BaseAppProps> = (props) => {
@@ -208,8 +213,23 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
     const i18nHandleLanguageChange = (language?: string) => {
         i18n.changeLanguage(language);
     };
+
+    // Espai de noms on base-react registra les seves traduccions (LIB_I18N_NS a lib/components/
+    // BaseApp.tsx, que la llibreria no exporta) i sobreescriptures de l'aplicació per idioma.
+    // base-react també hi registra l'anglès, que aquí no es fa servir i per això no té paquet.
+    const REACTLIB_I18N_NS = 'reactlib';
+    const REACTLIB_OVERRIDES: Record<string, any> = { ca: reactlibCa, es: reactlibEs };
+
     const i18nAddResourceBundleCallback = (language: string, namespace: string, bundle: any) => {
         i18n.addResourceBundle(language, namespace, bundle);
+        // base-react registra aquí les seves traduccions. Com que no s'hi pot tocar, els seus
+        // textos es corregeixen fusionant-hi a sobre el paquet de sobreescriptures de
+        // l'aplicació (veure i18n/reactlibCa.ts): fusió profunda -- només se substitueixen les
+        // claus declarades -- i amb sobreescriptura, perquè la clau ja existeix.
+        const overrides = namespace === REACTLIB_I18N_NS ? REACTLIB_OVERRIDES[language] : undefined;
+        if (overrides != null) {
+            i18n.addResourceBundle(language, namespace, overrides, true, true);
+        }
     };
     const anyHistoryEntryExist = () => location.key !== 'default';
     const goBack = (fallback?: string) => {
@@ -268,9 +288,6 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
                 '&:hover': {
                     backgroundColor: menuColorSet?.hoverBackground,
                 },
-            },
-            '& nav .MuiDrawer-root .MuiList-root .MuiList-root .MuiListItemButton-root.Mui-selected': {
-                boxShadow: 'none',
             },
         },
     };

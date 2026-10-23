@@ -2,7 +2,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     GridPage,
-    MuiDataGrid,
     MuiFilter,
     useFilterApiRef,
     useResourceApiService,
@@ -17,10 +16,10 @@ import MonitorIntegracioParamDetail from './MonitorIntegracioParamDetail';
 import ChipEstat from '../../components/ChipEstat';
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
-import ScreenTitle from '../../components/ScreenTitle';
 import { FilterClearButton } from '../../components/FilterButtons';
 import FilterCount from '../../components/FilterCount';
 import { icons } from '../../utils/icons';
+import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 
 // INTERFACES
 interface MonitorProps {
@@ -267,9 +266,8 @@ export const MonitorIntegracioGrid = () => {
         <>
             <PageTitle title={t('page.integracio.grid.title')}></PageTitle>
             <GridPage>
-                <ScreenFrame>
-                    <MuiDataGrid
-                        title={<ScreenTitle icon={icons.integracio} title={t('page.integracio.grid.title')} />}
+                <ScreenFrame icon={icons.integracio} title={t('page.integracio.grid.title')}>
+                    <StyledMuiGrid
                         resourceName="monitorIntegracioResource"
                         columns={columns}
                         fixedFilter={staticFilter}

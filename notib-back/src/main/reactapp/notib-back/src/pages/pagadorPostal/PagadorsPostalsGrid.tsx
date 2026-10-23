@@ -3,8 +3,7 @@ import { useTranslation } from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import {
     GridPage,
-    MuiDataGrid,
-    springFilterBuilder as filterBuilder,
+    springFilterBuilder as filterBuilder, useMuiDataGridApiRef,
 } from 'reactlib';
 import GridFormField from '../../components/GridFormField.tsx';
 import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer.tsx';
@@ -13,9 +12,10 @@ import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../h
 import { ROLE_ADMIN_LECTURA, useNotibContext } from '../../components/NotibContext.ts';
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
-import ScreenTitle from '../../components/ScreenTitle';
 import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
+import AddButton from "../../components/AddButton.tsx";
+import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 
 const columns = [
     {
@@ -89,6 +89,7 @@ export const PagadorsPostalsGrid: React.FC = () => {
 
     const { t } = useTranslation();
     const { currentRole } = useNotibContext();
+    const gridApiRef = useMuiDataGridApiRef()
     const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
     const filterDataGridProps = useDatagridFilterProps(
         'pagadorPostalResource',
@@ -102,18 +103,21 @@ export const PagadorsPostalsGrid: React.FC = () => {
         <>
             <PageTitle title={t('page.pagadorPostal.grid.title')}></PageTitle>
             <GridPage>
-                <ScreenFrame>
-                    <MuiDataGrid
-                        title={<ScreenTitle icon={icons.pagadorPostal} title={t('page.pagadorPostal.grid.title')} />}
+                <ScreenFrame icon={icons.pagadorPostal} title={t('page.pagadorPostal.grid.title')}>
+                    <StyledMuiGrid
                         resourceName="pagadorPostalResource"
                         columns={columns}
+                        apiRef={gridApiRef}
                         paginationActive
                         persistentStateActive
                         persistentStateClearPageSortPropsOnTopLevelRouteChange
                         {...filterDataGridProps}
                         {...pageSizeOptionsDataGridProps}
                         toolbarType="upper"
-                        toolbarHideCreate={isRoleAdminLectura ? true : undefined}
+                        toolbarHideCreate
+                        toolbarElementsWithPositions={ isRoleAdminLectura ? [] : [
+                            { position: 2, element: <AddButton gridApiRef={gridApiRef} text={t('page.pagadorPostal.grid.nou')} tooltip={t('page.pagadorPostal.grid.nouTooltip')} /> },
+                        ]}
                         popupEditActive
                         popupEditFormContent={<PagadorPostalFormContent/>}
                         popupEditFormDialogResourceTitle={t('page.pagadorPostal.grid.popupResourceTitle')}

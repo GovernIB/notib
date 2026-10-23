@@ -30,8 +30,9 @@ import Button from "@mui/material/Button";
 import {Icon, Tooltip} from "@mui/material";
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
-import { formScreenTitle } from '../../utils/formScreenTitle';
 import { icons } from '../../utils/icons';
+import FormScreen from "../../components/FormScreen.tsx";
+import FormBackButton from "../../components/FormBackButton.tsx";
 
 const useEntitatId = () => {
 
@@ -186,15 +187,13 @@ const EntitatFormTabDades: React.FC = () => {
         <Grid container spacing={2}>
             <GridFormField size={4} name="codi" />
             <GridFormField size={4} name="tipus" />
-            <Grid size={4} sx={{ display: 'flex', justifyContent: 'flex-end', '& .MuiFormControlLabel-root': { mr: 0 } }}>
-                <FormField name="activa" typeSwitch />
-            </Grid>
             <GridFormField size={8} name="nom" />
             <Grid size={4} />
             <GridFormField size={4} name="dir3Codi" onChange={dir3Codi => dir3Changed(dir3Codi)} />
             <GridFormField size={4} name="dir3CodiReg" />
             <Grid size={4} />
             <GridFormField size={12} name="apiKey" />
+            <GridFormField size={6} name="activa" typeSwitch />
             <GridFormField size={6} name="ambEntregaDeh" typeSwitch />
             <GridFormField size={6} name="entregaCieActiva" typeSwitch />
             {data?.entregaCieActiva && (
@@ -326,20 +325,25 @@ export const EntitatForm: React.FC = () => {
         isReady && (<>
             <PageTitle title={titol}></PageTitle>
             <FormPage>
-                <ScreenFrame>
-                    <MuiForm
-                        resourceName="entitatResource"
-                        id={id}
-                        title={formScreenTitle(hiddenBackButton ? icons.entitatActual : icons.entitat, titol)}
-                        hiddenBackButton={hiddenBackButton ? true : undefined}
-                        toolbarSubtitle={id != null ? subtitle : undefined}
-                        createLink="./{{id}}"
-                        //updateLink="../../"
-                        componentProps={{ style: { height: '100%' } }}
-                        commonFieldComponentProps={{ size: 'small' }}
-                    >
-                        <EntitatFormContent setSubtitle={setSubtitle} />
-                    </MuiForm>
+                <ScreenFrame
+                    icon={(hiddenBackButton ? icons.entitatActual : icons.entitat)}
+                    title={titol}
+                    subtitle={id != null ? subtitle : undefined}
+                    beforeTitle={hiddenBackButton ? undefined : <FormBackButton />}>
+                    <FormScreen>
+                        <MuiForm
+                            resourceName="entitatResource"
+                            id={id}
+                            title=""
+                            hiddenBackButton={hiddenBackButton ? true : undefined}
+                            createLink="./{{id}}"
+                            //updateLink="../../"
+                            componentProps={{ style: { height: '100%' } }}
+                            commonFieldComponentProps={{ size: 'small' }}
+                        >
+                            <EntitatFormContent setSubtitle={setSubtitle} />
+                        </MuiForm>
+                    </FormScreen>
                 </ScreenFrame>
             </FormPage>
         </>)

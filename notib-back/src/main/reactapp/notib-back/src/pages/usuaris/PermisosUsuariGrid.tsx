@@ -1,7 +1,7 @@
 import {Grid} from '@mui/material';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
-import {GridPage, MuiDataGrid, MuiDataGridColDef, springFilterBuilder as filterBuilder, } from 'reactlib';
+import {GridPage, MuiDataGridColDef, springFilterBuilder as filterBuilder, } from 'reactlib';
 import GridFormField from '../../components/GridFormField';
 import {useDatagridFilterProps, useDatagridPageSizeOptionsProps} from '../../hooks/useDataGrid';
 import {GRID_DETAIL_PANEL_TOGGLE_COL_DEF} from "@mui/x-data-grid-pro";
@@ -9,9 +9,9 @@ import CustomDetailPanelToggle from "../../utils/CustomDetailPanelToggle.tsx";
 import PermisosUsuariDetail from "./PermisosUsuariDetail.tsx";
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
-import ScreenTitle from '../../components/ScreenTitle';
 import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
+import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 
 
 const springFilterBuilder = (data: any) => filterBuilder.and(filterBuilder.like('codi', data.codi));
@@ -81,9 +81,8 @@ export const PermisosUsuariGrid = () => {
         <>
             <PageTitle title={t('page.usuaris.permisos.grid.title')}></PageTitle>
             <GridPage>
-                <ScreenFrame>
-                    <MuiDataGrid
-                        title={<ScreenTitle icon={icons.permisUsuari} title={t('page.usuaris.permisos.grid.title')} />}
+                <ScreenFrame icon={icons.permisUsuari} title={t('page.usuaris.permisos.grid.title')}>
+                    <StyledMuiGrid
                         resourceName="usuariPermisResource"
                         columns={columns}
                         paginationActive

@@ -4,9 +4,8 @@ import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import {
     GridPage,
-    MuiDataGrid,
     MuiDataGridColDef,
-    springFilterBuilder as filterBuilder,
+    springFilterBuilder as filterBuilder, useMuiDataGridApiRef,
 } from 'reactlib';
 import LinkToTab from '../../components/LinkToTab';
 import GridFormField from '../../components/GridFormField';
@@ -14,10 +13,11 @@ import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../h
 import { ROLE_ADMIN_LECTURA, useNotibContext } from '../../components/NotibContext';
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
-import ScreenTitle from '../../components/ScreenTitle';
 import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
 import { EntitatFormContent } from "./EntitatForm.tsx";
+import AddButton from "../../components/AddButton.tsx";
+import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -102,6 +102,7 @@ export const EntitatGrid: React.FC = () => {
     const { t } = useTranslation();
     const { currentRole } = useNotibContext();
     const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
+    const gridApiRef = useMuiDataGridApiRef();
     const filterDataGridProps = useDatagridFilterProps(
         'entitatResource',
         'FILTER_ENTITAT',
@@ -113,18 +114,21 @@ export const EntitatGrid: React.FC = () => {
         <>
             <PageTitle title={t('page.entitats.grid.title')}></PageTitle>
             <GridPage>
-                <ScreenFrame>
-                    <MuiDataGrid
-                        title={<ScreenTitle icon={icons.entitat} title={t('page.entitats.grid.title')} />}
+                <ScreenFrame icon={icons.entitat} title={t('page.entitats.grid.title')}>
+                    <StyledMuiGrid
                         resourceName="entitatResource"
                         columns={columns}
+                        apiRef={gridApiRef}
                         paginationActive
                         persistentStateActive
                         persistentStateClearPageSortPropsOnTopLevelRouteChange
                         {...filterDataGridProps}
                         {...pageSizeOptionsDataGridProps}
                         toolbarType="upper"
-                        toolbarHideCreate={isRoleAdminLectura ? true : undefined}
+                        toolbarHideCreate
+                        toolbarElementsWithPositions={ isRoleAdminLectura ? [] : [
+                            { position: 2, element: <AddButton gridApiRef={gridApiRef} text={t('page.entitats.grid.nou')} tooltip={t('page.entitats.grid.nouTooltip')} /> },
+                        ]}
                         popupEditActive
                         popupEditFormContent={<EntitatFormContent />}
                         popupEditFormDialogResourceTitle={t('page.entitats.grid.popupResourceTitle')}

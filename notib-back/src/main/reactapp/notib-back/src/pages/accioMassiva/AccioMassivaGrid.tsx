@@ -1,4 +1,4 @@
-import {GridPage, MuiDataGrid, MuiDataGridColDef, springFilterBuilder as filterBuilder} from "reactlib";
+import {GridPage, MuiDataGridColDef, springFilterBuilder as filterBuilder} from "reactlib";
 import {useTranslation} from "react-i18next";
 import React from "react";
 import {GRID_DETAIL_PANEL_TOGGLE_COL_DEF} from "@mui/x-data-grid-pro";
@@ -10,9 +10,9 @@ import AccioMassivaGridEnviaments from "./AccioMassivaGridElements.tsx";
 import CustomDetailPanelToggle from "../../utils/CustomDetailPanelToggle.tsx";
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
-import ScreenTitle from '../../components/ScreenTitle';
 import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
+import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 
 
 const useDataGridColumns = () => {
@@ -134,9 +134,8 @@ export const AccioMassivaGrid = () => {
         <>
             <PageTitle title={t('page.accioMassiva.grid.title')}></PageTitle>
             <GridPage>
-                <ScreenFrame>
-                <MuiDataGrid
-                    title={<ScreenTitle icon={icons.accioMassiva} title={t('page.accioMassiva.grid.title')} />}
+                <ScreenFrame icon={icons.accioMassiva} title={t('page.accioMassiva.grid.title')}>
+                <StyledMuiGrid
                     resourceName="accioMassivaResource"
                     columns={columns}
                     defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}

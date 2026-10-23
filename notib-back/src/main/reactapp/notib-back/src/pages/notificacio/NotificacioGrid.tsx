@@ -2,7 +2,7 @@ import React from 'react';
 import {Link, useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import {GRID_DETAIL_PANEL_TOGGLE_COL_DEF, GridApiPro, useGridApiRef,} from '@mui/x-data-grid-pro';
-import {GridPage, MuiDataGrid, MuiDataGridColDef, useMuiDataGridApiRef, useMuiDataGridContext, useResourceApiService,} from 'reactlib';
+import {GridPage, MuiDataGridColDef, useMuiDataGridApiRef, useMuiDataGridContext, useResourceApiService,} from 'reactlib';
 import {ROLE_ADMIN, ROLE_ADMIN_LECTURA, ROLE_USER, useNotibContext} from '../../components/NotibContext';
 import {useDatagridFilterProps, useDatagridPageSizeOptionsProps} from '../../hooks/useDataGrid';
 import NotificacioGridEnviaments from './NotificacioGridEnviaments';
@@ -20,8 +20,8 @@ import ContentFilter, {useSpringFilterBuilder} from "./NotificacioFiltre.tsx";
 import useEstatRemesaAsync from '../../hooks/useEstatRemesaAsync';
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
-import ScreenTitle from '../../components/ScreenTitle';
 import { icons } from '../../utils/icons';
+import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 // import useSseRowRefresh from "../../hooks/useSseRowRefresh";
 
 // Ha de ser una funció estable: MUI X recalcula les mides de les files cada vegada que getRowHeight canvia
@@ -489,12 +489,11 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
     return (<>
         <PageTitle title={t('page.notificacio.grid.title')}></PageTitle>
         <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
-            <ScreenFrame>
-                <MuiDataGrid
+            <ScreenFrame icon={titleIcon} title={t('page.notificacio.grid.title') + (titolSecundari || "")}>
+                <StyledMuiGrid
                     key={`${currentRole}-${notificacionsEsborrades}-${notificacionsErrorRegistre}-${notificacionsCallbackError}`}
                     datagridApiRef={datagridApiRef}
                     apiRef={apiRef}
-                    title={<ScreenTitle icon={titleIcon} title={t('page.notificacio.grid.title') + (titolSecundari || "")} />}
                     resourceName="notificacioResource"
                     columns={columns}
                     defaultSortModel={[{ field: 'createdDate', sort: 'desc' }]}
