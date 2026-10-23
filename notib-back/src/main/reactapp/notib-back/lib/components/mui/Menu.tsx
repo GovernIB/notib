@@ -139,7 +139,8 @@ const isCurrentMenuEntryOrAnyChildrenSelected = (
                 ? menuEntry.to
                 : '/' + menuEntry.to
             : menuEntry.to;
-        const selected = menuEntryTo === locationPath || locationPath.startsWith(menuEntryTo + '/');
+        const hasChildren = (menuEntry.children?.length ?? 0) > 0;
+        const selected = menuEntryTo === locationPath || (hasChildren && locationPath.startsWith(menuEntryTo + '/'));
         return selected || anyChildSelected;
     } else {
         return anyChildSelected;
