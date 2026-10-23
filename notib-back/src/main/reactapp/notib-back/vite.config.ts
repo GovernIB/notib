@@ -34,10 +34,16 @@ export default defineConfig(({ mode }) => {
             port: 5173,
         },
         server: {
+            // TODO DESCOMENTAR PER TEST OAW
+            // host: '0.0.0.0',
             open: env.DISABLE_OPEN_ON_START !== 'true',
             hmr: {
                 clientPort: 5173, // TODO Documentar esto
             },
+            // TODO DESCOMENTAR PER TEST OAW
+            // proxy: {
+            //     '/notibback': 'http://localhost:8082',
+            // },
         },
         plugins: [react(), tsconfigPaths(), fixBackendEndpointsBase()],
     };

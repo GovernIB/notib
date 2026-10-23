@@ -5,7 +5,6 @@ import com.nimbusds.jose.shaded.json.JSONObject;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
-import es.caib.notib.logic.intf.base.util.HttpRequestUtil;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.service.EntitatService;
 import lombok.extern.slf4j.Slf4j;
@@ -221,6 +220,13 @@ public abstract class BaseWebSecurityConfig {
 	 * @return la llista matchers.
 	 */
 	protected RequestMatcher[] internalPublicRequestMatchers() {
+		// TODO DESCOMENTAR PER TEST OAW
+//		return new RequestMatcher[]{
+//			new AntPathRequestMatcher("/**/*"),
+//			new AntPathRequestMatcher("/**"),
+//			new AntPathRequestMatcher("/*"),
+//
+//		};
 		return new RequestMatcher[] {
 				new AntPathRequestMatcher(BaseConfig.API_PATH),
 				new AntPathRequestMatcher(BaseConfig.PING_PATH),

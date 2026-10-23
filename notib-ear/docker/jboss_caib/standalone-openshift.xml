@@ -705,7 +705,8 @@
                 <public-client>true</public-client>
                 <principal-attribute>preferred_username</principal-attribute>
                 <verify-token-audience>true</verify-token-audience>
-            </secure-deployment>
+<!-- TODO DESCOMENTAR TEST OAW	<redirect-uri>http://IPLOCAL:8080/notibback/*</redirect-uri>-->
+			</secure-deployment>
             <secure-deployment name="notib-api-interna.war">
                 <auth-server-url>${env.JBOSS_AUTH_URL}</auth-server-url>
                 <realm>${env.JBOSS_AUTH_REALM}</realm>
@@ -733,8 +734,10 @@
             <inet-address value="${jboss.bind.address.management:127.0.0.1}"/>
         </interface>
         <interface name="public">
-            <inet-address value="${jboss.bind.address:127.0.0.1}"/>
-        </interface>
+<!--            <inet-address value="${jboss.bind.address:127.0.0.1}"/>-->
+			<inet-address value="${jboss.bind.address:0.0.0.0}"/>  <!-- Changed from 127.0.0.1 -->
+
+		</interface>
         <interface name="private">
             <inet-address value="${jboss.bind.address.private:127.0.0.1}"/>
         </interface>

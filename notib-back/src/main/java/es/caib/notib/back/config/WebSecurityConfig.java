@@ -14,11 +14,11 @@ import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.IDToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.mapping.SimpleAttributes2GrantedAuthoritiesMapper;
 import org.springframework.security.core.authority.mapping.SimpleMappableAttributesRetriever;
@@ -34,9 +34,6 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -383,5 +380,18 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 			this.originalRoles = originalRoles;
 		}
 	}
+
+	// TODO DESCOMENTAR PER TEST OAW
+//	@Bean
+//	public CorsConfigurationSource corsConfigurationSource() {
+//		CorsConfiguration config = new CorsConfiguration();
+//		config.addAllowedOriginPattern("*");
+//		config.addAllowedHeader("*");
+//		config.addAllowedMethod("*");
+//		config.setAllowCredentials(true);
+//		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//		source.registerCorsConfiguration("/**", config);
+//		return source;
+//	}
 
 }
