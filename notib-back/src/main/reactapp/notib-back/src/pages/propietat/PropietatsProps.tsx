@@ -12,13 +12,11 @@ import Icon from '@mui/material/Icon';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import {
-    MuiForm,
-    FormField,
+    FormIsolatedField,
     TextHighlight,
     useBaseAppContext,
     useResourceApiService,
     ResourceApiRequestArgs,
-    FormApiRef,
     springFilterBuilder,
 } from 'reactlib';
 import {useTheme} from "@mui/material/styles";
@@ -30,6 +28,7 @@ const PREFIX = 'es.caib.notib';
 type PropsContextType = {
     apiCreate: (args: ResourceApiRequestArgs) => Promise<any>;
     apiPatch: (id: any, args: ResourceApiRequestArgs) => Promise<any>;
+    setDirty: (key: string, dirty: boolean) => void;
 };
 const PropsContext = React.createContext<PropsContextType | undefined>(undefined);
 const usePropsContext = () => {
@@ -71,7 +70,6 @@ const buildCustomField = (c: any) => {
         label: '',
         value,
         options,
-        disabled: c.jbossProperty
     };
 };
 
@@ -106,25 +104,36 @@ const PropsListItem: React.FC<{
 }> = (props) => {
     const { item, highlight, title, expanded, onToggleExpand, onSaved } = props;
     const { t } = useTranslation();
-    const { apiPatch } = usePropsContext();
+    const { apiPatch, setDirty } = usePropsContext();
     const { temporalMessageShow } = useBaseAppContext();
-    const [changedValue, setChangedValue] = React.useState<any | undefined>(undefined);
+    // Cada propietat es desa de forma independent, per això el camp no va dins un formulari
+    // (MuiForm): el formulari deshabilita els camps si l'API no ofereix l'acció de crear
+    // (formulari sense id) i el seu bloquejador de sortida avisaria encara que s'hagués desat.
+    const field = React.useMemo(() => buildCustomField(item), [item]);
+    const [value, setValue] = React.useState<any>(field.value);
+    React.useEffect(() => {
+        setValue(field.value);
+    }, [field]);
     const disabled = item.jbossProperty;
-    const password = item.configTypeCode === 'PASSWORD' ? true : undefined;
-    const decimalScale = item.configTypeCode === 'INT' ? 0 : undefined;
+    // Propietats específiques de cada tipus de camp (FormIsolatedField no les té tipades)
+    const fieldTypeProps: any = {
+        password: item.configTypeCode === 'PASSWORD' ? true : undefined,
+        decimalScale: item.configTypeCode === 'INT' ? 0 : undefined,
+    };
     // Només es considera modificat si el valor actual del camp difereix realment del
     // valor original de la propietat (i no simplement perquè el camp hagi disparat
     // un onChange, cosa que alguns components fan també en normalitzar el seu valor inicial).
-    const isDirty =
-        changedValue !== undefined && normalizeValue(changedValue) !== normalizeValue(item.value);
-    const handleFieldOnChange = (value: any) => {
-        setChangedValue(value);
-    };
+    const isDirty = normalizeValue(value) !== normalizeValue(field.value);
+    // Es notifica si la propietat té canvis sense desar perquè el bloquejador de sortida
+    // només avisi en aquest cas (i no quan els canvis ja s'han desat individualment).
+    React.useEffect(() => {
+        setDirty(item.key, isDirty);
+    }, [item.key, isDirty, setDirty]);
+    React.useEffect(() => () => setDirty(item.key, false), [item.key, setDirty]);
     const handleSaveClick = () => {
-        apiPatch(item.id, { data: { value: changedValue } })
+        apiPatch(item.id, { data: { value } })
             .then(() => {
-                onSaved?.(item.key, changedValue);
-                setChangedValue(undefined);
+                onSaved?.(item.key, value);
                 temporalMessageShow(null, t('page.propietats.save.success'), 'success');
             })
             .catch((error) =>
@@ -152,15 +161,17 @@ const PropsListItem: React.FC<{
                         gap: 1,
                     }}
                 >
-                    <FormField
+                    <FormIsolatedField
+                        resourceName="configResource"
                         name={item.key}
+                        field={field}
+                        value={value}
                         inline
-                        password={password}
-                        decimalScale={decimalScale}
                         disabled={disabled}
-                        onChange={handleFieldOnChange}
+                        onChange={setValue}
+                        {...fieldTypeProps}
                         componentProps={{
-                            disabled,
+                            size: 'small',
                             helperText: (
                                 <TextHighlight
                                     text={item.key}
@@ -215,7 +226,6 @@ const PropsEntitatConfigs: React.FC<{ item: any; groupId: any; highlight?: strin
     const { t } = useTranslation();
     const { isReady: apiIsReady, find: apiFind } = useResourceApiService('configResource');
     const [entitatConfigs, setEntitatConfigs] = React.useState<any[]>();
-    const [customFields, setCustomFields] = React.useState<any[]>();
 
     React.useEffect(() => {
         if (!apiIsReady) {
@@ -236,7 +246,6 @@ const PropsEntitatConfigs: React.FC<{ item: any; groupId: any; highlight?: strin
                     (a.entitat?.description ?? '').localeCompare(b.entitat?.description ?? '')
                 );
             setEntitatConfigs(rows);
-            setCustomFields(rows.map(buildCustomField));
         });
     }, [apiIsReady, item.key, groupId]);
 
@@ -244,7 +253,7 @@ const PropsEntitatConfigs: React.FC<{ item: any; groupId: any; highlight?: strin
         setEntitatConfigs((prev) => prev?.map((c) => (c.key === key ? { ...c, value } : c)));
     };
 
-    if (entitatConfigs == null || customFields == null) {
+    if (entitatConfigs == null) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
                 <CircularProgress size={20} />
@@ -254,13 +263,7 @@ const PropsEntitatConfigs: React.FC<{ item: any; groupId: any; highlight?: strin
     return (
         <Box sx={{ pl: 4, pr: 2, pb: 1 }}>
             {entitatConfigs.length ? (
-                <MuiForm
-                    resourceName="configResource"
-                    customFields={customFields}
-                    hiddenToolbar
-                    commonFieldComponentProps={{ size: 'small' }}
-                >
-                    <List dense disablePadding>
+                <List dense disablePadding>
                         {entitatConfigs.map((ec) => (
                             <ListItem key={ec.key} disablePadding>
                                 <PropsListItem
@@ -271,8 +274,7 @@ const PropsEntitatConfigs: React.FC<{ item: any; groupId: any; highlight?: strin
                                 />
                             </ListItem>
                         ))}
-                    </List>
-                </MuiForm>
+                </List>
             ) : (
                 <Typography variant="body2" color="text.secondary">
                     {t('page.propietats.entitats.empty')}
@@ -282,11 +284,12 @@ const PropsEntitatConfigs: React.FC<{ item: any; groupId: any; highlight?: strin
     );
 };
 
-export const PropietatsProps: React.FC<{ quickFilter?: string; group?: any; formApiRef?: FormApiRef; }> = (props) => {
+export const PropietatsProps: React.FC<{ quickFilter?: string; group?: any; }> = (props) => {
 
-    const { quickFilter, group, formApiRef } = props;
+    const { quickFilter, group } = props;
     const { t } = useTranslation();
     const theme = useTheme();
+    const { useBlocker, t: tLib } = useBaseAppContext();
     const {
         isReady: apiIsReady,
         find: apiFind,
@@ -294,8 +297,8 @@ export const PropietatsProps: React.FC<{ quickFilter?: string; group?: any; form
         patch: apiPatch,
     } = useResourceApiService('configResource');
     const [configs, setConfigs] = React.useState<any[]>();
-    const [customFields, setCustomFields] = React.useState<any[]>();
     const [expandedKeys, setExpandedKeys] = React.useState<Set<string>>(new Set());
+    const [dirtyKeys, setDirtyKeys] = React.useState<Set<string>>(new Set());
     React.useEffect(() => {
         if (apiIsReady && group != null) {
             const args = {
@@ -311,13 +314,29 @@ export const PropietatsProps: React.FC<{ quickFilter?: string; group?: any; form
                 const configs = response.rows.filter(() => true);
                 setConfigs(configs);
                 setExpandedKeys(new Set());
-                setCustomFields(configs.map(buildCustomField));
             });
         }
     }, [apiIsReady, quickFilter, group]);
+    const setDirty = React.useCallback((key: string, dirty: boolean) => {
+        setDirtyKeys((prev) => {
+            if (prev.has(key) === dirty) {
+                return prev;
+            }
+            const next = new Set(prev);
+            if (dirty) {
+                next.add(key);
+            } else {
+                next.delete(key);
+            }
+            return next;
+        });
+    }, []);
+    // Només s'avisa en sortir si hi ha alguna propietat modificada pendent de desar.
+    useBlocker?.(() => dirtyKeys.size > 0 && !confirm(tLib('form.blocker')));
     const propsContextValue = {
         apiCreate,
         apiPatch,
+        setDirty,
     };
     const handleItemSaved = (key: string, value: any) => {
         setConfigs((prev) => prev?.map((c) => (c.key === key ? { ...c, value } : c)));
@@ -335,7 +354,7 @@ export const PropietatsProps: React.FC<{ quickFilter?: string; group?: any; form
     };
     return (
         group != null &&
-        customFields != null && (
+        configs != null && (
             <PropsContext.Provider value={propsContextValue}>
                 <Box sx={{ px: 3 }}>
                     <Typography
@@ -349,15 +368,9 @@ export const PropietatsProps: React.FC<{ quickFilter?: string; group?: any; form
                         {group.description}
                     </Typography>
                     <List component={Paper}>
-                        {customFields.length ? (
-                            <MuiForm
-                                apiRef={formApiRef}
-                                resourceName="configResource"
-                                customFields={customFields}
-                                hiddenToolbar
-                                commonFieldComponentProps={{ size: 'small' }}
-                            >
-                                {configs?.map((c) => {
+                        {configs.length ? (
+                            <>
+                                {configs.map((c) => {
                                     const expanded = expandedKeys.has(c.key);
                                     return (
                                         <ListItem key={c.key} disablePadding sx={{ display: 'block' }}>
@@ -386,7 +399,7 @@ export const PropietatsProps: React.FC<{ quickFilter?: string; group?: any; form
                                         </ListItem>
                                     );
                                 })}
-                            </MuiForm>
+                            </>
                         ) : (
                             <Box
                                 sx={{

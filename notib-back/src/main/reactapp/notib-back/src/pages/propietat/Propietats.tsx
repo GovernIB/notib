@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import TextField from '@mui/material/TextField';
 import Icon from '@mui/material/Icon';
 import IconButton from '@mui/material/IconButton';
-import {FormApiRef, GridPage, useBaseAppContext, useDebounce, useFormApiRef, useResourceApiService} from 'reactlib';
+import {GridPage, useBaseAppContext, useDebounce, useResourceApiService} from 'reactlib';
 import { PropietatsGroups } from './PropietatsGroups';
 import { PropietatsProps } from './PropietatsProps';
 import { Box } from '@mui/material';
@@ -14,7 +14,6 @@ import {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
 
 const PropietatsQuickFilter: React.FC<{
     onChange: (quickFilter: string | undefined) => void;
-    formApiRef: FormApiRef;
 }> = (props) => {
     const {onChange} = props;
     const {t} = useTranslation();
@@ -66,7 +65,6 @@ const Propietats: React.FC = () => {
     const { t } = useTranslation();
     const [quickFilter, setQuickFilter] = React.useState<string>();
     const [selectedGroup, setSelectedGroup] = React.useState<any>();
-    const formApiRef = useFormApiRef();
     const { artifactAction: apiAction } = useResourceApiService('configResource');
     const { temporalMessageShow } = useBaseAppContext();
     const sync = () => {
@@ -85,7 +83,7 @@ const Propietats: React.FC = () => {
 
                 // El cercador i el botó de desfer van a la barra de títol
                 actions={<>
-                    <PropietatsQuickFilter onChange={setQuickFilter} formApiRef={formApiRef} />
+                    <PropietatsQuickFilter onChange={setQuickFilter} />
                     <ToolbarButton
                         title={t('page.propietats.syncJboss.label')}
                         icon={icons.sincronitza}
@@ -127,7 +125,6 @@ const Propietats: React.FC = () => {
                         <PropietatsProps
                             group={selectedGroup}
                             quickFilter={quickFilter}
-                            formApiRef={formApiRef}
                         />
                     </Box>
                 </Box>
