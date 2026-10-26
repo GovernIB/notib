@@ -1191,7 +1191,9 @@ const translationCa = {
             toHome: "Anar a l'inici",
         },
         sitemap: {
-            title: "Mapa del lloc web",
+            // L'OAW (verificació 2.4) només reconeix l'enllaç al mapa web si el text coincideix exactament
+            // amb un de la seva llista ("Mapa del lloc" sí, "Mapa del lloc web" no)
+            title: "Mapa del lloc",
             desc: "Accés directe a totes les seccions principals de l’aplicació."
         },
         accessibilitat: {
@@ -1211,36 +1213,30 @@ const translationCa = {
                 introPart1: "Aquest lloc web és parcialment conforme amb",
                 introLinkText: "el RD 1112/2018",
                 introPart2: "a causa de les excepcions i de la manca de conformitat dels aspectes que s'indiquen a continuació.",
-                criteri1: "Criteri A - 4.1.2 Name, Role, Value: Alguns botons iconogràfics mancaven d'alternativa textual accessible. Solució aplicada: s'ha afegit l'atribut \"title\" i l'atribut \"aria-label\" amb text descriptiu a tots els botons que no disposaven d'etiqueta visible, garantint que els lectors de pantalla puguin identificar la seva funció.",
-                criteri2: "Criteri A - 1.1.1 Non-text Content: Algunes imatges informatives no disposaven de text alternatiu. Solució aplicada: s'ha realitzat una auditoria de tots els recursos gràfics. Les imatges no decoratives inclouen ara un atribut \"alt\" descriptiu i contextual. Les imatges purament decoratives utilitzen \"alt\" buit o \"role=presentation\" per ser ignorades per les tecnologies de suport.",
-                criteri3: "Criteri AA - 1.4.4 Resize Text: El text es truncava en escalar la interfície al 200%. Solució aplicada: en mides de pantalla reduïdes, els botons mostren únicament la icona acompanyada d'un atribut \"title\" descriptiu. S'ha eliminat l'ús de \"overflow: hidden\" en contenidors de text i s'ha verificat que tot el contingut romangui accessible amb zoom del 200%.",
-                criteri4: "Criteri AA - 2.5.8 Target Size (Minimum): Determinats elements interactius no complien amb la mida mínima de 24x24 píxels o l'espaiat requerit. Solució aplicada: s'ha modificat el posicionament i maquetació dels components per garantir una àrea de polsació adequada i un espaiat mínim de 8 píxels entre elements interactius, facilitant-ne l'ús en dispositius tàctils i per a persones amb dificultats de mobilitat.",
             },
             noAccesible: {
                 title: "Llista de contingut no accessible i explicació del motiu",
                 item1: {
-                    title: "Absència d’un encapçalament principal H1",
-                    desc1: "Els elements d’encapçalament (H1...H6) serveixen per identificar els títols de les diferents seccions en què s’estructura un document. El nivell emprat en cada encapçalament és el que definirà l’estructura jeràrquica de les seccions del document. Per tant, aquesta estructura d’encapçalaments i els nivells emprats han de ser correctes i han de reflectir l’estructura lògica del contingut de la pàgina. Cal identificar com a encapçalaments tots els títols de secció, sense emprar elements d’encapçalament únicament per crear efectes de presentació i sense saltar-se nivells intermedis en baixar en la jerarquia d’encapçalaments. A totes les pàgines hi ha d’haver com a mínim un encapçalament de nivell H1 que es correspongui amb el títol principal del contingut de la pàgina. Una estructura correcta d’encapçalaments és molt important, ja que les aplicacions d’usuari i els productes de suport, com ara els lectors de pantalla, poden proporcionar mecanismes especials de navegació que permetin als usuaris accedir ràpidament a les diferents seccions que componen una pàgina web (per exemple, mitjançant un índex o mapa del document amb accessos directes a les diferents seccions).",
+                    title: "Llista no ordenada mal construïda (WCAG 1.3.1 Informació i relacions)",
+                    desc1: "A les pantalles que pertanyen a un grup del menú lateral (Gestió, Configuració, Monitoritza i Enviaments massius), el submenú desplegat es mostra dins un element contenidor (DIV) que és fill directe de la llista (UL) del menú, en lloc de ser dins un element de llista (LI). A la pantalla de Propietats també hi ha elements de llista (LI) fora d’una llista. Els lectors de pantalla poden anunciar de manera incorrecta l’estructura i el nombre d’elements d’aquestes llistes.",
+                    desc2: "Motiu: el menú lateral el genera un component d’una biblioteca comuna a diverses aplicacions del Govern de les Illes Balears, que no es pot modificar de manera independent en aquesta aplicació. Les entrades del menú ja s’han corregit i està previst corregir el submenú en una propera versió de la biblioteca.",
                 },
                 item2: {
-                    title: "Llista no ordenada mal construïda",
-                    desc1: "Les llistes no ordenades s’han d’identificar mitjançant l’element UL i només han de contenir elements LI per identificar cadascun dels elements de la llista. No hi pot haver cap altre tipus d’elements com a fills directes de l’element UL. L’estructura de les llistes ha de ser correcta per garantir que aquesta",
-                },
-                item3: {
-                    title: "Presència de llistes no ordenades buides",
-                    desc1: "Les llistes no ordenades s’han d’identificar mitjançant l’element UL i cadascun dels seus elements mitjançant elements LI, que sempre hi han d’aparèixer. No s’han d’emprar elements de llista UL que no continguin cap element. Si en un moment determinat una llista no conté cap element, en lloc de mostrar-se com una llista sense elements fills (sense elements LI), s’ha d’eliminar de la pàgina. L’estructura de les llistes ha de ser correcta per garantir que aquestes",
+                    title: "Camps de formulari sense etiqueta associada correctament (WCAG 1.3.1 Informació i relacions i 3.3.2 Etiquetes o instruccions)",
+                    desc1: "Les etiquetes visibles dels desplegables dels filtres i dels formularis no estan associades programàticament al camp corresponent, i alguns camps de text no tenen cap etiqueta que n’identifiqui la finalitat (pantalles de Mètriques i Propietats i formularis de remesa, d’enviament massiu i d’entitat). Els lectors de pantalla poden no anunciar el nom del camp quan rep el focus.",
+                    desc2: "Motiu: els desplegables els genera un component de la biblioteca comuna esmentada. Està previst corregir aquests camps abans de la propera revisió.",
                 },
             },
             preparacio: {
                 title: "Preparació de la present declaració",
                 elaborat: "Aquesta declaració s'ha elaborat mitjançant autoavaluació realitzada per l'equip de desenvolupament utilitzant l'eina automatitzada: Rastrejador Web de l'Observatori d'Accessibilitat Web.",
-                dataPrep: "Data de preparació: 05/10/2026",
-                darreraRevisio: "Darrera revisió: 05/10/2026",
-                properaRevisio: "Propera revisió programada: 05/10/2027",
+                darreraRevisio: "Darrera revisió: 26/10/2026",
+                properaRevisio: "Propera revisió programada: 26/10/2027",
                 norma: "Norma de referència: UNE-EN 301549:2022, nivells A i AA",
+                mostra: "Mostra avaluada: 32 pàgines de l'aplicació, amb els rols de superadministrador, administrador d'entitat i usuari",
                 resultatTitle: "Resultat",
                 puntuacioLabel: "Puntuació mitjana del lloc web",
-                puntuacioVal: "8.8",
+                puntuacioVal: "8.62",
                 nivellLabel: "Nivell d'adequació estimat",
                 nivellVal: "AA",
                 situacioLabel: "Situació de compliment estimada",
@@ -1272,7 +1268,7 @@ const translationCa = {
             },
             opcional: {
                 title: "Contingut opcional",
-                mesures: "Mesures d'accessibilitat addicionals implementades: estructura d'encapçalaments revisada, afegides etiquetes dels camps que no en tenien, correcció de blocs de text de més de 150 caràcters sense marcatge de text.",
+                mesures: "Mesures d'accessibilitat addicionals implementades: estructura d'encapçalaments revisada (un únic encapçalament principal H1 per pantalla i sense salts de nivell), entrades del menú lateral i opcions dels menús desplegables marcades com a elements de llista, enllaços al mapa del lloc i a la declaració d'accessibilitat a totes les pantalles, identificació de l'idioma de la pàgina i correcció de blocs de text de més de 150 caràcters sense marcatge de text.",
                 config: "Configuració tècnica recomanada: navegadors actualitzats (Chrome, Firefox, Edge, Safari en les seves dues darreres versions), resolució mínima de 1280x720 píxels, i suport de zoom fins al 200% sense pèrdua de contingut o funcionalitat.",
                 recursos: "Recursos d'interès: Guia d'accessibilitat web del W3C (https://www.w3.org/WAI/), validadors automàtics d'accessibilitat (https://achecker.ca/), i documentació oficial del Reial Decret 1112/2018.",
             },

@@ -187,7 +187,7 @@ const EnviamentDetailTabHistoric: React.FC<{ id: any }> = (props) => {
     return (
         <GridPage disableMargins={false}>
             <MuiDataGrid
-                title=""
+                titleDisabled
                 resourceName="notificacioEnviamentAuditResource"
                 fixedFilter={'enviamentId:' + id}
                 sortModel={[{ field: 'tipusOperacio', sort: 'desc' }]}

@@ -26,6 +26,7 @@ import ScreenFrame from '../../components/ScreenFrame';
 import { icons } from '../../utils/icons';
 import FormScreen from "../../components/FormScreen.tsx";
 import FormBackButton from "../../components/FormBackButton.tsx";
+import { FORM_NO_TITLE } from "../../utils/formScreenTitle";
 
 const JSonButton: React.FC = () => {
     const { data } = useFormContext();
@@ -252,7 +253,7 @@ export const NotificacioFormContent: React.FC = () => {
     return (
         <Grid container spacing={2}>
             <Grid size={12}>
-                <Typography variant="h6" sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}>
+                <Typography variant="h6" component="h2" sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}>
                     {t('page.notificacio.form.tabs.remesa')}
                 </Typography>
                 <GridFormField size={12} name="concepte" />
@@ -306,7 +307,7 @@ export const NotificacioForm: React.FC = () => {
                 <FormScreen>
                     <MuiForm
                         resourceName="notificacioResource"
-                        title=""
+                        title={FORM_NO_TITLE}
                         id={id != null ? parseInt(id) : id}
                         initOnChangeRequest
                         hiddenBackButton

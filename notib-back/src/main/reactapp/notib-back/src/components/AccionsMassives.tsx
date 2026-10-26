@@ -114,7 +114,8 @@ const AccionsMassives: React.FC<AccionsMassivesProps> = (props) => {
             >
                 {options.map((option, index) => (
                     ('type' in option)
-                        ? (<Divider key={index}/>)
+                        // Dins la llista del menú (<ul>) el separador ha de ser un <li> (verificació 1.3 de l'OAW)
+                        ? (<Divider key={index} component="li"/>)
                         : (<MenuItem
                             key={index}
                             onClick={() => handleOptionClick(option.onClick)}

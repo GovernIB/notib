@@ -109,7 +109,7 @@ const NotificacioFormDocument: React.FC<{
         <Paper sx={{ px: 2, py: 1, mb: 2 }}>
             <Grid container spacing={2}>
                 <Grid size={10}>
-                    <Typography variant="h6">
+                    <Typography variant="h6" component="h3">
                         {t('page.notificacio.form.documents.title')} {index + 1}
                     </Typography>
                 </Grid>
@@ -164,7 +164,7 @@ export const NotificacioFormDocuments: React.FC = () => {
 
     return (
         <>
-            <Typography variant="h6" sx={{ mt: 3, mb: 2, borderBottom: 1, borderColor: 'divider' }}>
+            <Typography variant="h6" component="h2" sx={{ mt: 3, mb: 2, borderBottom: 1, borderColor: 'divider' }}>
                 {t('page.notificacio.form.tabs.documents')}
             </Typography>
             {documentsInfo?.map((document: any, index: number) => (

@@ -66,7 +66,7 @@ const EnviamentDetailTabRegistreEsdev: React.FC<{ id: any }> = (props) => {
     return (
         <GridPage disableMargins={false}>
             <MuiDataGrid
-                title=''
+                titleDisabled
                 resourceName="eventResource"
                 fixedFilter={'enviament.id:' + id}
                 columns={columns}

@@ -359,6 +359,7 @@ export const PropietatsProps: React.FC<{ quickFilter?: string; group?: any; }> =
                 <Box sx={{ px: 3 }}>
                     <Typography
                         variant="h6"
+                        component="h2"
                         sx={{
                             mb: 1,
                             pl: 2,
@@ -374,7 +375,7 @@ export const PropietatsProps: React.FC<{ quickFilter?: string; group?: any; }> =
                                     const expanded = expandedKeys.has(c.key);
                                     return (
                                         <ListItem key={c.key} disablePadding sx={{ display: 'block' }}>
-                                            <ListItemButton disableRipple>
+                                            <ListItemButton component="div" disableRipple>
                                                 <PropsListItem
                                                     item={c}
                                                     highlight={quickFilter}

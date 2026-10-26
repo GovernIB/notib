@@ -29,7 +29,7 @@ const FilsExecucioTab: React.FC = () => {
     return (
         <GridPage disableMargins={false}>
             <MuiDataGrid
-                title=""
+                titleDisabled
                 resourceName="threadInfoResource"
                 columns={columnsFils}
                 readOnly

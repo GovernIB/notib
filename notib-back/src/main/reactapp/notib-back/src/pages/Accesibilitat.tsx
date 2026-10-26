@@ -60,7 +60,7 @@ const Accessibilitat: React.FC = () => {
                     <Box sx={{p: 1}}>
                         <SectionTitle icon="cancel" color="error">{t(`${p}.noAccesible.title`)}</SectionTitle>
                         <Box component="ol">
-                            {([1, 2, 3] as const).map(i => (
+                            {([1, 2] as const).map(i => (
                                 <Box component="li" key={i} sx={{mb: 1}}>
                                     <Typography component="span" sx={{fontWeight: 600}}>
                                         {t(`${p}.noAccesible.item${i}.title`)}
@@ -77,10 +77,10 @@ const Accessibilitat: React.FC = () => {
                         <SectionTitle icon="calendar_today" color="warning">{t(`${p}.preparacio.title`)}</SectionTitle>
                         <Typography component="p">{t(`${p}.preparacio.elaborat`)}</Typography>
                         <Box component="ul">
-                            <Box component="li">{t(`${p}.preparacio.dataPrep`)}</Box>
                             <Box component="li">{t(`${p}.preparacio.darreraRevisio`)}</Box>
                             <Box component="li">{t(`${p}.preparacio.properaRevisio`)}</Box>
                             <Box component="li">{t(`${p}.preparacio.norma`)}</Box>
+                            <Box component="li">{t(`${p}.preparacio.mostra`)}</Box>
                         </Box>
                         <Typography component="p" sx={{fontWeight: 600, mt: 1}}>{t(`${p}.preparacio.resultatTitle`)}</Typography>
                         <Box component="ul">
