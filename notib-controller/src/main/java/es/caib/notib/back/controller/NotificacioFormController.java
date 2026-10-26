@@ -791,7 +791,7 @@ public class NotificacioFormController extends BaseUserController {
         }
         if (organsGestors != null) {
             for (var o : organsGestors) {
-                codisValor.add(CodiValorDto.builder().codi(o.getCodi()).valor(o.getCodi() + " " + o.getCodiNom()).build());
+                codisValor.add(CodiValorDto.builder().codi(o.getId() + "").valor(o.getCodiNom()).build());
             }
         }
         if (codisValor == null || codisValor.isEmpty()) {
