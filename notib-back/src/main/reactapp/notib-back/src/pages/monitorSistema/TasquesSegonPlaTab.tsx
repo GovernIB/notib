@@ -82,7 +82,7 @@ const TasquesSegonPlaTab: React.FC = () => {
     return (
         <GridPage disableMargins={false}>
             <MuiDataGrid
-                title=""
+                titleDisabled
                 apiRef={gridApiRef}
                 resourceName="backGroundTaskResource"
                 columns={columns}

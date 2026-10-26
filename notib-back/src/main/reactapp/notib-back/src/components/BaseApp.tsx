@@ -62,8 +62,17 @@ export type BaseAppProps = React.PropsWithChildren & {
     footerHeight?: number;
 };
 
+/**
+ * Enllaç que base-react fa servir a tots els components amb `to` (menú, botons, files de graella).
+ * Les entrades del menú lateral són ListItemButton que la llibreria posa directament dins el <ul> del
+ * menú, sense <li>: una llista mal construïda i "buida" (WCAG 1.3.1, verificació 1.3 de l'OAW). Com
+ * que no es pot tocar la llibreria, quan l'enllaç el pinta un ListItemButton s'embolcalla amb un <li>
+ * (veure també els selectors del menú a theme.ts). Les entrades amb fills (grups) no passen per
+ * aquí: el tema fa que el ListItemButton es pinti directament com a <li> (veure MuiListItemButton a theme.ts).
+ */
 export const Link = React.forwardRef<HTMLAnchorElement, RouterLinkProps>((itemProps, ref) => {
-    return <RouterLink ref={ref} {...itemProps} role={undefined} />;
+    const link = <RouterLink ref={ref} {...itemProps} role={undefined} />;
+    return itemProps.className?.includes('MuiListItemButton-root') ? <li>{link}</li> : link;
 });
 
 export const filterMenuEntries = (

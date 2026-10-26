@@ -134,7 +134,7 @@ const NotificacioFormEnviamentEntregaPostal: React.FC<NotificacioFormProps> = ({
             {entregaPostalActiva &&
                 <>
                     <Grid size={12}>
-                        <Typography variant="h6" sx={{mt: 3, mb: 2, borderBottom: 1, borderColor: 'divider'}}>
+                        <Typography variant="h6" component="h4" sx={{mt: 3, mb: 2, borderBottom: 1, borderColor: 'divider'}}>
                             {t('page.notificacio.form.entregaPostal.title')}
                         </Typography>
                     </Grid>
@@ -262,7 +262,7 @@ const NotificacioFormEnviament: React.FC<{ index: number; indexKey: number; hand
         <Paper sx={{ px: 2, py: 1, mb: 2 }}>
             <Grid container spacing={2}>
                 <Grid size={10}>
-                    <Typography variant="h6">
+                    <Typography variant="h6" component="h3">
                         {t('page.notificacio.form.enviaments.title')} {index + 1}
                     </Typography>
                 </Grid>
@@ -346,7 +346,7 @@ export const NotificacioFormEnviaments: React.FC = () => {
 
     return (
         <>
-            <Typography variant="h6" sx={{ mt: 3, mb: 2, borderBottom: 1, borderColor: 'divider' }}>
+            <Typography variant="h6" component="h2" sx={{ mt: 3, mb: 2, borderBottom: 1, borderColor: 'divider' }}>
                 {t('page.notificacio.form.tabs.enviaments')}
             </Typography>
             {enviamentsInfo?.map((enviament: any, index: number) => (

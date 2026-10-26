@@ -151,7 +151,7 @@ const NotificacioDetailTabHistoric: React.FC<{ id: any }> = (props) => {
     return (
         <GridPage>
             <MuiDataGrid
-                title=""
+                titleDisabled
                 resourceName="notificacioAuditResource"
                 fixedFilter={'notificacioId:' + id}
                 sortModel={[{ field: 'tipusOperacio', sort: 'desc' }]}

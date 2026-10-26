@@ -134,7 +134,7 @@ export function MetriquesBarsChart({ item }: { item: any }) {
     return (
         <Box sx={{ width: "100%" }}>
             <Paper sx={{ p: 2 }}>
-                <Typography variant="h6" sx={{ mb: 1 }}>{titol} </Typography>
+                <Typography variant="h6" component="h2" sx={{ mb: 1 }}>{titol} </Typography>
                 <Box sx={{ width: '100%', height: 200, overflow: 'visible', cursor: 'pointer' }} onClick={mostrarDetallMetrica}>
                     <BarChart
                         sx={{ '& .MuiBarChart-label': { fill: '#767b83' } }}
