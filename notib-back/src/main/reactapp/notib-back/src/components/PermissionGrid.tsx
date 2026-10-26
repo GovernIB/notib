@@ -110,7 +110,7 @@ const PermissionGrid: React.FC<{
     return (
         <MuiDataGrid
             apiRef={apiRef}
-            title=""
+            titleDisabled
             resourceName="aclEntryResource"
             columns={columns}
             fixedFilter={"resourceName:'" + resourceName + "' and resourceId:" + id}

@@ -26,6 +26,7 @@ import ScreenFrame from '../../components/ScreenFrame';
 import { icons } from '../../utils/icons';
 import FormScreen from "../../components/FormScreen.tsx";
 import FormBackButton from "../../components/FormBackButton.tsx";
+import { FORM_NO_TITLE } from "../../utils/formScreenTitle";
 
 const JSonButton: React.FC = () => {
     const { data } = useFormContext();
@@ -306,7 +307,7 @@ export const NotificacioForm: React.FC = () => {
                 <FormScreen>
                     <MuiForm
                         resourceName="notificacioResource"
-                        title=""
+                        title={FORM_NO_TITLE}
                         id={id != null ? parseInt(id) : id}
                         initOnChangeRequest
                         hiddenBackButton

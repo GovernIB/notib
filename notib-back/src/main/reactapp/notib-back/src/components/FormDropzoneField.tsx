@@ -114,7 +114,7 @@ export const FormDropzoneField: React.FC<FormDropzoneFieldProps> = ({
                         <CloudUploadIcon fontSize="inherit" />
                     </Box>
 
-                    <Typography variant="h6" color="textSecondary" sx={{ fontWeight: 400 }}>
+                    <Typography variant="h6" component="p" color="textSecondary" sx={{ fontWeight: 400 }}>
                         {isDragActive
                             ? t('component.FormDropzoneField.amollar')
                             : t('component.FormDropzoneField.arrosegar')}

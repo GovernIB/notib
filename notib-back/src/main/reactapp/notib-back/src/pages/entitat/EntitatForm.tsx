@@ -33,6 +33,7 @@ import ScreenFrame from '../../components/ScreenFrame';
 import { icons } from '../../utils/icons';
 import FormScreen from "../../components/FormScreen.tsx";
 import FormBackButton from "../../components/FormBackButton.tsx";
+import { FORM_NO_TITLE } from "../../utils/formScreenTitle";
 
 const useEntitatId = () => {
 
@@ -334,7 +335,7 @@ export const EntitatForm: React.FC = () => {
                         <MuiForm
                             resourceName="entitatResource"
                             id={id}
-                            title=""
+                            title={FORM_NO_TITLE}
                             hiddenBackButton={hiddenBackButton ? true : undefined}
                             createLink="./{{id}}"
                             //updateLink="../../"

@@ -210,7 +210,7 @@ const baseComponentStyles = {
                 // un píxel perquè el centre caigui just a MENU_ICON_COLUMN.
                 [`@container (max-width: ${MENU_COLLAPSED_BELOW}px)`]: {
                     '& .MuiListItemText-root': { display: 'none' },
-                    // Les entrades amb enllaç van dins un <li> (Link de BaseApp.tsx); els grups, no
+                    // Les entrades amb enllaç van dins un <li> (Link de BaseApp.tsx); els grups són el <li>
                     '& > div > .MuiList-root > .MuiListItemButton-root > .menu-item-icon, & > div > .MuiList-root > li > .MuiListItemButton-root > .menu-item-icon': {
                         marginLeft: `${-8 + MENU_BORDER_WIDTH}px`,
                     },
@@ -278,6 +278,14 @@ const baseComponentStyles = {
         },
     },
     MuiListItemButton: {
+        // Les entrades de grup del menú lateral (les que tenen fills) la llibreria les pinta amb
+        // ListItemButton sense `component`, és a dir, com a <div> directament dins el <ul> (WCAG 1.3.1,
+        // verificació 1.3 de l'OAW). Per defecte es pinten com a <li>; les entrades amb enllaç passen
+        // `component` i el <li> el posa el Link de BaseApp.tsx. Un ListItemButton fora d'una llista ha
+        // de passar `component="div"`.
+        defaultProps: {
+            component: 'li' as const,
+        },
         styleOverrides: {
             root: ({ theme }: { theme: Theme }) => ({
                 // `menu-item-icon` és la classe que la llibreria posa al ListItemIcon del menú

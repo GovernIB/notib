@@ -11,6 +11,7 @@ import ScreenFrame from '../../components/ScreenFrame';
 import { icons } from '../../utils/icons';
 import FormScreen from "../../components/FormScreen.tsx";
 import FormBackButton from "../../components/FormBackButton.tsx";
+import { FORM_NO_TITLE } from "../../utils/formScreenTitle";
 
 function NumberCircle({ number, size = 40, bg = '#31708f', color = '#fff' }: { number: string; size?: number; bg?: string; color?: string }) {
     const style = {
@@ -46,7 +47,7 @@ const NotificacioMassivaForm: React.FC = () => {
                             id={id != null ? parseInt(id) : id}
                             resourceName="notificacioMassivaResource"
                             apiRef={formApiRef}
-                            title=""
+                            title={FORM_NO_TITLE}
                             createLink="../"
                             toolbarElementsWithPositions={[
                                 {

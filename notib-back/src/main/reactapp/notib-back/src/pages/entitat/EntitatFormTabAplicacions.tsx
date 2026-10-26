@@ -115,7 +115,7 @@ const EntitatFormTabAplicacions: React.FC = () => {
     return (
         <MuiDataGrid
             apiRef={gridApiRef}
-            title=""
+            titleDisabled
             resourceName="aplicacioResource"
             fixedFilter={'entitat.id:' + id}
             formAdditionalData={{ entitat: { id } }}

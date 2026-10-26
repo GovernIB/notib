@@ -70,7 +70,7 @@ const NotificacioDetailTabRegistreEsdev: React.FC<{ id: any }> = (props) => {
     return (
         <GridPage disableMargins={false}>
             <MuiDataGrid
-                title=''
+                titleDisabled
                 datagridApiRef={datagridApiRef}
                 resourceName="eventResource"
                 fixedFilter={'notificacio.id:' + id}
