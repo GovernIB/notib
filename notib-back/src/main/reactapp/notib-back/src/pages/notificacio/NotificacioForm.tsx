@@ -253,7 +253,7 @@ export const NotificacioFormContent: React.FC = () => {
     return (
         <Grid container spacing={2}>
             <Grid size={12}>
-                <Typography variant="h6" sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}>
+                <Typography variant="h6" component="h2" sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}>
                     {t('page.notificacio.form.tabs.remesa')}
                 </Typography>
                 <GridFormField size={12} name="concepte" />
