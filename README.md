@@ -5,8 +5,8 @@
 > - Versió Estable: __notib-2.0.14__ (tag [NOTIB 2.0.11](https://github.com/GovernIB/notib/releases/tag/v2.0.14))
 > - Versió Desenvolupament: __notib-2.1.1__ (branca [notib2-dev](https://github.com/GovernIB/notib/tree/notib2-dev))  
 >  
-> - Versió actual del client REST: __2.0.8__
->   - Java7: ([notib-client-2.0.8.jar](https://github.com/GovernIB/maven/blob/gh-pages/maven/es/caib/notib/notib-client-legacy/2.1.0/notib-client-legacy-2.1.0.jar), [notib-client-intf-2.0.8.jar](https://github.com/GovernIB/maven/blob/gh-pages/maven/es/caib/notib/notib-client-intf/2.1.0/notib-client-intf-2.1.0.jar))  
+> - Versió actual del client REST: __2.1.0__
+>   - Java7: ([notib-client-legacy-2.1.0.jar](https://github.com/GovernIB/maven/blob/gh-pages/maven/es/caib/notib/notib-client-legacy/2.1.0/notib-client-legacy-2.1.0.jar), [notib-client-intf-2.0.8.jar](https://github.com/GovernIB/maven/blob/gh-pages/maven/es/caib/notib/notib-client-intf/2.1.0/notib-client-intf-2.1.0.jar))  
 >     ```
 >     <dependency>  
 >         <groupId>es.caib.notib</groupId>  
@@ -14,7 +14,7 @@
 >         <version>2.1.0</version>  
 >     </dependency>
 >     ```
->   - Java11: ([notib-client-2-2.0.8.jar](https://github.com/GovernIB/maven/blob/gh-pages/maven/es/caib/notib/notib-client/2.1.0/notib-client-2.1.0.jar), [notib-client-intf-2.0.8.jar](https://github.com/GovernIB/maven/blob/gh-pages/maven/es/caib/notib/notib-client-intf/2.1.0/notib-client-intf-2.1.0.jar))  
+>   - Java11: ([notib-client-2.1.0.jar](https://github.com/GovernIB/maven/blob/gh-pages/maven/es/caib/notib/notib-client/2.1.0/notib-client-2.1.0.jar), [notib-client-intf-2.1.0.jar](https://github.com/GovernIB/maven/blob/gh-pages/maven/es/caib/notib/notib-client-intf/2.1.0/notib-client-intf-2.1.0.jar))  
 >  
 >     ```
 >     <dependency>  
