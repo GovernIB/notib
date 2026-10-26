@@ -7,9 +7,9 @@ import {useNotibContext} from "./NotibContext.ts";
  * Client dels esdeveniments SSE (Server-Sent Events) que envia el servidor.
  *
  * Manté una connexió oberta contra `api/sse/subscribe/user/{codi}` (veure
- * `SseResourceController`) i deixa el que hi arriba a l'abast de tota l'aplicació. De moment
+ * `SseController`) i deixa el que hi arriba a l'abast de tota l'aplicació. De moment
  * l'únic esdeveniment són els avisos: en connectar el servidor n'envia l'estat actual, i el
- * torna a enviar cada vegada que la taula `dis_avis` canvia.
+ * torna a enviar cada vegada que un avís es crea, es modifica o s'esborra.
  *
  * L'estat es guarda en memòria i no al `sessionStorage`: el servidor envia els avisos tot d'una
  * en connectar, així que guardar-los només serviria per a pintar durant un instant una llista

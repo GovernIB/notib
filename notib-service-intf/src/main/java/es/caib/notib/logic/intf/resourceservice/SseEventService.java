@@ -45,11 +45,13 @@ public interface SseEventService {
 	enum SseQueue {
 		PROGRESS,
 		REMESA_ENVIAMENT_ESTAT,
+		AVISOS,
 		TEST
 	}
 
 	/**
-	 * Notifica a totes les connexions obertes que els avisos actius han canviat.
+	 * Notifica a totes les connexions obertes que els avisos actius han canviat: publica a la cua
+	 * AVISOS un event amb tots els avisos actius, un cop confirmada la transacció en curs (si n'hi ha).
 	 */
 	void notifyAvisosActius();
 

@@ -4,6 +4,7 @@ import es.caib.notib.logic.comanda.ComandaListener;
 import es.caib.notib.logic.intf.dto.AvisDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
+import es.caib.notib.logic.intf.resourceservice.SseEventService;
 import es.caib.notib.logic.intf.service.AvisService;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.persist.entity.AvisEntity;
@@ -37,6 +38,8 @@ public class AvisServiceImpl implements AvisService {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private PaginacioHelper paginacioHelper;
+	@Autowired
+	private SseEventService sseEventService;
 
 
 	@Transactional
@@ -47,6 +50,7 @@ public class AvisServiceImpl implements AvisService {
 		var entity = AvisEntity.getBuilder(avis.getAssumpte(), avis.getMissatge(), avis.getDataInici(), avis.getDataFinal(), avis.getAvisNivell(),
 							avis.getAvisAdministrador(), avis.getEntitatId()).build();
 		var dto = conversioTipusHelper.convertir(avisRepository.save(entity), AvisDto.class);
+		sseEventService.notifyAvisosActius();
 	    return dto;
     }
 
@@ -58,6 +62,7 @@ public class AvisServiceImpl implements AvisService {
 		var avisEntity = avisRepository.findById(avis.getId()).orElseThrow();
 		avisEntity.update(avis.getAssumpte(), avis.getMissatge(), avis.getDataInici(), avis.getDataFinal(), avis.getAvisNivell());
 		var dto = conversioTipusHelper.convertir(avisEntity, AvisDto.class);
+		sseEventService.notifyAvisosActius();
 	    return dto;
     }
 
@@ -70,6 +75,7 @@ public class AvisServiceImpl implements AvisService {
 			var avisEntity = avisRepository.findById(id).orElseThrow();
 			avisEntity.updateActiva(activa);
 			var dto = conversioTipusHelper.convertir(avisEntity, AvisDto.class);
+			sseEventService.notifyAvisosActius();
 		    return dto;
         } catch (Exception e) {
 			log.error("[Avis] Error arctualtizant la propietat activa per l'avis " + id, e);
@@ -86,6 +92,7 @@ public class AvisServiceImpl implements AvisService {
 			var avisEntity = avisRepository.findById(id).orElseThrow();
 			avisRepository.delete(avisEntity);
 			var dto = conversioTipusHelper.convertir(avisEntity, AvisDto.class);
+			sseEventService.notifyAvisosActius();
 			dto.setDataFinal(new Date());
 			return dto;
 		} catch (Exception e) {
