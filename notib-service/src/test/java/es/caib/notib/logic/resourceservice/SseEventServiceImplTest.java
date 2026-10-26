@@ -1,14 +1,19 @@
 package es.caib.notib.logic.resourceservice;
 
 import es.caib.notib.logic.helper.AvisEventHelper;
+import es.caib.notib.logic.intf.model.AvisResource;
 import es.caib.notib.logic.intf.model.SseEvent;
 import es.caib.notib.logic.intf.resourceservice.SseEventService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Test unitari per a SseEventServiceImpl.
@@ -25,6 +30,7 @@ class SseEventServiceImplTest {
 
 	@BeforeEach
 	void setUp() {
+		avisEventHelper = mock(AvisEventHelper.class);
 		service = new SseEventServiceImpl(avisEventHelper);
 	}
 
@@ -127,6 +133,33 @@ class SseEventServiceImplTest {
 		// when: un listener nou (d'una execució posterior no relacionada) es registra
 		service.addListener(queue, e -> called.set(true));
 		// then: no s'ha de reenviar l'estat d'una execució ja acabada
+		assertFalse(called.get());
+	}
+
+	@Test
+	void notifyAvisosActiusShouldPublishActiveAvisosToAvisosQueue() {
+		// given: sense transacció en curs, la notificació s'envia immediatament
+		List<AvisResource> avisos = List.of(new AvisResource());
+		when(avisEventHelper.findAvisosActius()).thenReturn(avisos);
+		AtomicReference<SseEvent> received = new AtomicReference<>();
+		service.addListener(SseEventService.SseQueue.AVISOS, received::set);
+		// when
+		service.notifyAvisosActius();
+		// then
+		assertNotNull(received.get());
+		assertEquals(SseEvent.SseEventName.AVISOS_CANVIATS, received.get().getEventName());
+		assertSame(avisos, received.get().getData());
+	}
+
+	@Test
+	void notifyAvisosActiusShouldNotBeReplayedToNewListeners() {
+		// given: cada subscriptor nou ja rep els avisos actuals en connectar
+		when(avisEventHelper.findAvisosActius()).thenReturn(List.of());
+		service.notifyAvisosActius();
+		AtomicBoolean called = new AtomicBoolean(false);
+		// when
+		service.addListener(SseEventService.SseQueue.AVISOS, e -> called.set(true));
+		// then
 		assertFalse(called.get());
 	}
 

@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.Map;
 import java.util.UUID;
@@ -61,9 +63,10 @@ public class SseEventServiceImpl implements SseEventService {
 			// Procés acabat: no ha de quedar cap estat resident que es reenviï a un listener futur
 			// d'una execució posterior, no relacionada, d'aquesta mateixa cua.
 			lastEvents.remove(queue.name());
-		} else if (event.getTargetUser() == null) {
+		} else if (event.getTargetUser() == null && !SseQueue.AVISOS.equals(queue)) {
 			// Els events adreçats a un usuari concret (p.ex. estats de remesa calculats per a la seva
-			// consulta) no són progrés d'un procés: no s'han de reenviar a un listener futur.
+			// consulta) no són progrés d'un procés: no s'han de reenviar a un listener futur. Tampoc
+			// els d'avisos: cada subscriptor nou ja rep l'estat actual en connectar.
 			lastEvents.put(queue.name(), event);
 		}
 		var listeners = consumers.get(queue.name());
@@ -88,7 +91,31 @@ public class SseEventServiceImpl implements SseEventService {
 
 	@Override
 	public void notifyAvisosActius() {
-		avisEventHelper.notifyAvisosActius();
+
+		// Si hi ha una transacció en curs, s'espera que es confirmi: abans els canvis no són visibles
+		// i, si es desfà, no hi ha res a notificar.
+		if (TransactionSynchronizationManager.isSynchronizationActive()) {
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+				@Override
+				public void afterCommit() {
+					publicarAvisosActius();
+				}
+			});
+		} else {
+			publicarAvisosActius();
+		}
+	}
+
+	private void publicarAvisosActius() {
+
+		try {
+			log.debug("Notificant als clients que els avisos actius han canviat");
+			var event = new SseEvent(SseEvent.SseEventName.AVISOS_CANVIATS, 0, SseEvent.SseEventStatus.RUNNING, null);
+			event.setData(avisEventHelper.findAvisosActius());
+			publishEvent(SseQueue.AVISOS, event);
+		} catch (Exception ex) {
+			log.error("Error notificant als clients que els avisos actius han canviat", ex);
+		}
 	}
 
 	@Override

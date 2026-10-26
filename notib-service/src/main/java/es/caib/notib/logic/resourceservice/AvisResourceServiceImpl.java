@@ -3,12 +3,12 @@ package es.caib.notib.logic.resourceservice;
 import es.caib.notib.logic.avisos.AvisMassiuActionExecutor;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
-import es.caib.notib.logic.helper.AvisEventHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.model.AvisResource;
 import es.caib.notib.logic.intf.resourceservice.AvisResourceService;
+import es.caib.notib.logic.intf.resourceservice.SseEventService;
 import es.caib.notib.persist.resourceentity.AvisResourceEntity;
 import es.caib.notib.persist.resourcerepository.AvisResourceRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,12 +31,12 @@ public class AvisResourceServiceImpl extends BaseMutableResourceService<AvisReso
 	private final AuthenticationHelper authenticationHelper;
 	private final UserSessionHelper userSessionHelper;
 	private final AvisResourceRepository avisResourceRepository;
-	private final AvisEventHelper avisEventHelper;
+	private final SseEventService sseEventService;
 
 	@PostConstruct
 	public void init() {
 
-		var massiu = new AvisMassiuActionExecutor(avisResourceRepository);
+		var massiu = new AvisMassiuActionExecutor(avisResourceRepository, sseEventService);
 		register(AvisResource.ACTION_ACTIVAR_MASSIU, massiu);
 		register(AvisResource.ACTION_DESACTIVAR_MASSIU, massiu);
 		register(AvisResource.ACTION_ESBORRAR_MASSIU, massiu);
@@ -55,21 +55,22 @@ public class AvisResourceServiceImpl extends BaseMutableResourceService<AvisReso
 	/**
 	 * Qualsevol canvi a la taula d'avisos s'ha de veure a l'instant a les pantalles que ja estan
 	 * obertes, i no només a la següent recàrrega: després de desar-lo o esborrar-lo es notifica
-	 * per SSE, que difereix l'enviament fins que la transacció s'ha confirmat).
+	 * per SSE (SseEventService.notifyAvisosActius difereix l'enviament fins que la transacció
+	 * s'ha confirmat). Les accions massives ho fan des d'AvisMassiuActionExecutor.
 	 */
 	@Override
 	protected void afterCreate(AvisResourceEntity entity, AvisResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
-		avisEventHelper.notifyAvisosActius();
+		sseEventService.notifyAvisosActius();
 	}
 
 	@Override
 	protected void afterUpdate(AvisResourceEntity entity, AvisResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
-		avisEventHelper.notifyAvisosActius();
+		sseEventService.notifyAvisosActius();
 	}
 
 	@Override
 	protected void afterDelete(AvisResourceEntity entity, Map<String, AnswerRequiredException.AnswerValue> answers) {
-		avisEventHelper.notifyAvisosActius();
+		sseEventService.notifyAvisosActius();
 	}
 
 
