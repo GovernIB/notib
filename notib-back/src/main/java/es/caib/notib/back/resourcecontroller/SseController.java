@@ -2,7 +2,9 @@ package es.caib.notib.back.resourcecontroller;
 
 import es.caib.notib.back.base.controller.BaseController;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
+import es.caib.notib.logic.intf.model.AvisResource;
 import es.caib.notib.logic.intf.model.SseEvent;
+import es.caib.notib.logic.intf.model.sse.AvisosActiusEvent;
 import es.caib.notib.logic.intf.resourceservice.SseEventService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,11 +12,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -48,6 +53,10 @@ public class SseController extends BaseController {
 	// arribar, cal enviar periòdicament un "batec" perquè el proxy no consideri la connexió SSE
 	// inactiva i la tanqui, encara que el client no en faci res (és un comentari SSE, no un event).
 	private static final long HEARTBEAT_INTERVAL_SECONDS = 15;
+
+	// Noms dels events del flux d'usuari, tal com els espera el client (SseClient.tsx)
+	private static final String EVENT_USER_CONNECT = "user_connect";
+	private static final String EVENT_AVISOS = "avisos";
 
 	private final SseEventService sseEventService;
 	private final ScheduledExecutorService heartbeatScheduler = Executors.newScheduledThreadPool(2, sseHeartbeatThreadFactory());
@@ -87,8 +96,11 @@ public class SseController extends BaseController {
 		description = "Es subscriu al flux d'events indicat amb queueId"
 	)
 	public ResponseEntity<SseEmitter> stream(@PathVariable String queueId) {
+		// La cua d'avisos porta tots els avisos actius sense filtrar: només s'hi accedeix des de
+		// subscribeUser, que els filtra pel rol i l'entitat de cada connexió.
 		Optional<SseEventService.SseQueue> queue =
 			Arrays.stream(SseEventService.SseQueue.values())
+				.filter(q -> !SseEventService.SseQueue.AVISOS.equals(q))
 				.filter(q -> q.name().equals(queueId))
 				.findFirst();
 		if (queue.isPresent()) {
@@ -148,6 +160,66 @@ public class SseController extends BaseController {
 		} else {
 			return ResponseEntity.notFound().build();
 		}
+	}
+
+	@GetMapping("/subscribe/user/{usuariCodi}")
+	@Operation(
+		summary = "Subscriure's al flux d'events de l'usuari",
+		description = "Obre el flux d'events de l'usuari (avisos actius) per al rol i l'entitat indicats"
+	)
+	public ResponseEntity<SseEmitter> subscribeUser(
+			@PathVariable String usuariCodi,
+			@RequestParam(required = false) String rol,
+			@RequestParam(required = false) Long entitatId) {
+		// L'EventSource no pot enviar les capçaleres X-App-Role/X-App-Session: el rol i l'entitat
+		// arriben com a paràmetres i cal comprovar que l'usuari i el rol són de qui fa la petició.
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth == null || !auth.getName().equals(usuariCodi)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+		if (rol != null && auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).noneMatch(rol::equals)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+		var queue = SseEventService.SseQueue.AVISOS;
+		SseEmitter emitter = new SseEmitter(0L);
+		try {
+			emitter.send(SseEmitter.event().name(EVENT_USER_CONNECT).data(usuariCodi));
+			emitter.send(SseEmitter.event().name(EVENT_AVISOS).data(sseEventService.getAvisosActius(rol, entitatId)));
+		} catch (IOException ex) {
+			log.debug("SSE: connexió ja tancada en enviar l'estat inicial", ex);
+			return ResponseEntity.ok(emitter);
+		}
+		var listenerId = new AtomicReference<String>();
+		listenerId.set(sseEventService.addListener(queue, event -> {
+			if (!(event.getData() instanceof List)) {
+				return;
+			}
+			@SuppressWarnings("unchecked")
+			var avisos = AvisosActiusEvent.filtrar((List<AvisResource>) event.getData(), rol, entitatId);
+			try {
+				emitter.send(SseEmitter.event().name(EVENT_AVISOS).data(avisos));
+			} catch (IOException ex) {
+				// Igual que a stream: no es crida completeWithError sobre una connexió ja tancada
+				log.debug("SSE: connexió ja tancada en enviar els avisos", ex);
+				sseEventService.removeListener(queue, listenerId.get());
+			} catch (Exception ex) {
+				emitter.completeWithError(ex);
+				sseEventService.removeListener(queue, listenerId.get());
+			}
+		}));
+		ScheduledFuture<?> heartbeat = heartbeatScheduler.scheduleAtFixedRate(
+			() -> sendHeartbeat(emitter),
+			HEARTBEAT_INTERVAL_SECONDS,
+			HEARTBEAT_INTERVAL_SECONDS,
+			TimeUnit.SECONDS);
+		Runnable cleanup = () -> {
+			heartbeat.cancel(true);
+			sseEventService.removeListener(queue, listenerId.get());
+		};
+		emitter.onCompletion(cleanup);
+		emitter.onTimeout(cleanup);
+		emitter.onError(e -> cleanup.run());
+		return ResponseEntity.ok(emitter);
 	}
 
 	/**

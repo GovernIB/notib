@@ -16,6 +16,6 @@ import java.util.List;
 public interface AvisResourceRepository extends BaseRepository<AvisResourceEntity, Long> {
 
 
-	@Query("from AvisEntity a where a.actiu = true and a.dataInici <= :currentDate and (a.dataFinal is null or a.dataFinal >= :currentDate) and (a.entitatId is null or a.entitatId = :entitatId)")
+	@Query("from AvisResourceEntity a where a.actiu = true and a.dataInici <= :currentDate and (a.dataFinal is null or a.dataFinal >= :currentDate)")
 	List<AvisResourceEntity> findActius(@Param("currentDate") Date currentDate);
 }

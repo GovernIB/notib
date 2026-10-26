@@ -5,6 +5,7 @@ import es.caib.notib.logic.intf.base.exception.ActionExecutionException;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.model.AccioMassivaParams;
 import es.caib.notib.logic.intf.model.AvisResource;
+import es.caib.notib.logic.intf.resourceservice.SseEventService;
 import es.caib.notib.persist.resourceentity.AvisResourceEntity;
 import es.caib.notib.persist.resourcerepository.AvisResourceRepository;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,7 @@ import java.util.Map;
 public class AvisMassiuActionExecutor implements BaseMutableResourceService.ActionExecutor<AvisResourceEntity, AccioMassivaParams, Serializable> {
 
 	private final AvisResourceRepository avisRepository;
+	private final SseEventService sseEventService;
 
 	@Override
 	public Serializable exec(String code, AvisResourceEntity entity, AccioMassivaParams params) throws ActionExecutionException {
@@ -45,6 +47,7 @@ public class AvisMassiuActionExecutor implements BaseMutableResourceService.Acti
 				default:
 					throw new ActionExecutionException(AvisResource.class, null, code, "Acció desconeguda");
 			}
+			sseEventService.notifyAvisosActius();
 			return null;
 		} catch (ActionExecutionException ex) {
 			throw ex;
