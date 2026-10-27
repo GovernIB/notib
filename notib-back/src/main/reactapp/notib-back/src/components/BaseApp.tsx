@@ -33,6 +33,7 @@ import { useNotibContext } from './NotibContext';
 import {AvisosBanner} from "./AvisosBanner.tsx";
 import reactlibCa from "../i18n/reactlibCa.ts";
 import reactlibEs from "../i18n/reactlibEs.ts";
+import {UserLastConection} from "./UserLastConection.tsx";
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
@@ -307,6 +308,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             ]}
             headerAuthBadgeIcon={roleBadgeIcon(currentRole)}
             headerAdditionalAuthComponents={[
+                <UserLastConection key="user_last_conection" />,
                 <Box key="user_profile" sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
                     <UserProfileMenu formDialogApiRef={formDialogApiRef} />
                 </Box>,

@@ -1333,6 +1333,10 @@ const translationCa = {
             general: 'Configuració general',
             tema: 'Aparença',
         },
+        UserLastConection: {
+            lastConnection: "Data i hora de la darrera connexió de l'usuari",
+            darreraConnexio: "Darrera connexió:",
+        },
         SwitchInterface: {
             classica: 'Interfície clàssica',
         },

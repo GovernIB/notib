@@ -9,6 +9,7 @@ import es.caib.notib.logic.intf.model.UsuariResource;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 /**
  * Entitat de base de dades d'usuari de l'aplicació.
@@ -58,6 +59,10 @@ public class UsuariResourceEntity extends es.caib.notib.persist.base.entity.Base
 	@Column(name = "num_elements_pagina_defecte", length = 3)
 	@Enumerated(EnumType.STRING)
 	private NumElementsPaginaDefecte numElementsPaginaDefecte;
+	@Column(name = "darrer_periode")
+	private LocalDateTime darrerPeriode;
+	@Column(name = "darrera_activitat")
+	private LocalDateTime darreraActivitat;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(

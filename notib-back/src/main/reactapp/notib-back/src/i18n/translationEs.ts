@@ -1306,6 +1306,10 @@ const translationEs = {
             general: 'Configuración general',
             tema: 'Apariencia',
         },
+        UserLastConection: {
+            lastConnection: "Fecha y hora de la última conexión del usuario",
+            darreraConnexio: "Última conexión:",
+        },
         SwitchInterface: {
             classica: 'Interfície clásica',
         },

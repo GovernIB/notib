@@ -5,6 +5,7 @@ import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.PermisosHelper;
+import es.caib.notib.logic.helper.UsuarisRefreshHelper;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.model.OrganGestorResource;
 import es.caib.notib.logic.intf.model.UsuariResource;
@@ -41,6 +42,7 @@ public class UsuariResourceServiceImpl
 	private final UsuariResourceRepository usuariResourceRepository;
 	private final CacheHelper cacheHelper;
 	private final PermisosHelper permisosHelper;
+	private final UsuarisRefreshHelper usuarisRefreshHelper;
 
 	@Override
 	protected void afterConversion(UsuariResourceEntity entity, UsuariResource resource) {
@@ -55,28 +57,30 @@ public class UsuariResourceServiceImpl
 		}
 		var rols = cacheHelper.findRolsUsuariAmbCodi(entity.getCodi());
 		resource.setRolsAmbPermis(permisosHelper.filterRolsAmbAlgunPermis(rols));
+		resource.setDarreraConnexio(entity.getDarrerPeriode());
 	}
 
 	@Override
 	public void refresh() {
+
 		UsuariResource usuariFromAuth = getUsuariResourceFromAuth();
-		if (usuariFromAuth != null) {
-			Optional<UsuariResourceEntity> usuariOptional = usuariResourceRepository.findById(authenticationHelper.getCurrentUserName());
-			if (usuariOptional.isPresent()) {
-				UsuariResourceEntity usuariFromDb = usuariOptional.get();
-				if (hasToUpdateUsuari(usuariFromDb, usuariFromAuth)) {
-					usuariFromDb.setNomSencer(usuariFromAuth.getNomSencer());
-					usuariFromDb.setNif(usuariFromAuth.getNif());
-					usuariFromDb.setEmail(usuariFromAuth.getEmail());
-					usuariResourceRepository.save(usuariFromDb);
-				}
-			} else {
-				UsuariResourceEntity usuari = UsuariResourceEntity.builder().
-					resource(usuariFromAuth).
-					build();
-				usuariResourceRepository.save(usuari);
-			}
+		if (usuariFromAuth == null) {
+			return;
 		}
+		var usuariOptional = usuariResourceRepository.findById(authenticationHelper.getCurrentUserName());
+		if (usuariOptional.isPresent()) {
+			var usuariFromDb = usuariOptional.get();
+			if (hasToUpdateUsuari(usuariFromDb, usuariFromAuth)) {
+				usuariFromDb.setNomSencer(usuariFromAuth.getNomSencer());
+				usuariFromDb.setNif(usuariFromAuth.getNif());
+				usuariFromDb.setEmail(usuariFromAuth.getEmail());
+				usuariResourceRepository.save(usuariFromDb);
+			}
+		} else {
+			var usuari = UsuariResourceEntity.builder().resource(usuariFromAuth).build();
+			usuariResourceRepository.save(usuari);
+		}
+		usuarisRefreshHelper.refreshCurrentUser();
 	}
 
 	@Override

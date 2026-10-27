@@ -13,10 +13,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
+import org.springframework.data.annotation.Transient;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -71,6 +73,8 @@ public class UsuariResource extends BaseResource<String> {
 	// capçalera) que l'usuari té assignats i que s'utilitzen en algun permís (ACL) concedit -calculat,
 	// no persistit; vegeu UsuariResourceServiceImpl.afterConversion.
 	protected List<String> rolsAmbPermis;
+	@Transient
+	private LocalDateTime darreraConnexio;
 
 	public String getId() {
 		return codi;

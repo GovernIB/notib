@@ -62,6 +62,8 @@ public class WebMvcConfig extends BaseWebMvcConfig {
 	private ObjectMapper objectMapper;
 	@Autowired
 	private UsuariResourceService usuariResourceService;
+	@Autowired
+	private CurrentUserHandlerInterceptor currentUserHandlerInterceptor;
 
 	private static final long MAX_UPLOAD_SIZE = 52428800;
 
@@ -225,6 +227,9 @@ public class WebMvcConfig extends BaseWebMvcConfig {
 		registry.addInterceptor(accesAdminInterceptor).addPathPatterns(ADMIN_PATHS).order(3);
 		registry.addInterceptor(accesUsuariInterceptor).addPathPatterns(USUARI_PATHS).excludePathPatterns(USUARI_EXCLUSIONS).order(4);
 		registry.addInterceptor(accesPagadorsInterceptor).addPathPatterns(PAGADORS_PATHS).order(5);
+//		registry.addInterceptor(currentUserHandlerInterceptor).excludePathPatterns(SUPER_EXCLUSIONS).addPathPatterns("/api/**");
+		registry.addInterceptor(currentUserHandlerInterceptor).addPathPatterns("/api/**");
+
 //		registry.addInterceptor(new CsrfTokenInterceptor());
 	}
 
