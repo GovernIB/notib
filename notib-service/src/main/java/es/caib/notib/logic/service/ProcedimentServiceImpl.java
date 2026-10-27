@@ -653,7 +653,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 				log.error("[ProcedimentService.getProcedimentsCieByEntitatAndCodi] Error consultant els procediments de l'entitat: " + codiEntitat + ". organCodi no pot ser null");
 				return null;
 			}
-			var entitat = entitatRepository.findByCodi(codiEntitat);
+			var entitat = entitatRepository.findByDir3Codi(codiEntitat);
 			if (entitat == null) {
 				log.error("[ProcedimentService.getProcedimentsCieByEntitatAndCodi] Error consultant els procediments de l'entitat: " + codiEntitat + ". Entitat Inexistent");
 				return null;
@@ -665,7 +665,7 @@ public class ProcedimentServiceImpl implements ProcedimentService {
 		} catch (Exception ex) {
 			var msg = "[ProcedimentService.getProcedimentsCieByEntitatAndCodi] Error consultant si el procediment pot fer entregues CIE, entitat: ";
 			log.error(msg + codiEntitat + " organ: " + organCodi + " procediment: " + codiProcediment, ex);
-			return false;
+			return null;
 		}
 	}
 
