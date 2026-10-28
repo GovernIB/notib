@@ -474,7 +474,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, true, false, false);
 			var enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacio.getId());
 			if (enviamentsPendents == null || enviamentsPendents.isEmpty()) {
-				throw new ValidationException("Aquesta notificació està enviada i no es pot modificar");
+				throw new ValidationException("Aquesta notificacio esta enviada i no es pot modificar. Id: " + notificacio.getId());
 			}
 			var notificacioEntity = notificacioRepository.findById(notificacio.getId()).orElseThrow();
 			var notData = notificacioHelper.buildNotificacioData(entitat, notificacio, false);
