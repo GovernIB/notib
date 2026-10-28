@@ -1,14 +1,14 @@
 databaseChangeLog:
-  - changeSet:
-      id: init_constraint-1
-      author: limit
-      changes:
-        - addForeignKeyConstraint:
-            baseTableName: ${db_prefix}ACCIO_MASSIVA
-            baseColumnNames: ENTITAT_ID
-            referencedTableName: ${db_prefix}ENTITAT
-            referencedColumnNames: ID
-            constraintName: ${db_prefix}ACC_MASS_ENTITAT_FK
+#  - changeSet:
+#      id: init_constraint-1
+#      author: limit
+#      changes:
+#        - addForeignKeyConstraint:
+#            baseTableName: ${db_prefix}ACCIO_MASSIVA
+#            baseColumnNames: ENTITAT_ID
+#            referencedTableName: ${db_prefix}ENTITAT
+#            referencedColumnNames: ID
+#            constraintName: ${db_prefix}ACC_MASS_ENTITAT_FK
   - changeSet:
       id: init_constraint-2
       author: limit
@@ -69,26 +69,26 @@ databaseChangeLog:
 #            referencedTableName: ${db_prefix}USUARI
 #            referencedColumnNames: CODI
 #            constraintName: ${db_prefix}CALLBACK_USR_FK
-  - changeSet:
-      id: init_constraint-8
-      author: limit
-      changes:
-        - addForeignKeyConstraint:
-            baseTableName: ${db_prefix}CALLBACK
-            baseColumnNames: NOTIFICACIO_ID
-            referencedTableName: ${db_prefix}NOTIFICACIO
-            referencedColumnNames: ID
-            constraintName: ${db_prefix}CALLBACK_NOT_FK
-  - changeSet:
-      id: init_constraint-9
-      author: limit
-      changes:
-        - addForeignKeyConstraint:
-            baseTableName: ${db_prefix}CALLBACK
-            baseColumnNames: ENVIAMENT_ID
-            referencedTableName: ${db_prefix}NOTIFICACIO_ENV
-            referencedColumnNames: ID
-            constraintName: ${db_prefix}CALLBACK_ENV_FK
+#  - changeSet:
+#      id: init_constraint-8
+#      author: limit
+#      changes:
+#        - addForeignKeyConstraint:
+#            baseTableName: ${db_prefix}CALLBACK
+#            baseColumnNames: NOTIFICACIO_ID
+#            referencedTableName: ${db_prefix}NOTIFICACIO
+#            referencedColumnNames: ID
+#            constraintName: ${db_prefix}CALLBACK_NOT_FK
+#  - changeSet:
+#      id: init_constraint-9
+#      author: limit
+#      changes:
+#        - addForeignKeyConstraint:
+#            baseTableName: ${db_prefix}CALLBACK
+#            baseColumnNames: ENVIAMENT_ID
+#            referencedTableName: ${db_prefix}NOTIFICACIO_ENV
+#            referencedColumnNames: ID
+#            constraintName: ${db_prefix}CALLBACK_ENV_FK
   - changeSet:
       id: init_constraint-10
       author: limit
