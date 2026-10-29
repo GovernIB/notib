@@ -1,4 +1,3 @@
-import {Grid} from '@mui/material';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {GridPage, MuiDataGridColDef, springFilterBuilder as filterBuilder, } from 'reactlib';
@@ -9,7 +8,6 @@ import CustomDetailPanelToggle from "../../utils/CustomDetailPanelToggle.tsx";
 import PermisosUsuariDetail from "./PermisosUsuariDetail.tsx";
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
-import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 
@@ -19,10 +17,7 @@ const springFilterBuilder = (data: any) => filterBuilder.and(filterBuilder.like(
 const ContentFilter: React.FC = () => {
 
     return (
-        <Grid container spacing={2}>
-            <GridFormField size={2} name="codi" />
-            <FilterClearButton />
-        </Grid>
+        <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="codi" />
     );
 };
 
@@ -91,7 +86,6 @@ export const PermisosUsuariGrid = () => {
                         persistentStateClearPageSortPropsOnTopLevelRouteChange
                         {...filterDataGridProps}
                         {...pageSizeOptionsDataGridProps}
-                        toolbarType="upper"
                         rowHideUpdateButton
                         getDetailPanelContent={({ row }) => <PermisosUsuariDetail id={row.id} />}
                         getDetailPanelHeight={() => 'auto'}

@@ -37,7 +37,7 @@ declare module '@mui/material/styles' {
 // un torrat sobre fons fosc no té contrast. No hi ha cap altre color d'identitat.
 const PRIMARY_MAIN = '#83cb41';
 const PRIMARY_DARK = '#497e3a';
-const PRIMARY_SOFT = '#a8db7a';
+const PRIMARY_SOFT = '#F2F9EB';
 const PRIMARY_LIGHT = lighten(PRIMARY_MAIN, 0.3);
 
 /**

@@ -66,7 +66,10 @@ export const DetailCard = (props: any) => {
         hidden,
         cardProps = {},
         headerProps = {},
+        gridProps = {},
+        contentProps = {},
         variant = 'overline',
+        titleComponent,
         ...other
     } = props;
 
@@ -75,7 +78,7 @@ export const DetailCard = (props: any) => {
     }
 
     return (
-        <Grid size={size}>
+        <Grid size={size} {...gridProps}>
             <Card sx={cardProps}>
                 {(title || header) && (
                     <CardHead
@@ -84,7 +87,11 @@ export const DetailCard = (props: any) => {
                         sx={{ py: 0, px: 2, ...headerProps }}
                     >
                         {title && (
-                            <Typography mt={0.5} variant={variant}>
+                            <Typography
+                                mt={0.5}
+                                variant={variant}
+                                {...(titleComponent && { component: titleComponent })}
+                            >
                                 {title}
                             </Typography>
                         )}
@@ -92,7 +99,7 @@ export const DetailCard = (props: any) => {
                     </CardHead>
                 )}
 
-                <CardContent sx={{ p: '0 !important' }}>
+                <CardContent sx={{ p: '0 !important', ...contentProps }}>
                     <Grid container {...other}>
                         {children}
                     </Grid>

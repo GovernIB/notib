@@ -58,6 +58,9 @@ export const FormScreen: React.FC<{ children: React.ReactNode }> = ({ children }
         <Box
             ref={wrapperRef}
             sx={{
+                // Perquè el `height: 100%` del MuiForm i de les pestanyes amb graella tinguin una
+                // referència (si no, la graella col·lapsa a la seva alçada mínima).
+                height: '100%',
                 // Mateix tractament que la barra de la graella (StyledMuiGrid.tsx).
                 '& > div > div > .MuiToolbar-root': {
                     position: 'absolute',
@@ -75,6 +78,15 @@ export const FormScreen: React.FC<{ children: React.ReactNode }> = ({ children }
                     zIndex: 1,
                     ...titleBarControlsSx,      // mateix estil que els controls de la barra de títol
                 },
+                // La llibreria deixa un marge (16px als costats, 24px a dalt) a la caixa del contingut
+                // pensat per a un formulari a pàgina sencera; aquí el ScreenFrame ja hi posa el seu
+                // padding (MAIN_PADDING) i els dos marges se sumaven.
+                '& > div > div > div:last-child': { m: 0 },
+                // Separació entre les pestanyes i el seu contingut: la llibreria hi deixa 24px.
+                '& [role="tabpanel"] > .MuiBox-root': { pt: 2 },
+                // Les graelles de les pestanyes (p. ex. permisos) pinten una barra d'eines de 64px
+                // (alçada per defecte de MUI) només per als botons de crear i refrescar.
+                '& [role="tabpanel"] .MuiToolbar-root': { minHeight: '48px' },
             }}>
             {children}
         </Box>

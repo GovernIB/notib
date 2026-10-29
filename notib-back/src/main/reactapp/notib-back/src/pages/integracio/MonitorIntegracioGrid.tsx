@@ -2,24 +2,22 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     GridPage,
-    MuiFilter,
-    useFilterApiRef,
     useResourceApiService,
     springFilterBuilder as filterBuilder,
     useCloseDialogButtons,
 } from 'reactlib';
 import GridFormField from '../../components/GridFormField';
-import { Badge, Box, Grid, Tab, Tabs } from '@mui/material';
+import { Badge, Box, Tab, Tabs } from '@mui/material';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
 import { useContentDialog } from '../../../lib/components/mui/Dialog';
 import MonitorIntegracioParamDetail from './MonitorIntegracioParamDetail';
 import ChipEstat from '../../components/ChipEstat';
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
-import { FilterClearButton } from '../../components/FilterButtons';
 import FilterCount from '../../components/FilterCount';
 import { icons } from '../../utils/icons';
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
+import StyledMuiFilter from '../../components/StyledMuiFilter';
 
 // INTERFACES
 interface MonitorProps {
@@ -112,16 +110,15 @@ const CustomTabs = ({ options, report, selectedTab, onTabChange }: MonitorProps)
 
 const ContentFilter = () => {
     return (
-        <Grid container spacing={2}>
-            <GridFormField size={1.5} name="dataInici" />
-            <GridFormField size={1.5} name="dataFi" />
-            <GridFormField size={3} name="descripcio" />
-            <GridFormField size={1.75} name="aplicacio" />
-            <GridFormField size={1.5} name="codiEntitat" />
-            <GridFormField size={1.25} name="tipus" />
-            <GridFormField size={1} name="estat" />
-            <FilterClearButton size={0.5} />
-        </Grid>
+        <>
+            <GridFormField size={{ xs: 12, sm: 6, md: 1.5 }} name="dataInici" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 1.5 }} name="dataFi" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 3 }} name="descripcio" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 1.75 }} name="aplicacio" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 1.5 }} name="codiEntitat" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 1.25 }} name="tipus" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 1 }} name="estat" />
+        </>
     );
 };
 
@@ -131,7 +128,6 @@ const MonitorIntegracioGridFilter = ({
     selectedTab,
     onTabChange,
 }: MonitorProps) => {
-    const filterApiRef = useFilterApiRef();
     // Últim Spring Filter aplicat, per al recompte de filtres de la barra de títol
     const [springFilter, setSpringFilter] = React.useState<string | undefined>();
 
@@ -149,24 +145,24 @@ const MonitorIntegracioGridFilter = ({
 
     return (
         <Box>
-            <MuiFilter
+            <StyledMuiFilter
                 resourceName="monitorIntegracioResource"
                 code="FILTER_MONITOR_INTEGRACIO"
-                apiRef={filterApiRef}
                 springFilterBuilder={springFilterBuilder}
                 onSpringFilterChange={setSpringFilter}
-                componentProps={{ sx: { mb: 2, mt: 0 } }}
-                commonFieldComponentProps={{ size: 'small' }}
+                componentProps={{ sx: { mb: 0, mt: 0 } }}
+                footer={
+                    <CustomTabs
+                        options={options}
+                        report={report}
+                        selectedTab={selectedTab}
+                        onTabChange={onTabChange}
+                    />
+                }
             >
                 <ContentFilter />
                 <FilterCount springFilter={springFilter} />
-                <CustomTabs
-                    options={options}
-                    report={report}
-                    selectedTab={selectedTab}
-                    onTabChange={onTabChange}
-                />
-            </MuiFilter>
+            </StyledMuiFilter>
         </Box>
     );
 };
@@ -274,7 +270,6 @@ export const MonitorIntegracioGrid = () => {
                         paginationActive
                         toolbarHideQuickFilter
                         readOnly
-                        toolbarType="upper"
                         toolbarAdditionalRow={
                             <MonitorIntegracioGridFilter
                                 options={options}

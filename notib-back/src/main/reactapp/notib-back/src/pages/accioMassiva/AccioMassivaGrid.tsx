@@ -4,13 +4,12 @@ import React from "react";
 import {GRID_DETAIL_PANEL_TOGGLE_COL_DEF} from "@mui/x-data-grid-pro";
 import {useDatagridFilterProps, useDatagridPageSizeOptionsProps} from "../../hooks/useDataGrid.tsx";
 import {formatEndOfDay, formatStartOfDay} from "../../utils/dateUtils.ts";
-import {Box, Chip, Grid, Icon} from "@mui/material";
+import {Box, Chip, Icon} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import AccioMassivaGridEnviaments from "./AccioMassivaGridElements.tsx";
 import CustomDetailPanelToggle from "../../utils/CustomDetailPanelToggle.tsx";
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
-import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 
@@ -102,17 +101,13 @@ const ContentFilter: React.FC = () => {
 
 
     return (
-        <Box>
-            <Grid container spacing={1}>
-                <GridFormField size={2.75} name="tipus" />
-                <GridFormField size={1.75} name="createdBy" />
-                <GridFormField size={1.75} name="dataIniciInici" />
-                <GridFormField size={1.75} name="dataIniciFi" />
-                <GridFormField size={2.5} name="estat" />
-
-                <FilterClearButton size={0.5} />
-            </Grid>
-        </Box>
+        <>
+            <GridFormField size={{ xs: 12, sm: 6, md: 3.25 }} name="tipus" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="createdBy" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataIniciInici" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataIniciFi" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 2.25 }} name="estat" />
+        </>
     );
 };
 
@@ -142,9 +137,9 @@ export const AccioMassivaGrid = () => {
                     paginationActive
                     persistentStateActive
                     persistentStateClearPageSortPropsOnTopLevelRouteChange
+                    toolbarCreateTitle={t('page.accioMassiva.grid.nou')}
                     {...filterDataGridProps}
                     {...pageSizeOptionsDataGridProps}
-                    toolbarType="upper"
                     getDetailPanelContent={({ row }) => <AccioMassivaGridEnviaments id={row.id} tipusElementSeleccionat={row.tipusElementSeleccionat}/>}
                     getDetailPanelHeight={() => 'auto'}
 

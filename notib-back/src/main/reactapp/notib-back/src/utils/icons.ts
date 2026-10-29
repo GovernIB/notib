@@ -36,7 +36,7 @@ export const icons = {
     activeMq: 'subscriptions',
     avis: 'notifications',
     mapaWeb: 'map',
-    accessibilitat: 'accessibility_new',
+    accessibilitat: 'accessibility',
     noTrobat: 'search_off',
 
     // --- Accions -----------------------------------------------------------------------------

@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
 import Chip from '@mui/material/Chip';
-import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import {
     GridPage,
@@ -18,7 +17,6 @@ import { DataCommonAdditionalAction } from '../../../lib/components/mui/datacomm
 import React from "react";
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
-import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
 import {ProcedimentForm} from "./ProcedimentForm.tsx";
 import AddButton from "../../components/AddButton.tsx";
@@ -111,17 +109,16 @@ const ContentFilter: React.FC = () => {
 
     const organGestorOptionRenderer = useOrganGestorOptionRenderer();
     return (
-        <Grid container spacing={2}>
-            <GridFormField size={1} name="codi" />
-            <GridFormField size={3} name="nom" />
-            <GridFormField size={4} name="organGestor" optionRenderer={organGestorOptionRenderer} />
-            <GridButtonField size={0.5} name="actiu" icon={'flash_on'} hiddenLabel />
-            <GridButtonField size={0.5} name="comu" icon={'public'} hiddenLabel />
-            <GridButtonField size={0.5} name="entregaCieActiva" icon={'email'} hiddenLabel />
-            <GridButtonField size={0.5} name="manual" icon={'sync'} hiddenLabel />
-            <GridButtonField size={0.5} name="requireDirectPermission" icon={'gpp_good'} hiddenLabel/>
-            <FilterClearButton />
-        </Grid>
+        <>
+            <GridFormField size={{ xs: 12, sm: 6, md: 1.5 }} name="codi" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 3 }} name="nom" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 4 }} name="organGestor" optionRenderer={organGestorOptionRenderer} />
+            <GridButtonField size={{ xs: 12, sm: 6, md: 0.5 }} name="actiu" icon={'flash_on'} hiddenLabel />
+            <GridButtonField size={{ xs: 12, sm: 6, md: 0.5 }} name="comu" icon={'public'} hiddenLabel />
+            <GridButtonField size={{ xs: 12, sm: 6, md: 0.5 }} name="entregaCieActiva" icon={'email'} hiddenLabel />
+            <GridButtonField size={{ xs: 12, sm: 6, md: 0.5 }} name="manual" icon={'sync'} hiddenLabel />
+            <GridButtonField size={{ xs: 12, sm: 6, md: 0.5 }} name="requireDirectPermission" icon={'gpp_good'} hiddenLabel />
+        </>
     );
 };
 
@@ -271,7 +268,6 @@ export const ProcedimentGrid = () => {
                         persistentStateClearPageSortPropsOnTopLevelRouteChange
                         {...filterDataGridProps}
                         {...pageSizeOptionsDataGridProps}
-                        toolbarType="upper"
                         popupEditActive
                         toolbarHideCreate
                         popupEditFormContent={<ProcedimentForm/>}

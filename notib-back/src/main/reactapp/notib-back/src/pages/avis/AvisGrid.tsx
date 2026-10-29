@@ -15,7 +15,6 @@ import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
-import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
 import AddButton from "../../components/AddButton.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
@@ -63,15 +62,14 @@ const springFilterBuilder = (data: any) => {
 
 const ContentFilter: React.FC = () => {
     return (
-        <Grid container spacing={2}>
-            <GridFormField size={2} name="entitat" />
-            <GridFormField size={4} name="assumpte" />
-            <GridFormField size={1.5} name="dataInici" />
-            <GridFormField size={1.5} name="dataFinal" />
-            <GridFormField size={1.5} name="avisNivell" />
-            <GridFormField size={1} name="actiu" />
-            <FilterClearButton />
-        </Grid>
+        <>
+            <GridFormField size={{ xs: 12, sm: 6, md: 2.5 }} name="entitat" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 3 }} name="assumpte" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 1.75 }} name="dataInici" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 1.75 }} name="dataFinal" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 1.5 }} name="avisNivell" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 1 }} name="actiu" />
+        </>
     );
 };
 
@@ -147,7 +145,6 @@ export const AvisGrid = () => {
                         {...filterDataGridProps}
                         {...pageSizeOptionsDataGridProps}
                         selectionActive
-                        toolbarType="upper"
                         toolbarHideCreate
                         toolbarElementsWithPositions={[
                             { position: 2, element: <MassiveActionsButton apiRef={datagridApiRef} refresh={refresh} /> },

@@ -9,7 +9,9 @@ import GridFormField from '../../components/GridFormField';
 import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
 import { useTabParam } from '../../hooks/useSearchParams';
 import ScreenFrame from '../../components/ScreenFrame';
-import { formScreenTitle } from '../../utils/formScreenTitle';
+import FormScreen from '../../components/FormScreen';
+import FormBackButton from '../../components/FormBackButton';
+import { FORM_NO_TITLE } from '../../utils/formScreenTitle';
 import { icons } from '../../utils/icons';
 
 export const OrganFormContent: React.FC<{ setSubtitle?: (subtitle: string) => void }> = (props) => {
@@ -67,19 +69,25 @@ export const OrganForm: React.FC = () => {
     const titol = id != null ? t('page.organs.form.titleUpdate') : t('page.organs.form.titleCreate');
     return (
         <FormPage>
-            <ScreenFrame icon={icons.organ} title={titol}>
-                <MuiForm
-                    resourceName="organGestorResource"
-                    id={id != null ? parseInt(id) : id}
-                    title={formScreenTitle(icons.organ, titol)}
-                    toolbarSubtitle={id != null ? subtitle : undefined}
-                    createLink="./{{id}}"
-                    //updateLink="../../"
-                    componentProps={{ style: { height: '100%' } }}
-                    commonFieldComponentProps={{ size: 'small' }}
-                >
-                    <OrganFormContent setSubtitle={setSubtitle} />
-                </MuiForm>
+            <ScreenFrame
+                icon={icons.organ}
+                title={titol}
+                subtitle={id != null ? subtitle : undefined}
+                beforeTitle={<FormBackButton />}>
+                <FormScreen>
+                    <MuiForm
+                        resourceName="organGestorResource"
+                        id={id != null ? parseInt(id) : id}
+                        title={FORM_NO_TITLE}
+                        hiddenBackButton
+                        createLink="./{{id}}"
+                        //updateLink="../../"
+                        componentProps={{ style: { height: '100%' } }}
+                        commonFieldComponentProps={{ size: 'small' }}
+                    >
+                        <OrganFormContent setSubtitle={setSubtitle} />
+                    </MuiForm>
+                </FormScreen>
             </ScreenFrame>
         </FormPage>
     );
