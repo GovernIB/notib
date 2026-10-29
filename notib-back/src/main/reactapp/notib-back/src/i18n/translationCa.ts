@@ -34,12 +34,12 @@ const translationCa = {
         menu: {
             home: 'Inici',
             config: 'Configuració',
-            monitoritza: 'Monitoritza',
+            monitoritza: 'Monitorització',
             entitats: 'Entitats',
             avisos: 'Avisos',
             propietats: 'Propietats de configuració',
             currentEntitat: 'Entitat actual',
-            organsGestors: 'Òrgans gestors',
+            organsGestors: 'Unitats organitzatives',
             procediments: 'Procediments',
             serveis: 'Serveis',
             grups: 'Grups',
@@ -149,7 +149,7 @@ const translationCa = {
         },
         organs: {
             grid: {
-                title: 'Òrgans gestors',
+                title: 'Unitats organitzatives',
                 viewSwitch: 'Vista en arbre',
                 groupColumn: 'Òrgan gestor',
                 popupDialogTitle: 'òrgan gestor',
@@ -1024,7 +1024,7 @@ const translationCa = {
         },
         integracio: {
             grid: {
-                title: 'Monitor de integraciones',
+                title: "Monitor d'integracions",
             },
             detall: {
                 title: "Detall del monitor d'integració",
