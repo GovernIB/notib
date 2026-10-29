@@ -1,4 +1,4 @@
-import {Box, Chip, Grid, Icon} from '@mui/material';
+import {Box, Chip, Icon} from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -18,7 +18,6 @@ import {ROLE_ADMIN_LECTURA, ROLE_USER, useNotibContext} from "../../components/N
 import {TemporalMessageSeverity} from "../../../lib/components/BaseAppContext.tsx";
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
-import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 
@@ -179,25 +178,27 @@ const useSpringFilterBuilder = () => {
 
 const ContentFilter: React.FC = () => {
 
-    const { t } = useTranslation();
     const { currentRole } = useNotibContext();
     const isNotRoleUser = currentRole !== ROLE_USER
 
     return (
-        <Box>
-            <Grid container spacing={1}>
-                <GridFormField size={1.75} name="dataIniciInici" />
-                <GridFormField size={1.75} name="dataIniciFi" />
-                <GridFormField size={2.5} name="estatProces" />
-                {isNotRoleUser && (<GridFormField size={1.75} name="createdBy" />)}
+        <>
+            <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataIniciInici" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataIniciFi" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 2.5 }} name="estatProces" />
+            {isNotRoleUser && <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="createdBy" />}
+        </>
+    );
+};
 
-                <FilterClearButton size={0.5} />
-            </Grid>
-            <Box paddingTop="15px" display="flex" justifyContent="end" fontSize="10px">
-                [<Box>{iconOk} {t('page.notificacioMassiva.grid.llegenda.numProcessats')}</Box>]
-                [<Box>{iconError} {t('page.notificacioMassiva.grid.llegenda.numErronis')}</Box>]
-                [<Box>{iconCancelada} {t('page.notificacioMassiva.grid.llegenda.numCancelats')}</Box>]
-            </Box>
+/** Llegenda de les icones de la columna de resum, sota la fila del filtre. */
+const FilterLegend: React.FC = () => {
+    const { t } = useTranslation();
+    return (
+        <Box paddingTop="15px" display="flex" justifyContent="end" fontSize="10px">
+            [<Box>{iconOk} {t('page.notificacioMassiva.grid.llegenda.numProcessats')}</Box>]
+            [<Box>{iconError} {t('page.notificacioMassiva.grid.llegenda.numErronis')}</Box>]
+            [<Box>{iconCancelada} {t('page.notificacioMassiva.grid.llegenda.numCancelats')}</Box>]
         </Box>
     );
 };
@@ -212,7 +213,8 @@ export const NotifiacioMassivaGrid = () => {
         'notificacioMassivaResource',
         'FILTER_NOTIFICACIO_MASSIVA',
         springFilterBuilder,
-        <ContentFilter />
+        <ContentFilter />,
+        { footer: <FilterLegend /> }
     );
     const columns = useDataGridColumns();
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
@@ -341,7 +343,6 @@ export const NotifiacioMassivaGrid = () => {
                         persistentStateClearPageSortPropsOnTopLevelRouteChange
                         {...filterDataGridProps}
                         {...pageSizeOptionsDataGridProps}
-                        toolbarType="upper"
                         // toolbarCreateLink="form"
                         toolbarHideCreate
                         // toolbarElementsWithPositions={[

@@ -3,13 +3,12 @@ import { useTranslation } from 'react-i18next';
 import {
     GridPage,
     useFilterApiContext,
+    useFormContext,
     springFilterBuilder as filterBuilder,
     useMuiDataGridApiRef,
     useMuiDataGridContext,
 } from 'reactlib';
-import { Grid } from '@mui/material';
 import GridFormField, { GridButtonField } from '../../components/GridFormField';
-import { FilterAdvancedButton, FilterClearButton } from '../../components/FilterButtons';
 import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
 import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
 import { useNotificacioDetailDialog } from '../notificacio/NotificacioDetailDialog';
@@ -199,14 +198,10 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
     )
 };
 
-const ContentFilter: React.FC<{openByDefault?: boolean}> = ({openByDefault}) => {
+const ContentFilter: React.FC = () => {
     const filterApiRef = useFilterApiContext();
     const organGestorOptionRenderer = useOrganGestorOptionRenderer();
-    const [advancedFilter, setAdvancedFilter] = React.useState(openByDefault ?? false);
-
-    const advancedFilterClick = () => {
-        setAdvancedFilter(!advancedFilter);
-    };
+    const { data } = useFormContext();
     const organId = filterApiRef.current?.getData()?.organGestor?.id;
     let procedimentFiltre;
     if (organId) {
@@ -217,40 +212,45 @@ const ContentFilter: React.FC<{openByDefault?: boolean}> = ({openByDefault}) => 
         procedimentFiltre = filterBuilder.or(filterBuilder.eq('tipus', `'PROCEDIMENT'`), filterBuilder.eq('tipus', `'SERVEI'`));
     }
     return (
-        <Grid container spacing={1}>
-            <GridFormField size={2} name="tipusEnviament" />
-            {/* Al filtre bàsic, el concepte ocupa l'espai que deixen els botons */}
-            <GridFormField size={advancedFilter ? 4 : 'grow'} name="notificacioConcepte" />
-            <GridFormField size={2.5} name="notificaEstat" />
-            <GridFormField size={1.75} name="dataEnviamentInici" />
-            <GridFormField size={1.75} name="dataEnviamentFi" />
-
-            {advancedFilter && (
+        <>
+            {!data?.advanced && (
                 <>
-                    <GridFormField size={2} name="dataCreacioInici" />
-                    <GridFormField size={2} name="dataCreacioFi" />
-                    <GridFormField size={2} name="enviamentDataProgramadaInici" />
-                    <GridFormField size={2} name="enviamentDataProgramadaFi" />
-                    <GridFormField size={2} name="notificaReferencia" />
-                    <GridFormField size={2} name="grupCodi" />
-                    <GridFormField size={4} name="organGestor" namedQueries={`PERM_READ`} optionRenderer={organGestorOptionRenderer} />
-                    <GridFormField size={3} name="procedimentServei" filter={procedimentFiltre} />
-                    <GridFormField size={2} name="createdBy" />
-                    <GridFormField size={3} name="notificacioDescripcio" />
-                    <GridFormField size={3} name="titularNomNif" />
-                    <GridFormField size={3} name="representantsString" />
-                    <GridFormField size={2} name="numRegistre" />
-                    <GridFormField size={2} name="dataCaducitatInici" />
-                    <GridFormField size={2} name="dataCaducitatFi" />
-                    <GridFormField size={2} name="referenciaEnviament" />
-                    <GridFormField size={2} name="referenciaNotificacio" />
-                    <GridFormField size={2} name="codiCsvUuidDocument" />
-                    <GridButtonField size={0.5} name="entregaPostalActiva" icon={'email'} hiddenLabel/>
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="tipusEnviament" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2.5 }} name="notificacioConcepte" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2.5 }} name="notificaEstat" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 1.75 }} name="dataEnviamentInici" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 1.75 }} name="dataEnviamentFi" />
                 </>
             )}
-            <FilterAdvancedButton open={advancedFilter} onClick={advancedFilterClick} />
-            <FilterClearButton />
-        </Grid>
+            {data?.advanced && (
+                <>
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="tipusEnviament" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 4 }} name="notificacioConcepte" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2.5 }} name="notificaEstat" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 1.75 }} name="dataEnviamentInici" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 1.75 }} name="dataEnviamentFi" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataCreacioInici" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataCreacioFi" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="enviamentDataProgramadaInici" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="enviamentDataProgramadaFi" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="notificaReferencia" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="grupCodi" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 4 }} name="organGestor" namedQueries={`PERM_READ`} optionRenderer={organGestorOptionRenderer} />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 3 }} name="procedimentServei" filter={procedimentFiltre} />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="createdBy" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 3 }} name="notificacioDescripcio" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 3 }} name="titularNomNif" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 3 }} name="representantsString" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="numRegistre" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataCaducitatInici" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataCaducitatFi" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="referenciaEnviament" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="referenciaNotificacio" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="codiCsvUuidDocument" />
+                    <GridButtonField size={{ xs: 12, sm: 6, md: 0.5 }} name="entregaPostalActiva" icon={'email'} hiddenLabel />
+                </>
+            )}
+        </>
     );
 };
 
@@ -273,9 +273,12 @@ const EnviamentGrid = () => {
         'notificacioEnviamentResource',
         'FILTER_ENVIAMENT',
         springFilterBuilder,
-        <ContentFilter openByDefault={!!referencia} />,
-        undefined,
-        {referenciaEnviament: referencia}
+        <ContentFilter />,
+        {
+            advancedSearch: true,
+            // Amb la referència a l'adreça (vinculada des d'altres pantalles) el filtre avançat s'obre sol
+            initialData: { referenciaEnviament: referencia, advanced: !!referencia },
+        }
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     const {anularRemesa,  anularRemesaDialog, ampliarTermini, ampliarTerminiDialog } = useAccionsNotificacio();
@@ -298,7 +301,6 @@ const EnviamentGrid = () => {
                         persistentStateClearPageSortPropsOnTopLevelRouteChange
                         {...filterDataGridProps}
                         {...pageSizeOptionsDataGridProps}
-                        toolbarType="upper"
                         toolbarElementsWithPositions={[
                             {
                                 position: 2,

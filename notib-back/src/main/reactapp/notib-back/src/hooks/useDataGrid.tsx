@@ -10,8 +10,8 @@ import {
     type DataGridProProps,
     type GridEventListener,
 } from '@mui/x-data-grid-pro';
-import { MuiFilter } from 'reactlib';
 import { useNotibContext } from '../components/NotibContext';
+import StyledMuiFilter from '../components/StyledMuiFilter';
 import FilterCount from '../components/FilterCount';
 
 export const useDatagridPageSizeOptionsProps = (
@@ -42,10 +42,26 @@ export const useDatagridFilterProps = (
     resourceName: string,
     code: string,
     springFilterBuilder: (data: any) => string | undefined,
+    /**
+     * Només els camps del filtre (GridFormField): el StyledMuiFilter pinta el layout Grid i el bloc de botons.
+     * Han d'ocupar una sola fila, botons inclosos: sumar `12 - FILTER_BUTTONS_COLUMNS.md` a `md` (11,5) o,
+     * amb `advancedSearch`, `12 - FILTER_BUTTONS_COLUMNS_ADVANCED.md` (10,5) al filtre bàsic.
+     */
     content: React.ReactElement,
-    minHeight: string = '40px',
-    initialData?: any,
+    options?: {
+        /** Amb botó per commutar entre el filtre bàsic i l'avançat (`useFormContext().data.advanced`). */
+        advancedSearch?: boolean;
+        /** Dades amb què s'inicialitza el filtre (també són les que recupera el botó «Neteja»). */
+        initialData?: any;
+        /** Alçada mínima de la fila del filtre mentre es carrega, perquè la graella no salti. */
+        minHeight?: string;
+        /** Contingut sota la fila del filtre (p. ex. una llegenda). */
+        footer?: React.ReactNode;
+        /** Clau amb què es desa el filtre (per defecte, el nom del recurs): cal quan diverses vistes comparteixen recurs. */
+        persistentStateKey?: string;
+    }
 ) => {
+    const { advancedSearch, initialData, minHeight = '67px', footer, persistentStateKey } = options ?? {};
     const [autoFindDisabled, setAutoFindDisabled] = React.useState<boolean>(true);
     // Últim Spring Filter aplicat, per al recompte de filtres de la barra de títol (FilterCount)
     const [springFilter, setSpringFilter] = React.useState<string | undefined>();
@@ -55,19 +71,23 @@ export const useDatagridFilterProps = (
         setSpringFilter(springFilter);
     };
     const filterComponent = (
-        <MuiFilter
+        <StyledMuiFilter
             resourceName={resourceName}
             code={code}
             persistentStateActive
+            persistentStateKey={persistentStateKey}
             springFilterBuilder={springFilterBuilder}
             onSpringFilterChange={handleSpringFilterChange}
+            // Sense cap filtre inicial no s'aplica res: la graella ha de poder fer la primera cerca
+            onEmptyInitialData={() => setAutoFindDisabled(false)}
             componentProps={{ sx: { mb: 0, mt: 0 } }}
-            commonFieldComponentProps={{ size: 'small' }}
             initialData={initialData}
+            advancedSearch={advancedSearch}
+            footer={footer}
         >
             {content}
             <FilterCount springFilter={springFilter} />
-        </MuiFilter>
+        </StyledMuiFilter>
     );
     return {
         loading: autoFindDisabled ? autoFindDisabled : undefined,

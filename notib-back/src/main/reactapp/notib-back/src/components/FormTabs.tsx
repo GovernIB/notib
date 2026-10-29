@@ -47,7 +47,13 @@ export const FormTabContent: React.FC<FormTabContentProps> = (props) => {
     const { index: currentIndex } = useFormTabsContext();
     if (!tabsInsideDialog) {
         return (
-            <MuiFormTabContent index={index} showOnCreate={showOnCreate} style={style} {...otherProps}>
+            // `style` només es passa si està definit: un `style={undefined}` explícit esborraria
+            // l'`height: 100%` que MuiFormTabContent posa per defecte (les graelles col·lapsarien).
+            <MuiFormTabContent
+                index={index}
+                showOnCreate={showOnCreate}
+                {...(style != null ? { style } : {})}
+                {...otherProps}>
                 {children}
             </MuiFormTabContent>
         );

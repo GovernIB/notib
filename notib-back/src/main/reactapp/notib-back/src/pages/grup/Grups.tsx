@@ -55,7 +55,6 @@ export const Grups: React.FC = () => {
                         persistentStateActive
                         persistentStateClearPageSortPropsOnTopLevelRouteChange
                         {...pageSizeOptionsDataGridProps}
-                        toolbarType="upper"
                         popupEditActive
                         popupEditFormContent={<GrupForm />}
                         popupEditFormDialogResourceTitle={t('page.grups.grid.popupResourceTitle')}

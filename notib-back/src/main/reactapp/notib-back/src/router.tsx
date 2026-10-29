@@ -15,7 +15,7 @@ import NotificacioGrid from './pages/notificacio/NotificacioGrid';
 import NotificacioForm from './pages/notificacio/NotificacioForm';
 import EnviamentGrid from './pages/enviament/EnviamentGrid';
 import NotFoundPage from './pages/NotFound';
-import Propietats from './pages/propietat/Propietats';
+import Propietats from './pages/propietats/Propietats';
 import MonitorIntegracioGrid from './pages/integracio/MonitorIntegracioGrid';
 import CacheGrid from './pages/cache/CacheGrid';
 import ActiveMqGrid from './pages/activeMq/ActiveMqGrid';

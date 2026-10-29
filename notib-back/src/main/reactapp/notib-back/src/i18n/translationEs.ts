@@ -24,6 +24,8 @@ const translationEs = {
         },
         actions: "Acciones",
         download: "Descarga",
+        undo: 'Deshacer',
+        cerca: 'Buscar',
     },
     app: {
         loading: 'Iniciando NOTIB',
@@ -35,7 +37,7 @@ const translationEs = {
             monitoritza: 'Monitoriza',
             entitats: 'Entidades',
             avisos: 'Avisos',
-            propietats: 'Propiedades',
+            propietats: 'Propiedades de configuración',
             currentEntitat: 'Entidad actual',
             organsGestors: 'Órganos gestores',
             procediments: 'Procediments',
@@ -221,21 +223,20 @@ const translationEs = {
             },
         },
         propietats: {
-            find: 'Buscar en las propiedades',
-            empty: 'Sin propiedades',
-            revert: 'Deshacer cambios',
-            save: {
-                success: 'Valor modificado correctamente',
-                error: 'Error modificando la propiedad',
-            },
+            title: 'Propiedades de configuración',
+            empty: 'No hay propiedades',
             entitats: {
-                empty: 'Sin propiedades por entidad configuradas',
+                label: 'Valores por entidad',
             },
-            syncJboss: {
-                label: "Sincronizar con JBoss",
-                ok: "Propiedades sincronizadas correctamente",
-                error: "Error sincronizando las propiedades"
-            }
+            accio: {
+                sync: {
+                    label: 'Sincroniza con JBoss',
+                    confirm:
+                        'Se copiará a la base de datos el valor que los ficheros de propiedades del servidor definen para las propiedades editables, y se perderán los valores guardados desde esta pantalla. ¿Quieres continuar?',
+                    ok: 'Las propiedades se han sincronizado correctamente',
+                    error: 'No se han podido sincronizar las propiedades',
+                },
+            },
         },
         propietatsConfiguracio: {
             grid: {
@@ -810,6 +811,7 @@ const translationEs = {
         accioMassiva : {
             grid: {
                 title: 'Acciones Masivas',
+                nou: 'Nueva acción masiva',
                 tipus: 'Tipo',
                 createdDate: 'Fecha creación',
                 dataInici: 'Fecha inicio',
@@ -1422,7 +1424,7 @@ const translationEs = {
         tancarFiltreAvançat: 'Cerrar filtro avanzado',
         neteja: 'Limpia',
         avancat: 'Avanzado',
-        simple: 'Simple',
+        basic: 'Básico',
         filtresAplicats_one: '{{count}} filtro aplicado',
         filtresAplicats_other: '{{count}} filtros aplicados',
         guardar: 'Guarda',

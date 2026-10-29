@@ -14,7 +14,6 @@ import { ROLE_ADMIN_LECTURA, useNotibContext } from '../../components/NotibConte
 import PageTitle from "../../components/PageTitle.tsx";
 import React from "react";
 import ScreenFrame from '../../components/ScreenFrame';
-import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
 import {useTabParam} from "../../hooks/useSearchParams.ts";
 import { FormTabs, FormTabContent } from '../../components/FormTabs';
@@ -79,16 +78,13 @@ const ContentFilter: React.FC = () => {
 
     const organGestorOptionRenderer = useOrganGestorOptionRenderer();
     return (
-        <Grid container spacing={2}>
-            <GridFormField size={2} name="nom" />
-            <GridFormField size={3} name="organGestorEmissor" optionRenderer={organGestorOptionRenderer} />
-            <GridFormField size={3} name="organGestorPagador" optionRenderer={organGestorOptionRenderer} />
-            <GridFormField size={1.75} name="contracteDataVigInici" />
-            <GridFormField size={1.75} name="contracteDataVigFinal" />
-            <Grid size={0.5}>
-                <FilterClearButton />
-            </Grid>
-        </Grid>
+        <>
+            <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="nom" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 3 }} name="organGestorEmissor" optionRenderer={organGestorOptionRenderer} />
+            <GridFormField size={{ xs: 12, sm: 6, md: 3 }} name="organGestorPagador" optionRenderer={organGestorOptionRenderer} />
+            <GridFormField size={{ xs: 12, sm: 6, md: 1.75 }} name="contracteDataVigInici" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 1.75 }} name="contracteDataVigFinal" />
+        </>
     );
 };
 
@@ -167,7 +163,6 @@ export const PagadorCieGrid: React.FC = () => {
                         persistentStateClearPageSortPropsOnTopLevelRouteChange
                         {...filterDataGridProps}
                         {...pageSizeOptionsDataGridProps}
-                        toolbarType="upper"
                         toolbarHideCreate
                         toolbarElementsWithPositions={ isRoleAdminLectura ? [] : [
                             { position: 2, element: <AddButton gridApiRef={gridApiRef} text={t('page.pagadorCie.grid.nou')} tooltip={t('page.pagadorCie.grid.nouTooltip')} /> },

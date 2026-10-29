@@ -34,7 +34,6 @@ import { CardData } from '../../components/CardData';
 import {ROLE_ADMIN_LECTURA, useNotibContext} from '../../components/NotibContext';
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
-import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 
@@ -475,16 +474,15 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
 const ContentFilter: React.FC = () => {
     const organGestorOptionRenderer = useOrganGestorOptionRenderer();
     return (
-        <Grid container spacing={2}>
-            <GridFormField size={1} name="codi" />
-            <GridFormField size={2} name="nom" />
-            <GridFormField size={4} name="pare" optionRenderer={organGestorOptionRenderer} />
-            <GridFormField size={1} name="llibre" />
-            <GridFormField size={1.25} name="estat" />
-            <GridFormField size={1} name="entregaCieActiva" />
-            <GridFormField size={1} name="permetreSir" />
-            <FilterClearButton />
-        </Grid>
+        <>
+            <GridFormField size={{ xs: 12, sm: 6, md: 1.25 }} name="codi" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="nom" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 4 }} name="pare" optionRenderer={organGestorOptionRenderer} />
+            <GridFormField size={{ xs: 12, sm: 6, md: 1 }} name="llibre" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 1.25 }} name="estat" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 1 }} name="entregaCieActiva" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 1 }} name="permetreSir" />
+        </>
     );
 };
 
@@ -532,7 +530,6 @@ export const OrganGrid = () => {
                         persistentStateClearPageSortPropsOnTopLevelRouteChange
                         {...filterDataGridProps}
                         {...pageSizeOptionsDataGridProps}
-                        toolbarType="upper"
                         popupEditActive
                         popupEditFormContent={<OrganFormContent />}
                         popupEditFormDialogResourceTitle={t('page.organs.grid.popupDialogTitle')}

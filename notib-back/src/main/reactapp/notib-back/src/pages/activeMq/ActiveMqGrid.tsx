@@ -84,7 +84,6 @@ export const ActiveMqGrid = () => {
                     <StyledMuiGrid
                         resourceName="activeMqResource"
                         columns={columns}
-                        toolbarType="upper"
                         toolbarHideQuickFilter
                         checkboxSelection={false}
                         toolbarElementsWithPositions={[{
