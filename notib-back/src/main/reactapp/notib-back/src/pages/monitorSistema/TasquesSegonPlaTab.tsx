@@ -1,13 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-    GridPage,
-    MuiDataGrid,
-    useBaseAppContext,
-    useMuiDataGridApiRef,
-    useResourceApiService,
-} from 'reactlib';
-import { Badge, Button, Icon } from '@mui/material';
+import { useBaseAppContext, useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
+import { Badge, Box, Button, Icon } from '@mui/material';
+import StyledMuiGrid from '../../components/StyledMuiGrid';
 
 const useTaskAction = (refresh?: () => void) => {
 
@@ -80,9 +75,8 @@ const TasquesSegonPlaTab: React.FC = () => {
     ];
 
     return (
-        <GridPage disableMargins={false}>
-            <MuiDataGrid
-                titleDisabled
+        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <StyledMuiGrid
                 apiRef={gridApiRef}
                 resourceName="backGroundTaskResource"
                 columns={columns}
@@ -113,11 +107,11 @@ const TasquesSegonPlaTab: React.FC = () => {
                 rowHideDeleteButton
                 rowAdditionalActions={actions}
                 selectionActive
-                onRowSelectionModelChange={(rowSelectionModel) => {
-                    setGridSelectedRows(rowSelectionModel?.ids);
+                onRowSelectionModelChange={(ids) => {
+                    setGridSelectedRows(new Set(ids));
                 }}
             />
-        </GridPage>
+        </Box>
     );
 };
 
