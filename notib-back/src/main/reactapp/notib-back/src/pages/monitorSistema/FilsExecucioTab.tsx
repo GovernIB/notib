@@ -1,4 +1,5 @@
-import { GridPage, MuiDataGrid } from 'reactlib';
+import Box from '@mui/material/Box';
+import StyledMuiGrid from '../../components/StyledMuiGrid';
 
 const FilsExecucioTab: React.FC = () => {
     const columnsFils = [
@@ -27,15 +28,14 @@ const FilsExecucioTab: React.FC = () => {
     const sortModelFils: any[] = [{ field: 'threadId', sort: 'asc' }];
 
     return (
-        <GridPage disableMargins={false}>
-            <MuiDataGrid
-                titleDisabled
+        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <StyledMuiGrid
                 resourceName="threadInfoResource"
                 columns={columnsFils}
                 readOnly
                 sortModel={sortModelFils}
             />
-        </GridPage>
+        </Box>
     );
 };
 
