@@ -144,8 +144,8 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 		var isRoleAdminOrgan = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN);
 		if (isRoleAdminOrgan && notibPermissionHelper.currentOrganGestorPermissionAllowed(BasePermission.ADMINISTRATION)) {
 			var permisComuns = notibPermissionHelper.currentOrganGestorPermissionAllowed(ExtendedPermission.PERM3);
-			superFilter += " and (organGestor.id:" + userSessionHelper.getCurrentOrganGestorId()
-							+ (permisComuns ? " or comu:true)" : "");
+			var filtreOrgan = " and (organGestor.id:" + userSessionHelper.getCurrentOrganGestorId() + (permisComuns ? " or comu:true)" : ")");
+			superFilter = !Strings.isNullOrEmpty(superFilter) ? superFilter + filtreOrgan : filtreOrgan;
 		}
 		return superFilter;
 	}

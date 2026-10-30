@@ -1,10 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBaseAppContext, useResourceApiService } from 'reactlib';
-import { Box, Grid, Icon, IconButton, LinearProgress, Typography } from '@mui/material';
+import { Grid, LinearProgress, Typography } from '@mui/material';
 import { ContenidoData, DetailCard, DetailCardContent } from '../../components/CardData.tsx';
 
-const useSistemAction = () => {
+export const useSistemAction = () => {
     const { isReady: apiIsReady, artifactAction: apiAction } =
         useResourceApiService('threadInfoResource');
     const { temporalMessageShow } = useBaseAppContext();
@@ -50,15 +50,8 @@ const LinearSpace = ({ value, total }: { value: number; total?: number }) => {
     );
 };
 
-const SistemaTab: React.FC = () => {
+const SistemaTab: React.FC<{ system: any }> = ({ system }) => {
     const { t } = useTranslation();
-    const { system, apiSystem, apiIsReady } = useSistemAction();
-
-    React.useEffect(() => {
-        if (apiIsReady) {
-            apiSystem();
-        }
-    }, [apiIsReady]);
 
     // Configuració per a la informació general del sistema
     const generalInfo = [
@@ -99,15 +92,6 @@ const SistemaTab: React.FC = () => {
 
     return (
         <>
-            <Box display={'flex'} justifyContent={'end'} mb={1}>
-                <IconButton
-                    title={t('component.GridToolbarButton.refresh')}
-                    onClick={apiSystem}
-                    color={'primary'}
-                >
-                    <Icon>refresh</Icon>
-                </IconButton>
-            </Box>
             <DetailCard>
                 {/* Info general */}
                 {generalInfo.map((item, index) => (

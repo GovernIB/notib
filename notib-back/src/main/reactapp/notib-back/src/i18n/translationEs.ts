@@ -40,12 +40,12 @@ const translationEs = {
         menu: {
             home: 'Inicio',
             config: 'Configuración',
-            monitoritza: 'Monitoriza',
+            monitoritza: 'Monitorización',
             entitats: 'Entidades',
             avisos: 'Avisos',
             propietats: 'Propiedades de configuración',
             currentEntitat: 'Entidad actual',
-            organsGestors: 'Órganos gestores',
+            organsGestors: 'Unidades organizativas',
             procediments: 'Procediments',
             serveis: 'Serveis',
             grups: 'Grupos',
@@ -151,7 +151,7 @@ const translationEs = {
         },
         organs: {
             grid: {
-                title: 'Órganos gestores',
+                title: 'Unidades organizativas',
                 viewSwitch: 'Vista en árbol',
                 groupColumn: 'Órgano gestor',
                 popupDialogTitle: 'órgano gestor',
