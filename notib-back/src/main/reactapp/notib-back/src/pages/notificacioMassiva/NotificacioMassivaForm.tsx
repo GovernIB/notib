@@ -10,7 +10,6 @@ import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
 import { icons } from '../../utils/icons';
 import FormScreen from "../../components/FormScreen.tsx";
-import FormBackButton from "../../components/FormBackButton.tsx";
 import { FORM_NO_TITLE } from "../../utils/formScreenTitle";
 
 function NumberCircle({ number, size = 40, bg = '#31708f', color = '#fff' }: { number: string; size?: number; bg?: string; color?: string }) {
@@ -41,14 +40,16 @@ const NotificacioMassivaForm: React.FC = () => {
                 <ScreenFrame
                     icon={icons.nouEnviamentMassiu}
                     title={t('page.notificacioMassiva.form.title')}
-                    beforeTitle={<FormBackButton />}>
+                    // beforeTitle={<FormBackButton />}
+                >
                     <FormScreen>
                         <MuiForm
-                            id={id != null ? parseInt(id) : id}
+                            id={id != null ? Number.parseInt(id) : id}
                             resourceName="notificacioMassivaResource"
                             apiRef={formApiRef}
                             title={FORM_NO_TITLE}
                             createLink="../"
+                            hiddenBackButton
                             toolbarElementsWithPositions={[
                                 {
                                     position: 2,
