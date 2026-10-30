@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -24,6 +25,7 @@ import org.springframework.security.core.authority.mapping.SimpleAttributes2Gran
 import org.springframework.security.core.authority.mapping.SimpleMappableAttributesRetriever;
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails;
@@ -115,6 +117,17 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 			http.logout(lo -> lo.
 				logoutRequestMatcher(new AntPathRequestMatcher(LOGOUT_URL)).
 				logoutSuccessHandler(jbossKeycloakLogoutSuccessHandler()));
+			// L'API no la protegeix el contenidor (veure web.xml): ho fa Spring Security. La
+			// pre-autenticació J2EE no registra cap entry point i Spring hi posaria el
+			// Http403ForbiddenEntryPoint: una petició a l'API sense sessió rebria un 403, que
+			// NotibAuthProvider no distingeix d'un error i no tornaria a iniciar la sessió. Amb un 401
+			// la interfície REACT torna a iniciar la sessió amb una navegació real. Si en lloc d'això
+			// l'adaptador redirigís les peticions AJAX al login, cada redirecció sobreescriuria la
+			// galeta OAuth_Token_Request_State (path "/", compartida amb les altres aplicacions del
+			// servidor) i, en tornar del login, l'adaptador respondria 400 Bad Request.
+			http.exceptionHandling(eh -> eh.defaultAuthenticationEntryPointFor(
+					new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+					new AntPathRequestMatcher(BaseConfig.API_PATH + "/**")));
 		}
 		http.authorizeHttpRequests().
 				requestMatchers(publicRequestMatchers()).permitAll();
@@ -246,6 +259,10 @@ public class WebSecurityConfig extends BaseWebSecurityConfig {
 				new AntPathRequestMatcher("/img/**/*"),
 				new AntPathRequestMatcher("/js/**/*"),
 				new AntPathRequestMatcher("/webjars/**"),
+				// Fitxers estàtics de la interfície REACT: veure el comentari equivalent al web.xml.
+				new AntPathRequestMatcher(BaseConfig.REACT_APP_PATH + "/assets/**"),
+				new AntPathRequestMatcher(BaseConfig.REACT_APP_PATH + "/favicon.png"),
+				new AntPathRequestMatcher(BaseConfig.REACT_APP_PATH + "/favicon.svg"),
 		};
 	}
 

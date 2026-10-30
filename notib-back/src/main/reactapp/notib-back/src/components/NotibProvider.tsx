@@ -3,10 +3,9 @@ import { useTranslation } from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
-import { useAuthContext, useResourceApiContext, useResourceApiService } from 'reactlib';
+import { useResourceApiContext, useResourceApiService } from 'reactlib';
 import {
     NotibContext,
-    ROLE_PREFIX,
     ROLE_SUPER,
     ROLE_ADMIN,
     ROLE_ADMIN_LECTURA,
@@ -14,7 +13,7 @@ import {
     ROLE_APLICACIO,
     ROLE_USER,
 } from './NotibContext';
-import { getAuthRolesUrl } from '../appUrls';
+import { useSessioUsuari } from './NotibAuthProvider';
 
 const ALLOWED_ROLES = [ROLE_APLICACIO, ROLE_SUPER, ROLE_ADMIN, ROLE_ADMIN_LECTURA, ROLE_ORGAN, ROLE_USER].reverse();
 
@@ -85,14 +84,7 @@ const useBroadcastSession = () => {
 
 type BroadcastSession = ReturnType<typeof useBroadcastSession>;
 
-const decodeJwt = (token: string) => {
-
-    const payload = token.split('.')[1];
-    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-    return JSON.parse(atob(base64));
-};
-
-// Es fa servir per tornar a consultar els rols disponibles quan l'usuari torna a la pestanya/finestra
+// Es fa servir per tornar a consultar les entitats disponibles quan l'usuari torna a la pestanya/finestra
 // (p.ex. després que un administrador li hagi concedit un permís nou), sense haver de tancar sessió.
 const useWindowFocusTrigger = () => {
 
@@ -186,12 +178,7 @@ const useMaxResultSelects = (currentRole: string | undefined) => {
 
 const useCurrentRole = (broadcast: BroadcastSession) => {
 
-    const {
-        isReady: authIsReady,
-        getUserId: authGetUserId,
-        getToken: authGetToken,
-        bearerTokenActive,
-    } = useAuthContext();
+    const { usuari: sessioUsuari } = useSessioUsuari();
     const { httpHeaders: apiHttpHeaders, setHttpHeaders: apiSetHttpHeaders } = useResourceApiContext();
     const [currentUserId, setCurrentUserId] = React.useState<string>();
     const [rolesAvailable, setRolesAvailable] = React.useState<string[]>();
@@ -204,50 +191,20 @@ const useCurrentRole = (broadcast: BroadcastSession) => {
 
     const setCurrentRole = (role?: string) => setSession({role, entitatId: undefined, organId: undefined});
     const { getValue: roleStorageGetValue, setValue: roleStorageSetValue } = useLocalStorage(currentUserId, 'currentRole');
-    const focusTrigger = useWindowFocusTrigger();
     React.useEffect(() => {
-        // Obté els rols disponibles del token JWT o de __AUTH_ROLES__. Es torna a consultar quan la
-        // finestra recupera el focus (focusTrigger) perquè, si un administrador ha concedit o revocat
-        // un permís mentre l'usuari tenia l'aplicació oberta, el canvi es reflecteixi sense haver de
-        // tancar sessió; com que currentRole ja està establert, això no en força el canvi, només
-        // n'actualitza la llista de disponibles.
-        if (!authIsReady) {
+        // Els rols disponibles surten de la sessió de servidor (NotibAuthProvider), que els calcula
+        // amb els permisos reals: n'hi ha (com l'administrador d'òrgan) que es concedeixen des de
+        // NOTIB i no formen part del token de Keycloak. NotibAuthProvider torna a consultar la
+        // sessió en tornar a la pestanya i amb l'activitat de l'usuari, i si un administrador ha
+        // concedit o revocat un permís mentre l'usuari tenia l'aplicació oberta, en actualitza els
+        // rols; com que currentRole ja està establert, això no en força el canvi, només n'actualitza
+        // la llista de disponibles.
+        if (sessioUsuari == null) {
             return;
         }
-        const userId = authGetUserId();
-        setCurrentUserId(userId);
-        const token = authGetToken();
-        if (token == null) {
-            return;
-        }
-        const tokenDecoded = decodeJwt(token);
-        if (tokenDecoded.realm_access == null) {
-            const windowAuthRoles = (window as any).__AUTH_ROLES__ ?? [];
-            const rolesAvailable = ALLOWED_ROLES.filter((a) => windowAuthRoles.includes(a));
-            setRolesAvailable(rolesAvailable);
-            return;
-        }
-        // Els rols del token només inclouen els gestionats des de Keycloak: n'hi ha (com l'administrador
-        // d'òrgan) que es concedeixen des de NOTIB i no hi apareixen mai. Es consulten sempre al
-        // servidor, que és qui coneix els permisos reals; si la consulta falla es cau als rols del
-        // propi token, per no deixar l'aplicació sense cap rol disponible.
-        // Només enviam el Bearer quan l'autenticació és per token (OidcAuthProvider): amb
-        // ContainerAuthProvider (bearerTokenActive=false) l'autenticació és per sessió/cookie i aquest
-        // endpoint no valida cap Bearer -Keycloak, quan detecta la capçalera Authorization, intenta
-        // autenticar la petició amb el token en lloc d'amb la sessió ja establerta, i si aquesta
-        // validació "bearer-only" falla (com passa en aquest mode, no pensat per anar per aquí) es rep
-        // un 401 encara que la sessió sigui perfectament vàlida.
-        fetch(getAuthRolesUrl(), bearerTokenActive ? { headers: { Authorization: 'Bearer ' + token } } : undefined).
-            then((response) => response.ok ? response.json() : Promise.reject(response.status)).
-            then((serverRoles: string[]) => {
-                setRolesAvailable(ALLOWED_ROLES.filter((a) => serverRoles.includes(a)));
-            }).
-            catch((error) => {
-                console.error('Error obtenint els rols disponibles des del servidor:', error);
-                const realmRoles = tokenDecoded.realm_access?.roles?.filter((r: string) => r === ROLE_USER || r.startsWith(ROLE_PREFIX)) ?? [];
-                setRolesAvailable(ALLOWED_ROLES.filter((a) => realmRoles.includes(a)));
-            });
-    }, [authIsReady, focusTrigger]);
+        setCurrentUserId(sessioUsuari.codi);
+        setRolesAvailable(ALLOWED_ROLES.filter((a) => sessioUsuari.rols.includes(a)));
+    }, [sessioUsuari]);
 
     React.useEffect(() => {
         // Configura l'estat amb el rol actual si aquest encara no s'ha inicialitzat i els rols disponibles ja s'han obtingut

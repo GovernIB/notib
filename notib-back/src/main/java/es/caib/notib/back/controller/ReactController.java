@@ -109,16 +109,7 @@ public class ReactController extends BaseUtilsController {
 
 	@Override
 	protected String[] getAuthRoles() {
-		return new String[] {
-			BaseConfig.ROLE_SUPER,
-			BaseConfig.ROLE_ADMIN,
-			BaseConfig.ROLE_ADMIN_LECTURA,
-			BaseConfig.ROLE_CARPETA,
-			BaseConfig.ROLE_ORGAN,
-			BaseConfig.ROLE_APL,
-			BaseConfig.ROLE_COM,
-			BaseConfig.ROLE_USER
-		};
+		return SessioUsuariController.ROLS_INTERFICIE;
 	}
 
 	@Override
