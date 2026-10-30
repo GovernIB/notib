@@ -148,7 +148,7 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 		}
 		if (isRoleAdminOrgan && notibPermissionHelper.currentOrganGestorPermissionAllowed(BasePermission.ADMINISTRATION)) {
 			var currentOrganGestorId = userSessionHelper.getCurrentOrganGestorId();
-			return (!StringUtils.isBlank(superFilter) ? superFilter : "") + " and id: " + currentOrganGestorId;
+			return !StringUtils.isBlank(superFilter) ? superFilter + " and id: " + currentOrganGestorId : "id: " + currentOrganGestorId;
 		}
 		if (isRoleAdmin || isRoleAdminLectura || isRoleAdminOrgan) {
 			return concatenaFiltresAnd(superFilter, entitatRootDescendantsFilterExpression());

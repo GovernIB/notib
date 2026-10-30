@@ -144,8 +144,8 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 		var isRoleAdminOrgan = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN);
 		if (isRoleAdminOrgan && notibPermissionHelper.currentOrganGestorPermissionAllowed(BasePermission.ADMINISTRATION)) {
 			var permisComuns = notibPermissionHelper.currentOrganGestorPermissionAllowed(ExtendedPermission.PERM3);
-			var filtreOrgan = " and (organGestor.id:" + userSessionHelper.getCurrentOrganGestorId() + (permisComuns ? " or comu:true)" : ")");
-			superFilter = !Strings.isNullOrEmpty(superFilter) ? superFilter + filtreOrgan : filtreOrgan;
+			var filtreOrgan = "(organGestor.id:" + userSessionHelper.getCurrentOrganGestorId() + (permisComuns ? " or comu:true)" : ")");
+			superFilter = !Strings.isNullOrEmpty(superFilter) ? superFilter + " and " + filtreOrgan : filtreOrgan;
 		}
 		return superFilter;
 	}
@@ -180,7 +180,11 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 				// "organGestor" (sense ".id") és una propietat d'entitat (ManyToOne): spring-filter
 				// intenta convertir el literal a un OrganGestorResourceEntity i falla amb
 				// InternalFilterException. Cal filtrar per l'id, no per l'entitat sencera.
-				filter += " and organGestor.id: " + organ.getId();
+				if (Strings.isNullOrEmpty(filter)) {
+					filter = "organGestor.id: " + organ.getId();
+				} else {
+					filter += " and organGestor.id: " + organ.getId();
+				}
 			}
 			Specification<ProcedimentResourceEntity> specification = toFindProcessedSpecification(quickFilter, filter, namedQueries);
 			procediments = procedimentResourceRepository.findAll(specification, processedSort);

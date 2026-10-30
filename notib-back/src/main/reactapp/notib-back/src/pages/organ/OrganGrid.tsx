@@ -31,7 +31,7 @@ import Dir3SyncBranch, { Dir3SyncNode } from './Dir3SyncBranch';
 import { CardData } from '../../components/CardData';
 // Amagat: substituït pel botó "Actualitzar òrgans i procediments" (OrganGridDir3SyncActionButton)
 // import OrgansProcedimentsSyncActionButton from './OrgansProcedimentsSyncActionButton';
-import {ROLE_ADMIN_LECTURA, useNotibContext} from '../../components/NotibContext';
+import {ROLE_ADMIN_LECTURA, ROLE_ORGAN, useNotibContext} from '../../components/NotibContext';
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
 import { icons } from '../../utils/icons';
@@ -490,7 +490,7 @@ export const OrganGrid = () => {
 
     const { t } = useTranslation();
     const dataGridApiRef = useMuiDataGridApiRef();
-    const { currentRole, currentEntitatId } = useNotibContext();
+    const { currentRole, currentEntitatId, currentOrganId, organsAvailable} = useNotibContext();
     const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
     const { treeDataViewActive, viewSwitchComponent } = useTreeDataViewSwitch(t('page.organs.grid.viewSwitch'), true);
     const columns = useColumns(treeDataViewActive);
@@ -501,11 +501,14 @@ export const OrganGrid = () => {
         1,
         { flex: 6 }
     );
+    const isRoleOrgan = currentRole === ROLE_ORGAN;
+    const currentOrgan = organsAvailable?.find((o: any) => o.id === currentOrganId);
     const filterDataGridProps = useDatagridFilterProps(
         'organGestorResource',
         'FILTER_ORGAN_GESTOR',
         springFilterBuilder,
-        <ContentFilter />
+        <ContentFilter />,
+        isRoleOrgan && currentOrgan ? { initialData: { codi: currentOrgan.codi } } : undefined
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (
