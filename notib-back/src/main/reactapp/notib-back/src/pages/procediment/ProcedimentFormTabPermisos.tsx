@@ -38,7 +38,8 @@ const PermissionForm: React.FC<{ comu: boolean }> = (props) => {
         if (typeof data?.sidName !== 'string' || typeof data?.tipus !== 'string') {
             return;
         }
-        const next = data.tipus === 'ROL' ? data.sidName.toUpperCase() : data.sidName.toLowerCase();
+        let next = data.tipus === 'ROL' && data.sidName !== 'tothom' ? data.sidName.toUpperCase() : data.sidName.toLowerCase();
+        next = next === 'TOTHOM' ? next.toLowerCase() : next;
         if (data.sidName !== next) {
             apiRef?.current?.setFieldValue?.('sidName', next);
         }
