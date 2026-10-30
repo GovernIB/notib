@@ -73,6 +73,7 @@ const NotificacioDetailTabRegistreEsdev: React.FC<{ id: any }> = (props) => {
                 titleDisabled
                 datagridApiRef={datagridApiRef}
                 resourceName="eventResource"
+                sortModel={[{ field: 'createdDate', sort: 'asc' }]}
                 fixedFilter={'notificacio.id:' + id}
                 columns={columns}
                 readOnly

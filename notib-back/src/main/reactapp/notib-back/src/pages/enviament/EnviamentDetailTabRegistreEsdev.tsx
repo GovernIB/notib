@@ -69,6 +69,7 @@ const EnviamentDetailTabRegistreEsdev: React.FC<{ id: any }> = (props) => {
                 titleDisabled
                 resourceName="eventResource"
                 fixedFilter={'enviament.id:' + id}
+                sortModel={[{ field: 'createdDate', sort: 'asc' }]}
                 columns={columns}
                 readOnly
                 toolbarHideQuickFilter

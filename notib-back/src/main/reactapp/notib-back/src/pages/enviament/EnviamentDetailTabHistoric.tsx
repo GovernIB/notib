@@ -190,7 +190,7 @@ const EnviamentDetailTabHistoric: React.FC<{ id: any }> = (props) => {
                 titleDisabled
                 resourceName="notificacioEnviamentAuditResource"
                 fixedFilter={'enviamentId:' + id}
-                sortModel={[{ field: 'tipusOperacio', sort: 'desc' }]}
+                sortModel={[{ field: 'createdDate', sort: 'asc' }]}
                 columns={columns}
                 readOnly
                 persistentStateActive
