@@ -44,6 +44,10 @@ const columns: MuiDataGridColDef[] = [
         flex: 0.6,
     },
     {
+        field: 'actiu',
+        flex: 0.6,
+    },
+    {
         field: 'entregaCieActiva',
         flex: 0.6,
         type: 'boolean',
@@ -60,11 +64,6 @@ const columns: MuiDataGridColDef[] = [
     },
     {
         field: 'manual',
-        flex: 0.6,
-        type: 'boolean',
-    },
-    {
-        field: 'actiu',
         flex: 0.6,
         type: 'boolean',
     },
@@ -97,8 +96,7 @@ const springFilterBuilder = (data: any) => {
         filterBuilder.like('codi', data.codi),
         filterBuilder.like('nom', data.nom),
         filterBuilder.eq('organGestor.id', data.organGestor?.id),
-        data?.actiu && filterBuilder.eq('actiu', `'${data.actiu}'`),
-        data?.comu && filterBuilder.eq('comu', `'${data.comu}'`),
+        data?.actiu !== undefined && data?.actiu !== null && filterBuilder.eq('actiu', `'${data.actiu}'`),        data?.comu && filterBuilder.eq('comu', `'${data.comu}'`),
         data?.entregaCieActiva ? filterBuilder.neq('entregaCie', null) : undefined,
         data?.manual && filterBuilder.eq('manual', `'${data.manual}'`),
         data?.requireDirectPermission && filterBuilder.eq('requireDirectPermission', `'${data.requireDirectPermission}'`)
@@ -107,14 +105,23 @@ const springFilterBuilder = (data: any) => {
 
 const ContentFilter: React.FC = () => {
 
+    const { t } = useTranslation();
     const organGestorOptionRenderer = useOrganGestorOptionRenderer();
     return (
         <>
             <GridFormField size={{ xs: 12, sm: 6, md: 1.5 }} name="codi" />
             <GridFormField size={{ xs: 12, sm: 6, md: 3 }} name="nom" />
             <GridFormField size={{ xs: 12, sm: 6, md: 4 }} name="organGestor" optionRenderer={organGestorOptionRenderer} />
-            <GridButtonField size={{ xs: 12, sm: 6, md: 0.5 }} name="actiu" icon={'flash_on'} hiddenLabel />
-            <GridButtonField size={{ xs: 12, sm: 6, md: 0.5 }} name="comu" icon={'public'} hiddenLabel />
+            <GridFormField
+                size={{ xs: 12, sm: 6, md: 1.5 }}
+                name="actiu"
+                type="enum"
+                componentProps={{ clearable: true }}
+                options={[
+                    { value: true, description: t('common.actiu') },
+                    { value: false, description: t('common.inactiu') },
+                ]}
+            />            <GridButtonField size={{ xs: 12, sm: 6, md: 0.5 }} name="comu" icon={'public'} hiddenLabel />
             <GridButtonField size={{ xs: 12, sm: 6, md: 0.5 }} name="entregaCieActiva" icon={'email'} hiddenLabel />
             <GridButtonField size={{ xs: 12, sm: 6, md: 0.5 }} name="manual" icon={'sync'} hiddenLabel />
             <GridButtonField size={{ xs: 12, sm: 6, md: 0.5 }} name="requireDirectPermission" icon={'gpp_good'} hiddenLabel />
@@ -199,8 +206,7 @@ export const ProcedimentGrid = () => {
         'FILTER_PROCEDIMENT',
         springFilterBuilder,
         <ContentFilter />,
-        isRoleOrgan && currentOrgan ? { initialData: { organGestor: currentOrgan } } : undefined
-    );
+        isRoleOrgan && currentOrgan ? { initialData: { organGestor: currentOrgan, actiu: true } } : { initialData: { actiu: true } }    );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     const {
         activarProcediment,
