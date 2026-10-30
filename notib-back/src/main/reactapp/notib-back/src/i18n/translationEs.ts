@@ -29,6 +29,12 @@ const translationEs = {
     },
     app: {
         loading: 'Iniciando NOTIB',
+        sessio: {
+            caducada: 'La sesión ha caducado. Vuelve a iniciar la sesión para continuar.',
+            iniciar: 'Inicia la sesión',
+            error: 'No se ha podido obtener la sesión del usuario.',
+            tornarAProvar: 'Vuelve a intentarlo',
+        },
         noEntitat: 'Este usuario no tiene acceso a ninguna entidad',
         sensePermisos: 'Este usuario no tiene ningún permiso para acceder a la aplicación',
         menu: {

@@ -2,6 +2,7 @@ import React from 'react';
 import { EventSource } from 'eventsource';
 import { useResourceApiContext } from 'reactlib';
 import {useNotibContext} from "./NotibContext.ts";
+import { useSessioUsuari } from "./NotibAuthProvider";
 
 /**
  * Client dels esdeveniments SSE (Server-Sent Events) que envia el servidor.
@@ -19,9 +20,6 @@ import {useNotibContext} from "./NotibContext.ts";
 /** Noms dels esdeveniments, tal com els envia el servidor (UserEventType). */
 const EVENT_USER_CONNECT = 'user_connect';
 const EVENT_AVISOS = 'avisos';
-
-/** Temps d'espera abans de tornar a connectar quan la connexió cau. */
-// const RECONNECT_DELAY_MS = 5000;
 
 export type AvisSse = {
     id: number;
@@ -78,7 +76,7 @@ const getSubscribeUrl = (apiUrl: string, usuariCodi: string, rol?: string, entit
 
 export const SseProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const { apiUrl } = useResourceApiContext();
-    // const { comprovarSessio } = useUser(); // TODO MIRAR PER USAR AIXO
+    const { comprovarSessio } = useSessioUsuari();
     const { isReady, currentUser, currentRole, currentEntitatId } = useNotibContext();
     const [state, setState] = React.useState<SseState>(SSE_STATE_INICIAL);
     const [subscripcio, setSubscripcio] = React.useState<SubscripcioSse>();
@@ -107,7 +105,6 @@ export const SseProvider: React.FC<React.PropsWithChildren> = ({ children }) => 
         }
         const { usuariCodi, rol, entitatId } = subscripcio;
         let eventSource: EventSource | null = null;
-        let reconnectTimeout: ReturnType<typeof setTimeout> | undefined;
         // Evita que una reconnexió ja programada s'executi després de desmuntar el component o
         // de canviar de rol o d'entitat, que és quan es torna a connectar des de zero.
         let cancelled = false;
@@ -120,7 +117,7 @@ export const SseProvider: React.FC<React.PropsWithChildren> = ({ children }) => 
             }
             eventSource?.close();
             // La petició s'autentica amb la galeta de la sessió de servidor (veure
-            // DistribucioAuthProvider); "include" fa que s'enviï també quan el front no és al
+            // NotibAuthProvider); "include" fa que s'enviï també quan el front no és al
             // mateix origen que el backend (`npm run dev`).
             eventSource = new EventSource(getSubscribeUrl(apiUrl, usuariCodi, rol, entitatId), {
                 fetch: (input, init) => fetch(input, { ...init, credentials: 'include' }),
@@ -143,12 +140,10 @@ export const SseProvider: React.FC<React.PropsWithChildren> = ({ children }) => 
                 setState((previous) => ({ ...previous, connected: false }));
                 eventSource?.close();
                 eventSource = null;
-                // Si la connexió ha caigut perquè la sessió ha caducat, reconnectar no serviria de
-                // res: DistribucioAuthProvider la torna a iniciar recarregant la pàgina.
-                // comprovarSessio();
-                // if (!cancelled) {
-                //     reconnectTimeout = setTimeout(connect, RECONNECT_DELAY_MS);
-                // }
+                // No es reconnecta tot d'una: si la connexió ha caigut perquè la sessió ha
+                // caducat, no serviria de res, i NotibAuthProvider la torna a iniciar recarregant
+                // la pàgina. Si la sessió és viva, es reconnecta en tornar a la pestanya.
+                comprovarSessio();
             };
         };
 
@@ -165,13 +160,11 @@ export const SseProvider: React.FC<React.PropsWithChildren> = ({ children }) => 
         return () => {
             cancelled = true;
             document.removeEventListener('visibilitychange', handleVisibilityChange);
-            clearTimeout(reconnectTimeout);
             eventSource?.close();
             eventSource = null;
             setState(SSE_STATE_INICIAL);
         };
-    // }, [apiUrl, subscripcio, comprovarSessio]);
-    }, [apiUrl, subscripcio]);
+    }, [apiUrl, subscripcio, comprovarSessio]);
 
     return <SseContext.Provider value={state}>{children}</SseContext.Provider>;
 };

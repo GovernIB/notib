@@ -15,11 +15,6 @@ const getAppBasePath = (): string => {
 // clàssica (vegeu NotibController.root a notib-back).
 export const getClassicAppUrl = (): string => window.location.origin + getAppBasePath() + 'index';
 
-// URL del recurs que retorna, per a l'usuari autenticat actual, els rols que efectivament té
-// concedits (calculats al servidor, no simplement decodificant el JWT: n'hi ha, com l'administrador
-// d'òrgan, que es concedeixen des de NOTIB i no formen part del token de Keycloak).
-export const getAuthRolesUrl = (): string => window.location.origin + getAppBasePath() + 'authRoles?format=json';
-
 const INTERFICIE_COOKIE = 'notibInterficie';
 
 // Marca, en una cookie, quina interfície ha triat explícitament l'usuari. En canviar d'interfície la

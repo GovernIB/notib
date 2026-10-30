@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import { CssBaseline } from '@mui/material';
 import { ThemeProvider, useTheme } from '@mui/material/styles';
-import { envVar, OidcAuthProvider, ContainerAuthProvider, ResourceApiProvider } from 'reactlib';
+import { envVar, ResourceApiProvider } from 'reactlib';
 import goibLogoLight from './assets/goib_logo_light.svg';
 import goibLogoDark from './assets/goib_logo_dark.svg';
 import notibLogoLight from './assets/notib_logo_light.png';
@@ -14,6 +14,7 @@ import notibLogoDark from './assets/notib_logo_dark.png';
 import { BaseApp } from './components/BaseApp';
 import DrassanaFooter from './components/DrassanaFooter';
 import NotibProvider from './components/NotibProvider';
+import NotibAuthProvider from './components/NotibAuthProvider';
 import FormInitialTabProvider from './components/FormInitialTabProvider';
 import {useNotibContext, ROLE_SUPER, ROLE_APLICACIO} from './components/NotibContext';
 import { lightTheme } from './theme';
@@ -36,17 +37,8 @@ export const envVars = {
     VITE_API_PUBLIC_URL: import.meta.env.VITE_API_PUBLIC_URL,
     VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
     VITE_API_SUFFIX: import.meta.env.VITE_API_SUFFIX,
-    VITE_AUTH_URL: import.meta.env.VITE_AUTH_URL,
-    VITE_AUTH_REALM: import.meta.env.VITE_AUTH_REALM,
-    VITE_AUTH_CLIENTID: import.meta.env.VITE_AUTH_CLIENTID,
     VITE_APP_VERSION: import.meta.env.VITE_APP_VERSION,
 };
-
-const getAuthConfig = () => ({
-    url: envVar('VITE_AUTH_URL', envVars),
-    realm: envVar('VITE_AUTH_REALM', envVars),
-    clientId: envVar('VITE_AUTH_CLIENTID', envVars),
-});
 
 export const getEnvApiUrl = () => {
 
@@ -63,9 +55,6 @@ export const getEnvApiUrl = () => {
     return (window.location.protocol + '//' + window.location.host + ':' + window.location.port + envApiSuffix);
 };
 
-// const isAuthUrlPresent = envVar('VITE_AUTH_URL', envVars) != null;
-const isAuthUrlPresent = Boolean(envVar('VITE_AUTH_URL', envVars));
-const AuthProvider = isAuthUrlPresent ? OidcAuthProvider : ContainerAuthProvider;
 const version = '0.0.0';
 
 const InnerApp: React.FC = () => {
@@ -155,15 +144,11 @@ const InnerApp: React.FC = () => {
 };
 
 export const App = () => {
-    const authConfig = getAuthConfig();
+    const apiUrl = getEnvApiUrl();
+    // Autenticació amb la sessió de servidor, sense token al navegador (veure NotibAuthProvider).
     return (
-        <AuthProvider
-            appBaseUrl={import.meta.env.BASE_URL}
-            logoutUrl={import.meta.env.BASE_URL}
-            config={authConfig}
-            mandatory
-        >
-            <ResourceApiProvider apiUrl={getEnvApiUrl()}>
+        <NotibAuthProvider apiUrl={apiUrl}>
+            <ResourceApiProvider apiUrl={apiUrl}>
                 <ThemeProvider theme={lightTheme}>
                     <CssBaseline />
                     <NotibProvider>
@@ -179,7 +164,7 @@ export const App = () => {
                     </NotibProvider>
                 </ThemeProvider>
             </ResourceApiProvider>
-        </AuthProvider>
+        </NotibAuthProvider>
     );
 };
 
