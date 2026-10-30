@@ -53,8 +53,10 @@ public class PagadorCieResourceServiceImpl extends BaseAdminEntitatResourceServi
 	@Override
 	protected void afterConversion(PagadorCieResourceEntity entity, PagadorCieResource resource) {
 
-		// Emplena el camp organGestorEmissor del recurs a partir de l'òrgan gestor de l'entitat.
-		resource.setOrganGestorEmissor(ResourceReference.toResourceReference(entity.getOrganGestor().getId(), entity.getOrganGestor().getNom()));
+		if (entity.getOrganGestor() != null) {
+			// Emplena el camp organGestorEmissor del recurs a partir de l'òrgan gestor de l'entitat.
+			resource.setOrganGestorEmissor(ResourceReference.toResourceReference(entity.getOrganGestor().getId(), entity.getOrganGestor().getNom()));
+		}
 		// Emplena el camp organGestorPagador del recurs a partir del camp organismePagadorCodi de l'entitat.
 		organGestorResourceRepository.findByEntitatAndCodi(
 			entity.getEntitat(),
