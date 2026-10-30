@@ -56,6 +56,18 @@
 			<url-pattern>/webjars/*</url-pattern>
 			<url-pattern>/images/*</url-pattern>
 		</web-resource-collection>
+		<!-- Fitxers estàtics de la interfície REACT (JS/CSS compilats, imatges i icona de la pestanya):
+		     no contenen dades. Si els protegís el contenidor, amb la sessió caducada cadascun rebria una
+		     redirecció al login i sobreescriuria la galeta d'estat OAuth_Token_Request_State (path "/")
+		     mentre la pàgina torna de Keycloak: l'estat no quadra i l'adaptador respon 400 Bad Request
+		     (reproduït a RIPEA el 30/10/2026 amb el favicon). La pàgina continua protegida i és l'única
+		     que fa el login. -->
+		<web-resource-collection>
+			<web-resource-name>Fitxers estàtics REACT</web-resource-name>
+			<url-pattern>/reactapp/assets/*</url-pattern>
+			<url-pattern>/reactapp/favicon.png</url-pattern>
+			<url-pattern>/reactapp/favicon.svg</url-pattern>
+		</web-resource-collection>
 		<!-- L'API de la interfície REACT no la protegeix el contenidor: una petició AJAX sense sessió
 		     rebria una redirecció al login de Keycloak en lloc d'un 401, i cada redirecció sobreescriuria
 		     la galeta OAuth_Token_Request_State (compartida amb les altres aplicacions del servidor).
