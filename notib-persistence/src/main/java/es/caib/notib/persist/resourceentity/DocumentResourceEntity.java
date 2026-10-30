@@ -3,10 +3,12 @@ package es.caib.notib.persist.resourceentity;
 import es.caib.notib.client.domini.*;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.model.DocumentResource;
+import liquibase.pro.packaged.L;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.tika.utils.StringUtils;
 
 import javax.persistence.*;
 
@@ -52,18 +54,28 @@ public class DocumentResourceEntity extends BaseAuditableResourceEntity<Document
 
 	@Builder
 	public DocumentResourceEntity(DocumentResource resource) {
-		this.arxiuGestdocId = resource.getArxiuGestdocId();
-		this.arxiuNom = resource.getArxiuNom();
-		this.hash = resource.getHash();
-		this.normalitzat = resource.getNormalitzat();
-		this.uuid = resource.getUuid();
-		this.csv = resource.getCsv();
-		this.mediaType = resource.getMediaType();
-		this.mida = resource.getMida();
-		this.origen = resource.getOrigen();
-		this.validesa = resource.getValidesa();
-		this.tipoDocumental = resource.getTipoDocumental();
-		this.modoFirma = resource.getModoFirma();
+
+		arxiuGestdocId = resource.getArxiuGestdocId();
+		arxiuNom = resource.getArxiuNom();
+		if (StringUtils.isBlank(arxiuNom) && resource.getAttachment() != null) {
+			arxiuNom = resource.getAttachment().getName();
+		}
+		hash = resource.getHash();
+		normalitzat = resource.getNormalitzat() != null && resource.getNormalitzat();
+		uuid = resource.getUuid();
+		csv = resource.getCsv();
+		mediaType = resource.getMediaType();
+		if (StringUtils.isBlank(mediaType) && resource.getAttachment() != null) {
+			mediaType = resource.getAttachment().getContentType();
+		}
+		mida = resource.getMida();
+		if (mida == null && resource.getAttachment() != null) {
+			mida = (long) resource.getAttachment().getContentLength();
+		}
+		origen = resource.getOrigen();
+		validesa = resource.getValidesa();
+		tipoDocumental = resource.getTipoDocumental();
+		modoFirma = resource.getModoFirma() != null && resource.getModoFirma();
 	}
 
 }
