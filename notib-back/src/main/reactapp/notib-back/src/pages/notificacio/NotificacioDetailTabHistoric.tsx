@@ -154,7 +154,7 @@ const NotificacioDetailTabHistoric: React.FC<{ id: any }> = (props) => {
                 titleDisabled
                 resourceName="notificacioAuditResource"
                 fixedFilter={'notificacioId:' + id}
-                sortModel={[{ field: 'tipusOperacio', sort: 'desc' }]}
+                sortModel={[{ field: 'createdDate', sort: 'asc' }]}
                 columns={columns}
                 readOnly
                 persistentStateActive
