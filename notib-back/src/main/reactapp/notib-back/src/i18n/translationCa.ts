@@ -26,6 +26,8 @@ const translationCa = {
         download: "Descarrega",
         undo: 'Desfés',
         cerca: 'Cerca',
+        actiu: "Actiu",
+        inactiu: "Inactiu"
     },
     app: {
         loading: 'Iniciant NOTIB',

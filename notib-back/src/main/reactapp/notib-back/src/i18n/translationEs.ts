@@ -26,6 +26,8 @@ const translationEs = {
         download: "Descarga",
         undo: 'Deshacer',
         cerca: 'Buscar',
+        actiu: "Activo",
+        inactiu: "Inactivo"
     },
     app: {
         loading: 'Iniciando NOTIB',
