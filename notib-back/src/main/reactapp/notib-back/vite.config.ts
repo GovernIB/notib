@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 // Vite prepends `base` to every root-relative src/href it finds in index.html.
-// The backend endpoints referenced there (sysenv, manifest, authToken, authRoles)
+// The backend endpoints referenced there (sysenv, manifest)
 // live under the servlet context path, not under the app's base path, so undo
 // that prefix for them once Vite's own html transform has already run.
 const fixBackendEndpointsBase = (): Plugin => {
