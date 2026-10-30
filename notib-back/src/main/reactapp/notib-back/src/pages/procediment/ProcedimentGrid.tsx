@@ -116,7 +116,6 @@ const ContentFilter: React.FC = () => {
                 size={{ xs: 12, sm: 6, md: 1.5 }}
                 name="actiu"
                 type="enum"
-                componentProps={{ clearable: true }}
                 options={[
                     { value: true, description: t('common.actiu') },
                     { value: false, description: t('common.inactiu') },
