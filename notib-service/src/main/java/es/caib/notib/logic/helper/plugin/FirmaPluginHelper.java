@@ -37,7 +37,7 @@ import java.util.Properties;
 @Component
 public class FirmaPluginHelper extends AbstractPluginHelper<FirmaServidorPlugin> {
 
-	public static final String GRUP = "FIRMA";
+	public static final String GRUP = "FIRMA_SERVIDOR";
 
 	private final NotificacioEnviamentRepository enviamentRepository;
 	private final JustificantEnviamentHelper justificantEnviamentHelper;

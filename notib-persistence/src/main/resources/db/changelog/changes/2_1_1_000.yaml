@@ -1069,3 +1069,183 @@ databaseChangeLog:
                                     name: CREATEDBY_CODI
                             -   column:
                                     name: ID
+
+    -   changeSet:
+            id: 2_1_1_000-58
+            author: limit
+            comment: >
+                Subgrups per a les propietats que penjaven directament dels grups GENERAL, SCHEDULLED, FIRMA i ASPECTE,
+                que a més tenen subgrups. El menú de propietats de la interfície React només ha de tenir pares que
+                s'expandeixen i fills amb les propietats. Es mouen també les còpies per entitat (comparteixen el grup).
+            changes:
+            # Subgrups nous (posició 0: els subgrups que ja hi havia comencen a la 1)
+            -   insert:
+                    tableName: ${db_prefix}config_group
+                    columns:
+                    -   column:
+                            name: id
+                            valueComputed: ${hibernateSeqNextVal}
+                    -   column:
+                            name: code
+                            value: GENERAL_COMUNES
+                    -   column:
+                            name: parent_code
+                            value: GENERAL
+                    -   column:
+                            name: parent_id
+                            valueComputed: (SELECT g.id FROM ${db_prefix}config_group g WHERE g.code = 'GENERAL')
+                    -   column:
+                            name: position
+                            valueNumeric: 0
+                    -   column:
+                            name: description
+                            value: Configuracions comunes
+            -   insert:
+                    tableName: ${db_prefix}config_group
+                    columns:
+                    -   column:
+                            name: id
+                            valueComputed: ${hibernateSeqNextVal}
+                    -   column:
+                            name: code
+                            value: SCHEDULLED_COMUNES
+                    -   column:
+                            name: parent_code
+                            value: SCHEDULLED
+                    -   column:
+                            name: parent_id
+                            valueComputed: (SELECT g.id FROM ${db_prefix}config_group g WHERE g.code = 'SCHEDULLED')
+                    -   column:
+                            name: position
+                            valueNumeric: 0
+                    -   column:
+                            name: description
+                            value: Configuració comuna de les tasques periòdiques
+            -   insert:
+                    tableName: ${db_prefix}config_group
+                    columns:
+                    -   column:
+                            name: id
+                            valueComputed: ${hibernateSeqNextVal}
+                    -   column:
+                            name: code
+                            value: FIRMA_SERVIDOR
+                    -   column:
+                            name: parent_code
+                            value: FIRMA
+                    -   column:
+                            name: parent_id
+                            valueComputed: (SELECT g.id FROM ${db_prefix}config_group g WHERE g.code = 'FIRMA')
+                    -   column:
+                            name: position
+                            valueNumeric: 0
+                    -   column:
+                            name: description
+                            value: Configuració de la firma en servidor
+            -   insert:
+                    tableName: ${db_prefix}config_group
+                    columns:
+                    -   column:
+                            name: id
+                            valueComputed: ${hibernateSeqNextVal}
+                    -   column:
+                            name: code
+                            value: ASPECTE_COMUNES
+                    -   column:
+                            name: parent_code
+                            value: ASPECTE
+                    -   column:
+                            name: parent_id
+                            valueComputed: (SELECT g.id FROM ${db_prefix}config_group g WHERE g.code = 'ASPECTE')
+                    -   column:
+                            name: position
+                            valueNumeric: 0
+                    -   column:
+                            name: description
+                            value: Aspecte comú de l'aplicació
+            # Mou les propietats (globals i còpies per entitat) als subgrups nous. S'actualitzen group_code (que encara
+            # fa servir el codi antic) i config_group_id (el que fa servir la interfície React).
+            -   update:
+                    tableName: ${db_prefix}config
+                    columns:
+                    -   column:
+                            name: group_code
+                            value: GENERAL_COMUNES
+                    -   column:
+                            name: config_group_id
+                            valueComputed: (SELECT g.id FROM ${db_prefix}config_group g WHERE g.code = 'GENERAL_COMUNES')
+                    where: group_code = 'GENERAL'
+            -   update:
+                    tableName: ${db_prefix}config
+                    columns:
+                    -   column:
+                            name: group_code
+                            value: SCHEDULLED_COMUNES
+                    -   column:
+                            name: config_group_id
+                            valueComputed: (SELECT g.id FROM ${db_prefix}config_group g WHERE g.code = 'SCHEDULLED_COMUNES')
+                    where: group_code = 'SCHEDULLED'
+            -   update:
+                    tableName: ${db_prefix}config
+                    columns:
+                    -   column:
+                            name: group_code
+                            value: FIRMA_SERVIDOR
+                    -   column:
+                            name: config_group_id
+                            valueComputed: (SELECT g.id FROM ${db_prefix}config_group g WHERE g.code = 'FIRMA_SERVIDOR')
+                    where: group_code = 'FIRMA'
+            -   update:
+                    tableName: ${db_prefix}config
+                    columns:
+                    -   column:
+                            name: group_code
+                            value: ASPECTE_COMUNES
+                    -   column:
+                            name: config_group_id
+                            valueComputed: (SELECT g.id FROM ${db_prefix}config_group g WHERE g.code = 'ASPECTE_COMUNES')
+                    where: group_code = 'ASPECTE'
+            rollback:
+            -   update:
+                    tableName: ${db_prefix}config
+                    columns:
+                    -   column:
+                            name: group_code
+                            value: GENERAL
+                    -   column:
+                            name: config_group_id
+                            valueComputed: (SELECT g.id FROM ${db_prefix}config_group g WHERE g.code = 'GENERAL')
+                    where: group_code = 'GENERAL_COMUNES'
+            -   update:
+                    tableName: ${db_prefix}config
+                    columns:
+                    -   column:
+                            name: group_code
+                            value: SCHEDULLED
+                    -   column:
+                            name: config_group_id
+                            valueComputed: (SELECT g.id FROM ${db_prefix}config_group g WHERE g.code = 'SCHEDULLED')
+                    where: group_code = 'SCHEDULLED_COMUNES'
+            -   update:
+                    tableName: ${db_prefix}config
+                    columns:
+                    -   column:
+                            name: group_code
+                            value: FIRMA
+                    -   column:
+                            name: config_group_id
+                            valueComputed: (SELECT g.id FROM ${db_prefix}config_group g WHERE g.code = 'FIRMA')
+                    where: group_code = 'FIRMA_SERVIDOR'
+            -   update:
+                    tableName: ${db_prefix}config
+                    columns:
+                    -   column:
+                            name: group_code
+                            value: ASPECTE
+                    -   column:
+                            name: config_group_id
+                            valueComputed: (SELECT g.id FROM ${db_prefix}config_group g WHERE g.code = 'ASPECTE')
+                    where: group_code = 'ASPECTE_COMUNES'
+            -   delete:
+                    tableName: ${db_prefix}config_group
+                    where: code IN ('GENERAL_COMUNES', 'SCHEDULLED_COMUNES', 'FIRMA_SERVIDOR', 'ASPECTE_COMUNES')

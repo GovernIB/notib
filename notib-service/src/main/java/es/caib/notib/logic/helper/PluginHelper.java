@@ -503,7 +503,7 @@ public class PluginHelper {
 			case "USUARIS":
 				dadesUsuarisPluginHelper.resetPlugin();
 				break;
-			case "FIRMA":
+			case "FIRMA_SERVIDOR":
 				firmaPluginHelper.resetPlugin();
 				break;
 			case "VALIDATE_SIGNATURE":

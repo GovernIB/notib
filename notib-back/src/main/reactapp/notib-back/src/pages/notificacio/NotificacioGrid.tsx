@@ -355,17 +355,25 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
     const springFilterBuilder = useSpringFilterBuilder();
     const [searchParams] = useSearchParams();
     const referencia = searchParams.get('referencia');
+    const persistentStateKey = 'notificacioResource' +
+        (notificacionsEsborrades
+            ? '-esborrades' : notificacionsErrorRegistre
+                ? '-errorRegistre' : notificacionsCallbackError ? '-callbackError' : '');
     const filterDataGridProps = useDatagridFilterProps(
         'notificacioResource',
         'FILTER_NOTIFICACIO',
         springFilterBuilder,
-        <ContentFilter openByDefault={!!referencia}
-                       notificacionsEsborrades={notificacionsEsborrades}
+        <ContentFilter notificacionsEsborrades={notificacionsEsborrades}
                        notificacionsErrorRegistre={notificacionsErrorRegistre}
                        notificacionsCallbackError={notificacionsCallbackError}
         />,
-        undefined,
-        {referencia: referencia}
+        {
+            advancedSearch: true,
+            // Amb la referència a l'adreça (vinculada des d'altres pantalles) el filtre avançat s'obre sol
+            initialData: { referencia: referencia, advanced: !!referencia },
+            // Cada vista té els seus camps de filtre: no han de compartir el filtre desat
+            persistentStateKey: persistentStateKey,
+        }
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
 
@@ -509,12 +517,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                     // (basada només en resourceName) faria que l'estat persistit d'una vista es
                     // sobreescrivís incorrectament amb el d'una altra. Per això s'inclou un sufix
                     // que les distingeix.
-                    persistentStateKey={
-                        'notificacioResource' +
-                        (notificacionsEsborrades
-                            ? '-esborrades' : notificacionsErrorRegistre
-                                ? '-errorRegistre' : notificacionsCallbackError ? '-callbackError' : '')
-                    }
+                    persistentStateKey={persistentStateKey}
                     persistentStateClearPageSortPropsOnTopLevelRouteChange
                     persistentStateActive
                     rowHideDeleteButton
@@ -522,7 +525,6 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                     {...filterDataGridProps}
                     fixedFilter={fixedFilter}
                     {...pageSizeOptionsDataGridProps}
-                    toolbarType="upper"
                     toolbarHideCreate
                     toolbarCreateLink="form"
                     toolbarElementsWithPositions={[

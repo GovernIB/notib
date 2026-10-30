@@ -24,6 +24,8 @@ const translationCa = {
         },
         actions: "Accions",
         download: "Descarrega",
+        undo: 'Desfés',
+        cerca: 'Cerca',
     },
     app: {
         loading: 'Iniciant NOTIB',
@@ -32,12 +34,12 @@ const translationCa = {
         menu: {
             home: 'Inici',
             config: 'Configuració',
-            monitoritza: 'Monitoritza',
+            monitoritza: 'Monitorització',
             entitats: 'Entitats',
             avisos: 'Avisos',
-            propietats: 'Propietats',
+            propietats: 'Propietats de configuració',
             currentEntitat: 'Entitat actual',
-            organsGestors: 'Òrgans gestors',
+            organsGestors: 'Unitats organitzatives',
             procediments: 'Procediments',
             serveis: 'Serveis',
             grups: 'Grups',
@@ -147,7 +149,7 @@ const translationCa = {
         },
         organs: {
             grid: {
-                title: 'Òrgans gestors',
+                title: 'Unitats organitzatives',
                 viewSwitch: 'Vista en arbre',
                 groupColumn: 'Òrgan gestor',
                 popupDialogTitle: 'òrgan gestor',
@@ -233,21 +235,20 @@ const translationCa = {
             },
         },
         propietats: {
-            find: 'Cercar a les propietats',
-            empty: 'Sense propietats',
-            revert: 'Desfer canvis',
-            save: {
-                success: 'Valor modificat correctament',
-                error: 'Error modificant la propietat',
-            },
+            title: 'Propietats de configuració',
+            empty: 'No hi ha propietats',
             entitats: {
-                empty: 'Sense propietats per entitat configurades',
+                label: 'Valors per entitat',
             },
-            syncJboss: {
-                label: "Sincronitzar amb JBoss",
-                ok: "Propietats sincronitzades correctament",
-                error: "Error sincronitzant les propietats"
-            }
+            accio: {
+                sync: {
+                    label: 'Sincronitza amb JBoss',
+                    confirm:
+                        "Es copiarà a la base de dades el valor que els fitxers de propietats del servidor defineixen per a les propietats editables, i es perdran els valors que s'hagin desat des d'aquesta pantalla. Vols continuar?",
+                    ok: "Les propietats s'han sincronitzat correctament",
+                    error: "No s'han pogut sincronitzar les propietats",
+                },
+            },
         },
         propietatsConfiguracio: {
             grid: {
@@ -833,6 +834,7 @@ const translationCa = {
         accioMassiva : {
             grid: {
                 title: 'Accions Massives',
+                nou: 'Nova acció massiva',
                 tipus: 'Tipus',
                 createdDate: 'Data creació',
                 dataInici: 'Data inici',
@@ -1022,7 +1024,7 @@ const translationCa = {
         },
         integracio: {
             grid: {
-                title: 'Monitor de integraciones',
+                title: "Monitor d'integracions",
             },
             detall: {
                 title: "Detall del monitor d'integració",
@@ -1451,7 +1453,7 @@ const translationCa = {
         tancarFiltreAvançat: 'Tancar filtre avançat',
         neteja: 'Neteja',
         avancat: 'Avançat',
-        simple: 'Simple',
+        basic: 'Bàsic',
         filtresAplicats_one: '{{count}} filtre aplicat',
         filtresAplicats_other: '{{count}} filtres aplicats',
         guardar: 'Desa',

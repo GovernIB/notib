@@ -1,7 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Chip from '@mui/material/Chip';
-import Grid from '@mui/material/Grid';
 import {
     GridPage,
     MuiDataGridColDef,
@@ -13,7 +12,6 @@ import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../h
 import { ROLE_ADMIN_LECTURA, useNotibContext } from '../../components/NotibContext';
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
-import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
 import { EntitatFormContent } from "./EntitatForm.tsx";
 import AddButton from "../../components/AddButton.tsx";
@@ -87,14 +85,12 @@ const springFilterBuilder = (data: any) => {
 
 const ContentFilter: React.FC = () => {
     return (
-        <Grid container spacing={2}>
-            <GridFormField size={1.5} name="codi" />
-            <GridFormField size={5} name="nom" />
-            <GridFormField size={1.5} name="dir3Codi" />
-            <GridFormField size={1} name="activa" />
-            {/* <GridFormField size={2} name="tipus" /> */}
-            <FilterClearButton />
-        </Grid>
+        <>
+            <GridFormField size={{ xs: 12, sm: 6, md: 1.5 }} name="codi" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 5 }} name="nom" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dir3Codi" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 1.5 }} name="activa" />
+        </>
     );
 };
 
@@ -124,7 +120,6 @@ export const EntitatGrid: React.FC = () => {
                         persistentStateClearPageSortPropsOnTopLevelRouteChange
                         {...filterDataGridProps}
                         {...pageSizeOptionsDataGridProps}
-                        toolbarType="upper"
                         toolbarHideCreate
                         toolbarElementsWithPositions={ isRoleAdminLectura ? [] : [
                             { position: 2, element: <AddButton gridApiRef={gridApiRef} text={t('page.entitats.grid.nou')} tooltip={t('page.entitats.grid.nouTooltip')} /> },

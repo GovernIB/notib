@@ -79,7 +79,6 @@ export const CacheGrid = () => {
                         resourceName="cacheResource"
                         columns={columns}
                         toolbarHideQuickFilter
-                        toolbarType="upper"
                         rowHideUpdateButton
                         rowHideDeleteButton
                         rowAdditionalActions={accions}

@@ -12,7 +12,6 @@ import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../h
 import { ROLE_ADMIN_LECTURA, useNotibContext } from '../../components/NotibContext.ts';
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
-import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
 import AddButton from "../../components/AddButton.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
@@ -57,17 +56,14 @@ const ContentFilter: React.FC = () => {
     const organGestorOptionRenderer = useOrganGestorOptionRenderer();
 
     return (
-        <Grid container spacing={2}>
-            <GridFormField size={2} name="nom" />
-            <GridFormField size={3} name="organGestor" optionRenderer={organGestorOptionRenderer} />
-            <GridFormField size={1.5} name="contracteNum" />
-            <GridFormField size={1.75} name="contracteDataVigInici" />
-            <GridFormField size={1.75} name="contracteDataVigFinal" />
-            <GridFormField size={1.5} name="facturacioClientCodi" />
-            <Grid size={0.5}>
-                <FilterClearButton />
-            </Grid>
-        </Grid>
+        <>
+            <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="nom" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 3 }} name="organGestor" optionRenderer={organGestorOptionRenderer} />
+            <GridFormField size={{ xs: 12, sm: 6, md: 1.5 }} name="contracteNum" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 1.75 }} name="contracteDataVigInici" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 1.75 }} name="contracteDataVigFinal" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 1.5 }} name="facturacioClientCodi" />
+        </>
     );
 };
 
@@ -113,7 +109,6 @@ export const PagadorsPostalsGrid: React.FC = () => {
                         persistentStateClearPageSortPropsOnTopLevelRouteChange
                         {...filterDataGridProps}
                         {...pageSizeOptionsDataGridProps}
-                        toolbarType="upper"
                         toolbarHideCreate
                         toolbarElementsWithPositions={ isRoleAdminLectura ? [] : [
                             { position: 2, element: <AddButton gridApiRef={gridApiRef} text={t('page.pagadorPostal.grid.nou')} tooltip={t('page.pagadorPostal.grid.nouTooltip')} /> },

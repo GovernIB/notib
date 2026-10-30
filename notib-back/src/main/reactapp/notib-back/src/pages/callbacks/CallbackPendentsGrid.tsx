@@ -2,6 +2,7 @@ import {
     GridPage,
     MuiDataGridColDef,
     springFilterBuilder as filterBuilder,
+    useFormContext,
     useMuiDataGridContext,
     useResourceApiService
 } from "reactlib";
@@ -10,7 +11,6 @@ import Box from "@mui/material/Box";
 import {Link} from "react-router-dom";
 import {useDatagridFilterProps, useDatagridPageSizeOptionsProps} from "../../hooks/useDataGrid.tsx";
 import React from "react";
-import {Grid} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import {formatEndOfDay, formatStartOfDay} from "../../utils/dateUtils.ts";
 import {DataCommonAdditionalAction} from "../../../lib/components/mui/datacommon/MuiDataCommon.tsx";
@@ -20,7 +20,6 @@ import {ROLE_ADMIN_LECTURA, ROLE_USER, useNotibContext} from "../../components/N
 import AccionsMassives, {MenuOption, useAccionsMassives} from "../../components/AccionsMassives.tsx";
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
-import { FilterClearButton } from '../../components/FilterButtons';
 import { icons } from '../../utils/icons';
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 
@@ -72,21 +71,32 @@ const ContentFilter: React.FC = () => {
 
 
 
-    return (
-        <Box>
-            <Grid container spacing={1}>
-                <GridFormField size={2} name="usuariCodi" />
-                <GridFormField size={1.75} name="notificacioReferencia" />
-                <GridFormField size={1.75} name="dataCreacioInici" />
-                <GridFormField size={1.75} name="dataCreacioFinal" />
-                <GridFormField size={2} name="dataUltimIntentInici" />
-                <GridFormField size={2} name="dataUltimIntentFinal" />
-                <GridFormField size={2.5} name="estat" />
-                <GridFormField size={2.5} name="fiReintents" />
+    const { data } = useFormContext();
 
-                <FilterClearButton size={0.5} />
-            </Grid>
-        </Box>
+    return (
+        <>
+            {!data?.advanced && (
+                <>
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="usuariCodi" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2.5 }} name="notificacioReferencia" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataCreacioInici" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataCreacioFinal" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="estat" />
+                </>
+            )}
+            {data?.advanced && (
+                <>
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="usuariCodi" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="notificacioReferencia" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataCreacioInici" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataCreacioFinal" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataUltimIntentInici" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataUltimIntentFinal" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="estat" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="fiReintents" />
+                </>
+            )}
+        </>
     );
 };
 
@@ -169,7 +179,8 @@ const CallbackPendentsGrid = () => {
         'callbackResource',
         'FILTER_CALLBACK_PENDENTS',
         springFilterBuilder,
-        <ContentFilter />
+        <ContentFilter />,
+        { advancedSearch: true }
     );
     const datagridApiRef = useGridApiRef();
 
@@ -229,7 +240,6 @@ const CallbackPendentsGrid = () => {
                         persistentStateClearPageSortPropsOnTopLevelRouteChange
                        {...filterDataGridProps}
                        {...pageSizeOptionsDataGridProps}
-                        toolbarType="upper"
                         toolbarHideCreate
                         toolbarElementsWithPositions={[
                             ...(amagarEntrada ? []

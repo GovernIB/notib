@@ -10,7 +10,7 @@ import { createPortal } from 'react-dom';
 import { useScreenFrame } from './ScreenFrameContext';
 import { titleBarControlsSx } from './titleBarControlsSx';
 import {fromSelectionModel, toSelectionModel} from "../utils/selectionModelUtils";
-import { SCREEN_GRID_MIN_HEIGHT, SCREEN_TITLE_MIN_HEIGHT, SCREEN_TITLE_PADDING_X } from '../utils/layout';
+import { MAIN_GAP, SCREEN_GRID_MIN_HEIGHT, SCREEN_TITLE_MIN_HEIGHT, SCREEN_TITLE_PADDING_X } from '../utils/layout';
 import { icons } from '../utils/icons';
 
 /**
@@ -312,6 +312,9 @@ const StyledMuiGrid = (props: StyledMuiGridProps) => {
                 // el crea reactlib i no admet ni props ni estils des de fora.
                 '& .MuiToolbar-root .MuiOutlinedInput-root': { height: '32px' },
                 '& .MuiToolbar-root .MuiOutlinedInput-input': { pt: 0, pb: 0 },
+                // Separació entre el filtre i la graella: la llibreria deixa la fila del filtre
+                // (`toolbarAdditionalRow`) sense marge inferior.
+                '& .toolbarAdditionalRow': { mb: MAIN_GAP + 'px' },
                 // Barra d'eines de la llibreria sobre la barra de títol del ScreenFrame, a la dreta
                 // i centrada verticalment (DataToolbar, que no es pot moure per props): amb
                 // `position: absolute` s'ancora al `.screen-frame` i conserva l'ordre dels seus
@@ -328,7 +331,7 @@ const StyledMuiGrid = (props: StyledMuiGridProps) => {
                         display: 'flex',
                         alignItems: 'center',
                         zIndex: 1,
-                        '& .MuiToolbar-root': { width: 'auto', minHeight: 0, mt: 0,  backgroundColor: 'transparent' },
+                        '& .MuiToolbar-root': { width: 'auto', minHeight: 0, mt: 0 },
                         // Botons, xips i filtre ràpid sobre la barra de títol
                         ...titleBarControlsSx,
                     },
