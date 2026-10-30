@@ -83,14 +83,13 @@ public class NotificacioEnviamentResourceServiceImpl extends BaseMutableResource
 		var isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
 		var isRoleAdminLectura = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN_LECTURA);
 		var isRoleAdminOrgan = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN);
+		if (isRoleAdminOrgan && notibPermissionHelper.currentOrganGestorPermissionAllowed(BasePermission.ADMINISTRATION)) {
+			return entitatFilter + " and notificacio.organGestor.id:" + userSessionHelper.getCurrentOrganGestorId();
+		}
 		if ((isRoleAdmin && notibPermissionHelper.currentEntitatPermissionAllowed(ExtendedPermission.PERM2)) ||
 			(isRoleAdminLectura && notibPermissionHelper.currentEntitatPermissionAllowed(ExtendedPermission.PERMX))) {
 			return entitatFilter;
 		}
-		if (isRoleAdminOrgan && notibPermissionHelper.currentOrganGestorPermissionAllowed(BasePermission.ADMINISTRATION)) {
-			return entitatFilter + " and notificacio.organGestor.id:" + userSessionHelper.getCurrentOrganGestorId();
-		}
-
 		List<String> andConditions = new ArrayList<>();
 		// Condició per a mostrar només les notificacions amb permís de lectura
 		var ids = notibPermissionHelper.getIdsToCheckNotificacioPermission(BasePermission.READ, BasePermission.READ);

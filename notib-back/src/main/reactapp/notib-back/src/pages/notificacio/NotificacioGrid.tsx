@@ -3,7 +3,7 @@ import {Link, useLocation, useNavigate, useSearchParams} from 'react-router-dom'
 import {useTranslation} from 'react-i18next';
 import {GRID_DETAIL_PANEL_TOGGLE_COL_DEF, GridApiPro, useGridApiRef,} from '@mui/x-data-grid-pro';
 import {GridPage, MuiDataGridColDef, useMuiDataGridApiRef, useMuiDataGridContext, useResourceApiService,} from 'reactlib';
-import {ROLE_ADMIN, ROLE_ADMIN_LECTURA, ROLE_USER, useNotibContext} from '../../components/NotibContext';
+import {ROLE_ADMIN, ROLE_ADMIN_LECTURA, ROLE_ORGAN, ROLE_USER, useNotibContext} from '../../components/NotibContext';
 import {useDatagridFilterProps, useDatagridPageSizeOptionsProps} from '../../hooks/useDataGrid';
 import NotificacioGridEnviaments from './NotificacioGridEnviaments';
 import {useNotificacioDetailDialog, useRemesesErrorCallbackDetailDialog, useRemesesErrorRegistreDetailDialog} from './NotificacioDetailDialog';
@@ -311,7 +311,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
 
     const { t } = useTranslation();
     const [ params ] = useSearchParams();
-    const { currentRole} = useNotibContext();
+    const { currentRole, currentOrganId, organsAvailable } = useNotibContext();
     const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
     const notificacioMassiva = params?.get('notificacioMassiva');
     const { state } = useLocation();
@@ -359,6 +359,8 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
         (notificacionsEsborrades
             ? '-esborrades' : notificacionsErrorRegistre
                 ? '-errorRegistre' : notificacionsCallbackError ? '-callbackError' : '');
+    const isRoleOrgan = currentRole === ROLE_ORGAN;
+    const currentOrgan = organsAvailable?.find((o: any) => o.id === currentOrganId);
     const filterDataGridProps = useDatagridFilterProps(
         'notificacioResource',
         'FILTER_NOTIFICACIO',
@@ -370,7 +372,11 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
         {
             advancedSearch: true,
             // Amb la referència a l'adreça (vinculada des d'altres pantalles) el filtre avançat s'obre sol
-            initialData: { referencia: referencia, advanced: !!referencia },
+            initialData: {
+                referencia: referencia,
+                advanced: !!referencia || isRoleOrgan,
+                ...(isRoleOrgan && currentOrgan ? { organGestor: currentOrganId } : {}),
+            },
             // Cada vista té els seus camps de filtre: no han de compartir el filtre desat
             persistentStateKey: persistentStateKey,
         }

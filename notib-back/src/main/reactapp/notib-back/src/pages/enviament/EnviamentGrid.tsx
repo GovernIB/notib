@@ -22,7 +22,7 @@ import {
 } from '../../utils/estatConfig';
 import {useSearchParams} from "react-router-dom";
 import useAccionsNotificacio from "../accions/AccionsNotificacio.tsx";
-import {ROLE_ADMIN_LECTURA, useNotibContext} from "../../components/NotibContext.ts";
+import {ROLE_ADMIN_LECTURA, ROLE_ORGAN, useNotibContext} from "../../components/NotibContext.ts";
 import {GridApiPro, useGridApiRef} from "@mui/x-data-grid-pro";
 import useSseRowRefresh from "../../hooks/useSseRowRefresh";
 import PageTitle from "../../components/PageTitle.tsx";
@@ -258,7 +258,7 @@ const EnviamentGrid = () => {
 
     const { t } = useTranslation();
     const gridApiRef = useMuiDataGridApiRef();
-    const { currentRole} = useNotibContext();
+    const { currentRole, currentOrganId, organsAvailable} = useNotibContext();
     const { dialogComponent: enviamentDialogComponent, onDetailClick } = useEnviamentDetailDialog();
     const { dialogComponent: notificacioDialogComponent, onDetailClick: onNotificacioDetailClick } = useNotificacioDetailDialog(false);
     const [searchParams] = useSearchParams();
@@ -269,6 +269,8 @@ const EnviamentGrid = () => {
     // al servidor, sense necessitat que l'usuari refresqui el llistat manualment.
     useSseRowRefresh('notificacioEnviamentResource', datagridApiRef, 'REMESA_ENVIAMENT_ESTAT', 'ENVIAMENT_ESTAT_CANVIAT');
     const referencia = searchParams.get('referencia');
+    const isRoleOrgan = currentRole === ROLE_ORGAN;
+    const currentOrgan = organsAvailable?.find((o: any) => o.id === currentOrganId);
     const filterDataGridProps = useDatagridFilterProps(
         'notificacioEnviamentResource',
         'FILTER_ENVIAMENT',
@@ -277,7 +279,11 @@ const EnviamentGrid = () => {
         {
             advancedSearch: true,
             // Amb la referència a l'adreça (vinculada des d'altres pantalles) el filtre avançat s'obre sol
-            initialData: { referenciaEnviament: referencia, advanced: !!referencia },
+            initialData: {
+                referenciaEnviament: referencia,
+                advanced: !!referencia || isRoleOrgan,
+                ...(isRoleOrgan && currentOrgan ? { organGestor: currentOrgan } : {}),
+            },
         }
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
