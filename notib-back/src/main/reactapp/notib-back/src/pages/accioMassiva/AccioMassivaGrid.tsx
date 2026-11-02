@@ -137,7 +137,7 @@ export const AccioMassivaGrid = () => {
                     paginationActive
                     persistentStateActive
                     persistentStateClearPageSortPropsOnTopLevelRouteChange
-                    toolbarCreateTitle={t('page.accioMassiva.grid.nou')}
+                    toolbarHideCreate
                     {...filterDataGridProps}
                     {...pageSizeOptionsDataGridProps}
                     getDetailPanelContent={({ row }) => <AccioMassivaGridEnviaments id={row.id} tipusElementSeleccionat={row.tipusElementSeleccionat}/>}
