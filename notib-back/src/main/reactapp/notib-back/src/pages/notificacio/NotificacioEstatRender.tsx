@@ -12,6 +12,7 @@ import {
     NOTIFICACIO_ESTAT_ENUM_MAP,
     NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP,
 } from '../../utils/estatConfig';
+import { tonal } from '../../utils/tonal';
 import { useTranslation } from 'react-i18next';
 import {ROLE_USER, useNotibContext} from "../../components/NotibContext.ts";
 
@@ -31,19 +32,19 @@ const EntregaPostal: React.FC<{ entregaPostal: any }> = ({ entregaPostal }) => {
     return (
         <Tooltip title={entregaPostal?.title} arrow>
             <Box
-                sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    alignSelf: 'flex-end',
-                    p: '2px',
-                    backgroundColor: entregaPostal?.label.includes('danger')
-                        ? '#d9534f'
-                        : '#5cb85c',
-                    borderRadius: '4px',
-                }}
+                sx={[
+                    {
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        alignSelf: 'flex-end',
+                        p: '2px',
+                        borderRadius: '4px',
+                    },
+                    tonal(entregaPostal?.label.includes('danger') ? 'error' : 'success'),
+                ]}
             >
-                <MailIcon style={{ fontSize: '15px', color: 'white' }} />
+                <MailIcon style={{ fontSize: '15px' }} />
             </Box>
         </Tooltip>
     );

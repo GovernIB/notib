@@ -12,6 +12,7 @@ import { formatEndOfDay, formatStartOfDay } from '../../utils/dateUtils';
 import { useContentDialog } from '../../../lib/components/mui/Dialog';
 import MonitorIntegracioParamDetail from './MonitorIntegracioParamDetail';
 import ChipEstat from '../../components/ChipEstat';
+import { tonalOpac } from '../../utils/tonal';
 import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
 import FilterCount from '../../components/FilterCount';
@@ -81,9 +82,11 @@ const CustomTabs = ({ options, report, selectedTab, onTabChange }: MonitorProps)
                                 errorCount > 0 ? (
                                     <Badge
                                         badgeContent={errorCount}
-                                        color="error"
                                         sx={(theme) => ({
+                                            // Comptador d'errors en color tonal, amb el fons opac
+                                            // perquè tapa part de l'etiqueta de la pestanya
                                             '& .MuiBadge-badge': {
+                                                ...tonalOpac('error')(theme),
                                                 right: -12,
                                                 top: 0,
                                                 border: `2px solid ${(theme.vars ?? theme).palette.background.paper}`,

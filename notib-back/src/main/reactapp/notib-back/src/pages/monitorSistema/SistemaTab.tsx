@@ -1,8 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBaseAppContext, useResourceApiService } from 'reactlib';
-import { Grid, LinearProgress, Typography } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 import { ContenidoData, DetailCard, DetailCardContent } from '../../components/CardData.tsx';
+import TonalLinearProgress from '../../components/TonalLinearProgress';
 
 export const useSistemAction = () => {
     const { isReady: apiIsReady, artifactAction: apiAction } =
@@ -40,13 +41,16 @@ const LinearSpace = ({ value, total }: { value: number; total?: number }) => {
     // Assegurem que el valor estigui entre 0 i 100
     const safeValue = Math.min(Math.max(v, 0), 100);
 
+    // El percentatge s'escriu a sobre: el nivell no es pot transmetre només amb el color
     return (
-        <LinearProgress
-            variant="determinate"
+        <TonalLinearProgress
             value={safeValue}
             color={v >= 90 ? 'error' : v >= 80 ? 'warning' : 'success'}
-            sx={{ width: '100%', height: 15, borderRadius: '4px' }}
-        />
+            sx={{ height: 18 }}
+            boxSx={{ fontSize: '0.75rem' }}
+        >
+            {`${safeValue}%`}
+        </TonalLinearProgress>
     );
 };
 
