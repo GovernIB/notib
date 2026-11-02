@@ -1,6 +1,7 @@
 import { Box, Card, CardContent, CardHeader, Grid, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Icon from '@mui/material/Icon';
+import { accentColor } from '../theme';
 
 const iconButton = {
     p: 0.5,
@@ -142,7 +143,7 @@ export const DetailCardContent = (props: any) => {
             }}
         >
             <Grid size={titleSize}>
-                <Typography color={'primary'} sx={{ fontWeight: 600, ...componentTitleProps }}>
+                <Typography sx={{ color: accentColor, fontWeight: 600, ...componentTitleProps }}>
                     {title}
                 </Typography>
             </Grid>
