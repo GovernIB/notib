@@ -3,6 +3,7 @@ import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { alpha } from '@mui/material/styles';
+import { tonal } from '../../utils/tonal';
 
 export type Dir3SyncNode = { codi?: string; nom: string };
 export type Dir3SyncNodeColor = 'red' | 'green' | 'orange';
@@ -41,19 +42,17 @@ const NodeChip: React.FC<{ node: Dir3SyncNode | null; color: Dir3SyncNodeColor }
             label={nodeLabel(node)}
             size="small"
             title={nodeLabel(node)}
-            sx={(theme) => {
-                const palette = theme.palette[muiColor(color)];
-                return {
+            sx={[
+                tonal(muiColor(color)),
+                (theme) => ({
                     width: '100%',
                     minWidth: 0,
                     justifyContent: 'flex-start',
-                    bgcolor: alpha(palette.main, 0.16),
-                    color: palette.dark,
                     border: '1px solid',
-                    borderColor: alpha(palette.main, 0.35),
+                    borderColor: alpha(theme.palette[muiColor(color)].main, 0.35),
                     '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: 'bold' },
-                };
-            }}
+                }),
+            ]}
         />
     );
 };

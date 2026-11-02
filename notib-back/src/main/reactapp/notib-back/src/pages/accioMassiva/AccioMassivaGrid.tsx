@@ -5,6 +5,7 @@ import {GRID_DETAIL_PANEL_TOGGLE_COL_DEF} from "@mui/x-data-grid-pro";
 import {useDatagridFilterProps, useDatagridPageSizeOptionsProps} from "../../hooks/useDataGrid.tsx";
 import {formatEndOfDay, formatStartOfDay} from "../../utils/dateUtils.ts";
 import {Box, Chip, Icon} from "@mui/material";
+import {tonal} from "../../utils/tonal";
 import GridFormField from "../../components/GridFormField.tsx";
 import AccioMassivaGridEnviaments from "./AccioMassivaGridElements.tsx";
 import CustomDetailPanelToggle from "../../utils/CustomDetailPanelToggle.tsx";
@@ -50,9 +51,9 @@ const useDataGridColumns = () => {
                     const iconPendent= React.cloneElement(<Icon>access_time</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center", ml: 0.1 } });
                     return (
                         <Box component="span" sx={{ display: "inline-flex", gap: 1, alignItems: "center" }}>
-                            {params.row.numOk > 0 && (<Chip key="ok" label={<>{iconOk}{params.row.numOk}</>} color="success" />)}
-                            {params.row.numErrors > 0 && (<Chip key="err" label={<>{iconError}{params.row.numErrors}</>} color="error" />)}
-                            {params.row.numPendent > 0 && (<Chip key="pend" label={<>{iconPendent}{params.row.numPendent}</>} color="warning" />)}
+                            {params.row.numOk > 0 && (<Chip key="ok" label={<>{iconOk}{params.row.numOk}</>} sx={tonal('success')} />)}
+                            {params.row.numErrors > 0 && (<Chip key="err" label={<>{iconError}{params.row.numErrors}</>} sx={tonal('error')} />)}
+                            {params.row.numPendent > 0 && (<Chip key="pend" label={<>{iconPendent}{params.row.numPendent}</>} sx={tonal('warning')} />)}
                         </Box>
                     );
                 }

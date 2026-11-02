@@ -20,6 +20,7 @@ import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
 import { icons } from '../../utils/icons';
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
+import { tonal, tonalNeutre } from '../../utils/tonal';
 
 const iconOk= React.cloneElement(<Icon>check</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center"} });
 const iconError= React.cloneElement(<Icon>close</Icon>, { fontSize: "inherit", sx: { verticalAlign: "center" } });
@@ -100,20 +101,20 @@ const useDataGridColumns = () => {
                         case "FINALITZAT_AMB_ERRORS": {
                             return (
                                 <Box display="flex" alignItems="center" justifyContent="space-between" width="100%" gap={1}>
-                                    <Chip label= {<>{labelText} [{iconOk} {notificacionsValidades}{" / "}{iconError} {totalNotificacions - notificacionsValidades}]</>} color="warning"/>
+                                    <Chip label= {<>{labelText} [{iconOk} {notificacionsValidades}{" / "}{iconError} {totalNotificacions - notificacionsValidades}]</>} sx={tonal('warning')}/>
                                     {descarregar}
                                 </Box>);
                         }
                         case "FINALITZAT":
-                            return (<Chip label={<>{labelText} {"["}{iconOk} {notificacionsValidades}{"]"}</>} color="success"/>);
+                            return (<Chip label={<>{labelText} {"["}{iconOk} {notificacionsValidades}{"]"}</>} sx={tonal('success')}/>);
                         case "ERRONIA":
                             return (
                                 <Box display="flex" alignItems="center" justifyContent="space-between" width="100%" gap={1}>
-                                    <Chip label={<>{labelText} {"["}{iconError} {totalNotificacions}{"]"}</>} color="error"/>
+                                    <Chip label={<>{labelText} {"["}{iconError} {totalNotificacions}{"]"}</>} sx={tonal('error')}/>
                                     {descarregar}
                                 </Box>);
                         default:
-                            return <Chip label={labelText} />;
+                            return <Chip label={labelText} sx={tonalNeutre} />;
                     }
                 }
             },
@@ -133,21 +134,21 @@ const useDataGridColumns = () => {
                         case "PENDENT":
                             return <Chip label={labelText + ` [${notificacionsValidades}]`} variant="outlined" />;
                         case "EN_PROCES":
-                            return (<Chip color="info" label={<>{labelText} ({progress}%){' '}[{iconOk} {notificacionsProcessades}]</>}/>);
+                            return (<Chip sx={tonal('info')} label={<>{labelText} ({progress}%){' '}[{iconOk} {notificacionsProcessades}]</>}/>);
                         case "EN_PROCES_AMB_ERRORS":
-                            return (<Chip color="warning" label={<>{labelText} ({progress}%){' '}[{iconOk} {notificacionsProcessades} / {iconError} {notificacionsProcessadesAmbError}]</>}/>);
+                            return (<Chip sx={tonal('warning')} label={<>{labelText} ({progress}%){' '}[{iconOk} {notificacionsProcessades} / {iconError} {notificacionsProcessadesAmbError}]</>}/>);
                         case "FINALITZAT":
-                            return (<Chip color="success" label={<>{labelText} [{iconOk} {notificacionsProcessades}]</>}/>);
+                            return (<Chip sx={tonal('success')} label={<>{labelText} [{iconOk} {notificacionsProcessades}]</>}/>);
                         case "FINALITZAT_AMB_ERRORS":
-                            return (<Chip color="warning" label={<>{labelText} [{iconOk} {notificacionsProcessades} / {iconError} {notificacionsProcessadesAmbError}]</>}/>);
+                            return (<Chip sx={tonal('warning')} label={<>{labelText} [{iconOk} {notificacionsProcessades} / {iconError} {notificacionsProcessadesAmbError}]</>}/>);
                         case "ERRONIA":
-                            return (<Chip color="error" label={<>{labelText} [{iconError} {notificacionsValidades}]</>}/>);
+                            return (<Chip sx={tonal('error')} label={<>{labelText} [{iconError} {notificacionsValidades}]</>}/>);
                         case "CANCELADA":
-                            return (<Chip color="warning" label={<>{labelText} [{iconOk} {notificacionsProcessades}] [{iconCancelada} {notificacionsCancelades}]</>}/>);
+                            return (<Chip sx={tonal('warning')} label={<>{labelText} [{iconOk} {notificacionsProcessades}] [{iconCancelada} {notificacionsCancelades}]</>}/>);
                         case "FINALITZAT_PARCIAL":
-                            return (<Chip color="info" label={<>{labelText} [{iconOk} {notificacionsProcessades} / {notificacionsProcessadesAmbError}] [{iconCancelada} {notificacionsCancelades}]</>}/>);
+                            return (<Chip sx={tonal('info')} label={<>{labelText} [{iconOk} {notificacionsProcessades} / {notificacionsProcessadesAmbError}] [{iconCancelada} {notificacionsCancelades}]</>}/>);
                         default:
-                            return <Chip label={labelText} />;
+                            return <Chip label={labelText} sx={tonalNeutre} />;
                     }
                 }
             },

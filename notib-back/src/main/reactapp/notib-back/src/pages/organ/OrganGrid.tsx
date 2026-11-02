@@ -2,7 +2,7 @@ import React from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Chip from '@mui/material/Chip';
+import PermisosBadge from '../../components/PermisosBadge';
 import Grid from '@mui/material/Grid';
 import Icon from '@mui/material/Icon';
 import Typography from '@mui/material/Typography';
@@ -80,7 +80,7 @@ const columns: MuiDataGridColDef[] = [
             return (
                 params.value != null && (
                     <LinkToTab id={params.id} tab={1} clickEnabled>
-                        <Chip label={params.value} color={params.value ? 'primary' : undefined} size="small"/>
+                        <PermisosBadge count={params.value} />
                     </LinkToTab>
                 )
             );

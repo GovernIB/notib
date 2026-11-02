@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import Chip from '@mui/material/Chip';
+import PermisosBadge from '../../components/PermisosBadge';
 import {
     GridPage,
     springFilterBuilder as filterBuilder,
@@ -82,7 +83,7 @@ const columns: MuiDataGridColDef[] = [
         renderCell: (params: any) => {
             return (
                 <LinkToTab id={params.id} row={params.row} popup tab={2} clickEnabled>
-                    <Chip label={params.value} color={params.value ? 'primary' : undefined} size="small"/>
+                    <PermisosBadge count={params.value} />
                 </LinkToTab>
             );
         },
