@@ -8,7 +8,7 @@ import {
 } from "reactlib";
 import {useTranslation} from "react-i18next";
 import Box from "@mui/material/Box";
-import {Link} from "react-router-dom";
+import Link from "@mui/material/Link";
 import {useDatagridFilterProps, useDatagridPageSizeOptionsProps} from "../../hooks/useDataGrid.tsx";
 import React from "react";
 import GridFormField from "../../components/GridFormField.tsx";
@@ -62,7 +62,10 @@ const columns: MuiDataGridColDef[] = [
         field: 'notificacioReferencia',
         flex: 4,
         renderCell: params => {
-            return <Link to={`/notificacions?referencia=${params.row.notificacioReferencia}`} style={{ color: '#fff' }} target="_blank">{params.row.notificacioReferencia}</Link>
+            return <Link href={`../notificacions?referencia=${params.row.notificacioReferencia}`} target="_blank" underline="none"
+                    sx={{ color: 'text.primary', '&:hover': { color: 'primary.main', textDecoration: 'none' }}}>
+                {params.row.notificacioReferencia}
+            </Link>
         }
     },
 ];

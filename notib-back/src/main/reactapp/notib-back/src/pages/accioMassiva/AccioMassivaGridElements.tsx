@@ -12,7 +12,7 @@ import Icon from "@mui/material/Icon";
 import TableBody from "@mui/material/TableBody";
 import {formatDate} from "../../utils/dateUtils.ts";
 import Typography from "@mui/material/Typography";
-import {Link} from "react-router-dom";
+import Link from "@mui/material/Link";
 
 export const AccioMassivaGridEnviaments: React.FC<{ id: any, tipusElementSeleccionat: any }> = (props) => {
 
@@ -56,7 +56,8 @@ export const AccioMassivaGridEnviaments: React.FC<{ id: any, tipusElementSelecci
                         {elements.map((element) => (
                             <TableRow key={element.id}>
                                 <TableCell component="th" scope="row">
-                                    <Link to={`/${ruta}?referencia=${element.referencia}`} target="_blank" style={{ color: '#fff' }}>
+                                    <Link  href={`../${ruta}?referencia=${element.referencia}`}  target="_blank" underline="none"
+                                        sx={{ color: 'text.primary', '&:hover': { color: 'primary.main', textDecoration: 'none' }}} >
                                         {element.referencia}
                                     </Link>
                                 </TableCell>
