@@ -260,14 +260,22 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 DocumentValidDto document4 = null;
                 DocumentValidDto document5 = null;
                 if (EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus())) {
-                    validarFirma = !documentsProcessatsMassiu.containsKey(notificacio.getDocument2().getArxiuNom());
-                    document2 = documentHelper.getDocument(notificacio.getDocument2(), validarFirma);
-                    validarFirma = !documentsProcessatsMassiu.containsKey(notificacio.getDocument3().getArxiuNom());
-                    document3 = documentHelper.getDocument(notificacio.getDocument3(), validarFirma);
-                    validarFirma = !documentsProcessatsMassiu.containsKey(notificacio.getDocument4().getArxiuNom());
-                    document4 = documentHelper.getDocument(notificacio.getDocument4(), validarFirma);
-                    validarFirma = !documentsProcessatsMassiu.containsKey(notificacio.getDocument5().getArxiuNom());
-                    document5 = documentHelper.getDocument(notificacio.getDocument5(), validarFirma);
+					if (notificacio.getDocument2() != null) {
+                    	validarFirma = !documentsProcessatsMassiu.containsKey(notificacio.getDocument2().getArxiuNom());
+                    	document2 = documentHelper.getDocument(notificacio.getDocument2(), validarFirma);
+					}
+					if (notificacio.getDocument3() != null) {
+				 		validarFirma = !documentsProcessatsMassiu.containsKey(notificacio.getDocument3().getArxiuNom());
+                    	document3 = documentHelper.getDocument(notificacio.getDocument3(), validarFirma);
+					}
+					if (notificacio.getDocument4() != null) {
+                    	validarFirma = !documentsProcessatsMassiu.containsKey(notificacio.getDocument4().getArxiuNom());
+                    	document4 = documentHelper.getDocument(notificacio.getDocument4(), validarFirma);
+					}
+					if (notificacio.getDocument5() != null) {
+                    	validarFirma = !documentsProcessatsMassiu.containsKey(notificacio.getDocument5().getArxiuNom());
+                    	document5 = documentHelper.getDocument(notificacio.getDocument5(), validarFirma);
+					}
                 }
 
                 //TODO AQUEST IF S'HA DE COMPROVAR SI REALMENT ES NECESITA, EN MASIVES ES POT CREAR SENSE DOCUMENT I VALIDA
