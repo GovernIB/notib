@@ -36,7 +36,9 @@ declare module '@mui/material/styles' {
 // molt fosc (`darken`) i el torrat un to clar (`PRIMARY_LIGHT`, és el `primary.light` de MUI), perquè
 // un torrat sobre fons fosc no té contrast. No hi ha cap altre color d'identitat.
 const PRIMARY_MAIN = '#83cb41';
-const PRIMARY_DARK = '#497e3a';
+// Prou fosc perquè, com a text o com a farciment amb text blanc, superi el 4,5:1 de la WCAG AA sobre
+// blanc (5,19) i sobre els grisos clars de les files de les graelles (#eee: 4,77).
+const PRIMARY_DARK = '#447436';
 const PRIMARY_SOFT = '#F2F9EB';
 const PRIMARY_LIGHT = lighten(PRIMARY_MAIN, 0.3);
 
@@ -112,9 +114,9 @@ const baseComponentStyles = {
     MuiCssBaseline: {
         styleOverrides: {
             // Contenidor del filtre dels llistats (veure components/StyledMuiFilter.tsx).
+            // Sense padding vertical: la separació amb la barra de títol i la graella és el `gap` de 15px
+            // (MAIN_GAP) del cos de ScreenFrame.
             '.styledFilter': {
-                paddingTop: '11px',
-                paddingBottom: '16px',
                 borderRadius: '4px',
                 backgroundColor: 'inherit',
             },
@@ -495,6 +497,13 @@ export const darkTheme = createTheme({
                 },
             },
         },
+        // El text d'ajuda d'un camp desactivat (p. ex. el nom de la propietat) és informació, no un
+        // control: amb el color de "desactivat" (blanc al 50%) queda a 4,41:1.
+        MuiFormHelperText: {
+            styleOverrides: {
+                root: { '&.Mui-disabled': { color: DARK_TEXT_SECONDARY } },
+            },
+        },
         MuiOutlinedInput: {
             styleOverrides: {
                 root: {
@@ -615,6 +624,13 @@ export const draculaTheme = createTheme({
                     backgroundImage: hatchPattern('#44475a'),
                     color: '#f8f8f2',
                 },
+            },
+        },
+        // El text d'ajuda d'un camp desactivat (p. ex. el nom de la propietat) és informació, no un
+        // control: amb el color de "desactivat" (blanc al 50%) queda a 4,41:1.
+        MuiFormHelperText: {
+            styleOverrides: {
+                root: { '&.Mui-disabled': { color: DRACULA_TEXT_SECONDARY } },
             },
         },
         MuiOutlinedInput: {
