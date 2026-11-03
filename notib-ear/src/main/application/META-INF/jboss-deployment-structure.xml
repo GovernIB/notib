@@ -105,6 +105,7 @@
 			<module name="deployment.notib-service-intf"/>
 			<module name="deployment.notib-client-intf"/>
 			<module name="deployment.notib-api-libs"/>
+			<module name="org.apache.cxf"/>
 		</dependencies>
 	</sub-deployment>
 	<ear-subdeployments-isolated>false</ear-subdeployments-isolated>
