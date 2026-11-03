@@ -21,7 +21,13 @@
 			<module name="io.undertow.core"/>
 			<module name="io.undertow.servlet" export="true"/>
 			<module name="io.undertow.websocket" export="true"/>
+			<module name="org.apache.cxf"/>
 		</dependencies>
 	</deployment>
+	<sub-deployment name="notib-api-externa.war">
+		<dependencies>
+			<module name="org.apache.cxf"/>
+		</dependencies>
+	</sub-deployment>
 	<ear-subdeployments-isolated>true</ear-subdeployments-isolated>
 </jboss-deployment-structure>
