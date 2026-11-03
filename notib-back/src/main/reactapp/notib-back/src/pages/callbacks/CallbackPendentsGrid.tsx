@@ -8,7 +8,6 @@ import {
 } from "reactlib";
 import {useTranslation} from "react-i18next";
 import Box from "@mui/material/Box";
-import Link from "@mui/material/Link";
 import {useDatagridFilterProps, useDatagridPageSizeOptionsProps} from "../../hooks/useDataGrid.tsx";
 import React from "react";
 import GridFormField from "../../components/GridFormField.tsx";
@@ -22,9 +21,10 @@ import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
 import { icons } from '../../utils/icons';
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
+import {useNotificacioDetailDialog} from "../notificacio/NotificacioDetailDialog.tsx";
 
 
-const columns: MuiDataGridColDef[] = [
+const columns = (onDetailClick: (id: any) => void): MuiDataGridColDef[] => [
     {
         field: 'usuariCodi',
         flex: 2.5,
@@ -58,14 +58,42 @@ const columns: MuiDataGridColDef[] = [
         field: 'pausat',
         flex: 1,
     },
+    // {
+    //     field: 'notificacioReferencia',
+    //     flex: 4,
+    //     renderCell: params => {
+    //         return <Link href={`../notificacions?referencia=${params.row.notificacioReferencia}`} target="_blank" underline="none"
+    //                 sx={{ color: 'text.primary', '&:hover': { color: 'primary.main', textDecoration: 'none' }}}>
+    //             {params.row.notificacioReferencia}
+    //         </Link>
+    //     }
+    //
+    // },
     {
         field: 'notificacioReferencia',
         flex: 4,
         renderCell: params => {
-            return <Link href={`../notificacions?referencia=${params.row.notificacioReferencia}`} target="_blank" underline="none"
-                    sx={{ color: 'text.primary', '&:hover': { color: 'primary.main', textDecoration: 'none' }}}>
+            return <Box
+                component="button"
+                onClick={() => {
+                    const notificacioId = params.row?.notificacio?.id || params.row?.notificacioId;
+                    if (notificacioId) {
+                        onDetailClick(notificacioId);
+                    }
+                }}
+                sx={{
+                    color: 'text.primary',
+                    textAlign: 'left',
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                    cursor: 'pointer',
+                    font: 'inherit',
+                    '&:hover': { textDecoration: 'underline' }
+                }}
+            >
                 {params.row.notificacioReferencia}
-            </Link>
+            </Box>
         }
     },
 ];
@@ -193,6 +221,8 @@ const CallbackPendentsGrid = () => {
         activarCallbackPendent
     } = useAccionsCallbacks();
 
+    const { dialogComponent: notificacioDialogComponent, onDetailClick } = useNotificacioDetailDialog(false);
+
     const {currentRole} = useNotibContext();
     let amagarEntrada = currentRole === ROLE_USER || currentRole === ROLE_ADMIN_LECTURA;
     let isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
@@ -234,7 +264,7 @@ const CallbackPendentsGrid = () => {
                         key={reloadKey}
                         resourceName="callbackResource"
                         datagridApiRef={datagridApiRef}
-                        columns={columns}
+                        columns={columns(onDetailClick)}
                         rowAdditionalActions={rowAdditionalActions}
                         paginationActive
                         selectionActive
@@ -254,6 +284,7 @@ const CallbackPendentsGrid = () => {
                     />
                 </ScreenFrame>
             </GridPage>
+            {notificacioDialogComponent}
         </>
     );
 }
