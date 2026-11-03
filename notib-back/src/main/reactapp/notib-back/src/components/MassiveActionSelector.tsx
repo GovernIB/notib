@@ -94,7 +94,7 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:Massi
                             disabled={typeof action?.disabled === 'function' ? action?.disabled(selectedRows) : action?.disabled}
                             sx={{ minWidth: '40px', maxHeight: '32.5px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                         >
-                            <Icon color="action" sx={{m: 0}}>{action?.icon}</Icon>
+                            <Icon color="inherit" sx={{ m: 0 }}>{action?.icon}</Icon>
                             {action?.title && <Typography variant={'body2'} sx={{display: {xs: 'none', sm: 'none', md: 'block'}}}
                                          ml={1}>{action?.title}</Typography>}
                         </Button>
