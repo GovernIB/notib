@@ -534,16 +534,16 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                     toolbarHideCreate
                     toolbarCreateLink="form"
                     toolbarElementsWithPositions={[
-                        ...(notificacionsEsborrades || (isRoleAdminLectura && notificacionsErrorRegistre) ? []
-                            : [{
-                                position: 2,
-                                element: <MassiveActionsButton apiRef={datagridApiRef} notificacionsErrorRegistre={notificacionsErrorRegistre} notificacionsCallbackError={notificacionsCallbackError} refresh={refrescarDespresAccioMassiva}/>,
-                            }]),
                         ...(!notificacioMassiva ? []
                             : [{
                                 position: 0,
                                 element: <IconButton onClick={()=> navigate('/notificacio/massiva')} sx={{mr:1}}><ArrowBackIosIcon /></IconButton>,
                             }]),
+                        ...(notificacionsEsborrades || (isRoleAdminLectura && notificacionsErrorRegistre) ? []
+                            : [{
+                                position: 2,
+                                element: <MassiveActionsButton apiRef={datagridApiRef} notificacionsErrorRegistre={notificacionsErrorRegistre} notificacionsCallbackError={notificacionsCallbackError} refresh={refrescarDespresAccioMassiva}/>,
+                            },]),
                         ...(isCreateLinkPresent ? [{ position: 2, element: <NotificacioAddButton /> }] : [])
                     ]}
                     onRowClick={(params) => notificacionsErrorRegistre ? onDetailClickErrorRegistre(params.id) : onDetailClick(params.id)}
@@ -552,6 +552,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                     rowAdditionalActions={rowAdditionalActions}
                     {...detailPanelProps}
                     getRowHeight={getRowHeightAuto}
+                    // density="compact"
                     getRowClassName={(params) => getGridRowColorClass(params.row.estat, NOTIFICACIO_ESTAT_ENUM_MAP)}
                     sx={generateGridRowStylesFromMap(NOTIFICACIO_ESTAT_ENUM_MAP)}
                 />
