@@ -44,7 +44,7 @@ const EntregaPostal: React.FC<{ entregaPostal: any }> = ({ entregaPostal }) => {
                     tonal(entregaPostal?.label.includes('danger') ? 'error' : 'success'),
                 ]}
             >
-                <MailIcon style={{ fontSize: '15px' }} />
+                <MailIcon fontSize="small" />
             </Box>
         </Tooltip>
     );
@@ -101,7 +101,7 @@ const EstatPrincipal: React.FC<{ estatEnum: string; nomEstat: string; anulat?: s
             ) : (
                 <>
                     <Tooltip title={anulat} arrow>
-                        <BlockIcon color="error" sx={{ fontSize: '16px' }} />
+                        <BlockIcon color="error" fontSize="small" />
                     </Tooltip>
                     <Typography variant="body2" sx={{ fontWeight: 500 }}>
                         {nomEstat}
@@ -135,28 +135,28 @@ const ErrorsIAvisos: React.FC<{
             {/* Errors crítics (Acumulats) */}
             {eventError?.error && eventError.error.length > 0 && (
                 <Tooltip title={eventError.error.map((err: any) => err.title).join(' | ')} arrow>
-                    <WarningIcon color="error" sx={{ fontSize: '16px' }} />
+                    <WarningIcon color="error" fontSize="small" />
                 </Tooltip>
             )}
 
             {/* Fi de reintents d'enviament */}
             {eventError?.errorFiReintents && (
                 <Tooltip title={eventError.errorFiReintents} arrow>
-                    <WarningIcon color="warning" sx={{ fontSize: '16px' }} />
+                    <WarningIcon color="warning" fontSize="small" />
                 </Tooltip>
             )}
 
             {/* Error en Callback */}
             {eventError?.errorCallback?.errorCallback && (
                 <Tooltip title={eventError.errorCallback.errorCallback} arrow>
-                    <ErrorIcon color="info" sx={{ fontSize: '16px' }} />
+                    <ErrorIcon color="info" fontSize="small" />
                 </Tooltip>
             )}
 
             {/* Fi de reintents de Callback */}
             {callbackFiReintents && (
                 <Tooltip title={callbackFiReintents} arrow>
-                    <WarningIcon color="info" sx={{ fontSize: '16px' }} />
+                    <WarningIcon color="info" fontSize="small" />
                 </Tooltip>
             )}
 
@@ -169,8 +169,8 @@ const ErrorsIAvisos: React.FC<{
                     arrow
                 >
                     <PhoneIphoneIcon
+                        fontSize="small"
                         sx={{
-                            fontSize: '16px',
                             color: (theme) =>
                                 theme.palette.mode === 'dark' ? '#f5c777' : '#8a6d3b',
                         }}
@@ -252,13 +252,13 @@ export const NotificacioEstatGrid: React.FC<NotificacioEstatRenderProps> = (prop
     const refrescar = (<Box sx={{display: "flex", justifyContent: "flex-end"}}>
                                     <Tooltip title={t('page.notificacio.detail.dades.refrescar')} arrow
                                              onClick={(event) => refrescarEstatString(event, notificacioId, refrescarEstat)}>
-                                        <RefreshIcon color="info" sx={{fontSize: '16px'}}/>
+                                        <RefreshIcon color="info" fontSize="small"/>
                                     </Tooltip>
                                 </Box>);
     // L'estat mostrat és el darrer conegut i el servidor n'està calculant un d'actualitzat
     const calculant = estatPendent ? (<Box sx={{display: "flex", justifyContent: "flex-end"}}>
                                     <Tooltip title={t('page.notificacio.detail.dades.calculant')} arrow>
-                                        <CircularProgress size={12} />
+                                        <CircularProgress size={16} />
                                     </Tooltip>
                                 </Box>) : null;
     const accio = calculant ?? (!isRoleUser ? refrescar : null);
@@ -356,46 +356,46 @@ export const NotificacioEstatDetall: React.FC<{ notificacio: any }> = (props) =>
             {/* Icona d'Error de Notificació */}
             {notificacio?.notificaErrorData && (
                 <Tooltip title={notificacio?.notificaErrorDescripcio} arrow>
-                    <WarningIcon color="error" sx={{ fontSize: '16px' }} />
+                    <WarningIcon color="error" fontSize="small" />
                 </Tooltip>
             )}
 
             {/* Gestió d'Anul·lació */}
             {notificacio.motiuAnulacio ? (
                 <Tooltip title={notificacio.motiuAnulacio} arrow>
-                    <BlockIcon color="error" sx={{ fontSize: '16px' }} />
+                    <BlockIcon color="error" fontSize="small" />
                 </Tooltip>
             ) : notificacio.anulat ? (
                 <Tooltip title={t('page.notificacio.detail.dades.anulada')} arrow>
-                    <BlockIcon color="error" sx={{ fontSize: '16px' }} />
+                    <BlockIcon color="error" fontSize="small" />
                 </Tooltip>
             ) : null}
 
             {/* Fi de Reintents de l'Enviament */}
             {notificacio?.fiReintents && (
                 <Tooltip title={notificacio?.fiReintentsDesc} arrow>
-                    <WarningIcon color="warning" sx={{ fontSize: '16px' }} />
+                    <WarningIcon color="warning" fontSize="small" />
                 </Tooltip>
             )}
 
             {/* Error de l'aplicació client */}
             {notificacio?.tipusUsuari === 'APLICACIO' && notificacio?.errorLastCallback && (
                 <Tooltip title={t('page.notificacio.detail.dades.errorCanviEstat')} arrow>
-                    <ErrorIcon color="primary" sx={{ fontSize: '16px' }} />
+                    <ErrorIcon color="primary" fontSize="small" />
                 </Tooltip>
             )}
 
             {/* Fi de Reintents de Callback */}
             {notificacio?.callbackFiReintents && (
                 <Tooltip title={notificacio?.callbackFiReintentsDesc} arrow>
-                    <WarningIcon color="info" sx={{ fontSize: '16px' }} />
+                    <WarningIcon color="info" fontSize="small" />
                 </Tooltip>
             )}
 
             {/* Errors de dispositius mòbils */}
             {notificacio?.notificacionsMovilErrorDesc?.map((errorText: string, id: number) => (
                 <Tooltip key={id} title={errorText} arrow>
-                    <PhoneIphoneIcon sx={{fontSize: '18px', color: (theme) => theme.palette.mode === 'dark' ? '#f5c777' : '#8a6d3b'}}/>
+                    <PhoneIphoneIcon fontSize="small" sx={{color: (theme) => theme.palette.mode === 'dark' ? '#f5c777' : '#8a6d3b'}}/>
                 </Tooltip>
             ))}
 

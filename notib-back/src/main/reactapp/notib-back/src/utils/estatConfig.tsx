@@ -7,7 +7,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import AsteriskIcon from '@mui/icons-material/Emergency';
 import CloseIcon from '@mui/icons-material/Close';
 import BanIcon from '@mui/icons-material/Block';
-import { Avatar } from '@mui/material';
+import { Chip } from '@mui/material';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import ErrorIcon from '@mui/icons-material/Error';
 
@@ -21,91 +21,79 @@ export interface MapConfigItem {
 export const NOTIFICACIO_ESTAT_ENUM_MAP: Record<string, MapConfigItem> = {
     PENDENT: {
         translationKey: 'utils.estatConfig.ESTAT_ENUM_MAP.PENDENT',
-        icona: <ClockIcon sx={{ fontSize: '16px' }} />,
+        icona: <ClockIcon fontSize="small" />,
         color: '#f0ad4e',
     },
     ENVIADA: {
         translationKey: 'utils.estatConfig.ESTAT_ENUM_MAP.ENVIADA',
-        icona: <SendIcon sx={{ fontSize: '14px' }} />,
+        icona: <SendIcon fontSize="small" />,
         color: '#5bc0de',
     },
     REGISTRADA: {
         translationKey: 'utils.estatConfig.ESTAT_ENUM_MAP.REGISTRADA',
-        icona: <FileIcon sx={{ fontSize: '16px' }} />,
+        icona: <FileIcon fontSize="small" />,
         color: '#007bff',
     },
     FINALITZADA: {
         translationKey: 'utils.estatConfig.ESTAT_ENUM_MAP.FINALITZADA',
-        icona: <CheckIcon sx={{ fontSize: '16px' }} />,
+        icona: <CheckIcon fontSize="small" />,
         color: '#00ff00',
     },
     PROCESSADA: {
         translationKey: 'utils.estatConfig.ESTAT_ENUM_MAP.PROCESSADA',
-        icona: <CheckCircleIcon sx={{ fontSize: '16px' }} />,
+        icona: <CheckCircleIcon fontSize="small" />,
         color: '#5cb85c',
     },
     EXPIRADA: {
         translationKey: 'utils.estatConfig.ESTAT_ENUM_MAP.EXPIRADA',
-        icona: <AsteriskIcon sx={{ fontSize: '14px' }} />,
+        icona: <AsteriskIcon fontSize="small" />,
         color: '#00ff00',
     },
     NOTIFICADA: {
         translationKey: 'utils.estatConfig.ESTAT_ENUM_MAP.NOTIFICADA',
-        icona: <CheckCircleIcon sx={{ fontSize: '16px' }} />,
+        icona: <CheckCircleIcon fontSize="small" />,
         color: '#00ff00',
     },
     REBUTJADA: {
         translationKey: 'utils.estatConfig.ESTAT_ENUM_MAP.REBUTJADA',
-        icona: <CloseIcon sx={{ fontSize: '16px' }} />,
+        icona: <CloseIcon fontSize="small" />,
         color: '#00ff00',
     },
     ENVIAT_SIR: {
         translationKey: 'utils.estatConfig.ESTAT_ENUM_MAP.ENVIAT_SIR',
         icona: (
-            <Avatar
-                variant="rounded"
-                sx={{
-                    width: 16,
-                    height: 16,
-                    fontSize: '10px',
-                    fontWeight: 'bold',
-                    backgroundColor: '#5bc0de',
-                    color: 'white',
-                }}
-            >
-                S
-            </Avatar>
+            <Chip size="small" label="S" sx={{ backgroundColor: '#5bc0de', color: 'white', fontWeight: 'bold' }} />
         ),
         color: '#5bc0de',
     },
     ENVIADA_AMB_ERRORS: {
         translationKey: 'utils.estatConfig.ESTAT_ENUM_MAP.ENVIADA_AMB_ERRORS',
-        icona: <SendIcon sx={{ fontSize: '14px' }} />,
+        icona: <SendIcon fontSize="small" />,
         color: '#d9534f',
     },
     FINALITZADA_AMB_ERRORS: {
         translationKey: 'utils.estatConfig.ESTAT_ENUM_MAP.FINALITZADA_AMB_ERRORS',
-        icona: <CheckIcon sx={{ fontSize: '16px' }} />,
+        icona: <CheckIcon fontSize="small" />,
         color: '#d9534f',
     },
     ENVIANT: {
         translationKey: 'utils.estatConfig.ESTAT_ENUM_MAP.ENVIANT',
-        icona: <ClockIcon sx={{ fontSize: '16px' }} />,
+        icona: <ClockIcon fontSize="small" />,
         color: '#f0ad4e',
     },
     OFICI_ACCEPTAT: {
         translationKey: 'utils.estatConfig.ESTAT_ENUM_MAP.OFICI_ACCEPTAT',
-        icona: <CheckCircleIcon sx={{ fontSize: '16px' }} />,
+        icona: <CheckCircleIcon fontSize="small" />,
         color: '#f0ad4e',
     },
     REBUTJADA_SIR: {
         translationKey: 'utils.estatConfig.ESTAT_ENUM_MAP.REBUTJADA_SIR',
-        icona: <CloseIcon sx={{ fontSize: '16px' }} />,
+        icona: <CloseIcon fontSize="small" />,
         color: '#f0ad4e',
     },
     ANULADA: {
         translationKey: 'utils.estatConfig.ESTAT_ENUM_MAP.ANULADA',
-        icona: <BanIcon sx={{ fontSize: '16px' }} />,
+        icona: <BanIcon fontSize="small" />,
         color: '#00ff00',
     },
 };
@@ -113,19 +101,7 @@ export const NOTIFICACIO_ESTAT_ENUM_MAP: Record<string, MapConfigItem> = {
 export const getEnviatSirConfig = (value: string): MapConfigItem => ({
     translationKey: 'utils.estatConfig.ESTAT_ENUM_MAP.ENVIAT_SIR',
     icona: (
-        <Avatar
-            variant="rounded"
-            sx={{
-                width: 16,
-                height: 16,
-                fontSize: '10px',
-                fontWeight: 'bold',
-                backgroundColor: '#5bc0de',
-                color: 'white',
-            }}
-        >
-            {value}
-        </Avatar>
+        <Chip size="small" label={value} sx={{ backgroundColor: '#5bc0de', color: 'white', fontWeight: 'bold' }} />
     ),
     color: '#5bc0de',
 });
@@ -208,52 +184,52 @@ export const NOTIFICACIO_REGISTRE_ESTAT_ENUM_MAP: Record<string, MapConfigItem> 
 const ESTAT_TRAMITACIO_ENUM_MAP: Record<string, { icona?: React.ReactNode; color?: string }> = {
     TRAMITACIO: {
         // translationKey: 'utils.estatConfig.ESTAT_TRAMITACIO_ENUM_MAP.TRAMITACIO',
-        icona: <ClockIcon sx={{ fontSize: '16px' }} />,
+        icona: <ClockIcon fontSize="small" />,
         color: '#777',
     },
     PENDENT_COMPAREIXENCA: {
         // translationKey: 'utils.estatConfig.ESTAT_TRAMITACIO_ENUM_MAP.PENDENT_COMPAREIXENCA',
-        icona: <MailOutlineIcon sx={{ fontSize: '16px' }} />,
+        icona: <MailOutlineIcon fontSize="small" />,
         color: '#e67e22',
     },
     LLEGIDA: {
         // translationKey: 'utils.estatConfig.ESTAT_TRAMITACIO_ENUM_MAP.LLEGIDA',
-        icona: <CheckCircleIcon sx={{ fontSize: '16px' }} />,
+        icona: <CheckCircleIcon fontSize="small" />,
         color: '#5cb85c',
     },
     REBUTJADA: {
         // translationKey: 'utils.estatConfig.ESTAT_TRAMITACIO_ENUM_MAP.REBUTJADA',
-        icona: <CloseIcon sx={{ fontSize: '16px' }} />,
+        icona: <CloseIcon fontSize="small" />,
         color: '#6F5647',
     },
     EXPIRADA: {
         // translationKey: 'utils.estatConfig.ESTAT_TRAMITACIO_ENUM_MAP.EXPIRADA',
-        icona: <AsteriskIcon sx={{ fontSize: '14px' }} />,
+        icona: <AsteriskIcon fontSize="small" />,
         color: '#F1D629',
     },
     ANULADA: {
         // translationKey: 'utils.estatConfig.ESTAT_TRAMITACIO_ENUM_MAP.ANULADA',
-        icona: <BanIcon sx={{ fontSize: '16px' }} />,
+        icona: <BanIcon fontSize="small" />,
         color: '#337ab7',
     },
     ERROR: {
         // translationKey: 'utils.estatConfig.ESTAT_TRAMITACIO_ENUM_MAP.ERROR',
-        icona: <ErrorIcon sx={{ fontSize: '16px' }} />,
+        icona: <ErrorIcon fontSize="small" />,
         color: '#d9534f',
     },
     ESTAT_FICTICI: {
         // translationKey: 'utils.estatConfig.ESTAT_TRAMITACIO_ENUM_MAP.ESTAT_FICTICI',
-        icona: <SendIcon sx={{ fontSize: '16px' }} />,
+        icona: <SendIcon fontSize="small" />,
         color: 'purple',
     },
     FINALITZADA: {
         // translationKey: 'utils.estatConfig.ESTAT_TRAMITACIO_ENUM_MAP.FINALITZADA',
-        icona: <SendIcon sx={{ fontSize: '16px' }} />,
+        icona: <SendIcon fontSize="small" />,
         color: '#1d541d',
     },
     PROCESSADA: {
         // translationKey: 'utils.estatConfig.ESTAT_TRAMITACIO_ENUM_MAP.PROCESSADA',
-        icona: <SendIcon sx={{ fontSize: '16px' }} />,
+        icona: <SendIcon fontSize="small" />,
         color: '#1d541d',
     },
 };

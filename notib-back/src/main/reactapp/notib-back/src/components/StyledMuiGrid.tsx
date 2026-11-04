@@ -312,6 +312,11 @@ const StyledMuiGrid = (props: StyledMuiGridProps) => {
                 // el crea reactlib i no admet ni props ni estils des de fora.
                 '& .MuiToolbar-root .MuiOutlinedInput-root': { height: '32px' },
                 '& .MuiToolbar-root .MuiOutlinedInput-input': { pt: 0, pb: 0 },
+                // Les icones de les cel·les (estats, avisos, booleans...) són de mida "small" (20px) en lloc
+                // dels 24px per defecte de MUI, tant les `Icon` com les `SvgIcon` de @mui/icons-material. Les que
+                // demanen `fontSize="inherit"` segueixen la mida del text (és la manera de fer-les més petites), i
+                // les que porten la classe `grid-icon-medium` mantenen els 24px de MUI.
+                '& .MuiDataGrid-cell :is(.MuiIcon-root, .MuiSvgIcon-root):not(.MuiIcon-fontSizeInherit):not(.MuiSvgIcon-fontSizeInherit):not(.grid-icon-medium)': { fontSize: '1.25rem' },
                 // Separació entre el filtre i la graella: la llibreria deixa la fila del filtre
                 // (`toolbarAdditionalRow`) sense marge inferior.
                 '& .toolbarAdditionalRow': { mb: MAIN_GAP + 'px' },
