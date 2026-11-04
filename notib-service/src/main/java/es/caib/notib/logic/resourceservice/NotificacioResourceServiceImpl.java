@@ -160,6 +160,7 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 		register(NotificacioResource.Fields.grupCodi, new NotificacioResourceServiceImpl.GrupCodiFieldOptionsProvider());
 		register(NotificacioResource.Fields.caducitat, new NotificacioResourceServiceImpl.CaducitatOnChangeLogicProcessor());
 		register(NotificacioResource.Fields.caducitatDiesNaturals, new NotificacioResourceServiceImpl.CaducitatOnChangeLogicProcessor());
+		register(NotificacioResource.Fields.enviamentDataProgramada, new NotificacioResourceServiceImpl.CaducitatOnChangeLogicProcessor());
 		register(NotificacioResource.PERSPECTIVE_DOCUMENTS_NOTIFICACIO, new DocumentPerspectiveApplicator());
 		register(NotificacioResource.PERSPECTIVE_ENVIAMENTS_NOTIFICACIO, new EnviamentPerspectiveApplicator());
 		register(NotificacioResource.PERSPECTIVE_NOTIFICACIO_DETALL, new NotificacioDetallPerspectiveApplicator(notificacioEnviamentResourceRepository, configHelper, callbackResourceRepository, eventResourceRepository, messageHelper, usuariResourceRepository));
@@ -762,7 +763,11 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 
 		@Override
 		public void onChange(Serializable id, NotificacioResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, NotificacioResource target) {
-			caducitatOnChange(previous.getCaducitatDiesNaturals(), previous, target);
+			if (previous.getCaducitatDiesNaturals() != null) {
+				caducitatOnChange(previous.getCaducitatDiesNaturals(), previous, target);
+			} else if (previous.getCaducitat() != null) {
+				caducitatOnChange(previous.getCaducitat(), previous, target);
+			}
 		}
 	}
 
@@ -787,16 +792,18 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 		}
 	}
 
-	/*
-	 * Lògica onChange pel camp interessatTipus. Segons el valor d'aquest camp canvien els camps visibles / obligatoris.
-	 */
+	/** Lògica onChange pel camp interessatTipus. Segons el valor d'aquest camp canvien els camps visibles / obligatoris. */
 	static class CaducitatOnChangeLogicProcessor implements OnChangeLogicProcessor<NotificacioResource> {
-
 		@Override
 		public void onChange(Serializable id, NotificacioResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, NotificacioResource target) {
-
+			if (NotificacioResource.Fields.enviamentDataProgramada.equals(fieldName)) {
+				Date novaDataProgramada = (Date) fieldValue;
+				enviamentDataProgramadaOnChange(novaDataProgramada, previous, target);
+				return;
+			}
 			if (NotificacioResource.Fields.caducitat.equals(fieldName)) {
-				var isCaducitatDiesNaturalsInPreviousFieldNames = previousFieldNames != null && previousFieldNames.length > 0 && NotificacioResource.Fields.caducitatDiesNaturals.equals(previousFieldNames[0]);
+				var isCaducitatDiesNaturalsInPreviousFieldNames = previousFieldNames != null && previousFieldNames.length > 0 &&
+					(NotificacioResource.Fields.caducitatDiesNaturals.equals(previousFieldNames[0]) || NotificacioResource.Fields.enviamentDataProgramada.equals(previousFieldNames[0]));
 				if (!isCaducitatDiesNaturalsInPreviousFieldNames) {
 					Date date = (Date) fieldValue;
 					caducitatOnChange(date, previous, target);
@@ -806,7 +813,8 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 			if (!NotificacioResource.Fields.caducitatDiesNaturals.equals(fieldName)) {
 				return;
 			}
-			var isCaducitatInPreviousFieldNames = previousFieldNames != null && previousFieldNames.length > 0 && NotificacioResource.Fields.caducitat.equals(previousFieldNames[0]);
+			var isCaducitatInPreviousFieldNames = previousFieldNames != null && previousFieldNames.length > 0 &&
+				(NotificacioResource.Fields.caducitat.equals(previousFieldNames[0]) || NotificacioResource.Fields.enviamentDataProgramada.equals(previousFieldNames[0]));
 			if (!isCaducitatInPreviousFieldNames) {
 				var caducitatDiesNaturals = (Integer) fieldValue;
 				caducitatOnChange(caducitatDiesNaturals, previous, target);
@@ -819,27 +827,40 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 		Integer numDiesNaturals = null;
 		if (caducitat != null) {
 			LocalDate dataConvertida = caducitat.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-			numDiesNaturals = (int)ChronoUnit.DAYS.between(LocalDate.now(), dataConvertida);
+			numDiesNaturals = (int)ChronoUnit.DAYS.between(obtenirDataInici(previous), dataConvertida);
 		}
 		target.setCaducitatDiesNaturals(numDiesNaturals);
-		/*// Només feim el canvi si el nombre de dies naturals és diferent a la que ja hi havia per a evitar bucle
-		// infinit d'onChange.
-		if (!Objects.equals(numDiesNaturals, previous.getCaducitatDiesNaturals())) {
-			target.setCaducitatDiesNaturals(numDiesNaturals);
-		}*/
 	}
 
 	private static void caducitatOnChange(Integer caducitatDiesNaturals, NotificacioResource previous, NotificacioResource target) {
 
 		Date caducitat = null;
 			if (caducitatDiesNaturals != null) {
-			caducitat = Date.from(LocalDate.now().plusDays(caducitatDiesNaturals).atStartOfDay(ZoneId.systemDefault()).toInstant());
+			caducitat = Date.from(obtenirDataInici(previous).plusDays(caducitatDiesNaturals).atStartOfDay(ZoneId.systemDefault()).toInstant());
 		}
 		target.setCaducitat(caducitat);
-		/*// Només feim el canvi si la caducitat és diferent a la que ja hi havia per a evitar bucle infinit d'onChange.
-		if (!Objects.equals(caducitat, previous.getCaducitat())) {
-			target.setCaducitat(caducitat);
-		}*/
+	}
+
+	private static void enviamentDataProgramadaOnChange(Date novaDataProgramada, NotificacioResource previous, NotificacioResource target) {
+		LocalDate novaDataInici = obtenirLocalDateNullSafe(novaDataProgramada);
+		if (previous.getCaducitatDiesNaturals() != null) {
+			Date novaCaducitat = Date.from(novaDataInici.plusDays(previous.getCaducitatDiesNaturals()).atStartOfDay(ZoneId.systemDefault()).toInstant());
+			target.setCaducitat(novaCaducitat);
+		} else if (previous.getCaducitat() != null) {
+			LocalDate dataConvertida = previous.getCaducitat().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+			Integer numDiesNaturals = (int)ChronoUnit.DAYS.between(novaDataInici, dataConvertida);
+			target.setCaducitatDiesNaturals(numDiesNaturals);
+		}
+	}
+
+	/** Retorna la data de inici de l'enviament, tornant el dia actual si no te valor. */
+	private static LocalDate obtenirDataInici(NotificacioResource resource) {
+		return obtenirLocalDateNullSafe(resource != null ? resource.getEnviamentDataProgramada() : null);
+	}
+
+	/** Converteix el valor amb LocalDate o torna la data actual. */
+	private static LocalDate obtenirLocalDateNullSafe(Date dateValue) {
+		return dateValue != null ? dateValue.toInstant().atZone(ZoneId.systemDefault()).toLocalDate() : LocalDate.now();
 	}
 
 }

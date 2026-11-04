@@ -473,6 +473,7 @@ public class NotificacioResource extends BaseResource<Long> {
 
 	@NotNull
 	private EnviamentTipus enviamentTipus;
+	@ResourceField(onChangeActive = true)
 	private Date enviamentDataProgramada;
 	@NotNull
 	@Size(max = 240)
