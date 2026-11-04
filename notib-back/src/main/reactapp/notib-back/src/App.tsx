@@ -9,8 +9,8 @@ import { ThemeProvider, useTheme } from '@mui/material/styles';
 import { envVar, ResourceApiProvider } from 'reactlib';
 import goibLogoLight from './assets/goib_logo_light.svg';
 import goibLogoDark from './assets/goib_logo_dark.svg';
-import notibLogoLight from './assets/notib_logo_light.png';
-import notibLogoDark from './assets/notib_logo_dark.png';
+import notibLogoLight from './assets/NOT_DRA_COL.svg';
+import notibLogoDark from './assets/NOT_DRA_COL_blanc.svg';
 import { BaseApp } from './components/BaseApp';
 import DrassanaFooter from './components/DrassanaFooter';
 import NotibProvider from './components/NotibProvider';
@@ -83,7 +83,8 @@ const InnerApp: React.FC = () => {
             code="NOTIB"
             logo={mode === 'light' ? goibLogoLight : goibLogoDark}
             logoStyle={{
-                '& img': { height: LOGO_HEIGHT + 'px', display: 'block' },
+                // El logo del Govern és més ample que la caixa: s'hi ajusta sense deformar-se.
+                '& img': { height: LOGO_HEIGHT + 'px', maxWidth: '100%', objectFit: 'contain', display: 'block' },
                 // El separador vertical ha de caure sobre la vora dreta del menú obert, i omplir
                 // l'alçada de la capçalera. El botó de menú duu un marge esquerre de -12 i un dret de
                 // 16, així que la caixa del logo arrenca a LOGO_BOX_LEFT. Fixant-ne l'amplada (en

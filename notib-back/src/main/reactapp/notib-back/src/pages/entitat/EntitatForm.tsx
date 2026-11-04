@@ -21,7 +21,7 @@ import EntitatFormTabTipusDocs from './EntitatFormTabTipusDocs';
 import EntitatFormTabAplicacions from './EntitatFormTabAplicacions';
 import EntitatFormTabPermisos from './EntitatFormTabPermisos';
 import goibLogoLight from '../../assets/goib_logo_light.svg';
-import notibLogoLight from '../../assets/notib_logo_light.png';
+import notibLogoLight from '../../assets/NOT_DRA_COL.svg';
 import { useNotibContext } from '../../components/NotibContext';
 import GridFormField from '../../components/GridFormField';
 import { useTabParam } from '../../hooks/useSearchParams';
