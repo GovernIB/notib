@@ -68,12 +68,6 @@ const useDataGridColumns = (datagridApiRef: any,
                 field: 'procediment',
                 flex:1,
                 width: 180,
-                // renderCell: (params: any) => {
-                //     console.log(params);
-                //     const letter = params.row.procediment != null ? 'P' : 'S';
-                //     const title = letter === 'P' ? t('page.notificacio.grid.procediment') : t('page.notificacio.grid.servei');
-                //     return (<><Chip label={letter} size="small" title={title} sx={{ mr: 1 }} />{params.formattedValue}</>);
-                // },
             },
             ...(notificacioErrorRegistre || notificacioCallbackError ? [] : [{
                 field: 'numExpedient',
@@ -352,7 +346,8 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
     // useSseRowRefresh('notificacioResource', datagridApiRef, 'REMESA_ENVIAMENT_ESTAT', 'NOTIFICACIO_ESTAT_CANVIAT');
     // Rep (via SSE) la columna estat de les remeses que el servidor calcula en segon pla
     useEstatRemesaAsync(datagridApiRef);
-    const springFilterBuilder = useSpringFilterBuilder();
+    const isPrincipal = !notificacionsEsborrades && !notificacionsErrorRegistre && !notificacionsCallbackError;
+    const springFilterBuilder = useSpringFilterBuilder(isPrincipal);
     const [searchParams] = useSearchParams();
     const referencia = searchParams.get('referencia');
     const persistentStateKey = 'notificacioResource' +
@@ -374,8 +369,9 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
             // Amb la referència a l'adreça (vinculada des d'altres pantalles) el filtre avançat s'obre sol
             initialData: {
                 referencia: referencia,
+                nomesLesMeves: false,
                 advanced: !!referencia || isRoleOrgan,
-                ...(isRoleOrgan && currentOrgan ? { organGestor: currentOrganId } : {}),
+                ...(isRoleOrgan && currentOrgan ? { organGestor: currentOrgan } : {}),
             },
             // Cada vista té els seus camps de filtre: no han de compartir el filtre desat
             persistentStateKey: persistentStateKey,
@@ -390,7 +386,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
             ampliarTermini, ampliarTerminiDialog,
             marcarProcessat, marcarProcessatDialog,
             esborrarRemesa,
-            recuperarRemesa} = useAccionsNotificacio();
+            recuperarRemesa} = useAccionsNotificacio(refrescarLlistat);
 
     const mostrarEditarBorrar = (estat : string) => {
         return isRoleAdminLectura || (estat !== 'PENDENT' && estat !== 'REGISTRADA');
@@ -413,7 +409,6 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                 icon: 'download',
                 showInMenu: true,
                 onClick: (id) => {
-                    console.log("click");
                 descarregarDocumentEnviat(id)} ,
                 hidden: noEsTaulaRemeses
             },
@@ -461,15 +456,6 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                 onClick: (id, row) => ampliarTermini(id, t('page.notificacio.grid.accions.ampliarTermini.modalTitle'), {caducitat: row.caducitat}),
                 hidden: row => isRoleAdminLectura || row?.entregaPostal || row?.estat !== 'ENVIADA' || noEsTaulaRemeses
             },
-            // {
-            //     label: t('page.notificacio.grid.accions.editar'),
-            //     title: t('page.notificacio.grid.accions.editar'),
-            //     icon: 'edit_icon',
-            //     showInMenu: true,
-            //     // onClick: (id) => console.log("editar " + id),
-            //     clickShowUpdateDialog: true
-            //     // hidden: (row) => mostrarEditarBorrar(row?.estat, currentRole),
-            // },
             {
                 label: t('page.notificacio.grid.accions.esborrar.title'),
                 title: t('page.notificacio.grid.accions.esborrar.title'),

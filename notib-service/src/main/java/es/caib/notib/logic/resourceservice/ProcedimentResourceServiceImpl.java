@@ -141,7 +141,7 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries, boolean isSingleResult) {
 
 		var superFilter = super.additionalSpringFilter(currentSpringFilter, namedQueries, isSingleResult);
-		var isRoleAdminOrgan = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN);
+		var isRoleAdminOrgan = userSessionHelper.isRolOrgan();
 		if (isRoleAdminOrgan && notibPermissionHelper.currentOrganGestorPermissionAllowed(BasePermission.ADMINISTRATION)) {
 			var permisComuns = notibPermissionHelper.currentOrganGestorPermissionAllowed(ExtendedPermission.PERM3);
 			var filtreOrgan = "(organGestor.id:" + userSessionHelper.getCurrentOrganGestorId() + (permisComuns ? " or comu:true)" : ")");

@@ -80,9 +80,9 @@ public class NotificacioEnviamentResourceServiceImpl extends BaseMutableResource
 
 		// Condició per a mostrar només les notificacions de l'entitat actual
 		var entitatFilter = "notificacio.entitat.id:" + userSessionHelper.getCurrentEntitatId();
-		var isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
-		var isRoleAdminLectura = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN_LECTURA);
-		var isRoleAdminOrgan = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN);
+		var isRoleAdmin = userSessionHelper.isRolAdmin();
+		var isRoleAdminLectura = userSessionHelper.isRolAdminLectura();
+		var isRoleAdminOrgan = userSessionHelper.isRolOrgan();
 		if (isRoleAdminOrgan && notibPermissionHelper.currentOrganGestorPermissionAllowed(BasePermission.ADMINISTRATION)) {
 			return entitatFilter + " and notificacio.organGestor.id:" + userSessionHelper.getCurrentOrganGestorId();
 		}

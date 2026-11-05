@@ -112,7 +112,7 @@ export const router = createBrowserRouter(
                 {
                     path: 'notificacions',
                     children: [
-                        { index: true, element: <NotificacioGrid notificacionsEsborrades={false} notificacionsErrorRegistre={false} /> },
+                        { index: true, element: <NotificacioGrid key="notificacio-notificacions" notificacionsEsborrades={false} notificacionsErrorRegistre={false} /> },
                         {
                             path: 'form',
                             children: [
@@ -124,16 +124,13 @@ export const router = createBrowserRouter(
                 },
                 {
                     path: 'notificacionsEsborrades',
-                    element: <NotificacioGrid notificacionsEsborrades={true} notificacionsErrorRegistre={false}/>
-                },
+                    element: <NotificacioGrid key="notificacio-esborrades" notificacionsEsborrades={true} notificacionsErrorRegistre={false}/> },
                 {
                     path: 'notificacionsErrorRegistre',
-                    element: <NotificacioGrid notificacionsErrorRegistre={true} notificacionsEsborrades={false}/>
-                },
+                    element: <NotificacioGrid key="notificacio-errorRegistre" notificacionsErrorRegistre={true} notificacionsEsborrades={false}/> },
                 {
                     path: 'notificacionsCallbackError',
-                    element: <NotificacioGrid notificacionsErrorRegistre={false} notificacionsEsborrades={false} notificacionsCallbackError={true}/>
-                },
+                    element: <NotificacioGrid key="notificacio-callbackError" notificacionsErrorRegistre={false} notificacionsEsborrades={false} notificacionsCallbackError={true}/> },
                 {
                     path: 'enviaments',
                     element: <EnviamentGrid />,

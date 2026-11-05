@@ -45,6 +45,26 @@ public class UserSessionHelper {
 		return HttpRequestUtil.getCurrentHttpRequest().map(r -> r.getHeader(selectedRoleHttpHeader)).orElse(null);
 	}
 
+	public boolean isRolSuper() {
+		return BaseConfig.ROLE_SUPER.equals(getCurrentRol());
+	}
+
+	public boolean isRolUser() {
+		return BaseConfig.ROLE_USER.equals(getCurrentRol());
+	}
+
+	public boolean isRolAdmin() {
+		return BaseConfig.ROLE_ADMIN.equals(getCurrentRol());
+	}
+
+	public boolean isRolAdminLectura() {
+		return BaseConfig.ROLE_ADMIN_LECTURA.equals(getCurrentRol());
+	}
+
+	public boolean isRolOrgan() {
+		return BaseConfig.ROLE_ORGAN.equals(getCurrentRol());
+	}
+
 	/**
 	 * Retorna l'id d'entitat actual.
 	 *

@@ -5,7 +5,7 @@ import {springFilterBuilder, springFilterBuilder as filterBuilder, useFilterApiC
 import {useNotibContext} from "../../components/NotibContext.ts";
 import {formatEndOfDay, formatStartOfDay} from "../../utils/dateUtils.ts";
 
-export const useSpringFilterBuilder = () => {
+export const useSpringFilterBuilder = (isPrincipal: boolean = true) => {
 
     const { currentUser } = useNotibContext();
     return (data: any) => {
@@ -25,7 +25,7 @@ export const useSpringFilterBuilder = () => {
             filterBuilder.like('registreNums', data?.registreNumeroSortida),
             data?.dataCaducitatInici && filterBuilder.gte('caducitat', `'${formatStartOfDay(data?.dataCaducitatInici)}'`),
             data?.dataCaducitatFi && filterBuilder.lte('caducitat', `'${formatEndOfDay(data?.dataCaducitatFi)}'`),
-            data?.nomesLesMeves && filterBuilder.eq('createdBy', `'${currentUser?.codi}'`),
+            data?.nomesLesMeves && isPrincipal && filterBuilder.eq('createdBy', `'${currentUser?.codi}'`),
             data?.entregaPostal && filterBuilder.eq('entregaPostal', `'${data?.entregaPostal}'`),
             data?.errorLastCallback && filterBuilder.eq('errorLastCallback', `'${data?.errorLastCallback}'`)
         );
