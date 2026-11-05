@@ -100,7 +100,19 @@ import java.io.Serializable;
 						roles = { BaseConfig.ROLE_SUPER }
 					)
 				}
-			)
+			),
+			@ResourceArtifact(
+				type = ResourceArtifactType.ACTION,
+				code = EntitatResource.ACTION_ACTIVAR,
+				requiresId = true),
+			@ResourceArtifact(
+				type = ResourceArtifactType.ACTION,
+				code = EntitatResource.ACTION_DESACTIVAR,
+				requiresId = true),
+			@ResourceArtifact(
+				type = ResourceArtifactType.ACTION,
+				code = EntitatResource.ACTION_RESET_ACT_ORGANS,
+				requiresId = true),
 		}
 
 )
@@ -122,6 +134,9 @@ public class EntitatResource extends BaseResource<Long> {
 	public static final String PERSPECTIVE_PERMISSIONS = "PERMISSIONS";
 	public static final String ACTION_LLIBRE_ENTITAT = "LLIBRE_ENTITAT";
 	public static final String ACTION_OFICINA_ENTITAT = "OFICINES_ENTITAT";
+	public static final String ACTION_ACTIVAR = "ACTIVAR";
+	public static final String ACTION_DESACTIVAR = "DESACTIVAR";
+	public static final String ACTION_RESET_ACT_ORGANS = "RESET_ACT_ORGANS";
 
 	@NotNull
 	@Size(max = 64)

@@ -56,7 +56,15 @@ import java.util.Date;
 			@ResourceArtifact(
 				type = ResourceArtifactType.ACTION,
 				code = AvisResource.ACTION_ESBORRAR_MASSIU,
-				formClass = AccioMassivaParams.class)
+				formClass = AccioMassivaParams.class),
+			@ResourceArtifact(
+				type = ResourceArtifactType.ACTION,
+				code = AvisResource.ACTION_ACTIVAR,
+				requiresId = true),
+			@ResourceArtifact(
+				type = ResourceArtifactType.ACTION,
+				code = AvisResource.ACTION_DESACTIVAR,
+				requiresId = true)
 		}
 )
 public class AvisResource extends BaseResource<Long> {
@@ -65,6 +73,8 @@ public class AvisResource extends BaseResource<Long> {
 	public static final String ACTION_ACTIVAR_MASSIU = "ACTIVAR_AVIS_MASSIU";
 	public static final String ACTION_DESACTIVAR_MASSIU = "DESACTIVAR_AVIS_MASSIU";
 	public static final String ACTION_ESBORRAR_MASSIU = "ESBORRAR_AVIS_MASSIU";
+	public static final String ACTION_ACTIVAR = "ACTIVAR";
+	public static final String ACTION_DESACTIVAR = "DESACTIVAR";
 
 	@NotNull
 	@Size(max = 256)

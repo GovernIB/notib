@@ -305,7 +305,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
 
     const { t } = useTranslation();
     const [ params ] = useSearchParams();
-    const { currentRole, currentOrganId, organsAvailable } = useNotibContext();
+    const { currentRole } = useNotibContext();
     const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
     const notificacioMassiva = params?.get('notificacioMassiva');
     const { state } = useLocation();
@@ -355,7 +355,6 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
             ? '-esborrades' : notificacionsErrorRegistre
                 ? '-errorRegistre' : notificacionsCallbackError ? '-callbackError' : '');
     const isRoleOrgan = currentRole === ROLE_ORGAN;
-    const currentOrgan = organsAvailable?.find((o: any) => o.id === currentOrganId);
     const filterDataGridProps = useDatagridFilterProps(
         'notificacioResource',
         'FILTER_NOTIFICACIO',
@@ -370,8 +369,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
             initialData: {
                 referencia: referencia,
                 nomesLesMeves: false,
-                advanced: !!referencia || isRoleOrgan,
-                ...(isRoleOrgan && currentOrgan ? { organGestor: currentOrgan } : {}),
+                advanced: !!referencia || isRoleOrgan
             },
             // Cada vista té els seus camps de filtre: no han de compartir el filtre desat
             persistentStateKey: persistentStateKey,

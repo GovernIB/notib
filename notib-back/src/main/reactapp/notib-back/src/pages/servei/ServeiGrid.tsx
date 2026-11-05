@@ -7,7 +7,7 @@ import {
     MuiDataGridColDef,
     MuiDataGridApiRef, useBaseAppContext, MuiActionReportButton, useMuiDataGridApiRef,
 } from 'reactlib';
-import {ROLE_ADMIN, ROLE_ADMIN_LECTURA, ROLE_ORGAN, useNotibContext} from '../../components/NotibContext';
+import {ROLE_ADMIN, ROLE_ADMIN_LECTURA, useNotibContext} from '../../components/NotibContext';
 import LinkToTab from '../../components/LinkToTab';
 import GridFormField, { GridButtonField } from '../../components/GridFormField';
 import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
@@ -185,19 +185,17 @@ const ProcedimentSyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRef;
 export const ProcedimentGrid = () => {
 
     const { t } = useTranslation();
-    const { currentEntitatId, currentOrganId, organsAvailable } = useNotibContext();
+    const { currentEntitatId } = useNotibContext();
     const dataGridApiRef = useMuiDataGridApiRef();
     const {currentRole} = useNotibContext();
     let isRoleAdmin = currentRole == ROLE_ADMIN;
     const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
-    const isRoleOrgan = currentRole === ROLE_ORGAN;
-    const currentOrgan = organsAvailable?.find((o: any) => o.id === currentOrganId);
     const filterDataGridProps = useDatagridFilterProps(
         'procedimentResource',
         'FILTER_PROCEDIMENT',
         springFilterBuilder,
         <ContentFilter />,
-        isRoleOrgan && currentOrgan ? { initialData: { organGestor: currentOrgan } } : undefined
+        { initialData: { actiu: true }}
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     return (

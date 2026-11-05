@@ -83,6 +83,16 @@ const translationEs = {
                 title: 'Entidades',
                 popupResourceTitle: "entidad",
             },
+            accio: {
+                modificar: "Modifica",
+                configurar: "Configura",
+                resetActOrgans: "Reset act. Órganos",
+                esborrar: "Borra",
+                activar: "Activa",
+                activarOk: "Entitat activada correctament",
+                desactivar: "Desactiva",
+                desactivarOk: "Entitat desactivada correctament",
+            },
             form: {
                 titleCreate: 'Crear entidad',
                 titleUpdate: 'Modificar entidad',
@@ -137,6 +147,15 @@ const translationEs = {
                 activar: { title: 'Activa', ok: 'Avisos activados correctamente' },
                 desactivar: { title: 'Desactiva', ok: 'Avisos desactivados correctamente' },
                 esborrar: { title: 'Borra', ok: 'Avisos borrados correctamente' },
+            },
+            accio: {
+                modificar: "Modifica",
+                esborrar: "Borra",
+                activar: "Activa",
+                activarOk: "Aviso activado correctamente",
+                desactivar: "Desactiva",
+                desactivarOk: "Aviso desactivado correctamente",
+                error: "Error ejecutando la acción",
             },
             form: {
                 titleCreate: 'Crear aviso',
