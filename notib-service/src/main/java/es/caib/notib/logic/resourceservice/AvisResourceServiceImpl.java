@@ -1,5 +1,6 @@
 package es.caib.notib.logic.resourceservice;
 
+import es.caib.notib.logic.avisos.AvisActivarDesactivarActionExecutor;
 import es.caib.notib.logic.avisos.AvisMassiuActionExecutor;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
@@ -36,10 +37,13 @@ public class AvisResourceServiceImpl extends BaseMutableResourceService<AvisReso
 	@PostConstruct
 	public void init() {
 
-		var massiu = new AvisMassiuActionExecutor(avisResourceRepository, sseEventService);
-		register(AvisResource.ACTION_ACTIVAR_MASSIU, massiu);
-		register(AvisResource.ACTION_DESACTIVAR_MASSIU, massiu);
-		register(AvisResource.ACTION_ESBORRAR_MASSIU, massiu);
+	var massiu = new AvisMassiuActionExecutor(avisResourceRepository, sseEventService);
+	var activarDesactivar = new AvisActivarDesactivarActionExecutor(avisResourceRepository, sseEventService);
+	register(AvisResource.ACTION_ACTIVAR_MASSIU, massiu);
+	register(AvisResource.ACTION_DESACTIVAR_MASSIU, massiu);
+	register(AvisResource.ACTION_ESBORRAR_MASSIU, massiu);
+	register(AvisResource.ACTION_ACTIVAR, activarDesactivar);
+	register(AvisResource.ACTION_DESACTIVAR, activarDesactivar);
 	}
 
 	@Override

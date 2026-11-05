@@ -262,7 +262,7 @@ const EnviamentGrid = () => {
 
     const { t } = useTranslation();
     const gridApiRef = useMuiDataGridApiRef();
-    const { currentRole, currentOrganId, organsAvailable} = useNotibContext();
+    const { currentRole } = useNotibContext();
     const { dialogComponent: enviamentDialogComponent, onDetailClick } = useEnviamentDetailDialog();
     const { dialogComponent: notificacioDialogComponent, onDetailClick: onNotificacioDetailClick } = useNotificacioDetailDialog(false);
     const [searchParams] = useSearchParams();
@@ -274,7 +274,6 @@ const EnviamentGrid = () => {
     useSseRowRefresh('notificacioEnviamentResource', datagridApiRef, 'REMESA_ENVIAMENT_ESTAT', 'ENVIAMENT_ESTAT_CANVIAT');
     const referencia = searchParams.get('referencia');
     const isRoleOrgan = currentRole === ROLE_ORGAN;
-    const currentOrgan = organsAvailable?.find((o: any) => o.id === currentOrganId);
     const filterDataGridProps = useDatagridFilterProps(
         'notificacioEnviamentResource',
         'FILTER_ENVIAMENT',
@@ -286,7 +285,6 @@ const EnviamentGrid = () => {
             initialData: {
                 referenciaEnviament: referencia,
                 advanced: !!referencia || isRoleOrgan,
-                ...(isRoleOrgan && currentOrgan ? { organGestor: currentOrgan } : {}),
             },
         }
     );

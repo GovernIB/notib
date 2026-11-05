@@ -3,9 +3,12 @@ package es.caib.notib.logic.resourceservice;
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
+import es.caib.notib.logic.entitat.EntitatActivarDesactivarActionExecutor;
+import es.caib.notib.logic.entitat.EntitatResectActOrgansActionExecutor;
 import es.caib.notib.logic.entitat.LlibreEntitatActionExecutor;
 import es.caib.notib.logic.entitat.OficinaEntitatActionExecutor;
 import es.caib.notib.logic.helper.AclHelper;
+import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
@@ -54,6 +57,7 @@ public class EntitatResourceServiceImpl extends BaseMutableResourceService<Entit
 	private final PagadorCieResourceRepository pagadorCieResourceRepository;
 	private final PagadorPostalResourceRepository pagadorPostalResourceRepository;
 	private final EntitatService entitatService;
+	private final CacheHelper cacheHelper;
 
 	@PostConstruct
 	public void init() {
@@ -62,6 +66,10 @@ public class EntitatResourceServiceImpl extends BaseMutableResourceService<Entit
 		register(EntitatResource.PERSPECTIVE_PERMISSIONS, new EntitatResourcePermisosPerspectiveApplicator(authenticationHelper, userSessionHelper, notibPermissionHelper));
 		register(EntitatResource.ACTION_LLIBRE_ENTITAT, new LlibreEntitatActionExecutor(entitatService));
 		register(EntitatResource.ACTION_OFICINA_ENTITAT, new OficinaEntitatActionExecutor(entitatService));
+		var activarAction = new EntitatActivarDesactivarActionExecutor(entitatService, cacheHelper);
+		register(EntitatResource.ACTION_ACTIVAR, activarAction);
+		register(EntitatResource.ACTION_DESACTIVAR, activarAction);
+		register(EntitatResource.ACTION_RESET_ACT_ORGANS, new EntitatResectActOrgansActionExecutor(entitatService));
 	}
 
 	@Override

@@ -9,7 +9,7 @@ import {
     MuiDataGridApiRef, useBaseAppContext, MuiActionReportButton, useMuiDataGridApiRef,
 } from 'reactlib';
 import LinkToTab from '../../components/LinkToTab';
-import {ROLE_ADMIN, ROLE_ADMIN_LECTURA, ROLE_ORGAN, useNotibContext} from '../../components/NotibContext';
+import {ROLE_ADMIN, ROLE_ADMIN_LECTURA, useNotibContext} from '../../components/NotibContext';
 import GridFormField, { GridButtonField } from '../../components/GridFormField';
 import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
 import { useDatagridFilterProps, useDatagridPageSizeOptionsProps } from '../../hooks/useDataGrid';
@@ -114,7 +114,7 @@ const ContentFilter: React.FC = () => {
             <GridFormField size={{ xs: 12, sm: 6, md: 3 }} name="nom" />
             <GridFormField size={{ xs: 12, sm: 6, md: 4 }} name="organGestor" optionRenderer={organGestorOptionRenderer} />
             <GridFormField
-                size={{ xs: 12, sm: 6, md: 1.5 }}
+                size={{ xs: 12, sm: 6, md: 1 }}
                 name="actiu"
                 type="enum"
                 options={[
@@ -193,20 +193,19 @@ const ProcedimentSyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRef;
 export const ProcedimentGrid = () => {
 
     const { t } = useTranslation();
-    const { currentEntitatId, currentOrganId, organsAvailable } = useNotibContext();
+    const { currentEntitatId } = useNotibContext();
     const dataGridApiRef = useMuiDataGridApiRef();
     const {currentRole} = useNotibContext();
     let isRoleAdmin = currentRole == ROLE_ADMIN;
     const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
-    const isRoleOrgan = currentRole === ROLE_ORGAN;
-    const currentOrgan = organsAvailable?.find((o: any) => o.id === currentOrganId);
 
     const filterDataGridProps = useDatagridFilterProps(
         'procedimentResource',
         'FILTER_PROCEDIMENT',
         springFilterBuilder,
         <ContentFilter />,
-        isRoleOrgan && currentOrgan ? { initialData: { organGestor: currentOrgan, actiu: true } } : { initialData: { actiu: true } }    );
+        { initialData: { actiu: true }}
+    );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     const {
         activarProcediment,

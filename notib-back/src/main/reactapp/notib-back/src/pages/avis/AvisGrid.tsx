@@ -4,10 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { GridApiPro, useGridApiRef } from '@mui/x-data-grid-pro';
 import {
     GridPage,
-    MuiDataGridColDef,
-    springFilterBuilder as filterBuilder,
+    MuiDataGridColDef, MuiDataGridProps,
+    springFilterBuilder as filterBuilder, useBaseAppContext,
     useMuiDataGridApiRef,
-    useMuiDataGridContext,
+    useMuiDataGridContext, useResourceApiService,
 } from 'reactlib';
 import AccionsMassives, { MenuOption, useAccionsMassives } from '../../components/AccionsMassives';
 import GridFormField from '../../components/GridFormField';
@@ -87,6 +87,67 @@ const AvisFormContent: React.FC = () => {
     );
 };
 
+const ACCIO_ACTIVAR = 'ACTIVAR';
+const ACCIO_DESACTIVAR = 'DESACTIVAR';
+type AccionsFila = NonNullable<MuiDataGridProps['rowAdditionalActions']>;
+
+export const useAvisAccions = (refresh: () => void): AccionsFila => {
+    const { t } = useTranslation();
+    const { temporalMessageShow } = useBaseAppContext();
+    const { isReady: apiIsReady, artifactAction: apiArtifactAction } = useResourceApiService('avisResource');
+    const executarAccio = (id: any, code: string, clauMissatgeOk: string) => {
+        if (!apiIsReady) {
+            return;
+        }
+        apiArtifactAction(id, { code })
+            .then(() => {
+                refresh();
+                temporalMessageShow(null, t(clauMissatgeOk), 'success');
+            })
+            .catch((error: any) =>
+                temporalMessageShow(
+                    t('page.avisos.accio.error'),
+                    error?.description ?? error?.message,
+                    'error'
+                )
+            );
+    };
+    return [
+        {
+            label: t('page.avisos.accio.modificar'),
+            icon: icons.modifica,
+            showInMenu: true,
+            rowLink: 'update',
+            clickShowUpdateDialog: true,
+        },
+        {
+            label: t('page.avisos.accio.activar'),
+            icon: icons.accepta,
+            showInMenu: true,
+            action: ACCIO_ACTIVAR,
+            hidden: (row: any) => row?.actiu,
+            onClick: (id: any) => executarAccio(id, ACCIO_ACTIVAR, 'page.avisos.accio.activarOk'),
+        },
+        {
+            label: t('page.avisos.accio.desactivar'),
+            icon: icons.cancela,
+            showInMenu: true,
+            action: ACCIO_DESACTIVAR,
+            hidden: (row: any) => !row?.actiu,
+            onClick: (id: any) =>
+                executarAccio(id, ACCIO_DESACTIVAR, 'page.avisos.accio.desactivarOk'),
+        },
+        {
+            label: t('page.avisos.accio.esborrar'),
+            icon: icons.esborra,
+            showInMenu: true,
+            rowLink: 'delete',
+            clickTriggerDelete: true,
+        },
+    ];
+};
+
+
 const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null>, refresh: () => void }> = ({ apiRef, refresh }) => {
 
     const { selection } = useMuiDataGridContext();
@@ -129,6 +190,7 @@ export const AvisGrid = () => {
     const datagridApiRef = useGridApiRef();
     const gridApiRef = useMuiDataGridApiRef();
     const refresh = React.useCallback(() => gridApiRef.current?.refresh(), [gridApiRef]);
+    const accions = useAvisAccions(refresh);
     return (
         <>
             <PageTitle title={t('page.avisos.grid.title')}></PageTitle>
@@ -146,6 +208,9 @@ export const AvisGrid = () => {
                         {...pageSizeOptionsDataGridProps}
                         selectionActive
                         toolbarHideCreate
+                        rowHideUpdateButton
+                        rowHideDeleteButton
+                        rowAdditionalActions={accions}
                         toolbarElementsWithPositions={[
                             { position: 2, element: <MassiveActionsButton apiRef={datagridApiRef} refresh={refresh} /> },
                             { position: 2, element: <AddButton gridApiRef={gridApiRef} text={t('page.avisos.grid.nou')} tooltip={t('page.avisos.grid.nouTooltip')}/> },

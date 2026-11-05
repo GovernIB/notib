@@ -189,11 +189,13 @@ const dir3SyncChangeKeys = ['creacions', 'modificacions', 'substitucions', 'exti
 const hasCanvis = (result: any) =>
     dir3SyncChangeKeys.some((k) => result?.[k]?.length > 0);
 
+const resultSenseCanvis = (result: any) => result?.senseCanvis === true || !hasCanvis(result);
+
 const OrganGridDir3SyncActionResults: React.FC<{ result: any }> = (props) => {
 
     const { result } = props;
     const { t } = useTranslation();
-    if (!hasCanvis(result)) {
+    if (resultSenseCanvis(result)) {
         return <Typography>{t('page.organs.grid.sync.dialogButton.senseCanvis')}</Typography>;
     }
     return (
@@ -388,7 +390,7 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
                 </Box>
             );
         }
-        setSenseCanvis(!hasCanvis(result));
+        setSenseCanvis(resultSenseCanvis(result));
         setSimular(false);
         // Neteja el registre de la previsualització: el registre de la sincronització real
         // (propera fase) ha de començar en blanc, no arrossegar els missatges d'aquesta fase.
@@ -414,24 +416,28 @@ const OrganGridDir3SyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRe
     };
 
     // Memoritzat: useFormDialog torna a aplicar els botons quan canvia la referència de l'array (un array nou a cada render provoca un bucle infinit)
-    const formDialogButtons = React.useMemo(() => [
-        {
-            value: false,
-            // Un cop feta la sincronització real ja no hi ha res a cancel·lar: el botó passa a
-            // tancar el diàleg.
-            text: t(syncCompleted ? 'page.organs.grid.sync.dialogButton.tancar' : 'page.organs.grid.sync.dialogButton.cancel'),
-            componentProps: { variant: 'outlined' },
-        },
-        {
-            value: true,
-            text: t('page.organs.grid.sync.dialogButton.sincronitzar'),
-            icon: 'save',
-            // No es deshabilita quan `senseCanvis` (sense canvis pendents als ÒRGANS): la
-            // sincronització real actualitza també permisos, procediments, serveis i oficines
-            // SIR, que poden tenir canvis pendents encara que els òrgans no en tinguin.
-            componentProps: { variant: 'contained', disabled: syncCompleted },
-        },
-    ], [t, syncCompleted]);
+    const formDialogButtons = React.useMemo(() => {
+        const buttons: any[] = [
+            {
+                value: false,
+                // Un cop feta la sincronització real ja no hi ha res a cancel·lar: el botó passa a
+                // tancar el diàleg.
+                text: t(syncCompleted ? 'page.organs.grid.sync.dialogButton.tancar' : 'page.organs.grid.sync.dialogButton.cancel'),
+                componentProps: { variant: 'outlined' },
+            },
+        ];
+        // Quan la previsualització indica que no hi ha canvis pendents (`senseCanvis === true` al JSON
+        // o sense canvis detectats als òrgans), s'amaga el botó "Sincronitzar" i només es pot tancar.
+        if (!syncCompleted && senseCanvis !== true) {
+            buttons.push({
+                value: true,
+                text: t('page.organs.grid.sync.dialogButton.sincronitzar'),
+                icon: 'save',
+                componentProps: { variant: 'contained' },
+            });
+        }
+        return buttons;
+    }, [t, syncCompleted, senseCanvis]);
 
     const extraActions = showResultActions && senseCanvis === false ? (
         <>

@@ -149,7 +149,9 @@ export const Propietats: React.FC = () => {
         if (isConfigReady) {
             apiConfigFind({
                 // Les propietats per entitat només es veuen des del diàleg de la propietat general
-                filter: springFilterBuilder.eq('entitat', null),
+                filter: new URLSearchParams(window.location.search).get('entitat')
+                    ? springFilterBuilder.eq('entitat.id', new URLSearchParams(window.location.search).get('entitat'))
+                    : springFilterBuilder.eq('entitat', null),
                 sorts: ['position,asc'],
                 unpaged: true,
             })

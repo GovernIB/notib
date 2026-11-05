@@ -86,6 +86,17 @@ const translationCa = {
                 nou: "Nova entitat",
                 nouTooltip: "Crea una nova entitat"
             },
+            accio: {
+                modificar: "Modifica",
+                configurar: "Configura",
+                resetActOrgans: "Reset act. Órganos",
+                resetActOrgansOk: "Actualització d'òrgans resetejada correctament",
+                esborrar: "Esborra",
+                activar: "Activa",
+                activarOk: "Entitat activada correctament",
+                desactivar: "Desactiva",
+                desactivarOk: "Entitat desactivada correctament",
+            },
             form: {
                 titleCreate: 'Crear entitat',
                 titleUpdate: 'Modificar entitat',
@@ -141,6 +152,15 @@ const translationCa = {
                 activar: { title: 'Activa', ok: 'Avisos activats correctament' },
                 desactivar: { title: 'Desactiva', ok: 'Avisos desactivats correctament' },
                 esborrar: { title: 'Esborra', ok: 'Avisos esborrats correctament' },
+            },
+            accio: {
+                modificar: "Modifica",
+                esborrar: "Esborra",
+                activar: "Activa",
+                activarOk: "Avís activat correctament",
+                desactivar: "Desactiva",
+                desactivarOk: "Avís desactivat correctament",
+                error: "Error executant l'acció",
             },
             form: {
                 titleCreate: 'Crear avís',

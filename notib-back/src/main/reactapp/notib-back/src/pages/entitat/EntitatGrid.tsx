@@ -17,6 +17,7 @@ import { icons } from '../../utils/icons';
 import { EntitatFormContent } from "./EntitatForm.tsx";
 import AddButton from "../../components/AddButton.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
+import useEntitatAccions from "./EntitatAccions.tsx";
 
 const columns: MuiDataGridColDef[] = [
     {
@@ -96,10 +97,13 @@ const ContentFilter: React.FC = () => {
 };
 
 export const EntitatGrid: React.FC = () => {
+
     const { t } = useTranslation();
     const { currentRole } = useNotibContext();
     const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
     const gridApiRef = useMuiDataGridApiRef();
+    const refresh = () => gridApiRef.current?.refresh?.();
+    const accions = useEntitatAccions(refresh);
     const filterDataGridProps = useDatagridFilterProps(
         'entitatResource',
         'FILTER_ENTITAT',
@@ -129,8 +133,9 @@ export const EntitatGrid: React.FC = () => {
                         popupEditFormContent={<EntitatFormContent />}
                         popupEditFormDialogResourceTitle={t('page.entitats.grid.popupResourceTitle')}
                         popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'xl' }}
-                        rowHideUpdateButton={isRoleAdminLectura}
-                        rowHideDeleteButton={isRoleAdminLectura}
+                        rowHideUpdateButton
+                        rowHideDeleteButton
+                        rowAdditionalActions={accions}
                     />
                 </ScreenFrame>
             </GridPage>
