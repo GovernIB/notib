@@ -5,6 +5,7 @@ import {
     GridPage,
     springFilterBuilder as filterBuilder, useFormContext, useMuiDataGridApiRef,
 } from 'reactlib';
+import { useGridApiRef } from '@mui/x-data-grid-pro';
 import LinkToTab from '../../components/LinkToTab';
 import GridFormField from '../../components/GridFormField';
 import useOrganGestorOptionRenderer from '../../components/OrganGestorOptionRenderer';
@@ -23,6 +24,7 @@ import PagadorCieFormTabFulles from "./PagadorCieFormTabFulles.tsx";
 import PagadorCieFormTabSobres from "./PagadorCieFormTabSobres.tsx";
 import AddButton from "../../components/AddButton.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
+import PagadorCieBorradoMasivoButton from '../../components/PagadorCieMassiveActionsButton.tsx';
 
 const columns = [
     {
@@ -144,7 +146,8 @@ export const PagadorCieGrid: React.FC = () => {
 
     const { t } = useTranslation();
     const { currentRole } = useNotibContext();
-    const gridApiRef = useMuiDataGridApiRef()
+    const gridApiRef = useMuiDataGridApiRef();
+    const datagridApiRef = useGridApiRef();
     const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
     const filterDataGridProps = useDatagridFilterProps(
         'pagadorCieResource',
@@ -153,12 +156,18 @@ export const PagadorCieGrid: React.FC = () => {
         <ContentFilter />
     );
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
+    const refrescarDespresAccioMassiva = React.useCallback(() => {
+        datagridApiRef.current?.setRowSelectionModel({ type: 'include', ids: new Set() });
+        gridApiRef.current?.refresh?.();
+    }, [datagridApiRef, gridApiRef]);
+
     return (
         <>
             <PageTitle title={t('page.pagadorCie.grid.title')}></PageTitle>
             <GridPage>
                 <ScreenFrame icon={icons.pagadorCie} title={t('page.pagadorCie.grid.title')}>
                     <StyledMuiGrid
+                        datagridApiRef={datagridApiRef}
                         resourceName="pagadorCieResource"
                         columns={columns}
                         apiRef={gridApiRef}
@@ -170,6 +179,7 @@ export const PagadorCieGrid: React.FC = () => {
                         toolbarType="upper"
                         toolbarHideCreate
                         toolbarElementsWithPositions={ isRoleAdminLectura ? [] : [
+                            { position: 2, element: <PagadorCieBorradoMasivoButton refresh={refrescarDespresAccioMassiva} /> },
                             { position: 2, element: <AddButton gridApiRef={gridApiRef} text={t('page.pagadorCie.grid.nou')} tooltip={t('page.pagadorCie.grid.nouTooltip')} /> },
                         ]}
                         popupEditActive
@@ -177,6 +187,7 @@ export const PagadorCieGrid: React.FC = () => {
                         popupEditFormDialogResourceTitle={t('page.pagadorCie.grid.popupResourceTitle')}
                         rowHideUpdateButton={isRoleAdminLectura}
                         rowHideDeleteButton={isRoleAdminLectura}
+                        selectionActive
                     />
                 </ScreenFrame>
             </GridPage>

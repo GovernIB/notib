@@ -10,6 +10,7 @@ import es.caib.notib.persist.resourceentity.EntitatResourceEntity;
 import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
 import es.caib.notib.persist.resourceentity.PagadorCieResourceEntity;
 import es.caib.notib.persist.resourcerepository.OrganGestorResourceRepository;
+import es.caib.notib.persist.resourcerepository.PagadorCieResourceRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,6 +39,8 @@ class PagadorCieResourceServiceImplTest {
 	private NotibPermissionHelper notibPermissionHelper;
 	@Mock
 	private OrganGestorResourceRepository organGestorRepository;
+	@Mock
+	private PagadorCieResourceRepository pagadorCieResourceRepository;
 	private PagadorCieResourceServiceImpl service;
 
 	@BeforeEach
@@ -46,7 +49,8 @@ class PagadorCieResourceServiceImplTest {
 			userSessionHelper,
 			authenticationHelper,
 			notibPermissionHelper,
-			organGestorRepository
+			organGestorRepository,
+			pagadorCieResourceRepository
 		);
 	}
 

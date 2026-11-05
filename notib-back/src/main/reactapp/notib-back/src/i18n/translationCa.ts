@@ -446,6 +446,14 @@ const translationCa = {
                     sobres: 'Formats de sobre',
                 },
             },
+            actions : {
+                esborrar: {
+                    title: 'Segur que vols eliminar els elements seleccionats?',
+                    button: 'Esborrar',
+                    ok: 'Eliminats correctament',
+                    error: 'Error inesperat',
+                },
+            },
         },
         notificacio: {
             grid: {

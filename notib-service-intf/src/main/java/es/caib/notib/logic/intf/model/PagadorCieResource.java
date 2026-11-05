@@ -19,6 +19,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Informació d'un pagador CIE.
@@ -50,12 +51,24 @@ import java.util.Date;
 		@ResourceArtifact(
 			type = ResourceArtifactType.FILTER,
 			code = PagadorCieResource.FILTER_CODE,
-			formClass = PagadorCieResource.PagadorCIEResourceFilter.class)
+			formClass = PagadorCieResource.PagadorCIEResourceFilter.class),
+		@ResourceArtifact(
+			type = ResourceArtifactType.ACTION,
+			code = PagadorCieResource.ACTION_ESBORRAR_MASSIU,
+			formClass = PagadorCieResource.EsborrarMassiuParams.class,
+			accessConstraints = {
+				@ResourceAccessConstraint(
+					type = ResourceAccessConstraint.ResourceAccessConstraintType.ROLE,
+					roles = { BaseConfig.ROLE_ADMIN }
+				)
+			}
+		),
 	}
 )
 public class PagadorCieResource extends BaseResource<Long> {
 
 	public static final String FILTER_CODE = "FILTER_PAGADOR_CIE";
+	public static final String ACTION_ESBORRAR_MASSIU = "ESBORRAR_MASSIU";
 
 	@NotNull
 	@Size(max = 256)
@@ -86,4 +99,10 @@ public class PagadorCieResource extends BaseResource<Long> {
 		private Date contracteDataVigFinal;
 	}
 
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	public static class EsborrarMassiuParams implements Serializable {
+		private List<Long> ids;
+	}
 }

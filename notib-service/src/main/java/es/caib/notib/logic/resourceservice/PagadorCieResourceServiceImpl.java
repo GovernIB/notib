@@ -9,9 +9,11 @@ import es.caib.notib.logic.intf.model.PagadorCieResource;
 import es.caib.notib.logic.intf.resourceservice.PagadorCieResourceService;
 import es.caib.notib.persist.resourceentity.PagadorCieResourceEntity;
 import es.caib.notib.persist.resourcerepository.OrganGestorResourceRepository;
+import es.caib.notib.persist.resourcerepository.PagadorCieResourceRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.Map;
 
 /**
@@ -24,15 +26,23 @@ import java.util.Map;
 public class PagadorCieResourceServiceImpl extends BaseAdminEntitatResourceServiceImpl<PagadorCieResource, PagadorCieResourceEntity> implements PagadorCieResourceService {
 
 	private final OrganGestorResourceRepository organGestorResourceRepository;
+	private final PagadorCieResourceRepository pagadorCieResourceRepository;
 
 	public PagadorCieResourceServiceImpl(
 		UserSessionHelper userSessionHelper,
 		AuthenticationHelper authenticationHelper,
 		NotibPermissionHelper notibPermissionHelper,
-		OrganGestorResourceRepository organGestorResourceRepository) {
+		OrganGestorResourceRepository organGestorResourceRepository,
+		PagadorCieResourceRepository pagadorCieResourceRepository) {
 
 		super(userSessionHelper, authenticationHelper, notibPermissionHelper);
 		this.organGestorResourceRepository = organGestorResourceRepository;
+		this.pagadorCieResourceRepository = pagadorCieResourceRepository;
+	}
+
+	@PostConstruct
+	public void init() {
+		register(PagadorCieResource.ACTION_ESBORRAR_MASSIU, new PagadorCieEsborrarMassiuActionExecutor(pagadorCieResourceRepository));
 	}
 
 	@Override

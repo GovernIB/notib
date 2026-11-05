@@ -419,6 +419,14 @@ const translationEs = {
                     sobres: 'Formatos de sobre',
                 },
             },
+            actions : {
+                esborrar: {
+                    title: '¿Seguro que quieres eliminar los elementos seleccionados?',
+                    button: 'Borrar',
+                    ok: 'Eliminados correctamente',
+                    error: 'Error inesperado',
+                },
+            },
         },
         notificacio: {
             grid: {
