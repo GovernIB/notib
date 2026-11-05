@@ -235,7 +235,11 @@ const ContentFilter: React.FC = () => {
                     <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="enviamentDataProgramadaFi" />
                     <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="notificaReferencia" />
                     <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="grupCodi" />
-                    <GridFormField size={{ xs: 12, sm: 6, md: 4 }} name="organGestor" namedQueries={`PERM_READ`} optionRenderer={organGestorOptionRenderer} />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 4 }}
+                                   name="organGestor"
+                                   namedQueries={`PERM_READ`}
+                                   isOptionEqualToValue={(option: any, value: any) => option?.id === value?.id}
+                                   optionRenderer={organGestorOptionRenderer} />
                     <GridFormField size={{ xs: 12, sm: 6, md: 3 }} name="procedimentServei" filter={procedimentFiltre} />
                     <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="createdBy" />
                     <GridFormField size={{ xs: 12, sm: 6, md: 3 }} name="notificacioDescripcio" />
@@ -286,6 +290,7 @@ const EnviamentGrid = () => {
             },
         }
     );
+    console.log(filterDataGridProps);
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     const {anularRemesa,  anularRemesaDialog, ampliarTermini, ampliarTerminiDialog } = useAccionsNotificacio();
     return (

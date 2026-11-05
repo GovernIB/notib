@@ -552,14 +552,14 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries, boolean isSingleResult) {
 
 		// Condició per a mostrar només les notificacions de l'entitat actual
-		var isRolSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);
+		var isRolSuper = userSessionHelper.isRolSuper();
 		if (isRolSuper) {
 			return "";
 		}
 		var entitatFilter = "entitat.id:" + userSessionHelper.getCurrentEntitatId();
-		var isRoleAdmin = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN);
-		var isRoleAdminLectura = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN_LECTURA);
-		var isRoleAdminOrgan = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN);
+		var isRoleAdmin = userSessionHelper.isRolAdmin();
+		var isRoleAdminLectura = userSessionHelper.isRolAdminLectura();
+		var isRoleAdminOrgan = userSessionHelper.isRolOrgan();
 		if (isRoleAdminOrgan && notibPermissionHelper.currentOrganGestorPermissionAllowed(BasePermission.ADMINISTRATION)) {
 			return entitatFilter + " and organGestor.id:" + userSessionHelper.getCurrentOrganGestorId();
 		}

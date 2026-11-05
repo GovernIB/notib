@@ -18,7 +18,7 @@ export const useRefrescarEstat = (
     }, [artifactAction, refreshGrid, t, temporalMessageShow]);
 };
 
-export const useAccionsNotificacio = () => {
+export const useAccionsNotificacio = (refreshGrid?: () => void) => {
 
     const { t } = useTranslation();
     const { exec: descarregarJustificantEnviament } = useMuiActionReportLogic(
@@ -190,8 +190,8 @@ export const useAccionsNotificacio = () => {
         resposta =>  {
             if (!resposta || !resposta.ok) {
                 temporalMessageShow(null, resposta.error, "error");
-                return;
             }
+            refreshGrid?.();
         },
         undefined,
         undefined,
