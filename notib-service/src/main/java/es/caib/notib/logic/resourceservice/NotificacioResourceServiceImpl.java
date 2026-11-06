@@ -24,7 +24,6 @@ import es.caib.notib.logic.helper.NotificacioEstatAsyncHelper;
 import es.caib.notib.logic.helper.NotificacioListHelper;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
-import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.exception.ResourceNotCreatedException;
 import es.caib.notib.logic.intf.base.model.FieldOption;
@@ -41,7 +40,6 @@ import es.caib.notib.logic.intf.resourceservice.NotificacioResourceService;
 import es.caib.notib.logic.intf.service.AccioMassivaService;
 import es.caib.notib.logic.intf.service.CallbackService;
 import es.caib.notib.logic.intf.service.EnviamentService;
-import es.caib.notib.logic.intf.service.EnviamentSmService;
 import es.caib.notib.logic.intf.service.GrupService;
 import es.caib.notib.logic.intf.service.JustificantService;
 import es.caib.notib.logic.intf.service.NotificacioService;
@@ -79,7 +77,6 @@ import es.caib.notib.persist.resourcerepository.CallbackResourceRepository;
 import es.caib.notib.persist.resourcerepository.DocumentResourceRepository;
 import es.caib.notib.persist.resourcerepository.EventResourceRepository;
 import es.caib.notib.persist.resourcerepository.NotificacioEnviamentResourceRepository;
-import es.caib.notib.persist.resourcerepository.NotificacioResourceRepository;
 import es.caib.notib.persist.resourcerepository.PersonaResourceRepository;
 import es.caib.notib.persist.resourcerepository.GrupResourceRepository;
 import es.caib.notib.persist.resourcerepository.ProcedimentOrganGestorResourceRepository;
@@ -562,7 +559,8 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 		var isRoleAdminLectura = userSessionHelper.isRolAdminLectura();
 		var isRoleAdminOrgan = userSessionHelper.isRolOrgan();
 		if (isRoleAdminOrgan && notibPermissionHelper.currentOrganGestorPermissionAllowed(BasePermission.ADMINISTRATION)) {
-			return entitatFilter + " and organGestor.id:" + userSessionHelper.getCurrentOrganGestorId();
+			var organIdsFilter = userSessionHelper.buildCurrentOrganGestorAndDescendentsIdsFilter(false);
+			return entitatFilter + " and " + organIdsFilter;
 		}
 		if ((isRoleAdmin && notibPermissionHelper.currentEntitatPermissionAllowed(ExtendedPermission.PERM2)) ||
 			(isRoleAdminLectura && notibPermissionHelper.currentEntitatPermissionAllowed(ExtendedPermission.PERMX))) {

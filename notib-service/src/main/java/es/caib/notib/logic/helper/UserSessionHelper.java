@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.stream.Collectors;
+
 /**
  * Helper per a obtenir informació de la sessió d'usuari (capçalera HTTP).
  *
@@ -26,6 +28,7 @@ public class UserSessionHelper {
 
 	private final EntitatResourceRepository entitatResourceRepository;
 	private final OrganGestorResourceRepository organGestorResourceRepository;
+	private final OrganigramaHelper organigramaHelper;
 
 	// Mateixa propietat que WebSecurityConfig.selectedRoleHttpHeader / NotibPermissionHelper: es llegeix
 	// directament de la capçalera de la petició (no de l'Authentication) perquè un usuari pot tenir més
@@ -123,6 +126,40 @@ public class UserSessionHelper {
 			throw new NotFoundException(currentOrganGestorId, OrganGestorResourceEntity.class, "Organ gestor no trobat a la bdd");
 		}
 		return organ.get();
+	}
+
+	/**
+	 * Construeix el filtre spring-filter per a l'òrgan gestor actual i tots els seus descendents.
+	 * Exemple: "organGestor.id: 1 or organGestor.id: 2 or organGestor.id: 5"
+	 *
+	 * @return el filtre d'ids d'òrgans gestors o null si no hi ha òrgan actual.
+	 */
+	public String buildCurrentOrganGestorAndDescendentsIdsFilter(boolean incloureNotificacio) {
+
+		var organ = getCurrentOrganGestor();
+		if (organ == null) {
+			return null;
+		}
+		var entitatId = getCurrentEntitatId();
+		if (entitatId == null) {
+			return null;
+		}
+		var entitatResourceEntity = entitatResourceRepository.findById(entitatId).orElse(null);
+		if (entitatResourceEntity == null) {
+			return null;
+		}
+		var codisDescendents = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
+			entitatResourceEntity.getDir3Codi(), organ.getCodi());
+		var organIds = organGestorResourceRepository.findByEntitat(entitatResourceEntity).stream()
+			.filter(og -> codisDescendents.contains(og.getCodi()))
+			.map(OrganGestorResourceEntity::getId)
+			.collect(Collectors.toList());
+		if (organIds.isEmpty()) {
+			return null;
+		}
+		return "(" + organIds.stream()
+			.map(id -> (incloureNotificacio ? "notificacio." : "") +"organGestor.id: " + id)
+			.collect(Collectors.joining(" or ")) + ")";
 	}
 
 	private UserSession getUserSession() {

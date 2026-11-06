@@ -5,6 +5,7 @@ import es.caib.notib.logic.helper.AclHelper;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.helper.PaginacioHelper;
+import es.caib.notib.logic.helper.OrganigramaHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
@@ -31,6 +32,7 @@ import es.caib.notib.logic.procediments.ProcedimentSyncManualActionExecutor;
 import es.caib.notib.logic.procediments.ProcedimentsSyncActionExecutor;
 import es.caib.notib.logic.procediments.ServeisSyncActionExecutor;
 import es.caib.notib.persist.resourceentity.EntregaCieResourceEntity;
+import es.caib.notib.persist.resourceentity.OrganGestorResourceEntity;
 import es.caib.notib.persist.resourceentity.ProcedimentResourceEntity;
 import es.caib.notib.persist.resourcerepository.EntitatResourceRepository;
 import es.caib.notib.persist.resourcerepository.EntregaCieResourceRepository;
@@ -84,6 +86,7 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 	private final OrganGestorService organGestorService;
 	private final GrupService grupService;
 
+
 	@PostConstruct
 	public void init() {
 
@@ -118,7 +121,8 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 		ServeiService serveiService,
 		OrganGestorService organGestorService,
 		GrupService grupService,
-		CacheHelper cacheHelper) {
+		CacheHelper cacheHelper,
+		OrganigramaHelper organigramaHelper) {
 
 		super(userSessionHelper, authenticationHelper, notibPermissionHelper);
 		this.aclHelper = aclHelper;
@@ -142,13 +146,18 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 
 		var superFilter = super.additionalSpringFilter(currentSpringFilter, namedQueries, isSingleResult);
 		var isRoleAdminOrgan = userSessionHelper.isRolOrgan();
-		if (isRoleAdminOrgan && notibPermissionHelper.currentOrganGestorPermissionAllowed(BasePermission.ADMINISTRATION)) {
+		if (isRoleAdminOrgan) {
 			var permisComuns = notibPermissionHelper.currentOrganGestorPermissionAllowed(ExtendedPermission.PERM3);
-			var filtreOrgan = "(organGestor.id:" + userSessionHelper.getCurrentOrganGestorId() + (permisComuns ? " or comu:true)" : ")");
-			superFilter = !Strings.isNullOrEmpty(superFilter) ? superFilter + " and " + filtreOrgan : filtreOrgan;
+			var organIdsFilter = userSessionHelper.buildCurrentOrganGestorAndDescendentsIdsFilter(false);
+			if (organIdsFilter != null) {
+				var filtreOrgan = "(" + organIdsFilter + (permisComuns ? " or comu:true)" : ")");
+				superFilter = !Strings.isNullOrEmpty(superFilter) ? superFilter + " and " + filtreOrgan : filtreOrgan;
+			}
 		}
 		return superFilter;
 	}
+
+
 
 	@Override
 	protected void completeResource(ProcedimentResource resource) {
@@ -171,24 +180,13 @@ public class ProcedimentResourceServiceImpl extends BaseAdminEntitatResourceServ
 		var entitat = userSessionHelper.getCurrentEntitatId();
 		Sort processedSort = toProcessedSort(pageable.getSort());
 		List<ProcedimentResourceEntity> procediments;
-		if (authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN) || authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN_LECTURA)) {
+		if (userSessionHelper.isRolAdmin() || userSessionHelper.isRolAdminLectura()) {
 			Specification<ProcedimentResourceEntity> specification = toFindProcessedSpecification(quickFilter, filter, namedQueries);
 			procediments = procedimentResourceRepository.findAll(specification, processedSort);
-		} else if (authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ORGAN)) {
-			var organ = userSessionHelper.getCurrentOrganGestor();
-			if (organ != null) {
-				// "organGestor" (sense ".id") és una propietat d'entitat (ManyToOne): spring-filter
-				// intenta convertir el literal a un OrganGestorResourceEntity i falla amb
-				// InternalFilterException. Cal filtrar per l'id, no per l'entitat sencera.
-				if (Strings.isNullOrEmpty(filter)) {
-					filter = "organGestor.id: " + organ.getId();
-				} else {
-					filter += " and organGestor.id: " + organ.getId();
-				}
-			}
+		} else if (userSessionHelper.isRolOrgan()) {
 			Specification<ProcedimentResourceEntity> specification = toFindProcessedSpecification(quickFilter, filter, namedQueries);
 			procediments = procedimentResourceRepository.findAll(specification, processedSort);
-		} else if (authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_USER)) {
+		} else if (userSessionHelper.isRolUser()) {
 			var isProcediment = !Strings.isNullOrEmpty(filter) && filter.contains("tipus:'PROCEDIMENT'");
 			var isServei = filter.contains("tipus:'SERVEI'");
 			Long filtreOrgan = null;
