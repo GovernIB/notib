@@ -4,6 +4,7 @@ import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.helper.AclHelper;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
+import es.caib.notib.logic.helper.OrganigramaHelper;
 import es.caib.notib.logic.helper.PaginacioHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
@@ -69,6 +70,8 @@ class ProcedimentResourceServiceImplTest {
 	private NotibPermissionHelper notibPermissionHelper;
 	private ProcedimentResourceServiceImpl service;
 	@Mock
+	private OrganigramaHelper organigramaHelper;
+	@Mock
 	private PaginacioHelper paginacioHelper;
 	@Mock
 	private ProcedimentServiceImpl procedimentService;
@@ -97,7 +100,8 @@ class ProcedimentResourceServiceImplTest {
 			serveiService,
 			organGestorService,
 			grupService,
-			cacheHelper
+			cacheHelper,
+			organigramaHelper
 		);
 	}
 

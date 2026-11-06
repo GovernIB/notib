@@ -49,7 +49,7 @@ public class AvisResourceServiceImpl extends BaseMutableResourceService<AvisReso
 	@Override
 	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries, boolean isSingleResult) {
 
-		var isRolSuper = authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER);
+		var isRolSuper = userSessionHelper.isRolSuper();
 		if (isRolSuper) {
 			return "";
 		}

@@ -1,6 +1,5 @@
 package es.caib.notib.logic.resourceservice;
 
-import es.caib.notib.logic.base.helper.AuthenticationHelper;
 import es.caib.notib.logic.base.service.BaseMutableResourceService;
 import es.caib.notib.logic.enviaments.CancelarEntregaPostalActionExecutor;
 import es.caib.notib.logic.enviaments.DiagramaStateMachineReportGenerator;
@@ -17,7 +16,6 @@ import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.NotibPermissionHelper;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.helper.UserSessionHelper;
-import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.base.exception.AnswerRequiredException;
 import es.caib.notib.logic.intf.base.exception.ResourceNotCreatedException;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
@@ -51,7 +49,6 @@ import java.util.Map;
 public class NotificacioEnviamentResourceServiceImpl extends BaseMutableResourceService<NotificacioEnviamentResource, Long, NotificacioEnviamentResourceEntity> implements NotificacioEnviamentResourceService {
 
 	private final UserSessionHelper userSessionHelper;
-	private final AuthenticationHelper authenticationHelper;
 	private final NotibPermissionHelper notibPermissionHelper;
 	private final PluginHelper pluginHelper;
 	private final MetricsHelper metricsHelper;
@@ -84,7 +81,8 @@ public class NotificacioEnviamentResourceServiceImpl extends BaseMutableResource
 		var isRoleAdminLectura = userSessionHelper.isRolAdminLectura();
 		var isRoleAdminOrgan = userSessionHelper.isRolOrgan();
 		if (isRoleAdminOrgan && notibPermissionHelper.currentOrganGestorPermissionAllowed(BasePermission.ADMINISTRATION)) {
-			return entitatFilter + " and notificacio.organGestor.id:" + userSessionHelper.getCurrentOrganGestorId();
+			var organIdsFilter = userSessionHelper.buildCurrentOrganGestorAndDescendentsIdsFilter(true);
+			return entitatFilter + " and " + organIdsFilter;
 		}
 		if ((isRoleAdmin && notibPermissionHelper.currentEntitatPermissionAllowed(ExtendedPermission.PERM2)) ||
 			(isRoleAdminLectura && notibPermissionHelper.currentEntitatPermissionAllowed(ExtendedPermission.PERMX))) {
