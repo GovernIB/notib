@@ -6,8 +6,9 @@ import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import Icon from '@mui/material/Icon';
 import IconButton from '@mui/material/IconButton';
-import {MAIN_GAP} from "../utils/layout.ts";
-import {AvisSse, useAvisosSse} from "./SseClient.tsx";
+import { AvisSse, useAvisosSse } from './SseClient.tsx';
+
+const AVISOS_GAP = 2;
 
 /**
  * Avisos actius de l'aplicació, damunt del contingut de la pàgina.
@@ -34,7 +35,11 @@ const AvisBanner: React.FC<{ avis: AvisSse }> = ({ avis }) => {
     return (
         <Alert
             severity={getSeverity(avis.avisNivell)}
-            sx={{ py: 0.75, alignItems: 'center' }}
+            sx={{
+                py: 0,
+                px: 1.5,
+                alignItems: 'center',
+            }}
             action={
                 <IconButton
                     color="inherit"
@@ -46,7 +51,7 @@ const AvisBanner: React.FC<{ avis: AvisSse }> = ({ avis }) => {
                 </IconButton>
             }
         >
-            <AlertTitle sx={{ m: 0 }}>{avis.assumpte}</AlertTitle>
+            <AlertTitle sx={{ m: 0, lineHeight: 1.4 }}>{avis.assumpte}</AlertTitle>
             <Collapse in={desplegat}>
                 {/* El missatge s'edita en un camp de text pla: es respecten els salts de línia
                     però no s'hi interpreta cap marcatge. */}
@@ -57,7 +62,6 @@ const AvisBanner: React.FC<{ avis: AvisSse }> = ({ avis }) => {
 };
 
 export const AvisosBanner: React.FC = () => {
-
     const avisos = useAvisosSse();
     // const avisos: any[] = [{id: 1, avisNivell: "ERRROR", missatge:"foo", assumpte: "bar" }];
     if (avisos.length === 0) {
@@ -66,7 +70,14 @@ export const AvisosBanner: React.FC = () => {
     return (
         // La separació amb la pantalla de sota la posa el `gap` de <main> (veure frameSx a BaseApp.tsx);
         // entre els avisos, la mateixa separació.
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: MAIN_GAP + 'px', flex: '0 0 auto' }}>
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: AVISOS_GAP + 'px',
+                flex: '0 0 auto',
+            }}
+        >
             {avisos.map((avis) => (
                 <AvisBanner key={avis.id} avis={avis} />
             ))}
