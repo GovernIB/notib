@@ -49,6 +49,8 @@ export type FormProps = React.PropsWithChildren & {
     perspectives?: string[];
     /** Camps personalitzats per a inicialitzar el formulari (si s'especifica aquesta propietat no es consultaran els camps a l'API REST) */
     customFields?: any[];
+    /** Permet establir si l'acció de desar està present als enllaços HATEOAS i així ignorar la lògica que deshabilita els camps del formulari si l'enllaç no hi és */
+    saveActionPresent?: true;
     /** Indica si s'ha de fer una petició onChange sense cap camp associat quan es crea el component */
     initOnChangeRequest?: true;
     /** Indica si s'ha d'aturar l'enviament del formulari si hi ha errors del validador (que no siguin errors de validació de l'API REST) */
@@ -219,6 +221,7 @@ export const Form: React.FC<FormProps> = (props) => {
         additionalData: additionalDataProp,
         perspectives,
         customFields,
+        saveActionPresent: saveActionPresentProp,
         initOnChangeRequest,
         avoidSubmitIfAnyValidatorErrors,
         saveOnFieldEnterKeyPressed,
@@ -301,8 +304,11 @@ export const Form: React.FC<FormProps> = (props) => {
     const { id, setInternalId } = useControlledId(idProp);
     const location = useLocation();
     const additionalData = additionalDataProp ?? location.state?.additionalData;
-    const isSaveActionPresent =
-        resourceType == null ? apiActions?.[id != null ? 'update' : 'create'] != null : true;
+    const isSaveActionPresent = saveActionPresentProp
+        ? saveActionPresentProp
+        : resourceType == null
+          ? apiActions?.[id != null ? 'update' : 'create'] != null
+          : true;
     const isDeleteActionPresent = id && apiActions?.['delete'] != null;
     const isReady = !isLoading;
     const anyModified = modified || externalModified;

@@ -302,6 +302,7 @@ export const useActionReportLogic = (
         formAdditionalData?: any,
         formDialogComponentProps?: any
     ) => {
+        setFinished(false);
         if (hasForm) {
             const formDialogTitle =
                 apiLink?.title ?? (action != null ? 'Exec ' + action : 'Generate ' + report);
