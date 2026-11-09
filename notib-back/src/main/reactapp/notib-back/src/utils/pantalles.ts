@@ -5,7 +5,6 @@ import {
     ROLE_SUPER,
     ROLE_USER,
 } from '../components/NotibContext';
-// import {useConfig} from "../components/ConfigProvider";
 
 /**
  * Rols amb els quals es pot operar a la interfície REACT: els mateixos que ofereix el selector de
@@ -85,12 +84,7 @@ export const PANTALLA_ROLS: Record<Pantalla, string[]> = {
 
 };
 
-export const isPantallaPermesa = (pantalla: Pantalla, rol?: string): boolean => {
-
-    console.log(rol);
-    console.log(pantalla);
-    return rol != null && PANTALLA_ROLS[pantalla].includes(rol);
-}
+export const isPantallaPermesa = (pantalla: Pantalla, rol?: string): boolean => rol != null && PANTALLA_ROLS[pantalla].includes(rol)
 
 /**
  * Pantalla d'inici per rol -- l'equivalent del HomeRedirect de RIPEA. Reprodueix la redirecció de
@@ -131,16 +125,9 @@ export const filtrarEntradesMenu = (
 ): MenuEntry[] =>
     entrades.reduce<MenuEntry[]>((visibles, entrada) => {
         const { pantalla, children, ...entradaMenu } = entrada;
-        // const { getByName } = useConfig()
         if (pantalla != null && !isPantallaPermesa(pantalla, rol)) {
             return visibles;
         }
-        // if (pantalla == 'metaDada' || pantalla == 'domini') {
-        //     const metadadesActives = getByName("es.caib.notib.permetre.metadades.registre")
-        //     if (!metadadesActives) {
-        //         return visibles;
-        //     }
-        // }
         if (children != null) {
             const fills = filtrarEntradesMenu(children, rol);
             if (fills.length === 0 && entradaMenu.to == null) {

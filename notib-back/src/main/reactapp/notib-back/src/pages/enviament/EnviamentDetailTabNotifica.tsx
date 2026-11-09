@@ -68,7 +68,6 @@ const EnviamentDetailTabNotifica: React.FC<{ enviament: any; apiCurrentFields: a
             );
         }
     };
-    console.log("foo: " + renderAlertEstat);
     return (
         <Box sx={{ height: '100%', overflowY: 'auto', minHeight: 0 }}>
             {renderContingutRefrescar()}
