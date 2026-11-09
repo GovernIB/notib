@@ -79,6 +79,12 @@ const translationCa = {
                 subtitle: 'Aplicació per a gestionar i enviar les notificacions de la CAIB',
             },
         },
+        forbidden: {
+            message: 'No teniu accés a aquesta pàgina amb el rol actual',
+        },
+        notFound: {
+            message: 'Pàgina no trobada',
+        },
         entitats: {
             grid: {
                 title: 'Entitats',
@@ -1223,10 +1229,6 @@ const translationCa = {
                     }
                 }
             }
-        },
-        notFound: {
-            title: 'Pàgina no trobada',
-            toHome: "Anar a l'inici",
         },
         sitemap: {
             // L'OAW (verificació 2.4) només reconeix l'enllaç al mapa web si el text coincideix exactament

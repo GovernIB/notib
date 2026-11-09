@@ -5,6 +5,8 @@ import es.caib.notib.logic.intf.base.annotation.ResourceArtifact;
 import es.caib.notib.logic.intf.base.annotation.ResourceConfig;
 import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
+import es.caib.notib.logic.intf.base.util.HttpRequestUtil;
+import javax.servlet.http.HttpServletRequest;
 import es.caib.notib.logic.intf.base.service.PermissionEvaluatorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +56,12 @@ public abstract class BasePermissionHelper {
 			PermissionEvaluatorService.RestApiOperation restapiOperation,
 			@Nullable BasePermission[] permissions,
 			PermissionMatchType matchType) {
+		String selectedRole = null;
+		java.util.Optional<HttpServletRequest> req = HttpRequestUtil.getCurrentHttpRequest();
+		if (req.isPresent()) {
+			selectedRole = req.get().getHeader("X-App-Role");
+		}
+		log.info("checkResourcePermission: targetType={}, selectedRole={}, authorities={}", targetType, selectedRole, auth != null ? auth.getAuthorities() : null);
 		try {
 			Class<?> targetTypeClass = Class.forName(targetType);
 			ResourceConfig resourceConfig = targetTypeClass.getAnnotation(ResourceConfig.class);

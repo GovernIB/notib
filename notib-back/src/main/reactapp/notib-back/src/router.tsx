@@ -29,6 +29,7 @@ import PermisosUsuariGrid from "./pages/usuaris/PermisosUsuariGrid.tsx";
 import PagadorsPostalsGrid from "./pages/pagadorPostal/PagadorsPostalsGrid.tsx";
 import Accessibilitat from "./pages/Accesibilitat.tsx";
 import Sitemap from "./pages/Sitemap.tsx";
+import ProtectedRoute from "./components/ProtectedRoute.tsx";
 
 export const router = createBrowserRouter(
     [
@@ -41,152 +42,239 @@ export const router = createBrowserRouter(
                     element: <HomeRedirect />,
                 },
                 {
-                    path: 'home',
-                    element: <Home />,
+                    element: <ProtectedRoute pantalla="home" />,
+                    children: [
+                        { path: 'home', element: <Home /> },
+                    ],
                 },
                 {
                     path: 'entitats',
                     children: [
-                        { index: true, element: <EntitatGrid /> },
-                        { path: 'current', element: <EntitatForm /> },
                         {
-                            path: 'form',
+                            element: <ProtectedRoute pantalla="entitats" />,
                             children: [
-                                { index: true, element: <EntitatForm /> },
-                                { path: ':id', element: <EntitatForm /> },
+                                { index: true, element: <EntitatGrid /> },
+                                {
+                                    path: 'form',
+                                    children: [
+                                        { index: true, element: <EntitatForm /> },
+                                        { path: ':id', element: <EntitatForm /> },
+                                    ],
+                                },
+                            ],
+                        },
+                        {
+                            element: <ProtectedRoute pantalla="entitatActual" />,
+                            children: [
+                                { path: 'current', element: <EntitatForm /> },
                             ],
                         },
                     ],
                 },
                 {
-                    path: 'propietats',
-                    element: <Propietats />,
-                },
-                {
-                    path: 'avisos',
+                    element: <ProtectedRoute pantalla="propietats" />,
                     children: [
-                        { index: true, element: <AvisGrid /> },
+                        { path: 'propietats', element: <Propietats /> },
                     ],
                 },
                 {
-                    path: 'procediments',
+                    element: <ProtectedRoute pantalla="avisos" />,
                     children: [
-                        { index: true, element: <ProcedimentGrid /> },
-                    ],
-                },
-                {
-                    path: 'serveis',
-                    children: [
-                        { index: true, element: <ServeiGrid /> },
-                    ],
-                },
-                {
-                    path: 'grups',
-                    element: <Grups />,
-                },
-                {
-                    path: 'organs',
-                    children: [
-                        { index: true, element: <OrganGrid /> },
                         {
-                            path: 'form',
+                            path: 'avisos',
+                            element: <AvisGrid />,
+                            handle: { titol: 'page.avisos.grid.title' },
+                        },
+                    ],
+                },
+                {
+                    element: <ProtectedRoute pantalla="procediments" />,
+                    children: [
+                        {
+                            path: 'procediments',
                             children: [
-                                { index: true, element: <OrganForm /> },
-                                { path: ':id', element: <OrganForm /> },
+                                { index: true, element: <ProcedimentGrid /> },
                             ],
                         },
                     ],
                 },
                 {
-                    path: 'pagadorspostal',
+                    element: <ProtectedRoute pantalla="serveis" />,
                     children: [
-                        { index: true, element: <PagadorsPostalsGrid /> },
-                    ]
-                },
-                {
-                    path: 'pagadorscie',
-                    children: [
-                        { index: true, element: <PagadorCieGrid /> },
-                    ]
-                },
-                {
-                    path: 'notificacions',
-                    children: [
-                        { index: true, element: <NotificacioGrid key="notificacio-notificacions" notificacionsEsborrades={false} notificacionsErrorRegistre={false} /> },
                         {
-                            path: 'form',
+                            path: 'serveis',
                             children: [
-                                { index: true, element: <NotificacioForm /> },
-                                { path: ':id', element: <NotificacioForm /> },
+                                { index: true, element: <ServeiGrid /> },
                             ],
                         },
                     ],
                 },
                 {
-                    path: 'notificacionsEsborrades',
-                    element: <NotificacioGrid key="notificacio-esborrades" notificacionsEsborrades={true} notificacionsErrorRegistre={false}/> },
-                {
-                    path: 'notificacionsErrorRegistre',
-                    element: <NotificacioGrid key="notificacio-errorRegistre" notificacionsErrorRegistre={true} notificacionsEsborrades={false}/> },
-                {
-                    path: 'notificacionsCallbackError',
-                    element: <NotificacioGrid key="notificacio-callbackError" notificacionsErrorRegistre={false} notificacionsEsborrades={false} notificacionsCallbackError={true}/> },
-                {
-                    path: 'enviaments',
-                    element: <EnviamentGrid />,
+                    element: <ProtectedRoute pantalla="grups" />,
+                    children: [
+                        { path: 'grups', element: <Grups /> },
+                    ],
                 },
                 {
-                    path: 'notificacio/massiva',
+                    element: <ProtectedRoute pantalla="organs" />,
                     children: [
-                        { index: true, element: <NotificacioMassivaGrid /> },
                         {
-                            path: 'form',
+                            path: 'organs',
                             children: [
-                                { index: true, element: <NotificacioMassivaForm /> },
+                                { index: true, element: <OrganGrid /> },
+                                {
+                                    path: 'form',
+                                    children: [
+                                        { index: true, element: <OrganForm /> },
+                                        { path: ':id', element: <OrganForm /> },
+                                    ],
+                                },
                             ],
                         },
                     ],
                 },
                 {
-                    path: 'accions/massives',
-                    element: <AccioMassivaGrid />,
-                },
-                {
-                    path: 'integracions',
+                    element: <ProtectedRoute pantalla="pagadorspostal" />,
                     children: [
-                        { index: true, element: <MonitorIntegracioGrid /> },
-                        /*{
-                            path: 'detail',
-                            children: [{ path: ':id', element: <MonitorIntegracioParamDetail /> }],
-                        },*/
+                        {
+                            path: 'pagadorspostal',
+                            children: [
+                                { index: true, element: <PagadorsPostalsGrid /> },
+                            ],
+                        },
                     ],
                 },
                 {
-                    path: 'caches',
-                    element: <CacheGrid />
-                },
-                {
-                    path: 'metriques',
-                    element: <Metriques />
-                },
-                {
-                    path: 'activemq',
+                    element: <ProtectedRoute pantalla="pagadorscie" />,
                     children: [
-                        { index: true, element: <ActiveMqGrid /> },
+                        {
+                            path: 'pagadorscie',
+                            children: [
+                                { index: true, element: <PagadorCieGrid /> },
+                            ],
+                        },
                     ],
                 },
                 {
-                    path: 'callbacks',
-                    element: <CallbackPendentsGrid />
-                },
-                {
-                    path: 'permisosUsuari',
-                    element: <PermisosUsuariGrid />
-                },
-                {
-                    path: 'monitorSistema',
+                    element: <ProtectedRoute pantalla="notificacions" />,
                     children: [
-                        { index: true, element: <MonitorSistema/> },
+                        {
+                            path: 'notificacions',
+                            children: [
+                                { index: true, element: <NotificacioGrid key="notificacio-notificacions" notificacionsEsborrades={false} notificacionsErrorRegistre={false} /> },
+                                {
+                                    path: 'form',
+                                    children: [
+                                        { index: true, element: <NotificacioForm /> },
+                                        { path: ':id', element: <NotificacioForm /> },
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    element: <ProtectedRoute pantalla="notificacionsEsborrades" />,
+                    children: [
+                        { path: 'notificacionsEsborrades', element: <NotificacioGrid key="notificacio-esborrades" notificacionsEsborrades={true} notificacionsErrorRegistre={false} /> },
+                    ],
+                },
+                {
+                    element: <ProtectedRoute pantalla="notificacionsErrorRegistre" />,
+                    children: [
+                        { path: 'notificacionsErrorRegistre', element: <NotificacioGrid key="notificacio-errorRegistre" notificacionsErrorRegistre={true} notificacionsEsborrades={false} /> },
+                    ],
+                },
+                {
+                    element: <ProtectedRoute pantalla="notificacionsCallbackError" />,
+                    children: [
+                        { path: 'notificacionsCallbackError', element: <NotificacioGrid key="notificacio-callbackError" notificacionsErrorRegistre={false} notificacionsEsborrades={false} notificacionsCallbackError={true} /> },
+                    ],
+                },
+                {
+                    element: <ProtectedRoute pantalla="enviaments" />,
+                    children: [
+                        { path: 'enviaments', element: <EnviamentGrid /> },
+                    ],
+                },
+                {
+                    element: <ProtectedRoute pantalla="notificacioMassiva" />,
+                    children: [
+                        {
+                            path: 'notificacio/massiva',
+                            children: [
+                                { index: true, element: <NotificacioMassivaGrid /> },
+                                {
+                                    path: 'form',
+                                    children: [
+                                        { index: true, element: <NotificacioMassivaForm /> },
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    element: <ProtectedRoute pantalla="accionsMassives" />,
+                    children: [
+                        { path: 'accions/massives', element: <AccioMassivaGrid /> },
+                    ],
+                },
+                {
+                    element: <ProtectedRoute pantalla="integracions" />,
+                    children: [
+                        {
+                            path: 'integracions',
+                            children: [
+                                { index: true, element: <MonitorIntegracioGrid /> },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    element: <ProtectedRoute pantalla="caches" />,
+                    children: [
+                        { path: 'caches', element: <CacheGrid /> },
+                    ],
+                },
+                {
+                    element: <ProtectedRoute pantalla="metriques" />,
+                    children: [
+                        { path: 'metriques', element: <Metriques /> },
+                    ],
+                },
+                {
+                    element: <ProtectedRoute pantalla="activemq" />,
+                    children: [
+                        {
+                            path: 'activemq',
+                            children: [
+                                { index: true, element: <ActiveMqGrid /> },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    element: <ProtectedRoute pantalla="callbacks" />,
+                    children: [
+                        { path: 'callbacks', element: <CallbackPendentsGrid /> },
+                    ],
+                },
+                {
+                    element: <ProtectedRoute pantalla="permisosUsuari" />,
+                    children: [
+                        { path: 'permisosUsuari', element: <PermisosUsuariGrid /> },
+                    ],
+                },
+                {
+                    element: <ProtectedRoute pantalla="monitorSistema" />,
+                    children: [
+                        {
+                            path: 'monitorSistema',
+                            children: [
+                                { index: true, element: <MonitorSistema /> },
+                            ],
+                        },
                     ],
                 },
                 {

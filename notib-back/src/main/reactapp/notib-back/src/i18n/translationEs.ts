@@ -1197,9 +1197,11 @@ const translationEs = {
                 }
             }
         },
+        forbidden: {
+            message: 'No teniu accés a aquesta pàgina amb el rol actual',
+        },
         notFound: {
-            title: 'Página no encontrada',
-            toHome: 'Ir al inicio',
+            message: 'Pàgina no trobada',
         },
         sitemap: {
             title: "Mapa del sitio web",
