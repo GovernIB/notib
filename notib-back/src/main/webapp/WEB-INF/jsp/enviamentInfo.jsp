@@ -190,7 +190,6 @@ $(document).ready(function() {
 			url: '<c:url value="/notificacio/enviament/${enviamentId}/state/machine/set/event"/>',
 			success: data => {
 				let msg = data ? "ok" : "error";
-				console.log(msg);
 			},
 			error: err => console.error(err)
 		});
@@ -248,7 +247,7 @@ $(document).ready(function() {
 					<c:otherwise>
 						<spring:message code="enviament.info.tab.estat.notifica"/>
 					</c:otherwise>
-				</c:choose>				
+				</c:choose>
 			</a>
 		</li>
 		<li role="presentation"<c:if test="${pipellaActiva == 'estatSeu'}"> class="active"</c:if>>
@@ -400,7 +399,7 @@ $(document).ready(function() {
 							<c:if test="${not empty enviament.titular.llinatge1}">
 								<tr>
 									<td><strong><spring:message code="enviament.info.titular.llinatges"/></strong></td>
-									<td>${enviament.titular.llinatge1} 
+									<td>${enviament.titular.llinatge1}
 									<c:if test="${not empty titular.llinatge2}">
 										${titular.llinatge2}
 									</c:if>
@@ -447,7 +446,7 @@ $(document).ready(function() {
 									<c:if test="${not empty destinatari.llinatge1}">
 										<tr>
 											<td><strong><spring:message code="enviament.info.destinatari.llinatges"/></strong></td>
-											<td>${destinatari.llinatge1} 
+											<td>${destinatari.llinatge1}
 											<c:if test="${not empty destinatari.llinatge2}">
 												${destinatari.llinatge2}
 											</c:if>

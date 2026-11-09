@@ -1,5 +1,5 @@
 import React from 'react';
-import {Link, useLocation, useNavigate, useSearchParams} from 'react-router-dom';
+import {Link, useLocation, useSearchParams} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import {GRID_DETAIL_PANEL_TOGGLE_COL_DEF, GridApiPro, useGridApiRef,} from '@mui/x-data-grid-pro';
 import {GridPage, MuiDataGridColDef, useMuiDataGridApiRef, useMuiDataGridContext, useResourceApiService,} from 'reactlib';
@@ -7,14 +7,13 @@ import {ROLE_ADMIN, ROLE_ADMIN_LECTURA, ROLE_ORGAN, ROLE_USER, useNotibContext} 
 import {useDatagridFilterProps, useDatagridPageSizeOptionsProps} from '../../hooks/useDataGrid';
 import NotificacioGridEnviaments from './NotificacioGridEnviaments';
 import {useNotificacioDetailDialog, useRemesesErrorCallbackDetailDialog, useRemesesErrorRegistreDetailDialog} from './NotificacioDetailDialog';
-import {Button, Chip, Icon, IconButton, Menu, MenuItem} from '@mui/material';
+import {Button, Chip, Icon, Menu, MenuItem} from '@mui/material';
 import AccionsMassives, {MenuOption, MenuOptionDivider, useAccionsMassives} from '../../components/AccionsMassives';
 import ButtonDetailExpandColapse from '../../components/ButtonDetailExpandColapse';
 import {DataCommonAdditionalAction} from '../../../lib/components/mui/datacommon/MuiDataCommon';
 import {NotificacioEstatGrid} from './NotificacioEstatRender';
 import {useAccionsNotificacio, useRefrescarEstat} from '../accions/AccionsNotificacio';
 import {generateGridRowStylesFromMap, getGridRowColorClass, NOTIFICACIO_ESTAT_ENUM_MAP,} from '../../utils/estatConfig';
-import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import CustomDetailPanelToggle from "../../utils/CustomDetailPanelToggle.tsx";
 import ContentFilter, {useSpringFilterBuilder} from "./NotificacioFiltre.tsx";
 import useEstatRemesaAsync from '../../hooks/useEstatRemesaAsync';
@@ -22,6 +21,7 @@ import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
 import { icons } from '../../utils/icons';
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
+import FormBackButton from "../../components/FormBackButton.tsx";
 // import useSseRowRefresh from "../../hooks/useSseRowRefresh";
 
 // Ha de ser una funció estable: MUI X recalcula les mides de les files cada vegada que getRowHeight canvia
@@ -471,7 +471,6 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                 hidden: (!notificacionsEsborrades || notificacionsErrorRegistre)
             }])
         ];
-    const navigate = useNavigate();
     const filtreMassiva = notificacioMassiva ? `notificacioMassiva.id :${notificacioMassiva}` : undefined
     const filtreEsborrades = notificacionsEsborrades ? `deleted:${true}` : `deleted:${false}`;
     const filtreErrorRegistre = notificacionsErrorRegistre ? "estat : 'PENDENT' and registreEnviamentIntent >: 3" : "";
@@ -487,7 +486,12 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
     return (<>
         <PageTitle title={t('page.notificacio.grid.title')}></PageTitle>
         <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
-            <ScreenFrame icon={titleIcon} title={t('page.notificacio.grid.title') + (titolSecundari || "")}>
+            <ScreenFrame
+                icon={titleIcon}
+                title={t('page.notificacio.grid.title')}
+                subtitle={titolSecundari || undefined}
+                beforeTitle={<FormBackButton linkTo={'/notificacio/massiva'}/>}
+            >
                 <StyledMuiGrid
                     key={`${currentRole}-${notificacionsEsborrades}-${notificacionsErrorRegistre}-${notificacionsCallbackError}`}
                     datagridApiRef={datagridApiRef}
@@ -518,11 +522,6 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                     toolbarHideCreate
                     toolbarCreateLink="form"
                     toolbarElementsWithPositions={[
-                        ...(!notificacioMassiva ? []
-                            : [{
-                                position: 0,
-                                element: <IconButton onClick={()=> navigate('/notificacio/massiva')} sx={{mr:1}}><ArrowBackIosIcon /></IconButton>,
-                            }]),
                         ...(notificacionsEsborrades || (isRoleAdminLectura && notificacionsErrorRegistre) ? []
                             : [{
                                 position: 2,

@@ -288,7 +288,6 @@ const EnviamentGrid = () => {
             },
         }
     );
-    console.log(filterDataGridProps);
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
     const {anularRemesa,  anularRemesaDialog, ampliarTermini, ampliarTerminiDialog } = useAccionsNotificacio();
     return (

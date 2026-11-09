@@ -12,8 +12,17 @@ import { toToolbarIcon } from '../../lib/components/mui/ToolbarIcon';
  * com la resta de pantalles de l'aplicació, el dibuixa l'aplicació i s'amaga el de la llibreria
  * amb `hiddenBackButton` del MuiForm.
  */
-export const FormBackButton: React.FC<{ goBackLink?: string }> = ({ goBackLink }) => {
+export const FormBackButton: React.FC<{ goBackLink?: string; linkTo?: string }> = ({ goBackLink, linkTo }) => {
     const { t, goBack, anyHistoryEntryExist } = useBaseAppContext();
+
+    if (linkTo) {
+        return toToolbarIcon('arrow_back', {
+            title: t('form.goBack.title'),
+            linkTo,
+            sx: { mr: 1 },
+        });
+    }
+
     // Mateixa condició que la llibreria (lib/components/mui/form/MuiForm.tsx, línia 57).
     const disabled = !anyHistoryEntryExist() && goBackLink == null;
     return toToolbarIcon('arrow_back', {
