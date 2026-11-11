@@ -84,7 +84,9 @@ public class Dir3ResourceServiceImpl extends BaseNoDatabaseReadonlyResourceServi
 			"\\s*" +
 			"(\\[[^\\]]*\\]|'[^']*'|\"[^\"]*\"|\\d+\\.?\\d*|[^\\s\\)]+)",
 		Pattern.CASE_INSENSITIVE);
+
 	private List<String[]> extractFilterTriplets(String filter) {
+
 		Matcher matcher = TRIPLET_PATTERN.matcher(filter);
 		List<String[]> triplets = new ArrayList<>();
 		while (matcher.find()) {
@@ -99,10 +101,8 @@ public class Dir3ResourceServiceImpl extends BaseNoDatabaseReadonlyResourceServi
 		return triplets;
 	}
 
-	private String getFieldValueFromFilterTriplets(
-		String field,
-		String op,
-		List<String[]> triplets) {
+	private String getFieldValueFromFilterTriplets(String field, String op, List<String[]> triplets) {
+
 		return triplets.stream().
 			filter(t -> t[0].equals(field) && t[1].equals(op)).
 			findFirst().
@@ -111,6 +111,7 @@ public class Dir3ResourceServiceImpl extends BaseNoDatabaseReadonlyResourceServi
 	}
 
 	private List<List<String>> partition(Set<String> coll, int size) {
+
 		List<String> list = new ArrayList<>(coll);
 		List<List<String>> parts = new ArrayList<>();
 		for (int i = 0; i < list.size(); i += size) {

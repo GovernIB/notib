@@ -26,7 +26,7 @@ declare module '@mui/material/styles' {
     }
 }
 
-// Identitat visual de DISTRIBUCIÓ (colors de Drassana). Per portar el disseny a una altra aplicació
+// Identitat visual de NOTIB (colors de Drassana). Per portar el disseny a una altra aplicació
 // només cal canviar aquests tres valors:
 //  - MAIN: color base. Capçaleres de pantalla, diàlegs i botons d'acció.
 //  - DARK: "torrat", és el `primary.dark` de MUI: hover dels botons i, als temes clars, badges,
@@ -35,7 +35,7 @@ declare module '@mui/material/styles' {
 // Als temes foscos l'atenuat i el torrat s'inverteixen i es deriven de la base: l'atenuat és un to
 // molt fosc (`darken`) i el torrat un to clar (`PRIMARY_LIGHT`, és el `primary.light` de MUI), perquè
 // un torrat sobre fons fosc no té contrast. No hi ha cap altre color d'identitat.
-const PRIMARY_MAIN = '#83cb41';
+const PRIMARY_MAIN = '#8fbd5e';
 // Prou fosc perquè, com a text o com a farciment amb text blanc, superi el 4,5:1 de la WCAG AA sobre
 // blanc (5,19) i sobre els grisos clars de les files de les graelles (#eee: 4,77).
 const PRIMARY_DARK = '#447436';

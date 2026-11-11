@@ -23,6 +23,7 @@ import {
     useMuiFormDialogApiRef,
 } from 'reactlib';
 import AppFormFieldReference from './AppFormFieldReference';
+import AppFormFieldEnum from './AppFormFieldEnum';
 import Offline from './Offline';
 import { UserProfileMenu, UserProfileFormDialog } from './UserProfile';
 import SwitchInterfaceMenuItem from './SwitchInterfaceMenuItem';
@@ -337,7 +338,10 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             // Els marges d'`<main>` els posa frameSx (la llibreria els deixa a 16px 24px).
             marginsDisabled
             saveAs={saveAs}
-            formFieldComponents={[{ type: 'reference', component: AppFormFieldReference }]}
+            formFieldComponents={[
+                { type: 'reference', component: AppFormFieldReference },
+                { type: 'enumIcon', component: AppFormFieldEnum },
+            ]}
             menuEntries={baseAppMenuEntries}
         >
             <CustomLocalizationProvider>

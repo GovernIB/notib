@@ -1,6 +1,7 @@
 import React from 'react';
 import {Link, useLocation, useSearchParams} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
+import dayjs from 'dayjs';
 import {GRID_DETAIL_PANEL_TOGGLE_COL_DEF, GridApiPro, useGridApiRef,} from '@mui/x-data-grid-pro';
 import {GridPage, MuiDataGridColDef, useMuiDataGridApiRef, useMuiDataGridContext, useResourceApiService,} from 'reactlib';
 import {ROLE_ADMIN, ROLE_ADMIN_LECTURA, ROLE_ORGAN, ROLE_USER, useNotibContext} from '../../components/NotibContext';
@@ -368,8 +369,10 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
             // Amb la referència a l'adreça (vinculada des d'altres pantalles) el filtre avançat s'obre sol
             initialData: {
                 referencia: referencia,
-                nomesLesMeves: false,
-                advanced: !!referencia || isRoleOrgan
+                nomesLesMeves: true,
+                advanced: !!referencia || isRoleOrgan,
+                dataIniciInici: dayjs().subtract(3, 'month').format('YYYY-MM-DD'),
+                dataIniciFi: dayjs().format('YYYY-MM-DD'),
             },
             // Cada vista té els seus camps de filtre: no han de compartir el filtre desat
             persistentStateKey: persistentStateKey,
@@ -490,7 +493,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                 icon={titleIcon}
                 title={t('page.notificacio.grid.title')}
                 subtitle={titolSecundari || undefined}
-                beforeTitle={<FormBackButton linkTo={'/notificacio/massiva'}/>}
+                beforeTitle={notificacioMassiva ? <FormBackButton linkTo={'/notificacio/massiva'} /> : undefined}
             >
                 <StyledMuiGrid
                     key={`${currentRole}-${notificacionsEsborrades}-${notificacionsErrorRegistre}-${notificacionsCallbackError}`}
@@ -527,7 +530,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                                 position: 2,
                                 element: <MassiveActionsButton apiRef={datagridApiRef} notificacionsErrorRegistre={notificacionsErrorRegistre} notificacionsCallbackError={notificacionsCallbackError} refresh={refrescarDespresAccioMassiva}/>,
                             },]),
-                        ...(isCreateLinkPresent ? [{ position: 2, element: <NotificacioAddButton /> }] : [])
+                        ...(isCreateLinkPresent && !notificacioMassiva? [{ position: 2, element: <NotificacioAddButton /> }] : [])
                     ]}
                     onRowClick={(params) => notificacionsErrorRegistre ? onDetailClickErrorRegistre(params.id) : onDetailClick(params.id)}
                     rowActionsColumnIndex={11}
