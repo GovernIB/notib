@@ -91,10 +91,10 @@ $(document).ready(function() {
 			$("#organismesModal").modal();
 			var entitatId = $('#entitatId').val();
 			loadOrganismes();
-			
+
 		}
-		
-		
+
+
 	});
 	$('#addOrganismeButton').on('click', function(){
 		var organSelect = document.getElementById('selOrganismes');
@@ -256,7 +256,7 @@ $(document).ready(function() {
 		<form:hidden path="id"/>
 		<ul class="nav nav-tabs" role="tablist">
 			<li role="presentation" class="active"><a href="#dadesgeneralsForm" aria-controls="dadesgeneralsForm" role="tab" data-toggle="tab"><spring:message code="procediment.form.titol.dadesgenerals"/><c:if test='${not empty errorsProc}'> <span class="fa fa-warning text-danger"></span></c:if></a></li>
-			<li role="presentation"><a href="#registreForm" aria-controls="registreForm" role="tab" data-toggle="tab"><spring:message code="procediment.form.titol.dadesregistre"/><c:if test='${not empty errorsRegistre}'> <span class="fa fa-warning text-danger"></span></c:if></a></li>
+<%--			<li role="presentation"><a href="#registreForm" aria-controls="registreForm" role="tab" data-toggle="tab"><spring:message code="procediment.form.titol.dadesregistre"/><c:if test='${not empty errorsRegistre}'> <span class="fa fa-warning text-danger"></span></c:if></a></li>--%>
 		</ul>
 		<br>
 		<div class="tab-content">
@@ -277,7 +277,7 @@ $(document).ready(function() {
 									  searchButton="searchOrgan" required="true" readonly="true" labelSize="2"/>
 				<form:hidden path="entitatId" value="${entitat.id}"/>
 				<form:hidden path="organGestor"/>
-				
+
 <%-- 				<not:inputText name="organGestor" textKey="procediment.form.camp.organ" required="true" labelSize="2"/> --%>
 <%--				<not:inputSelect name="pagadorPostalId" emptyOption="true" textKey="procediment.form.camp.postal" optionItems="${pagadorsPostal}" optionValueAttribute="id" optionTextAttribute="dir3codi" labelSize="2"/>--%>
 <%--				<not:inputSelect name="pagadorCieId" emptyOption="true" textKey="procediment.form.camp.cie" optionItems="${pagadorsCie}" optionValueAttribute="id" optionTextAttribute="dir3codi" labelSize="2"/>--%>
@@ -296,26 +296,26 @@ $(document).ready(function() {
 				<not:inputCheckbox name="requireDirectPermission" textKey="procediment.form.camp.requireDirectPermission" labelSize="2"/>
 				<not:inputCheckbox name="manual" textKey="procediment.form.camp.manual" labelSize="2"/>
 			</div>
-			<div role="tabpanel" class="tab-pane <c:if test='${not empty errorRegistre}'>active</c:if>" id="registreForm">
-				<div class="alert alert-warning" role="alert">
-				 	<spring:message code="procediment.form.warning"></spring:message>
-				</div>
-				<%--
-				<form:hidden path="oficina"/>
-				<not:inputTextSearch name="oficinaNom" textKey="procediment.form.camp.oficina" searchButton="searchOficina" required="true" readonly="true" labelSize="2"/>
-				<form:hidden path="llibre"/>
-				<not:inputTextSearch name="llibreNom" textKey="procediment.form.camp.llibre" searchButton="searchLlibre" required="true" readonly="true" labelSize="2"/>
-				--%>
-				<form:hidden path="tipusAssumpte"/>
-				<not:inputTextSearch name="tipusAssumpteNom" textKey="procediment.form.camp.tipusassumpte" searchButton="searchTipusAssumpte" labelSize="2" readonly="true"/>
-				<form:hidden path="codiAssumpte"/>
-				<not:inputTextSearch name="codiAssumpteNom" textKey="procediment.form.camp.codiassumpte" searchButton="searchCodiAssumpte" labelSize="2" readonly="true"/>
-			</div>
+<%--			<div role="tabpanel" class="tab-pane <c:if test='${not empty errorRegistre}'>active</c:if>" id="registreForm">--%>
+<%--				<div class="alert alert-warning" role="alert">--%>
+<%--				 	<spring:message code="procediment.form.warning"></spring:message>--%>
+<%--				</div>--%>
+<%--				&lt;%&ndash;--%>
+<%--				<form:hidden path="oficina"/>--%>
+<%--				<not:inputTextSearch name="oficinaNom" textKey="procediment.form.camp.oficina" searchButton="searchOficina" required="true" readonly="true" labelSize="2"/>--%>
+<%--				<form:hidden path="llibre"/>--%>
+<%--				<not:inputTextSearch name="llibreNom" textKey="procediment.form.camp.llibre" searchButton="searchLlibre" required="true" readonly="true" labelSize="2"/>--%>
+<%--				&ndash;%&gt;--%>
+<%--				<form:hidden path="tipusAssumpte"/>--%>
+<%--				<not:inputTextSearch name="tipusAssumpteNom" textKey="procediment.form.camp.tipusassumpte" searchButton="searchTipusAssumpte" labelSize="2" readonly="true"/>--%>
+<%--				<form:hidden path="codiAssumpte"/>--%>
+<%--				<not:inputTextSearch name="codiAssumpteNom" textKey="procediment.form.camp.codiassumpte" searchButton="searchCodiAssumpte" labelSize="2" readonly="true"/>--%>
+<%--			</div>--%>
 		</div>
 		<div id="modal-botons">
 			<button id="addProcedimentButton" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/procediments"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
-		</div>	
+		</div>
 	</form:form>
 	<!-- Organismes Modal -->
 	<div class="modal fade" id="organismesModal" role="dialog">
@@ -326,7 +326,7 @@ $(document).ready(function() {
 					<h4 class="modal-title"><spring:message code="procediment.form.titol.organismes"/></h4>
 				</div>
 				<div class="modal-body body">
-					<select id="selOrganismes" data-placeholder="<spring:message code="procediment.form.camp.organ"/>"></select> 
+					<select id="selOrganismes" data-placeholder="<spring:message code="procediment.form.camp.organ"/>"></select>
 					<div class="loading-screen" style="text-align: center; width:100%; hight: 80px;">
 						<div class="processing-icon" style="position: relative; top: 40px; text-align: center;">
 							<span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: burlywood;margin-top: 10px;"></span>
