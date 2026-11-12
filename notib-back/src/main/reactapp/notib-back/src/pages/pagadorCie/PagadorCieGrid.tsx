@@ -142,7 +142,7 @@ export const PagadorCieGrid: React.FC = () => {
     const { currentRole } = useNotibContext();
     const gridApiRef = useMuiDataGridApiRef()
     const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
-    const filterDataGridProps = useDatagridFilterProps(
+    const { filterComponent, ...filterDataGridProps } = useDatagridFilterProps(
         'pagadorCieResource',
         'FILTER_PAGADOR_CIE',
         springFilterBuilder,
@@ -154,6 +154,7 @@ export const PagadorCieGrid: React.FC = () => {
             <PageTitle title={t('page.pagadorCie.grid.title')}></PageTitle>
             <GridPage>
                 <ScreenFrame icon={icons.pagadorCie} title={t('page.pagadorCie.grid.title')}>
+                    {filterComponent}
                     <StyledMuiGrid
                         resourceName="pagadorCieResource"
                         columns={columns}

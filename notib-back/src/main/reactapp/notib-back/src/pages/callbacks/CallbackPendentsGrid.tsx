@@ -206,7 +206,7 @@ const CallbackPendentsGrid = () => {
         fetchParams();
     }, [apiIsReady, apiFind]);
     const springFilterBuilder = useSpringFilterBuilder(maxRetries);
-    const filterDataGridProps = useDatagridFilterProps(
+    const { filterComponent, ...filterDataGridProps } = useDatagridFilterProps(
         'callbackResource',
         'FILTER_CALLBACK_PENDENTS',
         springFilterBuilder,
@@ -260,6 +260,7 @@ const CallbackPendentsGrid = () => {
             <PageTitle title={t('page.callbacks.pendents.grid.title')}></PageTitle>
             <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
                 <ScreenFrame icon={icons.callbackPendent} title={t('page.callbacks.pendents.grid.title')}>
+                    {filterComponent}
                     <StyledMuiGrid
                         key={reloadKey}
                         resourceName="callbackResource"

@@ -199,7 +199,7 @@ export const ProcedimentGrid = () => {
     let isRoleAdmin = currentRole == ROLE_ADMIN;
     const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
 
-    const filterDataGridProps = useDatagridFilterProps(
+    const { filterComponent, ...filterDataGridProps } = useDatagridFilterProps(
         'procedimentResource',
         'FILTER_PROCEDIMENT',
         springFilterBuilder,
@@ -268,6 +268,7 @@ export const ProcedimentGrid = () => {
             <PageTitle title={t('page.procediments.grid.title')}></PageTitle>
             <GridPage>
                 <ScreenFrame icon={icons.procediment} title={t('page.procediments.grid.title')}>
+                    {filterComponent}
                     <StyledMuiGrid
                         resourceName="procedimentResource"
                         columns={columns}

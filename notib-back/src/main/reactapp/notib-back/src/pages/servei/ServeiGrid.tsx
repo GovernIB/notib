@@ -199,7 +199,7 @@ export const ProcedimentGrid = () => {
     const {currentRole} = useNotibContext();
     let isRoleAdmin = currentRole == ROLE_ADMIN;
     const isRoleAdminLectura = currentRole === ROLE_ADMIN_LECTURA;
-    const filterDataGridProps = useDatagridFilterProps(
+    const { filterComponent, ...filterDataGridProps } = useDatagridFilterProps(
         'procedimentResource',
         'FILTER_PROCEDIMENT',
         springFilterBuilder,
@@ -212,6 +212,7 @@ export const ProcedimentGrid = () => {
             <PageTitle title={t('page.serveis.grid.title')}></PageTitle>
             <GridPage>
                 <ScreenFrame icon={icons.servei} title={t('page.serveis.grid.title')}>
+                    {filterComponent}
                     <StyledMuiGrid
                         resourceName="procedimentResource"
                         columns={columns}

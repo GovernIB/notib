@@ -210,7 +210,7 @@ export const NotifiacioMassivaGrid = () => {
     const springFilterBuilder = useSpringFilterBuilder();
     const gridApiRef = useMuiDataGridApiRef();
     const { dialogComponent, onDetailClick } = useNotificacioMassivaResumDialog();
-    const filterDataGridProps = useDatagridFilterProps(
+    const { filterComponent, ...filterDataGridProps } = useDatagridFilterProps(
         'notificacioMassivaResource',
         'FILTER_NOTIFICACIO_MASSIVA',
         springFilterBuilder,
@@ -334,6 +334,7 @@ export const NotifiacioMassivaGrid = () => {
             <PageTitle title={t('page.notificacioMassiva.grid.title')}></PageTitle>
             <GridPage>
                 <ScreenFrame icon={icons.enviamentMassiu} title={t('page.notificacioMassiva.grid.title')} >
+                    {filterComponent}
                     <StyledMuiGrid
                         resourceName="notificacioMassivaResource"
                         columns={columns}

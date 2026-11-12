@@ -53,15 +53,13 @@ export const useDatagridFilterProps = (
         advancedSearch?: boolean;
         /** Dades amb què s'inicialitza el filtre (també són les que recupera el botó «Neteja»). */
         initialData?: any;
-        /** Alçada mínima de la fila del filtre mentre es carrega, perquè la graella no salti. */
-        minHeight?: string;
         /** Contingut sota la fila del filtre (p. ex. una llegenda). */
         footer?: React.ReactNode;
         /** Clau amb què es desa el filtre (per defecte, el nom del recurs): cal quan diverses vistes comparteixen recurs. */
         persistentStateKey?: string;
     }
 ) => {
-    const { advancedSearch, initialData, minHeight = '67px', footer, persistentStateKey } = options ?? {};
+    const { advancedSearch, initialData, footer, persistentStateKey } = options ?? {};
     const [autoFindDisabled, setAutoFindDisabled] = React.useState<boolean>(true);
     // Últim Spring Filter aplicat, per al recompte de filtres de la barra de títol (FilterCount)
     const [springFilter, setSpringFilter] = React.useState<string | undefined>();
@@ -93,8 +91,17 @@ export const useDatagridFilterProps = (
         loading: autoFindDisabled ? autoFindDisabled : undefined,
         autoFindDisabled,
         toolbarHideQuickFilter: true as true,
-        toolbarAdditionalRow: filterComponent,
-        toolbarAdditionalRowMinHeight: minHeight,
+        // El filtre ja no és dins la graella i aquesta no el rep sola: se li passa l'últim Spring Filter aplicat.
+        filter: springFilter,
+        // El recompte de filtres ja el pinta el <FilterCount> del filtre: la graella no l'ha de repetir.
+        toolbarShowFilterCount: false,
+        /**
+         * El filtre NO va dins la graella (`toolbarAdditionalRow`): la pantalla l'ha de pintar com a germà
+         * de la graella, just abans, dins del `ScreenFrame`, com fan Distribució, ConCSV i Ripea. Així la
+         * separació amb la barra de títol i amb la graella és només el `gap` (MAIN_GAP) del cos del marc.
+         * Ús: `const { filterComponent, ...filterDataGridProps } = useDatagridFilterProps(...)`.
+         */
+        filterComponent,
     };
 };
 

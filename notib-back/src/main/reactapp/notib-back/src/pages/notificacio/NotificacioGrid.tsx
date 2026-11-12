@@ -356,7 +356,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
             ? '-esborrades' : notificacionsErrorRegistre
                 ? '-errorRegistre' : notificacionsCallbackError ? '-callbackError' : '');
     const isRoleOrgan = currentRole === ROLE_ORGAN;
-    const filterDataGridProps = useDatagridFilterProps(
+    const { filterComponent, ...filterDataGridProps } = useDatagridFilterProps(
         'notificacioResource',
         'FILTER_NOTIFICACIO',
         springFilterBuilder,
@@ -495,6 +495,7 @@ const NotificacioGrid = ({notificacionsEsborrades = false, notificacionsErrorReg
                 subtitle={titolSecundari || undefined}
                 beforeTitle={notificacioMassiva ? <FormBackButton linkTo={'/notificacio/massiva'} /> : undefined}
             >
+                {filterComponent}
                 <StyledMuiGrid
                     key={`${currentRole}-${notificacionsEsborrades}-${notificacionsErrorRegistre}-${notificacionsCallbackError}`}
                     datagridApiRef={datagridApiRef}
