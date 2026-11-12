@@ -63,7 +63,8 @@ public class Dir3ResourceServiceImpl extends BaseNoDatabaseReadonlyResourceServi
 		String comunitatAutonoma = getFieldValueFromFilterTriplets("comunitatAutonoma", ":", filterTriplets);
 		String provincia = getFieldValueFromFilterTriplets("provincia", ":", filterTriplets);
 		String municipi = getFieldValueFromFilterTriplets("municipi", ":", filterTriplets);
-		Page<Dir3Resource> page = legacyHelper.dir3FindMultiple(
+		try {
+			Page<Dir3Resource> page = legacyHelper.dir3FindMultiple(
 				codi,
 				denominacio,
 				nivellAdministracio != null ? Long.parseLong(nivellAdministracio) : null,
@@ -73,9 +74,12 @@ public class Dir3ResourceServiceImpl extends BaseNoDatabaseReadonlyResourceServi
 				null,
 				null,
 				pageable);
-		calcularCampsRecurs(page);
-		return page.map(this::toResourceEntity);
-	}
+			calcularCampsRecurs(page);
+			return page.map(this::toResourceEntity);
+		} catch (Exception ex) {
+			return Page.empty();
+		}
+ 	}
 
 	private static final Pattern TRIPLET_PATTERN = Pattern.compile(
 		"([a-zA-Z_][a-zA-Z0-9_\\.]*)" +
