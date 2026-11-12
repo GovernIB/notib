@@ -37,6 +37,19 @@ const translationEs = {
             error: 'No se ha podido obtener la sesión del usuario.',
             tornarAProvar: 'Vuelve a intentarlo',
         },
+        avisos: {
+            mostra: 'Muestra el detalle del aviso',
+            amaga: 'Oculta el detalle del aviso',
+            tanca: 'Minimiza el aviso',
+            nivell: {
+                INFO: 'Información',
+                WARNING: 'Advertencia',
+                ERROR: 'Error',
+            },
+            chip: '{{nivell}}: {{count}}',
+            chipRestaura: 'Muestra los avisos de nivel «{{nivell}}» que has minimizado',
+            chipBuit: 'Ningún aviso de nivel «{{nivell}}»',
+        },
         noEntitat: 'Este usuario no tiene acceso a ninguna entidad',
         sensePermisos: 'Este usuario no tiene ningún permiso para acceder a la aplicación',
         menu: {

@@ -37,6 +37,19 @@ const translationCa = {
             error: "No s'ha pogut obtenir la sessió de l'usuari.",
             tornarAProvar: 'Torna-ho a provar',
         },
+        avisos: {
+            mostra: "Mostra el detall de l'avís",
+            amaga: "Amaga el detall de l'avís",
+            tanca: "Minimitza l'avís",
+            nivell: {
+                INFO: 'Informació',
+                WARNING: 'Advertència',
+                ERROR: 'Error',
+            },
+            chip: '{{nivell}}: {{count}}',
+            chipRestaura: 'Mostra els avisos de nivell «{{nivell}}» que has minimitzat',
+            chipBuit: 'Cap avís de nivell «{{nivell}}»',
+        },
         noEntitat: 'Aquest usuari no te accés a cap entitat',
         sensePermisos: 'Aquest usuari no té cap permís per accedir a l\'aplicació',
         menu: {

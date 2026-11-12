@@ -104,6 +104,9 @@ export const icons = {
     cercaAvancadaTanca: 'expand_less',
 
     // --- Estats i avisos ---------------------------------------------------------------------
+    informacio: 'info',
+    advertencia: 'warning',
+    error: 'error',
     senseDades: 'block',
 
 
