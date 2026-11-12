@@ -164,19 +164,26 @@ const EntregaPostalFields: React.FC = () => {
     const defaultsInitializedRef = React.useRef(false);
 
     React.useEffect(() => {
-        if (!defaultsInitializedRef.current && data) {
+        if (!data) {
+            return;
+        }
+        if (!defaultsInitializedRef.current) {
             if (!data.domiciliConcretTipus) {
                 data.domiciliConcretTipus = 'NACIONAL';
             }
-            if (!data.domiciliPaisCodiIso) {
+            if (!data.domiciliPaisCodiIso && data.domiciliConcretTipus === 'NACIONAL') {
                 data.domiciliPaisCodiIso = 'ES';
             }
-            if (!data.domiciliProvinciaCodi) {
+            if (!data.domiciliProvinciaCodi && data.domiciliConcretTipus === 'NACIONAL') {
                 data.domiciliProvinciaCodi = '07';
             }
             defaultsInitializedRef.current = true;
         }
-    }, [data]);
+        if (data.domiciliConcretTipus === 'ESTRANGER') {
+            data.domiciliPaisCodiIso = '';
+            data.domiciliProvinciaCodi = '';
+        }
+    }, [data, data?.domiciliConcretTipus]);
 
     const domiciliConcretTipus = data?.domiciliConcretTipus ?? 'NACIONAL';
 
@@ -201,7 +208,7 @@ const EntregaPostalFields: React.FC = () => {
                 <>
                     <GridFormField size={4} name="domiciliViaTipus" required={nacional}/>
                     <GridFormField size={8} name="domiciliViaNom" required={nacional || estranger}/>
-                    <GridFormField size={4} name="domiciliApartatCorreus" required={apCorreus} />
+                    {apCorreus && <GridFormField size={4} name="domiciliApartatCorreus" required={apCorreus} />}
                     <GridFormField size={4} name="domiciliNumeracioNumero" required={nacional} />
                     <GridFormField size={4} name="domiciliNumeracioPuntKm" required={nacional} />
                     <GridFormField size={4} name="domiciliPortal" />
@@ -210,8 +217,8 @@ const EntregaPostalFields: React.FC = () => {
                     <GridFormField size={4} name="domiciliPorta" />
                     <GridFormField size={4} name="domiciliBloc" />
                     <GridFormField size={4} name="domiciliCodiPostal" required />
-                    <GridFormField size={6} name="domiciliPaisCodiIso" autocomplete required  />
-                    {data?.domiciliPaisCodiIso === 'ES' && (
+                    {estranger && <GridFormField size={6} name="domiciliPaisCodiIso" autocomplete required  />}
+                    {nacional || apCorreus && (
                         <>
                             <GridFormField size={6} name="domiciliProvinciaCodi"  autocomplete required={nacional || apCorreus} />
                             <GridFormField size={6}
