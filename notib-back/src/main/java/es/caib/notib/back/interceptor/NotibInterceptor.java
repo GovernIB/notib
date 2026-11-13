@@ -2,6 +2,7 @@ package es.caib.notib.back.interceptor;
 
 import es.caib.notib.back.config.scopedata.SessionScopedContext;
 import es.caib.notib.back.helper.*;
+import es.caib.notib.logic.intf.dto.AvisDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.service.*;
@@ -305,14 +306,13 @@ public class NotibInterceptor implements AsyncHandlerInterceptor {
         if (Collections.disjoint(rolsDisponibles, rolsAvisos)) {
             return;
         }
-        // Es carregaran només si encara no s'han carregat, o si hi ha un canvi de rol
-        var canviRol = !StringUtils.isEmpty(request.getParameter(RolHelper.REQUEST_PARAMETER_CANVI_ROL));
-        var isNotSuper = RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual());
-        if ((sessionScopedContext.getAvisos() != null || RequestSessionHelper.isError(request)) && !canviRol && !isNotSuper) {
+        if (request.getParameter("AVISOS") != null || RequestSessionHelper.isError(request) || avisService == null ) {
             return;
         }
-        sessionScopedContext.setAvisos(RolHelper.isUsuariActualAdministradorEntitat(sessionScopedContext.getRolActual()) ?
-                avisService.findActiveAdmin(sessionScopedContext.getEntitatActualId()) : avisService.findActive());
+		List<AvisDto> avisos = RolHelper.isUsuariActualAdministrador(sessionScopedContext.getRolActual())
+			? avisService.findActive() : avisService.findActiveAdmin(sessionScopedContext.getEntitatActualId());
+		request.setAttribute("AVISOS", avisos);
+        sessionScopedContext.setAvisos( avisos );
     }
 
 

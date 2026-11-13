@@ -41,12 +41,12 @@ public class AvisResourceEntity extends BaseAuditableResourceEntity<AvisResource
 	@Column(name = "avis_admin", nullable = false)
 	private Boolean avisAdministrador;
 
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(
 			name = "entitat_id",
 			referencedColumnName = "id",
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "avis_entitat_fk"),
-			nullable = false)
+			nullable = true)
 	private EntitatResourceEntity entitat;
 
 	@Builder

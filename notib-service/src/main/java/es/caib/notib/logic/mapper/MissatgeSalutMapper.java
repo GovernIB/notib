@@ -20,7 +20,7 @@ public interface MissatgeSalutMapper {
 	@BeanMapping(ignoreByDefault = true)
 	@Mapping(source = "dataInici", target = "data")
 	@Mapping(source = "avisNivell", target = "nivell")
-	@Mapping(source = "missatge", target = "missatge")
+	@Mapping(target = "missatge", expression = "java((avisEntity.getEntitat() != null ? avisEntity.getEntitat().getDir3Codi() + \" - \" : \"\") + avisEntity.getMissatge())")
 	MissatgeSalut toMissatgeSalut(AvisEntity avisEntity);
 
 	@ValueMappings({
@@ -36,6 +36,9 @@ public interface MissatgeSalutMapper {
 	}
 
 	default OffsetDateTime toOffsetDateTime(Date data) {
-		return data.toInstant().atZone(ZoneId.systemDefault()).toOffsetDateTime();
+		return new java.util.Date(data.getTime())
+			.toInstant()
+			.atZone(ZoneId.systemDefault())
+			.toOffsetDateTime();
 	}
 }
