@@ -119,7 +119,7 @@ export const AccioMassivaGrid = () => {
     const columns = useDataGridColumns();
     const springFilterBuilder = useSpringFilterBuilder();
     const pageSizeOptionsDataGridProps = useDatagridPageSizeOptionsProps();
-    const filterDataGridProps = useDatagridFilterProps(
+    const { filterComponent, ...filterDataGridProps } = useDatagridFilterProps(
         'accioMassivaResource',
         'FILTER_ACCIO_MASSIVA',
         springFilterBuilder,
@@ -131,6 +131,7 @@ export const AccioMassivaGrid = () => {
             <PageTitle title={t('page.accioMassiva.grid.title')}></PageTitle>
             <GridPage>
                 <ScreenFrame icon={icons.accioMassiva} title={t('page.accioMassiva.grid.title')}>
+                {filterComponent}
                 <StyledMuiGrid
                     resourceName="accioMassivaResource"
                     columns={columns}

@@ -274,7 +274,7 @@ const EnviamentGrid = () => {
     useSseRowRefresh('notificacioEnviamentResource', datagridApiRef, 'REMESA_ENVIAMENT_ESTAT', 'ENVIAMENT_ESTAT_CANVIAT');
     const referencia = searchParams.get('referencia');
     const isRoleOrgan = currentRole === ROLE_ORGAN;
-    const filterDataGridProps = useDatagridFilterProps(
+    const { filterComponent, ...filterDataGridProps } = useDatagridFilterProps(
         'notificacioEnviamentResource',
         'FILTER_ENVIAMENT',
         springFilterBuilder,
@@ -295,6 +295,7 @@ const EnviamentGrid = () => {
             <PageTitle title={t('page.enviament.grid.title')}></PageTitle>
             <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
                 <ScreenFrame icon={icons.enviament} title={t('page.enviament.grid.title')}>
+                    {filterComponent}
                     <StyledMuiGrid
                         key={`${reloadKey}`}
                         datagridApiRef={datagridApiRef}

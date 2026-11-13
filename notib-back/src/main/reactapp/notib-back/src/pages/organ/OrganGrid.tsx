@@ -509,7 +509,7 @@ export const OrganGrid = () => {
     );
     const isRoleOrgan = currentRole === ROLE_ORGAN;
     const currentOrgan = organsAvailable?.find((o: any) => o.id === currentOrganId);
-    const filterDataGridProps = useDatagridFilterProps(
+    const { filterComponent, ...filterDataGridProps } = useDatagridFilterProps(
         'organGestorResource',
         'FILTER_ORGAN_GESTOR',
         springFilterBuilder,
@@ -522,6 +522,7 @@ export const OrganGrid = () => {
             <PageTitle title={t('page.organs.grid.title')}></PageTitle>
             <GridPage autoHeight={pageSizeOptionsDataGridProps.autoHeight}>
                 <ScreenFrame icon={icons.organ} title={t('page.organs.grid.title')}>
+                    {filterComponent}
                     <StyledMuiGrid
                         // MUI-X no admet bé canviar treeData/getTreeDataPath/apiRef en calent sobre la mateixa
                         // instància del grid (dona "No getTreeDataPath given" en canviar de vista): forçam un

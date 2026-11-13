@@ -104,7 +104,7 @@ export const EntitatGrid: React.FC = () => {
     const gridApiRef = useMuiDataGridApiRef();
     const refresh = () => gridApiRef.current?.refresh?.();
     const accions = useEntitatAccions(refresh);
-    const filterDataGridProps = useDatagridFilterProps(
+    const { filterComponent, ...filterDataGridProps } = useDatagridFilterProps(
         'entitatResource',
         'FILTER_ENTITAT',
         springFilterBuilder,
@@ -116,6 +116,7 @@ export const EntitatGrid: React.FC = () => {
             <PageTitle title={t('page.entitats.grid.title')}></PageTitle>
             <GridPage>
                 <ScreenFrame icon={icons.entitat} title={t('page.entitats.grid.title')}>
+                    {filterComponent}
                     <StyledMuiGrid
                         resourceName="entitatResource"
                         columns={columns}

@@ -4,6 +4,45 @@ import useOrganGestorOptionRenderer from "../../components/OrganGestorOptionRend
 import {springFilterBuilder, springFilterBuilder as filterBuilder, useFilterApiContext, useFormContext} from 'reactlib';
 import {useNotibContext} from "../../components/NotibContext.ts";
 import {formatEndOfDay, formatStartOfDay} from "../../utils/dateUtils.ts";
+import {NOTIFICACIO_ESTAT_ENUM_MAP} from "../../utils/estatConfig.tsx";
+import { Box } from "@mui/material";
+
+const ESTAT_FILTER_ORDER = [
+    'PENDENT',
+    'ENVIANT',
+    'REGISTRADA',
+    'ENVIADA',
+    'ENVIAT_SIR',
+    'OFICI_ACCEPTAT',
+    'REBUTJADA_SIR',
+    'ENVIADA_AMB_ERRORS',
+    'NOTIFICADA',
+    'REBUTJADA',
+    'EXPIRADA',
+    'FINALITZADA',
+    'FINALITZADA_AMB_ERRORS',
+    'PROCESSADA',
+    'ANULADA',
+];
+const ESTAT_FILTER_HIDDEN = ['PARCIALMENT_ANULADA'];
+
+// Renderitza l'opció d'estat amb la mateixa icona que la resta de la UI (equivalent a showEstat del JSP)
+const estatOptionRenderer = (option: any) => {
+    const value = option?.value ?? option?.id ?? option?.code;
+    const config = value ? NOTIFICACIO_ESTAT_ENUM_MAP[value] : undefined;
+    const label = option?.description ?? option?.label ?? option?.text ?? value;
+
+    return (
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            {config?.icona && (
+                <Box component="span" sx={{ display: "inline-flex", alignItems: "center", color: config.color }}>
+                    {config.icona}
+                </Box>
+            )}
+            <span>{label}</span>
+        </Box>
+    );
+};
 
 export const useSpringFilterBuilder = (isPrincipal: boolean = true) => {
 
@@ -19,6 +58,8 @@ export const useSpringFilterBuilder = (isPrincipal: boolean = true) => {
             filterBuilder.like('numExpedient', data?.numExpedient),
             filterBuilder.like('notificaIds', data?.identificadorNotifica),
             filterBuilder.eq('organGestor.id', data?.organGestor?.id),
+            filterBuilder.eq('procediment.id', data?.procediment?.id),
+            filterBuilder.eq('procediment.id', data?.servei?.id),
             filterBuilder.eq('tipusUsuari', `'${data?.tipusUsuari}'`),
             filterBuilder.eq('createdBy', `'${data?.createdBy}'`),
             filterBuilder.like('referencia', data?.referencia),
@@ -59,7 +100,7 @@ const ContentFilter: React.FC<{ notificacionsEsborrades: boolean, notificacionsE
                     <>
                         <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="enviamentTipus" />
                         <GridFormField size={{ xs: 12, sm: 6, md: 2.5 }} name="concepte" />
-                        <GridFormField size={{ xs: 12, sm: 6, md: 2.5 }} name="estat" />
+                        <GridFormField size={{ xs: 12, sm: 6, md: 2.5 }} name="estat" type="enumIcon" optionRenderer={estatOptionRenderer} hiddenEnumValues={ESTAT_FILTER_HIDDEN} optionOrder={ESTAT_FILTER_ORDER} />
                         <GridFormField size={{ xs: 12, sm: 6, md: 1.75 }} name="dataIniciInici" />
                         <GridFormField size={{ xs: 12, sm: 6, md: 1.75 }} name="dataIniciFi" />
                     </>
@@ -69,7 +110,7 @@ const ContentFilter: React.FC<{ notificacionsEsborrades: boolean, notificacionsE
                         <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="enviamentTipus" />
                         <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="concepte" />
                         <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="createdBy" />
-                        <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="estat" />
+                        <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="estat" type="enumIcon" optionRenderer={estatOptionRenderer} hiddenEnumValues={ESTAT_FILTER_HIDDEN} optionOrder={ESTAT_FILTER_ORDER} />
                         <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataIniciInici" />
                         <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataIniciFi" />
                         <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="interessat" />
@@ -116,7 +157,7 @@ const ContentFilter: React.FC<{ notificacionsEsborrades: boolean, notificacionsE
                     <>
                         <GridFormField size={{ xs: 12, sm: 6, md: 2.5 }} name="concepte" />
                         <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="createdBy" />
-                        <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="estat" />
+                        <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="estat" type="enumIcon" optionRenderer={estatOptionRenderer} hiddenEnumValues={ESTAT_FILTER_HIDDEN} optionOrder={ESTAT_FILTER_ORDER} />
                         <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataIniciInici" />
                         <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataIniciFi" />
                     </>
@@ -128,7 +169,7 @@ const ContentFilter: React.FC<{ notificacionsEsborrades: boolean, notificacionsE
                         <GridFormField size={{ xs: 12, sm: 6, md: 4 }} name="concepte" />
                         <GridFormField size={{ xs: 12, sm: 6, md: 2.25 }} name="dataIniciInici" />
                         <GridFormField size={{ xs: 12, sm: 6, md: 2.25 }} name="dataIniciFi" />
-                        <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="estat" />
+                        <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="estat" type="enumIcon" optionRenderer={estatOptionRenderer} hiddenEnumValues={ESTAT_FILTER_HIDDEN} optionOrder={ESTAT_FILTER_ORDER} />
                         <GridFormField size={{ xs: 12, sm: 6, md: 4 }} name="createdBy" />
                     </>
                 )}
@@ -142,7 +183,7 @@ const ContentFilter: React.FC<{ notificacionsEsborrades: boolean, notificacionsE
                 <>
                     <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="enviamentTipus" />
                     <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="concepte" />
-                    <GridFormField size={{ xs: 12, sm: 6, md: 2.5 }} name="estat" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2.5 }} name="estat" type="enumIcon" optionRenderer={estatOptionRenderer} hiddenEnumValues={ESTAT_FILTER_HIDDEN} optionOrder={ESTAT_FILTER_ORDER} />
                     <GridFormField size={{ xs: 12, sm: 6, md: 1.75 }} name="dataIniciInici" />
                     <GridFormField size={{ xs: 12, sm: 6, md: 1.75 }} name="dataIniciFi" />
                     <GridButtonField size={{ xs: 12, sm: 6, md: 0.5 }} name="nomesLesMeves" icon={'person'} hiddenLabel />
@@ -152,7 +193,7 @@ const ContentFilter: React.FC<{ notificacionsEsborrades: boolean, notificacionsE
                 <>
                     <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="enviamentTipus" />
                     <GridFormField size={{ xs: 12, sm: 6, md: 4 }} name="concepte" />
-                    <GridFormField size={{ xs: 12, sm: 6, md: 2.5 }} name="estat" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2.5 }} name="estat" type="enumIcon" optionRenderer={estatOptionRenderer} hiddenEnumValues={ESTAT_FILTER_HIDDEN} optionOrder={ESTAT_FILTER_ORDER} />
                     <GridFormField size={{ xs: 12, sm: 6, md: 1.75 }} name="dataIniciInici" />
                     <GridFormField size={{ xs: 12, sm: 6, md: 1.75 }} name="dataIniciFi" />
                     <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="interessat" />

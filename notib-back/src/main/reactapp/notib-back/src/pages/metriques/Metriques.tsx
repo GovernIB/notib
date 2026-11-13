@@ -197,7 +197,7 @@ export const Metriques = () => {
         apiGetOne("metriques").then((resposta) => setMetriques(JSON.parse(resposta?.metriques)));
     }, [apiIsReady, apiGetOne]);
     return (<>
-        <PageTitle title={t('page.metriques.grid.title')}></PageTitle>
+        <PageTitle title={t('page.metriques.title')}></PageTitle>
         <ScreenFrame
             icon={icons.metrica}
             title={t("page.metriques.title")}

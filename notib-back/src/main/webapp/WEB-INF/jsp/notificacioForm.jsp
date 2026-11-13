@@ -549,7 +549,7 @@
 					return;
 				}
 				$("#saveForm").attr("disabled", true);
-				let entregaPostal = viewModel.ambEntregaCIE && $('[id*="].entregaPostal.activa"]').toArray().some(x => return x.checked);
+				let entregaPostal = viewModel.ambEntregaCIE && $('[id*="].entregaPostal.activa"]').toArray().some(x =>  x.checked);
 				let procId = document.getElementById("procedimentId").value;
 				let organCodi = document.getElementById("organGestor").value;
 				$.ajax({

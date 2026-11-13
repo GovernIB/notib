@@ -161,21 +161,36 @@ const NotificacioFormEnviamentEntregaPostal: React.FC<NotificacioFormProps> = ({
 const EntregaPostalFields: React.FC = () => {
 
     const { data } = useFormContext();
-    if (data) {
-        if (!data?.domiciliConcretTipus) {
-            data.domiciliConcretTipus = 'NACIONAL';
+    const defaultsInitializedRef = React.useRef(false);
+
+    React.useEffect(() => {
+        if (!data) {
+            return;
         }
-        if (!data?.domiciliPaisCodiIso) {
-            data.domiciliPaisCodiIso = 'ES';
+        if (!defaultsInitializedRef.current) {
+            if (!data.domiciliConcretTipus) {
+                data.domiciliConcretTipus = 'NACIONAL';
+            }
+            if (!data.domiciliPaisCodiIso && data.domiciliConcretTipus === 'NACIONAL') {
+                data.domiciliPaisCodiIso = 'ES';
+            }
+            if (!data.domiciliProvinciaCodi && data.domiciliConcretTipus === 'NACIONAL') {
+                data.domiciliProvinciaCodi = '07';
+            }
+            defaultsInitializedRef.current = true;
         }
-        if (!data?.domiciliProvinciaCodi) {
-            data.domiciliProvinciaCodi = '07';
+        if (data.domiciliConcretTipus === 'ESTRANGER') {
+            data.domiciliPaisCodiIso = '';
+            data.domiciliProvinciaCodi = '';
         }
-    }
-    const nacional = data?.domiciliConcretTipus === 'NACIONAL';
-    const estranger = data?.domiciliConcretTipus === 'ESTRANGER';
-    const apCorreus = data?.domiciliConcretTipus === 'APARTAT_CORREUS';
-    const senseNormalitzar = data?.domiciliConcretTipus === 'SENSE_NORMALITZAR';
+    }, [data, data?.domiciliConcretTipus]);
+
+    const domiciliConcretTipus = data?.domiciliConcretTipus ?? 'NACIONAL';
+
+    const nacional = domiciliConcretTipus === 'NACIONAL';
+    const estranger = domiciliConcretTipus === 'ESTRANGER';
+    const apCorreus = domiciliConcretTipus === 'APARTAT_CORREUS';
+    const senseNormalitzar = domiciliConcretTipus === 'SENSE_NORMALITZAR';
     return (
         <Grid container spacing={2}  sx={{
             width: '100%',
@@ -193,7 +208,7 @@ const EntregaPostalFields: React.FC = () => {
                 <>
                     <GridFormField size={4} name="domiciliViaTipus" required={nacional}/>
                     <GridFormField size={8} name="domiciliViaNom" required={nacional || estranger}/>
-                    <GridFormField size={4} name="domiciliApartatCorreus" required={apCorreus} />
+                    {apCorreus && <GridFormField size={4} name="domiciliApartatCorreus" required={apCorreus} />}
                     <GridFormField size={4} name="domiciliNumeracioNumero" required={nacional} />
                     <GridFormField size={4} name="domiciliNumeracioPuntKm" required={nacional} />
                     <GridFormField size={4} name="domiciliPortal" />
@@ -202,9 +217,17 @@ const EntregaPostalFields: React.FC = () => {
                     <GridFormField size={4} name="domiciliPorta" />
                     <GridFormField size={4} name="domiciliBloc" />
                     <GridFormField size={4} name="domiciliCodiPostal" required />
-                    <GridFormField size={6} name="domiciliPaisCodiIso" autocomplete required  />
-                    <GridFormField size={6} name="domiciliProvinciaCodi" autocomplete required={nacional || apCorreus} />
-                    <GridFormField size={6} name="domiciliMunicipiCodiIne" required={nacional || apCorreus} />
+                    {estranger && <GridFormField size={6} name="domiciliPaisCodiIso" autocomplete required  />}
+                    {nacional || apCorreus && (
+                        <>
+                            <GridFormField size={6} name="domiciliProvinciaCodi"  autocomplete required={nacional || apCorreus} />
+                            <GridFormField size={6}
+                               name="domiciliMunicipiCodiIne"
+                               autocomplete required={nacional || apCorreus}
+                               requestParams={data?.domiciliProvinciaCodi != null ? { domiciliProvinciaCodi: data.domiciliProvinciaCodi } : undefined}
+                            />
+                        </>
+                    )}
                     <GridFormField size={6} name="domiciliPoblacio" required />
                     <GridFormField size={6} name="domiciliComplement" />
                 </>
@@ -321,7 +344,7 @@ const NotificacioFormEnviament: React.FC<{ index: number; indexKey: number; hand
                                     </Button>)}
                                 </Grid>
                             {/*)}*/}
-                           <NotificacioFormEnviamentEntregaPostal forceEntregaPostalActiva={forceEntregaPostalActiva}/>
+                           <NotificacioFormEnviamentEntregaPostal forceEntregaPostalActiva={forceEntregaPostalActiva && !isSir}/>
 
                         </Grid>
                     </MuiForm>

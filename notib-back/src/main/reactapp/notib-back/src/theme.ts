@@ -26,7 +26,7 @@ declare module '@mui/material/styles' {
     }
 }
 
-// Identitat visual de DISTRIBUCIÓ (colors de Drassana). Per portar el disseny a una altra aplicació
+// Identitat visual de NOTIB (colors de Drassana). Per portar el disseny a una altra aplicació
 // només cal canviar aquests tres valors:
 //  - MAIN: color base. Capçaleres de pantalla, diàlegs i botons d'acció.
 //  - DARK: "torrat", és el `primary.dark` de MUI: hover dels botons i, als temes clars, badges,
@@ -35,7 +35,7 @@ declare module '@mui/material/styles' {
 // Als temes foscos l'atenuat i el torrat s'inverteixen i es deriven de la base: l'atenuat és un to
 // molt fosc (`darken`) i el torrat un to clar (`PRIMARY_LIGHT`, és el `primary.light` de MUI), perquè
 // un torrat sobre fons fosc no té contrast. No hi ha cap altre color d'identitat.
-const PRIMARY_MAIN = '#83cb41';
+const PRIMARY_MAIN = '#8fbd5e';
 // Prou fosc perquè, com a text o com a farciment amb text blanc, superi el 4,5:1 de la WCAG AA sobre
 // blanc (5,19) i sobre els grisos clars de les files de les graelles (#eee: 4,77).
 const PRIMARY_DARK = '#447436';
@@ -304,19 +304,20 @@ const baseComponentStyles = {
     // que a la resta d'aplicacions de la família.
     MuiFormLabel: {
         styleOverrides: {
-            root: {
+            root: ({ theme }: { theme: Theme }) => ({
                 fontStyle: 'italic',
                 paddingRight: '2px',
                 fontSize: '14px',
-                fontWeight: 200,
+                fontWeight: 300,
+                ...(theme.palette.mode === 'light' && { color: 'rgba(0, 0, 0, 0.74)' }),
                 '&.Mui-disabled': { fontStyle: 'italic', paddingRight: '2px' },
                 '&.Mui-focused': { fontStyle: 'italic', paddingRight: '2px' },
-            },
+            }),
             filled: {
                 fontStyle: 'italic',
                 paddingRight: '2px',
                 fontSize: '14px',
-                fontWeight: 200,
+                fontWeight: 300,
                 '&.Mui-disabled': { fontStyle: 'italic', paddingRight: '2px', opacity: 1 },
                 '&.Mui-focused': { fontStyle: 'italic', paddingRight: '2px' },
             },
@@ -418,6 +419,7 @@ const LIGHT_GREY_BACKGROUND = '#e7e7e7';
 export const lightTheme = createTheme({
     palette: {
         mode: 'light',
+        text: { disabled: '#6e6e6e' },
         primary: { main: LIGHT_PRIMARY_MAIN, dark: PRIMARY_DARK },
         error: { main: '#d32f2f', contrastText: '#f8f8f2' },
         warning: { main: '#ed6c02', contrastText: '#f8f8f2' },
@@ -496,6 +498,7 @@ const DARK_PRIMARY_SOFT = darken(PRIMARY_MAIN, 0.7);
 export const darkTheme = createTheme({
     palette: {
         mode: 'dark',
+        text: { disabled: '#a0a0a0' },
         primary: { light: DARK_PRIMARY_LIGHT, main: DARK_PRIMARY_MAIN, dark: PRIMARY_DARK },
         error: { main: '#c62828', contrastText: '#f8f8f2' },
         warning: { main: '#e65100', contrastText: '#f8f8f2' },
@@ -629,7 +632,7 @@ export const draculaTheme = createTheme({
         },
         secondary: { main: '#f8f8f2' },
         background: { default: '#282a36', paper: '#303341' },
-        text: { primary: '#f8f8f2', secondary: '#d6d6c2' },
+        text: { primary: '#f8f8f2', secondary: '#d6d6c2', disabled: '#a8aab8' },
         error: { main: '#c62828', contrastText: '#f8f8f2' },
         warning: { main: '#e65100', contrastText: '#f8f8f2' },
         success: { main: '#1b5e20', contrastText: '#f8f8f2' },

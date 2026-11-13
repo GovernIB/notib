@@ -180,7 +180,7 @@ const MassiveActionsButton: React.FC<{ apiRef: React.RefObject<GridApiPro | null
 export const AvisGrid = () => {
 
     const { t } = useTranslation();
-    const filterDataGridProps = useDatagridFilterProps(
+    const { filterComponent, ...filterDataGridProps } = useDatagridFilterProps(
         'avisResource',
         'FILTER_AVIS',
         springFilterBuilder,
@@ -196,6 +196,7 @@ export const AvisGrid = () => {
             <PageTitle title={t('page.avisos.grid.title')}></PageTitle>
             <GridPage>
                 <ScreenFrame icon={icons.avis} title={t('page.avisos.grid.title')}>
+                    {filterComponent}
                     <StyledMuiGrid
                         resourceName="avisResource"
                         datagridApiRef={datagridApiRef}

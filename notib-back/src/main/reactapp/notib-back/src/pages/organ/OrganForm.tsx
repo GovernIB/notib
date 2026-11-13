@@ -37,11 +37,11 @@ export const OrganFormContent: React.FC<{ setSubtitle?: (subtitle: string) => vo
         <MuiFormTabs tabs={tabs} tabIndexesWithGrids={[1]} initialIndex={initialTab}>
             <MuiFormTabContent index={0} showOnCreate>
                 <Grid container spacing={2}>
-                    <GridFormField size={12} name="pare" optionRenderer={organGestorOptionRenderer} />
-                    <GridFormField size={4} name="codi" />
-                    <GridFormField size={8} name="nom" />
-                    <GridFormField size={4} name="estat" />
-                    <GridFormField size={6} name="llibre" />
+                    <GridFormField size={12} name="pare" optionRenderer={organGestorOptionRenderer} disabled />
+                    <GridFormField size={4} name="codi" disabled />
+                    <GridFormField size={8} name="nom" disabled />
+                    <GridFormField size={4} name="estat" disabled />
+                    <GridFormField size={6} name="llibre" disabled />
                     <GridFormField size={6} name="oficina" />
                     <GridFormField size={2} name="permetreSir" />
                     <GridFormField size={2} name="entregaCieActiva" />

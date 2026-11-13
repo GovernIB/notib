@@ -136,24 +136,25 @@ public class SseController extends BaseController {
 					sseEventService.removeListener(queue.get(), listenerId.get());
 				}
 			}));
-			ScheduledFuture<?> heartbeat = heartbeatScheduler.scheduleAtFixedRate(
-				() -> sendHeartbeat(emitter),
+			final ScheduledFuture<?>[] heartbeatRef = new ScheduledFuture<?>[1];
+			heartbeatRef[0] = heartbeatScheduler.scheduleAtFixedRate(
+				() -> sendHeartbeat(emitter, heartbeatRef[0], queue.get(), listenerId.get()),
 				HEARTBEAT_INTERVAL_SECONDS,
 				HEARTBEAT_INTERVAL_SECONDS,
 				TimeUnit.SECONDS);
 			emitter.onCompletion(() -> {
 				log.debug("Emitter onCompletion");
-				heartbeat.cancel(true);
+				heartbeatRef[0].cancel(true);
 				sseEventService.removeListener(queue.get(), listenerId.get());
 			});
 			emitter.onTimeout(() -> {
 				log.debug("Emitter onTimeout");
-				heartbeat.cancel(true);
+				heartbeatRef[0].cancel(true);
 				sseEventService.removeListener(queue.get(), listenerId.get());
 			});
 			emitter.onError(e -> {
 				log.debug("Emitter onError", e);
-				heartbeat.cancel(true);
+				heartbeatRef[0].cancel(true);
 				sseEventService.removeListener(queue.get(), listenerId.get());
 			});
 			return ResponseEntity.ok(emitter);
@@ -207,13 +208,14 @@ public class SseController extends BaseController {
 				sseEventService.removeListener(queue, listenerId.get());
 			}
 		}));
-		ScheduledFuture<?> heartbeat = heartbeatScheduler.scheduleAtFixedRate(
-			() -> sendHeartbeat(emitter),
+		final ScheduledFuture<?>[] heartbeatRef = new ScheduledFuture<?>[1];
+		heartbeatRef[0] = heartbeatScheduler.scheduleAtFixedRate(
+			() -> sendHeartbeat(emitter, heartbeatRef[0], queue, listenerId.get()),
 			HEARTBEAT_INTERVAL_SECONDS,
 			HEARTBEAT_INTERVAL_SECONDS,
 			TimeUnit.SECONDS);
 		Runnable cleanup = () -> {
-			heartbeat.cancel(true);
+			heartbeatRef[0].cancel(true);
 			sseEventService.removeListener(queue, listenerId.get());
 		};
 		emitter.onCompletion(cleanup);
@@ -225,14 +227,23 @@ public class SseController extends BaseController {
 	/**
 	 * Envia un comentari SSE buit (una línia ":", ignorada per l'EventSource del client) només
 	 * perquè hi hagi tràfic de tant en tant a la connexió i el proxy intermedi no la doni per
-	 * inactiva. Si l'enviament falla és que la connexió ja no és vàlida: no cal fer res, l'emitter
-	 * mateix dispararà onError/onCompletion i el batec quedarà cancel·lat des d'allà.
+	 * inactiva. Si l'enviament falla és que la connexió ja no és vàlida: es cancel·la el batec,
+	 * es treu el listener i es tanca l'emitter amb complete() per disparar onCompletion sense
+	 * error (evita el forward d'ErrorPageFilter sobre una resposta SSE ja compromesa).
 	 */
-	private void sendHeartbeat(SseEmitter emitter) {
+	private void sendHeartbeat(SseEmitter emitter, ScheduledFuture<?> heartbeat,
+			SseEventService.SseQueue queue, String listenerId) {
 		try {
 			emitter.send(SseEmitter.event().comment("heartbeat"));
-		} catch (Exception ex) {
+		} catch (IOException ex) {
 			log.debug("SSE heartbeat: connexió ja tancada", ex);
+			heartbeat.cancel(true);
+			sseEventService.removeListener(queue, listenerId);
+			try {
+				emitter.complete();
+			} catch (Exception ignored) {
+				// Ja està tancat; no importa.
+			}
 		}
 	}
 

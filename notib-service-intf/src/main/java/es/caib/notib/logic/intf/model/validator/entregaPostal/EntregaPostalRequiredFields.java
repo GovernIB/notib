@@ -118,10 +118,12 @@ public class EntregaPostalRequiredFields extends ValidatorHelper implements Cust
 			}
 		}
 		if (StringUtils.isEmpty(value.getDomiciliCodiPostal()) || value.getDomiciliCodiPostal().length() != 5) {
-			valid = addMessage(EntregaPostalResource.Fields.domiciliNumeracioNumero, context, "entregapostal.form.valid.codi.postal.buit");
+			valid = addMessage(EntregaPostalResource.Fields.domiciliCodiPostal, context, "entregapostal.form.valid.codi.postal.buit");
 		}
 
-		valid = validateNotNull(EntregaPostalResource.Fields.domiciliPaisCodiIso, value.getDomiciliPaisCodiIso(), valid, context);
+		if (StringUtils.isEmpty(value.getDomiciliPaisCodiIso())) {
+			valid = addMessage(EntregaPostalResource.Fields.domiciliPaisCodiIso, context, "entregapostal.form.valid.codi.postal.buit");
+		}
 
 		return valid;
 	}

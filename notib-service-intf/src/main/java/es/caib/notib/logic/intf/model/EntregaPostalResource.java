@@ -72,6 +72,7 @@ public class EntregaPostalResource extends BaseResource<Long> {
 	private String domiciliPorta;
 	private String domiciliComplement;
 	private String domiciliPoblacio;
+	@ResourceField(enumType = true)
 	private String domiciliMunicipiCodiIne;
 	private String domiciliMunicipiNom;
 	private String domiciliCodiPostal;

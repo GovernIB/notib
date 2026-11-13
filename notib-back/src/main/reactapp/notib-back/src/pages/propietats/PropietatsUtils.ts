@@ -13,7 +13,7 @@ export const VALORS_BOOLEANS_CERTS = ['true', 's', '1', 'yes', 'y', 'on'];
 
 /** Indica si el valor d'una propietat BOOL es considera cert. */
 export const esBooleaCert = (value: unknown): boolean =>
-    typeof value === 'string' && VALORS_BOOLEANS_CERTS.includes(value.trim().toLowerCase());
+    (typeof value === 'string' && VALORS_BOOLEANS_CERTS.includes(value.trim().toLowerCase())) || value === true;
 
 /** Text de l'error d'una crida a l'API (o del que s'hagi llançat). */
 export const missatgeError = (error: unknown): string => {

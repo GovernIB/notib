@@ -23,6 +23,7 @@ import {
     useMuiFormDialogApiRef,
 } from 'reactlib';
 import AppFormFieldReference from './AppFormFieldReference';
+import AppFormFieldEnum from './AppFormFieldEnum';
 import Offline from './Offline';
 import { UserProfileMenu, UserProfileFormDialog } from './UserProfile';
 import SwitchInterfaceMenuItem from './SwitchInterfaceMenuItem';
@@ -30,7 +31,9 @@ import { MAIN_GAP, MAIN_PADDING } from '../utils/layout';
 import { darkTheme, lightTheme } from '../theme';
 import { roleBadgeIcon } from '../utils/roleIcons';
 import { useNotibContext } from './NotibContext';
-import {AvisosBanner} from "./AvisosBanner.tsx";
+import { AvisosBanner } from './AvisosBanner';
+import AvisosChips from './AvisosChips';
+import { AvisosProvider } from './AvisosProvider';
 import reactlibCa from "../i18n/reactlibCa.ts";
 import reactlibEs from "../i18n/reactlibEs.ts";
 import {UserLastConection} from "./UserLastConection.tsx";
@@ -301,54 +304,61 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             },
         },
     };
+
     return (
-        <Box sx={menuColorSet ? { ...frameSx, ...menuColorSetSx } : frameSx}>
-        <MuiBaseApp
-            code={code}
-            headerTitle={title}
-            headerLogo={logo}
-            headerLogoStyle={logoStyle}
-            headerVersion={version}
-            headerAppbarStyle={appbarStyle}
-            headerAppbarBackgroundColor={appbarBackgroundColor}
-            headerAppbarBackgroundImg={appbarBackgroundImg}
-            headerAdditionalComponents={[
-                <SwitchInterfaceMenuItem key="fast_rewind" />,
-            ]}
-            headerAuthBadgeIcon={roleBadgeIcon(currentRole)}
-            headerAdditionalAuthComponents={[
-                <UserLastConection key="user_last_conection" />,
-                <Box key="user_profile" sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
-                    <UserProfileMenu formDialogApiRef={formDialogApiRef} />
-                </Box>,
-            ]}
-            offline={<Offline />}
-            footer={footer}
-            footerHeight={footerHeight}
-            persistentLanguage
-            i18nUseTranslation={useTranslation}
-            i18nCurrentLanguage={i18n.language}
-            i18nHandleLanguageChange={i18nHandleLanguageChange}
-            i18nAddResourceBundleCallback={i18nAddResourceBundleCallback}
-            routerGoBack={goBack}
-            routerNavigate={navigate}
-            routerUseBlocker={useBlocker}
-            routerUseLocationPath={useLocationPath}
-            routerAnyHistoryEntryExist={anyHistoryEntryExist}
-            linkComponent={Link}
-            // Els marges d'`<main>` els posa frameSx (la llibreria els deixa a 16px 24px).
-            marginsDisabled
-            saveAs={saveAs}
-            formFieldComponents={[{ type: 'reference', component: AppFormFieldReference }]}
-            menuEntries={baseAppMenuEntries}
-        >
-            <CustomLocalizationProvider>
-                <UserProfileFormDialog formDialogApiRef={formDialogApiRef} />
-                <AvisosBanner/>
-                {children}
-            </CustomLocalizationProvider>
-        </MuiBaseApp>
-        </Box>
+        <AvisosProvider>
+            <Box sx={menuColorSet ? { ...frameSx, ...menuColorSetSx } : frameSx}>
+                <MuiBaseApp
+                    code={code}
+                    headerTitle={title}
+                    headerLogo={logo}
+                    headerLogoStyle={logoStyle}
+                    headerVersion={version}
+                    headerAppbarStyle={appbarStyle}
+                    headerAppbarBackgroundColor={appbarBackgroundColor}
+                    headerAppbarBackgroundImg={appbarBackgroundImg}
+                    headerAdditionalComponents={[
+                        <SwitchInterfaceMenuItem key="fast_rewind" />,
+                        <AvisosChips key="avisos" />,
+                    ]}
+                    headerAuthBadgeIcon={roleBadgeIcon(currentRole)}
+                    headerAdditionalAuthComponents={[
+                        <UserLastConection key="user_last_conection" />,
+                        <Box key="user_profile" sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
+                            <UserProfileMenu formDialogApiRef={formDialogApiRef} />
+                        </Box>,
+                    ]}
+                    offline={<Offline />}
+                    footer={footer}
+                    footerHeight={footerHeight}
+                    persistentLanguage
+                    i18nUseTranslation={useTranslation}
+                    i18nCurrentLanguage={i18n.language}
+                    i18nHandleLanguageChange={i18nHandleLanguageChange}
+                    i18nAddResourceBundleCallback={i18nAddResourceBundleCallback}
+                    routerGoBack={goBack}
+                    routerNavigate={navigate}
+                    routerUseBlocker={useBlocker}
+                    routerUseLocationPath={useLocationPath}
+                    routerAnyHistoryEntryExist={anyHistoryEntryExist}
+                    linkComponent={Link}
+                    // Els marges d'`<main>` els posa frameSx (la llibreria els deixa a 16px 24px).
+                    marginsDisabled
+                    saveAs={saveAs}
+                    formFieldComponents={[
+                        { type: 'reference', component: AppFormFieldReference },
+                        { type: 'enumIcon', component: AppFormFieldEnum },
+                    ]}
+                    menuEntries={baseAppMenuEntries}
+                >
+                    <CustomLocalizationProvider>
+                        <UserProfileFormDialog formDialogApiRef={formDialogApiRef} />
+                        <AvisosBanner />
+                        {children}
+                    </CustomLocalizationProvider>
+                </MuiBaseApp>
+            </Box>
+        </AvisosProvider>
     );
 };
 

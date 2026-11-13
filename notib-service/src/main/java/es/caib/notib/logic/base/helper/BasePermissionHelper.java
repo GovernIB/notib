@@ -8,6 +8,8 @@ import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import es.caib.notib.logic.intf.base.util.HttpRequestUtil;
 import javax.servlet.http.HttpServletRequest;
 import es.caib.notib.logic.intf.base.service.PermissionEvaluatorService;
+import es.caib.notib.logic.objectes.LoggingTipus;
+import es.caib.notib.logic.utils.NotibLogger;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
@@ -61,7 +63,8 @@ public abstract class BasePermissionHelper {
 		if (req.isPresent()) {
 			selectedRole = req.get().getHeader("X-App-Role");
 		}
-		log.info("checkResourcePermission: targetType={}, selectedRole={}, authorities={}", targetType, selectedRole, auth != null ? auth.getAuthorities() : null);
+		var msg = String.format("checkResourcePermission: targetType=%s, selectedRole=%s, authorities=%s", targetType, selectedRole, auth != null ? auth.getAuthorities() : null);
+		NotibLogger.getInstance().info(msg, log, LoggingTipus.USUARIS);
 		try {
 			Class<?> targetTypeClass = Class.forName(targetType);
 			ResourceConfig resourceConfig = targetTypeClass.getAnnotation(ResourceConfig.class);

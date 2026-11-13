@@ -99,24 +99,15 @@ public class LegacyHelper {
 	/**
 	 * Fa una consulta d'unitats organitzatives al servei DIR3 extern en base a una sèrie de paràmetres.
 	 *
-	 * @param codi
-	 *            el codi DIR3.
-	 * @param denominacio
-	 *            la denominació.
-	 * @param nivellAdministracio
-	 *            el nivell de l'administració.
-	 * @param comunitatAutonoma
-	 *            el codi de la comunitat autònoma.
-	 * @param provincia
-	 *            el codi de la província.
-	 * @param municipi
-	 *            el codi del municipi.
-	 * @param ambOficines
-	 *            indica si només s'han de retornar les unitats que tenen oficines.
-	 * @param esUnitatArrel
-	 *            indica si només s'han de retornar les unitats arrel.
-	 * @param pageable
-	 *            la informació de paginació.
+	 * @param codi el codi DIR3.
+	 * @param denominacio la denominació.
+	 * @param nivellAdministracio el nivell de l'administració.
+	 * @param comunitatAutonoma el codi de la comunitat autònoma.
+	 * @param provincia el codi de la província.
+	 * @param municipi el codi del municipi.
+	 * @param ambOficines indica si només s'han de retornar les unitats que tenen oficines.
+	 * @param esUnitatArrel indica si només s'han de retornar les unitats arrel.
+	 * @param pageable la informació de paginació.
 	 * @return la pàgina amb els resultats de la consulta.
 	 */
 	public Page<Dir3Resource> dir3FindMultiple(
@@ -129,9 +120,10 @@ public class LegacyHelper {
 		Boolean ambOficines,
 		Boolean esUnitatArrel,
 		Pageable pageable) {
-		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
+
+		var currentEntitat = userSessionHelper.getCurrentEntitat();
 		ConfigHelper.setEntitatCodi(currentEntitat.getCodi());
-		List<OrganGestorDto> nodesDir3 = pluginHelper.cercaUnitats(
+		var nodesDir3 = pluginHelper.cercaUnitats(
 			currentEntitat.getId(),
 			codi,
 			denominacio,
@@ -141,13 +133,7 @@ public class LegacyHelper {
 			esUnitatArrel,
 			provincia,
 			municipi);
-		if (!nodesDir3.isEmpty()) {
-			return new PageImpl<>(
-				nodesDir3.stream().map(this::toDir3Resource).collect(Collectors.toList()),
-				pageable, nodesDir3.size());
-		} else {
-			return Page.empty();
-		}
+        return !nodesDir3.isEmpty() ? new PageImpl<>(nodesDir3.stream().map(this::toDir3Resource).collect(Collectors.toList()), pageable, nodesDir3.size()) : Page.empty();
 	}
 
 	/**
@@ -156,7 +142,8 @@ public class LegacyHelper {
 	 * @return la llista de comunitats autònomes.
 	 */
 	public List<CodiValor> dir3ConsultaComunitatsAutonomes() {
-		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
+
+		var currentEntitat = userSessionHelper.getCurrentEntitat();
 		ConfigHelper.setEntitatCodi(currentEntitat.getCodi());
 		return unitatsOrganitzativesPluginHelper.llistarComunitatsAutonomes();
 	}
@@ -164,12 +151,12 @@ public class LegacyHelper {
 	/**
 	 * Consulta la llista de províncies a DIR3.
 	 *
-	 * @param comunitatAutonomaCodi
-	 *            el codi de la comunitat autònoma.
+	 * @param comunitatAutonomaCodi el codi de la comunitat autònoma.
 	 * @return la llista de províncies.
 	 */
 	public List<CodiValor> dir3ConsultaProvincies(String comunitatAutonomaCodi) {
-		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
+
+		var currentEntitat = userSessionHelper.getCurrentEntitat();
 		ConfigHelper.setEntitatCodi(currentEntitat.getCodi());
 		return !Strings.isNullOrEmpty(comunitatAutonomaCodi) ? unitatsOrganitzativesPluginHelper.llistarProvincies(comunitatAutonomaCodi) : unitatsOrganitzativesPluginHelper.llistarProvincies();
 	}
@@ -177,12 +164,12 @@ public class LegacyHelper {
 	/**
 	 * Consulta la llista de localitats a DIR3.
 	 *
-	 * @param provinciaCodi
-	 *            el codi de la província.
+	 * @param provinciaCodi el codi de la província.
 	 * @return la llista de localitats.
 	 */
 	public List<CodiValor> dir3ConsultaLocalitats(String provinciaCodi) {
-		EntitatResourceEntity currentEntitat = userSessionHelper.getCurrentEntitat();
+
+		var currentEntitat = userSessionHelper.getCurrentEntitat();
 		ConfigHelper.setEntitatCodi(currentEntitat.getCodi());
 		return unitatsOrganitzativesPluginHelper.llistarLocalitats(provinciaCodi);
 	}
@@ -225,6 +212,7 @@ public class LegacyHelper {
 	}
 
 	private Dir3Resource toDir3Resource(NodeDir3 nodeDir3) {
+
 		Dir3Resource dir3Resource = new Dir3Resource();
 		dir3Resource.setCodi(nodeDir3.getCodi());
 		dir3Resource.setDenominacio(nodeDir3.getDenominacio());
@@ -235,6 +223,7 @@ public class LegacyHelper {
 	}
 
 	private Dir3Resource toDir3Resource(OrganGestorDto organGestorDto) {
+
 		Dir3Resource dir3Resource = new Dir3Resource();
 		dir3Resource.setCodi(organGestorDto.getCodi());
 		dir3Resource.setDenominacio(organGestorDto.getNom());

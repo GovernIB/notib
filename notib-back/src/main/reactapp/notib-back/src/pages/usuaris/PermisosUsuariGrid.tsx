@@ -24,7 +24,7 @@ const ContentFilter: React.FC = () => {
 export const PermisosUsuariGrid = () => {
 
     const { t } = useTranslation();
-    const filterDataGridProps = useDatagridFilterProps(
+    const { filterComponent, ...filterDataGridProps } = useDatagridFilterProps(
         'usuariPermisResource',
         'FILTER_USUARI_PERMIS',
         springFilterBuilder,
@@ -77,6 +77,7 @@ export const PermisosUsuariGrid = () => {
             <PageTitle title={t('page.usuaris.permisos.grid.title')}></PageTitle>
             <GridPage>
                 <ScreenFrame icon={icons.permisUsuari} title={t('page.usuaris.permisos.grid.title')}>
+                    {filterComponent}
                     <StyledMuiGrid
                         resourceName="usuariPermisResource"
                         columns={columns}
