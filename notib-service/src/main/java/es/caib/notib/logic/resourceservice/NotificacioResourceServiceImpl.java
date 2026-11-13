@@ -153,7 +153,6 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 	public void init() {
 
 		register(null, new NotificacioResourceServiceImpl.InitOnChangeLogicProcessor());
-		register(NotificacioResource.Fields.organGestor, new NotificacioResourceServiceImpl.OrganGestorOnChangeLogicProcessor());
 		register(NotificacioResource.Fields.grupCodi, new NotificacioResourceServiceImpl.GrupCodiFieldOptionsProvider());
 		register(NotificacioResource.Fields.caducitat, new NotificacioResourceServiceImpl.CaducitatOnChangeLogicProcessor());
 		register(NotificacioResource.Fields.caducitatDiesNaturals, new NotificacioResourceServiceImpl.CaducitatOnChangeLogicProcessor());
@@ -761,32 +760,13 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 
 		@Override
 		public void onChange(Serializable id, NotificacioResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, NotificacioResource target) {
+			target.setProcedimentRequired(EnviamentTipus.NOTIFICACIO.equals(previous.getEnviamentTipus()));
+
 			if (previous.getCaducitatDiesNaturals() != null) {
 				caducitatOnChange(previous.getCaducitatDiesNaturals(), previous, target);
 			} else if (previous.getCaducitat() != null) {
 				caducitatOnChange(previous.getCaducitat(), previous, target);
 			}
-		}
-	}
-
-	/*
-	 * Lògica onChange pel camp organGestor. Si l'usuari te permís "comunicacions sense procediment" sobre l'òrgan
-	 * gestor i la notificació és una comunicació s'ha de posar el camp procedimentRequired a false.
-	 */
-	class OrganGestorOnChangeLogicProcessor implements OnChangeLogicProcessor<NotificacioResource> {
-
-		@Override
-		public void onChange(Serializable id, NotificacioResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, NotificacioResource target) {
-
-			ResourceReference<OrganGestorResource, Long> organGestor = (ResourceReference)fieldValue;
-			var isComunicacio = previous.getEnviamentTipus() != null && (EnviamentTipus.COMUNICACIO.equals(previous.getEnviamentTipus()) || EnviamentTipus.SIR.equals(previous.getEnviamentTipus()));
-			if (organGestor == null || !isComunicacio) {
-				target.setProcedimentRequired(true);
-				return;
-			}
-			List<Long> organGestorIdsWithPermission = notibPermissionHelper.organGestorIdsWithPermissionRecursive(ExtendedPermission.PERM7);
-			var hasComunicacionsSenseProcedimentPermission = organGestorIdsWithPermission.contains(organGestor.getId());
-			target.setProcedimentRequired(!hasComunicacionsSenseProcedimentPermission);
 		}
 	}
 

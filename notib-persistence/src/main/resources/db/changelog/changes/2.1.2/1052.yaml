@@ -1,0 +1,41 @@
+databaseChangeLog:
+    - changeSet:
+          id: 1052
+          author: system
+          changes:
+              - insert:
+                    tableName: NOT_CONFIG
+                    columns:
+                        - column:
+                              name: ID
+                              value: 1052
+                        - column:
+                              name: KEY
+                              value: "es.caib.notib.plugin.digitalitzacio.actiu"
+                        - column:
+                              name: VALUE
+                              value: "true"
+                        - column:
+                              name: DESCRIPTION
+                              value: "Actiu"
+                        - column:
+                              name: GROUP_CODE
+                              value: "DIGITALITZACIO"
+                        - column:
+                              name: CONFIG_GROUP_ID
+                              valueComputed: "(SELECT ID FROM not_CONFIG_GROUP g WHERE g.code = 'DIGITALITZACIO')"
+                        - column:
+                              name: POSITION
+                              valueNumeric: 6
+                        - column:
+                              name: JBOSS_PROPERTY
+                              valueNumeric: 0
+                        - column:
+                              name: TYPE_CODE
+                              value: "BOOL"
+                        - column:
+                              name: CONFIG_TYPE_ID
+                              valueComputed: "(SELECT ID FROM not_CONFIG_TYPE t WHERE t.code = 'BOOL')"
+                        - column:
+                              name: CONFIGURABLE
+                              valueNumeric: 0

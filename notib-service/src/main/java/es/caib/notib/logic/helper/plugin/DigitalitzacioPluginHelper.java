@@ -171,6 +171,8 @@ public class DigitalitzacioPluginHelper extends AbstractPluginHelper<Digitalitza
 
     @Override
     protected DigitalitzacioPlugin getPlugin() {
+		if (!this.isDigitalitzacioActiu())
+			throw new RuntimeException("El plugin esa troba deshabilitat");
 
         var codiEntitat = getCodiEntitatActual();
         if (Strings.isNullOrEmpty(codiEntitat)) {
@@ -204,6 +206,10 @@ public class DigitalitzacioPluginHelper extends AbstractPluginHelper<Digitalitza
 
     private String getEndpointURL() {
         return configHelper.getConfig("es.caib.notib.plugin.digitalitzacio.endpointName");
+    }
+
+    private boolean isDigitalitzacioActiu() {
+        return configHelper.getConfigAsBoolean("es.caib.notib.plugin.digitalitzacio.actiu");
     }
 
     @Override
