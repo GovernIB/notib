@@ -90,7 +90,7 @@ public class AvisResource extends BaseResource<Long> {
 	private boolean actiu = true;
 	private boolean avisAdministrador;
 
-	@NotNull
+//	@NotNull
 	private ResourceReference<EntitatResource, Long> entitat;
 
 	@Getter

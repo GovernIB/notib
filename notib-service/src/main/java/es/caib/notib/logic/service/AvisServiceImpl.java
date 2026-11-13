@@ -60,7 +60,7 @@ public class AvisServiceImpl implements AvisService {
 
 		log.debug("Actualitzant avis existent (avis=" + avis + ")");
 		var avisEntity = avisRepository.findById(avis.getId()).orElseThrow();
-		avisEntity.update(avis.getAssumpte(), avis.getMissatge(), avis.getDataInici(), avis.getDataFinal(), avis.getAvisNivell());
+		avisEntity.update(avis.getAssumpte(), avis.getMissatge(), avis.getDataInici(), avis.getDataFinal(), avis.getAvisNivell(), avis.getEntitatId());
 		var dto = conversioTipusHelper.convertir(avisEntity, AvisDto.class);
 		sseEventService.notifyAvisosActius();
 	    return dto;

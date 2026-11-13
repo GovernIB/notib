@@ -1,23 +1,17 @@
 package es.caib.notib.persist.entity;
 
+import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.dto.AvisNivellEnumDto;
 import es.caib.notib.persist.audit.NotibAuditable;
 import lombok.Getter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
  * Classe del model de dades que representa una alerta d'error en segón pla.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter
@@ -25,7 +19,7 @@ import java.util.Date;
 @Table(	name = "not_avis")
 @EntityListeners(AuditingEntityListener.class)
 public class AvisEntity extends NotibAuditable<Long> {
-	
+
 	@Column(name = "assumpte", length = 256, nullable = false)
 	private String assumpte;
 	@Column(name = "missatge", length = 2048, nullable = false)
@@ -43,23 +37,31 @@ public class AvisEntity extends NotibAuditable<Long> {
 	private AvisNivellEnumDto avisNivell;
 	@Column(name = "avis_admin", nullable = false)
 	private Boolean avisAdministrador;
-	@Column(name = "entitat_id")
+
+	@ManyToOne()
+	@JoinColumn(
+		name = "entitat_id",
+		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "servei_entitat_fk"),
+		insertable = false, updatable = false)
+	private EntitatEntity entitat;
+	@Column(name = "entitat_id", length = 2048)
 	private Long entitatId;
-	
-	
-	public void update(String assumpte, String missatge, Date dataInici, Date dataFinal, AvisNivellEnumDto avisNivell) {
+
+
+	public void update(String assumpte, String missatge, Date dataInici, Date dataFinal, AvisNivellEnumDto avisNivell, Long entitatId) {
 
 		this.assumpte = assumpte;
 		this.missatge = missatge;
 		this.dataInici = dataInici;
 		this.dataFinal = dataFinal;
 		this.avisNivell = avisNivell;
+		this.entitatId = entitatId;
 	}
-	
+
 	public void updateActiva(Boolean actiu) {
 		this.actiu = actiu;
 	}
-	
+
 
 	public static Builder getBuilder(String assumpte, String missatge, Date dataInici, Date dataFinal, AvisNivellEnumDto avisNivell, Boolean avisAdministrador, Long entitatId) {
 		return new Builder(assumpte, missatge, dataInici, dataFinal, avisNivell, avisAdministrador, entitatId);
@@ -85,5 +87,5 @@ public class AvisEntity extends NotibAuditable<Long> {
 	}
 
 	private static final long serialVersionUID = 6125475298050864472L;
-	
+
 }

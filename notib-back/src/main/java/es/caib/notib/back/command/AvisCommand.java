@@ -13,7 +13,7 @@ import java.util.Date;
 
 /**
  * Command per al manteniment d'avisos.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter @Setter
@@ -30,7 +30,8 @@ public class AvisCommand {
 	private Boolean actiu;
 	@NotNull
 	private AvisNivellEnumDto avisNivell;
-	
+	private Long entitatId;
+
 	public static AvisCommand asCommand(AvisDto dto) {
 		return ConversioTipusHelper.convertir(dto, AvisCommand.class);
 	}

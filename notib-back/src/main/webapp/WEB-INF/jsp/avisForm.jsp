@@ -21,7 +21,7 @@
 	<link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/js/bootstrap-datepicker.min.js"/>"></script>
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
-	<script src="<c:url value="/js/webutil.common.js"/>"></script>	
+	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<not:modalHead/>
 </head>
 <body>
@@ -33,7 +33,15 @@
 		<not:inputDate name="dataInici" textKey="avis.form.camp.dataInici" required="true"/>
 		<not:inputDate name="dataFinal" textKey="avis.form.camp.dataFinal"/>
 		<not:inputSelect name="avisNivell" textKey="avis.form.camp.avisNivell" optionEnum="AvisNivellEnumDto" required="true"/>
-		
+
+		<not:inputSelect
+			name="entitatId"
+			optionItems="${entitats}"
+			optionValueAttribute="codi"
+			optionTextAttribute="valor"
+			textKey="avis.form.camp.entitat"
+			emptyOption="true"/>
+
 		<div id="modal-botons" class="well">>
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/avis"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

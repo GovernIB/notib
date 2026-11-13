@@ -6,6 +6,7 @@ import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.logic.intf.dto.AvisDto;
 import es.caib.notib.logic.intf.service.AvisService;
+import es.caib.notib.logic.intf.service.EntitatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -25,15 +26,17 @@ import java.util.List;
 
 /**
  * Controlador per al manteniment de avisos.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Controller
 @RequestMapping("/avis")
 public class AvisController extends TableAccionsMassivesController {
-	
+
 	@Autowired
 	private AvisService avisService;
+	@Autowired
+	private EntitatService entitatService;
 
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "AvisController.session.seleccio";
 	private static final String REDIRECT = "redirect:../../avis";
@@ -60,12 +63,24 @@ public class AvisController extends TableAccionsMassivesController {
 	public String getNew(Model model) {
 		return get(null, model);
 	}
-	
+
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 	    binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true));
 	}
-	
+
+	private void formVariable(Model model) {
+		var rolActual = sessionScopedContext.getRolActual();
+		if (rolActual == null) {
+			rolActual = "tothom";
+		}
+
+		var entitatsAccessibles = entitatService.findAccessiblesUsuariActualCodiValor(rolActual);
+//			.map(entitat -> ResourceReference.toResourceReference(Long.valueOf(entitat.getCodi()), entitat.getValor()))
+//			.collect(Collectors.toList());
+		model.addAttribute("entitats", entitatsAccessibles);
+	}
+
 	@GetMapping(value = "/{avisId}")
 	public String get(@PathVariable Long avisId, Model model) {
 
@@ -73,6 +88,7 @@ public class AvisController extends TableAccionsMassivesController {
 		if (avisId != null) {
 			avis = avisService.findById(avisId);
 		}
+		this.formVariable(model);
 		if (avis != null) {
 			model.addAttribute(AvisCommand.asCommand(avis));
 			return "avisForm";
@@ -84,9 +100,10 @@ public class AvisController extends TableAccionsMassivesController {
 	}
 
 	@PostMapping
-	public String save(HttpServletRequest request, @Valid AvisCommand command, BindingResult bindingResult) {
+	public String save(HttpServletRequest request, @Valid AvisCommand command, BindingResult bindingResult, Model model) {
 
 		if (bindingResult.hasErrors()) {
+			this.formVariable(model);
 			return "avisForm";
 		}
 		var url = "redirect:avis";
