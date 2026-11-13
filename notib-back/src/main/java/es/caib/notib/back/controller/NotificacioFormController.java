@@ -593,6 +593,12 @@ public class NotificacioFormController extends BaseUserController {
         return df.format(CaducitatHelper.sumarDiesNaturals(dies));
     }
 
+    @GetMapping(value = "/caducitatDataDesdeData/{dia}/{mes}/{any}/{dies}")
+    @ResponseBody
+    public String getDataCaducitatDesdeData(@PathVariable String dia, @PathVariable String mes, @PathVariable String any, @PathVariable int dies) throws ParseException {
+        return df.format(CaducitatHelper.sumarDiesNaturals(df.parse(dia + "/" + mes + "/" + any), dies));
+    }
+
     private void emplenarModelNotificacio(HttpServletRequest request, Model model, NotificacioCommand notificacioCommand) {
 
         var entitatActual = sessionScopedContext.getEntitatActual();

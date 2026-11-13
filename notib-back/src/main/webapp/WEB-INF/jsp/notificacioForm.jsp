@@ -1275,7 +1275,41 @@
 			let val = $("#caducitatDiesNaturals").val();
 			val = val > 99999999 ? 99999999 : val;
 			$("#caducitatDiesNaturals").val(val);
-			updateCaducitatAmbDies($("#caducitatDiesNaturals").val());
+			let dataProgramada = $("#enviamentDataProgramada").val();
+			if (!dataProgramada) {
+				updateCaducitatAmbDies(val);
+				return;
+			}
+			let campsData = dataProgramada.split("/");
+			$.ajax({
+				type: 'GET',
+				url: "<c:url value="/notificacio/caducitatDataDesdeData/"/>" + campsData[0] + "/" + campsData[1] + "/" + campsData[2] + "/" + val,
+				success: function (data) {
+					$("#caducitat").val(data);
+				},
+				error: function () {
+					console.log("error obtenint la data de caducitat a partir de la data programada");
+				}
+			});
+		});
+
+		// Quan canvia la data d'enviament programada, s'actualitza la caducitat (data programada + dies naturals)
+		$("#enviamentDataProgramada").change(function () {
+			let dataProgramada = $(this).val();
+			let dies = $("#caducitatDiesNaturals").val();
+			if (dataProgramada && dies) {
+				let campsData = dataProgramada.split("/");
+				$.ajax({
+					type: 'GET',
+					url: "<c:url value="/notificacio/caducitatDataDesdeData/"/>" + campsData[0] + "/" + campsData[1] + "/" + campsData[2] + "/" + dies,
+					success: function (data) {
+						$("#caducitat").val(data);
+					},
+					error: function () {
+						console.log("error obtenint la data de caducitat a partir de la data programada");
+					}
+				});
+			}
 		});
 
 		$(window).keydown(function(event){
