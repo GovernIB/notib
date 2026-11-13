@@ -64,9 +64,26 @@ public class SseController extends BaseController {
 	private static ThreadFactory sseHeartbeatThreadFactory() {
 		var counter = new AtomicInteger();
 		return runnable -> {
-			var thread = new Thread(runnable, "sse-heartbeat-" + counter.incrementAndGet());
+			// Els batecs SSE cridem heartbeat.cancel(true) (FutureTask.cancel(true) → Thread.interrupt)
+			// quan la connexió es tanca. Sense netejar, el fil del pool quedava marcat com a
+			// interrupt i la propera tasca que requereix un semàfor (l'adquisició del pool
+			// StrictMaxPool de l'EJB SseEventServiceEjb) fallava amb InterruptedException →
+			// WFLYEJB0379 "Acquire semaphore was interrupted". Es neteja el senyal al final de
+			// cada tasca perquè no es propagui a la següent.
+			var thread = new Thread(sseHeartbeatTask(runnable), "sse-heartbeat-" + counter.incrementAndGet());
 			thread.setDaemon(true);
 			return thread;
+		};
+	}
+
+	private static Runnable sseHeartbeatTask(Runnable task) {
+		return () -> {
+			try {
+				task.run();
+			} finally {
+				// interrupted() és static: comprova i NETEJA el flag d'interrupt del fil actual.
+				Thread.currentThread().interrupted();
+			}
 		};
 	}
 
