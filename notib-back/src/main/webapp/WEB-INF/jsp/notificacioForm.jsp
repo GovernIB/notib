@@ -2148,8 +2148,10 @@
 			<div class="container-fluid">
                 <ul class="nav nav-tabs" role="tablist">
                     <li role="presentation" class="active"><a href="#fitxer" id="fitxerTab" class="fitxer" aria-controls="fitxer" role="tab" data-toggle="tab"><spring:message code="notificacio.form.titol.document"/></a></li>
-                    <li role="presentation"><a href="#escaneig" id="escaneigTab" class="escaneig" aria-controls="escaneig" role="tab" data-toggle="tab"><spring:message code="notificacio.form.titol.escaneig"/></a></li>
-                </ul>
+					<c:if test="${isDigitalibActiva}">
+						<li role="presentation"><a href="#escaneig" id="escaneigTab" class="escaneig" aria-controls="escaneig" role="tab" data-toggle="tab"><spring:message code="notificacio.form.titol.escaneig"/></a></li>
+					</c:if>
+				</ul>
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane" id="escaneig">
                         <c:if test="${not empty noFileScanned}">
