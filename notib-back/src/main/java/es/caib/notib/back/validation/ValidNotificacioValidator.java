@@ -85,32 +85,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 				}
 			}
 
-			Long organId;
-			try {
-				organId = Long.parseLong(notificacio.getOrganGestor());
-			} catch (Exception ex) {
-				var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.organ.buit", null, locale);
-				context.buildConstraintViolationWithTemplate(msg).addNode("organGestor").addConstraintViolation();//				var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.organ.buit", null, locale);
-				context.buildConstraintViolationWithTemplate(msg).addNode("organGestor").addConstraintViolation();
-				return false;
-			}
-			var entitat = entitatService.findByDir3codi(notificacio.getEmisorDir3Codi());
-			var organ = organService.findById(entitat.getId(), organId);
-			if (EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus())) {
-				if (organ != null) {
-					valid = entitat.isOficinaEntitat() || organ.getOficina() != null && !StringUtils.isEmpty(organ.getOficina().getCodi());
-					if (!valid) {
-						var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.organ.sense.oficina", null, locale);
-						context.buildConstraintViolationWithTemplate(msg).addNode("organGestor").addConstraintViolation();
-					}
-				}
-			}
-			if (comunicacioAmbAdministracio && comunicacioSenseAdministracio) {
-				valid = false;
-				context.disableDefaultConstraintViolation();
-				var msg = MessageHelper.getInstance().getMessage("notificacio.form.comunicacio", null, locale);
-				context.buildConstraintViolationWithTemplate(msg).addConstraintViolation();
-			}
+
 
 			// Procediment
 			boolean useProcediment = "PROCEDIMENT".equals(notificacio.getTipusProcSer());
@@ -158,6 +133,33 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 					var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.caducitat", null, locale);
 					context.buildConstraintViolationWithTemplate(msg).addNode("caducitat").addConstraintViolation();
 				}
+			}
+
+			Long organId;
+			try {
+				organId = Long.parseLong(notificacio.getOrganGestor());
+			} catch (Exception ex) {
+				var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.organ.buit", null, locale);
+				context.buildConstraintViolationWithTemplate(msg).addNode("organGestor").addConstraintViolation();//				var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.organ.buit", null, locale);
+				context.buildConstraintViolationWithTemplate(msg).addNode("organGestor").addConstraintViolation();
+				return false;
+			}
+			var entitat = entitatService.findByDir3codi(notificacio.getEmisorDir3Codi());
+			var organ = organService.findById(entitat.getId(), organId);
+			if (EnviamentTipus.SIR.equals(notificacio.getEnviamentTipus())) {
+				if (organ != null) {
+					valid = entitat.isOficinaEntitat() || organ.getOficina() != null && !StringUtils.isEmpty(organ.getOficina().getCodi());
+					if (!valid) {
+						var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.organ.sense.oficina", null, locale);
+						context.buildConstraintViolationWithTemplate(msg).addNode("organGestor").addConstraintViolation();
+					}
+				}
+			}
+			if (comunicacioAmbAdministracio && comunicacioSenseAdministracio) {
+				valid = false;
+				context.disableDefaultConstraintViolation();
+				var msg = MessageHelper.getInstance().getMessage("notificacio.form.comunicacio", null, locale);
+				context.buildConstraintViolationWithTemplate(msg).addConstraintViolation();
 			}
 
 			// Validació de documents

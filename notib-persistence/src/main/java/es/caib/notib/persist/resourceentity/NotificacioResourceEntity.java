@@ -146,12 +146,12 @@ public class NotificacioResourceEntity extends BaseAuditableResourceEntity<Notif
 		nullable = false)
 	private OrganGestorResourceEntity organGestor;
 
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(
 		name = "procediment_id",
 		referencedColumnName = "id",
 		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "procediment_not_fk"),
-		nullable = false)
+		nullable = true)
 	private ProcedimentResourceEntity procediment;
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)

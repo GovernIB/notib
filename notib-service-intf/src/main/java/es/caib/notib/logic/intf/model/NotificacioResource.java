@@ -527,7 +527,7 @@ public class NotificacioResource extends BaseResource<Long> {
 	// mai troba aquesta named query a la petició i el desplegable no aplica cap filtre de permisos (només
 	// l'entitat actual i els seus descendents) -es mostren tots els òrgans de l'entitat, no només els que
 	// l'usuari actual pot administrar/gestionar.
-	@ResourceField(onChangeActive = true, namedQueries = {OrganGestorResource.NAMED_QUERY_PERM_READ_VIGENT})
+	@ResourceField(namedQueries = {OrganGestorResource.NAMED_QUERY_PERM_READ_VIGENT})
 	private ResourceReference<OrganGestorResource, Long> organGestor;
 	private ResourceReference<ProcedimentResource, Long> procediment;
 //	@NotNull

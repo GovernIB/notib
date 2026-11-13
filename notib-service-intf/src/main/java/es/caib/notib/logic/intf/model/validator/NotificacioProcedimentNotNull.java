@@ -1,13 +1,12 @@
 package es.caib.notib.logic.intf.model.validator;
 
+import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.base.validation.CustomValidator;
 import es.caib.notib.logic.intf.model.NotificacioResource;
-import es.caib.notib.logic.intf.resourceservice.NotificacioResourceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import javax.validation.ConstraintValidatorContext;
-import java.util.Map;
 
 /**
  * Valida si el camp de procediment ha de ser NotNull. En les notificacions a on l'usuari te permís de "comunicacions
@@ -19,11 +18,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class NotificacioProcedimentNotNull implements CustomValidator<NotificacioResource> {
 
-	private final NotificacioResourceService notificacioResourceService;
-
 	@Override
 	public boolean validate(NotificacioResource value, ConstraintValidatorContext context) {
-		if (isProcedimentRequired(value)) {
+		if (EnviamentTipus.NOTIFICACIO.equals(value.getEnviamentTipus())) {
 			return value.getProcediment() != null;
 		} else {
 			return true;
@@ -33,16 +30,6 @@ public class NotificacioProcedimentNotNull implements CustomValidator<Notificaci
 	@Override
 	public String getFieldMessage() {
 		return "{javax.validation.constraints.NotNull.message}";
-	}
-
-	private boolean isProcedimentRequired(NotificacioResource notificacio) {
-		Map<String, Object> changes = notificacioResourceService.onChange(
-			null,
-			notificacio,
-			NotificacioResource.Fields.organGestor,
-			notificacio.getOrganGestor(),
-			null);
-		return (boolean)changes.get(NotificacioResource.Fields.procedimentRequired);
 	}
 
 }
