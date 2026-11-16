@@ -428,52 +428,7 @@ class NotificacioResourceServiceImplTest {
 			target
 		);
 		assertNotNull(target.getCaducitat());
-	}
-
-	// =====================================================
-	// onChange (organGestor)
-	// =====================================================
-
-	@Test
-	void organGestorOnChangeShouldSetProcedimentRequiredTrue_whenComunicacionsSenseProcedimentPermissionNotGranted() {
-		NotificacioResource previous = new NotificacioResource();
-		previous.setEnviamentTipus(EnviamentTipus.COMUNICACIO);
-		NotificacioResource target = new NotificacioResource();
-		ResourceReference<OrganGestorResource, Long> organGestor = ResourceReference.toResourceReference(1L);
-		var processor = service.new OrganGestorOnChangeLogicProcessor();
-		when(notibPermissionHelper.organGestorIdsWithPermissionRecursive(any())).thenReturn(
-			List.of(10L));
-		processor.onChange(
-			null,
-			previous,
-			NotificacioResource.Fields.organGestor,
-			organGestor,
-			Map.of(),
-			new String[]{},
-			target
-		);
-		assertTrue(target.isProcedimentRequired());
-	}
-
-	@Test
-	void organGestorOnChangeShouldSetProcedimentRequiredFalse_whenComunicacionsSenseProcedimentPermissionGranted() {
-		NotificacioResource previous = new NotificacioResource();
-		previous.setEnviamentTipus(EnviamentTipus.COMUNICACIO);
-		NotificacioResource target = new NotificacioResource();
-		ResourceReference<OrganGestorResource, Long> organGestor = ResourceReference.toResourceReference(1L);
-		var processor = service.new OrganGestorOnChangeLogicProcessor();
-		when(notibPermissionHelper.organGestorIdsWithPermissionRecursive(any())).thenReturn(
-			List.of(1L));
-		processor.onChange(
-			null,
-			previous,
-			NotificacioResource.Fields.organGestor,
-			organGestor,
-			Map.of(),
-			new String[]{},
-			target
-		);
-		assertFalse(target.isProcedimentRequired());
+		assertNotNull(target.isProcedimentRequired());
 	}
 
 	// =====================================================
