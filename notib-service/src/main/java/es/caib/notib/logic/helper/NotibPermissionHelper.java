@@ -295,12 +295,12 @@ public class NotibPermissionHelper {
 	public Permission getOrganGestorNotificacioCreatePermission(EnviamentTipus enviamentTipus) {
 
 		if (EnviamentTipus.COMUNICACIO.equals(enviamentTipus)) {
-			return ExtendedPermission.PERM5;
+			return ExtendedPermission.PERM8;
 		}
 		if (EnviamentTipus.SIR.equals(enviamentTipus)) {
-			return ExtendedPermission.PERM6;
+			return ExtendedPermission.PERM7;
 		}
-		return ExtendedPermission.PERM4;
+		return ExtendedPermission.PERM5;
 	}
 
 	/**
@@ -364,7 +364,7 @@ public class NotibPermissionHelper {
 	private Set<Long> organGestorWithProcedimentsComunsPermission() {
 
 		var userSids = aclHelper.getCurrentUserSids().toArray(Sid[]::new);
-		var idsWithPermission = aclHelper.findIdsWithAnyPermission(AclHelper.ORGAN_GESTOR_CLASS, List.of(ExtendedPermission.PERM3),userSids)
+		var idsWithPermission = aclHelper.findIdsWithAnyPermission(AclHelper.ORGAN_GESTOR_CLASS, List.of(ExtendedPermission.PERM6),userSids)
 								.stream().map(Long::valueOf).collect(Collectors.toSet());
 
 		// Si no n'hi ha cap no pot retornar null perquè la consulta retornaria tots els resultats i no h'ha de retornar cap.

@@ -222,7 +222,7 @@ public class EntitatResourceServiceImpl extends BaseMutableResourceService<Entit
 				return true;
 			}
 			// Si és comunicació, comprovam si té permís per a fer comunicacions sense procediment sobre algun òrgan gestor.
-			if (isComunicacio && !notibPermissionHelper.organGestorIdsWithPermissionRecursive(ExtendedPermission.PERM7).isEmpty()) {
+			if (isComunicacio && !notibPermissionHelper.organGestorIdsWithPermissionRecursive(ExtendedPermission.PERM9).isEmpty()) {
 				return true;
 			}
 			// Comprovam si es tenen permisos sobre algun procediment/servei no comú
