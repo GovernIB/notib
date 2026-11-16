@@ -5,7 +5,7 @@ import {springFilterBuilder, springFilterBuilder as filterBuilder, useFilterApiC
 import {useNotibContext} from "../../components/NotibContext.ts";
 import {formatEndOfDay, formatStartOfDay} from "../../utils/dateUtils.ts";
 import {NOTIFICACIO_ESTAT_ENUM_MAP} from "../../utils/estatConfig.tsx";
-import { Box } from "@mui/material";
+import {Box, Chip} from "@mui/material";
 
 const ESTAT_FILTER_ORDER = [
     'PENDENT',
@@ -26,22 +26,34 @@ const ESTAT_FILTER_ORDER = [
 ];
 const ESTAT_FILTER_HIDDEN = ['PARCIALMENT_ANULADA'];
 
-// Renderitza l'opció d'estat amb la mateixa icona que la resta de la UI (equivalent a showEstat del JSP)
+const enviamentTipusOptionRenderer = (option: any) => {
+
+    const value = option?.value?.substring(0, 1);
+    const label = option?.description ?? option?.label ?? option?.text ?? value;
+    return <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                {value && (<Chip label={value} size="small" title={label}/>
+                )}
+                <span>{label}</span>
+            </Box>
+
+};
+
 const estatOptionRenderer = (option: any) => {
+
+// Renderitza l'opció d'estat amb la mateixa icona que la resta de la UI (equivalent a showEstat del JSP)
+        // const value = option?.value ?? option?.id ?? option?.code;
+        // const config = value ? NOTIFICACIO_ESTAT_ENUM_MAP[value] : undefined;
     const value = option?.value ?? option?.id ?? option?.code;
     const config = value ? NOTIFICACIO_ESTAT_ENUM_MAP[value] : undefined;
     const label = option?.description ?? option?.label ?? option?.text ?? value;
-
-    return (
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            {config?.icona && (
-                <Box component="span" sx={{ display: "inline-flex", alignItems: "center", color: config.color }}>
-                    {config.icona}
-                </Box>
-            )}
-            <span>{label}</span>
-        </Box>
-    );
+    return <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                {config?.icona && (
+                    <Box component="span" sx={{ display: "inline-flex", alignItems: "center", color: config.color }}>
+                        {config.icona}
+                    </Box>
+                )}
+                <span>{label}</span>
+            </Box>
 };
 
 export const useSpringFilterBuilder = (isPrincipal: boolean = true) => {
@@ -98,7 +110,7 @@ const ContentFilter: React.FC<{ notificacionsEsborrades: boolean, notificacionsE
             <>
                 {!data?.advanced && (
                     <>
-                        <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="enviamentTipus" />
+                        <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="enviamentTipus" type="enumIcon" optionRenderer={enviamentTipusOptionRenderer} />
                         <GridFormField size={{ xs: 12, sm: 6, md: 2.5 }} name="concepte" />
                         <GridFormField size={{ xs: 12, sm: 6, md: 2.5 }} name="estat" type="enumIcon" optionRenderer={estatOptionRenderer} hiddenEnumValues={ESTAT_FILTER_HIDDEN} optionOrder={ESTAT_FILTER_ORDER} />
                         <GridFormField size={{ xs: 12, sm: 6, md: 1.75 }} name="dataIniciInici" />
@@ -107,7 +119,7 @@ const ContentFilter: React.FC<{ notificacionsEsborrades: boolean, notificacionsE
                 )}
                 {data?.advanced && (
                     <>
-                        <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="enviamentTipus" />
+                        <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="enviamentTipus" type="enumIcon" optionRenderer={enviamentTipusOptionRenderer} />
                         <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="concepte" />
                         <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="createdBy" />
                         <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="estat" type="enumIcon" optionRenderer={estatOptionRenderer} hiddenEnumValues={ESTAT_FILTER_HIDDEN} optionOrder={ESTAT_FILTER_ORDER} />
@@ -181,7 +193,7 @@ const ContentFilter: React.FC<{ notificacionsEsborrades: boolean, notificacionsE
         <>
             {!data?.advanced && (
                 <>
-                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="enviamentTipus" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="enviamentTipus" type="enumIcon" optionRenderer={enviamentTipusOptionRenderer} />
                     <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="concepte" />
                     <GridFormField size={{ xs: 12, sm: 6, md: 2.5 }} name="estat" type="enumIcon" optionRenderer={estatOptionRenderer} hiddenEnumValues={ESTAT_FILTER_HIDDEN} optionOrder={ESTAT_FILTER_ORDER} />
                     <GridFormField size={{ xs: 12, sm: 6, md: 1.75 }} name="dataIniciInici" />
@@ -191,7 +203,7 @@ const ContentFilter: React.FC<{ notificacionsEsborrades: boolean, notificacionsE
             )}
             {data?.advanced && (
                 <>
-                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="enviamentTipus" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="enviamentTipus" type="enumIcon" optionRenderer={enviamentTipusOptionRenderer} />
                     <GridFormField size={{ xs: 12, sm: 6, md: 4 }} name="concepte" />
                     <GridFormField size={{ xs: 12, sm: 6, md: 2.5 }} name="estat" type="enumIcon" optionRenderer={estatOptionRenderer} hiddenEnumValues={ESTAT_FILTER_HIDDEN} optionOrder={ESTAT_FILTER_ORDER} />
                     <GridFormField size={{ xs: 12, sm: 6, md: 1.75 }} name="dataIniciInici" />
