@@ -97,7 +97,7 @@ class OrganGestorResourceServiceImplTest {
 
 	@Test
 	void shouldReturnSuperFilterIfAdmin() {
-		when(authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_SUPER)).thenReturn(false);
+		when(authenticationHelper.isCurrentUserInRole(any())).thenReturn(false);
 		when(authenticationHelper.isCurrentUserInRole(BaseConfig.ROLE_ADMIN)).thenReturn(true);
 		String result = service.additionalSpringFilter("base", new String[]{}, false);
 		assertNotNull(result);

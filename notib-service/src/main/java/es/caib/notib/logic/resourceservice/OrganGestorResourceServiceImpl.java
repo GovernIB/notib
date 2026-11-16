@@ -416,11 +416,11 @@ public class OrganGestorResourceServiceImpl extends BaseAdminEntitatResourceServ
 		var entitatId = userSessionHelper.getCurrentEntitatId();
 		var usuariCodi = authenticationHelper.getCurrentUserName();
 		if (entitatId == null || usuariCodi == null) {
-			return concatenaFiltresAnd(filter, "id: -1");
+			return concatenaFiltresAnd(filter, "id: '-1'");
 		}
 		var organs = permisosService.getOrgansAmbPermis(entitatId, usuariCodi, true);
 		if (organs.isEmpty()) {
-			return concatenaFiltresAnd(filter, "id: -1");
+			return concatenaFiltresAnd(filter, "id: '-1'");
 		}
 		var joinedIds = organs.stream().map(CodiValorDto::getCodi).collect(Collectors.joining(","));
 		return concatenaFiltresAnd(filter, "id in (" + joinedIds + ")");
