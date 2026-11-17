@@ -439,6 +439,17 @@
             });
             return false;
         });
+
+		const tipusUsuari = [
+			<c:forEach var="item" items="${tipusUsuari}" varStatus="status">
+			{
+				value: '${item.value}',
+				text: '${item.text}'
+			}<c:if test="${!status.last}">,</c:if>
+			</c:forEach>
+		];
+
+		console.log("tipusUsuari", tipusUsuari);
     });
 
     function deselecciona() {
@@ -889,7 +900,7 @@
     </div>
     <div class="row filtreOcult">
         <div class="col-md-2">
-            <not:inputSelect id="tipusUsuari" name="tipusUsuari"  optionValueAttribute="value" optionTextKeyAttribute="text"  emptyOption="true"  placeholderKey="notificacio.list.filtre.camp.tipususuari" inline="true" />
+            <not:inputSelect id="tipusUsuari" name="tipusUsuari" optionItems="${tipusUsuari}" optionValueAttribute="value" optionTextKeyAttribute="text"  emptyOption="true"  placeholderKey="notificacio.list.filtre.camp.tipususuari" inline="true" />
         </div>
         <div class="col-md-4">
             <c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>

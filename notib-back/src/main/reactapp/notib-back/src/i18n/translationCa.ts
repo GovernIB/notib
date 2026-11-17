@@ -123,11 +123,11 @@ const translationCa = {
                     dades: 'Dades',
                     personalitzar: 'Personalitzar',
                     tipusDocs: 'Tipus doc.',
-                    aplicacions: 'Aplicacions',
+                    aplicacions: 'Aplicacions client',
                     permisos: 'Permisos',
                 },
                 resourceNames: {
-                    aplicacio: 'aplicació',
+                    aplicacio: 'aplicació client',
                     permis: 'permís',
                 },
                 personalitzar: {
@@ -259,7 +259,7 @@ const translationCa = {
                         'Dona permís per a consultar les notificacions i comunicacions (SIR i no SIR creades amb aquest òrgan o un òrgan fill com a òrgan emissor).',
                     processar: 'Processar',
                     processarTooltip:
-                        'Permet marcar les notificacions i comunicacions (SIR i no SIR creades amb aquest òrgan o un òrgan fill com a òrgan emissor) en un estat final com a processades, sempre que hagin estat creades des de la mateixa aplicació, i no via API REST.',
+                        'Permet marcar les notificacions i comunicacions (SIR i no SIR creades amb aquest òrgan o un òrgan fill com a òrgan emissor) en un estat final com a processades, sempre que hagin estat creades des de la mateixa aplicació client, i no via API REST.',
                     gestio: 'Gestió',
                     gestioTooltip:
                         "Dona accés a la pestanya d'accions del detall de les notificacions i comunicacions (SIR i no SIR creades amb aquest òrgan o un òrgan fill com a òrgan).",
@@ -384,7 +384,7 @@ const translationCa = {
                         'Dona permís per a consultar les notificacions i comunicacions (SIR i no SIR creades amb aquest procediment o servei).',
                     procesAllowed: 'Processar',
                     procesAllowedTooltip:
-                        'Permet marcar les notificacions i comunicacions (SIR i no SIR creades amb aquest procediment o servei) en un estat final com a processades, sempre que hagin estat creades de la mateixa aplicació i no via API REST.',
+                        'Permet marcar les notificacions i comunicacions (SIR i no SIR creades amb aquest procediment o servei) en un estat final com a processades, sempre que hagin estat creades de la mateixa aplicació client i no via API REST.',
                     gestioAllowed: 'Gestió',
                     gestioAllowedTooltip:
                         "Dona accés a la pestanya d'accions del detall de les notificacions i comunicacions (SIR i no SIR amb aquest procediment o servei).",
@@ -450,7 +450,7 @@ const translationCa = {
                         'Dona permís per a consultar les notificacions i comunicacions (SIR i no SIR creades amb aquest procediment o servei).',
                     procesAllowed: 'Processar',
                     procesAllowedTooltip:
-                        'Permet marcar les notificacions i comunicacions (SIR i no SIR creades amb aquest procediment o servei) en un estat final com a processades, sempre que hagin estat creades de la mateixa aplicació i no via API REST.',
+                        'Permet marcar les notificacions i comunicacions (SIR i no SIR creades amb aquest procediment o servei) en un estat final com a processades, sempre que hagin estat creades de la mateixa aplicació client i no via API REST.',
                     gestioAllowed: 'Gestió',
                     gestioAllowedTooltip:
                         "Dona accés a la pestanya d'accions del detall de les notificacions i comunicacions (SIR i no SIR amb aquest procediment o servei).",
