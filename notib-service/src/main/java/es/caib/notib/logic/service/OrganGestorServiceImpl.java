@@ -3,19 +3,8 @@ package es.caib.notib.logic.service;
 import com.google.common.base.Strings;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.cacheable.PermisosCacheable;
-import es.caib.notib.logic.helper.CacheHelper;
-import es.caib.notib.logic.helper.ConfigHelper;
-import es.caib.notib.logic.helper.ConversioTipusHelper;
-import es.caib.notib.logic.helper.EntityComprovarHelper;
-import es.caib.notib.logic.helper.IntegracioHelper;
-import es.caib.notib.logic.helper.MessageHelper;
-import es.caib.notib.logic.helper.MetricsHelper;
-import es.caib.notib.logic.helper.OrganGestorHelper;
-import es.caib.notib.logic.helper.OrganigramaHelper;
-import es.caib.notib.logic.helper.PaginacioHelper;
-import es.caib.notib.logic.helper.PermisosHelper;
-import es.caib.notib.logic.helper.PluginHelper;
-import es.caib.notib.logic.helper.ProcSerSyncHelper;
+import es.caib.notib.logic.helper.*;
+import es.caib.notib.logic.intf.acl.ExtendedPermission;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.Arbre;
 import es.caib.notib.logic.intf.dto.ArbreNode;
@@ -70,6 +59,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.acls.model.Sid;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -151,6 +141,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	private MessageHelper messageHelper;
 	@Resource
 	private IntegracioHelper integracioHelper;
+	@Resource
+	private AclHelper aclHelper;
 
 	private static Long permisosEntitatsModificatsInstant;
 	protected static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<>();
@@ -1775,4 +1767,22 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		return !"A99999999".equals(o.getCodiPare()) && findOperadorsPare(entitat, o.getCodiPare());
 	}
 
+	@Override
+	public boolean isHideProcediment(Long id) {
+		var sids = aclHelper.getCurrentUserSids().toArray(Sid[]::new);
+		boolean senseProcediment = aclHelper.anyPermissionGranted(
+			AclHelper.ORGAN_GESTOR_CLASS,
+			id,
+			List.of(ExtendedPermission.COMUNICACIO_SENSE_PROCEDIMENT),
+			sids);
+
+		if (senseProcediment) {
+			return !aclHelper.anyPermissionGranted(
+				AclHelper.ORGAN_GESTOR_CLASS,
+				id,
+				List.of(ExtendedPermission.COMUNICACIO, ExtendedPermission.COMUNICACIO_SIR),
+				sids);
+		}
+		return false;
+	}
 }

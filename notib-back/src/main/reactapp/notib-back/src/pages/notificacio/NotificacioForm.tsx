@@ -261,7 +261,9 @@ export const NotificacioFormContent: React.FC = () => {
             <GridFormField size={12} name="descripcio" type="textarea" />
             <GridFormField size={6} name="organGestor" namedQueries={`PERM_READ_VIGENT`} onChange={handleOrganGestorChange} />
             <Grid size={6}>
-                <ProcedimentServeiField organGestorFromProcedimentRef={organGestorFromProcedimentRef} />
+                {!data?.hideProcediment &&
+                    <ProcedimentServeiField organGestorFromProcedimentRef={organGestorFromProcedimentRef}/>
+                }
             </Grid>
             {agrupable && (
                 <GridFormField
@@ -286,6 +288,7 @@ export const NotificacioForm: React.FC = () => {
     const { id } = useParams();
     const [searchParams] = useSearchParams();
     const type = searchParams.get('type');
+    console.log("type", type)
     const formApiRef = useFormApiRef();
     const initialData = {
         enviamentsInfo: [{ id: new Date().valueOf() }],

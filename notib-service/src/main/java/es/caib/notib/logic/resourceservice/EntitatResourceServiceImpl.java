@@ -217,20 +217,28 @@ public class EntitatResourceServiceImpl extends BaseMutableResourceService<Entit
 		 */
 		private boolean checkPermisRemesa(Permission permisOrgansGestors, Permission permisProcediments, Boolean isServei, boolean isComunicacio) {
 
-			// Si té permís sobre algun òrgan gestor
-			if (!notibPermissionHelper.organGestorIdsWithPermissionRecursive(permisOrgansGestors).isEmpty()) {
-				return true;
+			// 1. Evaluar permisos sobre órganos gestores
+			boolean tePermisOrgan = !notibPermissionHelper.organGestorIdsWithPermissionRecursive(permisOrgansGestors).isEmpty();
+			boolean tePermisComunicacioSenseProc = !notibPermissionHelper.organGestorIdsWithPermissionRecursive(ExtendedPermission.PERM9).isEmpty();
+
+			// 2. Evaluar permisos sobre procedimientos/servicios (comunes o no comunes)
+			boolean tePermisProcedimentNoComu = !notibPermissionHelper.procedimentServeiNoComuIdsWithPermission(permisProcediments, isServei).isEmpty();
+			boolean tePermisProcedimentComu = !notibPermissionHelper.procedimentServeiComuOrganGestorIdsWithPermission(permisProcediments, isServei).isEmpty();
+
+			// Tiene permiso en algún procedimiento (sea común o no común)
+			boolean tePermisProcediment = tePermisProcedimentNoComu || tePermisProcedimentComu;
+
+			// 3. NUEVA REGLA: Si NO es comunicación, necesita permiso en Órgano Y en Procedimiento
+			if (!isComunicacio) {
+				return tePermisOrgan && tePermisProcediment;
 			}
-			// Si és comunicació, comprovam si té permís per a fer comunicacions sense procediment sobre algun òrgan gestor.
-			if (isComunicacio && !notibPermissionHelper.organGestorIdsWithPermissionRecursive(ExtendedPermission.PERM9).isEmpty()) {
-				return true;
-			}
-			// Comprovam si es tenen permisos sobre algun procediment/servei no comú
-			if (!notibPermissionHelper.procedimentServeiNoComuIdsWithPermission(permisProcediments, isServei).isEmpty()) {
-				return true;
-			}
-			// Comprovam si es tenen permisos sobre algun procediment/servei comú
-			return !notibPermissionHelper.procedimentServeiComuOrganGestorIdsWithPermission(permisProcediments, isServei).isEmpty();
+
+			// 4. REGLA ORIGINAL: Si SÍ es comunicación, basta con cumplir cualquiera de las condiciones anteriores
+			// (Se mantiene la lógica original de tu código como fallback)
+			return tePermisOrgan
+				|| tePermisComunicacioSenseProc
+				|| tePermisProcedimentNoComu
+				|| tePermisProcedimentComu;
 		}
 	}
 

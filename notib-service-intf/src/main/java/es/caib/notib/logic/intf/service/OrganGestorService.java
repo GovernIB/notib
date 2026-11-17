@@ -26,7 +26,7 @@ import java.util.List;
 
 /**
  * Declaració dels mètodes per a la consulta dels procediments associats a una entitat
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface OrganGestorService {
@@ -38,7 +38,7 @@ public interface OrganGestorService {
 //
 //	@PreAuthorize("isAuthenticated()")
 //	public OrganGestorDto delete(Long entitatId, Long organId);
-	
+
 	@PreAuthorize("isAuthenticated()")
 	public OrganGestorDto update(OrganGestorDto dto);
 
@@ -108,22 +108,22 @@ public interface OrganGestorService {
 
 	@PreAuthorize("isAuthenticated()")
 	boolean organGestorEnUs(Long organId);
-	
+
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	List<OrganGestorDto> findAll();
-	
+
 	@PreAuthorize("isAuthenticated()")
 	OrganGestorDto findById(Long entitatId, Long id);
-	
+
 	@PreAuthorize("isAuthenticated()")
 	OrganGestorDto findByCodi(Long entitatId, String codi);
-	
+
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	 List<OrganGestorDto> findByEntitat(Long entitatId);
-	
+
 	@PreAuthorize("isAuthenticated()")
 	 List<CodiValorEstatDto> findOrgansGestorsCodiByEntitat(Long entitatId);
-	
+
 	@PreAuthorize("isAuthenticated()")
 	List<OrganGestorDto> findByProcedimentIds(List<Long> procedimentIds);
 
@@ -134,7 +134,7 @@ public interface OrganGestorService {
 	List<OrganGestorDto> findDescencentsByCodi(
 			Long entitatId,
 			String organCodi);
-	
+
 	@PreAuthorize("isAuthenticated()")
 	PaginaDto<OrganGestorDto> findAmbFiltrePaginat(Long entitatId, String organCodiDir3, OrganGestorFiltreDto filtre, PaginacioParamsDto paginacioParams);
 
@@ -161,26 +161,26 @@ public interface OrganGestorService {
 
 	/**
 	 * Recupera els organimes d'una entitat.
-	 * 
+	 *
 	 * @return La llista dels tipus d'assumpte.
 	 */
 	@PreAuthorize("isAuthenticated()")
 	List<OrganismeDto> findOrganismes(EntitatDto entitat);
-	
+
 	@PreAuthorize("isAuthenticated()")
 	List<OrganismeDto> findOrganismes(EntitatDto entitat, OrganGestorDto organGestor);
 
 	/**
 	 * Recupera el llibre d'un òrgan gestor (anomenat organisme dins Regweb)
-	 * 
+	 *
 	 * @return La llista dels codis d'assumpte.
 	 */
 	@PreAuthorize("isAuthenticated()")
 	LlibreDto getLlibreOrganisme(Long entitatId, String organGestorDir3Codi);
-	
+
 	/**
 	 * Recupera les oficines SIR d'un òrgan gestor / entitat (anomenat organisme dins Regweb)
-	 * 
+	 *
 	 * @param entitatId Entitat actual
 	 * @param dir3codi Codi DIR3 de l'òrgan gestor / entitat del qual es volen recuperar les oficines
 	 * @param isFiltre Indicar si la cerca és per emplenar un filtre
@@ -237,5 +237,6 @@ public interface OrganGestorService {
 	@PreAuthorize("isAuthenticated()")
 	boolean entregaCieActivaPerPare(EntitatDto entitat, String organCodi);
 
+	boolean isHideProcediment(Long id);
 
 }

@@ -31,6 +31,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
+import javax.persistence.Transient;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -527,7 +528,7 @@ public class NotificacioResource extends BaseResource<Long> {
 	// mai troba aquesta named query a la petició i el desplegable no aplica cap filtre de permisos (només
 	// l'entitat actual i els seus descendents) -es mostren tots els òrgans de l'entitat, no només els que
 	// l'usuari actual pot administrar/gestionar.
-	@ResourceField(namedQueries = {OrganGestorResource.NAMED_QUERY_PERM_READ_VIGENT})
+	@ResourceField(onChangeActive = true, namedQueries = {OrganGestorResource.NAMED_QUERY_PERM_READ_VIGENT})
 	private ResourceReference<OrganGestorResource, Long> organGestor;
 	private ResourceReference<ProcedimentResource, Long> procediment;
 //	@NotNull
@@ -601,7 +602,7 @@ public class NotificacioResource extends BaseResource<Long> {
 	private String usuariNom;
 	private String usuariCodi;
 
-
+	@Transient private boolean hideProcediment;
 
 	@Getter
 	@Setter

@@ -987,6 +987,16 @@
 
 			$.ajax({
 				type: 'GET',
+				url: "<c:url value="/notificacio/organ/"/>"+ organ + "/hideProcediment",
+				success: data => {
+					$("#procedimentRow").toggle(!data)
+					$("#procedimentToogle").toggle(!data)
+				},
+				error: () => console.log("error obtenint els dies de caducitat a partir de la data")
+			});
+
+			$.ajax({
+				type: 'GET',
 				url: "<c:url value="/notificacio/organ/oficina/"/>"+ organ,
 				success: data => {
 					let e = "${enviamentTipus}"
@@ -1731,7 +1741,7 @@
 				</div>
 			</div>
 
-			<div class="row" <c:if test="${enviamentTipus == 'NOTIFICACIO'}">style="display: none;"</c:if>>
+			<div id="procedimentToogle" class="row" <c:if test="${enviamentTipus == 'NOTIFICACIO'}">style="display: none;"</c:if>>
 				<div class="col-xs-2"> </div>
 				<div class="form-group col-xs-10">
 					<div class="btn-group" data-toggle="buttons" style="padding-left: 15px;">

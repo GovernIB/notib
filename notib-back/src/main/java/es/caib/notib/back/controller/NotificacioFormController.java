@@ -241,6 +241,21 @@ public class NotificacioFormController extends BaseUserController {
         }
     }
 
+    @ResponseBody
+    @GetMapping(value = "/organ/{organCodi}/hideProcediment")
+    public boolean isHideProcediment(HttpServletRequest request, Model model, @PathVariable String organCodi) {
+
+        try {
+			if (organCodi != null && !"-".equals(organCodi)) {
+				var id = Long.parseLong(organCodi);
+				return organGestorService.isHideProcediment(id);
+			}
+        } catch (Exception ex) {
+            log.error("Error obtinguent la oficina de l'órgan " + organCodi, ex);
+        }
+		return false;
+    }
+
     @PostMapping(value = "/newOrModify")
     public String save(HttpServletRequest request, @Valid NotificacioCommand notificacioCommand, BindingResult bindingResult, Model model) throws IOException {
 
