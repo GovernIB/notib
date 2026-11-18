@@ -355,6 +355,11 @@ public class EjbClientConfig {
 		return getLocalEjbFactoyBean(LogService.class, false);
 	}
 
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean excepcioLogResourceService() {
+		return getLocalEjbFactoyBean(ExcepcioLogResourceService.class, true);
+	}
+
 	private LocalStatelessSessionProxyFactoryBean getLocalEjbFactoyBean(
 		Class<?> serviceClass,
 		boolean withSuffix) {

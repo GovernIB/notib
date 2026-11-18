@@ -32,6 +32,7 @@ export const icons = {
     cache: 'sd_storage',
     integracio: 'sync_alt',
     metrica: 'bar_chart',
+    excepcio: 'bug_report',
     monitorSistema: 'monitor_heart',
     activeMq: 'subscriptions',
     avis: 'notifications',

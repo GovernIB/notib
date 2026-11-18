@@ -40,4 +40,9 @@ public class PropertyConfig {
 
 	public static final String PROP_COMUNICACIONS_SIR_INTERNES = PROPERTY_PREFIX + "comunicacions.sir.internes";
 
+//	public static final String EXCEPCIONS_RETENCIO_DIES = "es.caib.notib.excepcions.retencio.dies";
+//	public static final String EXCEPCIONS_NETEJA_CRON = "es.caib.notib.excepcions.neteja.cron";
+//	public static final String EXCEPCIONS_DEDUP_MINUTS = "es.caib.notib.excepcions.dedup.minuts";
+
+
 }

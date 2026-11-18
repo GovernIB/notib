@@ -352,7 +352,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Emmagatzemant excepció (exception=" + exception + ")");
-			excepcioLogHelper.addExcepcio(exception);
+			excepcioLogHelper.addExcepcio("/aplicacioService/excepcioSave", exception);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

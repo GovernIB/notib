@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.logic.intf.service;
 
@@ -7,7 +7,7 @@ package es.caib.notib.logic.intf.service;
 /**
  * Declaració dels mètodes per a la consulta de notificacions i dels
  * destinataris i events associats.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface SchedulledService {
@@ -26,7 +26,7 @@ public interface SchedulledService {
 	 * Mètode d'execució periòdica per a refrescar totes les notificacions DEH finalitzades sense certificació (cas pooling)
 	 */
 	void enviamentRefrescarEstatDEH();
-	
+
 	/**
 	 * Mètode d'execució periòdica per a refrescar totes les notificacions CIE finalitzades sense certificació (cas pooling)
 	 */
@@ -58,4 +58,6 @@ public interface SchedulledService {
 	void generarEstadistiques();
 
 	void enviarCorreusAgrupats();
+
+	void natejarExcepcionsAntigues();
 }

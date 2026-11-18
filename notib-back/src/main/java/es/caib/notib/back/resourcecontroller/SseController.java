@@ -249,12 +249,16 @@ public class SseController extends BaseController {
 	 * error (evita el forward d'ErrorPageFilter sobre una resposta SSE ja compromesa).
 	 */
 	private void sendHeartbeat(SseEmitter emitter, ScheduledFuture<?> heartbeat,
-			SseEventService.SseQueue queue, String listenerId) {
+							   SseEventService.SseQueue queue, String listenerId) {
 		try {
 			emitter.send(SseEmitter.event().comment("heartbeat"));
 		} catch (IOException ex) {
 			log.debug("SSE heartbeat: connexió ja tancada", ex);
 			heartbeat.cancel(true);
+			// heartbeat.cancel(true) interromp el fil actual. Cal netejar el flag d'interrupt
+			// abans de cridar l'EJB (removeListener), altrament el pool StrictMaxPool falla
+			// amb "Acquire semaphore was interrupted" (WFLYEJB0379).
+			Thread.interrupted();
 			sseEventService.removeListener(queue, listenerId);
 			try {
 				emitter.complete();

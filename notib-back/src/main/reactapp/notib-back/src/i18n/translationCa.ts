@@ -27,7 +27,15 @@ const translationCa = {
         undo: 'Desfés',
         cerca: 'Cerca',
         actiu: "Actiu",
-        inactiu: "Inactiu"
+        inactiu: "Inactiu",
+        action: {
+            exec: 'Executa',
+            cancel: 'Cancel·la',
+        },
+        report: {
+            generate: 'Genera',
+            cancel: 'Cancel·la',
+        }
     },
     app: {
         loading: 'Iniciant NOTIB',
@@ -69,6 +77,7 @@ const translationCa = {
             pagadorsCie: "Centres d'impressió i ensobrat",
             notificacions: 'Remeses',
             integracions: 'Integracions',
+            excepcions: 'Excepcions',
             cache: "Cache d'aplicacions",
             activemq: 'Monitor ActiveMQ',
             notificacionsCallbacksError: 'Notificacions callback erronies',
@@ -1106,6 +1115,12 @@ const translationCa = {
                 excepcioMessage: "Missatge d'excepció:",
                 excepcioStacktrace: 'Stacktrace',
             },
+        },
+        excepcio: {
+            grid: {
+                title: "Excepcions",
+                detallTitol: "Detall de l'excepció"
+            }
         },
         cache: {
             grid: {

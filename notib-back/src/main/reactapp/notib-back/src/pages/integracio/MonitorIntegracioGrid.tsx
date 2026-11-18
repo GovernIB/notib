@@ -272,6 +272,7 @@ export const MonitorIntegracioGrid = () => {
                         fixedFilter={staticFilter}
                         paginationActive
                         toolbarHideQuickFilter
+                        defaultSortModel={[{ field: 'data', sort: 'desc' }]}
                         readOnly
                         toolbarAdditionalRow={
                             <MonitorIntegracioGridFilter

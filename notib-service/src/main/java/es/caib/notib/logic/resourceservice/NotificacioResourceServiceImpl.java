@@ -201,6 +201,7 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 
 		var resource = super.entityToResource(entity);
 		resource.setEstatString(entity.getEstatString());
+		resource.setProcedimentTipus(entity.getProcedimentTipus());
 		return resource;
 	}
 

@@ -36,6 +36,7 @@ public class ExcepcioLogDto implements Serializable {
 	private String message;
 	private String stacktrace;
 
+	public ExcepcioLogDto() {}
 
 	public ExcepcioLogDto(Throwable exception) {
 

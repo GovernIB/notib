@@ -1,9 +1,12 @@
 package es.caib.notib.persist.entity.monitor;
 
 
+import es.caib.notib.logic.intf.base.config.BaseConfig;
 import es.caib.notib.logic.intf.dto.IntegracioAccioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioCodi;
+import es.caib.notib.persist.resourceentity.ExcepcioLogResourceEntity;
+import es.caib.notib.persist.resourceentity.NotificacioResourceEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +21,9 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -84,6 +90,13 @@ public class MonitorIntegracioEntity extends AbstractPersistable<Long> {
 
     @OneToMany(mappedBy = "monitorIntegracio", fetch = FetchType.LAZY, orphanRemoval = true, cascade={CascadeType.ALL})
     private List<MonitorIntegracioParamEntity> parametres = new ArrayList<>();
+
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(
+		name = "excepcio_id",
+		referencedColumnName = "id",
+		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "MON_INT_EXCEPCIO_FK"))
+	private ExcepcioLogResourceEntity excepcio;
 
 
     public void setErrorDescripcio(String errorDescripcio) {

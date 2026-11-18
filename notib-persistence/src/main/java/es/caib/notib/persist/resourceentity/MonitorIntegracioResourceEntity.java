@@ -85,6 +85,13 @@ public class MonitorIntegracioResourceEntity extends BaseResourceEntity<MonitorI
 	@Column(name = "codi_usuari", length = 64)
 	private String codiUsuari;
 
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(
+		name = "excepcio_id",
+		referencedColumnName = "id",
+		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "MON_INT_EXCEPCIO_FK"))
+	private ExcepcioLogResourceEntity excepcio;
+
 
 	@OneToMany(mappedBy = "monitorIntegracio", fetch = FetchType.LAZY, orphanRemoval = true, cascade={CascadeType.ALL})
 	private List<MonitorIntegracioParamResourceEntity> parametres = new ArrayList<>();

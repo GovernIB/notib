@@ -67,8 +67,27 @@ const useDataGridColumns = (datagridApiRef: any,
             }]),
             {
                 field: 'procediment',
-                flex:1,
+                flex: 1,
                 width: 180,
+                renderCell: (params: any) => {
+                    const row = params?.row ?? {};
+                    const value = params?.value ?? {};
+                    const rawTipus = row.procedimentTipus ?? value?.tipus ?? value?.procedimentTipus;
+                    const tipus = typeof rawTipus === 'string' ? rawTipus : rawTipus?.code ?? rawTipus?.value ?? rawTipus?.name ?? '';
+                    const badge =
+                        tipus === 'PROCEDIMENT'
+                            ? <Chip label="P" size="small" color="primary" variant="outlined" />
+                            : tipus === 'SERVEI'
+                                ? <Chip label="S" size="small" color="warning" variant="outlined" />
+                                : null;
+                    const descripcio = typeof value === 'string' ? value : value?.description ?? value;
+                    return (
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                            {badge}
+                            {descripcio}
+                        </span>
+                    );
+                },
             },
             ...(notificacioErrorRegistre || notificacioCallbackError ? [] : [{
                 field: 'numExpedient',

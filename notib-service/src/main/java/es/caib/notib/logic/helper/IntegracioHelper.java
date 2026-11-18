@@ -34,15 +34,17 @@ public class IntegracioHelper {
 	private final MonitorIntegracioRepository monitorRepository;
 	private final MonitorIntegracioParamRepository monitorParamRepository;
 	private final CacheHelper cacheHelper;
+	private final ExcepcioLogHelper excepcioLogHelper;
 
 
 	private static final String APLICACIO_WEB = "Interficie web";
 
-    public IntegracioHelper(AplicacioRepository aplicacioRepository, MonitorIntegracioRepository monitorRepository, MonitorIntegracioParamRepository monitorParamRepository, @Lazy CacheHelper cacheHelper) {
+    public IntegracioHelper(AplicacioRepository aplicacioRepository, MonitorIntegracioRepository monitorRepository, MonitorIntegracioParamRepository monitorParamRepository, @Lazy CacheHelper cacheHelper, ExcepcioLogHelper excepcioLogHelper) {
         this.aplicacioRepository = aplicacioRepository;
         this.monitorRepository = monitorRepository;
         this.monitorParamRepository = monitorParamRepository;
         this.cacheHelper = cacheHelper;
+		this.excepcioLogHelper = excepcioLogHelper;
     }
 
 
@@ -105,8 +107,10 @@ public class IntegracioHelper {
 			notificacioId(info.getNotificacioId()).build();
 		assignarAccioAParams(info, accio);
 		if (throwable != null) {
-			accio.setExcepcioMessage(ExceptionUtils.getMessage(throwable));
-			accio.setExcepcioStacktrace(ExceptionUtils.getStackTrace(throwable));
+			var excepcio = excepcioLogHelper.addExcepcio("/integracio/" + info.getTipus() + "/" + info.getDescripcio(), throwable);
+			accio.setExcepcio(excepcio);
+//			accio.setExcepcioMessage(ExceptionUtils.getMessage(throwable));
+//			accio.setExcepcioStacktrace(ExceptionUtils.getStackTrace(throwable));
 		}
 		addAccio(accio, obtenirUsuari);
 		log.debug("Error d'integracio " + info.getDescripcio() + ": " + errorDescripcio + "(integracioCodi=" + info.getCodi() + ", "
