@@ -58,8 +58,15 @@ public class ValidaSignaturaPluginHelper extends AbstractPluginHelper<ValidateSi
 		}
 	}
 
+	public static boolean isImage(String contentType) {
+		return contentType != null && contentType.toLowerCase().startsWith("image/");
+	}
 
 	public SignatureInfoDto detectSignedAttachedUsingValidateSignaturePlugin(byte[] documentContingut, String nom, String firmaContentType) {
+
+		if ( isImage(firmaContentType) ) {
+			return SignatureInfoDto.builder().signed(false).error(false).build();
+		}
 
 		var info = new IntegracioInfo(IntegracioCodi.VALIDASIG, "Validació firmes de document", IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Nom del document", nom), new AccioParam("ContentType", firmaContentType));
