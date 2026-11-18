@@ -18,6 +18,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * Classe de model de dades que conté la informació d'un usuari.
@@ -71,6 +73,8 @@ public class UsuariEntity implements Serializable {
     protected Long organDefecte;
     @Column(name = "procediment_defecte")
     protected Long procedimentDefecte;
+	@Column(name = "darrera_activitat")
+	private Date darreraActivitat;
 
 
     @Version

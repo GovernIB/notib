@@ -15,6 +15,8 @@ import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * Informació d'un usuari.
@@ -48,6 +50,7 @@ public class UsuariDto implements Serializable {
     private Long entitatDefecte;
     private Long procedimentDefecte;
     private Long organDefecte;
+	private Date darreraActivitat;
 
 	public String getEmailValor() {
 		return !StringUtils.isEmpty(emailAlt) ? emailAlt : email;

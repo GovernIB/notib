@@ -2,6 +2,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib tagdir="/WEB-INF/tags/notib" prefix="not"%>
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator"%>
@@ -286,6 +287,14 @@
 						<ul class="dropdown-menu">
 							<li>
 								<a id="mu_config" href="<c:url value="/usuari/configuracio"/>" data-toggle="modal" data-refresh-pagina="true" data-maximized="true"><spring:message code="decorator.menu.configuracio.user"/></a>
+								<c:if test="${not empty usuariActual.darreraActivitat}">
+									<span style="padding: 3px 20px; display: block; color: #666; font-size: 12px;">
+										<span class="fa fa-clock-o"></span>&nbsp;
+										<spring:message code="decorator.menu.user.darrera.connexio"/>:
+										<fmt:formatDate value="${usuariActual.darreraActivitat}" pattern="dd/MM/yyyy HH:mm:ss"/>
+									</span>
+								</c:if>
+
 								<c:choose>
 									<c:when test="${isRolActualUsuari}">
 										<a id="mu_manual" href="https://github.com/GovernIB/notib/raw/${manifestAtributes['Implementation-SCM-Branch']}/doc/pdf/NOTIB_usuari.pdf" rel="noopener noreferrer" target="_blank"><span class="fa fa-download"></span> <spring:message code="decorator.menu.manual.usuari"/></a>
