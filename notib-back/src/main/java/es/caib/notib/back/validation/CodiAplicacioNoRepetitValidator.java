@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.back.validation;
 
@@ -23,7 +23,7 @@ import java.util.Locale;
 /**
  * Constraint de validació que controla que no es repeteixi
  * el codi d'entitat.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -36,8 +36,8 @@ public class CodiAplicacioNoRepetitValidator implements ConstraintValidator<Codi
 	private AplicacioService aplicacioService;
 	@Autowired
 	private SessionScopedContext sessionScopedContext;
-	
-	
+
+
 	@Override
 	public void initialize(final CodiAplicacioNoRepetit constraintAnnotation) {
 
@@ -76,9 +76,9 @@ public class CodiAplicacioNoRepetitValidator implements ConstraintValidator<Codi
 				return false;
 			}
 			return true;
-			
+
         } catch (final Exception ex) {
-			var msg = "Error inesperat en la validació del codi de l'aplicació.";
+			var msg = "Error inesperat en la validació del codi de l'aplicació. codi: " + command.getUsuariCodi() + " entitat: " + command.getEntitatId();
 			log.error(msg, ex);
 			MissatgesHelper.error(request, msg);
 			return false;

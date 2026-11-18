@@ -30,6 +30,7 @@ import PagadorsPostalsGrid from "./pages/pagadorPostal/PagadorsPostalsGrid.tsx";
 import Accessibilitat from "./pages/Accesibilitat.tsx";
 import Sitemap from "./pages/Sitemap.tsx";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
+import {ExcepcioGrid} from "./pages/excepcio/ExcepcioGrid.tsx";
 
 export const router = createBrowserRouter(
     [
@@ -227,6 +228,17 @@ export const router = createBrowserRouter(
                             path: 'integracions',
                             children: [
                                 { index: true, element: <MonitorIntegracioGrid /> },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    element: <ProtectedRoute pantalla="excepcions" />,
+                    children: [
+                        {
+                            path: 'excepcions',
+                            children: [
+                                { index: true, element: <ExcepcioGrid /> },
                             ],
                         },
                     ],

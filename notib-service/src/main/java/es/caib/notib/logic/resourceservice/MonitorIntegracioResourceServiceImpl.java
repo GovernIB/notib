@@ -37,6 +37,17 @@ public class MonitorIntegracioResourceServiceImpl extends BaseMutableResourceSer
 		register(MonitorIntegracioResource.REPORT_AGRUPACIONS, new MonitorIntegracioResourceServiceImpl.AgrupacioReportGenerator());
 	}
 
+	@Override
+	protected MonitorIntegracioResource entityToResource(MonitorIntegracioResourceEntity entity) {
+
+		var resource = super.entityToResource(entity);
+		if (entity.getExcepcio() != null) {
+			resource.setExcepcioMessage(entity.getExcepcio().getMessage());
+			resource.setExcepcioStacktrace(entity.getExcepcio().getStacktrace());
+		}
+		return resource;
+	}
+
 	class AgrupacioReportGenerator implements ReportGenerator<MonitorIntegracioResourceEntity, Serializable, MonitorIntegracioResource.MonitorIntegracioAgrupacioItem> {
 		@Override
 		public List<MonitorIntegracioResource.MonitorIntegracioAgrupacioItem> generateData(

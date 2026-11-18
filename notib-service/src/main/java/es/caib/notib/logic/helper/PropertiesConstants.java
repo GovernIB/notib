@@ -23,19 +23,19 @@ public class PropertiesConstants {
 
     // 6. Refrescar notificacions expirades
     public static final String REFRESCAR_NOTIFICACIONS_EXPIRADES_CRON = "es.caib.notib.refrescar.notificacions.expirades.cron";
-    
+
     // 7. Callback de client
     public static final String PROCESSAR_PENDENTS_RATE = "es.caib.notib.tasca.callback.pendents.periode";
     public static final String PROCESSAR_PENDENTS_INITIAL_DELAY = "es.caib.notib.tasca.callback.pendents.retard.inicial";
-    
+
     // 8. Consulta certificació notificacions DEH finalitzades
     public static final String ENVIAMENT_DEH_REFRESCAR_CERT_PENDENTS_RATE = "es.caib.notib.tasca.enviament.deh.actualitzacio.certificacio.periode";
     public static final String ENVIAMENT_DEH_REFRESCAR_CERT_PENDENTS_INITIAL_DELAY = "es.caib.notib.tasca.enviament.deh.actualitzacio.certificacio.retard.inicial";
-    
+
     // 9. Consulta certificació notificacions CIE finalitzades
     public static final String ENVIAMENT_CIE_REFRESCAR_CERT_PENDENTS_RATE = "es.caib.notib.tasca.enviament.cie.actualitzacio.certificacio.periode";
     public static final String ENVIAMENT_CIE_REFRESCAR_CERT_PENDENTS_INITIAL_DELAY = "es.caib.notib.tasca.enviament.cie.actualitzacio.certificacio.retard.inicial";
-    
+
     // 10. Actualització dels serveis a partir de la informació de Rolsac
     public static final String ACTUALITZAR_SERVEIS_CRON = "es.caib.notib.actualitzacio.serveis.cron";
 
@@ -57,4 +57,8 @@ public class PropertiesConstants {
     public static final String EVICT_CACHE_PAISOS_PROVINCIES = "es.caib.notib.cache.paisos.provincies";
     public static final String GENERAR_DADES_EXPLOTACIO_CRON = "es.caib.notib.generar.dades.explotacio.cron";
     public static final String ENVIAR_CORREUS_AGRUPATS_CRON = "es.caib.notib.enviar.correus.agrupats.cron";
+
+	public static final String EXCEPCIONS_RETENCIO_DIES = "es.caib.notib.excepcions.retencio.dies";
+	public static final String EXCEPCIONS_NETEJA_CRON = "es.caib.notib.excepcions.neteja.cron";
+	public static final String EXCEPCIONS_DEDUP_MINUTS = "es.caib.notib.excepcions.dedup.minuts";
 }

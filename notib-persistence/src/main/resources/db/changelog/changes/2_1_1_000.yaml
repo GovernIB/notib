@@ -1249,3 +1249,101 @@ databaseChangeLog:
             -   delete:
                     tableName: ${db_prefix}config_group
                     where: code IN ('GENERAL_COMUNES', 'SCHEDULLED_COMUNES', 'FIRMA_SERVIDOR', 'ASPECTE_COMUNES')
+
+    -   changeSet:
+            id: 2_1_1_000-59
+            author: limit
+            changes:
+                -   createTable:
+                        tableName: ${db_prefix}EXCEPCIO_LOG
+                        columns:
+                            -   column:
+                                    name: ID
+                                    type: ${type.pk}
+                                    constraints:
+                                        nullable: false
+                                        primaryKey: true
+                                        primaryKeyName: ${db_prefix}EXCEPCIO_LOG_PK
+                            -   column:
+                                    name: DATA
+                                    type: TIMESTAMP(6)
+                                    constraints:
+                                        nullable: false
+                            -   column:
+                                    name: TIPUS
+                                    type: varchar(512 ${varcharUnit})
+                            -   column:
+                                    name: OBJECT_ID
+                                    type: varchar(512 ${varcharUnit})
+                            -   column:
+                                    name: OBJECT_CLASS
+                                    type: varchar(512 ${varcharUnit})
+                            -   column:
+                                    name: URI
+                                    type: varchar(1024 ${varcharUnit})
+                            -   column:
+                                    name: PARAM1
+                                    type: varchar(512 ${varcharUnit})
+                            -   column:
+                                    name: PARAM2
+                                    type: varchar(512 ${varcharUnit})
+                            -   column:
+                                    name: MESSAGE
+                                    type: varchar(4000 ${varcharUnit})
+                            -   column:
+                                    name: STACKTRACE
+                                    type: CLOB
+                            -   column:
+                                    name: ENTITAT_ID
+                                    type: ${type.pk}
+                            -   column:
+                                    name: createddate
+                                    type: TIMESTAMP(6)
+                            -   column:
+                                    name: createdby_codi
+                                    type: varchar(64 ${varcharUnit})
+                            -   column:
+                                    name: LASTMODIFIEDBY_CODI
+                                    type: varchar(64 ${varcharUnit})
+                            -   column:
+                                    name: LASTMODIFIEDDATE
+                                    type: TIMESTAMP(6)
+                            -   column:
+                                    name: SIGNATURA
+                                    type: varchar(64 ${varcharUnit})
+                            -   column:
+                                    name: num_ocurrencies
+                                    type: numeric(10,0)
+                            -   column:
+                                    name: data_darrera
+                                    type: TIMESTAMP(6)
+                - sql:
+                      "CREATE INDEX NOT_EXCEPCIO_LOG_SIGN_IDX ON NOT_EXCEPCIO_LOG (SIGNATURA, DATA_DARRERA);"
+    -   changeSet:
+            id: 2_1_1_000-60
+            author: limit
+            changes:
+                -   addColumn:
+                        tableName: ${db_prefix}mon_int
+                        columns:
+                            -   column:
+                                    name: excepcio_id
+                                    type: ${type.pk}
+                -   addForeignKeyConstraint:
+                        baseTableName: ${db_prefix}mon_int
+                        baseColumnNames: excepcio_id
+                        referencedTableName: ${db_prefix}EXCEPCIO_LOG
+                        referencedColumnNames: ID
+                        constraintName: ${db_prefix}MON_INT_EXCEPCIO_FK
+
+    -   changeSet:
+            id: 2_1_1_000-61
+            author: limit
+            changes:
+                - sql: "INSERT INTO not_CONFIG (id,POSITION, KEY, VALUE, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE, TYPE_CODE, CONFIG_GROUP_ID, CONFIG_TYPE_ID) VALUES (not_HIBERNATE_SEQ.NEXTVAL, 1, 'es.caib.notib.excepcions.retencio.dies', '30', 0, 'Dies que es conserven les excepcions del monitor d''excepcions abans de ser esborrades', 'SCHEDULLED', 'INT', (SELECT ID FROM not_CONFIG_GROUP g WHERE g.code = 'SCHEDULLED'), (SELECT ID FROM not_CONFIG_TYPE t WHERE t.code = 'INT') );
+                INSERT INTO not_CONFIG (id,POSITION, KEY, VALUE, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE, TYPE_CODE, CONFIG_GROUP_ID, CONFIG_TYPE_ID) VALUES (not_HIBERNATE_SEQ.NEXTVAL, 1, 'es.caib.notib.excepcions.neteja.cron', '0 0 3 * * SAT', 0, 'Expressió cron per indicar quan executar la tasca que esborra les excepcions antigues del monitor d''excepcions', 'SCHEDULLED', 'CRON', (SELECT ID FROM not_CONFIG_GROUP g WHERE g.code = 'SCHEDULLED'), (SELECT ID FROM not_CONFIG_TYPE t WHERE t.code = 'CRON') );
+                INSERT INTO not_CONFIG (id,POSITION, KEY, VALUE, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE, TYPE_CODE, CONFIG_GROUP_ID, CONFIG_TYPE_ID) VALUES (not_HIBERNATE_SEQ.NEXTVAL, 1, 'es.caib.ripea.excepcions.dedup.minuts', '10', 0, 'Minuts durant els quals una excepció repetida no es torna a registrar (només s''incrementa el comptador d''ocurrències). 0 per desactivar', 'SCHEDULLED', 'INT', (SELECT ID FROM not_CONFIG_GROUP g WHERE g.code = 'SCHEDULLED'), (SELECT ID FROM not_CONFIG_TYPE t WHERE t.code = 'INT') );"
+
+
+
+

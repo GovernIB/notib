@@ -177,6 +177,14 @@ export const getMenuEntries = (role: string | undefined, t: TFunction): MenuEntr
             hidden: role !== ROLE_SUPER,
         },
         {
+            id: 'excepcions',
+            title: t('app.menu.excepcions'),
+            to: '/excepcions',
+            icon: icons.excepcio,
+            resourceName: 'excepcioLogResource',
+            hidden: role !== ROLE_SUPER,
+        },
+        {
             id: 'metriques',
             title: t('app.menu.metriques'),
             to: '/metriques',

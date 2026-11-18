@@ -6,6 +6,7 @@ import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.EmailNotificacioHelper;
 import es.caib.notib.logic.helper.EnviamentHelper;
+import es.caib.notib.logic.helper.ExcepcioLogHelper;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.NotificaHelper;
@@ -114,6 +115,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 	protected JmsTemplate jmsTemplate;
 	@Autowired
 	protected EmailNotificacioHelper emailNotificacioHelper;
+	@Autowired
+	private ExcepcioLogHelper excepcioLogHelper;
 
 
 	// 1. Actualització dels procediments a partir de la informació de Rolsac
@@ -437,6 +440,14 @@ public class SchedulledServiceImpl implements SchedulledService {
 		} catch (Exception ex) {
 			log.error("Error enviant els correus agrupats per dia", ex);
 		}
+	}
+
+	@Override
+	public void natejarExcepcionsAntigues() {
+
+		int dies = excepcioLogHelper.getRetencioDies();
+		int esborrats = excepcioLogHelper.esborrarExcepcionsMesAntigues(dies);
+		log.info("Esborrades {} excepcions de log amb més de {} dies d'antiguitat", esborrats, dies);
 	}
 
 	private void esborrarTemporals(String dir) throws Exception {

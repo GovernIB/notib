@@ -50,6 +50,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
     private static String NETEJAR_LIMIT_ENVIAMENTS_MINUT_APLICACIONS = "0 * * * * *";
     private static String NETEJAR_LIMIT_ENVIAMENTS_DIES_APLICACIONS = "0 0 0 * * *";
     private static String ENVIAR_CORREUS_AGRUPATS_DEFCRON = "0 00 21 * * *";
+    private static String EXCEPCIONS_NETEJA_DEFCRON = "0 0 3 * * SAT";
 
     private static Integer CALLBACK_CLIENT = 0;
     private static Integer CERT_DEH = 1;
@@ -228,6 +229,15 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 (Supplier<SchedulledService> s) -> s.get().enviarCorreusAgrupats(),
                 PropertiesConstants.ENVIAR_CORREUS_AGRUPATS_CRON,
                 ENVIAR_CORREUS_AGRUPATS_DEFCRON);
+		// 14. Natejar excepcions antigues
+		/////////////////////////////////////////////////////////////////////////
+		registerCronTask(
+			"natejarExcepcionsAntigues",
+			schedulledServiceSupplier,
+			(Supplier<SchedulledService> s) -> s.get().natejarExcepcionsAntigues(),
+			PropertiesConstants.EXCEPCIONS_NETEJA_CRON,
+			EXCEPCIONS_NETEJA_DEFCRON);
+
     }
 
     private <T> void registerCronTask(String taskName, Supplier<T> supplier, Consumer<Supplier<T>> method, String cronConfig, String defualtCron) {

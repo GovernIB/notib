@@ -16,6 +16,7 @@ export const ROLS_APLICACIO = [ROLE_SUPER, ROLE_ADMIN, ROLE_ADMIN_LECTURA, ROLE_
 export type Pantalla = 'home'
     | 'entitats'
     | 'integracions'
+    | 'excepcions'
     | 'metriques'
     | 'monitorSistema'
     | 'activemq'
@@ -59,6 +60,7 @@ export const PANTALLA_ROLS: Record<Pantalla, string[]> = {
     home: ROLS_APLICACIO,
     entitats: [ROLE_SUPER],
     integracions: [ROLE_SUPER],
+    excepcions: [ROLE_SUPER],
     metriques: [ROLE_SUPER],
     monitorSistema: [ROLE_SUPER],
     activemq: [ROLE_SUPER],
