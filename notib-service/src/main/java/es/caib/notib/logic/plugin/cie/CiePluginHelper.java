@@ -362,6 +362,14 @@ public class CiePluginHelper extends AbstractPluginHelper<CiePlugin> {
 			var procediment = notificacio.getProcediment();
             EntregaCieEntity cieEntity =  procediment != null && !procediment.isComu() ? procediment.getEntregaCieEfectiva() :
                             notificacio.getOrganGestor().getEntregaCie();
+
+			if (cieEntity == null) {
+				var errorDescripcio = "Error enviament " + enviament.getId() + " no ha estat possible trobar el seu cieEntity";
+				integracioHelper.addAccioError(info, errorDescripcio);
+				cancelarUpdateEntregaPostal(uuidEnviament, false);
+				resposta.setDescripcioError(errorDescripcio);
+				return false;
+			}
             if (!cieEntity.getCie().isCieExtern()) {
                 return true;
             }

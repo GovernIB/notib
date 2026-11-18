@@ -31,7 +31,7 @@ const EnviamentDetailTabEntregaPostal: React.FC<{
                     )}
                     {!isRolActualAdministradorLectura && (
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                            {enviament?.entregaPostalInfo?.cieEstat == 'ERROR' && (
+                            {enviament?.entregaPostalInfo?.cieEstat === 'ENVIADO_CI' && (
                                 <MuiActionReportButton
                                     resourceName="notificacioEnviamentResource"
                                     action="CANCELAR_ENTREGA_POSTAL"
