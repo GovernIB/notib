@@ -1,0 +1,77 @@
+databaseChangeLog:
+    - changeSet:
+          id: 1080
+          author: system
+          changes:
+              - insert:
+                    tableName: NOT_CONFIG
+                    columns:
+                        - column:
+                              name: ID
+                              value: 1080
+                        - column:
+                              name: KEY
+                              value: "es.caib.notib.plugin.comanda.avisos.cie.caducat.cron"
+                        - column:
+                              name: VALUE
+                              value: "0 0 0 * * *"
+                        - column:
+                              name: DESCRIPTION
+                              value: "Especificar l'expressió cron indicant la freqüencia en que s'han d'enviar els avisos per caducitat"
+                        - column:
+                              name: GROUP_CODE
+                              value: "COMANDA"
+                        - column:
+                              name: CONFIG_GROUP_ID
+                              valueComputed: "(SELECT ID FROM not_CONFIG_GROUP g WHERE g.code = 'COMANDA')"
+                        - column:
+                              name: POSITION
+                              valueNumeric: 5
+                        - column:
+                              name: JBOSS_PROPERTY
+                              valueNumeric: 0
+                        - column:
+                              name: TYPE_CODE
+                              value: "CRON"
+                        - column:
+                              name: CONFIG_TYPE_ID
+                              valueComputed: "(SELECT ID FROM not_CONFIG_TYPE t WHERE t.code = 'CRON')"
+                        - column:
+                              name: CONFIGURABLE
+                              valueNumeric: 0
+              - insert:
+                    tableName: NOT_CONFIG
+                    columns:
+                        - column:
+                              name: ID
+                              value: 1081
+                        - column:
+                              name: KEY
+                              value: "es.caib.notib.plugin.comanda.avisos.cie.caducat.dies"
+                        - column:
+                              name: VALUE
+                              value: "10"
+                        - column:
+                              name: DESCRIPTION
+                              value: "Nombre de dies de diferencia amb el cual s'ha davisar la caducitat d'un CIE"
+                        - column:
+                              name: GROUP_CODE
+                              value: "COMANDA"
+                        - column:
+                              name: CONFIG_GROUP_ID
+                              valueComputed: "(SELECT ID FROM not_CONFIG_GROUP g WHERE g.code = 'COMANDA')"
+                        - column:
+                              name: POSITION
+                              valueNumeric: 6
+                        - column:
+                              name: JBOSS_PROPERTY
+                              valueNumeric: 0
+                        - column:
+                              name: TYPE_CODE
+                              value: "INT"
+                        - column:
+                              name: CONFIG_TYPE_ID
+                              valueComputed: "(SELECT ID FROM not_CONFIG_TYPE t WHERE t.code = 'INT')"
+                        - column:
+                              name: CONFIGURABLE
+                              valueNumeric: 0

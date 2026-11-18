@@ -17,6 +17,7 @@ import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.statemachine.SmConstants;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
+import es.caib.notib.persist.entity.cie.PagadorCieEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import joptsimple.internal.Strings;
 import lombok.RequiredArgsConstructor;
@@ -38,9 +39,11 @@ import org.springframework.web.client.RestTemplate;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.util.Base64;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 @Slf4j
@@ -82,27 +85,17 @@ public class ComandaListener {
 			if (!isComandaActiva()) {
 				return;
 			}
-			enviarMissatgeComanda(MissatgeComanda.builder()
+			enviarAvisComanda(MissatgeComanda.builder()
 				.id(enviament.getId())
 				.tipus(tipus)
 				.build());
 		} catch (Exception ex) {
-			log.error("[ComandaListener.avisEnviament] Error enviant l'avis", ex);
+			log.error("[enviarAvis] Error construint l'avis de Comanda", ex);
 		}
 	}
 
-	private void enviarMissatgeComanda(MissatgeComanda missatge) throws Exception {
+	public void enviarAvisComanda(MissatgeComanda missatgeComanda) {
 
-		NotibLogger.getInstance().info("[ComandaListener] Enviant missatge a la cua de tasques de Comanda " + missatge, log, LoggingTipus.COMANDA);
-		jmsTemplate.convertAndSend(SmConstants.CUA_COMANDA_AVISOS, missatge);
-	}
-
-	@Transactional
-	@JmsListener(destination = SmConstants.CUA_COMANDA_AVISOS, containerFactory = SmConstants.JMS_FACTORY_ACK)
-	public void enviarAvisComanda(@Payload MissatgeComanda missatgeComanda, @Headers MessageHeaders headers, Message message) throws JMSException, InterruptedException {
-
-		message.acknowledge();
-		Avis avis = null;
 		try {
 			var enviament = enviamentRepository.findById(missatgeComanda.getId()).orElseThrow();
 			var tipus = missatgeComanda.getTipus();
@@ -123,7 +116,7 @@ public class ComandaListener {
 			var appBaseUrl = configHelper.getConfig("es.caib.notib.app.base.url");
 			var redireccio = appBaseUrl + "/notificacio/" + notificacio.getId() + "/enviament/" + enviament.getId();
 
-			avis = new Avis()
+			Avis avis = new Avis()
 				.appCodi(APP_CODI)
 				.entornCodi(entornCodi)
 				.identificador(enviament.getNotificaReferencia())
@@ -137,17 +130,73 @@ public class ComandaListener {
 				.grupsAmbPermis(permisos.getRolsAmbPermis())
 				.redireccio(new URL(redireccio))
 				.grup(notificacio.getGrupCodi());
+
+			this.enviarMissatgeComanda(avis);
 		} catch (Exception ex) {
-			log.error("[enviarAvisComanda] Error reconstruint l'avis de Comanda", ex);
-			return;
+			log.error("[enviarAvisComanda] Error construint l'avis de Comanda", ex);
 		}
+	}
+
+	public void sendAvisCaducitat(PagadorCieEntity cie) {
+		try {
+			var entornCodi = getEntornCodi();
+
+			OffsetDateTime avui = DatesUtils.toOffsetDateTime(new Date()).truncatedTo(ChronoUnit.DAYS);
+			OffsetDateTime caducitat = DatesUtils.toOffsetDateTime(cie.getContracteDataVig());
+
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+			String formattedDate = caducitat.format(formatter);
+
+			boolean expired = avui.isAfter(caducitat);
+			String description = expired
+				?"El contracte CIE ha espirat en data " + formattedDate
+				:"El contracte CIE expirarà el dia " + formattedDate;
+
+			AvisTipus tipus = expired
+				?AvisTipus.ERROR
+				:AvisTipus.ALERTA;
+
+			Avis avis = new Avis()
+				.appCodi(APP_CODI)
+				.entornCodi(entornCodi)
+				.identificador(String.valueOf(cie.getId()))
+				.nom(cie.getNom() + " caducitat")
+				.descripcio(description)
+				.tipus(tipus)
+				.dataInici(avui)
+				.dataFi(avui.plusDays(1));
+
+			this.enviarMissatgeComanda(avis);
+		} catch (Exception ex) {
+			log.error("[sendAvisCaducitat] Error construint l'avis de Comanda", ex);
+		}
+	}
+
+	private void enviarMissatgeComanda(Avis avis) {
+		try {
+			if (!isComandaActiva()) {
+				return;
+			}
+			NotibLogger.getInstance().info("[ComandaListener] Enviant missatge a la cua d'avisos de Comanda " + avis, log, LoggingTipus.COMANDA);
+			jmsTemplate.convertAndSend(SmConstants.CUA_COMANDA_AVISOS, avis);
+		} catch (Exception ex) {
+			log.error("[ComandaListener.enviarMissatgeComanda] Error enviant l'avis", ex);
+		}
+	}
+
+	@Transactional
+	@JmsListener(destination = SmConstants.CUA_COMANDA_AVISOS, containerFactory = SmConstants.JMS_FACTORY_ACK)
+	public void sendAvis(@Payload Avis avis, @Headers MessageHeaders headers, Message message) throws JMSException {
+
+		message.acknowledge();
+
 		NotibLogger.getInstance().info("[ComandaListener] Enviant avis a la cua d'avisos de Comanda " + avis, log, LoggingTipus.COMANDA);
 		var info = new IntegracioInfo(IntegracioCodi.COMANDA, "Enviament d'avis a comanda", IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Avis", avis.toString()));
 		String url;
 		try {
 			url = configHelper.getConfig("es.caib.notib.plugin.comanda.url");
-			if (Strings.isNullOrEmpty(url )) {
-				throw new Exception("La propietat es.caib.notib.plugin.comanda.url.base no pot ser null");
+			if (Strings.isNullOrEmpty(url)) {
+				throw new Exception("La propietat es.caib.notib.plugin.comanda.url no pot ser null");
 			}
 			url = url.endsWith("/") ? url.substring(0,url.length()-1) : url;
 		} catch (Exception ex) {

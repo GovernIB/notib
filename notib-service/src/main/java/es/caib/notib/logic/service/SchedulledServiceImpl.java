@@ -1,6 +1,7 @@
 package es.caib.notib.logic.service;
 
 import com.google.common.base.Strings;
+import es.caib.notib.logic.comanda.ComandaListener;
 import es.caib.notib.logic.email.EmailConstants;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
@@ -24,18 +25,15 @@ import es.caib.notib.logic.intf.service.ProcedimentService;
 import es.caib.notib.logic.intf.service.SchedulledService;
 import es.caib.notib.logic.intf.service.ServeiService;
 import es.caib.notib.logic.intf.statemachine.events.ConsultaNotificaRequest;
+import es.caib.notib.logic.intf.util.DatesUtils;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
-import es.caib.notib.persist.repository.CorreusAgrupatsRepository;
-import es.caib.notib.persist.repository.EntitatRepository;
-import es.caib.notib.persist.repository.EnviamentTableRepository;
-import es.caib.notib.persist.repository.NotificacioTableViewRepository;
-import es.caib.notib.persist.repository.OrganGestorRepository;
+import es.caib.notib.persist.entity.cie.PagadorCieEntity;
+import es.caib.notib.persist.repository.*;
 import es.caib.notib.persist.repository.monitor.MonitorIntegracioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.jms.core.JmsTemplate;
@@ -54,6 +52,8 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.Principal;
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -117,6 +117,10 @@ public class SchedulledServiceImpl implements SchedulledService {
 	protected EmailNotificacioHelper emailNotificacioHelper;
 	@Autowired
 	private ExcepcioLogHelper excepcioLogHelper;
+	@Autowired
+	private ComandaListener comandaListener;
+	@Autowired
+	private PagadorCieRepository pagadorCieRepository;
 
 
 	// 1. Actualització dels procediments a partir de la informació de Rolsac
@@ -448,6 +452,21 @@ public class SchedulledServiceImpl implements SchedulledService {
 		int dies = excepcioLogHelper.getRetencioDies();
 		int esborrats = excepcioLogHelper.esborrarExcepcionsMesAntigues(dies);
 		log.info("Esborrades {} excepcions de log amb més de {} dies d'antiguitat", esborrats, dies);
+	}
+
+	@Override
+	public void enviarAvisosCaducitat() {
+		OffsetDateTime ara = DatesUtils.toOffsetDateTime(new Date()).truncatedTo(ChronoUnit.DAYS);
+
+		Integer dies = configHelper.getConfigAsInteger(PropertiesConstants.AVISOS_CADUCITAT_DIES);
+
+		Date dataInici = Date.from(ara.plusDays(-dies).toInstant());
+		Date dataFi = Date.from(ara.plusDays(dies + 1).toInstant());
+
+		List<PagadorCieEntity> cies = pagadorCieRepository.findAllByCaducat(dataInici, dataFi);
+		for (PagadorCieEntity cie: cies) {
+			comandaListener.sendAvisCaducitat(cie);
+		}
 	}
 
 	private void esborrarTemporals(String dir) throws Exception {

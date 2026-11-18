@@ -60,4 +60,6 @@ public interface SchedulledService {
 	void enviarCorreusAgrupats();
 
 	void natejarExcepcionsAntigues();
+
+	void enviarAvisosCaducitat();
 }

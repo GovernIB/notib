@@ -51,6 +51,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
     private static String NETEJAR_LIMIT_ENVIAMENTS_DIES_APLICACIONS = "0 0 0 * * *";
     private static String ENVIAR_CORREUS_AGRUPATS_DEFCRON = "0 00 21 * * *";
     private static String EXCEPCIONS_NETEJA_DEFCRON = "0 0 3 * * SAT";
+    private static String AVISOS_CADUCITAT_DEFCRON = "0 0 0 * * *";
 
     private static Integer CALLBACK_CLIENT = 0;
     private static Integer CERT_DEH = 1;
@@ -237,6 +238,14 @@ public class SchedulingConfig implements SchedulingConfigurer {
 			(Supplier<SchedulledService> s) -> s.get().natejarExcepcionsAntigues(),
 			PropertiesConstants.EXCEPCIONS_NETEJA_CRON,
 			EXCEPCIONS_NETEJA_DEFCRON);
+		// 15. Enviar avisos de caducitat
+		/////////////////////////////////////////////////////////////////////////
+		registerCronTask(
+			"enviarAvisosCaducitat",
+			schedulledServiceSupplier,
+			(Supplier<SchedulledService> s) -> s.get().enviarAvisosCaducitat(),
+			PropertiesConstants.AVISOS_CADUCITAT_CRON,
+			AVISOS_CADUCITAT_DEFCRON);
 
     }
 

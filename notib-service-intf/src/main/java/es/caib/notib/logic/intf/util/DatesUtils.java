@@ -4,11 +4,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.DayOfWeek;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
@@ -147,6 +143,6 @@ public class DatesUtils {
     }
 
     public static OffsetDateTime toOffsetDateTime(Date data) {
-        return data != null ? data.toInstant().atZone(ZoneId.systemDefault()).toOffsetDateTime() : null;
+        return data != null ? data.toInstant().atOffset(ZoneOffset.UTC) : null;
     }
 }

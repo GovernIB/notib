@@ -61,4 +61,7 @@ public class PropertiesConstants {
 	public static final String EXCEPCIONS_RETENCIO_DIES = "es.caib.notib.excepcions.retencio.dies";
 	public static final String EXCEPCIONS_NETEJA_CRON = "es.caib.notib.excepcions.neteja.cron";
 	public static final String EXCEPCIONS_DEDUP_MINUTS = "es.caib.notib.excepcions.dedup.minuts";
+
+	public static final String AVISOS_CADUCITAT_CRON = "es.caib.notib.plugin.comanda.avisos.cie.caducat.cron";
+	public static final String AVISOS_CADUCITAT_DIES = "es.caib.notib.plugin.comanda.avisos.cie.caducat.dies";
 }

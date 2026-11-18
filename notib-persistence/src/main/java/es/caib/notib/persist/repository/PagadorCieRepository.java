@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
  * de dades del tipus pagador cie.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface PagadorCieRepository extends JpaRepository<PagadorCieEntity, Long> {
@@ -35,7 +35,7 @@ public interface PagadorCieRepository extends JpaRepository<PagadorCieEntity, Lo
 	List<PagadorCieEntity> findByEntitat(EntitatEntity entitat);
 	public List<PagadorCieEntity> findByEntitatIdAndOrganGestorCodiIn(Long entitatId, List<String> organsFills);
 	public List<PagadorCieEntity> findByOrganGestor(OrganGestorEntity organGestorId);
-	
+
 	@Query(	"from " +
 			"    PagadorCieEntity b " +
 			"where " +
@@ -46,7 +46,7 @@ public interface PagadorCieRepository extends JpaRepository<PagadorCieEntity, Lo
 			@Param("organismePagador") String organismePagador,
 			@Param("entitat") EntitatEntity entitat,
 			Pageable paginacio);
-	
+
 	@Query(	"from " +
 			"    PagadorCieEntity b " +
 			"where " +
@@ -69,4 +69,12 @@ public interface PagadorCieRepository extends JpaRepository<PagadorCieEntity, Lo
 	int updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 
 
+	@Query(	"from " +
+		"    PagadorCieEntity b " +
+		"where " +
+		":dataInici <= b.contracteDataVig " +
+		"and b.contracteDataVig <= :dataFi ")
+	List<PagadorCieEntity> findAllByCaducat(
+		@Param("dataInici") Date dataInici,
+		@Param("dataFi") Date dataFi);
 }

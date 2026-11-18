@@ -102,4 +102,9 @@ public class SchedulledService extends AbstractService<es.caib.notib.logic.intf.
 		getDelegateService().natejarExcepcionsAntigues();
 	}
 
+	@Override
+	public void enviarAvisosCaducitat() {
+		getDelegateService().enviarAvisosCaducitat();
+	}
+
 }
