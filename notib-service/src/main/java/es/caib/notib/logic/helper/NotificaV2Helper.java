@@ -2,6 +2,10 @@ package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
 import es.caib.comanda.model.management.AvisTipus;
+import es.caib.comanda.model.server.monitoring.EstatSalut;
+import es.caib.comanda.model.server.monitoring.EstatSalutEnum;
+import es.caib.comanda.model.server.monitoring.IntegracioPeticions;
+import es.caib.comanda.model.server.monitoring.IntegracioSalut;
 import es.caib.notib.client.domini.CieEstat;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.InteressatTipus;
@@ -47,7 +51,9 @@ import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
+import es.caib.notib.plugin.AbstractSalutPlugin;
 import es.caib.notib.plugin.utils.WsClientHelper;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
@@ -57,6 +63,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.PostConstruct;
 
 import javax.ejb.CreateException;
 import javax.management.InstanceNotFoundException;
@@ -83,7 +91,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -116,6 +126,106 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	private AccioMassivaHelper accioMassivaHelper;
     @Autowired
     private ComandaListener comandaListener;
+	@Autowired
+	private MeterRegistry meterRegistry;
+
+	private static final String PLUGIN_CODI = "NTF";
+
+	// Separats plugins per cada operació per tenir peticionsPerEntorn
+	private final Map<String, AbstractSalutPlugin> salutPlugins = new HashMap<>();
+
+	public AbstractSalutPlugin getSalutPlugin(String operacio) {
+		return salutPlugins.computeIfAbsent(operacio, k -> {
+			var plugin = new AbstractSalutPlugin();
+			plugin.init(meterRegistry, PLUGIN_CODI, "", operacio);
+			return plugin;
+		});
+	}
+
+	public void init(MeterRegistry registry, String codiPlugin, String codiEntiat) {
+		// Inicialitza tots els plugins
+		for (var entry : salutPlugins.entrySet()) {
+			entry.getValue().init(registry, codiPlugin, codiEntiat, entry.getKey());
+		}
+	}
+
+	@PostConstruct
+	public void initSalutPlugin() {
+		// Pre-crear plugins per les operacions conegudes
+		getSalutPlugin("ENVIAMENT");
+		getSalutPlugin("AMPLIAR_PLAZO");
+		getSalutPlugin("ANULAR");
+		getSalutPlugin("ADVISER");
+	}
+
+	@Override
+	public boolean teConfiguracioEspecifica() {
+		// Retorna true si algun plugin té configuració específica
+		return salutPlugins.values().stream().anyMatch(AbstractSalutPlugin::teConfiguracioEspecifica);
+	}
+
+	@Override
+	public EstatSalut getEstatPlugin() {
+		// Estat global: DOWN si qualsevol plugin està DOWN, sinó el pitjor estat
+		EstatSalutEnum estatGlobal = EstatSalutEnum.UP;
+		int totalLatencia = 0;
+		int count = 0;
+
+		for (var plugin : salutPlugins.values()) {
+			var estat = plugin.getEstatPlugin();
+			if (estat.getEstat() == EstatSalutEnum.DOWN) {
+				estatGlobal = EstatSalutEnum.DOWN;
+			} else if (estat.getEstat() == EstatSalutEnum.DEGRADED && estatGlobal != EstatSalutEnum.DOWN) {
+				estatGlobal = EstatSalutEnum.DEGRADED;
+			} else if (estat.getEstat() == EstatSalutEnum.WARN && estatGlobal == EstatSalutEnum.UP) {
+				estatGlobal = EstatSalutEnum.WARN;
+			}
+			if (estat.getLatencia() != null) {
+				totalLatencia += estat.getLatencia();
+				count++;
+			}
+		}
+
+		return new EstatSalut().estat(estatGlobal).latencia(count > 0 ? totalLatencia / count : null);
+	}
+
+	@Override
+	public IntegracioPeticions getPeticionsPlugin() {
+		// Combina totes les peticions
+		long totalOk = 0, totalError = 0, peticionsOkUltimPeriode = 0, peticionsErrorUltimPeriode = 0;
+		long totalTempsMig = 0, tempsMigUltimPeriode = 0;
+		Map<String, IntegracioPeticions> peticionsPerEntorn = new HashMap<>();
+
+		for (var entry : salutPlugins.entrySet()) {
+			var peticions = entry.getValue().getPeticionsPlugin();
+			peticionsPerEntorn.put(entry.getKey(), peticions);
+
+			if (peticions.getTotalOk() != null) totalOk += peticions.getTotalOk();
+			if (peticions.getTotalError() != null) totalError += peticions.getTotalError();
+			if (peticions.getPeticionsOkUltimPeriode() != null) peticionsOkUltimPeriode += peticions.getPeticionsOkUltimPeriode();
+			if (peticions.getPeticionsErrorUltimPeriode() != null) peticionsErrorUltimPeriode += peticions.getPeticionsErrorUltimPeriode();
+			if (peticions.getTotalTempsMig() != null) totalTempsMig += peticions.getTotalTempsMig();
+			if (peticions.getTempsMigUltimPeriode() != null) tempsMigUltimPeriode += peticions.getTempsMigUltimPeriode();
+		}
+
+		return new IntegracioPeticions()
+				.totalOk(totalOk)
+				.totalError(totalError)
+				.peticionsOkUltimPeriode(peticionsOkUltimPeriode)
+				.peticionsErrorUltimPeriode(peticionsErrorUltimPeriode)
+				.totalTempsMig((int) totalTempsMig)
+				.peticionsPerEntorn(peticionsPerEntorn)
+				.tempsMigUltimPeriode((int) tempsMigUltimPeriode);
+	}
+
+	public IntegracioSalut getIntegracionsSalut() {
+		var estatSalut = getEstatPlugin();
+		return new IntegracioSalut()
+				.codi(PLUGIN_CODI)
+				.estat(estatSalut.getEstat())
+				.latencia(estatSalut.getLatencia())
+				.peticions(getPeticionsPlugin());
+	}
 
 	private static final String NOTIB = "Notib";
     @Autowired
@@ -255,13 +365,16 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			auditHelper.auditaNotificacio(notificacio, TipusOperacio.UPDATE, "NotificaV2Helper.notificacioEnviar");
             if (errorSbs) {
                 SubsistemesHelper.addErrorOperation(NOT);
+				getSalutPlugin("ENVIAMENT").incrementarOperacioError();
             } else {
                 SubsistemesHelper.addSuccessOperation(NOT, System.currentTimeMillis() - start);
+				getSalutPlugin("ENVIAMENT").incrementarOperacioOk(System.currentTimeMillis() - start);
             }
 			return notificacio;
 		} catch (Exception ex) {
 			log.error("Error inesperat enviant la notificacio", ex);
 			SubsistemesHelper.addErrorOperation(NOT);
+			getSalutPlugin("ENVIAMENT").incrementarOperacioError();
 			throw ex;
 		}
 	}
@@ -378,7 +491,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	@Transactional
 	public RespostaAnulacio anular(String identificador, String motiu) {
 
+		long start = System.currentTimeMillis();
 		var enviament = notificacioEnviamentRepository.findByNotificaReferencia(identificador);
+		var error = false;
+		var errorDescripcio = "";
 		try {
 			var apiKey = enviament.getNotificacio().getEntitat().getApiKey();
 			var organEmisor = enviament.getNotificacio().getEmisorDir3Codi();
@@ -403,9 +519,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			getSincronizarEnvioWs(apiKey).sincronizarEnvioOE(organEmisor, id, tipoEntrega, modoNotificacion, estat, dataHolder,
 					motiu, receptor, null, null, null, codigoRespuesta, descripcionRespuesta, opcionesRespuestaSincronizarOE);
 
-			var error = !"200".equals(codigoRespuesta.value);
-			var errorDesc = error ? codigoRespuesta.value + " - " + descripcionRespuesta.value : "";
-			notificacioEventHelper.addNotificaAnular(enviament, error, errorDesc, false);
+			error = !"200".equals(codigoRespuesta.value);
+			errorDescripcio = error ? codigoRespuesta.value + " - " + descripcionRespuesta.value : "";
+			notificacioEventHelper.addNotificaAnular(enviament, error, errorDescripcio, false);
 			var resposta = new RespostaAnulacio();
 			resposta.setIdentificador(identificador);
 			resposta.setError(error);
@@ -413,12 +529,21 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			resposta.setDescripcioResposta(descripcionRespuesta.value);
 			return resposta;
 		} catch (Exception ex) {
+			error = true;
+			errorDescripcio = ex.getMessage();
 			var resposta = new RespostaAnulacio();
 			resposta.setIdentificador(identificador);
 			resposta.setCodiResposta("Error");
 			resposta.setDescripcioResposta(ex.getMessage());
-			notificacioEventHelper.addNotificaAnular(enviament, true, ex.getMessage(), false);
+			notificacioEventHelper.addNotificaAnular(enviament, true, errorDescripcio, false);
 			return resposta;
+		} finally {
+			var elapsedTime = System.currentTimeMillis() - start;
+			if (error) {
+				getSalutPlugin("ANULAR").incrementarOperacioError();
+			} else {
+				getSalutPlugin("ANULAR").incrementarOperacioOk(elapsedTime);
+			}
 		}
 	}
 
@@ -488,8 +613,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	@Transactional
 	public RespuestaAmpliarPlazoOE ampliarPlazoOE(AmpliarPlazoOE ampliarPlazo, List<NotificacioEnviamentEntity> enviaments) {
 
+		long start = System.currentTimeMillis();
 		var info = new IntegracioInfo(IntegracioCodi.NOTIFICA, "Ampliació de termini", IntegracioAccioTipusEnumDto.ENVIAMENT);
 		RespuestaAmpliarPlazoOE resposta;
+		var error = false;
+		var errorDesc = "";
 		try {
 			var apiKey = enviaments.get(0).getNotificacio().getEntitat().getApiKey();
 			var organEmisor = enviaments.get(0).getNotificacio().getEmisorDir3Codi();
@@ -504,43 +632,40 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		} catch (Exception ex) {
 			var msg = "Error inesperat al ampliarPlazosOE ";
 			log.error(msg, ex);
+			error = true;
+			errorDesc = msg + ex.getMessage();
 			resposta = new RespuestaAmpliarPlazoOE();
 			resposta.setCodigoRespuesta("error");
 			resposta.setError(true);
 			resposta.setDescripcionRespuesta(msg + ex.getMessage());
 		}
 		var ok = false;
-		var errorDesc = "";
 		var codiEntitat = "";
 		ok = "000".equals(resposta.getCodigoRespuesta());
 		errorDesc = !ok ? resposta.getDescripcionRespuesta()  : "";
 		for (var enviament : enviaments) {
 			info.addParam("Notificacio/Enviament", enviament.getNotificacio().getId() + "/" + enviament.getId());
 			codiEntitat +=  enviament.getNotificacio().getEntitat().getCodi();
-//			if (!ok) {
-//				notificacioEventHelper.addNotificaAmpliarPlazo(enviament, !ok, errorDesc, false);
-//				continue;
-//			}
 			var ampliaciones = resposta.getAmpliacionesPlazo();
 			if (ampliaciones == null || ampliaciones.getAmpliacionPlazo() == null || ampliaciones.getAmpliacionPlazo().isEmpty()) {
+				error = true;
 				errorDesc = "[ampliarPlazoOE] No han arribat dades suficients per guardar la informacio a Notib";
 				log.error(errorDesc);
 				notificacioEventHelper.addNotificaAmpliarPlazo(enviament, true, errorDesc, false);
 				if (ampliarPlazo.getAccioMassiva() != null) {
 					accioMassivaHelper.actualitzar(ampliarPlazo.getAccioMassiva(), enviament.getId(), errorDesc, "");
 				}
-
 				continue;
 			}
 			for (var ampliacion : ampliaciones.getAmpliacionPlazo()) {
 				if (!enviament.getNotificaIdentificador().equals(ampliacion.getIdentificador())) {
 					continue;
 				}
-
 				if ("KO".equals(ampliacion.getEstado())) {
 					resposta.setError(true);
 					resposta.setCodigoRespuesta(ampliacion.getCodigo());
 					resposta.setDescripcionRespuesta(ampliacion.getMensajeError());
+					error = true;
 					errorDesc += ampliacion.getMensajeError();
 					ok = false;
 					notificacioEventHelper.addNotificaAmpliarPlazo(enviament, true, ampliacion.getMensajeError(), false);
@@ -551,14 +676,15 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				}
 				Date dataCaducitat;
 				if (Strings.isNullOrEmpty(ampliacion.getFechaCaducidad())) {
-					var error = "[ampliarPlazoOE] Data de caducitat buida";
+					error = true;
+					var error2 = "[ampliarPlazoOE] Data de caducitat buida";
 					resposta.setError(true);
 					resposta.setCodigoRespuesta("Error");
-					resposta.setDescripcionRespuesta(error);
+					resposta.setDescripcionRespuesta(error2);
 					ok = false;
-					notificacioEventHelper.addNotificaAmpliarPlazo(enviament, true, error, false);
+					notificacioEventHelper.addNotificaAmpliarPlazo(enviament, true, error2, false);
 					if (ampliarPlazo.getAccioMassiva() != null) {
-						accioMassivaHelper.actualitzar(ampliarPlazo.getAccioMassiva(), enviament.getId(), error, "");
+						accioMassivaHelper.actualitzar(ampliarPlazo.getAccioMassiva(), enviament.getId(), error2, "");
 					}
 					continue;
 				}
@@ -566,15 +692,16 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					dataCaducitat = new SimpleDateFormat("dd/MM/yyyy").parse(ampliacion.getFechaCaducidad());
 					enviament.setNotificaDataCaducitat(dataCaducitat);
 				} catch (Exception ex) {
-					var error = "[ampliarPlazoOE] Error convertit la data de caducitat " + ampliacion.getFechaCaducidad();
-					log.error(error, ex);
+					error = true;
+					var error2 = "[ampliarPlazoOE] Error convertit la data de caducitat " + ampliacion.getFechaCaducidad();
+					log.error(error2, ex);
 					resposta.setError(true);
 					resposta.setCodigoRespuesta("Error");
-					resposta.setDescripcionRespuesta(error);
+					resposta.setDescripcionRespuesta(error2);
 					ok = false;
-					notificacioEventHelper.addNotificaAmpliarPlazo(enviament, true, error, false);
+					notificacioEventHelper.addNotificaAmpliarPlazo(enviament, true, error2, false);
 					if (ampliarPlazo.getAccioMassiva() != null) {
-						accioMassivaHelper.actualitzar(ampliarPlazo.getAccioMassiva(), enviament.getId(), error, "");
+						accioMassivaHelper.actualitzar(ampliarPlazo.getAccioMassiva(), enviament.getId(), error2, "");
 					}
 					continue;
 				}
@@ -598,10 +725,16 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		} else {
 			integracioHelper.addAccioError(info, errorDesc);
 		}
+		var elapsedTime = System.currentTimeMillis() - start;
+		if (error) {
+			getSalutPlugin("AMPLIAR_PLAZO").incrementarOperacioError();
+		} else {
+			getSalutPlugin("AMPLIAR_PLAZO").incrementarOperacioOk(elapsedTime);
+		}
 		return resposta;
-	}
+}
 
-	private Datado getDarrerDatat(RespuestaInfoEnvioLigero resultadoInfoEnvio, NotificacioEnviamentEntity enviament, IntegracioInfo info) throws DatatypeConfigurationException, ParseException {
+private Datado getDarrerDatat(RespuestaInfoEnvioLigero resultadoInfoEnvio, NotificacioEnviamentEntity enviament, IntegracioInfo info) throws DatatypeConfigurationException, ParseException {
 
 		info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
 		if (resultadoInfoEnvio.getDatados() == null) {

@@ -23,6 +23,7 @@ public class AbstractSalutPlugin implements SalutPlugin {
     private MeterRegistry registry;
     private MeterRegistry localRegistry;
     private String codiPlugin;
+    private String operacio;  // Nom de l'operació (ENVIAMENT, AMPLIAR_PLAZO, ANULAR)
     @Setter
     protected String urlPlugin;
     @Setter
@@ -46,11 +47,17 @@ public class AbstractSalutPlugin implements SalutPlugin {
     private static final int UP_LT_PCT = 5;      // <5% errors
 
     public void init(MeterRegistry registry, String codiPlugin, String codiEntitat) {
+        init(registry, codiPlugin, codiEntitat, null);
+    }
+
+    public void init(MeterRegistry registry, String codiPlugin, String codiEntitat, String operacio) {
 
         this.registry = registry;
         this.codiPlugin = codiPlugin;
+        this.operacio = operacio;
         this.codiEntitat = codiEntitat;
-        var timerBuilder = Timer.builder("plugin." + codiPlugin)
+        var meterName = operacio != null ? "plugin." + codiPlugin + "." + operacio : "plugin." + codiPlugin;
+        var timerBuilder = Timer.builder(meterName)
                 .tag("result", "success")
                 .publishPercentiles(0.5, 0.75, 0.95, 0.99)
                 .publishPercentileHistogram();
@@ -58,7 +65,7 @@ public class AbstractSalutPlugin implements SalutPlugin {
             timerBuilder.tag("entitat", codiEntitat);
         }
         timerOkGlobal = timerBuilder.register(registry);
-        counterErrorGlobal = Counter.builder("plugin." + codiPlugin).register(registry);
+        counterErrorGlobal = Counter.builder(meterName).register(registry);
         cuaPeticions = new CuaFifoBool(20);
         initializeLocalTimers();
     }
@@ -125,15 +132,17 @@ public class AbstractSalutPlugin implements SalutPlugin {
 
     private EstatSalutEnum calculaEstat(Long totalPeticionsOk, Long totalPeticionsError) {
 
-        var totalPeticions = totalPeticionsOk + totalPeticionsError;
+        var ok = totalPeticionsOk != null ? totalPeticionsOk : 0L;
+        var error = totalPeticionsError != null ? totalPeticionsError : 0L;
+        var totalPeticions = ok + error;
         if (totalPeticions == 0L) {
             return darrerEstat;
         }
         long peticionsOkSegures;
         long peticionsErrorSegures;
         if (totalPeticions >= 20) {
-            peticionsOkSegures = totalPeticionsOk;
-            peticionsErrorSegures = totalPeticionsError;
+            peticionsOkSegures = ok;
+            peticionsErrorSegures = error;
         } else {
             peticionsOkSegures = !cuaPeticions.isEmpty() ? cuaPeticions.getOk() : 0L;
             peticionsErrorSegures = !cuaPeticions.isEmpty() ? cuaPeticions.getError() : 0L;

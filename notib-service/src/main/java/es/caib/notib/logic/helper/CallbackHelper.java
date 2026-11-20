@@ -42,6 +42,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.CBK;
+import static es.caib.notib.logic.helper.SubsistemesHelper.SubsistemesEnum.NOT;
+
 /**
  * Classe per englobar la tasca de notificar l'estat o la certificació a l'aplicació
  * client a partir de la referència del destinatari de la notificació.
@@ -81,7 +84,8 @@ public class CallbackHelper {
 	private JmsTemplate jmsTemplate;
     @Autowired
     private AccioMassivaHelper accioMassivaHelper;
-
+    @Autowired
+	private SalutHelper salutHelper;
 
 	private boolean isInterficieWeb(NotificacioEntity not) {
 		return not.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB;
@@ -262,6 +266,8 @@ public class CallbackHelper {
 			integracioHelper.addAccioOk(info);
 			log.info(String.format("[Callback] Enviament del callback [Id: %d] de la notificacio [Id: %d] enviament [Id: %d] exitos", callback.getId(), notificacio.getId(), env.getId()));
 			elapsedTime = System.nanoTime() - start;
+			SubsistemesHelper.addSuccessOperation(SubsistemesHelper.SubsistemesEnum.CBK, System.currentTimeMillis() - start);
+			SalutHelper.addIntegracioExit(callback.getUsuariCodi(), CBK.name(), elapsedTime);
 			log.info("marcar com a notificat: "  + elapsedTime);
 			if (accioMassivaId != null) {
 				accioMassivaHelper.actualitzar(accioMassivaId, env.getId(), "", "");
@@ -280,6 +286,8 @@ public class CallbackHelper {
 			notificacio.updateLastCallbackError(true);
 			integracioHelper.addAccioError(info, "Error enviant l'avis de canvi d'estat", ex);
 			var elapsedTime = System.nanoTime() - start;
+			SubsistemesHelper.addErrorOperation(CBK);
+			SalutHelper.addIntegracioError(callback.getUsuariCodi(), CBK.name());
 			log.info("excepcio: "  + elapsedTime);
 			if (accioMassivaId != null) {
 				accioMassivaHelper.actualitzar(accioMassivaId, env.getId(), errorDescripcio, Arrays.toString(ex.getStackTrace()));

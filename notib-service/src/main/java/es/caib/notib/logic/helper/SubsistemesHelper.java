@@ -16,10 +16,13 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -121,7 +124,7 @@ public class SubsistemesHelper {
         CSR ("Callback SIR", false),
         CNT ("Callback de Notificació", false),
         CCI ("Callback de CIE", false),
-//        CBK ("Callback de client"),
+        CBK ("Callback d'aplicacions", false),
         GDO ("Gestió documental FileSystem", true);
 
         private final String nom;
@@ -130,6 +133,24 @@ public class SubsistemesHelper {
             this.nom = nom;
             this.sistemaCritic = sistemaCritic;
         }
+
+		public static SubsistemesEnum valueOfCodi(String codi) {
+			for (SubsistemesEnum subsistema : SubsistemesEnum.values()) {
+				if (subsistema.name().equals(codi)) {
+					return subsistema;
+				}
+			}
+			return null;
+		}
+
+		public static final Set<String> CODIS =
+			Arrays.stream(values())
+				.map(SubsistemesEnum::name)
+				.collect(Collectors.toSet());
+
+		public static boolean containsCodi(String codi) {
+			return CODIS.contains(codi);
+		}
     }
 
     public static void addSuccessOperation(SubsistemesEnum subsistema, long duracio) {

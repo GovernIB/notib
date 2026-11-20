@@ -5,13 +5,19 @@ import es.caib.comanda.model.server.monitoring.ContextInfo;
 import es.caib.comanda.model.server.monitoring.EstatSalut;
 import es.caib.comanda.model.server.monitoring.EstatSalutEnum;
 import es.caib.comanda.model.server.monitoring.IntegracioInfo;
+import es.caib.comanda.model.server.monitoring.IntegracioPeticions;
 import es.caib.comanda.model.server.monitoring.IntegracioSalut;
 import es.caib.comanda.model.server.monitoring.Manual;
 import es.caib.comanda.model.server.monitoring.MissatgeSalut;
 import es.caib.comanda.model.server.monitoring.SalutInfo;
 import es.caib.comanda.model.server.monitoring.SubsistemaInfo;
+import es.caib.comanda.model.server.monitoring.SubsistemaSalut;
 import es.caib.comanda.ms.salut.helper.MonitorHelper;
+import es.caib.notib.logic.helper.ConfigHelper;
+import es.caib.notib.logic.helper.NotificaV0Helper;
+import es.caib.notib.logic.helper.NotificaV2Helper;
 import es.caib.notib.logic.helper.PluginHelper;
+import es.caib.notib.logic.helper.SalutHelper;
 import es.caib.notib.logic.helper.SubsistemesHelper;
 import es.caib.notib.logic.helper.plugin.AbstractPluginHelper;
 import es.caib.notib.logic.intf.service.SalutService;
@@ -19,6 +25,7 @@ import es.caib.notib.logic.mapper.MissatgeSalutMapper;
 import es.caib.notib.logic.utils.CustomHealthIndicator;
 import es.caib.notib.logic.utils.NotibBenchmark;
 import es.caib.notib.persist.repository.AvisRepository;
+import joptsimple.internal.Strings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
@@ -45,7 +52,9 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.DoubleSummaryStatistics;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -56,11 +65,14 @@ public class SalutServiceImpl implements SalutService {
 
     private final JdbcTemplate jdbcTemplate;
     private final PluginHelper pluginHelper;
+    private final NotificaV0Helper notificaV0Helper;
+    private final NotificaV2Helper notificaV2Helper;
+    private final ConfigHelper configHelper;
     private final MissatgeSalutMapper missatgeSalutMapper;
     private final AvisRepository avisRepository;
     private final CustomHealthIndicator healthIndicator;
 
-    @Override
+	@Override
     public List<IntegracioInfo> getIntegracions() {
         return pluginHelper.getPluginHelpers().stream()
                 .flatMap(pluginHelper -> pluginHelper.getIntegracionsInfo().stream())
@@ -178,11 +190,71 @@ public class SalutServiceImpl implements SalutService {
             for (var helper : helpers) {
                 integracionsSalut.add(helper.getIntegracionsSalut());
             }
+            // Afegir salut de Notifica (versió activa)
+            var versio = configHelper.getConfig("es.caib.notib.notifica.versio");
+			integracionsSalut.add("0".equals(versio) ? notificaV0Helper.getIntegracionsSalut() : notificaV2Helper.getIntegracionsSalut());
+			var callbacks = SalutHelper.getIntegracioStats();
+			integracionsSalut.add(construirIntegracioAPL(callbacks));
+
         } catch (Exception e) {
             log.error("Error checkIntegracions", e);
             return Collections.emptyList();
         }
         return integracionsSalut;
+    }
+
+    private IntegracioSalut construirIntegracioAPL(List<SubsistemaSalut> callbacks) {
+
+        long totalOk = 0L;
+        long totalError = 0L;
+        long peticionsOkUltimPeriode = 0L;
+        long peticionsErrorUltimPeriode = 0L;
+        long totalTempsMig = 0L;
+        long tempsMigUltimPeriode = 0L;
+
+        Map<String, IntegracioPeticions> peticionsPerEntorn = new HashMap<>();
+
+        for (var callback : callbacks) {
+            totalOk += callback.getTotalOk() != null ? callback.getTotalOk() : 0L;
+            totalError += callback.getTotalError() != null ? callback.getTotalError() : 0L;
+            peticionsOkUltimPeriode += callback.getPeticionsOkUltimPeriode() != null ? callback.getPeticionsOkUltimPeriode() : 0L;
+            peticionsErrorUltimPeriode += callback.getPeticionsErrorUltimPeriode() != null ? callback.getPeticionsErrorUltimPeriode() : 0L;
+            totalTempsMig += callback.getTotalTempsMig() != null ? callback.getTotalTempsMig() : 0L;
+            tempsMigUltimPeriode += callback.getTempsMigUltimPeriode() != null ? callback.getTempsMigUltimPeriode() : 0L;
+
+            var codiEntorn = callback.getCodi();
+            if (Strings.isNullOrEmpty(codiEntorn)) {
+				continue;
+			}
+			var peticionsEntorn = new IntegracioPeticions()
+					.totalOk(callback.getTotalOk() != null ? callback.getTotalOk() : 0L)
+					.totalError(callback.getTotalError() != null ? callback.getTotalError() : 0L)
+					.peticionsOkUltimPeriode(callback.getPeticionsOkUltimPeriode() != null ? callback.getPeticionsOkUltimPeriode() : 0L)
+					.peticionsErrorUltimPeriode(callback.getPeticionsErrorUltimPeriode() != null ? callback.getPeticionsErrorUltimPeriode() : 0L)
+					.totalTempsMig(callback.getTotalTempsMig() != null ? callback.getTotalTempsMig().intValue() : 0)
+					.tempsMigUltimPeriode(callback.getTempsMigUltimPeriode() != null ? callback.getTempsMigUltimPeriode().intValue() : 0);
+			peticionsPerEntorn.put(codiEntorn, peticionsEntorn);
+        }
+
+        var totalPeticions = totalOk + totalError;
+        var estat = totalPeticions == 0L
+                ? EstatSalutEnum.UNKNOWN
+                : (totalError > 0L ? EstatSalutEnum.DOWN : EstatSalutEnum.UP);
+
+        var peticions = new IntegracioPeticions()
+                .totalOk(totalOk)
+                .totalError(totalError)
+                .peticionsOkUltimPeriode(peticionsOkUltimPeriode)
+                .peticionsErrorUltimPeriode(peticionsErrorUltimPeriode)
+                .totalTempsMig((int) totalTempsMig)
+                .tempsMigUltimPeriode((int) tempsMigUltimPeriode)
+                .peticionsPerEntorn(peticionsPerEntorn);
+
+        return new IntegracioSalut()
+                .codi("APL")
+                .estat(estat)
+                .latencia((int) tempsMigUltimPeriode)
+                .peticions(peticions);
     }
 
 //    public List<DetallSalut> checkAltres() {

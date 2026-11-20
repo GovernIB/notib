@@ -25,6 +25,7 @@ import es.caib.notib.logic.wsdl.notificaV2.sincronizarEnvioOE.RespuestaSincroniz
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.repository.NotificacioRepository;
+import es.caib.notib.plugin.AbstractSalutPlugin;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.time.DateUtils;
@@ -64,7 +65,7 @@ import java.util.TreeSet;
  */
 @Slf4j
 @Component
-public abstract class AbstractNotificaHelper {
+public abstract class AbstractNotificaHelper extends AbstractSalutPlugin {
 
 	@Autowired
 	protected ConfigHelper configHelper;
