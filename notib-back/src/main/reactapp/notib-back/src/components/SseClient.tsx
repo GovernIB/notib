@@ -62,7 +62,7 @@ export const useAvisosSse = () => useSseClient().avisos;
  * comprova que siguin de l'usuari abans d'obrir la connexió.
  */
 const getSubscribeUrl = (apiUrl: string, usuariCodi: string, rol?: string, entitatId?: number) => {
-    const base = apiUrl.endsWith('/') ? apiUrl.slice(0, -1) : apiUrl;
+    const base = apiUrl.trim().endsWith('/') ? apiUrl.slice(0, -1) : apiUrl;
     const params = new URLSearchParams();
     if (rol != null) {
         params.set('rol', rol);
