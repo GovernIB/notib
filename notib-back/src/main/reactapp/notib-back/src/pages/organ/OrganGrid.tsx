@@ -336,7 +336,7 @@ const OficinesSyncActionButton: React.FC<{ dataGridApiRef: MuiDataGridApiRef; }>
             formDialogButtons={formDialogButtons}
             buttonIcon="refresh"
             onSuccess={resposta => {
-                const msg = resposta?.ok ? "success" : "error";
+                const msg = resposta ? "success" : "error";
                 dataGridApiRef.current?.refresh();
                 temporalMessageShow(null, t('page.organs.grid.sync.oficines.' + msg), msg);
             }}
