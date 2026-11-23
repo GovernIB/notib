@@ -84,7 +84,7 @@ const useDataGridColumns = (datagridApiRef: any,
                     return (
                         <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                             {badge}
-                            {descripcio}
+                            {typeof descripcio === 'string' ? descripcio : null}
                         </span>
                     );
                 },
