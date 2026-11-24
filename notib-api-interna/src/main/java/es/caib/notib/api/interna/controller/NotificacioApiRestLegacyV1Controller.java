@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.api.interna.controller;
 
@@ -10,11 +10,13 @@ import es.caib.notib.client.domini.RespostaConsultaDadesRegistre;
 import es.caib.notib.client.domini.RespostaConsultaEstatEnviament;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacio;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
+import es.caib.notib.logic.intf.dto.AplicacioVersio;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +29,7 @@ import java.util.Date;
 
 /**
  * Controlador del servei REST v1 per a la gestio de notificacions.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Deprecated
@@ -41,6 +43,9 @@ public class NotificacioApiRestLegacyV1Controller extends NotificacioApiRestBase
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping(value = "/alta", produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaAlta alta(@Parameter(description = "Objecte amb les dades necessàries per a generar una notificació", required = true) @RequestBody Notificacio notificacio) {
+
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.LegacyV2);
 		try {
 			return notificacioServiceWs.alta(notificacio);
 		} catch (Exception e) {
@@ -51,6 +56,8 @@ public class NotificacioApiRestLegacyV1Controller extends NotificacioApiRestBase
 	@GetMapping(value = {"/consultaEstatNotificacio/**"}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(HttpServletRequest request) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.LegacyV2);
 		var identificador = extractIdentificador(request);
 		try {
 			if (!identificador.isEmpty()) {
@@ -66,6 +73,8 @@ public class NotificacioApiRestLegacyV1Controller extends NotificacioApiRestBase
 	@GetMapping(value = {"/consultaEstatEnviament/**"}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaConsultaEstatEnviament consultaEstatEnviament(HttpServletRequest request) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.LegacyV2);
 		var referencia = extractIdentificador(request);
 		try {
 			if (!referencia.isEmpty()) {
@@ -79,9 +88,10 @@ public class NotificacioApiRestLegacyV1Controller extends NotificacioApiRestBase
 	}
 
 	@PostMapping(value = {"/consultaDadesRegistre"}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public RespostaConsultaDadesRegistre consultaDadesRegistre(@Parameter(description = "Objecte amb les dades necessàries per consultar les dades de registre d'una notificació o enviament")
-			@RequestBody DadesConsulta dadesConsulta) {
+	public RespostaConsultaDadesRegistre consultaDadesRegistre(@Parameter(description = "Objecte amb les dades necessàries per consultar les dades de registre d'una notificació o enviament") @RequestBody DadesConsulta dadesConsulta) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.LegacyV2);
 		try {
 			return notificacioServiceWs.consultaDadesRegistre(dadesConsulta);
 		} catch (Exception e) {
@@ -91,6 +101,9 @@ public class NotificacioApiRestLegacyV1Controller extends NotificacioApiRestBase
 
 	@GetMapping(value = {"/consultaJustificantNotificacio/**"}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaConsultaJustificantEnviament consultaJustificantV1(HttpServletRequest request) {
+
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.LegacyV2);
 		return consultaJustificant(request);
 	}
 
@@ -99,6 +112,8 @@ public class NotificacioApiRestLegacyV1Controller extends NotificacioApiRestBase
 	public String donarPermisConsultaV1(@Parameter(description = "Objecte amb les dades necessàries per donar el permís", required = true)
 										@RequestBody PermisConsulta permisConsulta) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.LegacyV2);
 		return donarPermisConsulta(permisConsulta);
 	}
 }

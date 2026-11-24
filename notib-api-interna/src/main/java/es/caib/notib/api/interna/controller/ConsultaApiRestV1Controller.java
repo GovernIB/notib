@@ -2,9 +2,11 @@ package es.caib.notib.api.interna.controller;
 
 import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.logic.intf.dto.ApiConsulta;
+import es.caib.notib.logic.intf.dto.AplicacioVersio;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.client.domini.consulta.Arxiu;
 import es.caib.notib.logic.intf.rest.consulta.Resposta;
+import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -21,6 +23,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,8 +46,11 @@ public class ConsultaApiRestV1Controller {
 	private EnviamentService enviamentService;
 	@Autowired
 	private NotificacioService notificacioService;
+	@Autowired
+	protected AplicacioService aplicacioService;
+
 	private static final String PATH = "/consulta/v1";
-	
+
 	@GetMapping(value="/comunicacions/{dniTitular}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(summary = "Consulta totes les comunicacions d'un titular donat el seu dni", description = "Retorna informació de totes les comunicacions d'un titular, i el seu estat")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Notificacions/Comunicacions per titular", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema( implementation = Resposta.class, description = "Informació de comunicacions/notificacions"))})})
@@ -60,14 +66,16 @@ public class ConsultaApiRestV1Controller {
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@Parameter(name = "mida", description = "Mida de la pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "mida", required = false) Integer mida) {
-		
+
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v1);
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.COMUNICACIO).estatFinal(null)
 						.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
 		return enviamentService.findEnviaments(consulta);
 	}
-	
+
 	@GetMapping(value="/notificacions/{dniTitular}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(summary = "Consulta totes les notificacions d'un titular donat el seu dni", description = "Retorna informació de totes les notificacions d'un titular, i el seu estat")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Notificacions/Comunicacions per titular", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema( implementation = Resposta.class, description = "Informació de comunicacions/notificacions"))})})
@@ -84,6 +92,8 @@ public class ConsultaApiRestV1Controller {
 			@Parameter(name = "mida", description = "Mida de la pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v1);
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(null)
@@ -111,6 +121,8 @@ public class ConsultaApiRestV1Controller {
 			@Parameter(name = "mida", description = "Mida de la pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v1);
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.COMUNICACIO).estatFinal(false)
@@ -138,6 +150,8 @@ public class ConsultaApiRestV1Controller {
 			@Parameter(name = "mida", description = "Mida de la pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v1);
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(false)
@@ -165,6 +179,8 @@ public class ConsultaApiRestV1Controller {
 			@Parameter(name = "mida", description = "Mida de la pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v1);
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.COMUNICACIO).estatFinal(true)
@@ -192,6 +208,8 @@ public class ConsultaApiRestV1Controller {
 			@Parameter(name = "mida", description = "Mida de la pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v1);
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(true)
@@ -208,6 +226,8 @@ public class ConsultaApiRestV1Controller {
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Notificacions/Comunicacions per titular", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema( implementation = Arxiu.class, description = "Informació de comunicacions/notificacions"))})})
 	public ResponseEntity<Arxiu> getDocument(HttpServletRequest request, @Parameter(description = "Identificador de la notificació de la que es vol obtenir el document", required = true) @PathVariable Long notificacioId) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v1);
 		Arxiu document;
 		ArxiuDto arxiu = null;
 		var status = HttpStatus.OK;
@@ -235,6 +255,8 @@ public class ConsultaApiRestV1Controller {
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Notificacions/Comunicacions per titular", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema( implementation = Arxiu.class, description = "Informació de comunicacions/notificacions"))})})
 	public ResponseEntity<Arxiu> getCertificacio(HttpServletRequest request, @Parameter(description = "Identificador de l'enviament de la que es vol obtenir la certificació", required = true) @PathVariable Long enviamentId) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v1);
 		Arxiu certificacio;
 		ArxiuDto arxiu = null;
 		var status = HttpStatus.OK;
@@ -258,6 +280,8 @@ public class ConsultaApiRestV1Controller {
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Notificacions/Comunicacions per titular", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema( implementation = Arxiu.class, description = "Informació de comunicacions/notificacions"))})})
 	public ResponseEntity<Arxiu> getJustificant(HttpServletRequest request, @Parameter(description = "Identificador de l'enviament de la que es vol obtenir el justificant", required = true) @PathVariable Long enviamentId) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v1);
 		Arxiu justificant;
 		byte[] contingutJustificant = null;
 		var status = HttpStatus.OK;

@@ -4,6 +4,7 @@
 package es.caib.notib.persist.entity;
 
 import es.caib.notib.logic.intf.dto.AplicacioDto;
+import es.caib.notib.logic.intf.dto.AplicacioVersio;
 import es.caib.notib.persist.audit.NotibAuditable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,6 +24,7 @@ import java.time.LocalTime;
  */
 @Builder
 @Getter
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -52,6 +54,9 @@ public class AplicacioEntity extends NotibAuditable<Long> {
     private Integer maxEnviamentsDiaLaboral;
 	@Column(name = "max_env_dia_no_laboral", nullable = false)
     private Integer maxEnviamentsDiaNoLaboral;
+	@Column(name = "darrera_versio_api")
+	@Enumerated(EnumType.STRING)
+	private AplicacioVersio darreraVersioApi;
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "entitat_id", nullable = false)
@@ -73,6 +78,10 @@ public class AplicacioEntity extends NotibAuditable<Long> {
 
 	public void updateActiva(boolean activa) {
 		this.activa = activa;
+	}
+
+	public void updateDarreraVersio(AplicacioVersio versio) {
+		darreraVersioApi = versio;
 	}
 
 	public static Builder getBuilder(EntitatEntity entitat, String codi, String urlCallback) {

@@ -18,6 +18,7 @@ import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.ExcepcioLogHelper;
 import es.caib.notib.logic.helper.MessageHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
+import es.caib.notib.logic.intf.dto.AplicacioVersio;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.ExcepcioLogDto;
 import es.caib.notib.logic.intf.dto.ProcessosInicialsEnum;
@@ -27,6 +28,7 @@ import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.objectes.LoggingTipus;
 import es.caib.notib.logic.utils.NotibLogger;
 import es.caib.notib.persist.entity.UsuariEntity;
+import es.caib.notib.persist.repository.AplicacioRepository;
 import es.caib.notib.persist.repository.ProcessosInicialsRepository;
 import es.caib.notib.persist.repository.UsuariRepository;
 import es.caib.notib.persist.repository.acl.AclSidRepository;
@@ -77,6 +79,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	@Autowired
 	private UsuariRepository usuariRepository;
+	@Autowired
+	private AplicacioRepository aplicacioRepository;
 	@Autowired
 	private AclSidRepository aclSidRepository;
 	@Autowired
@@ -661,6 +665,22 @@ public class AplicacioServiceImpl implements AplicacioService {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(metricsList);
     }
+
+	@Transactional
+	@Override
+	public void updateVersioApi(String usuariCodi, AplicacioVersio versio) {
+
+		if (Strings.isNullOrEmpty(usuariCodi)) {
+			log.error("No s'ha actualitzat la versio de l'API, el codi de l'usuari es null. Versio: " + versio);
+		}
+		try {
+			var aplicacio = aplicacioRepository.findByUsuariCodi(usuariCodi);
+			aplicacio.updateDarreraVersio(versio);
+		} catch (Exception ex) {
+			log.error("Error actualitzant la versio de l'API emprada per l'aplicacio client: " + usuariCodi + " versio: " + versio, ex);
+		}
+
+	}
 
 	private String formatEvent(RecordedEvent event) {
 

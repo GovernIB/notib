@@ -95,6 +95,7 @@
 						{{if headerCsrf}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
+				<th data-col-name="darreraVersioApi"><spring:message code="aplicacio.list.columna.darrera.versio.api"/></th>
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">

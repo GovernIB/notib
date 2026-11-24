@@ -9,6 +9,7 @@ import es.caib.notib.logic.intf.base.model.ResourceArtifactType;
 import es.caib.notib.logic.intf.base.model.ResourceReference;
 import es.caib.notib.logic.intf.base.permission.PermissionEnum;
 import es.caib.notib.logic.intf.base.validation.CustomValidation;
+import es.caib.notib.logic.intf.dto.AplicacioVersio;
 import es.caib.notib.logic.intf.model.validator.entitat.CodiAplicacioNoRepetit;
 import es.caib.notib.logic.intf.model.validator.entitat.CodiDir3EntitatNoRepetit;
 import es.caib.notib.logic.intf.model.validator.entitat.CodiEntitatNoRepetit;
@@ -84,6 +85,7 @@ public class AplicacioResource extends BaseResource<Long> {
 	@NotNull
 	private Integer maxEnviamentsDiaNoLaboral;
 	private boolean aplicarLimitEnviaments;
+	private AplicacioVersio darreraVersioApi;
 
 	@NotNull
 	private ResourceReference<EntitatResource, Long> entitat;

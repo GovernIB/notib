@@ -15,7 +15,8 @@ import {
 import GridFormField from '../../components/GridFormField';
 import { Box, Icon, IconButton } from '@mui/material';
 import GridToolbarButton from '../../components/GridToolbarButton';
-import {ROLE_ADMIN_LECTURA, useNotibContext} from "../../components/NotibContext.ts";
+import {ROLE_ADMIN_LECTURA, useNotibContext} from "../../components/NotibContext.ts";
+
 import { icons } from '../../utils/icons';
 
 const columns: MuiDataGridColDef[] = [
@@ -34,6 +35,23 @@ const columns: MuiDataGridColDef[] = [
         sortable: false,
         flex: 1,
         type: 'boolean',
+    },
+    {
+        field: 'aplicarLimitEnviaments',
+        sortable: false,
+        flex: 1,
+        type: 'boolean',
+    },
+    {
+        field: 'headerCsrf',
+        sortable: false,
+        flex: 1,
+        type: 'boolean',
+    },
+    {
+        field: 'darreraVersioApi',
+        sortable: false,
+        flex: 1,
     },
 ];
 

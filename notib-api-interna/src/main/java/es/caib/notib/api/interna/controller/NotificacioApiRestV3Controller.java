@@ -13,8 +13,10 @@ import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
+import es.caib.notib.logic.intf.dto.AplicacioVersio;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioV3;
+import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,21 +49,22 @@ public class NotificacioApiRestV3Controller extends NotificacioApiRestBaseContro
 
 	@Autowired
 	private EnviamentSmService enviamentSmService;
+	@Autowired
+	private AplicacioService aplicacioService;
 
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping(value = "/alta", produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaAltaV2 alta(@RequestBody NotificacioV3 notificacio) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v3);
 		try {
 			var not = new Notificacio(notificacio);
 			var resposta = notificacioServiceWs.altaV2(not);
 //			resposta.getReferenciesAsV1().forEach(r -> enviamentSmService.altaEnviament(r.getReferencia()));
 			return resposta;
 		} catch (Exception e) {
-			var auth = SecurityContextHolder.getContext().getAuthentication();
-			if (auth == null) {
-				return RespostaAltaV2.builder().error(true).errorDescripcio(getErrorDescripcio(e)).errorData(new Date()).build();
-			}
+
 			var usr = auth.getName();
 			var rols = auth.getAuthorities();
 			log.error("Error donant d'alta la notificació usuari: " + usr + " rols : " + rols, e);
@@ -72,7 +75,8 @@ public class NotificacioApiRestV3Controller extends NotificacioApiRestBaseContro
 	@GetMapping(value = {"/consultaEstatNotificacio/{identificador}"}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaConsultaEstatNotificacioV2 consultaEstatNotificacio(HttpServletRequest request, @PathVariable("identificador") String identificador) {
 
-//		var identificador = extractIdentificador(request);
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v3);
 		try {
 			if (!identificador.isEmpty()) {
 				return notificacioServiceWs.consultaEstatNotificacioV2(identificador);
@@ -87,7 +91,8 @@ public class NotificacioApiRestV3Controller extends NotificacioApiRestBaseContro
 	@GetMapping(value = {"/consultaEstatEnviament/{referencia}"}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaConsultaEstatEnviamentV2 consultaEstatEnviament(HttpServletRequest request, @PathVariable("referencia") String referencia) throws UnsupportedEncodingException {
 
-//		var referencia = extractIdentificador(request);
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v3);
 		try {
 			if (!referencia.isEmpty()) {
 				return notificacioServiceWs.consultaEstatEnviamentV2(referencia);
@@ -102,6 +107,8 @@ public class NotificacioApiRestV3Controller extends NotificacioApiRestBaseContro
 	@PostMapping(value = {"/consultaDadesRegistre"}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaConsultaDadesRegistreV2 consultaDadesRegistre(@RequestBody DadesConsulta dadesConsulta) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v3);
 		try {
 			return notificacioServiceWs.consultaDadesRegistreV2(dadesConsulta);
 		} catch (Exception e) {
@@ -112,6 +119,8 @@ public class NotificacioApiRestV3Controller extends NotificacioApiRestBaseContro
 	@GetMapping(value = {"/consultaJustificantNotificacio/{referencia}"}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaConsultaJustificantEnviament consultaJustificantV2(HttpServletRequest request, @PathVariable("referencia") String referencia) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v3);
 		var resposta = consultaJustificant(request);
 		var contingut = resposta.getJustificant().getContingut();
 		resposta.getJustificant().setContingut(org.apache.commons.codec.binary.Base64.encodeBase64(contingut));
@@ -120,6 +129,9 @@ public class NotificacioApiRestV3Controller extends NotificacioApiRestBaseContro
 
 	@GetMapping(value = {"/consultaJustificantNotificacioRaw/{referencia}"}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaConsultaJustificantEnviament consultaJustificantV2Raw(HttpServletRequest request, @PathVariable("referencia") String referencia) {
+
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v3);
 		return consultaJustificant(request);
 	}
 
@@ -128,6 +140,8 @@ public class NotificacioApiRestV3Controller extends NotificacioApiRestBaseContro
 	@PostMapping(value = "/permisConsulta", produces = MediaType.APPLICATION_JSON_VALUE)
 	public String donarPermisConsultaV2(@RequestBody PermisConsulta permisConsulta) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v3);
 		return donarPermisConsulta(permisConsulta);
 	}
 
@@ -135,6 +149,8 @@ public class NotificacioApiRestV3Controller extends NotificacioApiRestBaseContro
 	@ResponseBody
 	public RespuestaAmpliarPlazoOE ampliarPlazo(@RequestBody AmpliarPlazoOE ampliarPlazo, HttpServletRequest request, HttpServletResponse response) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v3);
 		var resposta = notificacioServiceWs.ampliarPlazo(ampliarPlazo);
 		return resposta;
 	}

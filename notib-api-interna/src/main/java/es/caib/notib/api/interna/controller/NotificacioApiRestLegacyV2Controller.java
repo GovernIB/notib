@@ -10,6 +10,7 @@ import es.caib.notib.client.domini.RespostaConsultaDadesRegistreV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
+import es.caib.notib.logic.intf.dto.AplicacioVersio;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -47,15 +48,14 @@ public class NotificacioApiRestLegacyV2Controller extends NotificacioApiRestBase
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping(value = "/alta", produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaAltaV2 alta(@RequestBody Notificacio notificacio) {
+
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.LegacyV22);
 		try {
 			var resposta = notificacioServiceWs.altaV2(notificacio);
 //			resposta.getReferenciesAsV1().forEach(r -> enviamentSmService.altaEnviament(r.getReferencia()));
 			return resposta;
 		} catch (Exception e) {
-			var auth = SecurityContextHolder.getContext().getAuthentication();
-			if (auth == null) {
-				return RespostaAltaV2.builder().error(true).errorDescripcio(getErrorDescripcio(e)).errorData(new Date()).build();
-			}
 			var usr = auth.getName();
 			var rols = auth.getAuthorities();
 			log.error("Error donant d'alta la notificació usuari: " + usr + " rols : " + rols, e);
@@ -66,6 +66,8 @@ public class NotificacioApiRestLegacyV2Controller extends NotificacioApiRestBase
 	@GetMapping(value = {"/consultaEstatNotificacio/**"}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaConsultaEstatNotificacioV2 consultaEstatNotificacio(HttpServletRequest request) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.LegacyV22);
 		var identificador = extractIdentificador(request);
 		try {
 			if (!identificador.isEmpty()) {
@@ -81,6 +83,8 @@ public class NotificacioApiRestLegacyV2Controller extends NotificacioApiRestBase
 	@GetMapping(value = {"/consultaEstatEnviament/**"}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaConsultaEstatEnviamentV2 consultaEstatEnviament(HttpServletRequest request) throws UnsupportedEncodingException {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.LegacyV22);
 		var referencia = extractIdentificador(request);
 		try {
 			if (!referencia.isEmpty()) {
@@ -96,6 +100,8 @@ public class NotificacioApiRestLegacyV2Controller extends NotificacioApiRestBase
 	@PostMapping(value = {"/consultaDadesRegistre"}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaConsultaDadesRegistreV2 consultaDadesRegistre(@RequestBody DadesConsulta dadesConsulta) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.LegacyV22);
 		try {
 			return notificacioServiceWs.consultaDadesRegistreV2(dadesConsulta);
 		} catch (Exception e) {
@@ -105,6 +111,9 @@ public class NotificacioApiRestLegacyV2Controller extends NotificacioApiRestBase
 
 	@GetMapping(value = {"/consultaJustificantNotificacio/**"}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaConsultaJustificantEnviament consultaJustificantV2(HttpServletRequest request) {
+
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.LegacyV22);
 		return consultaJustificant(request);
 	}
 

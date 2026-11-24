@@ -1,6 +1,7 @@
 package es.caib.notib.persist.resourceentity;
 
 import es.caib.notib.logic.intf.base.config.BaseConfig;
+import es.caib.notib.logic.intf.dto.AplicacioVersio;
 import es.caib.notib.logic.intf.model.AplicacioResource;
 import lombok.Builder;
 import lombok.Getter;
@@ -44,6 +45,9 @@ public class AplicacioResourceEntity extends BaseAuditableResourceEntity<Aplicac
 	private Integer maxEnviamentsDiaNoLaboral;
 	@Column(name = "aplicar_limit_env", nullable = false)
 	private boolean aplicarLimitEnviaments = true;
+	@Column(name = "darrera_versio_api")
+	@Enumerated(EnumType.STRING)
+	private AplicacioVersio darreraVersioApi;
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(

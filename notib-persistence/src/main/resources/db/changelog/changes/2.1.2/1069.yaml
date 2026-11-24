@@ -4,12 +4,12 @@ databaseChangeLog:
             author: limit
             changes:
                 -   addColumn:
-                    tableName: ${db_prefix}_user
-                    columns:
-                        -   column:
-                                name: darrer_periode
-                                type: timestamp
-                        -   column:
-                                name: darrer_periode
-                                type: darrera_activitat
+                        tableName: ${db_prefix}_user
+                        columns:
+                            -   column:
+                                    name: darrer_periode
+                                    type: timestamp
+                            -   column:
+                                    name: darrer_periode
+                                    type: darrera_activitat
 

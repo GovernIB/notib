@@ -1,8 +1,9 @@
 /**
- * 
+ *
  */
 package es.caib.notib.ejb;
 
+import es.caib.notib.logic.intf.dto.AplicacioVersio;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.ExcepcioLogDto;
 import es.caib.notib.logic.intf.dto.ProcessosInicialsEnum;
@@ -17,7 +18,7 @@ import java.util.List;
 /**
  * Implementació de AplicacioService com a EJB que empra una clase
  * delegada per accedir a la funcionalitat del servei.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Primary
@@ -261,4 +262,10 @@ public class AplicacioService extends AbstractService<es.caib.notib.logic.intf.s
     public String getMetriques() throws Exception {
         return getDelegateService().getMetriques();
     }
+
+	@Override
+    @PermitAll
+	public void updateVersioApi(String usuariCodi, AplicacioVersio versio) {
+		getDelegateService().updateVersioApi(usuariCodi, versio);
+	}
 }

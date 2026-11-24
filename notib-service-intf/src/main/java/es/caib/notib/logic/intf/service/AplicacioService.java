@@ -1,8 +1,9 @@
 /**
- * 
+ *
  */
 package es.caib.notib.logic.intf.service;
 
+import es.caib.notib.logic.intf.dto.AplicacioVersio;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.ExcepcioLogDto;
 import es.caib.notib.logic.intf.dto.ProcessosInicialsEnum;
@@ -14,7 +15,7 @@ import java.util.List;
 
 /**
  * Declaració dels mètodes comuns de l'aplicació.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface AplicacioService {
@@ -55,13 +56,13 @@ public interface AplicacioService {
 	 */
 	@PreAuthorize("isAuthenticated()")
 	List<String> findRolsUsuariAmbCodi(String usuariCodi);
-	
+
 	@PreAuthorize("isAuthenticated()")
 	List<String> findRolsUsuariActual();
 
 	@PreAuthorize("isAuthenticated()")
     boolean usuariHasRol(String codi, String rol);
-	
+
 	/**
 	 * Consulta els usuaris donat un text.
 	 * @param text Text per a fer la consulta.
@@ -112,7 +113,7 @@ public interface AplicacioService {
 	 */
 	@PreAuthorize("isAuthenticated()")
 	String propertyGet(String property);
-	
+
 	/**
 	 * Retorna el valor d'un paràmetre de configuració de l'aplicació.
 	 * @param property El codi del paràmetre
@@ -154,12 +155,12 @@ public interface AplicacioService {
 
 	/**
 	 * Modifica la configuració de l'usuari actual
-	 * 
+	 *
 	 * @return L'usuari actual.
 	 */
 	@PreAuthorize("isAuthenticated()")
 	UsuariDto updateUsuariActual(UsuariDto asDto);
-	
+
 	@PreAuthorize("isAuthenticated()")
 	void updateRolUsuariActual(String rol);
 
@@ -168,10 +169,10 @@ public interface AplicacioService {
 
 	@PreAuthorize("isAuthenticated()")
     String getBaseUrl();
-	
+
 	/**
 	 * Recupera les mètriques de l'aplicació.
-	 * 
+	 *
 	 * @return El registre de les mètriques.
 	 */
 	String getMetrics();
@@ -215,4 +216,7 @@ public interface AplicacioService {
 	boolean isRecording();
 
     String getMetriques() throws Exception;
+
+	@PreAuthorize("isAuthenticated()")
+	void updateVersioApi(String usuariCodi, AplicacioVersio versio);
 }

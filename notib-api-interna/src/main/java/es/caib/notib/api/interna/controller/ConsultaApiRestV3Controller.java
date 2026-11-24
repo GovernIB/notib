@@ -9,6 +9,7 @@ import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.consulta.Arxiu;
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import es.caib.notib.logic.intf.dto.ApiConsulta;
+import es.caib.notib.logic.intf.dto.AplicacioVersio;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.NotificacioService;
@@ -19,6 +20,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -56,6 +58,8 @@ public class ConsultaApiRestV3Controller extends NotificacioApiRestBaseControlle
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v3);
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).estatFinal(null).basePath(basePath)
@@ -76,6 +80,8 @@ public class ConsultaApiRestV3Controller extends NotificacioApiRestBaseControlle
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v3);
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.COMUNICACIO).estatFinal(null).basePath(basePath)
@@ -95,6 +101,8 @@ public class ConsultaApiRestV3Controller extends NotificacioApiRestBaseControlle
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v3);
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(null).basePath(basePath)
@@ -118,6 +126,8 @@ public class ConsultaApiRestV3Controller extends NotificacioApiRestBaseControlle
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v3);
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).estatFinal(false).basePath(basePath)
@@ -141,6 +151,8 @@ public class ConsultaApiRestV3Controller extends NotificacioApiRestBaseControlle
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v3);
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.COMUNICACIO).estatFinal(false).basePath(basePath)
@@ -164,6 +176,8 @@ public class ConsultaApiRestV3Controller extends NotificacioApiRestBaseControlle
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v3);
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(false).basePath(basePath)
@@ -187,6 +201,8 @@ public class ConsultaApiRestV3Controller extends NotificacioApiRestBaseControlle
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v3);
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.COMUNICACIO).estatFinal(true).basePath(basePath)
@@ -210,6 +226,8 @@ public class ConsultaApiRestV3Controller extends NotificacioApiRestBaseControlle
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v3);
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.COMUNICACIO).estatFinal(true).basePath(basePath)
@@ -233,6 +251,8 @@ public class ConsultaApiRestV3Controller extends NotificacioApiRestBaseControlle
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v3);
 		var location = ServletUriComponentsBuilder.fromServletMapping(request).path(PATH).buildAndExpand().toUri();
 		var basePath = location.toString();
 		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(EnviamentTipus.NOTIFICACIO).estatFinal(true).basePath(basePath)
@@ -248,6 +268,8 @@ public class ConsultaApiRestV3Controller extends NotificacioApiRestBaseControlle
 	@GetMapping(value="/document/{notificacioId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Arxiu> getDocument(HttpServletRequest request, @PathVariable Long notificacioId) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v3);
 		Arxiu document;
 		ArxiuDto arxiu = null;
 		var status = HttpStatus.OK;
@@ -273,6 +295,8 @@ public class ConsultaApiRestV3Controller extends NotificacioApiRestBaseControlle
 	@GetMapping(value="/certificacio/{enviamentId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Arxiu> getCertificacio(HttpServletRequest request, @PathVariable Long enviamentId) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v3);
 		Arxiu certificacio;
 		ArxiuDto arxiu = null;
 		var status = HttpStatus.OK;
@@ -294,6 +318,8 @@ public class ConsultaApiRestV3Controller extends NotificacioApiRestBaseControlle
 	@GetMapping(value="/justificant/{enviamentId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Arxiu> getJustificant(HttpServletRequest request, @PathVariable Long enviamentId) {
 
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v3);
 		Arxiu justificant = null;
 		byte[] contingutJustificant = null;
 		var status = HttpStatus.OK;
