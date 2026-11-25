@@ -269,6 +269,13 @@ export const NotibAuthProvider: React.FC<NotibAuthProviderProps> = ({ apiUrl, ch
             // real perquè el navegador hi enviï les seves galetes i es tanqui la sessió SSO (veure
             // el comentari equivalent a ContainerAuthProvider de base-react).
             signOut: () => {
+                // Netejar els filtres persistits perquè no es recuperin en tornar a iniciar sessió
+                Object.keys(localStorage).forEach(key => {
+                    if (key.includes('_FLT_')) localStorage.removeItem(key);
+                });
+                Object.keys(sessionStorage).forEach(key => {
+                    if (key.includes('_FLT_')) sessionStorage.removeItem(key);
+                });
                 window.location.href = backendBaseUrl + '/logout';
             },
         };
@@ -280,6 +287,13 @@ export const NotibAuthProvider: React.FC<NotibAuthProviderProps> = ({ apiUrl, ch
     if (estat === 'autenticat') {
         contingut = children;
     } else if (estat === 'caducada') {
+        // Netejar els filtres persistits quan la sessió caduca
+        Object.keys(localStorage).forEach(key => {
+            if (key.includes('_FLT_')) localStorage.removeItem(key);
+        });
+        Object.keys(sessionStorage).forEach(key => {
+            if (key.includes('_FLT_')) sessionStorage.removeItem(key);
+        });
         contingut = <PantallaSessio missatge={t('app.sessio.caducada')} accio={t('app.sessio.iniciar')} onAccio={iniciarSessio} />;
     } else if (estat === 'error') {
         contingut = <PantallaSessio missatge={t('app.sessio.error')} accio={t('app.sessio.tornarAProvar')} onAccio={tornarAProvar} />;
