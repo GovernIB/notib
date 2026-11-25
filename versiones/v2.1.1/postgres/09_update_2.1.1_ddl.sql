@@ -20,5 +20,6 @@ CREATE TABLE not_excepcio_log (
     CONSTRAINT not_excepcio_log_pk PRIMARY KEY (id)
 );
 CREATE INDEX not_excepcio_log_sign_idx ON not_excepcio_log (signatura, data_darrera);
+GRANT SELECT, UPDATE, INSERT, DELETE ON NOT_EXCEPCIO_LOG TO WWW_NOTIB;
 ALTER TABLE not_mon_int ADD COLUMN excepcio_id BIGINT;
 ALTER TABLE not_mon_int ADD CONSTRAINT not_mon_int_excepcio_fk FOREIGN KEY (excepcio_id) REFERENCES not_excepcio_log (id);

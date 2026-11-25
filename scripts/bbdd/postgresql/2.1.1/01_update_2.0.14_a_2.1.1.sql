@@ -259,6 +259,8 @@ CREATE TABLE not_excepcio_log (
 
 CREATE INDEX not_excepcio_log_sign_idx ON not_excepcio_log (signatura, data_darrera);
 
+GRANT SELECT, UPDATE, INSERT, DELETE ON NOT_EXCEPCIO_LOG TO WWW_NOTIB;
+
 -- Changeset db/changelog/changes/2_1_1_000.yaml::2_1_1_000-60::limit
 ALTER TABLE not_mon_int ADD COLUMN excepcio_id BIGINT;
 
