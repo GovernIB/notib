@@ -29,6 +29,7 @@ import PageTitle from "../../components/PageTitle.tsx";
 import ScreenFrame from '../../components/ScreenFrame';
 import { icons } from '../../utils/icons';
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
+import dayjs from "dayjs";
 
 const columns = [
     {
@@ -285,6 +286,8 @@ const EnviamentGrid = () => {
             initialData: {
                 referenciaEnviament: referencia,
                 advanced: !!referencia || isRoleOrgan,
+                dataEnviamentInici: dayjs().subtract(3, 'month').format('YYYY-MM-DD'),
+                dataEnviamentFi: dayjs().format('YYYY-MM-DD'),
             },
         }
     );

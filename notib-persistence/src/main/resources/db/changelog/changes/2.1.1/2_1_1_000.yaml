@@ -1318,7 +1318,8 @@ databaseChangeLog:
                                     name: data_darrera
                                     type: TIMESTAMP(6)
                 - sql:
-                      "CREATE INDEX NOT_EXCEPCIO_LOG_SIGN_IDX ON NOT_EXCEPCIO_LOG (SIGNATURA, DATA_DARRERA);"
+                      "CREATE INDEX NOT_EXCEPCIO_LOG_SIGN_IDX ON NOT_EXCEPCIO_LOG (SIGNATURA, DATA_DARRERA);
+                      GRANT SELECT, UPDATE, INSERT, DELETE ON NOT_EXCEPCIO_LOG TO WWW_NOTIB;"
     -   changeSet:
             id: 2_1_1_000-60
             author: limit
