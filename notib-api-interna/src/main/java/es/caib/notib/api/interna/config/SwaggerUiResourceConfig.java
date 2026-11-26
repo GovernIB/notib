@@ -29,7 +29,7 @@ public class SwaggerUiResourceConfig implements WebMvcConfigurer {
                         path.lastIndexOf("/index.html"));
             }
         } catch (Exception e) {
-            log.error("[SwaggerUiResourceConfig] Error resolguent la versió del swagger", ex);
+            log.error("[SwaggerUiResourceConfig] Error resolguent la versió del swagger", e);
         }
         SWAGGER_UI_VERSION = version;
     }
