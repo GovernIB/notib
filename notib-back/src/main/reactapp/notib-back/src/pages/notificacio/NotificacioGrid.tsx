@@ -50,11 +50,11 @@ const useDataGridColumns = (datagridApiRef: any,
             },
             {
                 field: 'createdDate',
-                width: 155,
+                width: 120,
             }]),
             {
                 field: 'enviadaDate',
-                width: 155,
+                width: 120,
             },
             ...(noEsTaulaRemeses ? [] : [{
                 field: 'registreNums',
@@ -68,7 +68,7 @@ const useDataGridColumns = (datagridApiRef: any,
             {
                 field: 'procediment',
                 flex: 1,
-                width: 180,
+                width: 210,
                 renderCell: (params: any) => {
                     const row = params?.row ?? {};
                     const value = params?.value ?? {};
@@ -100,7 +100,7 @@ const useDataGridColumns = (datagridApiRef: any,
             },
             ...(notificacioErrorRegistre ? [] : [{
                 flex: 1,
-                field: 'createdBy',
+                field: 'createdByNom',
             },
                 ...(notificacioCallbackError ? [] : [{
                     field: 'titular',

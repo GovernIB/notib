@@ -101,10 +101,13 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -230,6 +233,7 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 	protected void afterConversion(List<NotificacioResourceEntity> entities, List<NotificacioResource> resources) {
 
 		emplenarPermisProcessar(entities, resources);
+		emplenarCreatedByNom(entities, resources);
 		Map<Long, NotificacioResource> pendents = new LinkedHashMap<>();
 		for (int i = 0; i < entities.size(); i++) {
 			if (Boolean.TRUE.equals(entities.get(i).getPerActualitzar())) {
@@ -252,6 +256,7 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 	protected void afterConversion(NotificacioResourceEntity entity, NotificacioResource resource) {
 
 		emplenarPermisProcessar(List.of(entity), List.of(resource));
+		emplenarCreatedByNom(List.of(entity), List.of(resource));
 		if (Boolean.TRUE.equals(entity.getPerActualitzar())) {
 			actualitzarEstats(Map.of(entity.getId(), resource));
 		}
@@ -842,6 +847,29 @@ public class NotificacioResourceServiceImpl extends BaseMutableResourceService<N
 		if (!Objects.equals(caducitat, previous.getCaducitat())) {
 			target.setCaducitat(caducitat);
 		}*/
+	}
+
+	private void emplenarCreatedByNom(List<NotificacioResourceEntity> entities, List<NotificacioResource> resources) {
+
+		Set<String> codis = new LinkedHashSet<>();
+		String codi;
+		for (var entity : entities) {
+			codi = entity.getCreatedBy();
+			if (codi != null) {
+				codis.add(codi);
+			}
+		}
+		if (codis.isEmpty()) {
+			return;
+		}
+		Map<String, String> codiANom = new HashMap<>();
+		for (var usuari : usuariResourceRepository.findAllById(codis)) {
+			codiANom.put(usuari.getId(), usuari.getNomSencer() + " (" + usuari.getCodi() + ")" );
+		}
+		for (var i = 0; i < entities.size(); i++) {
+			codi = entities.get(i).getCreatedBy();
+			resources.get(i).setCreatedByNom(codi != null ? codiANom.get(codi) : null);
+		}
 	}
 
 }
