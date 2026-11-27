@@ -14,6 +14,8 @@ import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.intf.dto.AplicacioVersio;
+import es.caib.notib.logic.intf.dto.anular.Anulacio;
+import es.caib.notib.logic.intf.dto.anular.RespostaAnular;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.service.EnviamentSmService;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -64,6 +66,21 @@ public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseContro
 			var rols = auth.getAuthorities();
 			log.error("Error donant d'alta la notificació usuari: " + usr + " rols : " + rols, e);
 			return RespostaAltaV2.builder().error(true).errorDescripcio(getErrorDescripcio(e)).errorData(new Date()).build();
+		}
+	}
+
+	@PostMapping(value = "/anular", produces = MediaType.APPLICATION_JSON_VALUE)
+	public RespostaAnular anular(@RequestBody Anulacio anulacio) {
+
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v3);
+		try {
+			return notificacioServiceWs.anular(anulacio);
+		} catch (Exception e) {
+			var usr = auth.getName();
+			var rols = auth.getAuthorities();
+			log.error("Error anulant els enviaments. Usuari: " + usr + " rols : " + rols, e);
+			return RespostaAnular.builder().build();
 		}
 	}
 

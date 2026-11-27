@@ -43,6 +43,8 @@ import es.caib.notib.logic.intf.dto.PermisDto;
 import es.caib.notib.logic.intf.dto.ProgresDescarregaDto;
 import es.caib.notib.logic.intf.dto.TipusEnumDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
+import es.caib.notib.logic.intf.dto.anular.Anulacio;
+import es.caib.notib.logic.intf.dto.anular.RespostaAnular;
 import es.caib.notib.logic.intf.dto.notificacio.Enviament;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
@@ -1120,6 +1122,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		return notificaHelper.ampliarPlazoOE(ampliarPlazo);
 	}
 
+	@Override
+	public RespostaAnular anular(Anulacio anulacio) {
+		return notificaHelper.anular(anulacio);
+	}
 
 	// Donar permís de consulta sobre procediment
 	// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

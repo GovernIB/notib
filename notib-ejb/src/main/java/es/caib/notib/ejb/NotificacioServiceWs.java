@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.ejb;
 
@@ -16,6 +16,8 @@ import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
+import es.caib.notib.logic.intf.dto.anular.Anulacio;
+import es.caib.notib.logic.intf.dto.anular.RespostaAnular;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
 import org.springframework.context.annotation.Primary;
@@ -27,7 +29,7 @@ import javax.xml.bind.annotation.XmlElement;
 
 /**
  * EJB per a la publicació del servei web de gestió de notificacions.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Primary
@@ -87,7 +89,7 @@ public class NotificacioServiceWs extends AbstractService<es.caib.notib.logic.in
 //		usuariHelper.generarUsuariAutenticatEjb(sessionContext, true);
 		return getDelegateService().donarPermisConsulta(permisConsulta);
 	}
-	
+
 	@Override
 	@RolesAllowed({"NOT_APL"})
 	public RespostaConsultaDadesRegistre consultaDadesRegistre(DadesConsulta dadesConsulta) {
@@ -111,6 +113,12 @@ public class NotificacioServiceWs extends AbstractService<es.caib.notib.logic.in
 	@RolesAllowed({"NOT_APL"})
 	public RespuestaAmpliarPlazoOE ampliarPlazo(AmpliarPlazoOE ampliarPlazo) {
 		return getDelegateService().ampliarPlazo(ampliarPlazo);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_APL"})
+	public RespostaAnular anular(Anulacio anulacio) {
+		return getDelegateService().anular(anulacio);
 	}
 
 }

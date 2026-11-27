@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.ejb.ws;
 
@@ -18,6 +18,8 @@ import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.ejb.AbstractService;
 import es.caib.notib.ejb.helper.UsuariAuthHelper;
+import es.caib.notib.logic.intf.dto.anular.Anulacio;
+import es.caib.notib.logic.intf.dto.anular.RespostaAnular;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
 import org.jboss.ws.api.annotation.WebContext;
@@ -35,7 +37,7 @@ import javax.xml.bind.annotation.XmlElement;
 
 /**
  * EJB per a la publicació del servei web de gestió de notificacions.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Primary
@@ -108,7 +110,7 @@ public class NotificacioServiceWsV2 extends AbstractService<es.caib.notib.logic.
 		usuariHelper.generarUsuariAutenticatEjb(sessionContext, true);
 		return getDelegateService().donarPermisConsulta(permisConsulta);
 	}
-	
+
 	@Override
 	@WebMethod
 	public RespostaConsultaDadesRegistre consultaDadesRegistre(DadesConsulta dadesConsulta) {
@@ -132,6 +134,12 @@ public class NotificacioServiceWsV2 extends AbstractService<es.caib.notib.logic.
 	@WebMethod
 	public RespuestaAmpliarPlazoOE ampliarPlazo(AmpliarPlazoOE ampliarPlazo) {
 		return getDelegateService().ampliarPlazo(ampliarPlazo);
+	}
+
+	@Override
+	@WebMethod
+	public RespostaAnular anular(Anulacio anulacio) {
+		return getDelegateService().anular(anulacio);
 	}
 
 }

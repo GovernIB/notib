@@ -104,8 +104,28 @@ public class NotificaHelper {
 	public RespostaAnular anular(Anulacio anulacio) {
 
 		var respostaAnular = new RespostaAnular();
+		if (anulacio.getIdentificadors() == null || anulacio.getIdentificadors().isEmpty()) {
+			var respostaAnulacio = RespostaAnulacio.builder()
+				.error(true)
+				.codiResposta("Error")
+				.descripcioResposta("No s'han enviat identificadors per anular").build();
+			respostaAnular.addResposta(respostaAnulacio);
+			return respostaAnular;
+		}
 		for (var identificador : anulacio.getIdentificadors()) {
-			var enviament = enviamentRepository.findByUuid(identificador).orElseThrow();
+
+			NotificacioEnviamentEntity enviament;
+			try {
+				enviament = enviamentRepository.findByUuid(identificador).orElseThrow();
+			} catch (Exception ex) {
+				var respostaAnulacio = RespostaAnulacio.builder()
+					.identificador(identificador)
+					.error(true)
+					.codiResposta("Error")
+					.descripcioResposta("Enviament inexistent, no es pot anular").build();
+				respostaAnular.addResposta(respostaAnulacio);
+				continue;
+			}
 			if (enviament.getEntregaPostal() != null && !ciePluginHelper.cancelar(identificador)) {
 				var respostaAnulacio = RespostaAnulacio.builder()
 						.identificador(identificador)

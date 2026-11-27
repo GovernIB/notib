@@ -7,6 +7,7 @@ import es.caib.notib.api.interna.openapi.interficies.NotificacioApiRestV3Intf;
 import es.caib.notib.client.domini.DadesConsulta;
 import es.caib.notib.client.domini.PermisConsulta;
 import es.caib.notib.client.domini.RespostaAltaV2;
+import es.caib.notib.client.domini.RespostaAnulacio;
 import es.caib.notib.client.domini.RespostaConsultaDadesRegistreV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
@@ -14,6 +15,8 @@ import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
 import es.caib.notib.logic.intf.dto.AplicacioVersio;
+import es.caib.notib.logic.intf.dto.anular.Anulacio;
+import es.caib.notib.logic.intf.dto.anular.RespostaAnular;
 import es.caib.notib.logic.intf.dto.notificacio.Notificacio;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioV3;
 import es.caib.notib.logic.intf.service.AplicacioService;
@@ -69,6 +72,21 @@ public class NotificacioApiRestV3Controller extends NotificacioApiRestBaseContro
 			var rols = auth.getAuthorities();
 			log.error("Error donant d'alta la notificació usuari: " + usr + " rols : " + rols, e);
 			return RespostaAltaV2.builder().error(true).errorDescripcio(getErrorDescripcio(e)).errorData(new Date()).build();
+		}
+	}
+
+	@PostMapping(value = "/anular", produces = MediaType.APPLICATION_JSON_VALUE)
+	public RespostaAnular anular(@RequestBody Anulacio anulacio) {
+
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		aplicacioService.updateVersioApi(auth.getName(), AplicacioVersio.v3);
+		try {
+			return notificacioServiceWs.anular(anulacio);
+		} catch (Exception e) {
+			var usr = auth.getName();
+			var rols = auth.getAuthorities();
+			log.error("Error anulant els enviaments. Usuari: " + usr + " rols : " + rols, e);
+			return RespostaAnular.builder().build();
 		}
 	}
 
